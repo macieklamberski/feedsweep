@@ -252,12 +252,6 @@ describeForEachParser('jwplayerAmpEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  it('should return undefined for a media id that is a dot segment', async () => {
-    const value = '<amp-jwplayer data-media-id=".."></amp-jwplayer>'
-
-    expect(await extract(value)).toBeUndefined()
-  })
-
   it('should return undefined for an empty media id', async () => {
     const value = html`
       <amp-jwplayer data-media-id="" data-player-id="abc12345"></amp-jwplayer>
@@ -774,12 +768,6 @@ describeForEachParser('jwplayerMountEmbedResolver', (parseHtml) => {
           <div class="jw-media jw-reset"></div>
         </div>
       `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined for a mount id whose media id is a dot segment', async () => {
-      const value = '<div id="jwplayer_.._fuSXM6PS_div" class="jwplayer"></div>'
 
       expect(await extract(value)).toBeUndefined()
     })

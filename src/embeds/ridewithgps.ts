@@ -106,14 +106,7 @@ const readQueryEmbed = (parsed: URL): EmbedResolverResult | undefined => {
   }
 
   // The id comes out of the query decoded, and the page goes into a path beside the raw spelling.
-  const segment = encodePathSegment(id)
-
-  // A dot segment names no page, so the player stays without one.
-  if (!segment) {
-    return composePrivateEmbed(kind, id, src, title)
-  }
-
-  return composeEmbed(kind, shape, segment, src, title)
+  return composeEmbed(kind, shape, encodePathSegment(id), src, title)
 }
 
 // The older per-resource spelling, `ridewithgps.com/{routes|trips}/{id}/embed`, which feeds

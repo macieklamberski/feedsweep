@@ -27,8 +27,6 @@ const matterportResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const segment = encodePathSegment(id)
-
   const query = composeQuery({ m: id, ...pickQueryParams(parsed.search, navigationParams) })
 
   return {
@@ -36,9 +34,7 @@ const matterportResolveEmbed: ResolveEmbed = (url, element) => {
     id,
     src: `https://my.matterport.com/show/${query}`,
     url: `https://my.matterport.com/show/${composeQuery({ m: id })}`,
-    thumbnail: segment
-      ? `https://my.matterport.com/api/v2/player/models/${segment}/thumb/`
-      : undefined,
+    thumbnail: `https://my.matterport.com/api/v2/player/models/${encodePathSegment(id)}/thumb/`,
     ratio: '4/3',
     title: attr(element, 'title'),
   }

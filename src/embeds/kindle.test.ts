@@ -318,19 +318,6 @@ describeForEachParser('kindleEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should keep the player and drop the thumbnail for an asin that is a dot segment', async () => {
-      const value = '<iframe src="https://read.amazon.com/kp/card?asin=.."></iframe>'
-
-      const expected: EmbedResolverResult = {
-        provider: 'kindle',
-        id: 'read.amazon.com/..',
-        src: 'https://read.amazon.com/kp/card?asin=..',
-        height: 550,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should ignore the card route on a foreign host', async () => {
       const value = '<iframe src="https://evil.test/kp/card?asin=B08DGQCKF3"></iframe>'
 

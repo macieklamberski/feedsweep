@@ -52,15 +52,8 @@ const extractBlueskyPost = (uri: string): BlueskyPost | undefined => {
     return
   }
 
-  // The URI is never parsed as a url, so a dot segment, a space or a `?` in it survives.
-  const authority = encodePathSegment(match[1])
-  const rkey = encodePathSegment(match[3])
-
-  if (!authority || !rkey) {
-    return
-  }
-
-  return { authority, rkey }
+  // The URI is never parsed as a url, so a space or a `?` in it survives.
+  return { authority: encodePathSegment(match[1]), rkey: encodePathSegment(match[3]) }
 }
 
 const extractBlueskyPostFromUrl = (link: string): BlueskyPost | undefined => {

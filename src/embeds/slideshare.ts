@@ -328,11 +328,9 @@ const slideshareFlashResolveEmbed: ResolveEmbed = (url, element) => {
   const account = getQueryParam(parsed.searchParams, 'userName')
   const slug = getQueryParam(parsed.searchParams, 'stripped_title')
   // Both come out of the query decoded, and each goes into a path segment of its own.
-  const accountSegment = account ? encodePathSegment(account) : undefined
-  const slugSegment = slug ? encodePathSegment(slug) : undefined
   const composed =
-    accountSegment && slugSegment
-      ? `https://www.slideshare.net/${accountSegment}/${slugSegment}`
+    account && slug
+      ? `https://www.slideshare.net/${encodePathSegment(account)}/${encodePathSegment(slug)}`
       : undefined
   // The player names the deck itself only once the __ss_ div around it is gone.
   const isPlayer = wrapper?.localName === 'object' || wrapper?.localName === 'embed'

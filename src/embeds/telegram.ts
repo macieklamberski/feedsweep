@@ -47,16 +47,14 @@ const readPost = (value: string | undefined): EmbedResolverResult | undefined =>
 
 // The attribute holds only the `{channel}/{id}` pair, so no route word can stand in either half.
 const readDeclaredPost = (value: string | undefined): EmbedResolverResult | undefined => {
-  const [channel = '', messageId = '', ...rest] = value?.split('/') ?? []
-  // Each half comes out of the attribute decoded, and each goes into a path.
-  const channelSegment = encodePathSegment(channel)
-  const messageSegment = encodePathSegment(messageId)
+  const [channel, messageId, ...rest] = value?.split('/') ?? []
 
-  if (!channelSegment || !messageSegment || rest.length) {
+  if (!channel || !messageId || rest.length) {
     return
   }
 
-  return composePost(channelSegment, messageSegment)
+  // Each half comes out of the attribute decoded, and each goes into a path.
+  return composePost(encodePathSegment(channel), encodePathSegment(messageId))
 }
 
 // Telegram ships a post as a bare <script data-telegram-post> whose widget.js builds the iframe.

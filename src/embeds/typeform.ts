@@ -15,18 +15,12 @@ const titlePropRegex = /(?:^|,)title=([^,]+)/
 // widget, so they have to be excluded before the id is read.
 const launcherAttributes = ['data-tf-popup', 'data-tf-slider', 'data-tf-popover', 'data-tf-sidetab']
 
-const composeEmbed = (id: string, title?: string): EmbedResolverResult | undefined => {
-  const segment = encodePathSegment(id)
-
-  if (!segment) {
-    return
-  }
-
+const composeEmbed = (id: string, title?: string): EmbedResolverResult => {
   const result: EmbedResolverResult = {
     provider: 'typeform',
     id,
-    src: `https://form.typeform.com/to/${segment}`,
-    url: `https://form.typeform.com/to/${segment}`,
+    src: `https://form.typeform.com/to/${encodePathSegment(id)}`,
+    url: `https://form.typeform.com/to/${encodePathSegment(id)}`,
     height: 500,
   }
 

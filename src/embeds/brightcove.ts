@@ -67,20 +67,13 @@ const composePlayerUrl = (
   videoId: string,
   player = 'default',
   embed = 'default',
-): string | undefined => {
+): string => {
+  const query = composeQuery({ videoId })
   // Each part stays in its own segment: unescaped, `data-player="../../999999/stolen"` names
   // another account's player, and the Flash `publisherID` comes out of a query decoded.
-  const accountSegment = encodePathSegment(account)
-  const playerSegment = encodePathSegment(player)
-  const embedSegment = encodePathSegment(embed)
+  const segment = `${encodePathSegment(player)}_${encodePathSegment(embed)}`
 
-  if (!accountSegment || !playerSegment || !embedSegment) {
-    return
-  }
-
-  const query = composeQuery({ videoId })
-
-  return `https://players.brightcove.net/${accountSegment}/${playerSegment}_${embedSegment}/index.html${query}`
+  return `https://players.brightcove.net/${encodePathSegment(account)}/${segment}/index.html${query}`
 }
 
 // Brightcove's in-page embed: a bare <video-js> or video element only its loader script fills.
@@ -105,21 +98,15 @@ export const brightcoveVideoJsEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const src = composePlayerUrl(
-      account,
-      videoId,
-      attr(element, 'data-player'),
-      attr(element, 'data-embed'),
-    )
-
-    if (!src) {
-      return
-    }
-
     return {
       provider,
       id: `${account}/${videoId}`,
-      src,
+      src: composePlayerUrl(
+        account,
+        videoId,
+        attr(element, 'data-player'),
+        attr(element, 'data-embed'),
+      ),
       ratio: playerRatio,
     }
   },
@@ -148,18 +135,12 @@ export const brightcoveSkyEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const src = composePlayerUrl(account, videoId, attr(element, 'data-player-id'))
-
-    if (!src) {
-      return
-    }
-
     const poster = find(element, 'img.sdc-site-video__poster-img, img.ui-video-player-poster-image')
 
     return {
       provider,
       id: `${account}/${videoId}`,
-      src,
+      src: composePlayerUrl(account, videoId, attr(element, 'data-player-id')),
       thumbnail: attr(poster, 'src'),
       ratio: playerRatio,
       title:
@@ -199,16 +180,10 @@ const brightcoveFlashResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const src = composePlayerUrl(account, videoId)
-
-  if (!src) {
-    return
-  }
-
   return {
     provider,
     id: `${account}/${videoId}`,
-    src,
+    src: composePlayerUrl(account, videoId),
     ratio: playerRatio,
   }
 }

@@ -192,7 +192,7 @@ describeForEachParser('imgurBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should escape the percent sign of an id carrying an encoded slash', async () => {
+    it('should leave the percent sign of an id carrying an encoded slash as written', async () => {
       const value = html`
         <blockquote
           class="imgur-embed-pub"
@@ -201,10 +201,10 @@ describeForEachParser('imgurBlockquoteEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'imgur',
-        id: 'pVa2%252FrXL',
-        src: 'https://imgur.com/pVa2%252FrXL/embed',
-        url: 'https://imgur.com/pVa2%252FrXL',
-        thumbnail: 'https://i.imgur.com/pVa2%252FrXLm.jpg',
+        id: 'pVa2%2FrXL',
+        src: 'https://imgur.com/pVa2%2FrXL/embed',
+        url: 'https://imgur.com/pVa2%2FrXL',
+        thumbnail: 'https://i.imgur.com/pVa2%2FrXLm.jpg',
       }
 
       expect(await extract(value)).toEqual(expected)

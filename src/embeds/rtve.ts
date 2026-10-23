@@ -103,16 +103,12 @@ const rtveFlashResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const id = encodePathSegment(match[1])
-
-  if (!id) {
-    return
-  }
-
   // The 4.x snippet writes the asset's page link as the object's fallback, named after it.
   const title = element?.closest('object')?.querySelector(':scope > a')?.textContent?.trim()
 
-  return { ...composeEmbed(isAnyOf(match[2], 'audios') ? 'audio' : 'video', id), title }
+  const kind = isAnyOf(match[2], 'audios') ? 'audio' : 'video'
+
+  return { ...composeEmbed(kind, encodePathSegment(match[1])), title }
 }
 
 // RTVE's retired Flash player under /swf/, which names its asset as {id}_es_{audios|videos}.

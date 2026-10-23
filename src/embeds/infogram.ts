@@ -40,15 +40,10 @@ const composeInfogramEmbed = (
 
 // An attribute's chart id comes out decoded. The `_/` in front of a current id is a segment of
 // its own, and the rest goes into the path as one.
-const encodeChartId = (chartId: string): string | undefined => {
+const encodeChartId = (chartId: string): string => {
   const prefix = chartId.startsWith('_/') ? '_/' : ''
-  const segment = encodePathSegment(chartId.slice(prefix.length))
 
-  if (!segment) {
-    return
-  }
-
-  return `${prefix}${segment}`
+  return `${prefix}${encodePathSegment(chartId.slice(prefix.length))}`
 }
 
 // Infogram ships a chart as an empty div its loader fills, so stripEmptyTags deletes the div and
@@ -63,13 +58,8 @@ export const infogramWidgetEmbedResolver = createMarkupEmbedResolver(
     }
 
     const [, chartId, query = ''] = match
-    const path = encodeChartId(chartId)
 
-    if (!path) {
-      return
-    }
-
-    return composeInfogramEmbed(chartId, path, query, attr(element, 'data-title'))
+    return composeInfogramEmbed(chartId, encodeChartId(chartId), query, attr(element, 'data-title'))
   },
 )
 
@@ -88,13 +78,7 @@ export const infogramScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const path = encodeChartId(chartId)
-
-    if (!path) {
-      return
-    }
-
-    return composeInfogramEmbed(chartId, path, '', attr(element, 'title'))
+    return composeInfogramEmbed(chartId, encodeChartId(chartId), '', attr(element, 'title'))
   },
 )
 

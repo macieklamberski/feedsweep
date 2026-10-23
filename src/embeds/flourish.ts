@@ -21,10 +21,7 @@ const widgetSrcRegex = /^([^/]+)\/([^/?]+)(?:\?.*)?$/
 
 // `visualisation` and `story` are the two kinds feeds carry. The endpoint answers 403 for a wrong
 // kind, an unknown kind or a fabricated id.
-const composeEmbed = (
-  resource: string | undefined,
-  id: string | undefined,
-): EmbedResolverResult | undefined => {
+const composeEmbed = (resource: string, id: string): EmbedResolverResult | undefined => {
   if (!resource || resource === nonEmbeddableResource || !id) {
     return
   }
@@ -48,7 +45,7 @@ export const flourishWidgetEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    // The path is never parsed, so a dot segment in it survives into the player url.
+    // The src is read unparsed, and both halves go into a path.
     const result = composeEmbed(encodePathSegment(match[1]), encodePathSegment(match[2]))
     // The div usually wraps a static thumbnail img, bare or inside a <noscript>.
     const thumbnail = attr(element.querySelector('img'), 'src')

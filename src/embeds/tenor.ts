@@ -48,17 +48,16 @@ export const tenorWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.tenor-gif-embed[data-postid]',
   (element) => {
     const postId = attr(element, 'data-postid')
-    // The id comes out of its attribute decoded, and it goes into a path.
-    const segment = postId ? encodePathSegment(postId) : undefined
 
-    if (!segment) {
+    if (!postId) {
       return
     }
 
     // Tenor writes the GIF's name as the text of its own `/view/` link. The other anchor is a
     // search link, which names a query and not this GIF.
     return {
-      ...composeEmbed(segment),
+      // The id comes out of its attribute decoded, and it goes into a path.
+      ...composeEmbed(encodePathSegment(postId)),
       title: text(element, 'a[href*="tenor.com/view/" i]'),
     }
   },

@@ -1,4 +1,4 @@
-import { decodeSegment, isAnyOf, isPresent, parseUrl } from 'trousse'
+import { decodeSegment, isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -47,13 +47,7 @@ const readClaimPath = (parsed: URL): string | undefined => {
   }
 
   // Each claim was read decoded, and each goes back into the path as one segment.
-  const claimSegments = claims.map(encodePathSegment)
-
-  if (!claimSegments.every(isPresent)) {
-    return
-  }
-
-  return claimSegments.join('/')
+  return claims.map(encodePathSegment).join('/')
 }
 
 const odyseeResolveEmbed: ResolveEmbed = (url) => {

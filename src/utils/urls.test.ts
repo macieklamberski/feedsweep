@@ -256,9 +256,9 @@ describe('encodePathSegment', () => {
     expect(encodePathSegment(value)).toBe(expected)
   })
 
-  it('should escape a literal percent sign and whitespace', () => {
-    const value = '50% off\tnow'
-    const expected = '50%25%20off%09now'
+  it('should escape whitespace', () => {
+    const value = 'off\tnow later'
+    const expected = 'off%09now%20later'
 
     expect(encodePathSegment(value)).toBe(expected)
   })
@@ -276,18 +276,18 @@ describe('encodePathSegment', () => {
     expect(encodePathSegment(value)).toBe(value)
   })
 
-  it('should return undefined for a whole value of two dots', () => {
-    expect(encodePathSegment('..')).toBeUndefined()
-  })
-
-  it('should return undefined for a whole value of one dot', () => {
-    expect(encodePathSegment('.')).toBeUndefined()
-  })
-
-  it('should keep dots that are not the whole value', () => {
-    const value = '...'
+  it('should leave an already percent-encoded value as written', () => {
+    const value = 'caf%C3%A9'
 
     expect(encodePathSegment(value)).toBe(value)
+  })
+
+  it('should leave a whole value of two dots as written', () => {
+    expect(encodePathSegment('..')).toBe('..')
+  })
+
+  it('should leave a whole value of one dot as written', () => {
+    expect(encodePathSegment('.')).toBe('.')
   })
 })
 

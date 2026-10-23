@@ -235,30 +235,6 @@ describeForEachParser('amebaReblogCardEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    it('should return undefined for a stated entry id that is a dot segment', async () => {
-      const value = html`
-        <iframe
-          src="https://ameblo.jp/s/embed/reblog-card/ncbar/entry-12423195042.html"
-          data-ameba-id="ncbar"
-          data-entry-id=".."
-        ></iframe>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should return undefined for a stated blog id that is a dot segment', async () => {
-      const value = html`
-        <iframe
-          src="https://ameblo.jp/s/embed/reblog-card/ncbar/entry-12423195042.html"
-          data-ameba-id=".."
-          data-entry-id="12423195042"
-        ></iframe>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
   })
 
   describe('edge cases', () => {

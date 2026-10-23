@@ -2,7 +2,7 @@ import { getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { iframeResizerHeightRequest, readIframeResizerHeight } from '../utils/hints.js'
-import { isDotSegment, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = '123formbuilder'
@@ -44,8 +44,7 @@ export const oneTwoThreeFormBuilderScriptEmbedResolver = createMarkupEmbedResolv
     const loader = parseUrlOnHosts(attr(element, 'src'), oneTwoThreeFormBuilderHosts)
     const formId = loader?.pathname.match(loaderPathRegex)?.[1]
 
-    // `/embed/...js` leaves a `..` id, which the minted path resolves away.
-    if (!loader || !formId || isDotSegment(formId)) {
+    if (!loader || !formId) {
       return
     }
 

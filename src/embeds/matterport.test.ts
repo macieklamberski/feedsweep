@@ -108,20 +108,6 @@ describeForEachParser('matterportEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should keep the player and drop the thumbnail for a model id that is a dot segment', async () => {
-      const value = '<iframe src="https://my.matterport.com/show/?m=.."></iframe>'
-
-      const expected: EmbedResolverResult = {
-        provider: 'matterport',
-        id: '..',
-        src: 'https://my.matterport.com/show/?m=..',
-        url: 'https://my.matterport.com/show/?m=..',
-        ratio: '4/3',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should ignore a foreign host carrying the same path', async () => {
       const value = '<iframe src="https://evil.test/show/?m=BcjnMUreh6A"></iframe>'
 

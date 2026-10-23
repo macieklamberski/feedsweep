@@ -183,19 +183,6 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should keep the player and drop the url and thumbnail for an id that is a dot segment', async () => {
-      const value = '<iframe src="https://ridewithgps.com/embeds?type=route&id=.."></iframe>'
-
-      const expected: EmbedResolverResult = {
-        provider: 'ridewithgps',
-        id: 'route/..',
-        src: 'https://ridewithgps.com/embeds?type=route&id=..',
-        height: 700,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should ignore a foreign host carrying the same path', async () => {
       const value = '<iframe src="https://evil.test/embeds?type=route&id=38984773"></iframe>'
 

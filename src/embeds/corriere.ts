@@ -1,7 +1,7 @@
 import { getPathSegments, getQueryParam, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { flashVar } from '../utils/dom.js'
-import { isDotSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The regional `video.corrieredelmezzogiorno.corriere.it` keeps its own videos, which
@@ -32,8 +32,7 @@ const readFeedVideo = (value: string | undefined): EmbedResolverResult | undefin
 
   const id = getPathSegments(feed).at(-1)?.match(rssFileRegex)?.[1]
 
-  // `video_...rss` leaves a `..` id, which the minted path resolves away.
-  if (!id || isDotSegment(id)) {
+  if (!id) {
     return
   }
 

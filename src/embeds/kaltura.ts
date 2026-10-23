@@ -65,10 +65,9 @@ const composeEmbed = ({ partner, entryId, parsed }: Entry): EmbedResolverResult 
     id: `${partner}/${entryId}`,
     src: `https://${host}${parsed.pathname}${query}${playback}`,
     // The poster answers 200 `image/jpeg` for a real entry, 404 for an invented or a deleted one.
-    thumbnail:
-      hasToken || !entrySegment
-        ? undefined
-        : `https://${host}/p/${partner}/thumbnail/entry_id/${entrySegment}/width/640`,
+    thumbnail: hasToken
+      ? undefined
+      : `https://${host}/p/${partner}/thumbnail/entry_id/${entrySegment}/width/640`,
     ratio: '16/9',
   }
 }

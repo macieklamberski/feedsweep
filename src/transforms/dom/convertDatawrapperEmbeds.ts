@@ -10,7 +10,7 @@ const visWrapperIdRegex = /^datawrapper-vis-(.+)$/
 // pre-2017 form keys a `window.datawrapper[<id>]` object instead.
 const resizeScriptRegex = /datawrapper-height|window\.datawrapper/
 
-// The url is never parsed, so a dot segment in it survives into the chart id.
+// The url is read unparsed, and the chart id goes into a path.
 const getChartId = (url: string | null | undefined): string | undefined => {
   return encodePathSegment(url?.match(chartIdRegex)?.[1] ?? '')
 }

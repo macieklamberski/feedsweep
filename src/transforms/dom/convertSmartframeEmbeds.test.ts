@@ -72,28 +72,6 @@ describeForEachParser('convertSmartframeEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should leave an element whose customer id is a dot segment alone', async () => {
-    const value = html`
-      <smartframe-embed
-        customer-id=".."
-        image-id="WmOBDE33lTbF"
-      ></smartframe-embed>
-    `
-
-    expect(await transform(value)).toEqualHtml(value)
-  })
-
-  it('should leave an element whose image id is a dot segment alone', async () => {
-    const value = html`
-      <smartframe-embed
-        customer-id="b0c95bc04383cef69c6b47df872135cf"
-        image-id=".."
-      ></smartframe-embed>
-    `
-
-    expect(await transform(value)).toEqualHtml(value)
-  })
-
   // The element arrives inside the paragraph the plugin wraps it in, and the picture has to
   // survive that as an ordinary image the rest of the passes then treat like any other.
   it('should reach the image through the whole pipeline', async () => {

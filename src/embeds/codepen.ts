@@ -112,13 +112,9 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
   }
 
   const user = readUser(rawUser)
-  const queryToken = pathToken ? undefined : getQueryParam(parsed.searchParams, 'token')
+  const queryToken = getQueryParam(parsed.searchParams, 'token')
   // A query token comes out decoded, and it goes into a path beside the raw path spelling.
-  const token = queryToken ? encodePathSegment(queryToken) : pathToken
-
-  if (queryToken && !token) {
-    return
-  }
+  const token = pathToken ?? (queryToken ? encodePathSegment(queryToken) : undefined)
 
   return {
     kind,
@@ -180,13 +176,11 @@ const composeEmbed = (
 // `data-slug-hash` is what the dialog writes today and `data-href` what it wrote before, holding
 // the pen's whole url. A prefill block carries neither.
 const readPenReference = (element: Element): CodepenTarget | undefined => {
-  const declaredSlug = attr(element, 'data-slug-hash')
+  const slug = attr(element, 'data-slug-hash')
 
-  if (declaredSlug) {
+  if (slug) {
     // The attribute comes out decoded, and the slug goes into a path.
-    const slug = encodePathSegment(declaredSlug)
-
-    return slug ? { kind: 'embed', slug } : undefined
+    return { kind: 'embed', slug: encodePathSegment(slug) }
   }
 
   const href = attr(element, 'data-href')
@@ -215,11 +209,6 @@ const readWidget = (element: Element): EmbedResolverResult | undefined => {
   const declaredToken = attr(element, 'data-token')
   // The block's attributes come out decoded, and the token and the user go into a path.
   const token = declaredToken ? encodePathSegment(declaredToken) : reference.token
-
-  if (declaredToken && !token) {
-    return
-  }
-
   let user = reference.user
   let ownerPath = reference.ownerPath
   let linkedTitle: string | undefined
@@ -239,14 +228,10 @@ const readWidget = (element: Element): EmbedResolverResult | undefined => {
 
   // After the link: `data-user` goes stale when a block is copied and the two disagree.
   // `data-user` names a person and has no way to say team.
-  const declaredUser = user ? undefined : readUser(attr(element, 'data-user'))
+  const declaredUser = readUser(attr(element, 'data-user'))
 
-  if (declaredUser) {
+  if (!user && declaredUser) {
     user = encodePathSegment(declaredUser)
-
-    if (!user) {
-      return
-    }
   }
 
   ownerPath ??= user

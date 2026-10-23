@@ -16,13 +16,11 @@ const playerPath = '/iframe.php'
 const shortHost = 'v.traileraddict.com'
 
 const composeEmbed = (id: string): EmbedResolverResult => {
-  const segment = encodePathSegment(id)
-
   return {
     provider,
     id,
     src: `https://traileraddict.com/iframe.php${composeQuery({ id })}`,
-    url: segment ? `https://traileraddict.com/watch/${segment}` : undefined,
+    url: `https://traileraddict.com/watch/${encodePathSegment(id)}`,
     ratio: '16/9',
   }
 }

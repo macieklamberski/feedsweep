@@ -164,13 +164,7 @@ export const appleToolsEmbedResolver = createUrlEmbedResolver(appleToolsHosts, (
   const [, kind, pathId] = match
 
   const country = getQueryParam(parsed?.searchParams, 'country')?.toLowerCase()
-  // Empty where the tool named no storefront.
-  const storefront = country ? encodePathSegment(country) : ''
-
-  if (storefront === undefined) {
-    return
-  }
-
+  const storefront = country ? encodePathSegment(country) : undefined
   const modernUrl = `https://music.apple.com/${storefront ? `${storefront}/` : ''}${kind}/${pathId}`
 
   return appleResolveEmbed(modernUrl)

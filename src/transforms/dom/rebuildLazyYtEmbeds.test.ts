@@ -236,17 +236,6 @@ describeForEachParser('rebuildLazyYtEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should leave a facade whose video id is a dot segment', async () => {
-    const value = html`
-      <div
-        class="youtube-embed"
-        data-video_id=".."
-      ></div>
-    `
-
-    expect(await transform(value)).toEqualHtml(value)
-  })
-
   it('should be idempotent', async () => {
     const value = html`
       <div

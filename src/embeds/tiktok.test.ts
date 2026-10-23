@@ -734,24 +734,6 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore a data-unique-id that is a dot segment', async () => {
-      const value = html`
-        <blockquote
-          class="tiktok-embed"
-          data-unique-id=".."
-          data-embed-type="creator"
-        ></blockquote>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a data-video-id that is a dot segment', async () => {
-      const value = '<blockquote class="tiktok-embed" data-video-id=".."></blockquote>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     // A foreign cite names neither the url nor a handle, and nothing else in the markup does
     // either, so the id stays the bare video id: the player is still mintable, only the
     // enrichment key is out of reach.
@@ -1368,19 +1350,6 @@ describeForEachParser('tiktokMetasliderEmbedResolver', (parseHtml) => {
           <div
             class="tiktok"
             data-video-id=""
-          ></div>
-        </li>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a slide whose video id is a dot segment', async () => {
-      const value = html`
-        <li class="ms-tiktok">
-          <div
-            class="tiktok"
-            data-video-id=".."
           ></div>
         </li>
       `

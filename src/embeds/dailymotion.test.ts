@@ -700,36 +700,6 @@ describeForEachParser('dailymotionEmbedResolver', (parseHtml) => {
 
     expect(await extract(value)).toEqual(expected)
   })
-
-  describe('a value that is a dot segment', () => {
-    it('should keep the player and drop the url and thumbnail for a geo video that is a dot segment', async () => {
-      const value = '<iframe src="https://geo.dailymotion.com/player/xm0u7.html?video=.."></iframe>'
-
-      const expected: EmbedResolverResult = {
-        provider: 'dailymotion',
-        id: '..',
-        src: 'https://geo.dailymotion.com/player/xpiw2.html?video=..',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should keep the player and drop the url for a geo playlist that is a dot segment', async () => {
-      const value = html`
-        <iframe src="https://geo.dailymotion.com/player/xm0u7.html?playlist=.."></iframe>
-      `
-
-      const expected: EmbedResolverResult = {
-        provider: 'dailymotion',
-        id: 'playlist/..',
-        src: 'https://geo.dailymotion.com/player/xpiw2.html?playlist=..',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-  })
 })
 
 describeForEachParser('dailymotionScriptEmbedResolver', (parseHtml) => {

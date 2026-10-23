@@ -62,13 +62,12 @@ export const puzzlemeWidgetEmbedResolver = createMarkupEmbedResolver(
     const kind = attr(element, 'data-puzzletype')
     const id = attr(element, 'data-id')
     const set = attr(element, 'data-set')
-    // The puzzle type comes out of its attribute decoded, and it goes into a path.
-    const segment = kind ? encodePathSegment(kind) : undefined
 
-    if (!segment || !id || !set) {
+    if (!kind || !id || !set) {
       return
     }
 
-    return composePuzzlemeEmbed(segment, id, set)
+    // The puzzle type comes out of its attribute decoded, and it goes into a path.
+    return composePuzzlemeEmbed(encodePathSegment(kind), id, set)
   },
 )

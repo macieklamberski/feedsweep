@@ -32,18 +32,10 @@ const playerParams = ['access_key', 'start_page']
 
 // The embeds route answers 200 with an identical body for any id, rendering "Document deleted by
 // owner" for a Flash-era id and "Document Not Found" for an invented one.
-const composeEmbed = (
-  document: string,
-  search = '',
-  title?: string,
-): EmbedResolverResult | undefined => {
+const composeEmbed = (document: string, search = ''): EmbedResolverResult => {
   const params = pickQueryParams(search, playerParams)
   // The Flash `document_id` comes out of a query decoded, and it goes into a path.
   const segment = encodePathSegment(document)
-
-  if (!segment) {
-    return
-  }
 
   return {
     provider: 'scribd',
@@ -52,7 +44,6 @@ const composeEmbed = (
     // The document page takes no key, so a private document gets no page url.
     url: params.access_key ? undefined : `https://www.scribd.com/document/${segment}`,
     height: 600,
-    title,
   }
 }
 
@@ -85,7 +76,7 @@ export const scribdResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  return composeEmbed(document, parsed.search, attr(element, 'title'))
+  return { ...composeEmbed(document, parsed.search), title: attr(element, 'title') }
 }
 
 // Scribd's player iframe, /embeds/{id}/content.

@@ -61,12 +61,6 @@ describeForEachParser('convertDatawrapperEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should leave an iframe whose chart id is a dot segment', async () => {
-    const value = '<iframe src="https://datawrapper.dwcdn.net/../1/"></iframe>'
-
-    expect(await transform(value)).toEqualHtml(value)
-  })
-
   it('should remove the sibling resize listener script', async () => {
     const value = html`
       <iframe src="https://datawrapper.dwcdn.net/bdqZJ/2/" title="Egg prices"></iframe>

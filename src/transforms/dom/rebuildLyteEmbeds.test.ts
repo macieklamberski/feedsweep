@@ -85,17 +85,6 @@ describeForEachParser('rebuildLyteEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should leave a facade whose video id is a dot segment', async () => {
-    const value = html`
-      <div
-        id="WYL_.."
-        class="lyMe"
-      ></div>
-    `
-
-    expect(await transform(value)).toEqualHtml(value)
-  })
-
   it('should leave a playlist facade, whose id names a playlist', async () => {
     const value = html`
       <div

@@ -201,14 +201,13 @@ const readXspfPlayer = (player: URL): EmbedResolverResult | undefined => {
     archiveHosts,
   )
   const identifier = getQueryParam(playlist?.searchParams, 'identifier')
-  // A query identifier comes out decoded, and it goes into a path.
-  const segment = identifier ? encodePathSegment(identifier) : undefined
 
-  if (!segment) {
+  if (!identifier) {
     return
   }
 
-  return { ...composeEmbedResult(segment), height: audioPlayerHeight }
+  // A query identifier comes out decoded, and it goes into a path.
+  return { ...composeEmbedResult(encodePathSegment(identifier)), height: audioPlayerHeight }
 }
 
 // The `soundFile` flashvar names one file of an item that can hold hundreds, so the file is kept.
@@ -245,13 +244,12 @@ const archiveFlashResolveEmbed: ResolveEmbed = (url, element) => {
   // The config arrives as the `flashVars` attribute or, on the older player, as a `config` query.
   const config = flashVars(element) ?? getQueryParam(parsed.searchParams, 'config')
   const identifier = config?.match(downloadIdentifierRegex)?.[1]
-  const segment = identifier ? encodePathSegment(identifier) : undefined
 
-  if (!segment || !config) {
+  if (!identifier || !config) {
     return
   }
 
-  const result = composeEmbedResult(segment)
+  const result = composeEmbedResult(encodePathSegment(identifier))
 
   if (namesAudioFile(config)) {
     return { ...result, height: audioPlayerHeight }

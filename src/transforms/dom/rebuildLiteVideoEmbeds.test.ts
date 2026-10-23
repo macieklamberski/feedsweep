@@ -50,12 +50,6 @@ describeForEachParser('rebuildLiteVideoEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should leave a lite-youtube element whose videoid is a dot segment', async () => {
-    const value = '<lite-youtube videoid=".."></lite-youtube>'
-
-    expect(await transform(value)).toEqualHtml(value)
-  })
-
   it('should keep a lite-vimeo videoid holding a slash inside one path segment', async () => {
     const value = '<lite-vimeo videoid="../76979871"></lite-vimeo>'
     const expected = '<iframe src="https://player.vimeo.com/video/..%2F76979871"></iframe>'

@@ -1,7 +1,6 @@
-import { isPresent } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr, isElement, isSkippable, isText } from '../../utils/dom.js'
-import { absoluteUrlRegex, encodePathSegment, isDotSegment } from '../../utils/urls.js'
+import { absoluteUrlRegex, encodePathSegment } from '../../utils/urls.js'
 import { createLink } from '../../utils/widgets.js'
 
 const gistScriptRegex = /gist\.github\.com\/(?:([^/?"]+)\/)?([^/?"#]+)\.js/i
@@ -28,14 +27,8 @@ const gistCarrierSelector = [
 
 // An attribute names the gist decoded, as an id or an `{owner}/{id}` path, and each of its
 // segments goes into the link as one.
-const encodeGistPath = (value: string): string | undefined => {
-  const segments = value.split('/').map(encodePathSegment)
-
-  if (!segments.every(isPresent)) {
-    return
-  }
-
-  return segments.join('/')
+const encodeGistPath = (value: string): string => {
+  return value.split('/').map(encodePathSegment).join('/')
 }
 
 const readGistPath = (element: Element): string | undefined => {
@@ -75,15 +68,7 @@ const readGistPath = (element: Element): string | undefined => {
     return
   }
 
-  const [, owner, id] = match
-
-  // `/...js` leaves a `..` id, and the unparsed src can hold a `..` owner. Either one, written
-  // into the link's path, resolves away.
-  if (isDotSegment(id) || (owner && isDotSegment(owner))) {
-    return
-  }
-
-  return owner ? `${owner}/${id}` : id
+  return match[1] ? `${match[1]}/${match[2]}` : match[2]
 }
 
 // GitHub's anchor for one file on the gist page, such as `#file-reduce-kt` for `reduce.kt`.

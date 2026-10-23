@@ -144,18 +144,6 @@ describeForEachParser('tencentEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the player and drop the page and poster for an id that is a dot segment', async () => {
-      const value = '<iframe src="https://v.qq.com/txp/iframe/player.html?vid=.."></iframe>'
-      const expected: EmbedResolverResult = {
-        provider: 'tencent',
-        id: '..',
-        src: 'https://v.qq.com/txp/iframe/player.html?vid=..',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should keep an ampersand in the id inside the vid parameter', async () => {
       const value =
         '<iframe src="https://v.qq.com/txp/iframe/player.html?vid=v03604lrvan%26autoplay%3D1"></iframe>'

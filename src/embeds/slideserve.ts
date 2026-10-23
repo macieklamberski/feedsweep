@@ -1,7 +1,7 @@
 import { getPathSegments, getQueryParam, isAnyOf, isHostOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { flashVar } from '../utils/dom.js'
-import { isDotSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'slideserve'
@@ -40,14 +40,8 @@ const readFlashId = (parsed: URL): string | undefined => {
     slideserveHosts,
     isHostOf,
   )
-  const id = movie?.pathname.match(movieFileRegex)?.[1]
 
-  // `/video/...swf` leaves a `..` id, which the minted path resolves away.
-  if (!id || isDotSegment(id)) {
-    return
-  }
-
-  return id
+  return movie?.pathname.match(movieFileRegex)?.[1]
 }
 
 // No `url` and no `thumbnail`: the deck page is `/{user}/{slug}`, and the slide images sit on a

@@ -13,10 +13,8 @@ const mediaTokenRegex = /av:[^/]+$/
 const brResolveEmbed: ResolveEmbed = (url) => {
   const [section, route, slot] = getPathSegments(url)
   const token = decodeSegment(slot)?.match(mediaTokenRegex)?.[0]
-  // The token is read decoded, and it goes back into the path.
-  const segment = token ? encodePathSegment(token) : undefined
 
-  if (!isAnyOf(section, 'mediathek') || !isAnyOf(route, 'embed') || !segment) {
+  if (!isAnyOf(section, 'mediathek') || !isAnyOf(route, 'embed') || !token) {
     return
   }
 
@@ -25,7 +23,8 @@ const brResolveEmbed: ResolveEmbed = (url) => {
   return {
     provider,
     id: token,
-    src: `https://www.br.de/mediathek/embed/${segment}`,
+    // The token is read decoded, and it goes back into the path.
+    src: `https://www.br.de/mediathek/embed/${encodePathSegment(token)}`,
     ratio: '16/9',
   }
 }

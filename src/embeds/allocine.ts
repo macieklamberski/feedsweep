@@ -41,16 +41,10 @@ export const allocineResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const segment = encodePathSegment(cmedia)
-
-  if (!segment) {
-    return
-  }
-
   return {
     provider,
     id: cmedia,
-    src: `https://player.allocine.fr/${segment}.html`,
+    src: `https://player.allocine.fr/${encodePathSegment(cmedia)}.html`,
     ratio: '16/9',
   }
 }

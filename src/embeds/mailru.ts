@@ -1,4 +1,4 @@
-import { getQueryParam, isHostOrSubdomainOf, isPresent, parseUrl } from 'trousse'
+import { getQueryParam, isHostOrSubdomainOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
@@ -47,13 +47,9 @@ const composeSubject = (subject: string): EmbedResolverResult | undefined => {
 
   const [, type, user, album, counter] = match
   // A Flash or span subject comes out decoded, and each of its parts goes into a path.
-  const segments = [type, user, album, counter].map(encodePathSegment)
-
-  if (!segments.every(isPresent)) {
-    return
-  }
-
-  const [typeSegment, userSegment, albumSegment, counterSegment] = segments
+  const [typeSegment, userSegment, albumSegment, counterSegment] = [type, user, album, counter].map(
+    encodePathSegment,
+  )
   const owner = `${typeSegment}/${userSegment}`
 
   return {

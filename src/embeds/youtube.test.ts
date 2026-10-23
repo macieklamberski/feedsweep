@@ -1058,36 +1058,6 @@ describeForEachParser('youtubeIframeEmbedResolver', (parseHtml) => {
 
     expect(await extract(value)).toEqual(expected)
   })
-
-  describe('a value that is a dot segment', () => {
-    it('should keep the player and drop the url for an uploads username that is a dot segment', async () => {
-      const value = html`
-        <iframe src="https://www.youtube.com/embed?listType=user_uploads&list=.."></iframe>
-      `
-
-      const expected: EmbedResolverResult = {
-        provider: 'youtube',
-        id: 'user/..',
-        src: 'https://www.youtube.com/embed?listType=user_uploads&list=..',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should keep the player and drop the url for a live stream channel that is a dot segment', async () => {
-      const value = '<iframe src="https://www.youtube.com/embed/live_stream?channel=.."></iframe>'
-
-      const expected: EmbedResolverResult = {
-        provider: 'youtube',
-        id: 'channel/..',
-        src: 'https://www.youtube.com/embed/live_stream?channel=..',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-  })
 })
 
 describeForEachParser('youtubeAmpEmbedResolver', (parseHtml) => {
@@ -1220,12 +1190,6 @@ describeForEachParser('youtubeAmpEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should return undefined for a videoid that is a dot segment', async () => {
-      const value = '<amp-youtube data-videoid=".."></amp-youtube>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should keep a live channel id holding slashes inside one path segment', async () => {
       const value = '<amp-youtube data-live-channelid="../../evil"></amp-youtube>'
       const expected: EmbedResolverResult = {
@@ -1233,18 +1197,6 @@ describeForEachParser('youtubeAmpEmbedResolver', (parseHtml) => {
         id: 'channel/../../evil',
         src: 'https://www.youtube.com/embed/live_stream?channel=../../evil',
         url: 'https://www.youtube.com/channel/..%2F..%2Fevil',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should keep the player and drop the url for an AMP live channel that is a dot segment', async () => {
-      const value = '<amp-youtube data-live-channelid=".."></amp-youtube>'
-      const expected: EmbedResolverResult = {
-        provider: 'youtube',
-        id: 'channel/..',
-        src: 'https://www.youtube.com/embed/live_stream?channel=..',
         ratio: '16/9',
       }
 
@@ -1383,14 +1335,6 @@ describeForEachParser('youtubeFc2EmbedResolver', (parseHtml) => {
     it('should ignore a path going on past the shell', async () => {
       const value = html`
         <iframe src="https://static.fc2.com/misc/blog/view/ext_youtube_player.html/x?id=dQw4w9WgXcQ"></iframe>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a query id that is a dot segment', async () => {
-      const value = html`
-        <iframe src="https://static.fc2.com/misc/blog/view/ext_youtube_player.html?id=.."></iframe>
       `
 
       expect(await extract(value)).toBeUndefined()
@@ -1557,19 +1501,6 @@ describeForEachParser('youtubeMetasliderEmbedResolver', (parseHtml) => {
           <div
             class="youtube"
             data-id=""
-          ></div>
-        </li>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a slide whose video id is a dot segment', async () => {
-      const value = html`
-        <li class="ms-youtube">
-          <div
-            class="youtube"
-            data-id=".."
           ></div>
         </li>
       `

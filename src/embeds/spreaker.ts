@@ -45,8 +45,6 @@ export const spreakerResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const title = attr(element, 'title')
-  // The query id comes out decoded, and it goes into the page path.
-  const segment = encodePathSegment(embed.id)
 
   // Both kinds name a page that takes the bare id and redirects to its canonical slugged form,
   // `/episode/{id}` and `/show/{id}`, so the click target is the resource the player plays.
@@ -54,7 +52,8 @@ export const spreakerResolveEmbed: ResolveEmbed = (url, element) => {
     provider,
     id: `${embed.kind}/${embed.id}`,
     src: `https://widget.spreaker.com/player${composeQuery({ [embed.param]: embed.id })}`,
-    url: segment ? `https://www.spreaker.com/${embed.kind}/${segment}` : undefined,
+    // The query id comes out decoded, and it goes into the page path.
+    url: `https://www.spreaker.com/${embed.kind}/${encodePathSegment(embed.id)}`,
     height: playerHeight,
     title,
   }

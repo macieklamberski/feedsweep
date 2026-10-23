@@ -5,10 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const nprHosts = ['www.npr.org']
 
-const composeEmbed = (
-  storyId: string | undefined,
-  mediaId: string | undefined,
-): EmbedResolverResult | undefined => {
+const composeEmbed = (storyId: string, mediaId: string): EmbedResolverResult | undefined => {
   if (!storyId || !mediaId) {
     return
   }

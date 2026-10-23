@@ -55,9 +55,8 @@ export const amebaReblogCardEmbedResolver = createUrlEmbedResolver(amebloHosts, 
   const entryId = attr(element, 'data-entry-id')
   // A stated pair comes out of its attributes decoded, and both halves go into a path.
   const id =
-    blogId && entryId
-      ? readReblogCardId(encodePathSegment(blogId), encodePathSegment(entryId))
-      : readReblogCardId(match[1], match[2])
+    readReblogCardId(encodePathSegment(blogId ?? ''), encodePathSegment(entryId ?? '')) ??
+    readReblogCardId(match[1], match[2])
 
   if (!id) {
     return

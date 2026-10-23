@@ -94,13 +94,6 @@ describeForEachParser('slideserveEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a movie whose id is a dot segment', async () => {
-      const value =
-        '<embed src="http://www.slideserve.com/player.swf?moviePath=http://www.slideserve.com/video/...swf">'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should ignore the embed route under a leading segment', async () => {
       const value = '<iframe src="https://www.slideserve.com/x/embed/11734358"></iframe>'
 

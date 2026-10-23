@@ -275,17 +275,6 @@ describeForEachParser('videopressFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should return undefined for a flashvars guid that is a dot segment', async () => {
-      const value = html`
-        <embed
-          src="http://s0.videopress.com/player.swf?v=1"
-          flashvars="guid=..&isDynamicSeeking=false"
-        ></embed>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should read the flashvars guid when the src names a different one', async () => {
       const value = html`
         <embed

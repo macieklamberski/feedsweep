@@ -58,12 +58,13 @@ const resolveClip = (element: Element): EmbedResolverResult | undefined => {
 
   // Sanitizers empty or strip `data-video-id` while leaving the cite or a caption link intact.
   const videoId = declared ?? cited.videoId ?? linked.videoId
-  // The declared id comes out of its attribute decoded, and it goes into a path.
-  const segment = videoId ? encodePathSegment(videoId) : undefined
 
-  if (!segment) {
+  if (!videoId) {
     return
   }
+
+  // The declared id comes out of its attribute decoded, and it goes into a path.
+  const segment = encodePathSegment(videoId)
 
   const author = text(
     find(element, 'section a', (anchor) => text(anchor)?.startsWith('@') === true),
@@ -106,13 +107,7 @@ const readHandle = (element: Element): { handle: string; segment: string } | und
   const declared = attr(element, 'data-unique-id')
 
   if (declared) {
-    const segment = encodePathSegment(declared)
-
-    if (!segment) {
-      return
-    }
-
-    return { handle: declared, segment }
+    return { handle: declared, segment: encodePathSegment(declared) }
   }
 
   for (const anchor of element.querySelectorAll('a[href]')) {
@@ -191,13 +186,7 @@ export const tiktokIframeEmbedResolver = createUrlEmbedResolver(tiktokHosts, tik
 
 // A forum's s9e MediaEmbed helper frame, naming the clip id in its url fragment.
 export const tiktokS9eEmbedResolver = createS9eEmbedResolver('tiktok', (videoId) => {
-  const segment = encodePathSegment(videoId)
-
-  if (!segment) {
-    return
-  }
-
-  return tiktokResolveEmbed(`https://www.tiktok.com/embed/v2/${segment}`)
+  return tiktokResolveEmbed(`https://www.tiktok.com/embed/v2/${encodePathSegment(videoId)}`)
 })
 
 // MetaSlider Pro's TikTok slide: a poster image that only the plugin's script swaps for the player.
@@ -205,12 +194,13 @@ export const tiktokMetasliderEmbedResolver = createMarkupEmbedResolver(
   'li.ms-tiktok div.tiktok[data-video-id]',
   (element) => {
     const videoId = attr(element, 'data-video-id')
-    // The id comes out of its attribute decoded, and it goes into a path.
-    const segment = videoId ? encodePathSegment(videoId) : undefined
 
-    if (!segment) {
+    if (!videoId) {
       return
     }
+
+    // The id comes out of its attribute decoded, and it goes into a path.
+    const segment = encodePathSegment(videoId)
 
     const { handle } = readWatchUrl(attr(element, 'data-cite'))
     const watchPath = handle ? `@${handle}/video/${segment}` : undefined

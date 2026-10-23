@@ -244,14 +244,6 @@ describeForEachParser('allocineEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a cmedia that is a dot segment', async () => {
-      const value = html`
-        <iframe src="http://www.allocine.fr/_video/iblogvision.aspx?cmedia=.."></iframe>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should ignore a foreign host carrying the same path', async () => {
       const value =
         '<iframe src="https://evil.test/_video/iblogvision.aspx?cmedia=19567053"></iframe>'

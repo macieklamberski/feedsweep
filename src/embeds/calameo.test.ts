@@ -252,19 +252,6 @@ describeForEachParser('calameoEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should keep the player and drop the url for a bkcode that is a dot segment', async () => {
-      const value = '<iframe src="https://v.calameo.com/?bkcode=.."></iframe>'
-
-      const expected: EmbedResolverResult = {
-        provider: 'calameo',
-        id: '..',
-        src: 'https://v.calameo.com/?bkcode=..',
-        ratio: '300/194',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should ignore a foreign host carrying the viewer query', async () => {
       const value = '<iframe src="https://evil.test/?bkcode=0077756511c9c6e552299"></iframe>'
 

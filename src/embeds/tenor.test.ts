@@ -162,12 +162,6 @@ describeForEachParser('tenorWidgetEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    it('should ignore a post id that is a dot segment', async () => {
-      const value = '<div class="tenor-gif-embed" data-postid=".."></div>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
   })
 })
 

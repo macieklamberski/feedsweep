@@ -71,7 +71,7 @@ const composeItem = (id: string, src: string): Item => {
 }
 
 const readDashboardId = (url: URL): string | undefined => {
-  // The parser resolves no dot segment in a fragment, and the id goes into a path.
+  // A fragment is never decoded or resolved, and the id goes into a path.
   if (isAnyOf(url.pathname, dashboardShellPaths)) {
     const fragmentId = url.hash.match(dashboardFragmentRegex)?.[1]
 

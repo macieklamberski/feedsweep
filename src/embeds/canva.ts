@@ -46,12 +46,13 @@ export const canvaWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.canva-embed[data-design-id]',
   (element) => {
     const id = attr(element, 'data-design-id')
-    // The id comes out of its attribute decoded, and it goes into a path.
-    const segment = id ? encodePathSegment(id) : undefined
 
-    if (!segment) {
+    if (!id) {
       return
     }
+
+    // The id comes out of its attribute decoded, and it goes into a path.
+    const segment = encodePathSegment(id)
 
     return {
       provider: 'canva',

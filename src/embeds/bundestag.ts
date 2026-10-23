@@ -34,14 +34,13 @@ export const bundestagResolveEmbed: ResolveEmbed = (url) => {
   }
 
   const query = composeQuery({ e: 'bt-od', ep: '69', a: '144277506', c: id })
-  // The query id comes out decoded, and it goes into the page path.
-  const segment = encodePathSegment(id)
 
   return {
     provider: 'bundestag',
     id,
     src: `https://webtv.bundestag.de/pservices/player/embed/nokey${query}`,
-    url: segment ? `https://dbtg.tv/cvid/${segment}` : undefined,
+    // The query id comes out decoded, and it goes into the page path.
+    url: `https://dbtg.tv/cvid/${encodePathSegment(id)}`,
     ratio: '16/9',
   }
 }

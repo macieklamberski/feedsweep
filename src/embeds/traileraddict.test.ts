@@ -234,19 +234,6 @@ describeForEachParser('traileraddictEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should keep the player and drop the url for an id that is a dot segment', async () => {
-      const value = '<iframe src="https://traileraddict.com/iframe.php?id=.."></iframe>'
-
-      const expected: EmbedResolverResult = {
-        provider: 'traileraddict',
-        id: '..',
-        src: 'https://traileraddict.com/iframe.php?id=..',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
     it('should ignore a foreign host carrying the same path', async () => {
       const value = '<embed src="https://evil.test/emd/20301">'
 

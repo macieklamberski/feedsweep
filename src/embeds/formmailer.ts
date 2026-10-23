@@ -48,15 +48,14 @@ export const formmailerWidgetEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     const host = attr(element, 'data-form-host')
     const [hash = '', ...prefill] = attr(element, 'data-form-hash')?.split('?') ?? []
-    const segment = encodePathSegment(hash)
 
-    if (!segment) {
+    if (!hash) {
       return
     }
 
     const query = prefill.length ? `?${prefill.join('?')}` : ''
 
-    return formmailerResolveEmbed(`https://${host}/fms/${segment}${query}`)
+    return formmailerResolveEmbed(`https://${host}/fms/${encodePathSegment(hash)}${query}`)
   },
 )
 

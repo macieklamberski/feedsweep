@@ -67,15 +67,8 @@ const composeNamedEmbed = (
   workbook: string,
   sheet: string,
   title: string | undefined,
-): EmbedResolverResult | undefined => {
-  const workbookSegment = encodePathSegment(workbook)
-  const sheetSegment = encodePathSegment(sheet)
-
-  if (!workbookSegment || !sheetSegment) {
-    return
-  }
-
-  return composeTableauEmbed(workbookSegment, sheetSegment, title)
+): EmbedResolverResult => {
+  return composeTableauEmbed(encodePathSegment(workbook), encodePathSegment(sheet), title)
 }
 
 // The snippet's image of the viz, written from the same workbook and sheet as the viz. Its

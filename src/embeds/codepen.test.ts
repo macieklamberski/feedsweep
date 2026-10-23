@@ -807,19 +807,6 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should return undefined for a token that is a dot segment', async () => {
-      const value = html`
-        <p
-          class="codepen"
-          data-slug-hash="XJpKqXm"
-          data-user="argyleink"
-          data-token=".."
-        ></p>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should use a malformed token carrying a query as written, even if the player answers an error', async () => {
       const value = html`
         <p
@@ -913,18 +900,6 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       }
 
       expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should return undefined for a data-user that is a dot segment', async () => {
-      const value = html`
-        <p
-          class="codepen"
-          data-slug-hash="XJpKqXm"
-          data-user=".."
-        ></p>
-      `
-
-      expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore a block naming no pen', async () => {
@@ -1397,12 +1372,6 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a query token that is a dot segment', async () => {
-      const value = '<iframe src="https://codepen.io/leaverou/embed/OJYzQjN?token=.."></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     // The selector matches every iframe, so the host check inside `extract` is what rejects
     // this one. A lookalike host would never reach it.
     it('should ignore a foreign host carrying the same path', async () => {

@@ -313,12 +313,6 @@ describe('mailruResolveEmbed', () => {
       expect(mailruResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should refuse a movieSrc whose user is a dot segment', () => {
-      const value = 'http://img.mail.ru/r/video2/uvpv3.swf?2&movieSrc=mail/../../885&autoplay=0'
-
-      expect(mailruResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should keep a movieSrc counter holding a query separator inside its path segment', () => {
       const value = 'http://img.mail.ru/r/video2/uvpv3.swf?2&movieSrc=mail/anizm.com/4418/4427%3Fx'
       const expected: EmbedResolverResult = {

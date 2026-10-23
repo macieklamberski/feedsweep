@@ -3,7 +3,6 @@ import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.j
 import { attr } from '../utils/dom.js'
 import {
   encodePathSegment,
-  isDotSegment,
   isFileName,
   parseUrlOnHosts,
   placeholderBaseUrl,
@@ -47,16 +46,15 @@ export const speakerdeckScriptEmbedResolver = createMarkupEmbedResolver(
     const raw = attr(element, 'data-id') ?? ''
     const inlineSlide = raw.match(slideSuffixRegex)?.[1]
     const deckId = raw.replace(slideSuffixRegex, '')
-    // The id comes out of its attribute decoded, and it goes into a path.
-    const segment = encodePathSegment(deckId)
 
-    if (!segment) {
+    if (!deckId) {
       return
     }
 
     const slide = inlineSlide ?? attr(element, 'data-slide') ?? undefined
 
-    return composeEmbed(segment, { slide })
+    // The id comes out of its attribute decoded, and it goes into a path.
+    return composeEmbed(encodePathSegment(deckId), { slide })
   },
 )
 
@@ -68,8 +66,7 @@ export const speakerdeckLegacyScriptEmbedResolver = createMarkupEmbedResolver(
     const url = parseUrlOnHosts(attr(element, 'src'), speakerdeckHosts)
     const deckId = url?.pathname.match(legacyScriptPathRegex)?.[1]
 
-    // `/embed/...js` leaves a `..` id, which the minted path resolves away.
-    if (!deckId || isDotSegment(deckId)) {
+    if (!deckId) {
       return
     }
 

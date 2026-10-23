@@ -228,23 +228,11 @@ export const pickQueryParams = (
   return picked
 }
 
-const dotSegments = ['.', '..']
-
-// A whole `.` or `..` is a dot segment the url parser resolves away.
-export const isDotSegment = (value: string): boolean => {
-  return dotSegments.includes(value)
-}
-
 // A decoded value written into a url path stays one segment. Only the characters that would open
-// a new segment, a query or a fragment, a literal `%` and whitespace are escaped, so an `@`, `=` or
-// `:` the value holds reads as written. A url parser reads `\` as `/` in an http path, so it is
-// escaped too. A dot segment is refused.
-export const encodePathSegment = (value: string): string | undefined => {
-  if (isDotSegment(value)) {
-    return
-  }
-
-  return value.replace(/[%/?#\\\s]/g, (character) => encodeURIComponent(character))
+// a new segment, a query or a fragment, and whitespace are escaped, so an `@`, `=`, `:` or `%` the
+// value holds reads as written. A url parser reads `\` as `/` in an http path, so it is escaped too.
+export const encodePathSegment = (value: string): string => {
+  return value.replace(/[/?#\\\s]/g, (character) => encodeURIComponent(character))
 }
 
 // The publisher's query with only the parameters a player reads left in it. Each pair stays as

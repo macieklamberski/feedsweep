@@ -100,14 +100,10 @@ const readYandexMusicItem = (url: string): YandexMusicItem | undefined => {
   return readRoute(rest)
 }
 
-// The values come out of a fragment or a `{track}:{album}` pair, where a dot segment survives.
-const composeYandexMusicEmbed = (item: YandexMusicItem): EmbedResolverResult | undefined => {
+// The values come out of a fragment or a `{track}:{album}` pair, and each goes into a path.
+const composeYandexMusicEmbed = (item: YandexMusicItem): EmbedResolverResult => {
   if (item.kind === 'album') {
     const album = encodePathSegment(item.album)
-
-    if (!album) {
-      return
-    }
 
     return {
       provider,
@@ -122,10 +118,6 @@ const composeYandexMusicEmbed = (item: YandexMusicItem): EmbedResolverResult | u
     const owner = encodePathSegment(item.owner)
     const playlist = encodePathSegment(item.playlist)
 
-    if (!owner || !playlist) {
-      return
-    }
-
     return {
       provider,
       id: `playlist/${item.owner}/${item.playlist}`,
@@ -136,11 +128,7 @@ const composeYandexMusicEmbed = (item: YandexMusicItem): EmbedResolverResult | u
   }
 
   const track = encodePathSegment(item.track)
-  const album = item.album ? encodePathSegment(item.album) : ''
-
-  if (!track || album === undefined) {
-    return
-  }
+  const album = item.album ? encodePathSegment(item.album) : undefined
 
   // The track id alone addresses the track, so the album stays out of the key.
   const path = album ? `album/${album}/track/${track}` : `track/${track}`

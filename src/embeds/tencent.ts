@@ -54,11 +54,11 @@ const tencentResolveEmbed: ResolveEmbed = (url) => {
     provider,
     id: videoId,
     src: `https://v.qq.com/txp/iframe/player.html${composeQuery({ vid: videoId })}`,
-    url: segment ? `https://v.qq.com/x/page/${segment}.html` : undefined,
+    url: `https://v.qq.com/x/page/${segment}.html`,
     // The poster the watch page shows, addressed by the id alone, and an invented id gets a 5 KB
     // png placeholder. `vv.video.qq.com/getinfo?vids={vid}&otype=json` answers key-free with the
     // title, the duration and the frame size.
-    thumbnail: segment ? `https://puui.qpic.cn/qqvideo_ori/0/${segment}_496_280/0` : undefined,
+    thumbnail: `https://puui.qpic.cn/qqvideo_ori/0/${segment}_496_280/0`,
     ratio: playerRatio,
   }
 }

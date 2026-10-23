@@ -44,10 +44,6 @@ export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
     // The file id comes out of the query decoded, and it goes into a path.
     const deckPath = encodePathSegment(fileId)
 
-    if (!deckPath) {
-      return
-    }
-
     return {
       provider,
       id: fileId,

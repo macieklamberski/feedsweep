@@ -406,17 +406,6 @@ describeForEachParser('preziEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should return undefined for a prezi_id that is a dot segment', async () => {
-      const value = html`
-        <embed
-          src="http://prezi.com/bin/preziloader.swf"
-          flashvars="prezi_id=.."
-        >
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should use a malformed presentation id as written, even if the player answers an error', async () => {
       const value = html`
         <embed
