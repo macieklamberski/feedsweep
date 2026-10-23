@@ -34,7 +34,7 @@ const megatvResolveEmbed: ResolveEmbed = (url) => {
     provider: 'megatv',
     id,
     src: `https://www.megatv.com/embed/${composeQuery({ p: id })}`,
-    url: post ? `https://www.megatv.com/?p=${post}` : undefined,
+    url: post ? `https://www.megatv.com/${composeQuery({ p: post })}` : undefined,
     // The player is Video.js in fluid mode, and the share dialog boxes it 560 by 315.
     ratio: '16/9',
   }

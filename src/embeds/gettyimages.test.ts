@@ -80,7 +80,7 @@ describe('composeWidgetEmbedUrl', () => {
         tld: 'com',
       }
       const expected =
-        'https://embed.gettyimages.com/embed/491183014?et=iPo3qjCKSVJU-bRwLBwNoQ&tld=com&sig=OOM9B40x%3D'
+        'https://embed.gettyimages.com/embed/491183014?et=iPo3qjCKSVJU-bRwLBwNoQ&tld=com&sig=OOM9B40x='
 
       expect(composeWidgetEmbedUrl(value)).toBe(expected)
     })
@@ -92,7 +92,7 @@ describe('composeWidgetEmbedUrl', () => {
         sig: 'fm662LcjhNR8CxuM7wLJezgkjAkdEGOGXPDPYc-P3nk=',
       }
       const expected =
-        'https://embed.gettyimages.com/embed/52941277?et=O4y9JTw-Sfx-xS1g8rcemg&sig=fm662LcjhNR8CxuM7wLJezgkjAkdEGOGXPDPYc-P3nk%3D'
+        'https://embed.gettyimages.com/embed/52941277?et=O4y9JTw-Sfx-xS1g8rcemg&sig=fm662LcjhNR8CxuM7wLJezgkjAkdEGOGXPDPYc-P3nk='
 
       expect(composeWidgetEmbedUrl(value)).toBe(expected)
     })

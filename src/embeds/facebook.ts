@@ -254,7 +254,7 @@ export const facebookS9eEmbedResolver = createMarkupEmbedResolver(
 
     const [, page, kind, id] = match
     const href = s9eWatchKindRegex.test(kind)
-      ? `https://www.facebook.com/watch/?v=${id}`
+      ? `https://www.facebook.com/watch/${composeQuery({ v: id })}`
       : `https://www.facebook.com/${page || s9ePlaceholderPage}/posts/${id}`
 
     return facebookResolveEmbed(href)

@@ -4,7 +4,7 @@ import { attr } from '../utils/dom.js'
 
 const provider = 'blubrry'
 
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // PowerPress, Blubrry's WordPress plugin, renders the same player on the publisher's own domain
@@ -58,7 +58,7 @@ export const blubrryResolveEmbed: ResolveEmbed = (url, element) => {
     src:
       kind === 'episode'
         ? `https://player.blubrry.com/id/${id}/`
-        : `https://player.blubrry.com/?media_url=${encodeURIComponent(id)}`,
+        : `https://player.blubrry.com/${composeQuery({ media_url: id })}`,
     height: playerHeight,
     title: attr(element, 'title'),
   }
