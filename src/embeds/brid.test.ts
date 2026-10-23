@@ -139,6 +139,46 @@ describeForEachParser('bridEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should keep a player id holding a slash inside one path segment', async () => {
+      const value = html`
+        <div
+          id="Brid_3"
+          class="brid"
+        ></div>
+        <script type="text/javascript">
+          $bp("Brid_3", {"id":"26602/x","video":"755958"});
+        </script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'brid',
+        id: '26602%2Fx/755958',
+        src: 'https://services.brid.tv/services/iframe/video/755958/26602%2Fx',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a video id holding a slash inside one path segment', async () => {
+      const value = html`
+        <div
+          id="Brid_3"
+          class="brid"
+        ></div>
+        <script type="text/javascript">
+          $bp("Brid_3", {"id":"26602","video":"755958/x"});
+        </script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'brid',
+        id: '26602/755958%2Fx',
+        src: 'https://services.brid.tv/services/iframe/video/755958%2Fx/26602',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {

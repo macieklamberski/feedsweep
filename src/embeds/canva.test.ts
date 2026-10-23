@@ -258,6 +258,25 @@ describeForEachParser('canvaWidgetEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should keep a design id holding a slash inside one path segment', async () => {
+      const value = html`
+        <div
+          class="canva-embed"
+          data-height-ratio="1"
+          data-design-id="DAC3_5NqG20/edit"
+        ></div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'canva',
+        id: 'DAC3_5NqG20/edit',
+        src: 'https://www.canva.com/design/DAC3_5NqG20%2Fedit/view?embed',
+        url: 'https://www.canva.com/design/DAC3_5NqG20%2Fedit/view',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 })
 

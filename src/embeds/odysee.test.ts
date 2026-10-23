@@ -194,6 +194,19 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should keep a decoded claim holding a query separator inside one path segment', async () => {
+      const value = '<iframe src="https://odysee.com/$/embed/webb%3Ftalk:7"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'odysee',
+        id: 'webb%3Ftalk:7',
+        src: 'https://odysee.com/$/embed/webb%3Ftalk:7',
+        url: 'https://odysee.com/webb%3Ftalk:7',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('the older spellings of a claim', () => {

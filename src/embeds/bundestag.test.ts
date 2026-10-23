@@ -50,6 +50,19 @@ describe('bundestagResolveEmbed', () => {
 
       expect(bundestagResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should keep an id holding a slash inside one page path segment', () => {
+      const value = 'https://webtv.bundestag.de/pservices/player/embed/nokey?c=7657%2F467'
+      const expected: EmbedResolverResult = {
+        provider: 'bundestag',
+        id: '7657/467',
+        src: 'https://webtv.bundestag.de/pservices/player/embed/nokey?e=bt-od&ep=69&a=144277506&c=7657/467',
+        url: 'https://dbtg.tv/cvid/7657%2F467',
+        ratio: '16/9',
+      }
+
+      expect(bundestagResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {

@@ -439,6 +439,20 @@ describeForEachParser('tableauIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should keep a hash workbook holding a fragment sign inside one path segment', async () => {
+      const value = html`
+        <iframe src="https://public.tableau.com/profile/vizimpact#!/vizhome/HackerTeamClients#x/Sheet1"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tableau',
+        id: 'HackerTeamClients%23x',
+        src: 'https://public.tableau.com/views/HackerTeamClients%23x/Sheet1?:embed=y&:showVizHome=no',
+        url: 'https://public.tableau.com/views/HackerTeamClients%23x/Sheet1',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should ignore a hash that names a workbook and no sheet', async () => {
       const value =
         '<iframe src="https://public.tableau.com/profile/vizimpact#!/vizhome/HackerTeamClients-locationstatus"></iframe>'

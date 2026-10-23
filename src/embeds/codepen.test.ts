@@ -851,6 +851,28 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should keep a data-token holding a query separator inside one path segment', async () => {
+      const value = html`
+        <p
+          class="codepen"
+          data-slug-hash="XJpKqXm"
+          data-user="argyleink"
+          data-token="c8ec7595b68381e99d38441487db546f?autoplay=1"
+        ></p>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'XJpKqXm',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm/c8ec7595b68381e99d38441487db546f%3Fautoplay=1',
+        url: 'https://codepen.io/argyleink/pen/XJpKqXm/c8ec7595b68381e99d38441487db546f%3Fautoplay=1',
+        thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
+        height: 300,
+        author: '@argyleink',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should read a bare slug in data-href', async () => {
       const value = html`
         <p

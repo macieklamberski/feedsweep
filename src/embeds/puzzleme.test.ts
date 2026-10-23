@@ -189,6 +189,27 @@ describeForEachParser('puzzlemeWidgetEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should keep a puzzle type holding a slash inside one path segment', async () => {
+      const value = html`
+        <div
+          class="pm-embed-div"
+          data-id="54602d16"
+          data-set="5af39ea5bb2b35a56ac4bd3ce390f334711dcd7db2135f17dcababdeae256d48"
+          data-puzzletype="cross/word"
+          data-height="700px"
+        ></div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'puzzleme',
+        id: '5af39ea5bb2b35a56ac4bd3ce390f334711dcd7db2135f17dcababdeae256d48/54602d16',
+        src: 'https://puzzleme.amuselabs.com/pmm/cross%2Fword?id=54602d16&set=5af39ea5bb2b35a56ac4bd3ce390f334711dcd7db2135f17dcababdeae256d48&embed=1',
+        url: 'https://puzzleme.amuselabs.com/pmm/cross%2Fword?id=54602d16&set=5af39ea5bb2b35a56ac4bd3ce390f334711dcd7db2135f17dcababdeae256d48',
+        height: 700,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {

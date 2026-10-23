@@ -299,6 +299,42 @@ describeForEachParser('podcloudWidgetEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should keep a data-feed holding a slash inside one path segment', async () => {
+      const value = html`
+        <div
+          data-podcloud="player"
+          data-feed="xv-bras/xv-jambes"
+          data-item="episode-23"
+        ></div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'podcloud',
+        id: 'xv-bras%2Fxv-jambes/episode-23',
+        src: 'https://podcloud.fr/podcast/xv-bras%2Fxv-jambes/episode/episode-23/player',
+        url: 'https://podcloud.fr/podcast/xv-bras%2Fxv-jambes/episode/episode-23',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a data-item holding a slash inside one path segment', async () => {
+      const value = html`
+        <div
+          data-podcloud="player"
+          data-feed="xv-bras-xv-jambes"
+          data-item="episode/23"
+        ></div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'podcloud',
+        id: 'xv-bras-xv-jambes/episode%2F23',
+        src: 'https://podcloud.fr/podcast/xv-bras-xv-jambes/episode/episode%2F23/player',
+        url: 'https://podcloud.fr/podcast/xv-bras-xv-jambes/episode/episode%2F23',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {

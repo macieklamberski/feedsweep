@@ -120,6 +120,19 @@ describe('spreakerResolveEmbed', () => {
     expect(spreakerResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should keep an episode id holding a slash inside one page path segment', () => {
+    const value = 'https://widget.spreaker.com/player?episode_id=52842990%2Fx'
+    const expected: EmbedResolverResult = {
+      provider: 'spreaker',
+      id: 'episode/52842990/x',
+      src: 'https://widget.spreaker.com/player?episode_id=52842990/x',
+      url: 'https://www.spreaker.com/episode/52842990%2Fx',
+      height: 200,
+    }
+
+    expect(spreakerResolveEmbed(value)).toEqual(expected)
+  })
+
   it('should return undefined for a spreaker url naming no episode', () => {
     const value = 'https://widget.spreaker.com/player?x=1'
 

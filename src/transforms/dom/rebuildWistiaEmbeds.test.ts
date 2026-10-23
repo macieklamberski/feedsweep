@@ -63,6 +63,13 @@ describeForEachParser('rebuildWistiaEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should keep a facade id holding a slash inside one path segment', async () => {
+    const value = '<div class="wistia_embed wistia_async_u3gz5bka6b/x"></div>'
+    const expected = '<iframe src="https://fast.wistia.net/embed/iframe/u3gz5bka6b%2Fx"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should rebuild a custom element whose id is uppercase, keeping its case', async () => {
     const value = '<wistia-player media-id="U3GZ5BKA6B"></wistia-player>'
     const expected = '<iframe src="https://fast.wistia.net/embed/iframe/U3GZ5BKA6B"></iframe>'
@@ -125,6 +132,13 @@ describeForEachParser('rebuildWistiaEmbeds', (parseHtml) => {
   it('should rebuild an id longer than the ten characters Wistia mints today', async () => {
     const value = '<wistia-player media-id="u3gz5bka6bx"></wistia-player>'
     const expected = '<iframe src="https://fast.wistia.net/embed/iframe/u3gz5bka6bx"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a media-id holding a slash inside one path segment', async () => {
+    const value = '<wistia-player media-id="u3gz5bka6b/x"></wistia-player>'
+    const expected = '<iframe src="https://fast.wistia.net/embed/iframe/u3gz5bka6b%2Fx"></iframe>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })
@@ -236,6 +250,13 @@ describeForEachParser('rebuildWistiaEmbeds', (parseHtml) => {
     it('should rebuild a mount div whose id is uppercase, keeping its case', async () => {
       const value = '<div class="wistia_embed" id="wistia_NZ50SN6QXT">&nbsp;</div>'
       const expected = '<iframe src="https://fast.wistia.net/embed/iframe/NZ50SN6QXT"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep a mount div id holding a slash inside one path segment', async () => {
+      const value = '<div class="wistia_embed" id="wistia_nz50sn6qxt/x">&nbsp;</div>'
+      const expected = '<iframe src="https://fast.wistia.net/embed/iframe/nz50sn6qxt%2Fx"></iframe>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })

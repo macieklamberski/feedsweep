@@ -156,6 +156,13 @@ describeForEachParser('rebuildPiktochartEmbeds', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+
+    it('should keep a uid holding a slash inside one path segment', async () => {
+      const value = '<div class="piktowrapper-embed" data-uid="30289406/copy"></div>'
+      const expected = '<iframe src="https://create.piktochart.com/embed/30289406%2Fcopy"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 
   describe('sad paths', () => {
