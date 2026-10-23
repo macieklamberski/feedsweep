@@ -36,14 +36,15 @@ const isTweetUrl = (url: URL): boolean => {
   return isKnownHost || nitterHostRegex.test(url.hostname)
 }
 
-// `/{handle}/status/{id}`, with the plural `statuses` form from the earliest era.
-const statusPathRegex = /^\/([a-zA-Z0-9_]+)\/status(?:es)?\/(\d+)(?:\/|$)/
+// `/{handle}/status/{id}`, with the plural `statuses` form from the earliest era. The id is its
+// digit run: feeds cut the query into it, as in `{id}_src=twsrc%5Etfw`, and the tweet still plays.
+const statusPathRegex = /^\/([a-zA-Z0-9_]+)\/status(?:es)?\/(\d+)/
 
 // The paths that name a status and carry no handle: the web client's permalink, the 2015-2017
 // video frames, and the card frame before them. The frames are dead, answering 404 or a stub
 // for a real id and a fabricated one alike, so the id in them is worth more than the url.
 const handlelessPathRegex =
-  /^\/(?:i\/(?:web\/status|videos\/tweet|videos|cards\/tfw\/v\d+)|status(?:es)?)\/(\d+)(?:\/|$)/
+  /^\/(?:i\/(?:web\/status|videos\/tweet|videos|cards\/tfw\/v\d+)|status(?:es)?)\/(\d+)/
 
 // Twitter takes `i` where a handle belongs and redirects to the real one, so a status recovered
 // without a handle still yields a url a reader can follow.
