@@ -7,10 +7,10 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const provider = 'crowdsignal'
 
 // `/results` is the poll's own tally page, a different thing from the poll.
-const pollPathRegex = /^\/(\d+)(?:\/embed)?\/?$/
-const loaderPathRegex = /^\/p\/([^/]+)\.js$/
-const retiredPollPathRegex = /^\/poll\/([^/]+)\/?$/
-const flashPlayerPathRegex = /^\/poll\.swf$/
+const pollPathRegex = /^\/(\d+)(?:\/embed)?\/?$/i
+const loaderPathRegex = /^\/p\/([^/]+)\.js$/i
+const retiredPollPathRegex = /^\/poll\/([^/]+)\/?$/i
+const flashPlayerPathRegex = /^\/poll\.swf$/i
 
 // A poll's height follows its answer count, and the frame posts none.
 const pollHeight = 533
@@ -62,7 +62,7 @@ const readFallbackPollId = (fallback: Element): string | undefined => {
 // `static.polldaddy.com`, writes the poll into the page client side. A <noscript> right after it
 // naming the same poll as a frame or a link would show the poll a second time.
 export const crowdsignalScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="polldaddy.com/p/"]',
+  'script[src*="polldaddy.com/p/" i]',
   (element) => {
     const loader = parseUrlOnHosts(attr(element, 'src'), 'polldaddy.com')
     const pollId = loader?.pathname.match(loaderPathRegex)?.[1]

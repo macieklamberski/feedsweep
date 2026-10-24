@@ -55,6 +55,17 @@ describe('extractIvooxSubject', () => {
     expect(extractIvooxSubject(value)).toEqual(expected)
   })
 
+  it('should read a legacy player whose file name spells iVoox with a capital V', () => {
+    const value = 'http://www.ivoox.com/playeriVoox_em_7041_1.html'
+    const expected: IvooxSubject = {
+      kind: 'episode',
+      id: '7041',
+      page: '1',
+    }
+
+    expect(extractIvooxSubject(value)).toEqual(expected)
+  })
+
   // The letters are enumerated because they are not a sequence: the ones outside the list answer
   // 404 while the listed ones serve (probed 2026-08-15 with real ids), so matching a shape would
   // mint dead urls. An unlisted generation keeps the generic placeholder.

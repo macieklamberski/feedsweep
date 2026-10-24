@@ -5,11 +5,11 @@ import { createLinkedImage } from '../../utils/widgets.js'
 
 // `giphy.com/embed/{id}`, the media host spelling `media.giphy.com/media/{id}/giphy.gif` that
 // some feeds put in an iframe instead, and the `giphy.com/gifs/{slug}-{id}` page url.
-const giphyPathRegex = /^\/(?:embed|media|gifs)\/([^/]+)/
+const giphyPathRegex = /^\/(?:embed|media|gifs)\/([^/]+)/i
 
 // A Giphy gif shipped as an iframe, a third-party frame around a file that animates in an <img>.
 export const convertGiphyEmbeds: DomTransform = () => (document) => {
-  for (const iframe of document.querySelectorAll('iframe[src*="giphy.com/"]')) {
+  for (const iframe of document.querySelectorAll('iframe[src*="giphy.com/" i]')) {
     const segment = parseUrlOnHosts(attr(iframe, 'src'), 'giphy.com')?.pathname.match(
       giphyPathRegex,
     )?.[1]

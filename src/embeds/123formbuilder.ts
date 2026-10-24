@@ -1,4 +1,4 @@
-import { parseUrl } from 'trousse'
+import { getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { iframeResizerHeightRequest, readIframeResizerHeight } from '../utils/hints.js'
@@ -10,9 +10,9 @@ const provider = '123formbuilder'
 // 123ContactForm is the platform's former name, and its host still serves the same form ids.
 const oneTwoThreeFormBuilderHosts = ['123formbuilder.com', '123contactform.com']
 
-const loaderPathRegex = /^\/embed\/([^/]+)\.js$/
+const loaderPathRegex = /^\/embed\/([^/]+)\.js$/i
 const formPathRegex = /^\/(\d+)\/?$/
-const legacyFramePathRegex = /^\/my-contact-form-(?:a\d+-)?(\d+)\.html$/
+const legacyFramePathRegex = /^\/my-contact-form-(?:a\d+-)?(\d+)\.html$/i
 
 const composeEmbed = (formId: string): EmbedResolverResult => {
   return {
@@ -39,7 +39,7 @@ export const oneTwoThreeFormBuilderResolveEmbed: ResolveEmbed = (url) => {
 // The inline form, written in place by `/embed/{id}.js`, a script the pipeline drops. The frame
 // the loader writes carries the host page's address in `ref`, so the form page is minted instead.
 export const oneTwoThreeFormBuilderScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="123formbuilder.com/embed/"], script[src*="123contactform.com/embed/"]',
+  'script[src*="123formbuilder.com/embed/" i], script[src*="123contactform.com/embed/" i]',
   (element) => {
     const loader = parseUrlOnHosts(attr(element, 'src'), oneTwoThreeFormBuilderHosts)
     const formId = loader?.pathname.match(loaderPathRegex)?.[1]
@@ -50,7 +50,10 @@ export const oneTwoThreeFormBuilderScriptEmbedResolver = createMarkupEmbedResolv
 
     // The loader writes nothing without `data-role="form"`, and `?type=lightbox` opens the form
     // in an overlay from a text link, which is chrome.
-    if (attr(element, 'data-role') !== 'form' || loader.searchParams.get('type') === 'lightbox') {
+    if (
+      !isAnyOf(attr(element, 'data-role'), 'form') ||
+      isAnyOf(getQueryParam(loader.searchParams, 'type'), 'lightbox')
+    ) {
       return
     }
 

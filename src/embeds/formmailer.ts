@@ -1,4 +1,4 @@
-import { getPathSegments, isPlainObject } from 'trousse'
+import { getPathSegments, isAnyOf, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
@@ -14,7 +14,7 @@ const formmailerHosts = ['ssl.form-mailer.jp', 'pro.form-mailer.jp']
 // The form reads any field name off its query as a prefill, such as `タイトル[0]`, so the query
 // goes to the frame as the carrier sends it. `errorScroll` is the loader's own display setting.
 const composeEmbed = (form: URL, hash: string): EmbedResolverResult => {
-  const query = filterUrlQuery(form, (name) => name !== 'errorScroll')
+  const query = filterUrlQuery(form, (name) => !isAnyOf(name, 'errorScroll'))
 
   return {
     provider,
@@ -34,7 +34,7 @@ export const formmailerResolveEmbed: ResolveEmbed = (url) => {
 
   const [route, hash, ...rest] = getPathSegments(parsed)
 
-  if (route !== 'fms' || !hash || rest.length > 0) {
+  if (!isAnyOf(route, 'fms') || !hash || rest.length > 0) {
     return
   }
 

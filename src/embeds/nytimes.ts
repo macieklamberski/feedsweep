@@ -3,6 +3,7 @@ import { attr } from '../utils/dom.js'
 
 const provider = 'nytimes'
 
+import { getQueryParam, isAnyOf } from 'trousse'
 import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -24,9 +25,9 @@ const footerHeight = 71
 // id answers 200 with the same 695 byte shell and renders "Video Data Failed to Load".
 export const nytimesResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, nytimesHosts)
-  const id = parsed?.searchParams.get('videoId')
+  const id = getQueryParam(parsed?.searchParams, 'videoId')
 
-  if (parsed?.pathname !== playerPath && parsed?.pathname !== legacyPlayerPath) {
+  if (!isAnyOf(parsed?.pathname, [playerPath, legacyPlayerPath])) {
     return
   }
 

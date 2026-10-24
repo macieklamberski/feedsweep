@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
@@ -8,8 +8,8 @@ const preziHosts = ['prezi.com']
 
 // The Flash snippet's one loader, with the presentation named in flashvars and repeated in the
 // element ids as `prezi_{id}` and `preziEmbed_{id}`.
-const loaderPathRegex = /\/bin\/preziloader\.swf$/
-const elementIdRegex = /^prezi(?:Embed)?_(.+)/
+const loaderPathRegex = /\/bin\/preziloader\.swf$/i
+const elementIdRegex = /^prezi(?:Embed)?_(.+)/i
 
 // Classic ids are 12 characters and share tokens 20. A share token's page lives on `/view/{id}/`,
 // and `/p/{id}/` answers 404 for it, while a classic id's page answers only on `/p/{id}/`.
@@ -44,15 +44,15 @@ const composeVideoEmbed = (id: string): EmbedResolverResult => {
 }
 
 const readFrameId = ([route, second, third]: Array<string>): string | undefined => {
-  if (route === 'embed') {
+  if (isAnyOf(route, 'embed')) {
     return second
   }
 
-  if (route === 'p' && second === 'embed') {
+  if (isAnyOf(route, 'p') && isAnyOf(second, 'embed')) {
     return third
   }
 
-  if (route === 'p' && third === 'embed') {
+  if (isAnyOf(route, 'p') && isAnyOf(third, 'embed')) {
     return second
   }
 }
@@ -84,11 +84,11 @@ export const preziResolveEmbed: ResolveEmbed = (url, element) => {
   const segments = getPathSegments(parsed)
   const [route, second, third] = segments
 
-  if (route === 'view' && third === 'embed') {
+  if (isAnyOf(route, 'view') && isAnyOf(third, 'embed')) {
     return composeEmbed(second, 'view')
   }
 
-  if (route === 'v' && second === 'embed' && third) {
+  if (isAnyOf(route, 'v') && isAnyOf(second, 'embed') && third) {
     return composeVideoEmbed(third)
   }
 

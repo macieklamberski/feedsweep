@@ -1,4 +1,4 @@
-import { getPathSegments, isPlainObject, toMap } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, isPlainObject, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -18,11 +18,11 @@ const spotifyHeights = toMap({
 
 // `embed` opens a player path, `embed-podcast` its older podcast-only twin, `intl-{lang}` a
 // localized page path. Whatever follows the id (`/video` on a video podcast) is decorative.
-const pathPrefixRegex = /^(?:embed|embed-podcast|intl-[a-z]{2})$/
+const pathPrefixRegex = /^(?:embed|embed-podcast|intl-[a-z]{2})$/i
 // spotify:{type}:{id}, or the owned playlist form spotify:user:{handle}:playlist:{id}.
 // The pre-2017 snippet framed `embed.spotify.com/?uri=spotify:{type}:{id}`, and that host still
 // serves a player.
-const legacyUriRegex = /^spotify:(?:.*:)?([a-z]+):([a-zA-Z0-9]+)$/
+const legacyUriRegex = /^spotify:(?:.*:)?([a-z]+):([a-zA-Z0-9]+)$/i
 // Substack writes `By {owner}` where a playlist card's act goes, and Spotify names that same
 // account bare on its own player.
 const ownerPrefixRegex = /^By /
@@ -75,7 +75,7 @@ const readPathPair = (url: URL | undefined): [string, string] | undefined => {
   const segments = getPathSegments(url)
   const named = pathPrefixRegex.test(segments[0] ?? '') ? segments.slice(1) : segments
   // The same ownership spelled as a path, `/embed/user/{handle}/playlist/{id}`.
-  const owned = named[0] === 'user' ? named.slice(2) : named
+  const owned = isAnyOf(named[0], 'user') ? named.slice(2) : named
 
   return owned[0] && owned[1] ? [owned[0], owned[1]] : undefined
 }
@@ -91,7 +91,7 @@ export const spotifyResolveEmbed: ResolveEmbed = (url, element) => {
   // The `uri` parameter also carries an open.spotify.com url, in every spelling the carrier's own
   // path has: the `intl-{lang}` prefix, an `/embed/` prefix and the `user/{handle}/playlist/{id}`
   // ownership form.
-  const uri = parsed.searchParams.get('uri') ?? undefined
+  const uri = getQueryParam(parsed.searchParams, 'uri')
   const legacy = uri?.match(legacyUriRegex)
   // The type and id are taken as a pair from whichever source names both, never one from each:
   // a path stating a type and no id would otherwise take its id from the parameter and mint one
@@ -99,7 +99,8 @@ export const spotifyResolveEmbed: ResolveEmbed = (url, element) => {
   const pair =
     readPathPair(parsed) ??
     (legacy ? [legacy[1], legacy[2]] : readPathPair(parseUrlOnHosts(uri, spotifyHosts)))
-  const [type, id] = pair ?? []
+  const [rawType, id] = pair ?? []
+  const type = rawType?.toLowerCase()
 
   if (!type || !id || !spotifyHeights.has(type)) {
     return

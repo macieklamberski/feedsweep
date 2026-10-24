@@ -213,6 +213,19 @@ describeForEachParser('bandcampEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read an album option in capitals and mint the album player', async () => {
+      const value =
+        '<iframe src="https://bandcamp.com/EmbeddedPlayer/ALBUM=3373381116/size=large/"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'bandcamp',
+        id: 'album/3373381116',
+        src: 'https://bandcamp.com/EmbeddedPlayer/album=3373381116/size=large/tracklist=false/artwork=small/',
+        height: 120,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should keep the video player form for a video embed', async () => {
       const value = html`
         <iframe src="https://bandcamp.com/VideoEmbed?track=1959185434&bgcol=ffffff"></iframe>

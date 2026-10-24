@@ -1,4 +1,4 @@
-import { decodeSegment, getPathSegments, parseUrl } from 'trousse'
+import { decodeSegment, getPathSegments, getQueryParam, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { absoluteUrlRegex, composeQuery, isFileName, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -26,7 +26,7 @@ const readFileName = (documentUrl: string): string | undefined => {
 // as the `src` query parameter.
 export const officeResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
-  const documentUrl = parsed?.searchParams.get('src')
+  const documentUrl = getQueryParam(parsed?.searchParams, 'src')
 
   if (!parsed || !documentUrl || !viewerPathRegex.test(parsed.pathname)) {
     return

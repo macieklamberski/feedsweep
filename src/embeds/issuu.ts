@@ -1,4 +1,11 @@
-import { decodeSegment, getPathSegments, isAnyOf, parseUrl, trimObject } from 'trousse'
+import {
+  decodeSegment,
+  getPathSegments,
+  getQueryParam,
+  isAnyOf,
+  parseUrl,
+  trimObject,
+} from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 
 const provider = 'issuu'
@@ -67,7 +74,7 @@ const readDocumentUrl = (url: string): EmbedResolverResult | undefined => {
 
   const [publisher, marker, documentName, page] = getPathSegments(parsed)
 
-  if (marker !== 'docs' || !documentName || isFileName(documentName)) {
+  if (!isAnyOf(marker, 'docs') || !documentName || isFileName(documentName)) {
     return
   }
 
@@ -75,7 +82,7 @@ const readDocumentUrl = (url: string): EmbedResolverResult | undefined => {
   return composeDocumentEmbed(
     decodeSegment(publisher) ?? publisher,
     decodeSegment(documentName) ?? documentName,
-    page === storyRoute ? undefined : page,
+    isAnyOf(page, storyRoute) ? undefined : page,
   )
 }
 
@@ -96,13 +103,14 @@ export const issuuWidgetEmbedResolver = createMarkupEmbedResolver(
 // `documentName` by the older snippet, in the swf query or in flashvars, beside a `documentId`
 // that is a third id space neither url form accepts.
 const readFlashDocument = (parsed: URL, element?: Element): EmbedResolverResult | undefined => {
-  const settings = parsed.searchParams.has('docName')
-    ? parsed.searchParams
-    : new URLSearchParams(flashVars(element))
+  const settings =
+    getQueryParam(parsed.searchParams, 'docName') !== undefined
+      ? parsed.searchParams
+      : new URLSearchParams(flashVars(element))
   const embed = composeDocumentEmbed(
-    settings.get('username') ?? settings.get('documentUsername') ?? undefined,
-    settings.get('docName') ?? settings.get('documentName') ?? undefined,
-    settings.get('pageNumber') ?? undefined,
+    getQueryParam(settings, 'username') ?? getQueryParam(settings, 'documentUsername'),
+    getQueryParam(settings, 'docName') ?? getQueryParam(settings, 'documentName'),
+    getQueryParam(settings, 'pageNumber'),
   )
 
   if (!embed) {
@@ -111,7 +119,7 @@ const readFlashDocument = (parsed: URL, element?: Element): EmbedResolverResult 
 
   return {
     ...embed,
-    title: settings.get('loadingInfoText') ?? undefined,
+    title: getQueryParam(settings, 'loadingInfoText'),
   }
 }
 
@@ -143,9 +151,9 @@ const issuuResolveEmbed: ResolveEmbed = (url, element) => {
   const embed =
     composeConfigEmbed(parsed.hash.replace('#', '')) ??
     composeDocumentEmbed(
-      parsed.searchParams.get('u') ?? undefined,
-      parsed.searchParams.get('d') ?? undefined,
-      parsed.searchParams.get('p') ?? undefined,
+      getQueryParam(parsed.searchParams, 'u'),
+      getQueryParam(parsed.searchParams, 'd'),
+      getQueryParam(parsed.searchParams, 'p'),
     )
 
   return embed && { ...embed, title }

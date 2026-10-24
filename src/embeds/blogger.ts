@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { composeQuery } from '../utils/urls.js'
@@ -12,11 +12,17 @@ const bloggerHosts = ['blogger.com']
 export const extractBloggerToken = (link: string): string | undefined => {
   const parsed = parseUrl(link)
 
-  if (!parsed || getPathSegments(parsed)[0] !== 'video.g') {
+  if (!parsed || !isAnyOf(getPathSegments(parsed)[0], 'video.g')) {
     return
   }
 
-  return parsed.searchParams.get('token') || undefined
+  const token = getQueryParam(parsed.searchParams, 'token')
+
+  if (!token) {
+    return
+  }
+
+  return token
 }
 
 // Blogger's own hosted video: an iframe on blogger.com/video.g with no poster and no page to open.

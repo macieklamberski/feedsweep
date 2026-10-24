@@ -2,7 +2,9 @@ import {
   audioExtensions,
   documentExtensions,
   flashExtensions,
+  getQueryParam,
   imageExtensions,
+  isAnyOf,
   isHostOrSubdomainOf,
   normalizeUrl,
   parseUrl,
@@ -80,7 +82,7 @@ export const isFileName = (value: string): boolean => {
 // extension while the response is HTML. Feeds carry the colon percent-encoded too, and the
 // `/w/index.php?title=File:Clip.webm` spelling moves the namespace into the query.
 const filePagePathRegex = /\/wiki\/[^/?#]*(?::|%3A)[^/?#]*$/i
-const scriptPathRegex = /\/index\.php$/
+const scriptPathRegex = /\/index\.php$/i
 const titleParamRegex = /[?&]title=[^&#]*(?::|%3A)/i
 const filePageNameRegex = /\/wiki\/[^/?#]*?(?::|%3A)([^/?#]+)$/i
 
@@ -212,7 +214,7 @@ export const pickQueryParams = (
   const picked: Record<string, string> = {}
 
   for (const name of names) {
-    const value = parsed.get(name)
+    const value = getQueryParam(parsed, name)
 
     if (value) {
       picked[name] = value
@@ -261,11 +263,11 @@ export const filterUrlQuery = (url: URL, isKept: (name: string) => boolean): str
 export const dropUrlParams = (url: string, names: ReadonlyArray<string>): string => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
-  if (!parsed || !names.some((name) => parsed.searchParams.has(name))) {
+  if (!parsed || !names.some((name) => getQueryParam(parsed.searchParams, name) !== undefined)) {
     return url
   }
 
-  parsed.search = filterUrlQuery(parsed, (name) => !names.includes(name))
+  parsed.search = filterUrlQuery(parsed, (name) => !isAnyOf(name, names))
 
   return parsed.href
 }

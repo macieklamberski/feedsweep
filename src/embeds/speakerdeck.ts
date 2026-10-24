@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { composeQuery, isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
@@ -13,8 +13,8 @@ const deckRouteWords = ['player', 'embed']
 
 // Speaker Deck's embed.js appends `data-id` to the player path, so `{id}?slide=N` opens slide N
 // on the publisher's page.
-const slideSuffixRegex = /\?slide=([^&]+)$/
-const legacyScriptPathRegex = /^\/embed\/([^/]+)\.js$/
+const slideSuffixRegex = /\?slide=([^&]+)$/i
+const legacyScriptPathRegex = /^\/embed\/([^/]+)\.js$/i
 
 // One feed can embed the same deck at several slides. Without the slide those collapse into
 // identical placeholders, and the player url honours `?slide=`.
@@ -55,7 +55,7 @@ export const speakerdeckScriptEmbedResolver = createMarkupEmbedResolver(
 // Speaker Deck's first embed code, a script whose `document.write` emits the `data-id` script
 // above with the same deck id.
 export const speakerdeckLegacyScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="speakerdeck.com/embed/"]',
+  'script[src*="speakerdeck.com/embed/" i]',
   (element) => {
     const url = parseUrlOnHosts(attr(element, 'src'), speakerdeckHosts)
     const deckId = url?.pathname.match(legacyScriptPathRegex)?.[1]
@@ -74,11 +74,11 @@ export const speakerdeckResolveEmbed: ResolveEmbed = (url, element) => {
   const [route = '', deckId] = getPathSegments(url)
 
   // Speaker Deck serves files on its own host, so a file name is an enclosure.
-  if (!deckRouteWords.includes(route) || !deckId || isFileName(deckId)) {
+  if (!isAnyOf(route, deckRouteWords) || !deckId || isFileName(deckId)) {
     return
   }
 
-  const slide = parseUrl(url, placeholderBaseUrl)?.searchParams.get('slide') ?? undefined
+  const slide = getQueryParam(parseUrl(url, placeholderBaseUrl)?.searchParams, 'slide')
 
   return composeEmbed(deckId, { slide, title: attr(element, 'title') })
 }

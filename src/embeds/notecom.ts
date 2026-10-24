@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { readPixels } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -48,15 +48,15 @@ const readNoteUrl = (link: string): NoteUrl | undefined => {
   const parsed = parseUrlOnHosts(link, notecomHosts)
   const segments = parsed ? getPathSegments(parsed) : []
 
-  if (segments[1] === 'n' && segments[2]) {
+  if (isAnyOf(segments[1], 'n') && segments[2]) {
     return { noteId: segments[2], kind: 'post' }
   }
 
-  if (segments[0] === 'n' && segments.length === 2) {
+  if (isAnyOf(segments[0], 'n') && segments.length === 2) {
     return { noteId: segments[1], kind: 'post' }
   }
 
-  if (segments[0] === 'embed' && segments[1] === 'notes' && segments.length === 3) {
+  if (isAnyOf(segments[0], 'embed') && isAnyOf(segments[1], 'notes') && segments.length === 3) {
     return { noteId: segments[2], kind: 'player' }
   }
 }

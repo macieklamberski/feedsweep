@@ -3,7 +3,7 @@ import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The asset id Getty calls `items`, and the opaque embed token it calls `et`.
-const embedPathRegex = /^\/embed\/([^/]+)\/?$/
+const embedPathRegex = /^\/embed\/([^/]+)\/?$/i
 
 const gettyImagesHosts = ['gettyimages.com']
 

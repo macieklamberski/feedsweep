@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf, startsWithAnyOf } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readIframeResizeHeight } from '../utils/hints.js'
@@ -20,7 +20,7 @@ const contentOptions = ['guid', 'playlist']
 const readContentOptions = (segments: Array<string>): Array<string> => {
   return segments
     .flatMap((segment) => segment.split(';'))
-    .filter((option) => contentOptions.includes(option.split(':')[0]))
+    .filter((option) => isAnyOf(option.split(':')[0], contentOptions))
 }
 
 // The player's url and page, as the episode page's og:video and og:url write them. A show with
@@ -39,7 +39,7 @@ const composeEmbed = (
   // With a content option the page names another item, so the key is the option the player
   // queries by: `podcastItem(_id)` for a guid, `playlist(user_id, _id)` for a playlist, which
   // wins over a guid.
-  const option = options.find((value) => value.startsWith('playlist:')) ?? options[0]
+  const option = options.find((value) => startsWithAnyOf(value, ['playlist:'])) ?? options[0]
 
   if (option) {
     return {
@@ -73,17 +73,17 @@ export const podcloudResolveEmbed: ResolveEmbed = (url, element) => {
   const segments = getPathSegments(parsed)
   const [route, show, kind, episode, player] = segments
 
-  if (route !== 'podcast') {
+  if (!isAnyOf(route, 'podcast')) {
     return
   }
 
   const title = attr(element, 'title')
 
-  if (kind === 'player') {
+  if (isAnyOf(kind, 'player')) {
     return composeEmbed(show, undefined, readContentOptions(segments.slice(3)), title)
   }
 
-  if (kind === 'episode' && player === 'player') {
+  if (isAnyOf(kind, 'episode') && isAnyOf(player, 'player')) {
     return composeEmbed(show, episode, readContentOptions(segments.slice(5)), title)
   }
 }

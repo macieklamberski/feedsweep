@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { pickUrlParams } from '../utils/urls.js'
@@ -29,20 +29,20 @@ const docHeight = 500
 export const googledocsResolveEmbed: ResolveEmbed = (url, element) => {
   const pathSegments = getPathSegments(url)
 
-  if (pathSegments[0] !== 'document' || pathSegments[1] !== 'd') {
+  if (!isAnyOf(pathSegments[0], 'document') || !isAnyOf(pathSegments[1], 'd')) {
     return
   }
 
-  const isPublished = pathSegments[2] === 'e'
+  const isPublished = isAnyOf(pathSegments[2], 'e')
   const docId = pathSegments[isPublished ? 3 : 2]
   const route = pathSegments.slice(isPublished ? 4 : 3).join('/')
-  const isShared = sharedRoutes.includes(route)
+  const isShared = isAnyOf(route, sharedRoutes)
 
   if (!docId) {
     return
   }
 
-  if (!isShared && route !== 'pub') {
+  if (!isShared && !isAnyOf(route, 'pub')) {
     return
   }
 

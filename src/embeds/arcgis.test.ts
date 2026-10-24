@@ -243,6 +243,20 @@ describe('arcgisResolveEmbed', () => {
 
       expect(arcgisResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read a lowercase classic embed path and mint the path Esri serves', () => {
+      const value =
+        'https://www.arcgis.com/apps/embed/index.html?webmap=62bf87f7b2f64f15b48491d39242f4d7'
+      const expected: EmbedResolverResult = {
+        provider: 'arcgis',
+        id: '62bf87f7b2f64f15b48491d39242f4d7',
+        src: 'https://www.arcgis.com/apps/Embed/index.html?webmap=62bf87f7b2f64f15b48491d39242f4d7',
+        url: 'https://www.arcgis.com/home/webmap/embedViewer.html?webmap=62bf87f7b2f64f15b48491d39242f4d7',
+        height: 500,
+      }
+
+      expect(arcgisResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -297,13 +311,6 @@ describe('arcgisResolveEmbed', () => {
 
     it('should ignore the StoryMaps route list with no item', () => {
       const value = 'https://storymaps.arcgis.com/stories'
-
-      expect(arcgisResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a lowercase classic embed path, which answers 404', () => {
-      const value =
-        'https://www.arcgis.com/apps/embed/index.html?webmap=62bf87f7b2f64f15b48491d39242f4d7'
 
       expect(arcgisResolveEmbed(value)).toBeUndefined()
     })

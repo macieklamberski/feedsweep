@@ -1,4 +1,4 @@
-import { isHostOrSubdomainOf, isPlainObject, parseUrl } from 'trousse'
+import { getQueryParam, isAnyOf, isHostOrSubdomainOf, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, jsonAttr, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
@@ -37,13 +37,13 @@ const isTweetUrl = (url: URL): boolean => {
 }
 
 // `/{handle}/status/{id}`, with the plural `statuses` form from the earliest era.
-const statusPathRegex = /^\/([a-zA-Z0-9_]+)\/status(?:es)?\/(\d+)/
+const statusPathRegex = /^\/([a-zA-Z0-9_]+)\/status(?:es)?\/(\d+)/i
 
 // The paths that name a status and carry no handle: the web client's permalink, the 2015-2017
 // video frames, and the card frame before them. The frames are dead, answering 404 or a stub
 // for a real id and a fabricated one alike, so the id in them is worth more than the url.
 const handlelessPathRegex =
-  /^\/(?:i\/(?:web\/status|videos\/tweet|videos|cards\/tfw\/v\d+)|status(?:es)?)\/(\d+)/
+  /^\/(?:i\/(?:web\/status|videos\/tweet|videos|cards\/tfw\/v\d+)|status(?:es)?)\/(\d+)/i
 
 // Twitter takes `i` where a handle belongs and redirects to the real one, so a status recovered
 // without a handle still yields a url a reader can follow.
@@ -90,7 +90,7 @@ const findStatus = (element: Element): { status: Status; anchor?: Element } | un
   // The frame has to be the platform's own: `id` is an ordinary parameter name, so any other
   // iframe a publisher nested in the quote would otherwise name the tweet.
   const frame = parseUrl(attr(find(element, 'iframe[src]'), 'src') ?? '', placeholderBaseUrl)
-  const framed = frame && isTweetUrl(frame) ? frame.searchParams.get('id') : undefined
+  const framed = frame && isTweetUrl(frame) ? getQueryParam(frame.searchParams, 'id') : undefined
   const declared =
     attr(element, 'data-twitter-tweet-id') ??
     attr(element, 'data-tweet-id') ??
@@ -244,13 +244,16 @@ export const twitterSubstackEmbedResolver = createMarkupEmbedResolver(
 // The player a stored-after-render copy already points at, and the one this resolver mints, so
 // a feed carrying the frame alone still names its provider. The player has two spellings with
 // the same `id` query, and both occur in real feeds.
-const playerPaths = new Set(['/embed/Tweet.html', '/embed/index.html'])
+const playerPaths = ['/embed/Tweet.html', '/embed/index.html']
 
 // A post has no name: its words go to `description`, and the frame titles itself `Twitter Tweet`
 // or `X Post`.
 export const twitterResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url)
-  const id = parsed && playerPaths.has(parsed.pathname) ? parsed.searchParams.get('id') : undefined
+  const id =
+    parsed && isAnyOf(parsed.pathname, playerPaths)
+      ? getQueryParam(parsed.searchParams, 'id')
+      : undefined
 
   if (id) {
     return composeEmbed({ handle: '', id }, {})

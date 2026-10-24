@@ -1,4 +1,4 @@
-import { parseUrl } from 'trousse'
+import { getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
 import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
@@ -12,9 +12,9 @@ const pixivHosts = ['pixiv.net']
 
 // A work id is the illustration's number and an upload hash. The endpoint keys on the number.
 const illustIdRegex = /^(\d+)(?:_[0-9a-f]+)?$/
-const workPathRegex = /^\/(?:member_illust\.php|artworks\/\d+)$/
-const artistPathRegex = /^\/(?:member\.php|users\/\d+)$/
-const framePathRegex = /^\/(code|embed_mk2|fixed|oembed_iframe)\.php$/
+const workPathRegex = /^\/(?:member_illust\.php|artworks\/\d+)$/i
+const artistPathRegex = /^\/(?:member\.php|users\/\d+)$/i
+const framePathRegex = /^\/(code|embed_mk2|fixed|oembed_iframe)\.php$/i
 
 // The loader draws nothing for a `data-size` outside its own table.
 const loaderSizes = ['small', 'medium', 'large']
@@ -47,8 +47,8 @@ const pixivResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const route = parsed.pathname.match(framePathRegex)?.[1]
-  const workId = parsed.searchParams.get('id')
+  const route = parsed.pathname.match(framePathRegex)?.[1]?.toLowerCase()
+  const workId = getQueryParam(parsed.searchParams, 'id')
 
   if (!route || !workId) {
     return
@@ -58,7 +58,7 @@ const pixivResolveEmbed: ResolveEmbed = (url) => {
   const page = illustIdRegex.test(workId) ? `https://www.pixiv.net/artworks/${illustId}` : undefined
 
   // `type` picks the id space, and a novel's number reads the same as an illustration's.
-  if (route === 'oembed_iframe' && parsed.searchParams.get('type') !== 'illust') {
+  if (route === 'oembed_iframe' && !isAnyOf(getQueryParam(parsed.searchParams, 'type'), 'illust')) {
     return
   }
 
@@ -77,7 +77,7 @@ const pixivResolveEmbed: ResolveEmbed = (url) => {
 // and the author. The loader writes a frame onto `embed.pixiv.net/embed_mk2.php`, and the result
 // mints the frame pixiv's oEmbed answer names for the same work.
 export const pixivScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="source.pixiv.net/source/embed.js"][data-id], script[src*="s.pximg.net/source/embed.js"][data-id]',
+  'script[src*="source.pixiv.net/source/embed.js" i][data-id], script[src*="s.pximg.net/source/embed.js" i][data-id]',
   (element) => {
     const workId = attr(element, 'data-id')
     const size = attr(element, 'data-size') ?? ''
@@ -88,7 +88,7 @@ export const pixivScriptEmbedResolver = createMarkupEmbedResolver(
     if (
       !parseUrlOnHosts(attr(element, 'src'), loaderHosts) ||
       !workId ||
-      !loaderSizes.includes(size) ||
+      !isAnyOf(size, loaderSizes) ||
       !border
     ) {
       return

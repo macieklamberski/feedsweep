@@ -1,4 +1,4 @@
-import { parseUrl } from 'trousse'
+import { getQueryParam, parseUrl } from 'trousse'
 import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
@@ -11,7 +11,7 @@ const cardHost = 'hatenablog-parts.com'
 const cardIframeSelector = [
   'iframe.embed-card',
   'iframe.hatenablogcard',
-  `iframe[src*="${cardHost}/embed"]`,
+  `iframe[src*="${cardHost}/embed" i]`,
 ].join(', ')
 
 // A host list misses this: a blog on a custom domain serves its own card from that domain.
@@ -49,7 +49,7 @@ export const hatenaCiteResolver: CiteResolver = {
     const result = buildCite({
       provider: 'hatena',
       // The citation's href comes first: it is the plain target, so it needs no decoding.
-      url: citationHref ?? cardUrl?.searchParams.get('url'),
+      url: citationHref ?? getQueryParam(cardUrl?.searchParams, 'url'),
       title: attr(element, 'title'),
       publisher: text(citationLink),
     })

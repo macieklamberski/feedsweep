@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { composeQuery, encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -10,7 +10,6 @@ const traileraddictHosts = ['traileraddict.com']
 // The Flash player's two routes, which now 301 to the trailer's watch page.
 const flashRoutes = ['emb', 'emd']
 
-// The server matches this path in its own case only.
 const playerPath = '/iframe.php'
 
 // Only this host takes the id as its only segment. The apex serves pages there, such as `/search`.
@@ -46,8 +45,8 @@ export const traileraddictResolveEmbed: ResolveEmbed = (url) => {
     return composeEmbed(id)
   }
 
-  if (parsed.pathname === playerPath) {
-    const id = parsed.searchParams.get('id')
+  if (isAnyOf(parsed.pathname, playerPath)) {
+    const id = getQueryParam(parsed.searchParams, 'id')
 
     if (!id) {
       return

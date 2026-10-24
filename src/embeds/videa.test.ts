@@ -66,17 +66,23 @@ describe('videaResolveEmbed', () => {
 
       expect(videaResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the player route in another case and mint it in lowercase', () => {
+      const value = 'https://videa.hu/PLAYER?v=RJiqVlMkla4Ckqf3'
+      const expected: EmbedResolverResult = {
+        provider: 'videa',
+        id: 'RJiqVlMkla4Ckqf3',
+        src: 'https://videa.hu/player?v=RJiqVlMkla4Ckqf3',
+        ratio: '16/9',
+      }
+
+      expect(videaResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
     it('should ignore the player with no video', () => {
       const value = 'https://videa.hu/player?start=120'
-
-      expect(videaResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore the player route in another case, which the server answers with 404', () => {
-      const value = 'https://videa.hu/PLAYER?v=RJiqVlMkla4Ckqf3'
 
       expect(videaResolveEmbed(value)).toBeUndefined()
     })

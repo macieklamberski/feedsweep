@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -20,7 +20,7 @@ const flashHosts = ['boos.audioboo.fm', 'abfiles.s3.amazonaws.com']
 const bucketHost = 's3.amazonaws.com'
 
 // The `mp3` flashvar names the audio file, the post page with `.mp3` on its last segment.
-const mp3ExtensionRegex = /\.mp3(?=\?|$)/
+const mp3ExtensionRegex = /\.mp3(?=\?|$)/i
 
 // `/posts/{id}/embed[/v4]` is current. `/boos/{id}/embed` is the pre-rename spelling.
 const postIdMarkers = ['posts', 'boos']
@@ -33,14 +33,14 @@ export const extractAudioboomPost = (
   link: string,
 ): { id: string; isCurrent: boolean } | undefined => {
   const segments = getPathSegments(link)
-  const marker = segments.findIndex((segment) => postIdMarkers.includes(segment))
+  const marker = segments.findIndex((segment) => isAnyOf(segment, postIdMarkers))
   const id = marker >= 0 ? segments[marker + 1]?.match(postIdRegex)?.[1] : undefined
 
   if (!id) {
     return
   }
 
-  return { id, isCurrent: segments.includes('v4') }
+  return { id, isCurrent: segments.some((segment) => isAnyOf(segment, 'v4')) }
 }
 
 // No metadata offline: Audioboom's oEmbed accepts only `audioboom.com` page urls, not the

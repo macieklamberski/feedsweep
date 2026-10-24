@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -21,7 +21,7 @@ export const patroniteResolveEmbed: ResolveEmbed = (url) => {
 
   const [route, slug, id] = getPathSegments(parsed)
 
-  if (route !== 'widget' || !id) {
+  if (!isAnyOf(route, 'widget') || !id) {
     return
   }
 

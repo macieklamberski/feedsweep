@@ -94,12 +94,6 @@ describeForEachParser('slideserveEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should ignore the embed route in uppercase', async () => {
-      const value = '<iframe src="https://www.slideserve.com/EMBED/11734358"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should ignore the embed route under a leading segment', async () => {
       const value = '<iframe src="https://www.slideserve.com/x/embed/11734358"></iframe>'
 
@@ -160,6 +154,18 @@ describeForEachParser('slideserveEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should read the embed route in uppercase and mint it in lowercase', async () => {
+      const value = '<iframe src="https://www.slideserve.com/EMBED/11734358"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'slideserve',
+        id: '11734358',
+        src: 'https://www.slideserve.com/embed/11734358',
+        ratio: '300/271',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should leave the title out of a viewkey with no title', async () => {
       const value = html`
         <embed

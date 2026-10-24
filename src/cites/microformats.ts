@@ -42,38 +42,39 @@ const readImageUrl = (element: Nullish<Element>): string | undefined => {
 // Any mf2-emitting theme, IndieWeb sites and Hugo microblog themes, renders the same classes.
 export const microformatsCiteResolver: CiteResolver = {
   kind: 'cite',
-  selector: '.h-cite',
+  selector: '[class~="h-cite" i]',
   extract: (element) => {
     // The p-author is itself an h-card with its own u-url and p-name.
-    const notInAuthor = (node: Element) => !node.closest('.p-author')
+    const notInAuthor = (node: Element) => !node.closest('[class~="p-author" i]')
 
     // One selector list would return the content when it precedes the summary.
     // `summary` and `content` each come in a plain-text p- and an HTML e- spelling.
     const description =
-      find(element, '.p-summary, .e-summary', notInAuthor) ??
-      find(element, '.p-content, .e-content', notInAuthor)
+      find(element, '[class~="p-summary" i], [class~="e-summary" i]', notInAuthor) ??
+      find(element, '[class~="p-content" i], [class~="e-content" i]', notInAuthor)
     // The image property is `u-featured` in the newer IndieWeb convention and `u-photo` in
     // the base spec.
     const image =
-      find(element, '.u-featured', notInAuthor) ?? find(element, '.u-photo', notInAuthor)
-    const author = find(element, '.p-author')
-    const published = find(element, '.dt-published', notInAuthor)
+      find(element, '[class~="u-featured" i]', notInAuthor) ??
+      find(element, '[class~="u-photo" i]', notInAuthor)
+    const author = find(element, '[class~="p-author" i]')
+    const published = find(element, '[class~="dt-published" i]', notInAuthor)
 
     const kind = Array.from(element.classList)
       .filter((name) => startsWithAnyOf(name, responsePrefixes))
-      .map((name) => citeKindByResponseProperty.get(name.slice(2)))
+      .map((name) => citeKindByResponseProperty.get(name.slice(2).toLowerCase()))
       .find((named) => named !== undefined)
 
     return buildCite({
       provider: 'microformats',
-      url: attr(find(element, '.u-url', notInAuthor), 'href'),
-      title: text(find(element, '.p-name', notInAuthor)),
+      url: attr(find(element, '[class~="u-url" i]', notInAuthor), 'href'),
+      title: text(find(element, '[class~="p-name" i]', notInAuthor)),
       description: text(description),
-      author: text(author, '.p-name') ?? text(author),
-      publisher: text(find(element, '.p-publication', notInAuthor)),
+      author: text(author, '[class~="p-name" i]') ?? text(author),
+      publisher: text(find(element, '[class~="p-publication" i]', notInAuthor)),
       // Passed through unparsed, as the spec allows a bare date as well as a full timestamp.
       date: readDateValue(published),
-      icon: readImageUrl(find(element, '.p-author .u-photo')),
+      icon: readImageUrl(find(element, '[class~="p-author" i] [class~="u-photo" i]')),
       thumbnail: readImageUrl(image),
       kind,
     })

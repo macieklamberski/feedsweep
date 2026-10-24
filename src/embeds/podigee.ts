@@ -1,4 +1,4 @@
-import { getPathSegments, isPlainObject } from 'trousse'
+import { getPathSegments, isAnyOf, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest, readPixels } from '../utils/hints.js'
@@ -48,7 +48,7 @@ export const podigeeScriptEmbedResolver = createMarkupEmbedResolver(
     const configuration = attr(element, 'data-configuration') ?? ''
     const parsed = parseUrlOnHosts(configuration, podigeeHosts)
 
-    if (parsed && showHostRegex.test(parsed.hostname) && parsed.pathname === '/embed') {
+    if (parsed && showHostRegex.test(parsed.hostname) && isAnyOf(parsed.pathname, '/embed')) {
       return composeEmbed(parsed)
     }
 
@@ -70,7 +70,7 @@ export const podigeeResolveEmbed: ResolveEmbed = (url) => {
   }
 
   // With anything after `embed` the show serves its website page.
-  if (rest[0] === 'embed' && rest.length === 1) {
+  if (isAnyOf(rest[0], 'embed') && rest.length === 1) {
     return composeEmbed(parsed, episode)
   }
 

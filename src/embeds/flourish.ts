@@ -1,4 +1,4 @@
-import { getPathSegments, isHostOf, isPlainObject, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
@@ -68,7 +68,7 @@ export const flourishResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const segments = getPathSegments(parsed)
-  const isPlayer = segments[2] === 'embed'
+  const isPlayer = isAnyOf(segments[2], 'embed')
   // The share page frames the same player inside the site's header, footer and cookie banner.
   // `flo.uri.sh` serves no page at that path, and the host serves its own files beside it.
   const isSharePage =

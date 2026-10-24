@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { readObjectHeight } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -20,7 +20,11 @@ export const helloassoResolveEmbed: ResolveEmbed = (url) => {
 
   const [route, org, type, slug, kind, ...rest] = getPathSegments(parsed)
 
-  if (route !== 'associations' || rest.length > 0 || !kind?.startsWith('widget')) {
+  if (
+    !isAnyOf(route, 'associations') ||
+    rest.length > 0 ||
+    !kind?.toLowerCase().startsWith('widget')
+  ) {
     return
   }
 

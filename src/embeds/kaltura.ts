@@ -1,3 +1,4 @@
+import { getQueryParam, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { composeQuery, encodePathSegment, filterUrlQuery, parseUrlOnHosts } from '../utils/urls.js'
@@ -5,7 +6,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'kaltura'
 
-const partnerPathRegex = /^\/p\/([^/]+)\//
+const partnerPathRegex = /^\/p\/([^/]+)\//i
 
 const kalturaHost = 'kaltura.com'
 
@@ -38,7 +39,7 @@ type Entry = {
 const readEntry = (url: string | undefined): Entry | undefined => {
   const parsed = parseUrlOnHosts(url, kalturaHost)
   const partner = parsed?.pathname.match(partnerPathRegex)?.[1]
-  const entryId = parsed?.searchParams.get('entry_id')
+  const entryId = getQueryParam(parsed?.searchParams, 'entry_id')
 
   return parsed && partner && entryId ? { partner, entryId, parsed } : undefined
 }
@@ -48,10 +49,11 @@ const readEntry = (url: string | undefined): Entry | undefined => {
 const composeEmbed = ({ partner, entryId, parsed }: Entry): EmbedResolverResult => {
   const host = saasHosts.has(parsed.hostname) ? 'cdnapisec.kaltura.com' : parsed.hostname
   const query = composeQuery({ iframeembed: 'true', entry_id: entryId })
-  const hasToken = parsed.searchParams.has(tokenParam)
+  const hasToken = getQueryParam(parsed.searchParams, tokenParam) !== undefined
   const kept = filterUrlQuery(
     parsed,
-    (name) => name === tokenParam || widgetParams.includes(name) || playbackParams.includes(name),
+    (name) =>
+      isAnyOf(name, tokenParam) || isAnyOf(name, widgetParams) || isAnyOf(name, playbackParams),
   )
   const playback = kept.replace('?', '&')
   // The entry comes out of the query decoded, and it goes into a path.
@@ -88,11 +90,11 @@ export const kalturaIframeEmbedResolver = createUrlEmbedResolver([kalturaHost], 
 // Kaltura's auto-embed script, which writes the iframe into an empty div at load time. Feeds strip
 // the script, and the emptied div dies as an empty tag with the video.
 export const kalturaScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="kaltura.com/p/"]',
+  'script[src*="kaltura.com/p/" i]',
   (element) => {
     const entry = readEntry(attr(element, 'src'))
 
-    if (entry?.parsed.searchParams.get('autoembed') !== 'true') {
+    if (!entry || !isAnyOf(getQueryParam(entry.parsed.searchParams, 'autoembed'), 'true')) {
       return
     }
 

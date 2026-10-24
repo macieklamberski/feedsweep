@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { filterUrlQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -15,7 +15,7 @@ const safeIdRegex = /^[A-Za-z]+_\d+$/
 // The Flash players, all of them under `widgets/swf/{revision}/`. `pro_widget` is the common one
 // at 49 occurrences, then `tuneWidget` 17, `widgetPlayer` 7, `press` 5, `widgetPlayerMini` 3,
 // `blog_player` 2 and `widgetPlayerMicro` 1.
-const flashPathRegex = /^\/widgets\/swf\//
+const flashPathRegex = /^\/widgets\/swf\//i
 
 // The three parameters those players use to name their subject. They are the same id space as
 // the html widget's path: all six Flash-era ids sampled from the corpus answer 200 there, against
@@ -27,7 +27,7 @@ const flashIdParams = ['id', 'emailPlaylist', 'twID']
 const widgetParams = ['widget_id', 'pwc[song_ids]', 'pwc[included_songs]']
 
 const isWidgetParam = (name: string): boolean => {
-  return widgetParams.includes(name)
+  return isAnyOf(name, widgetParams)
 }
 
 const composeSource = (id: string, query: string): string => {
@@ -37,7 +37,9 @@ const composeSource = (id: string, query: string): string => {
 const readWidgetId = (url: URL): string | undefined => {
   const segments = getPathSegments(url)
 
-  return segments[0] === 'widget_code' && segments[1] === 'html_widget' ? segments[2] : undefined
+  return isAnyOf(segments[0], 'widget_code') && isAnyOf(segments[1], 'html_widget')
+    ? segments[2]
+    : undefined
 }
 
 // The Flash players sit on cache.reverbnation.com, which serves swf files and nothing else.
@@ -47,7 +49,7 @@ const readFlashId = (url: URL): string | undefined => {
   }
 
   for (const name of flashIdParams) {
-    const id = url.searchParams.get(name)
+    const id = getQueryParam(url.searchParams, name)
 
     if (id) {
       return id

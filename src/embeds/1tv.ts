@@ -1,4 +1,4 @@
-import { getPathSegments, toMap } from 'trousse'
+import { getPathSegments, isAnyOf, toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -26,9 +26,9 @@ export const channelOneResolveEmbed: ResolveEmbed = (url) => {
   }
 
   const [route, id, ...rest] = getPathSegments(parsed)
-  const legacyType = legacyRouteTypes.get(route)
+  const legacyType = legacyRouteTypes.get(route?.toLowerCase())
 
-  if ((route !== 'embed' && !legacyType) || !id || rest.length > 0) {
+  if ((!isAnyOf(route, 'embed') && !legacyType) || !id || rest.length > 0) {
     return
   }
 

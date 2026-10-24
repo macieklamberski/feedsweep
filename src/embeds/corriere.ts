@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -9,7 +9,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const corriereFrameHosts = ['video.corriere.it']
 const corriereFlashHosts = ['corriereobjects.it']
 
-const rssFileRegex = /^video_(.+)\.rss$/
+const rssFileRegex = /^video_(.+)\.rss$/i
 
 const composeEmbed = (id: string): EmbedResolverResult => {
   return {
@@ -48,7 +48,7 @@ export const corriereResolveEmbed: ResolveEmbed = (url, element) => {
   if (flash) {
     const [widget, swf, , ...rest] = getPathSegments(flash)
 
-    if (widget !== 'widget' || swf !== 'swf' || rest.length > 0) {
+    if (!isAnyOf(widget, 'widget') || !isAnyOf(swf, 'swf') || rest.length > 0) {
       return
     }
 
@@ -66,17 +66,17 @@ export const corriereResolveEmbed: ResolveEmbed = (url, element) => {
   if (segments.length === 3) {
     const [widget, players] = segments
 
-    if (widget !== 'widget' || players !== 'players') {
+    if (!isAnyOf(widget, 'widget') || !isAnyOf(players, 'players')) {
       return
     }
 
-    return readFeedVideo(parsed.searchParams.get('videoId') ?? undefined)
+    return readFeedVideo(getQueryParam(parsed.searchParams, 'videoId'))
   }
 
   if (segments.length === 2) {
     const [videoEmbed, id] = segments
 
-    if (videoEmbed !== 'video-embed') {
+    if (!isAnyOf(videoEmbed, 'video-embed')) {
       return
     }
 

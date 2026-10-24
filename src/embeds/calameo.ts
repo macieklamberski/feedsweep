@@ -1,4 +1,4 @@
-import { parseUrl, trimObject } from 'trousse'
+import { getQueryParam, parseUrl, trimObject } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { flashVars } from '../utils/dom.js'
 import { composeQuery, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
@@ -11,8 +11,11 @@ const viewerRatio = '300/194'
 // player's flashvars when the `<embed src>` names a bare `cmini.swf`.
 export const calameoResolveEmbed: ResolveEmbed = (url, element) => {
   const urlParams = parseUrl(url, placeholderBaseUrl)?.searchParams
-  const params = urlParams?.has('bkcode') ? urlParams : new URLSearchParams(flashVars(element))
-  const code = params.get('bkcode')
+  const params =
+    urlParams && getQueryParam(urlParams, 'bkcode') !== undefined
+      ? urlParams
+      : new URLSearchParams(flashVars(element))
+  const code = getQueryParam(params, 'bkcode')
 
   if (!code) {
     return
@@ -26,9 +29,9 @@ export const calameoResolveEmbed: ResolveEmbed = (url, element) => {
     namedParams.append(name.toLowerCase(), value)
   }
 
-  const authId = namedParams.get('authid') ?? undefined
+  const authId = getQueryParam(namedParams, 'authid')
   // The page the viewer opens on.
-  const page = namedParams.get('page') ?? undefined
+  const page = getQueryParam(namedParams, 'page')
   const query = composeQuery(trimObject({ bkcode: code, page, authid: authId }, Boolean))
   const src = `https://v.calameo.com/${query}`
 

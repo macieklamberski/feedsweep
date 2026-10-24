@@ -1,7 +1,7 @@
 import type { DomTransform } from '../../types.js'
 import { hasText } from '../../utils/dom.js'
 
-const cargoImageSelector = 'img[src*="cargo.site"], img[data-src*="cargo.site"]'
+const cargoImageSelector = 'img[src*="cargo.site" i], img[data-src*="cargo.site" i]'
 
 // A Cargo project: caption text and a run of bare images with no block wrappers between them,
 // which wrapBareInlineInParagraphs would sweep into one paragraph along with the caption and nav.

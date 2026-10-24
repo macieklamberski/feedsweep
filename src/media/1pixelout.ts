@@ -1,4 +1,4 @@
-import { parseUrl } from 'trousse'
+import { getQueryParam, parseUrl } from 'trousse'
 import type { MediaResolver, MediaResolverResult } from '../types.js'
 import { flashVars } from '../utils/dom.js'
 import {
@@ -14,8 +14,8 @@ const weeblyHost = 'weebly.com'
 
 const httpUrlRegex = /^https?:\/\//i
 const embedCallRegex = /AudioPlayer\.embed\(\s*["']([^"']+)["']\s*,\s*\{([^}]*)\}/g
-const soundFileOptionRegex = /\bsoundFile\s*:\s*(["'])(.*?)\1/
-const titlesOptionRegex = /\btitles\s*:\s*(["'])(.*?)\1/
+const soundFileOptionRegex = /\bsoundFile\s*:\s*(["'])(.*?)\1/i
+const titlesOptionRegex = /\btitles\s*:\s*(["'])(.*?)\1/i
 
 // See: https://plugins.svn.wordpress.org/audio-player/tags/2.0.4.6/audio-player.php.
 // `encodeSource` writes the file list as unpadded base64url, plus a stray `A` when the bit count
@@ -70,9 +70,10 @@ export const onePixelOutFlashMediaResolver: MediaResolver = {
 
     // A feed that escapes the markup twice leaves `&amp;` between the flashvars.
     const config = new URLSearchParams(foldEscapedAmpersands(flashVars(element) ?? ''))
-    const soundFile = config.get('soundFile') ?? player.searchParams.get('soundFile')
+    const soundFile =
+      getQueryParam(config, 'soundFile') ?? getQueryParam(player.searchParams, 'soundFile')
 
-    return composeAudio(soundFile ?? undefined, config.get('titles') ?? undefined)
+    return composeAudio(soundFile, getQueryParam(config, 'titles'))
   },
 }
 
@@ -82,9 +83,9 @@ export const onePixelOutFlashMediaResolver: MediaResolver = {
 export const onePixelOutWidgetMediaResolver: MediaResolver = {
   kind: 'media',
   selector: [
-    'p[id^="audioplayer_"]',
-    'div[id^="audioplayer_"]',
-    'p[id^="onepixeloutaudioplayer_"]',
+    'p[id^="audioplayer_" i]',
+    'div[id^="audioplayer_" i]',
+    'p[id^="onepixeloutaudioplayer_" i]',
   ].join(', '),
   extract: (element) => {
     // Some copies also write a native player into the mount for browsers without Flash.

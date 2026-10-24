@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -19,7 +19,7 @@ export const tmzResolveEmbed: ResolveEmbed = (url) => {
 
   const [route = '', slug, ...rest] = getPathSegments(parsed)
 
-  if (!playerRoutes.includes(route) || !slug || rest.length > 0) {
+  if (!isAnyOf(route, playerRoutes) || !slug || rest.length > 0) {
     return
   }
 

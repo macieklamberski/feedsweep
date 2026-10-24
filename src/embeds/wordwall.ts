@@ -1,4 +1,4 @@
-import { getPathSegments, isHostOf } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
 import { hexRegex, localePairRegex, localeWordRegex, pickUrlParams } from '../utils/urls.js'
@@ -19,7 +19,7 @@ const extractActivityId = (link: string): string | undefined => {
 
   // The older share code framed `/embed/play/{a}/{b}/{c}`, where `{a}{b}` is the numeric
   // activity id and `{c}` a check the server validates, so the player needs all three as written.
-  if (segments[0] === 'embed' && segments[1] === 'play') {
+  if (isAnyOf(segments[0], 'embed') && isAnyOf(segments[1], 'play')) {
     const numbers = segments.slice(2, 5)
 
     if (numbers.length !== 3) {
@@ -31,10 +31,10 @@ const extractActivityId = (link: string): string | undefined => {
 
   // Wordwall serves the same activity at `/embed/{id}` and at `/{lang}/embed/{id}`, where the
   // locale prefix only sets the language of the player strings.
-  const locale = segments[0] === 'embed' ? undefined : segments[0]
+  const locale = isAnyOf(segments[0], 'embed') ? undefined : segments[0]
   const idIndex = locale ? 2 : 1
 
-  if (segments[idIndex - 1] !== 'embed') {
+  if (!isAnyOf(segments[idIndex - 1], 'embed')) {
     return
   }
 

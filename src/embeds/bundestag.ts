@@ -1,4 +1,4 @@
-import { getPathSegments, toMap } from 'trousse'
+import { getPathSegments, getQueryParam, toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
@@ -21,13 +21,13 @@ export const bundestagResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const name = idParams.get(getPathSegments(parsed).join('/'))
+  const name = idParams.get(getPathSegments(parsed).join('/').toLowerCase())
 
   if (!name) {
     return
   }
 
-  const id = parsed.searchParams.get(name)
+  const id = getQueryParam(parsed.searchParams, name)
 
   if (!id) {
     return
@@ -50,7 +50,7 @@ export const bundestagIframeEmbedResolver = createUrlEmbedResolver(
 )
 
 export const bundestagScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="webtv.bundestag.de/player/"]',
+  'script[src*="webtv.bundestag.de/player/" i]',
   (element) => {
     return bundestagResolveEmbed(attr(element, 'src') ?? '')
   },

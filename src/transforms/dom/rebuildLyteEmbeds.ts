@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import { composeEmbedUrl, extractVideoId, isVideoId } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
 import {
@@ -26,8 +26,8 @@ const readThumbnailVideoId = (src: string): string | undefined => {
     return
   }
 
-  const cachedUrl = url.pathname.endsWith('/lyteCache.php')
-    ? url.searchParams.get('origThumbUrl')
+  const cachedUrl = url.pathname.toLowerCase().endsWith('/lytecache.php')
+    ? getQueryParam(url.searchParams, 'origThumbUrl')
     : undefined
 
   if (cachedUrl) {
@@ -40,7 +40,7 @@ const readThumbnailVideoId = (src: string): string | undefined => {
 
   const [route, videoId] = getPathSegments(url)
 
-  if (route === 'vi' && videoId && isVideoId(videoId)) {
+  if (isAnyOf(route, 'vi') && videoId && isVideoId(videoId)) {
     return videoId
   }
 }

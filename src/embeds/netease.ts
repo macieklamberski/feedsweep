@@ -1,4 +1,4 @@
-import { toMap } from 'trousse'
+import { getQueryParam, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -17,8 +17,8 @@ const typeRoutes = toMap({
   '4': 'djradio',
 })
 
-const playerPathRegex = /^\/outchain\/player\/?$/
-const flashPlayerPathRegex = /^\/style\/swf\/widget\.swf$/
+const playerPathRegex = /^\/outchain\/player\/?$/i
+const flashPlayerPathRegex = /^\/style\/swf\/widget\.swf$/i
 
 // Without `height` the player loads its list layout and fills its box. 250 shows the header, about
 // three tracks and the footer, so a playlist shows that it holds more than one.
@@ -52,11 +52,11 @@ export const neteaseResolveEmbed: ResolveEmbed = (url) => {
   const query = parsed.searchParams
 
   if (playerPathRegex.test(parsed.pathname)) {
-    return composeResult(query.get('type') ?? '', query.get('id') ?? '')
+    return composeResult(getQueryParam(query, 'type') ?? '', getQueryParam(query, 'id') ?? '')
   }
 
   if (flashPlayerPathRegex.test(parsed.pathname)) {
-    return composeResult(query.get('type') ?? '', query.get('sid') ?? '')
+    return composeResult(getQueryParam(query, 'type') ?? '', getQueryParam(query, 'sid') ?? '')
   }
 }
 

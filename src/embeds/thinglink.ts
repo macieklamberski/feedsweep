@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -7,16 +7,16 @@ const thinglinkHost = 'thinglink.com'
 
 // The four viewer routes share one snowflake id space, so an id taken off any of them addresses
 // the same scene under `card`, the viewer ThingLink's oEmbed writes for every kind.
-const cardRoutes = new Set(['card', 'mediacard', 'videocard'])
+const cardRoutes = ['card', 'mediacard', 'videocard']
 
 const readSceneId = (url: URL): string | undefined => {
   const [route = '', second, third] = getPathSegments(url)
 
-  if (route === 'view') {
-    return second === 'scene' ? third : undefined
+  if (isAnyOf(route, 'view')) {
+    return isAnyOf(second, 'scene') ? third : undefined
   }
 
-  return cardRoutes.has(route) ? second : undefined
+  return isAnyOf(route, cardRoutes) ? second : undefined
 }
 
 // A scene at or above this id states no poster, since `cdn.thinglink.me` redirects most of them to

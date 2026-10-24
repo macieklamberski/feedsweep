@@ -1,4 +1,4 @@
-import { getPathSegments, toMap } from 'trousse'
+import { getPathSegments, isAnyOf, toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { composeQuery, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
@@ -33,21 +33,21 @@ const readTrack = (url: URL): Track | undefined => {
   const [route, second, third, fourth] = segments
 
   // The retired players, `embed3/{artist}/{slug}` and its four siblings.
-  const retired = retiredRoutes.get(route ?? '')
+  const retired = retiredRoutes.get((route ?? '').toLowerCase())
 
   if (retired && second && third) {
     return { artist: second, kind: retired, slug: third, search: '' }
   }
 
-  if (route !== 'embed' || !second || !third || !fourth) {
+  if (!isAnyOf(route, 'embed') || !second || !third || !fourth) {
     return
   }
 
   // The current player spells the kind either side of the artist: `embed/song/{artist}/{slug}`
   // 301s to `embed/{artist}/song/{slug}`.
-  return audiomackHeights.has(second)
-    ? { artist: third, kind: second, slug: fourth, search: url.search }
-    : { artist: second, kind: third, slug: fourth, search: url.search }
+  return audiomackHeights.has(second.toLowerCase())
+    ? { artist: third, kind: second.toLowerCase(), slug: fourth, search: url.search }
+    : { artist: second, kind: third.toLowerCase(), slug: fourth, search: url.search }
 }
 
 export const audiomackResolveEmbed: ResolveEmbed = (url, element) => {

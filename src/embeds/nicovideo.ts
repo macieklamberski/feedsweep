@@ -1,4 +1,4 @@
-import { getPathSegments, isPlainObject } from 'trousse'
+import { getPathSegments, isAnyOf, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -31,7 +31,7 @@ export const extractNicovideoId = (link: string): string | undefined => {
   // Every player and card route opens the path, and a marker deeper in it is another page's.
   const [marker, videoId] = getPathSegments(parsed)
 
-  if (!marker || !videoIdMarkers.includes(marker)) {
+  if (!marker || !isAnyOf(marker, videoIdMarkers)) {
     return
   }
 
@@ -77,7 +77,7 @@ export const nicovideoIframeEmbedResolver = createUrlEmbedResolver(
 // Nicovideo's thumb_watch script writes the player where it stands, and a reader never runs it.
 // Nicovideo answers it with a 302 to embed.nicovideo.jp/watch/{id}/script.
 export const nicovideoScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="nicovideo.jp/thumb_watch"], script[src*="embed.nicovideo.jp/watch"]',
+  'script[src*="nicovideo.jp/thumb_watch" i], script[src*="embed.nicovideo.jp/watch" i]',
   (element) => {
     return nicovideoResolveEmbed(attr(element, 'src') ?? '')
   },

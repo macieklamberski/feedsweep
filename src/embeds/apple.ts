@@ -1,4 +1,11 @@
-import { getPathSegments, isHostOrSubdomainOf, type Nullish, parseUrl, toMap } from 'trousse'
+import {
+  getPathSegments,
+  getQueryParam,
+  isHostOrSubdomainOf,
+  type Nullish,
+  parseUrl,
+  toMap,
+} from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr } from '../utils/dom.js'
 import {
@@ -20,7 +27,7 @@ const applePodcastsHosts = ['podcasts.apple.com']
 // The path is `/{storefront}/{kind}/{slug}/{id}`, with the storefront and the slug both
 // optional. A music id is numeric, a playlist or station id carries a two-letter prefix
 // (`pl.`, `ra.`) and a podcast id an `id` one.
-const podcastIdPrefixRegex = /^id/
+const podcastIdPrefixRegex = /^id/i
 
 // The player is fluid-width. The podcast show player fills any frame and floors at 180 at 320
 // wide, 360 at 640 and 422 at 1280, and the episode player floors at 160 at every width.
@@ -46,8 +53,9 @@ export const appleResolveEmbed: ResolveEmbed = (url) => {
 
   const segments = getPathSegments(parsed)
   // Any first segment that is not a kind is the storefront.
-  const hasStorefront = !appleHeights.has(segments[0] ?? '')
-  const [kind, ...rest] = hasStorefront ? segments.slice(1) : segments
+  const hasStorefront = !appleHeights.has(segments[0]?.toLowerCase() ?? '')
+  const [rawKind, ...rest] = hasStorefront ? segments.slice(1) : segments
+  const kind = rawKind?.toLowerCase()
   const pathId = rest[rest.length - 1]
 
   // A segment past the id, such as an artist's `see-all`, names a page on the site, not a player.
@@ -61,8 +69,8 @@ export const appleResolveEmbed: ResolveEmbed = (url) => {
 
   const isPodcast = isHostOrSubdomainOf(parsed, applePodcastsHosts)
   const host = isPodcast ? 'podcasts.apple.com' : 'music.apple.com'
-  const trackId = parsed.searchParams.get('i') || undefined
-  const id = trackId ?? pathId.replace(podcastIdPrefixRegex, '')
+  const trackId = getQueryParam(parsed.searchParams, 'i')
+  const id = trackId ? trackId : pathId.replace(podcastIdPrefixRegex, '')
   const query = trackId ? pickUrlParams(url, ['i']) : ''
 
   return {
@@ -140,7 +148,7 @@ export const appleEmbedResolver = createUrlEmbedResolver(appleHosts, (url, eleme
 // same marketing page, so the frame shows no player for anybody.
 const appleToolsHosts = ['tools.applemusic.com']
 
-const toolsPathRegex = /^\/embed\/v1\/([a-z]+)\/([^/]+)$/
+const toolsPathRegex = /^\/embed\/v1\/([a-z]+)\/([^/]+)$/i
 
 // The same album, playlist or song as the modern player, reached through the retired tool's url.
 // The tool wrote the storefront as `country`. A missing `country` drops the segment, and Apple
@@ -155,7 +163,7 @@ export const appleToolsEmbedResolver = createUrlEmbedResolver(appleToolsHosts, (
 
   const [, kind, pathId] = match
 
-  const country = parsed?.searchParams.get('country')?.toLowerCase()
+  const country = getQueryParam(parsed?.searchParams, 'country')?.toLowerCase()
   const storefront = country ? encodePathSegment(country) : undefined
   const modernUrl = `https://music.apple.com/${storefront ? `${storefront}/` : ''}${kind}/${pathId}`
 

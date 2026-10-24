@@ -1,10 +1,10 @@
 import { parseUrlOnHosts } from '../utils/urls.js'
 
-const loaderPathRegex = /^\/a\/([^/]+)\.js$/
-const pagePathRegex = /^\/a\/([^/]+)$/
+const loaderPathRegex = /^\/a\/([^/]+)\.js$/i
+const pagePathRegex = /^\/a\/([^/]+)$/i
 
 // Older casts render as a .png rather than an .svg.
-const renderPathRegex = /\/a\/([^/]+)\.(?:svg|png)/
+const renderPathRegex = /\/a\/([^/]+)\.(?:svg|png)/i
 
 const readCastId = (url: string | undefined, regex: RegExp): string | undefined => {
   return parseUrlOnHosts(url, 'asciinema.org')?.pathname.match(regex)?.[1]

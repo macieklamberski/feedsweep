@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { alphanumericRegex, encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
@@ -90,7 +90,7 @@ export const typeformResolveEmbed: ResolveEmbed = (url, element) => {
   // A form id in a url path is alphanumeric (`MTt3Pw7K`). The enclosure probe offers every file on
   // a Typeform host to this resolver, so the alphabet is what tells a form from a file such as
   // `/to/MTt3Pw7K.mp3`.
-  return segments[0] === 'to' && segments[1] && alphanumericRegex.test(segments[1])
+  return isAnyOf(segments[0], 'to') && segments[1] && alphanumericRegex.test(segments[1])
     ? composeEmbed(segments[1], attr(element, 'title'))
     : undefined
 }

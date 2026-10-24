@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { iframeResizerHeightRequest, readIframeResizerHeight } from '../utils/hints.js'
@@ -12,16 +12,21 @@ const tickettailorHosts = ['tickettailor.com']
 const readKey = (segments: Array<string>): string | undefined => {
   const [route, first, second, third, fourth, fifth] = segments
 
-  if (route === 'all-tickets' && first) {
+  if (isAnyOf(route, 'all-tickets') && first) {
     return first
   }
 
-  if (route === 'events' && first && second) {
+  if (isAnyOf(route, 'events') && first && second) {
     return `${first}/${second}`
   }
 
   // A checkout names the event by id beside a checksum it answers 404 without.
-  if (route === 'checkout' && first === 'new-session' && second === 'id' && fourth === 'chk') {
+  if (
+    isAnyOf(route, 'checkout') &&
+    isAnyOf(first, 'new-session') &&
+    isAnyOf(second, 'id') &&
+    isAnyOf(fourth, 'chk')
+  ) {
     if (!fifth) {
       return
     }
@@ -51,12 +56,12 @@ const composeEmbed = (page: URL): EmbedResolverResult | undefined => {
 // frames one whose own `type` is `inline`, or whose parent's class is exactly `tt-widget`, so a
 // script that WordPress wrapped in a paragraph inside the snippet's div stays a link.
 const isInlineLoader = (element: Element): boolean => {
-  if (attr(element, 'src')?.includes('tt-widget.js')) {
-    return attr(element, 'data-type') === 'inline'
+  if (attr(element, 'src')?.toLowerCase().includes('tt-widget.js')) {
+    return isAnyOf(attr(element, 'data-type'), 'inline')
   }
 
   return (
-    attr(element, 'type') === 'inline' ||
+    isAnyOf(attr(element, 'type'), 'inline') ||
     element.parentElement?.getAttribute('class') === 'tt-widget'
   )
 }
@@ -64,7 +69,7 @@ const isInlineLoader = (element: Element): boolean => {
 // Ticket Tailor's inline widget: the loader reads the box or event page off `data-url` and
 // frames it in place, and the pipeline drops the script.
 export const tickettailorScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="tickettailor"][data-url], script[src*="tt-widget.js"][data-url]',
+  'script[src*="tickettailor" i][data-url], script[src*="tt-widget.js" i][data-url]',
   (element) => {
     if (!isInlineLoader(element)) {
       return

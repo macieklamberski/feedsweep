@@ -34,13 +34,13 @@ const staticImageHosts = [
   'publicrevizit.tableausoftware.com', // A retired image host older snippets name
 ]
 
-const viewPathRegex = /^\/views\/([^/]+)\/([^/]+)$/
+const viewPathRegex = /^\/views\/([^/]+)\/([^/]+)$/i
 const viewNameRegex = /^([^/]+)\/([^/]+)$/
-const profilePathRegex = /^\/profile\/[^/]+$/
-const vizHomeHashRegex = /^#!\/vizhome\/([^/?]+)\/([^/?]+)(?:\?|$)/
+const profilePathRegex = /^\/profile\/[^/]+$/i
+const vizHomeHashRegex = /^#!\/vizhome\/([^/?]+)\/([^/?]+)(?:\?|$)/i
 // `/static/images/{first two letters}/{workbook}/{sheet}/{file}`. A shared viz has no workbook
 // and writes `/static/images/{first two letters}/{key}/{file}`.
-const staticImagePathRegex = /^\/static\/images\/[^/]+\/([^/]+)\/([^/]+)\/[^/]+$/
+const staticImagePathRegex = /^\/static\/images\/[^/]+\/([^/]+)\/([^/]+)\/[^/]+$/i
 // Blogger escapes the `<noscript>` content to text and doubles the `&` of each `&#47;` it holds.
 const escapedSlashRegex = /&(?:amp;)*#47;/g
 const imageUrlRegex = /https?:\/\/[^\s"'<>]+/

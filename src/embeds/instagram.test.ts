@@ -279,6 +279,23 @@ describeForEachParser('instagramBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read the plural reels spelling in capitals as the same path', async () => {
+      const value = html`
+        <blockquote
+          class="instagram-media"
+          data-instgrm-permalink="https://www.instagram.com/REELS/DGPdABWz84n/"
+        ></blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'reel/DGPdABWz84n',
+        src: 'https://www.instagram.com/reel/DGPdABWz84n/embed/',
+        url: 'https://www.instagram.com/reel/DGPdABWz84n/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // A sound page, not a post: the kind would read as a reel and the literal `audio` as the
     // shortcode. Instagram spells it under both the singular and the plural.
     const soundPageEmbedUrls: Array<string> = [

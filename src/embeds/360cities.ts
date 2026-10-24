@@ -7,9 +7,9 @@ const provider = '360cities'
 
 const threeSixtyCitiesHosts = ['360cities.net']
 
-const framePathRegex = /^\/embed_iframe\/([^/]+)$/
-const flashPlayerPathRegex = /^\/javascripts\/krpano\/krpano\.swf$/
-const flashPanoPathRegex = /^\/krpano\/external_embed\/([^/]+)\.xml$/
+const framePathRegex = /^\/embed_iframe\/([^/]+)$/i
+const flashPlayerPathRegex = /^\/javascripts\/krpano\/krpano\.swf$/i
+const flashPanoPathRegex = /^\/krpano\/external_embed\/([^/]+)\.xml$/i
 
 const composeEmbed = (slug: string): EmbedResolverResult => {
   return {

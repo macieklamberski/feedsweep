@@ -1,4 +1,4 @@
-import { getPathSegments, toMap } from 'trousse'
+import { getPathSegments, isAnyOf, toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { pickUrlParams } from '../utils/urls.js'
@@ -23,11 +23,12 @@ const retiredEmbedKinds = toMap({
 const embedParams = ['token']
 
 const composeEmbed = (
-  kind: string | undefined,
+  rawKind: string | undefined,
   id: string | undefined,
   query = '',
 ): EmbedResolverResult | undefined => {
-  const embedKind = embedKinds.get(kind ?? '')
+  const kind = rawKind?.toLowerCase() ?? ''
+  const embedKind = embedKinds.get(kind)
 
   if (!embedKind || !id) {
     return
@@ -56,9 +57,9 @@ export const stravaPlaceholderEmbedResolver = createMarkupEmbedResolver(
 // dropped.
 export const stravaResolveEmbed: ResolveEmbed = (url) => {
   const [route, id, embed] = getPathSegments(url)
-  const retiredKind = retiredEmbedKinds.get(route ?? '')
+  const retiredKind = retiredEmbedKinds.get(route?.toLowerCase() ?? '')
 
-  if (retiredKind && embed === 'embed') {
+  if (retiredKind && isAnyOf(embed, 'embed')) {
     return composeEmbed(retiredKind, id)
   }
 

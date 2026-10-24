@@ -1,4 +1,4 @@
-import { getPathSegments, isHostOf, parseUrl } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, isHostOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
@@ -9,7 +9,7 @@ const provider = 'slideserve'
 // Exact: `cdn6.slideserve.com` and its siblings serve the slide images.
 const slideserveHosts = ['slideserve.com', 'www.slideserve.com']
 
-const movieFileRegex = /^\/video\/([^/]+)\.swf$/
+const movieFileRegex = /^\/video\/([^/]+)\.swf$/i
 // The Flash player's `viewkey`, `presentation/{id}/{title}`.
 const viewkeyRegex = /^[^/]+\/[^/]+\/(.+)/
 
@@ -23,11 +23,11 @@ const parseOnHosts = (url: string | null | undefined): URL | undefined => {
   }
 }
 
-// The route word is case-sensitive. The server ignores a segment after the id.
+// The server ignores a segment after the id.
 const readEmbedId = (parsed: URL): string | undefined => {
   const [route, id] = getPathSegments(parsed)
 
-  if (route !== 'embed') {
+  if (!isAnyOf(route, 'embed')) {
     return
   }
 
@@ -39,11 +39,11 @@ const readEmbedId = (parsed: URL): string | undefined => {
 const readFlashId = (parsed: URL): string | undefined => {
   const [file] = getPathSegments(parsed)
 
-  if (file !== 'player.swf') {
+  if (!isAnyOf(file, 'player.swf')) {
     return
   }
 
-  const movie = parseOnHosts(parsed.searchParams.get('moviePath'))
+  const movie = parseOnHosts(getQueryParam(parsed.searchParams, 'moviePath'))
 
   return movie?.pathname.match(movieFileRegex)?.[1]
 }

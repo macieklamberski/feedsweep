@@ -39,7 +39,7 @@ const findFallback = (script: Element, castId: string) => {
 // asciinema's embed is a `<script src="asciinema.org/a/{id}.js">` that draws the player client
 // side. The cast's static SVG render stands in.
 export const convertAsciinemaEmbeds: DomTransform = () => (document) => {
-  for (const script of document.querySelectorAll('script[src*="asciinema.org/a/"]')) {
+  for (const script of document.querySelectorAll('script[src*="asciinema.org/a/" i]')) {
     const castId = extractLoaderCastId(attr(script, 'src'))
 
     if (!castId) {

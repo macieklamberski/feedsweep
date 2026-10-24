@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
@@ -9,7 +9,7 @@ const provider = 'arte'
 const arteHosts = ['arte.tv']
 
 // The retired players, `player/v{3..7}/index.{php,html}`, and `player/index.*` they redirect to.
-const legacyPlayerPathRegex = /^\/player\/(?:v\d+\/)?index\.(?:php|html)$/
+const legacyPlayerPathRegex = /^\/player\/(?:v\d+\/)?index\.(?:php|html)$/i
 
 type Program = { language: string; id: string }
 
@@ -25,7 +25,9 @@ const readProgram = (language: string | undefined, id: string | undefined): Prog
 // {lang}/{id}`, which names the program. Older `json_url`s pointed at ARTE Concert's own player
 // and at a `papi` guide feed, both gone with no program id to carry over.
 const readLegacyProgram = (parsed: URL): Program | undefined => {
-  const config = parseUrlOnHosts(parsed.searchParams.get('json_url') ?? '', ['api.arte.tv'])
+  const config = parseUrlOnHosts(getQueryParam(parsed.searchParams, 'json_url') ?? '', [
+    'api.arte.tv',
+  ])
 
   if (!config) {
     return
@@ -33,7 +35,7 @@ const readLegacyProgram = (parsed: URL): Program | undefined => {
 
   const [api, player, , route, language, id] = getPathSegments(config)
 
-  if (api !== 'api' || player !== 'player' || route !== 'config') {
+  if (!isAnyOf(api, 'api') || !isAnyOf(player, 'player') || !isAnyOf(route, 'config')) {
     return
   }
 
@@ -57,7 +59,7 @@ const composeEmbed = ({ language, id }: Program): EmbedResolverResult => {
 const readProgramFromPlayer = (parsed: URL): Program | undefined => {
   const [route, language, id] = getPathSegments(parsed)
 
-  if (route === 'embeds') {
+  if (isAnyOf(route, 'embeds')) {
     return readProgram(language, id)
   }
 

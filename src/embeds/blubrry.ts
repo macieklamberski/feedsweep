@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 
@@ -29,11 +29,11 @@ export const extractBlubrryEmbed = (link: string): BlubrryPlayer | undefined => 
 
   const segments = getPathSegments(parsed)
 
-  if (segments[0] === 'id' && segments[1]) {
+  if (isAnyOf(segments[0], 'id') && segments[1]) {
     return { kind: 'episode', id: segments[1] }
   }
 
-  const mediaUrl = parsed.searchParams.get('media_url')
+  const mediaUrl = getQueryParam(parsed.searchParams, 'media_url')
 
   if (!mediaUrl) {
     return

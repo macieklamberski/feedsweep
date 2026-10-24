@@ -1,4 +1,4 @@
-import { parseUrl } from 'trousse'
+import { getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
@@ -13,7 +13,7 @@ const widgetPath = '/map-widget/v1/'
 
 // The Constructor's own script loads the older `sid={id}` as `um=constructor:{id}`. The prefix
 // names the constructor space, since `um` also carries `mymaps:` maps.
-const constructorIdRegex = /^constructor:(.+)/
+const constructorIdRegex = /^constructor:(.+)/i
 
 const mapHeight = 400
 
@@ -32,7 +32,8 @@ const composeWidget = (um: string): string => {
 }
 
 const resolveConstructorMap = (query: URLSearchParams): EmbedResolverResult | undefined => {
-  const constructorId = query.get('um')?.match(constructorIdRegex)?.[1] ?? query.get('sid')
+  const constructorId =
+    getQueryParam(query, 'um')?.match(constructorIdRegex)?.[1] ?? getQueryParam(query, 'sid')
 
   if (!constructorId) {
     return
@@ -52,7 +53,7 @@ const resolveConstructorMap = (query: URLSearchParams): EmbedResolverResult | un
 // The Constructor's script injects the map where it stands, so a reader strips it and the map
 // renders as nothing. Its own query states the id.
 export const yandexMapsScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="api-maps.yandex.ru/services/constructor/"]',
+  'script[src*="api-maps.yandex.ru/services/constructor/" i]',
   (element): EmbedResolverResult | undefined => {
     // The selector matches a substring any host can carry, so the host is checked here.
     const url = parseUrlOnHosts(attr(element, 'src'), yandexMapsHosts)
@@ -71,7 +72,7 @@ export const yandexMapsIframeEmbedResolver = createUrlEmbedResolver(
   (url) => {
     const parsed = parseUrl(url)
 
-    if (parsed?.pathname !== widgetPath) {
+    if (!parsed || !isAnyOf(parsed.pathname, widgetPath)) {
       return
     }
 

@@ -1,4 +1,11 @@
-import { decodeSegment, fixMalformedQuery, getPathSegments, parseUrl } from 'trousse'
+import {
+  decodeSegment,
+  fixMalformedQuery,
+  getPathSegments,
+  getQueryParam,
+  isAnyOf,
+  parseUrl,
+} from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import {
@@ -21,12 +28,12 @@ const strayLeadingQuoteRegex = /^(?:%22|")/
 
 // `videoseries` and `live_stream` are YouTube embed path words, and each is eleven legal id
 // characters.
-const nonVideoIds = new Set(['videoseries', 'live_stream'])
+const nonVideoIds = ['videoseries', 'live_stream']
 
 // A url can stack two of these: `/embed/watch?v=` and `/embed/shorts/{id}` are authoring mistakes
 // that YouTube answers with a player page which cues nothing, and each still names the video
 // after the stack.
-const pathWords = new Set([
+const pathWords = [
   'shorts',
   'embed',
   'live',
@@ -35,15 +42,15 @@ const pathWords = new Set([
   'v', // The Flash player path, shipped in pre-2010 object/embed markup
   'e', // A short-lived embed alias from the same era
   'w', // A watch alias of the same era; still serves the video today
-])
+]
 
 const queryIdParams = ['v', 'vi', 'video_id']
 
 // The 2010 AJAX site and the profile grids of the same era kept the video id in the fragment
 // (`/watch#!v={id}`, `/user/{name}#p/u/1/{id}`), so the server-side path names no video. The
 // links survive in old posts, and the hash still says which video was meant.
-const hashbangIdRegex = /^#!vi?=([^&;]+)/
-const gridFragmentIdRegex = /^#p\/.+\/([0-9A-Za-z_-]{11})$/
+const hashbangIdRegex = /^#!vi?=([^&;]+)/i
+const gridFragmentIdRegex = /^#p\/.+\/([0-9A-Za-z_-]{11})$/i
 
 // `youtube.googleapis.com/v/{id}` is the Flash player's other host, still shipped by Blogger
 // feeds of that era.
@@ -52,7 +59,7 @@ const youtubeHosts = ['youtube.com', 'youtube-nocookie.com', 'youtu.be', 'youtub
 // A bare id, already separated from any url: the right shape, and not one of the embed path
 // words that share it.
 export const isVideoId = (value: string): boolean => {
-  return safeVideoIdRegex.test(value) && !nonVideoIds.has(value)
+  return safeVideoIdRegex.test(value) && !isAnyOf(value, nonVideoIds)
 }
 
 // hqdefault exists for every video, and maxresdefault and sddefault only for some.
@@ -79,7 +86,7 @@ const readPathId = (url: URL): string | undefined => {
 
   let index = 0
 
-  while (index < segments.length && pathWords.has(segments[index])) {
+  while (index < segments.length && isAnyOf(segments[index], pathWords)) {
     index++
   }
 
@@ -103,7 +110,7 @@ export const extractVideoId = (link: string): string | undefined => {
 
   const candidates = [
     readPathId(url),
-    ...queryIdParams.map((param) => url.searchParams.get(param)),
+    ...queryIdParams.map((param) => getQueryParam(url.searchParams, param)),
     url.hash.match(hashbangIdRegex)?.[1],
     url.hash.match(gridFragmentIdRegex)?.[1],
   ]
@@ -127,7 +134,7 @@ export const youtubeEmbedParams = [
 ]
 
 // A watch or share link spells its start offset as `t`: `90`, `90s`, `1m30s` or `1h2m3s`.
-const watchOffsetRegex = /^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?$/
+const watchOffsetRegex = /^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?$/i
 
 // The clock spelling some publishers write in a fragment: `24:09` or `1:02:03`.
 const clockOffsetRegex = /^(?:(\d+):)?(\d+):(\d+)$/
@@ -156,7 +163,7 @@ const readEmbedParams = (url: string): Record<string, string> => {
 
   const offsetQueries = [parsed.search, parsed.hash.slice(1)]
   const start = offsetQueries
-    .map((query) => parseWatchOffset(new URLSearchParams(query).get('t') ?? ''))
+    .map((query) => parseWatchOffset(getQueryParam(new URLSearchParams(query), 't') ?? ''))
     .find(Boolean)
 
   if (start) {
@@ -242,47 +249,47 @@ const resolveCollectionEmbed = (
   parsed: URL,
   segments: Array<string>,
 ): EmbedResolverResult | undefined => {
-  const listType = parsed.searchParams.get('listType')
-  const list = parsed.searchParams.get('list')
-  const channel = parsed.searchParams.get('channel')
+  const listType = getQueryParam(parsed.searchParams, 'listType')
+  const list = getQueryParam(parsed.searchParams, 'list')
+  const channel = getQueryParam(parsed.searchParams, 'channel')
 
-  if (segments[1] === 'live_stream') {
+  if (isAnyOf(segments[1], 'live_stream')) {
     return channel ? composeChannelEmbed(channel, encodePathSegment(channel)) : undefined
   }
 
   // `/embed/videoseries?list=`, `/embed/playlist?list=` and the bare `/embed/?list=` some
   // WordPress plugins emit are the same playlist spelled three ways.
-  if (segments[1] !== 'videoseries' && segments[1] !== 'playlist' && segments.length !== 1) {
+  if (!isAnyOf(segments[1], ['videoseries', 'playlist']) && segments.length !== 1) {
     return
   }
 
   // `listType=search` named a search query, not an id, and YouTube removed it in 2020: the
   // embed plays nothing and there is nothing to resolve it to.
-  if (listType === 'search' || !list) {
+  if (isAnyOf(listType, 'search') || !list) {
     return
   }
 
-  return listType === 'user_uploads' ? composeUploadsEmbed(list) : composeListEmbed(list)
+  return isAnyOf(listType, 'user_uploads') ? composeUploadsEmbed(list) : composeListEmbed(list)
 }
 
 const resolveTarget = (url: string): EmbedResolverResult | undefined => {
   const parsed = parseYoutubeUrl(url)
   const segments = parsed ? getPathSegments(parsed) : []
 
-  if (segments[0] === 'embed' && parsed) {
+  if (isAnyOf(segments[0], 'embed') && parsed) {
     const embed = resolveCollectionEmbed(parsed, segments)
 
     // A `/embed/{id}` path names a video and falls through; the rest of the embed paths name
     // their content here or name nothing resolvable.
-    if (embed || segments.length === 1 || nonVideoIds.has(segments[1])) {
+    if (embed || segments.length === 1 || isAnyOf(segments[1], nonVideoIds)) {
       return embed
     }
   }
 
   // The playlist page refuses framing, so a frame of it shows nothing, and its `list` is the id
   // the playlist player takes.
-  if (segments[0] === 'playlist') {
-    const list = parsed?.searchParams.get('list')
+  if (isAnyOf(segments[0], 'playlist')) {
+    const list = getQueryParam(parsed?.searchParams, 'list')
 
     if (!list) {
       return
@@ -294,7 +301,7 @@ const resolveTarget = (url: string): EmbedResolverResult | undefined => {
   // The Flash player took its playlist on `/p/{id}`, the playlist the modern url spells as
   // `list=PL{id}`, and the swf it points at is dead, so the id is the only thing left to rebuild
   // from. The publisher's `?hl=` and `&fs=1` are player chrome and go with the rest of the query.
-  if (segments[0] === 'p') {
+  if (isAnyOf(segments[0], 'p')) {
     const head = segments[1] ?? ''
     // The id moves from a path segment into the query, so it is decoded first.
     const list = decodeSegment(head) ?? head
@@ -324,18 +331,20 @@ export const youtubeFc2EmbedResolver = createUrlEmbedResolver(
   (url, element) => {
     const parsed = parseUrl(url)
 
-    if (parsed?.pathname !== '/misc/blog/view/ext_youtube_player.html') {
+    if (!parsed || !isAnyOf(parsed.pathname, '/misc/blog/view/ext_youtube_player.html')) {
       return
     }
 
     // FC2's iframe snippet also carries the id as `data-id`, which the shell never reads.
-    const videoId = [parsed.searchParams.get('id'), attr(element, 'data-id')].find(Boolean)
+    const videoId = [getQueryParam(parsed.searchParams, 'id'), attr(element, 'data-id')].find(
+      Boolean,
+    )
 
     if (!videoId) {
       return
     }
 
-    const title = parsed.searchParams.get('title')
+    const title = getQueryParam(parsed.searchParams, 'title')
 
     return {
       ...composeVideoEmbed(videoId),
@@ -363,7 +372,7 @@ export const youtubeAmpEmbedResolver = createMarkupEmbedResolver(
     }
 
     // `videoseries` and `live_stream` are route words that sit where a video id does.
-    if (nonVideoIds.has(videoId)) {
+    if (isAnyOf(videoId, nonVideoIds)) {
       return
     }
 
