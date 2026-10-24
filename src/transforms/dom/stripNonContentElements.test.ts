@@ -48,10 +48,14 @@ const specimens: Record<string, string | [string, string]> = {
     '<iframe src="https://www.google.com/recaptcha/api/fallback?hl=en&amp;k=6LddubAUAAAAAOZ0V8l7NcrIkv58vlZKl6k6b2c_" frameborder="0" scrolling="no" style="width: 302px; height:422px; border-style: none;"></iframe>',
   'iframe[src*="recaptcha.net/"]':
     '<iframe src="https://api-secure.recaptcha.net/noscript?k=6LeMVQQAAAAAAE8eiOuwZPcQUIg_1ooYyN7m3Ibx" height="300" width="500" frameborder="0"></iframe>',
-  'textarea:is([name="g-recaptcha-response"], .g-recaptcha-response)':
-    '<textarea id="g-recaptcha-response" name="g-recaptcha-response" class="recaptcha_challenge_field" style="width: 250px; height: 80px; border: 1px solid #c1c1c1; margin: 0px; padding: 0px; resize: none;" value=""></textarea>',
-  'textarea[name="recaptcha_challenge_field"]':
-    '<textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>',
+  'noscript textarea[name="g-recaptcha-response"]': [
+    '<noscript><div style="width: 250px; height: 80px; position: absolute; border-style: none; bottom: 21px; left: 25px; margin: 0px; padding: 0px; right: 25px;"><textarea id="g-recaptcha-response" name="g-recaptcha-response" class="recaptcha_challenge_field" style="width: 250px; height: 80px; border: 1px solid #c1c1c1; margin: 0px; padding: 0px; resize: none;" value=""></textarea></div></noscript>',
+    '<noscript><div style="width: 250px; height: 80px; position: absolute; border-style: none; bottom: 21px; left: 25px; margin: 0px; padding: 0px; right: 25px;"></div></noscript>',
+  ],
+  'noscript textarea[name="recaptcha_challenge_field"]': [
+    '<noscript><textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea></noscript>',
+    '<noscript></noscript>',
+  ],
   '.adsbygoogle':
     '<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-x" data-ad-slot="123"></ins>',
   'div[id^="div-gpt-ad"]': '<div id="div-gpt-ad-1234567890"></div>',
@@ -768,16 +772,24 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
-    it('should strip the reCAPTCHA response box MailPoet renames', async () => {
+    it('should keep the reCAPTCHA response box MailPoet renames', async () => {
       const value = html`
-        <div class="mailpoet_recaptcha_noscript_input">
-          <textarea id="g-recaptcha-response" name="data[recaptcha]" class="g-recaptcha-response"></textarea>
-        </div>
+        <noscript>
+          <div class="mailpoet_recaptcha_noscript_input">
+            <textarea id="g-recaptcha-response" name="data[recaptcha]" class="g-recaptcha-response"></textarea>
+          </div>
+        </noscript>
       `
 
-      expect(await transform(value)).toEqualHtml(
-        '<div class="mailpoet_recaptcha_noscript_input"></div>',
-      )
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a reCAPTCHA response box outside a noscript', async () => {
+      const value = html`
+        <textarea name="g-recaptcha-response" class="g-recaptcha-response" aria-hidden="true"></textarea>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
     })
 
     it('should keep the comment box of the form a reCAPTCHA guards', async () => {
