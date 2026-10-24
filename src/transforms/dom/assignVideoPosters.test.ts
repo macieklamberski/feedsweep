@@ -1,12 +1,18 @@
 import { expect, it } from 'bun:test'
 import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
+import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { assignVideoPosters } from './assignVideoPosters.js'
 
 describeForEachParser('assignVideoPosters', (parseHtml) => {
-  const transform = (value: string) => {
-    return applyDomTransforms(parseHtml(value), [assignVideoPosters(baseContext)])
+  const transform = (value: string, context: TransformContext = baseContext) => {
+    return applyDomTransforms(parseHtml(value), [assignVideoPosters(context)])
+  }
+
+  const withCleaner: TransformContext = {
+    ...baseContext,
+    cleanUrlFn: (url) => url.split('?')[0] ?? url,
   }
 
   it('should replace the resolver thumbnail with the publisher inline poster', async () => {
@@ -22,6 +28,33 @@ describeForEachParser('assignVideoPosters', (parseHtml) => {
     `
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should clean a thumbnail moved onto an embed with the provided cleanUrlFn', async () => {
+    const value = html`
+      <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg?utm_source=feed">
+      <div data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"></div>
+    `
+    const expected = html`
+      <div
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+        data-embed-thumbnail="https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"
+      ></div>
+    `
+
+    expect(await transform(value, withCleaner)).toEqualHtml(expected)
+  })
+
+  it('should clean a poster moved onto a video with the provided cleanUrlFn', async () => {
+    const value = html`
+      <video src="https://example.com/clip.mp4"></video>
+      <img src="https://example.com/poster.jpg?utm_source=feed" data-enclosure="">
+    `
+    const expected = html`
+      <video src="https://example.com/clip.mp4" poster="https://example.com/poster.jpg"></video>
+    `
+
+    expect(await transform(value, withCleaner)).toEqualHtml(expected)
   })
 
   it('should keep a feed-defined thumbnail over an inline poster', async () => {

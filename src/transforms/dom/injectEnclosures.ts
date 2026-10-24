@@ -8,13 +8,7 @@ import type {
 } from '../../types.js'
 import { enclosureMarker, isEnclosureKind, prepareEnclosures } from '../../utils/enclosures.js'
 import { findPosterEvidence, getImageFingerprint } from '../../utils/images.js'
-import {
-  cleanUrl,
-  flashFileRegex,
-  imageFileRegex,
-  resolveOrDropUrl,
-  resolveOrKeepUrl,
-} from '../../utils/urls.js'
+import { cleanUrl, flashFileRegex, imageFileRegex, resolveOrDropUrl } from '../../utils/urls.js'
 import {
   createCaptionedFigure,
   createEmbedPlaceholder,
@@ -22,6 +16,7 @@ import {
   createImage,
   createMediaElement,
   prepareEmbedMetadata,
+  prepareMediaMetadata,
   resolveEmbedProbe,
   setDimensions,
 } from '../../utils/widgets.js'
@@ -65,15 +60,18 @@ const createNativeMediaElement = (
   enclosure: Enclosure,
   context: TransformContext,
 ): HTMLElement => {
-  const poster = resolveOrKeepUrl(enclosure.thumbnails?.[0]?.url, context)
+  const metadata = prepareMediaMetadata(
+    {
+      tag,
+      src,
+      poster: enclosure.thumbnails?.[0]?.url,
+      width: enclosure.width,
+      height: enclosure.height,
+    },
+    context,
+  )
 
-  return createMediaElement(document, {
-    tag,
-    src: cleanUrl(src, context),
-    poster,
-    width: enclosure.width,
-    height: enclosure.height,
-  })
+  return createMediaElement(document, metadata)
 }
 
 // The src arrives resolved from the loop, the way createNativeMediaElement takes its own: an
@@ -260,7 +258,7 @@ export const injectEnclosures: DomTransform = (context) => {
       if (!isEnclosureKind(enclosure, 'image')) {
         files.push(
           createFilePlaceholder(document, {
-            url: mediaSource,
+            url: cleanUrl(mediaSource, context),
             name: getFileName(enclosure, mediaSource),
             type: enclosure.type ?? enclosure.medium,
             size: enclosure.length,
@@ -289,7 +287,7 @@ export const injectEnclosures: DomTransform = (context) => {
         continue
       }
 
-      const imageElement = injectImageEnclosure(document, enclosure, mediaSource)
+      const imageElement = injectImageEnclosure(document, enclosure, cleanUrl(mediaSource, context))
 
       if (!imageElement) {
         continue

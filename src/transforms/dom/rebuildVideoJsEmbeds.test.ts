@@ -45,6 +45,48 @@ describeForEachParser('rebuildVideoJsEmbeds', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should clean the poster with the provided cleanUrlFn', async () => {
+      const value = html`
+        <video-js poster="https://example.com/poster.jpg?utm_source=feed">
+          <source src="https://example.com/clip.mp4" type="video/mp4">
+        </video-js>
+      `
+      const context: TransformContext = {
+        ...baseContext,
+        cleanUrlFn: (url) => url.split('?')[0] ?? url,
+      }
+      const expected = html`
+        <video
+          poster="https://example.com/poster.jpg"
+          controls
+          src="https://example.com/clip.mp4"
+        ></video>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should resolve a relative poster against the base url', async () => {
+      const value = html`
+        <video-js poster="/media/poster.jpg">
+          <source src="https://example.com/clip.mp4" type="video/mp4">
+        </video-js>
+      `
+      const context: TransformContext = {
+        ...baseContext,
+        baseUrl: 'https://example.com/post',
+      }
+      const expected = html`
+        <video
+          poster="https://example.com/media/poster.jpg"
+          controls
+          src="https://example.com/clip.mp4"
+        ></video>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
     it('should prefer the poster attribute over the data-setup poster', async () => {
       const config = JSON.stringify({
         sources: [{ src: 'https://example.com/clip.mp4', type: 'video/mp4' }],

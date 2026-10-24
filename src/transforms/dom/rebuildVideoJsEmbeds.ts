@@ -1,7 +1,7 @@
 import type { DomTransform, TransformContext } from '../../types.js'
 import { attr, jsonAttr } from '../../utils/dom.js'
-import { cleanUrl, videoFileRegex } from '../../utils/urls.js'
-import { createMediaElement } from '../../utils/widgets.js'
+import { videoFileRegex } from '../../utils/urls.js'
+import { createMediaElement, prepareMediaMetadata } from '../../utils/widgets.js'
 
 type SetupConfig = {
   sources?: Array<{ src?: string }>
@@ -24,11 +24,12 @@ const buildVideo = (
     return
   }
 
-  return createMediaElement(document, {
-    tag: 'video',
-    src: cleanUrl(source, context),
-    poster: attr(element, 'poster') ?? setup?.poster,
-  })
+  const metadata = prepareMediaMetadata(
+    { tag: 'video', src: source, poster: attr(element, 'poster') ?? setup?.poster },
+    context,
+  )
+
+  return createMediaElement(document, metadata)
 }
 
 // <video-js> is a custom element that renders as nothing until the Video.js script upgrades it.

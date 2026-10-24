@@ -1366,6 +1366,32 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
     expect(await transform(value, withResolver(posterResolver))).toEqualHtml(expected)
   })
 
+  it('should clean a poster with the provided cleanUrlFn', async () => {
+    const posterResolver: MediaResolver = {
+      kind: 'media',
+      selector: '.poster-embed',
+      extract: () => ({
+        tag: 'video',
+        src: 'https://example.com/clip.mp4',
+        poster: 'https://example.com/still.jpg?utm_source=feed',
+      }),
+    }
+    const context: TransformContext = {
+      ...withResolver(posterResolver),
+      cleanUrlFn: (url) => url.split('?')[0] ?? url,
+    }
+    const value = '<div class="poster-embed"></div>'
+    const expected = html`
+      <video
+        src="https://example.com/clip.mp4"
+        controls
+        poster="https://example.com/still.jpg"
+      ></video>
+    `
+
+    expect(await transform(value, context)).toEqualHtml(expected)
+  })
+
   it('should not write a poster onto an audio element', async () => {
     const posterResolver: MediaResolver = {
       kind: 'media',
