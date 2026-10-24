@@ -34,6 +34,7 @@ import { hoistFigcaptionFromAnchor } from '../transforms/dom/hoistFigcaptionFrom
 import { injectEnclosures } from '../transforms/dom/injectEnclosures.js'
 import { linkifyGistEmbeds } from '../transforms/dom/linkifyGistEmbeds.js'
 import { linkifyPaypalDonateForms } from '../transforms/dom/linkifyPaypalDonateForms.js'
+import { linkifyPodomaticPlaylists } from '../transforms/dom/linkifyPodomaticPlaylists.js'
 import { linkifyUrls } from '../transforms/dom/linkifyUrls.js'
 import { markTimestamps } from '../transforms/dom/markTimestamps.js'
 import { mergeConsecutiveOneLinerPres } from '../transforms/dom/mergeConsecutiveOneLinerPres.js'
@@ -173,6 +174,10 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // A GitHub Gist embed is a JS-only <script> or loader mount that renders nothing in a reader.
   // Replace it with a link to the gist so the content is at least reachable.
   linkifyGistEmbeds,
+
+  // Runs after unwrapWpcomWidgetFrames, which rebuilds the player, and before convertWidgets,
+  // which drops a swf no resolver claims.
+  linkifyPodomaticPlaylists,
 
   // Runs before stripNonContentElements, which strips the `/cgi-bin/webscr` forms this leaves.
   linkifyPaypalDonateForms,
