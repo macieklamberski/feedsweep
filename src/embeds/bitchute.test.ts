@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
-import type { EmbedResolverResult } from '../types.js'
-import { bitchuteEmbedResolver } from './bitchute.js'
+import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import { bitchuteEmbedResolver, bitchuteRenderHint } from './bitchute.js'
 
 describeForEachParser('bitchuteEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, bitchuteEmbedResolver)
@@ -149,5 +149,16 @@ describeForEachParser('bitchute through the pipeline', (parseHtml) => {
     `
 
     expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
+  })
+})
+
+describe('bitchuteRenderHint', () => {
+  it('should start the player with autoPlay and skip the overlay that throws before it', () => {
+    const expected: EmbedRenderHint = {
+      provider: 'bitchute',
+      autoplayParams: { autoPlay: 'true', embedMode: 'false' },
+    }
+
+    expect(bitchuteRenderHint).toEqual(expected)
   })
 })

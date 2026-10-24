@@ -1,7 +1,9 @@
 import { getPathSegments, isAnyOf } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'bitchute'
 
 const bitchuteHosts = ['bitchute.com']
 
@@ -22,7 +24,7 @@ const bitchuteResolveEmbed: ResolveEmbed = (url, element) => {
   // The cover image sits under the channel's hash, which the video url does not carry, and
   // `api.bitchute.com/oembed/?url={page}` answers with it, the title and the channel, key-free.
   return {
-    provider: 'bitchute',
+    provider,
     id,
     src: `https://www.bitchute.com/embed/${id}/`,
     url: `https://www.bitchute.com/video/${id}/`,
@@ -32,6 +34,12 @@ const bitchuteResolveEmbed: ResolveEmbed = (url, element) => {
 }
 
 // BitChute's player iframe on the www and the old host, carrying only a title.
-// No render hint: the player reads `autoPlay` off its query, then gates `play()` on an unmuted
-// autoplay probe and sits on its poster.
 export const bitchuteEmbedResolver = createUrlEmbedResolver(bitchuteHosts, bitchuteResolveEmbed)
+
+// The player starts on `autoPlay` spelled `true` alone. Its default embed mode throws while
+// building the title overlay, before it reaches the autoplay branch, so `embedMode=false` skips
+// the overlay and lets the start run.
+export const bitchuteRenderHint: EmbedRenderHint = {
+  provider,
+  autoplayParams: { autoPlay: 'true', embedMode: 'false' },
+}

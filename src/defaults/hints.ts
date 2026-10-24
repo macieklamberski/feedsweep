@@ -6,6 +6,7 @@ import { archiveRenderHint } from '../embeds/archive.js'
 import { arteRenderHint } from '../embeds/arte.js'
 import { audioboomRenderHint } from '../embeds/audioboom.js'
 import { aushaRenderHint } from '../embeds/ausha.js'
+import { bitchuteRenderHint } from '../embeds/bitchute.js'
 import { blubrryRenderHint } from '../embeds/blubrry.js'
 import { blueskyRenderHint } from '../embeds/bluesky.js'
 import { brRenderHint } from '../embeds/br.js'
@@ -104,6 +105,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   arteRenderHint,
   audioboomRenderHint,
   aushaRenderHint,
+  bitchuteRenderHint,
   blubrryRenderHint,
   blueskyRenderHint,
   bridRenderHint,
