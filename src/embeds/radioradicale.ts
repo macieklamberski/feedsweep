@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -32,7 +32,7 @@ const readFlashId = (parsed: URL): string | undefined => {
 
   const [scheda, embedcfg, id, , ...rest] = getPathSegments(config)
 
-  if (scheda !== 'scheda' || embedcfg !== 'embedcfg' || rest.length > 0) {
+  if (!isAnyOf(scheda, 'scheda') || !isAnyOf(embedcfg, 'embedcfg') || rest.length > 0) {
     return
   }
 
@@ -40,9 +40,8 @@ const readFlashId = (parsed: URL): string | undefined => {
 }
 
 // Radio Radicale's archive player, `/scheda/{id}/iframe`, which 301s to the same path with the
-// recording's slug inserted. The page `/scheda/{id}` does the same. The server matches the route
-// words in their own case only: `/IFRAME` lands on the page, which refuses framing. The Flash
-// player took the same id, so it is rebuilt onto the current one.
+// recording's slug inserted. The page `/scheda/{id}` does the same. The server folds the case of
+// the route words. The Flash player took the same id, so it is rebuilt onto the current one.
 export const radioradicaleResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, radioradicaleHosts)
 
@@ -58,7 +57,7 @@ export const radioradicaleResolveEmbed: ResolveEmbed = (url) => {
 
   const [scheda, id, iframe, ...rest] = getPathSegments(parsed)
 
-  if (scheda !== 'scheda' || iframe !== 'iframe' || rest.length > 0) {
+  if (!isAnyOf(scheda, 'scheda') || !isAnyOf(iframe, 'iframe') || rest.length > 0) {
     return
   }
 

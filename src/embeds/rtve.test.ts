@@ -20,13 +20,14 @@ describe('rtveResolveEmbed', () => {
       expect(rtveResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should build the placeholder from an audio player url without a poster', () => {
+    it('should build the placeholder from an audio player url with its poster', () => {
       const value = 'https://secure-embed.rtve.es/drmn/embed/audio/1925451/'
       const expected: EmbedResolverResult = {
         provider: 'rtve',
         id: 'audio/1925451',
         src: 'https://www.rtve.es/drmn/embed/audio/1925451/',
         url: 'https://www.rtve.es/a/1925451/',
+        thumbnail: 'https://img.rtve.es/a/1925451/',
         ratio: '16/9',
       }
 
@@ -164,6 +165,7 @@ describeForEachParser('rtveIframeEmbedResolver', (parseHtml) => {
         id: 'audio/2518208',
         src: 'https://www.rtve.es/drmn/embed/audio/2518208/',
         url: 'https://www.rtve.es/a/2518208/',
+        thumbnail: 'https://img.rtve.es/a/2518208/',
         ratio: '16/9',
       }
 
@@ -227,6 +229,7 @@ describeForEachParser('rtveFlashEmbedResolver', (parseHtml) => {
         id: 'audio/1025053',
         src: 'https://www.rtve.es/drmn/embed/audio/1025053/',
         url: 'https://www.rtve.es/a/1025053/',
+        thumbnail: 'https://img.rtve.es/a/1025053/',
         ratio: '16/9',
       }
 
@@ -329,6 +332,7 @@ describeForEachParser('rtveFlashEmbedResolver', (parseHtml) => {
         id: 'audio/383526',
         src: 'https://www.rtve.es/drmn/embed/audio/383526/',
         url: 'https://www.rtve.es/a/383526/',
+        thumbnail: 'https://img.rtve.es/a/383526/',
         ratio: '16/9',
         title: 'Mediterráneo: 18 enero 2009',
       }
@@ -349,6 +353,7 @@ describeForEachParser('rtveFlashEmbedResolver', (parseHtml) => {
         id: 'audio/420589',
         src: 'https://www.rtve.es/drmn/embed/audio/420589/',
         url: 'https://www.rtve.es/a/420589/',
+        thumbnail: 'https://img.rtve.es/a/420589/',
         ratio: '16/9',
         title: 'Videodrome: Encrucijada (22 febrero 2009)',
       }
@@ -499,6 +504,7 @@ describeForEachParser('rtveFlashEmbedResolver', (parseHtml) => {
         id: 'audio/1251286',
         src: 'https://www.rtve.es/drmn/embed/audio/1251286/',
         url: 'https://www.rtve.es/a/1251286/',
+        thumbnail: 'https://img.rtve.es/a/1251286/',
         ratio: '16/9',
       }
 
@@ -660,6 +666,7 @@ describeForEachParser('rtve through the pipeline', (parseHtml) => {
         data-embed-id="audio/383526"
         data-embed-src="https://www.rtve.es/drmn/embed/audio/383526/"
         data-embed-url="https://www.rtve.es/a/383526/"
+        data-embed-thumbnail="https://img.rtve.es/a/383526/"
         data-embed-ratio="16/9"
         data-embed-title="Mediterráneo: 18 enero 2009"
       ></div>

@@ -30,9 +30,9 @@ export const extractTedTalk = (link: string): string | undefined => {
   return (segments[1] === 'lang' ? segments[3] : segments[1])?.replace(htmlSuffixRegex, '')
 }
 
-// The Flash player's url is the same file for every talk, so the carrier names nothing on its
-// own and the talk is only in the flashVars, inside the ad targeting keys:
-// `adKeys=talk={slug};year=2010;theme=…`. The player is dead, so these embeds render nothing.
+// The Flash player's url is the same file for every talk, and the player is dead, so these embeds
+// render nothing. The talk is only in the flashVars: as a slug in the ad targeting keys,
+// `adKeys=talk={slug};year=2010;theme=…`, and as a numeric id in `ti`.
 const flashPlayerPathRegex = /\/assets\/player\/swf\/embedplayer\.swf$/i
 // The talk key in the flashVars adKeys value, spelled talk={slug};year={year}.
 const adKeysTalkRegex = /(?:^|;)talk=([^;]+)/i
@@ -82,8 +82,7 @@ export const tedResolveEmbed: ResolveEmbed = (url, element) => {
     provider,
     id: talk.slug,
     // Feeds carry a short slug (`ethan_zuckerman`) and TED redirects it to the full one, which
-    // cannot be derived offline. `/embed/{slug}` reaches the canonical player in a single hop
-    // while the `/talks/` path in the markup takes two.
+    // cannot be derived offline.
     src: `https://embed.ted.com/embed/${talk.slug}`,
     url: `https://www.ted.com/talks/${talk.slug}`,
     thumbnail: talk.thumbnail,
@@ -95,8 +94,7 @@ export const tedResolveEmbed: ResolveEmbed = (url, element) => {
 export const tedEmbedResolver = createUrlEmbedResolver(tedHosts, tedResolveEmbed)
 
 // Starts playback on the click that loads the player: the embed reads `autoplay` out of its route
-// query. It reaches the player only when the url does not redirect, since the embed's 308 from
-// a legacy talk slug to the canonical one drops the query.
+// query, and its 308 from a short talk slug to the full one keeps the query.
 export const tedRenderHint: EmbedRenderHint = {
   provider,
   autoplayParams: { autoplay: 'true' },

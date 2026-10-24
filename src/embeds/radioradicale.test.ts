@@ -118,12 +118,6 @@ describe('radioradicaleResolveEmbed', () => {
       expect(radioradicaleResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for the player word in capitals, which lands on the page', () => {
-      const value = 'https://www.radioradicale.it/scheda/542812/IFRAME'
-
-      expect(radioradicaleResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for the Flash player configuration', () => {
       const value = 'http://www.radioradicale.it/scheda/embedcfg/401265/2838705'
 

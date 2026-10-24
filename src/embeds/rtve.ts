@@ -27,22 +27,19 @@ const audioConfigRegex = /\/rtve_config_audio_embed\.xml$/i
 const playerRatio = '16/9'
 
 // Audio and video are two id spaces with one grammar, and rtve.es/api/{videos|audios}/{id}.json
-// needs the kind. img.rtve.es/v/{id}/ answers for a video id only, and no poster route exists for
-// audio.
+// needs the kind. The page and the poster share the kind's letter: img.rtve.es/v/{id}/ and
+// img.rtve.es/a/{id}/.
 const composeEmbed = (kind: Kind, id: string): EmbedResolverResult => {
-  const result: EmbedResolverResult = {
+  const letter = kind === 'video' ? 'v' : 'a'
+
+  return {
     provider,
     id: `${kind}/${id}`,
     src: `https://www.rtve.es/drmn/embed/${kind}/${id}/`,
-    url: `https://www.rtve.es/${kind === 'video' ? 'v' : 'a'}/${id}/`,
+    url: `https://www.rtve.es/${letter}/${id}/`,
+    thumbnail: `https://img.rtve.es/${letter}/${id}/`,
     ratio: playerRatio,
   }
-
-  if (kind === 'video') {
-    result.thumbnail = `https://img.rtve.es/v/${id}/`
-  }
-
-  return result
 }
 
 export const rtveResolveEmbed: ResolveEmbed = (url, element) => {

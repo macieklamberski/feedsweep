@@ -34,8 +34,7 @@ const playerHosts = foxBrands.map((brand) => brand.playerHost)
 const playerRatio = '16/9'
 
 // `video-embed.html` is what Fox names as the player in the video page's `twitter:player` and
-// `embedUrl`. The Fox News player answers 404 for an unknown id, while the Fox Business player
-// answers 200 with an empty shell and its page url redirects to the `/video` index.
+// `embedUrl`. Both players answer 404 for an unknown id.
 const composeEmbed = (brand: FoxBrand, id: string): EmbedResolverResult => {
   return {
     provider: brand.provider,
@@ -72,7 +71,8 @@ export const foxnewsResolveEmbed: ResolveEmbed = (url) => {
   return composeEmbed(brand, id)
 }
 
-// Fox's old share snippet is an `embed.js` script tag whose loader is gone, so nothing plays.
+// Fox's old share snippet is an `embed.js` script tag. The Fox News loader answers 404, and the
+// Fox Business one still writes the `video-embed.html` iframe.
 export const foxnewsScriptEmbedResolver = createMarkupEmbedResolver(
   playerHosts.map((host) => `script[src*="${host}/v/embed.js"]`).join(', '),
   (element) => {
