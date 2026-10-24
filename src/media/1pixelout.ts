@@ -1,7 +1,12 @@
 import { parseUrl } from 'trousse'
 import type { MediaResolver, MediaResolverResult } from '../types.js'
 import { flashVars } from '../utils/dom.js'
-import { flashFileRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  flashFileRegex,
+  foldEscapedAmpersands,
+  parseUrlOnHosts,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { readCarrierUrl } from '../utils/widgets.js'
 
 // Weebly's own copy has a resolver of its own, later in the list.
@@ -64,7 +69,7 @@ export const onePixelOutFlashMediaResolver: MediaResolver = {
     }
 
     // A feed that escapes the markup twice leaves `&amp;` between the flashvars.
-    const config = new URLSearchParams(flashVars(element)?.replaceAll('&amp;', '&'))
+    const config = new URLSearchParams(foldEscapedAmpersands(flashVars(element) ?? ''))
     const soundFile = config.get('soundFile') ?? player.searchParams.get('soundFile')
 
     return composeAudio(soundFile ?? undefined, config.get('titles') ?? undefined)

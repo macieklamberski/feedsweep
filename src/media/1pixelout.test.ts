@@ -270,6 +270,23 @@ describeForEachParser('onePixelOutFlashMediaResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read flashvars the feed escaped three times', async () => {
+      const value = html`
+        <embed
+          src="http://s0.wp.com/wp-content/plugins/audio-player/player.swf"
+          flashvars="bg=0xF8F8F8&amp;amp;amp;soundFile=http%3A%2F%2Fexample.com%2Faudio%2Fepisode.mp3"
+          width="290"
+          height="24"
+        />
+      `
+      const expected: MediaResolverResult = {
+        tag: 'audio',
+        src: 'http://example.com/audio/episode.mp3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should read a swf named by a relative path', async () => {
       const value = html`
         <embed

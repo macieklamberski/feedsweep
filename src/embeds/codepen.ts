@@ -5,6 +5,7 @@ import {
   alphanumericRegex,
   composeQuery,
   encodePathSegment,
+  foldEscapedAmpersands,
   isFileName,
   placeholderBaseUrl,
   uuidRegex,
@@ -70,7 +71,7 @@ const readUser = (value: string | undefined): string | undefined => {
 
 const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
   // A twice-encoded feed leaves a literal `&amp;` that hides the `key` parameter after it.
-  const parsed = parseUrl(value?.replaceAll('&amp;', '&') ?? '', placeholderBaseUrl)
+  const parsed = parseUrl(foldEscapedAmpersands(value ?? ''), placeholderBaseUrl)
 
   if (!parsed || !isHostOf(parsed, codepenHosts)) {
     return

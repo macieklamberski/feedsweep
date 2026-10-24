@@ -409,6 +409,15 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should fold an ampersand the feed escaped three times in an unknown iframe', async () => {
+    const value = '<iframe src="https://unknown-site.com/embed?a=1&amp;amp;amp;b=2"></iframe>'
+    const expected = html`
+      <div data-embed-src="https://unknown-site.com/embed?a=1&amp;b=2"></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should preserve dimensions when wrapping unknown iframe', async () => {
     const value = html`
       <iframe

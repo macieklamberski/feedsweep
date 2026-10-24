@@ -21,6 +21,7 @@ export const placeholderBaseUrl = 'https://example.com'
 const urlShapeRegex = /[:/.]/
 const queryOrHashRegex = /[?#]/
 const pathSlashRunRegex = /^https?:\/\/[^/?#]+[^?#]*\/\//i
+const escapedAmpersandRegex = /&(?:amp;)+/g
 
 // Protocol-relative `//host/path` is left unmatched, so it resolves to the base url's scheme.
 export const absoluteUrlRegex = /^[a-z][a-z0-9+.-]*:/i
@@ -167,6 +168,13 @@ export const collapseSlashRuns = (url: string): string => {
   }
 
   return normalizeUrl(url, { collapseSlashes: true })
+}
+
+// A feed that escapes its markup twice leaves `&amp;` in the attribute, so every pair after it
+// reads as `amp;{name}`. resolveUrl decodes one level on the way out, so without this a resolver
+// reads another query than the one the placeholder carries.
+export const foldEscapedAmpersands = (url: string): string => {
+  return url.replace(escapedAmpersandRegex, '&')
 }
 
 // A real, loadable src, not empty and not the `about:blank` lazy placeholder.
