@@ -464,6 +464,31 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
       expect(await transform(value, context)).toEqualHtml(expected)
     })
 
+    it('should clean a video poster with the provided cleanUrlFn', async () => {
+      const value = '<p>Episode notes</p>'
+      const context: TransformContext = {
+        ...withEnclosures([
+          {
+            url: 'https://example.com/episode.mp4',
+            type: 'video/mp4',
+            thumbnails: [{ url: 'https://example.com/still.jpg?utm_source=feed' }],
+          },
+        ]),
+        cleanUrlFn: (url) => url.split('?')[0] ?? url,
+      }
+      const expected = html`
+        <video
+          src="https://example.com/episode.mp4"
+          controls
+          poster="https://example.com/still.jpg"
+          data-enclosure=""
+        ></video>
+        <p>Episode notes</p>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
     it('should keep the src when the cleanUrlFn answers with nothing', async () => {
       const value = '<p>Episode notes</p>'
       const context: TransformContext = {
@@ -492,6 +517,22 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
     it('should inject image enclosure as img element', async () => {
       const value = '<p>Content</p>'
       const context = withEnclosures([{ url: 'https://example.com/photo.jpg', type: 'image/jpeg' }])
+      const expected = html`
+        <img src="https://example.com/photo.jpg" data-enclosure="">
+        <p>Content</p>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should clean the src with the provided cleanUrlFn', async () => {
+      const value = '<p>Content</p>'
+      const context: TransformContext = {
+        ...withEnclosures([
+          { url: 'https://example.com/photo.jpg?utm_source=feed', type: 'image/jpeg' },
+        ]),
+        cleanUrlFn: (url) => url.split('?')[0] ?? url,
+      }
       const expected = html`
         <img src="https://example.com/photo.jpg" data-enclosure="">
         <p>Content</p>
@@ -1506,6 +1547,31 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
   })
 
   describe('file enclosures', () => {
+    it('should clean the url with the provided cleanUrlFn', async () => {
+      const value = '<p>Content</p>'
+      const context: TransformContext = {
+        ...withEnclosures([
+          {
+            url: 'https://example.com/files/report.pdf?utm_source=feed',
+            type: 'application/pdf',
+            title: 'Annual report',
+          },
+        ]),
+        cleanUrlFn: (url) => url.split('?')[0] ?? url,
+      }
+      const expected = html`
+        <p>Content</p>
+        <div
+          data-file-url="https://example.com/files/report.pdf"
+          data-file-name="Annual report"
+          data-file-type="application/pdf"
+          data-enclosure=""
+        ></div>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
     it('should inject a document after the content with its name, type and size', async () => {
       const value = '<p>Content</p>'
       const context = withEnclosures([

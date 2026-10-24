@@ -315,6 +315,16 @@ export const cleanUrl: CleanUrl = ((url, context: CleanContext) => {
   return cleaned
 }) as CleanUrl
 
+type PrepareUrl = {
+  (url: string, context: ResolveContext & CleanContext): string
+  (url: string | undefined, context: ResolveContext & CleanContext): string | undefined
+}
+
+// Every url a result hands on: resolved against the base, then through the caller's cleanUrlFn.
+export const prepareUrl: PrepareUrl = ((url, context: ResolveContext & CleanContext) => {
+  return cleanUrl(resolveOrKeepUrl(url, context), context)
+}) as PrepareUrl
+
 export const isSamePage = (
   href: string,
   baseUrl: string | undefined,

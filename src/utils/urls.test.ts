@@ -8,6 +8,7 @@ import {
   parseUrlOnHosts,
   pickQueryParams,
   pickUrlParams,
+  prepareUrl,
   resolveOrDropUrl,
   resolveOrKeepUrl,
 } from './urls.js'
@@ -177,6 +178,21 @@ describe('cleanUrl', () => {
 
     expect(cleanUrl(undefined, { ...baseContext, cleanUrlFn })).toBeUndefined()
     expect(called).toBe(false)
+  })
+})
+
+describe('prepareUrl', () => {
+  it('should resolve the url before cleaning it', () => {
+    const valueUrl = '/media/poster.jpg?utm_source=feed'
+    const baseUrl = 'https://example.com/post'
+    const cleanUrlFn = (url: string) => url.split('?')[0] ?? url
+    const expectedUrl = 'https://example.com/media/poster.jpg'
+
+    expect(prepareUrl(valueUrl, { ...baseContext, baseUrl, cleanUrlFn })).toBe(expectedUrl)
+  })
+
+  it('should return undefined for an undefined url', () => {
+    expect(prepareUrl(undefined, baseContext)).toBeUndefined()
   })
 })
 

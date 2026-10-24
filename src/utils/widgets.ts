@@ -36,6 +36,7 @@ import {
   collapseSlashRuns,
   foldEscapedAmpersands,
   parseUrlOnHosts,
+  prepareUrl,
   resolveOrDropUrl,
   resolveOrKeepUrl,
 } from './urls.js'
@@ -320,6 +321,17 @@ export const createIframe = (document: Document, src: string): HTMLElement => {
   iframe.setAttribute('src', src)
 
   return iframe
+}
+
+export const prepareMediaMetadata = (
+  metadata: MediaResolverResult,
+  context: TransformContext,
+): MediaResolverResult => {
+  return {
+    ...metadata,
+    src: prepareUrl(metadata.src, context),
+    poster: prepareUrl(metadata.poster, context),
+  }
 }
 
 // The one native player every pass mints, whether the media came out of the markup or out of an

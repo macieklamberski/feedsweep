@@ -11,8 +11,8 @@ import {
   cleanUrl,
   flashFileRegex,
   isMediaWikiFilePage,
+  prepareUrl,
   resolveOrDropUrl,
-  resolveOrKeepUrl,
   videoFileRegex,
 } from '../../utils/urls.js'
 import {
@@ -26,6 +26,7 @@ import {
   isMediaResult,
   isResolvedIframe,
   prepareEmbedMetadata,
+  prepareMediaMetadata,
   readCarrierUrl,
   resolveEmbedProbe,
 } from '../../utils/widgets.js'
@@ -212,13 +213,12 @@ export const convertWidgets: DomTransform = (context) => {
         continue
       }
 
-      // resolveOrKeepUrl, unlike the tiers below: dropping the url takes the media out of the item,
-      // since no browser reads a data-* url and the container renders nothing on its own.
-      const resolved = resolveOrKeepUrl(parked.src, context)
-      const cleaned = cleanUrl(resolved, context)
+      // An unresolved url is kept, unlike the tiers below: dropping it takes the media out of the
+      // item, since no browser reads a data-* url and the container renders nothing on its own.
+      const src = prepareUrl(parked.src, context)
 
       // The container often holds a caption or a track title beside the parked url.
-      element.prepend(createMediaElement(document, { tag: parked.tag, src: cleaned }))
+      element.prepend(createMediaElement(document, { tag: parked.tag, src }))
     }
 
     // Runs before the tiers below, which claim the frame it leaves.
@@ -282,9 +282,8 @@ export const convertWidgets: DomTransform = (context) => {
             continue
           }
 
-          const cleaned = cleanUrl(src, context)
-          const poster = resolveOrKeepUrl(metadata.poster, context)
-          const mediaElement = createMediaElement(document, { ...metadata, src: cleaned, poster })
+          const prepared = prepareMediaMetadata({ ...metadata, src }, context)
+          const mediaElement = createMediaElement(document, prepared)
           const target = carrierOrShell(element)
 
           target.replaceWith(captionMedia(document, mediaElement, target, metadata.title))

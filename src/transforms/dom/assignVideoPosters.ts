@@ -1,8 +1,9 @@
 import { escapeRegex } from 'trousse'
-import type { CleanUrlFn, DomTransform } from '../../types.js'
-import { removeWithEmptyWrappers } from '../../utils/dom.js'
+import type { CleanUrlFn, DomTransform, TransformContext } from '../../types.js'
+import { attr, removeWithEmptyWrappers } from '../../utils/dom.js'
 import { buildMediaKey, enclosureMarker } from '../../utils/enclosures.js'
 import { findPosterEvidence, getVideoThumbnail } from '../../utils/images.js'
+import { prepareUrl } from '../../utils/urls.js'
 import { updateEmbedPlaceholder } from '../../utils/widgets.js'
 
 // A player without a resolver, like JW Player, carries no data-embed-provider to match on.
@@ -64,8 +65,13 @@ const findVideoElement = (players: Array<Element>): Element | undefined => {
 // Give the video its poster, then drop the now-redundant standalone image. By default an
 // existing poster is kept (e.g. a YouTube resolver thumbnail). Pass overwrite to replace it
 // with a better one.
-const moveImageToVideoPoster = (image: Element, video: Element, overwrite = false): void => {
-  const url = image.getAttribute('src')
+const moveImageToVideoPoster = (
+  image: Element,
+  video: Element,
+  context: TransformContext,
+  overwrite = false,
+): void => {
+  const url = prepareUrl(attr(image, 'src'), context)
 
   if (url) {
     if (video.localName === 'video') {
@@ -108,7 +114,7 @@ export const assignVideoPosters: DomTransform = (context) => (document) => {
 
       // Only a feed-defined enclosure thumbnail outranks a named poster, not a resolver's guess.
       const isFeedDefined = video.hasAttribute(enclosureMarker)
-      moveImageToVideoPoster(image, video, evidence === 'id' && !isFeedDefined)
+      moveImageToVideoPoster(image, video, context, evidence === 'id' && !isFeedDefined)
       break
     }
   }
@@ -135,7 +141,7 @@ export const assignVideoPosters: DomTransform = (context) => (document) => {
   const isPoster = !hasThumbnail && repeats.size === 0
 
   if (isPoster) {
-    moveImageToVideoPoster(poster, video)
+    moveImageToVideoPoster(poster, video, context)
   }
 
   // Without the marker a repeat run reads them as the item's own images and moves none.
