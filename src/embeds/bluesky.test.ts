@@ -45,22 +45,24 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
       const value = html`
         <blockquote
           class="bluesky-embed"
-          data-bluesky-uri="at://did:plc:5w4eqcxzw5jv5qfnmzxcakfy/app.bsky.feed.post/3m5j5f542422y"
+          data-bluesky-uri="at://did:plc:bgfdt2ekglwcly5wuclxdecw/app.bsky.feed.post/3mpk4zwbyxs2t"
+          data-bluesky-cid="bafyreib5x4xrwuvv7jgw2yb33nh2c36xpr2frzoyipveu2wo4ovufkfxmy"
           data-bluesky-embed-color-mode="system"
         >
-          <p lang="de">Ein Beitrag aus dem Einbettungsdialog.</p>
-          &mdash; Autorin (<a href="https://bsky.app/profile/did:plc:5w4eqcxzw5jv5qfnmzxcakfy?ref_src=embed">@autorin.example</a>)
-          <a href="https://bsky.app/profile/did:plc:5w4eqcxzw5jv5qfnmzxcakfy/post/3m5j5f542422y?ref_src=embed">16. September 2025 um 08:34</a>
+          <p lang="en">Donald Trump uses the office of the president to make billions while American families struggle to afford their basic needs. His infinite greed is disgusting.<br><br><a href="https://bsky.app/profile/did:plc:bgfdt2ekglwcly5wuclxdecw/post/3mpk4zwbyxs2t?ref_src=embed">[image or embed]</a></p>
+          &mdash; Juliana Stratton (<a href="https://bsky.app/profile/did:plc:bgfdt2ekglwcly5wuclxdecw?ref_src=embed">@julianastratton.bsky.social</a>)
+          <a href="https://bsky.app/profile/did:plc:bgfdt2ekglwcly5wuclxdecw/post/3mpk4zwbyxs2t?ref_src=embed">1 July 2026 at 00:15</a>
         </blockquote>
       `
       const expected: EmbedResolverResult = {
         provider: 'bluesky',
-        id: 'did:plc:5w4eqcxzw5jv5qfnmzxcakfy/3m5j5f542422y',
-        src: 'https://embed.bsky.app/embed/did:plc:5w4eqcxzw5jv5qfnmzxcakfy/app.bsky.feed.post/3m5j5f542422y',
-        url: 'https://bsky.app/profile/did:plc:5w4eqcxzw5jv5qfnmzxcakfy/post/3m5j5f542422y',
-        description: 'Ein Beitrag aus dem Einbettungsdialog.',
-        author: 'Autorin (@autorin.example)',
-        date: '2025-11-13T12:15:28.936Z',
+        id: 'did:plc:bgfdt2ekglwcly5wuclxdecw/3mpk4zwbyxs2t',
+        src: 'https://embed.bsky.app/embed/did:plc:bgfdt2ekglwcly5wuclxdecw/app.bsky.feed.post/3mpk4zwbyxs2t',
+        url: 'https://bsky.app/profile/did:plc:bgfdt2ekglwcly5wuclxdecw/post/3mpk4zwbyxs2t',
+        description:
+          'Donald Trump uses the office of the president to make billions while American families struggle to afford their basic needs. His infinite greed is disgusting.',
+        author: 'Juliana Stratton (@julianastratton.bsky.social)',
+        date: '2026-06-30T23:15:21.731Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -668,7 +670,7 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should not read a date from a record key whose top bit is set', async () => {
+    it('should not read a date from a record key too large for 64 bits', async () => {
       const value = html`
         <blockquote
           class="bluesky-embed"
@@ -987,6 +989,29 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         src: 'https://embed.bsky.app/embed/did:plc:fhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mfq7aeuwbg42',
         url: 'https://bsky.app/profile/did:plc:fhz4agnyzcrsvpnprxrbjrpa/post/3mfq7aeuwbg42',
         date: '2026-02-26T02:58:47.993Z',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the date from a record key whose tail holds an o', async () => {
+      const value = html`
+        <iframe
+          id="bluesky-3mogemliugp2p"
+          data-bluesky-id="6494931896807279"
+          src="https://embed.bsky.app/embed/did:plc:y3cfhqre6iuilnhwp23fgl2v/app.bsky.feed.post/3mogemliugp2p?id=6494931896807279"
+          width="100%"
+          style="display: block; flex-grow: 1;"
+          frameborder="0"
+          scrolling="no"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'did:plc:y3cfhqre6iuilnhwp23fgl2v/3mogemliugp2p',
+        src: 'https://embed.bsky.app/embed/did:plc:y3cfhqre6iuilnhwp23fgl2v/app.bsky.feed.post/3mogemliugp2p',
+        url: 'https://bsky.app/profile/did:plc:y3cfhqre6iuilnhwp23fgl2v/post/3mogemliugp2p',
+        date: '2026-06-16T17:55:13.567Z',
       }
 
       expect(await extract(value)).toEqual(expected)

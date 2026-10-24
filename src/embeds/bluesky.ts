@@ -26,11 +26,10 @@ const atUriRegex = /^at:\/\/([^/]+)\/([^/]+)\/([^/?#]+)/
 // Whitespace, an en dash, an em dash or a hyphen.
 const authorSeparatorRegex = /^[\s–—-]+/
 
-// A post's record key is a TID: 64 bits in base32-sortable, the top bit zero, then microseconds
-// since the Unix epoch the client set when it wrote the post, then a 10-bit clock id.
+// A post's record key is a TID: a 64-bit integer in base32-sortable, holding microseconds since
+// the Unix epoch the client set when it wrote the post, then a 10-bit clock id.
 // See: https://atproto.com/specs/tid.
 const tidAlphabet = '234567abcdefghijklmnopqrstuvwxyz'
-// length: keeps a record key that is not a TID out
 const tidRegex = /^[234567abcdefghij][234567abcdefghijklmnopqrstuvwxyz]{12}$/
 
 type BlueskyPost = {
