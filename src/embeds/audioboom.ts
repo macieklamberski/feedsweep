@@ -1,4 +1,4 @@
-import { getPathSegments, isHostOf, isHostOrSubdomainOf } from 'trousse'
+import { getPathSegments } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -15,8 +15,7 @@ const postIdRegex = /^(\d+)(?:-[^.]*)?$/
 const audioboomHosts = ['audioboom.com', 'audioboo.fm']
 
 // Audioboo's Flash players, on its own host and on its S3 bucket.
-const flashBucket = 'boos.audioboo.fm'
-const flashHosts = [flashBucket, 'abfiles.s3.amazonaws.com']
+const flashHosts = ['boos.audioboo.fm', 'abfiles.s3.amazonaws.com']
 // S3 serves a bucket path-style too, on its own host with the bucket as the first segment.
 const bucketHost = 's3.amazonaws.com'
 
@@ -86,14 +85,16 @@ export const audioboomWidgetEmbedResolver = createMarkupEmbedResolver(
 // page in `mp3LinkURL` or the audio file in `mp3`. Audioboo's embed code paired it with the
 // compact player, which answers for the same id.
 const audioboomFlashResolveEmbed: ResolveEmbed = (url, element) => {
-  const isPathStyle = isHostOf(url, bucketHost)
+  const player = parseUrlOnHosts(url, [...flashHosts, bucketHost])
 
-  if (isPathStyle && getPathSegments(url)[0] !== flashBucket) {
+  if (!player) {
     return
   }
 
-  // Another bucket's virtual host passes the host gate as a subdomain of S3's.
-  if (!isPathStyle && !isHostOrSubdomainOf(url, flashHosts)) {
+  // Another bucket, path-style or on its own subdomain of S3's host, is not Audioboo's.
+  const bucket = player.hostname === bucketHost ? getPathSegments(player)[0] : player.hostname
+
+  if (!bucket || !flashHosts.includes(bucket)) {
     return
   }
 
