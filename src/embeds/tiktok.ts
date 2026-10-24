@@ -14,11 +14,11 @@ const tiktokHosts = ['tiktok.com']
 // Every player url TikTok has issued frames the clip by its numeric id: `/embed/{id}` and
 // `/embed/v2/{id}` from the oEmbed loader's eras, `/player/v1/{id}` from the current player.
 // All three still serve (probed 2026-08-15; both embed paths answer 400 on a fabricated id).
-const playerPathRegex = /^\/(?:embed(?:\/v2)?|player\/v1)\/(\d+)\/?$/
+const playerPathRegex = /^\/(?:embed(?:\/v2)?|player\/v1)\/(\d+)\/?$/i
 
 // A watch url names the clip's owner and the clip: `/@handle/video/{id}`. Sanitized copies
 // sometimes keep only the `/video/{id}` half, so the handle is optional.
-const watchPathRegex = /^(?:\/@([^/]+))?\/video\/(\d+)\/?$/
+const watchPathRegex = /^(?:\/@([^/]+))?\/video\/(\d+)\/?$/i
 
 // Not a 9/16 ratio: the frame stays 738 tall at any width, and the ratio asks 1778 at 1000.
 // The clip is letterboxed inside a frame whose header, caption, sound row and action rail set

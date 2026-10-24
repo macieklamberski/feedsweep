@@ -1,4 +1,4 @@
-import { decodeSegment, getPathSegments, parseUrl } from 'trousse'
+import { decodeSegment, getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import {
@@ -44,9 +44,9 @@ const composeEmbed = (document: string, search = ''): EmbedResolverResult => {
 const readDocumentId = (parsed: URL): string | undefined => {
   const segments = getPathSegments(parsed)
   // Feeds carry the same routes under `/mobile`, the mobile site's prefix.
-  const [marker, document] = segments[0] === 'mobile' ? segments.slice(1) : segments
+  const [marker, document] = isAnyOf(segments[0], 'mobile') ? segments.slice(1) : segments
 
-  if (!marker || !documentIdMarkers.includes(marker) || !document) {
+  if (!marker || !isAnyOf(marker, documentIdMarkers) || !document) {
     return
   }
 
@@ -83,7 +83,8 @@ export const scribdFlashResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const document = parsed.searchParams.get('document_id') ?? flashVar(element, 'document_id')
+  const document =
+    getQueryParam(parsed.searchParams, 'document_id') ?? flashVar(element, 'document_id')
 
   if (!document) {
     return

@@ -8,12 +8,12 @@ const provider = 'buzzsprout'
 
 const buzzsproutHosts = ['buzzsprout.com']
 // /{podcast}/{episode}-{slug}.js, with or without episodes/.
-const episodeScriptPathRegex = /^\/(\d+)\/(?:episodes\/)?(\d+)(?:-[^/]*)?\.js$/
+const episodeScriptPathRegex = /^\/(\d+)\/(?:episodes\/)?(\d+)(?:-[^/]*)?\.js$/i
 // A script naming the podcast alone is the show player, which carries every episode.
-const showScriptPathRegex = /^\/(\d+)\.js$/
+const showScriptPathRegex = /^\/(\d+)\.js$/i
 // /{podcast}/{episode}-{slug} with or without episodes/, the slug dot-free to keep .mp3 out.
 // The episode audio is `buzzsprout.com/{podcast}/{episode}-{slug}.mp3` on the same host.
-const episodePagePathRegex = /^\/(\d+)\/(?:episodes\/)?(\d+)(?:-[^/.]*)?$/
+const episodePagePathRegex = /^\/(\d+)\/(?:episodes\/)?(\d+)(?:-[^/.]*)?$/i
 
 // Both heights are what Buzzsprout's own script writes onto the iframe it builds: 200 for the
 // small episode player, 375 for the large show player (read from the served script, 2026-08-15).
@@ -61,7 +61,7 @@ export const buzzsproutIframeEmbedResolver: EmbedResolver = createUrlEmbedResolv
 // Buzzsprout's WordPress shortcode: an empty div and a script naming the ids, which no reader runs.
 // Feeds carrying the shortcode have no enclosure for the episode either.
 export const buzzsproutScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="buzzsprout.com"]',
+  'script[src*="buzzsprout.com" i]',
   (element) => {
     // The selector guarantees a src containing the host substring, so only the host and
     // path checks can reject.

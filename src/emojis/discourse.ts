@@ -892,7 +892,7 @@ const getGlyph = (src: string): string | undefined => {
   const path = src.split(queryOrHashRegex)[0]
   const stem = getFileStem(path)
   const isToned = toneRegex.test(stem)
-  const name = isToned ? getFileStem(path.slice(0, path.lastIndexOf('/'))) : stem
+  const name = (isToned ? getFileStem(path.slice(0, path.lastIndexOf('/'))) : stem).toLowerCase()
   const glyph = getNameGlyph(discourseAliases.get(name) ?? name)
 
   if (!glyph || !isToned) {

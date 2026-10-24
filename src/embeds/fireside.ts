@@ -1,4 +1,4 @@
-import { decodeSegment, getPathSegments } from 'trousse'
+import { decodeSegment, getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -6,7 +6,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const tokenRegex = /^[^+]+\+[^+]+$/
 
 // A shape, not a version list: refusing a later version silently drops the height and the id.
-const playerVersionRegex = /^v\d$/
+const playerVersionRegex = /^v\d$/i
 
 const currentPlayerVersion = 'v3'
 
@@ -22,9 +22,10 @@ type FiresidePlayer = { version: string; token: string }
 // route, naming the same token and no version.
 export const extractFiresideToken = (link: string): FiresidePlayer | undefined => {
   const segments = getPathSegments(link)
-  const versioned = segments[0] === 'player' ? segments.slice(1) : segments
-  const [version, encodedToken] =
-    segments[0] === 's' ? [currentPlayerVersion, segments[1]] : versioned
+  const versioned = isAnyOf(segments[0], 'player') ? segments.slice(1) : segments
+  const [version, encodedToken] = isAnyOf(segments[0], 's')
+    ? [currentPlayerVersion, segments[1]]
+    : versioned
 
   if (!version || !playerVersionRegex.test(version)) {
     return

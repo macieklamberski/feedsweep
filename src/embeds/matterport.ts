@@ -1,4 +1,4 @@
-import { parseUrl } from 'trousse'
+import { getQueryParam, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import {
@@ -13,7 +13,7 @@ const provider = 'matterport'
 
 const matterportHosts = ['my.matterport.com']
 
-const showPathRegex = /^\/show\/?$/
+const showPathRegex = /^\/show\/?$/i
 
 // The start pose a shared location link writes, the keys the showcase reads to place the camera.
 const navigationParams = ['start', 'sm', 'sp', 'sq', 'sr', 'ss', 'sf', 'sz']
@@ -26,7 +26,7 @@ const matterportResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const id = parsed.searchParams.get('m')
+  const id = getQueryParam(parsed.searchParams, 'm')
 
   if (!id) {
     return

@@ -1,3 +1,4 @@
+import { getQueryParam, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -6,14 +7,14 @@ const provider = 'tencent'
 
 // A vid of cover is an unfilled snippet's route word, and it mints a grey poster and a dead link.
 // The word is Tencent's own, from `v.qq.com/x/cover/{cid}/{vid}.html`.
-const nonVideoWords = new Set(['cover'])
+const nonVideoWords = ['cover']
 
 // `v.qq.com` serves the player; the other two served the Flash player.
 const tencentHosts = ['v.qq.com', 'static.video.qq.com', 'imgcache.qq.com']
 
 // `/txp/iframe/player.html` is the current player. The older `/iframe/player.html` is a stub that
 // `location.replace`s onto it, and `/iframe/preview.html` is the mobile player of the same era.
-const playerPathRegex = /^\/(?:txp\/iframe\/player|iframe\/player|iframe\/preview)\.html$/
+const playerPathRegex = /^\/(?:txp\/iframe\/player|iframe\/player|iframe\/preview)\.html$/i
 const flashPathRegex = /\/TPout\.swf$/i
 
 // The 640x498 and 500x375 boxes the older carriers state held the retired player's chrome.
@@ -28,10 +29,10 @@ const readVideoId = (url: string): string | undefined => {
     return
   }
 
-  const videoId = parsed.searchParams.get('vid')
+  const videoId = getQueryParam(parsed.searchParams, 'vid')
 
   // Tencent serves video on the player host, so a file name in vid is an enclosure.
-  if (!videoId || isFileName(videoId) || nonVideoWords.has(videoId)) {
+  if (!videoId || isFileName(videoId) || isAnyOf(videoId, nonVideoWords)) {
     return
   }
 

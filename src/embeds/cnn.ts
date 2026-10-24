@@ -1,4 +1,4 @@
-import { parseUrl } from 'trousse'
+import { getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { composeQuery, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
@@ -44,7 +44,7 @@ const composeEmbed = (id: string): EmbedResolverResult => {
 }
 
 // The loader script and the 2014 iframe spell the id with a `/video/` prefix.
-const videoPrefixRegex = /^\/?video\//
+const videoPrefixRegex = /^\/?video\//i
 
 const resolveVideoId = (value: string | null | undefined): EmbedResolverResult | undefined => {
   const id = value?.replace(videoPrefixRegex, '')
@@ -55,16 +55,16 @@ const resolveVideoId = (value: string | null | undefined): EmbedResolverResult |
 const resolveTarget = (url: string): EmbedResolverResult | undefined => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
-  if (parsed?.pathname === '/v1/fav/') {
-    return resolveVideoId(parsed.searchParams.get('video'))
+  if (parsed && isAnyOf(parsed.pathname, '/v1/fav/')) {
+    return resolveVideoId(getQueryParam(parsed.searchParams, 'video'))
   }
 
-  if (parsed?.pathname === '/video/api/embed.html') {
+  if (parsed && isAnyOf(parsed.pathname, '/video/api/embed.html')) {
     return resolveVideoId(parsed.hash.slice(1))
   }
 
-  if (parsed?.pathname === '/video/savp/evp/') {
-    return resolveVideoId(parsed.searchParams.get('vid'))
+  if (parsed && isAnyOf(parsed.pathname, '/video/savp/evp/')) {
+    return resolveVideoId(getQueryParam(parsed.searchParams, 'vid'))
   }
 }
 
@@ -88,7 +88,7 @@ export const cnnIframeEmbedResolver = createUrlEmbedResolver(cnnHosts, cnnResolv
 // The Flash player, `i.cdn.turner.com/cnn/.element/apps/cvp/3.0/swf/{player}.swf?…&videoId={id}`,
 // as an `<embed>` or an `<object>`. The id sits in the swf's own query on every specimen, and in
 // `flashVars` on none, but the player read both so both are read here.
-const flashPlayerPathRegex = /^\/cnn\/\.element\/apps\/cvp\/.*\.swf$/
+const flashPlayerPathRegex = /^\/cnn\/\.element\/apps\/cvp\/.*\.swf$/i
 
 export const cnnFlashResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
@@ -97,7 +97,9 @@ export const cnnFlashResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  return resolveVideoId(parsed.searchParams.get('videoId') ?? flashVar(element, 'videoId'))
+  return resolveVideoId(
+    getQueryParam(parsed.searchParams, 'videoId') ?? flashVar(element, 'videoId'),
+  )
 }
 
 // CNN's Flash player swf as an <embed> or an <object>, which no browser runs today.
@@ -105,10 +107,10 @@ export const cnnFlashEmbedResolver = createUrlEmbedResolver(cdnHosts, cnnFlashRe
 
 // CNN's 2009 share snippet: a loader script that is gone, beside a <noscript> link.
 export const cnnScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="cdn.turner.com/cnn/.element/js/"][src*="/video/evp/module.js"]',
+  'script[src*="cdn.turner.com/cnn/.element/js/" i][src*="/video/evp/module.js" i]',
   (element) => {
     const parsed = parseUrlOnHosts(attr(element, 'src'), cdnHosts)
 
-    return resolveVideoId(parsed?.searchParams.get('vid'))
+    return resolveVideoId(getQueryParam(parsed?.searchParams, 'vid'))
   },
 )

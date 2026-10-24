@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
 import { localePairRegex } from '../utils/urls.js'
@@ -16,7 +16,7 @@ const readVideo = (url: string): Video | undefined => {
   const [first, second, third] = getPathSegments(url)
 
   // The route word tells an embed from a channel, `/channel`, or a shared post, `/s`.
-  if (first === 'embed') {
+  if (isAnyOf(first, 'embed')) {
     if (!second) {
       return
     }
@@ -24,7 +24,7 @@ const readVideo = (url: string): Video | undefined => {
     return { id: second }
   }
 
-  if (second !== 'embed') {
+  if (!isAnyOf(second, 'embed')) {
     return
   }
 

@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -26,7 +26,7 @@ export const lividResolveEmbed: ResolveEmbed = (url, element) => {
   // The older player route, `oe/{account}/video/{number}`, still plays. Livid assigns the video's
   // current id itself, so the route cannot be rebuilt onto it and the player url is kept. The
   // number names a video only together with its account.
-  if (route === 'oe') {
+  if (isAnyOf(route, 'oe')) {
     const [, account, kind, number] = segments
 
     if (kind?.toLowerCase() !== 'video' || !number) {

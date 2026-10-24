@@ -1,4 +1,4 @@
-import { isHostOrSubdomainOf, toMap } from 'trousse'
+import { getQueryParam, isHostOrSubdomainOf, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { composeQuery, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -20,15 +20,15 @@ const srgplayEmbedParams = ['startTime', 'subdivisions']
 
 // The business unit after `urn:` picks the host. The rest varies in segment count, the corpus
 // carries `urn:srf:ais:video:` beside `urn:srf:video:`, so it is kept as the source wrote it.
-const urnUnitRegex = /^urn:([a-z]+):/
+const urnUnitRegex = /^urn:([a-z]+):/i
 
 // The shared player, and the same player on each unit's own host.
-const urnPlayerPathRegex = /^\/(?:p\/[^/]+\/embed|play\/embed)\/?$/
+const urnPlayerPathRegex = /^\/(?:p\/[^/]+\/embed|play\/embed)\/?$/i
 
 // The page players, which name a media id in `id`: the retired per-show `videoembed` answers 404,
 // and `popupvideoplayer` is a live page that renders the same player as `/play/embed`.
-const retiredPlayerPathRegex = /^\/player\/tv\/[^/]+\/videoembed\/[^/]+$/
-const popupPlayerPathRegex = /^\/play\/tv\/popupvideoplayer$/
+const retiredPlayerPathRegex = /^\/player\/tv\/[^/]+\/videoembed\/[^/]+$/i
+const popupPlayerPathRegex = /^\/play\/tv\/popupvideoplayer$/i
 
 const readBusinessUnit = (parsed: URL): string | undefined => {
   for (const [unit, host] of playerHosts) {
@@ -38,9 +38,9 @@ const readBusinessUnit = (parsed: URL): string | undefined => {
   }
 }
 
-const composeEmbed = (urn: string | null, search: string): EmbedResolverResult | undefined => {
+const composeEmbed = (urn: string | undefined, search: string): EmbedResolverResult | undefined => {
   const unit = urn?.match(urnUnitRegex)?.[1]
-  const host = unit && playerHosts.get(unit)
+  const host = unit && playerHosts.get(unit.toLowerCase())
 
   if (!urn || !host) {
     return
@@ -48,7 +48,7 @@ const composeEmbed = (urn: string | null, search: string): EmbedResolverResult |
 
   // `/play/tv/-/video/-` redirects onto the slugged page and answers 404 for a urn naming nothing.
   // The route spells the medium, so an audio urn needs one this platform has not been measured on.
-  const page = urn.includes(':video:')
+  const page = urn.toLowerCase().includes(':video:')
     ? `https://www.${host}/play/tv/-/video/-${composeQuery({ urn })}`
     : undefined
   const query = composeQuery({ urn, ...pickQueryParams(search, srgplayEmbedParams) })
@@ -72,7 +72,7 @@ const srgplayResolveEmbed: ResolveEmbed = (url) => {
   }
 
   if (urnPlayerPathRegex.test(parsed.pathname)) {
-    return composeEmbed(parsed.searchParams.get('urn'), parsed.search)
+    return composeEmbed(getQueryParam(parsed.searchParams, 'urn'), parsed.search)
   }
 
   const isRetired = retiredPlayerPathRegex.test(parsed.pathname)
@@ -81,7 +81,7 @@ const srgplayResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const mediaId = parsed.searchParams.get('id')
+  const mediaId = getQueryParam(parsed.searchParams, 'id')
 
   if (!mediaId) {
     return

@@ -20,8 +20,8 @@ const zohoworkdriveHosts = [...zohoworkdriveDomains.keys()]
 
 // `/embed/{fileId}` is the embed dialog's frame. `/external/{linkId}` is a share link's page, and
 // its `/embed` suffix only spins, so it is rebuilt without it.
-const embedPathRegex = /^\/embed\/([^/]+)$/
-const externalPathRegex = /^\/external\/([^/]+)(?:\/embed)?$/
+const embedPathRegex = /^\/embed\/([^/]+)$/i
+const externalPathRegex = /^\/external\/([^/]+)(?:\/embed)?$/i
 
 // The only playback setting the dialog writes besides autoplay.
 const playbackParams = ['loop']

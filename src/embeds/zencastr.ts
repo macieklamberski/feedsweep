@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -17,7 +17,7 @@ export const zencastrResolveEmbed: ResolveEmbed = (url) => {
   const [route, id, ...rest] = parsed ? getPathSegments(parsed) : []
 
   // The `embed` route serves no deeper route.
-  if (route !== 'embed' || !id || rest.length) {
+  if (!isAnyOf(route, 'embed') || !id || rest.length) {
     return
   }
 

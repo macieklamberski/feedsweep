@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { isFileName } from '../utils/urls.js'
@@ -31,7 +31,7 @@ export const extractTransistorEmbed = (link: string): Subject | undefined => {
     return
   }
 
-  const mode = showModes.find((named) => named === segments[2])
+  const mode = showModes.find((named) => isAnyOf(segments[2], named))
 
   if (kind === 'e' && mode) {
     return { kind: mode, id: subject }

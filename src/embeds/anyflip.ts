@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
@@ -27,7 +27,7 @@ export const anyflipResolveEmbed: ResolveEmbed = (url, element) => {
   const bucket = parsed.hostname === bucketHost ? segments.shift() : parsed.hostname
   const [user, book, ...rest] = segments
 
-  if (bucket !== viewerHost || !book || !viewerPaths.includes(rest.join('/'))) {
+  if (!isAnyOf(bucket, viewerHost) || !book || !isAnyOf(rest.join('/'), viewerPaths)) {
     return
   }
 

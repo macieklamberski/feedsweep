@@ -1,4 +1,4 @@
-import { parseUrl } from 'trousse'
+import { getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { composeQuery } from '../utils/urls.js'
@@ -27,7 +27,7 @@ const decodePlayerHash = (hash: string): string | undefined => {
 }
 
 const readItemHash = (parsed: URL): string | undefined => {
-  const hash = parsed.searchParams.get('hash') ?? ''
+  const hash = getQueryParam(parsed.searchParams, 'hash') ?? ''
 
   if (parsed.hostname === playerHost) {
     if (parsed.pathname !== '/') {
@@ -37,7 +37,7 @@ const readItemHash = (parsed: URL): string | undefined => {
     return decodePlayerHash(hash)
   }
 
-  if (!itemHashPaths.includes(parsed.pathname)) {
+  if (!isAnyOf(parsed.pathname, itemHashPaths)) {
     return
   }
 

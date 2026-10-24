@@ -8,7 +8,7 @@ type ExternalVideoConfig = {
   url?: unknown
 }
 
-const loaderSelector = 'script[src*="/contents/js/external_video.js"]'
+const loaderSelector = 'script[src*="/contents/js/external_video.js" i]'
 
 // The inline script assigns one global: extVideoConfig = {"width":"480","height":"320","url":"…"};
 const configRegex = /extVideoConfig\s*=\s*(\{[^}]*\})/

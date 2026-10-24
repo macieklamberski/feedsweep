@@ -1,4 +1,4 @@
-import { getPathSegments, isHostOrSubdomainOf, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOrSubdomainOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -17,9 +17,9 @@ const playerHeight = 100
 // `creators.spotify.com/pod/profile/{user}/embed/episodes/{slug}/{audioId}`.
 export const extractAnchorEpisode = (link: string): string | undefined => {
   const segments = getPathSegments(link)
-  const marker = segments.indexOf('embed')
+  const marker = segments.findIndex((segment) => isAnyOf(segment, 'embed'))
 
-  if (marker < 1 || segments[marker + 1] !== 'episodes') {
+  if (marker < 1 || !isAnyOf(segments[marker + 1], 'episodes')) {
     return
   }
 
@@ -33,8 +33,8 @@ export const extractAnchorEpisode = (link: string): string | undefined => {
   return `${show}/${episode}`
 }
 
-const anchorShowPathRegex = /^\/([^/]+)\/embed\/?$/
-const spotifyShowPathRegex = /^\/pod\/(?:show|profile)\/([^/]+)\/embed\/?$/
+const anchorShowPathRegex = /^\/([^/]+)\/embed\/?$/i
+const spotifyShowPathRegex = /^\/pod\/(?:show|profile)\/([^/]+)\/embed\/?$/i
 
 // `anchor.fm/{show}/embed`, `podcasters.spotify.com/pod/show/{show}/embed`,
 // `creators.spotify.com/pod/profile/{show}/embed`.

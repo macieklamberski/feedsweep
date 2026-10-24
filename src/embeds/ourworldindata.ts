@@ -1,4 +1,4 @@
-import { parseUrl } from 'trousse'
+import { isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { filterUrlQuery, isFileName } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -60,7 +60,7 @@ const ourworldindataResolveEmbed: ResolveEmbed = (url) => {
 
   const isChart = kind === 'grapher'
   const query = filterUrlQuery(parsed, (name) => {
-    return !displayParams.includes(name)
+    return !isAnyOf(name, displayParams)
   })
   const src = `https://ourworldindata.org/${kind}/${slug}${query}`
 

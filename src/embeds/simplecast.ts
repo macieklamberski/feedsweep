@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { digitsRegex, uuidRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -16,7 +16,7 @@ export const extractSimplecastEpisode = (
   link: string,
 ): { id: string; isCurrent: boolean } | undefined => {
   const segments = getPathSegments(link)
-  const id = segments[0] === 'e' ? segments[1] : segments[0]
+  const id = isAnyOf(segments[0], 'e') ? segments[1] : segments[0]
 
   if (!id) {
     return

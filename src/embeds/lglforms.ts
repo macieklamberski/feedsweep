@@ -7,8 +7,8 @@ const provider = 'lglforms'
 
 const lglformsHosts = ['secure.lglforms.com']
 
-const formPathRegex = /^\/form_engine\/s\/([^/]+)$/
-const loaderPathRegex = /^\/form_engine\/s\/([^/]+)\.js$/
+const formPathRegex = /^\/form_engine\/s\/([^/]+)$/i
+const loaderPathRegex = /^\/form_engine\/s\/([^/]+)\.js$/i
 
 // A form's height follows its fields, and the frame posts one only to the page its `origin`
 // query names, which is the reader's own address, so a long form scrolls inside the frame.
@@ -38,7 +38,7 @@ export const lglformsResolveEmbed: ResolveEmbed = (url) => {
 // LGL Forms' embed, a script that writes the form's frame in place and that the pipeline drops.
 // The frame it writes carries the host page's address in `origin`, so the form page is minted.
 export const lglformsScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="lglforms.com/form_engine/s/"]',
+  'script[src*="lglforms.com/form_engine/s/" i]',
   (element) => {
     const loader = parseUrlOnHosts(attr(element, 'src'), lglformsHosts)
     const formKey = loader?.pathname.match(loaderPathRegex)?.[1]

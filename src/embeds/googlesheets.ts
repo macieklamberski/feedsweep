@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getAnyOf, getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr, getElementDimensions } from '../utils/dom.js'
 import { composeQuery, pickQueryParams, pickUrlParams } from '../utils/urls.js'
@@ -46,33 +46,34 @@ const readTabFragment = (url: string): string => {
 export const googlesheetsResolveEmbed: ResolveEmbed = (url, element) => {
   const pathSegments = getPathSegments(url)
 
-  if (pathSegments[0] !== 'spreadsheets') {
+  if (!isAnyOf(pathSegments[0], 'spreadsheets')) {
     return
   }
 
-  const segments = pathSegments[1] === 'u' ? pathSegments.slice(3) : pathSegments.slice(1)
+  const segments = isAnyOf(pathSegments[1], 'u') ? pathSegments.slice(3) : pathSegments.slice(1)
 
-  if (segments[0] !== 'd') {
+  if (!isAnyOf(segments[0], 'd')) {
     return
   }
 
-  const isPublished = segments[1] === 'e'
+  const isPublished = isAnyOf(segments[1], 'e')
   const sheetId = segments[isPublished ? 2 : 1]
   const route = segments.slice(isPublished ? 3 : 2).join('/')
-  const isChart = route === chartRoute
+  const isChart = isAnyOf(route, chartRoute)
   // A publish token answers 404 on `/edit` and `/preview`.
-  const isShared = !isPublished && sharedRoutes.includes(route)
+  const isShared = !isPublished && isAnyOf(route, sharedRoutes)
+  const publishRoute = isChart ? chartRoute : getAnyOf(route, sheetRoutes)
 
   if (!sheetId) {
     return
   }
 
-  if (!isChart && !isShared && !sheetRoutes.includes(route)) {
+  if (!isShared && !publishRoute) {
     return
   }
 
   const sheetPath = isPublished ? `e/${sheetId}` : sheetId
-  const frameRoute = isShared ? 'preview' : route
+  const frameRoute = isShared ? 'preview' : publishRoute
   const query = pickUrlParams(url, isChart ? chartParams : sheetParams)
   const fragment = readTabFragment(url)
   // A chart draws at its own pixel size and never scales, and its carrier declares that size.

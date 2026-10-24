@@ -60,7 +60,7 @@ export const jwplayerIframeEmbedResolver = createUrlEmbedResolver(
 
 // JW Player's script embed: the same players/{mediaId}-{playerId} url beside an empty botr_ div.
 export const jwplayerScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="jwplayer.com/players/"], script[src*="jwplatform.com/players/"]',
+  'script[src*="jwplayer.com/players/" i], script[src*="jwplatform.com/players/" i]',
   (element) => {
     const src = attr(element, 'src') ?? ''
 
@@ -93,7 +93,7 @@ export const jwplayerAmpEmbedResolver = createMarkupEmbedResolver(
 // legacy `content.jwplatform.com/feeds/{mediaId}.json`, `jw6/{mediaId}.xml` or
 // `feed/{mediaId}.rss`, also on `jwpsrv.com`, `/` often escaped.
 const setupPlaylistRegex =
-  /(?:jwplayer|jwplatform|jwpsrv)\.com\\?\/(?:v2\\?\/media|feeds?|jw6)\\?\/([^\\/."'?]+)/
+  /(?:jwplayer|jwplatform|jwpsrv)\.com\\?\/(?:v2\\?\/media|feeds?|jw6)\\?\/([^\\/."'?]+)/i
 const setupMountRegex = /jwplayer\(\s*["']([^"']+)["']\s*\)/
 
 // An empty div.jwplayer beside an inline jwplayer(...).setup() call, stripped as an empty tag.
@@ -160,7 +160,7 @@ const readJwpppBox = (element: Element, mediaId: string): Partial<EmbedResolverR
 // a mount that an inline setup call fills. The mount sits before the library or between it and the
 // setup call. It keeps whatever text it holds.
 export const jwplayerLibraryEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="jwplatform.com/libraries/"], script[src*="jwpsrv.com/library/"]',
+  'script[src*="jwplatform.com/libraries/" i], script[src*="jwpsrv.com/library/" i]',
   (element) => {
     if (!parseUrlOnHosts(attr(element, 'src') ?? '', libraryHosts)) {
       return

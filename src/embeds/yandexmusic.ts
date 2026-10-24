@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -29,7 +29,7 @@ type YandexMusicItem =
 const readRoute = (route: Array<string>): YandexMusicItem | undefined => {
   const [kind, first, second, third] = route
 
-  if (kind === 'track' && first) {
+  if (isAnyOf(kind, 'track') && first) {
     const [track, album] = first.split(':')
 
     if (!track) {
@@ -43,8 +43,8 @@ const readRoute = (route: Array<string>): YandexMusicItem | undefined => {
     }
   }
 
-  if (kind === 'album' && first) {
-    if (second === 'track' && third) {
+  if (isAnyOf(kind, 'album') && first) {
+    if (isAnyOf(second, 'track') && third) {
       return {
         kind: 'track',
         track: third,
@@ -58,7 +58,7 @@ const readRoute = (route: Array<string>): YandexMusicItem | undefined => {
     }
   }
 
-  if (kind === 'playlist' && first && second) {
+  if (isAnyOf(kind, 'playlist') && first && second) {
     return {
       kind: 'playlist',
       owner: first,
@@ -71,10 +71,10 @@ const readYandexMusicItem = (url: string): YandexMusicItem | undefined => {
   const [route, ...rest] = getPathSegments(url)
 
   // The retired Flash player, `/embed/{track}/track.swf`.
-  if (route === 'embed') {
+  if (isAnyOf(route, 'embed')) {
     const [track, file] = rest
 
-    if (!track || file !== 'track.swf') {
+    if (!track || !isAnyOf(file, 'track.swf')) {
       return
     }
 
@@ -84,7 +84,7 @@ const readYandexMusicItem = (url: string): YandexMusicItem | undefined => {
     }
   }
 
-  if (route !== 'iframe') {
+  if (!isAnyOf(route, 'iframe')) {
     return
   }
 

@@ -1,4 +1,4 @@
-import { getPathSegments, isHostOf, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, isElement, isWhitespaceText, keepIfMatches, text } from '../utils/dom.js'
 import { localeWordRegex, placeholderBaseUrl } from '../utils/urls.js'
@@ -10,7 +10,7 @@ const provider = 'yumpu'
 // the bare host and its `www.` spelling name a document.
 const yumpuHosts = ['yumpu.com', 'www.yumpu.com']
 
-const documentPathRegex = /^\/[a-z]{2}\/document\/view\/\d+(?:\/|$)/
+const documentPathRegex = /^\/[a-z]{2}\/document\/view\/\d+(?:\/|$)/i
 
 // The snippet can ship an empty anchor right after the iframe, naming the document page and its
 // title. The page sits in a numeric id space the embed hash does not join to offline, so the
@@ -44,12 +44,12 @@ const yumpuResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const segments = getPathSegments(parsed)
-  const isLocaleless = segments[0] === 'embed'
+  const isLocaleless = isAnyOf(segments[0], 'embed')
   // YUMPU redirects an embed path with no locale prefix to `/en/`.
   const locale = isLocaleless ? 'en' : keepIfMatches(segments[0], localeWordRegex)
   const [embed, view, hash] = isLocaleless ? segments : segments.slice(1)
 
-  if (!locale || embed !== 'embed' || view !== 'view' || !hash) {
+  if (!locale || !isAnyOf(embed, 'embed') || !isAnyOf(view, 'view') || !hash) {
     return
   }
 

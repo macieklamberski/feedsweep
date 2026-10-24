@@ -1,4 +1,4 @@
-import { decodeSegment, getPathSegments, parseUrl, toMap } from 'trousse'
+import { decodeSegment, getPathSegments, getQueryParam, isAnyOf, parseUrl, toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import {
   composeQuery,
@@ -81,14 +81,14 @@ const composePrivateEmbed = (
 
 // `ridewithgps.com/embeds?type={route|trip|event}`, the id in the parameter its kind names.
 const readQueryEmbed = (parsed: URL): EmbedResolverResult | undefined => {
-  const kind = parsed.searchParams.get('type') ?? ''
+  const kind = getQueryParam(parsed.searchParams, 'type')?.toLowerCase() ?? ''
   const shape = embedKinds.get(kind)
 
-  if (parsed.pathname !== '/embeds' || !shape) {
+  if (!isAnyOf(parsed.pathname, '/embeds') || !shape) {
     return
   }
 
-  const id = parsed.searchParams.get(shape.idParam)
+  const id = getQueryParam(parsed.searchParams, shape.idParam)
 
   if (!id) {
     return
@@ -112,11 +112,11 @@ const readPathEmbed = (parsed: URL): EmbedResolverResult | undefined => {
   const segments = getPathSegments(parsed)
   const [path, id, marker] = segments
 
-  if (segments.length !== 3 || marker !== 'embed' || !id) {
+  if (segments.length !== 3 || !isAnyOf(marker, 'embed') || !id) {
     return
   }
 
-  const kind = kindsByPath.get(path ?? '')
+  const kind = kindsByPath.get((path ?? '').toLowerCase())
   const shape = embedKinds.get(kind ?? '')
 
   if (!kind || !shape) {

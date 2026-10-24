@@ -1,4 +1,4 @@
-import { parseUrl } from 'trousse'
+import { getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { composeQuery, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
@@ -17,11 +17,11 @@ const playerPaths = ['/player', '/flvplayer.swf']
 export const videaResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
-  if (!parsed || !playerPaths.includes(parsed.pathname)) {
+  if (!parsed || !isAnyOf(parsed.pathname, playerPaths)) {
     return
   }
 
-  const id = parsed.searchParams.get('v')
+  const id = getQueryParam(parsed.searchParams, 'v')
 
   if (!id) {
     return

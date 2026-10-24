@@ -1,4 +1,12 @@
-import { getPathSegments, isHostOf, parseUrl, trimObject } from 'trousse'
+import {
+  getAnyOf,
+  getPathSegments,
+  getQueryParam,
+  isAnyOf,
+  isHostOf,
+  parseUrl,
+  trimObject,
+} from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
 import {
@@ -58,6 +66,8 @@ type CodepenTarget = {
   slug: string
 }
 
+const penKinds: Array<CodepenTarget['kind']> = ['pen', 'embed']
+
 const readUser = (value: string | undefined): string | undefined => {
   // The share dialog writes the handle with its `@`, while the url path carries both spellings.
   const name = value?.trim().replace(leadingAtRegex, '')
@@ -78,22 +88,24 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
   }
 
   const allSegments = getPathSegments(parsed)
-  // The 2.0 editor's pens sit one segment deeper, under `editor/`. The route word is case-sensitive.
-  const segments = allSegments[0] === 'editor' ? allSegments.slice(1) : allSegments
+  // The 2.0 editor's pens sit one segment deeper, under `editor/`.
+  const isEditor = isAnyOf(allSegments[0], 'editor')
+  const segments = isEditor ? allSegments.slice(1) : allSegments
   // A team's pens sit one segment deeper, under `team/{name}/`.
-  const isTeam = segments[0] === 'team'
-  const [rawUser, kind, ...rest] = isTeam ? segments.slice(1) : segments
+  const isTeam = isAnyOf(segments[0], 'team')
+  const [rawUser, route, ...rest] = isTeam ? segments.slice(1) : segments
+  const kind = getAnyOf(route, penKinds)
 
   if (!rawUser || reservedOwnerSegments.has(rawUser.toLowerCase())) {
     return
   }
 
-  if (kind !== 'pen' && kind !== 'embed') {
+  if (!kind) {
     return
   }
 
   // `embed/preview/{slug}` is the deferred-loading player, the same pen behind one more segment.
-  const [slug, pathToken] = kind === 'embed' && rest[0] === 'preview' ? rest.slice(1) : rest
+  const [slug, pathToken] = kind === 'embed' && isAnyOf(rest[0], 'preview') ? rest.slice(1) : rest
 
   // CodePen serves assets on its own host, so a file name is an enclosure.
   if (!slug || isFileName(slug)) {
@@ -101,7 +113,7 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
   }
 
   const user = readUser(rawUser)
-  const queryToken = parsed.searchParams.get('token')
+  const queryToken = getQueryParam(parsed.searchParams, 'token')
   // A query token comes out decoded, and it goes into a path beside the raw path spelling.
   const token = pathToken ?? (queryToken ? encodePathSegment(queryToken) : undefined)
 
@@ -111,9 +123,9 @@ const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
     user,
     ownerPath: user && (isTeam ? `team/${user}` : user),
     playerOwner: isTeam ? `team/${rawUser}` : rawUser,
-    key: parsed.searchParams.get('key') ?? undefined,
+    key: getQueryParam(parsed.searchParams, 'key'),
     token,
-    isEditor: allSegments[0] === 'editor',
+    isEditor,
   }
 }
 

@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -9,7 +9,7 @@ const bitchuteResolveEmbed: ResolveEmbed = (url, element) => {
   const [route, id] = getPathSegments(url)
 
   // The route word tells a video from a channel or a profile.
-  if (route !== 'embed' && route !== 'video') {
+  if (!isAnyOf(route, ['embed', 'video'])) {
     return
   }
 

@@ -12,12 +12,12 @@ const ccmaHosts = [
   'tv3.cat', // The Flash players
 ]
 
-const embedPathRegex = /^\/3cat\/video\/([^/]+)\/embed\/?$/
-const legacyEmbedPathRegex = /^\/video\/embed\/(super3\/)?(\d+)\/?$/
-const audioEmbedPathRegex = /^\/audio\/embed\/([^/]+)\/?$/
-const evpPlayerPathRegex = /^\/ria\/players\//
-const svpPlayerPathRegex = /^\/svp2\/svp2\.swf$/
-const svpObjectIdRegex = /^SVP(\d+)IE$/
+const embedPathRegex = /^\/3cat\/video\/([^/]+)\/embed\/?$/i
+const legacyEmbedPathRegex = /^\/video\/embed\/(super3\/)?(\d+)\/?$/i
+const audioEmbedPathRegex = /^\/audio\/embed\/([^/]+)\/?$/i
+const evpPlayerPathRegex = /^\/ria\/players\//i
+const svpPlayerPathRegex = /^\/svp2\/svp2\.swf$/i
+const svpObjectIdRegex = /^SVP(\d+)IE$/i
 
 // The video and the audio player both draw a 16:9 box at every width.
 const playerRatio = '16/9'

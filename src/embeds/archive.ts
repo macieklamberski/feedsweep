@@ -1,4 +1,11 @@
-import { fixMalformedQuery, getPathSegments, isHostOrSubdomainOf, parseUrl } from 'trousse'
+import {
+  fixMalformedQuery,
+  getPathSegments,
+  getQueryParam,
+  isAnyOf,
+  isHostOrSubdomainOf,
+  parseUrl,
+} from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, flashVar, flashVars } from '../utils/dom.js'
 import {
@@ -41,8 +48,8 @@ const readSegmentParts = (url: URL | undefined): SegmentParts => {
   const [route = '', segment = '', ...rest] = url ? getPathSegments(url) : []
 
   return {
-    head: itemRoutes.includes(route) ? segment : '',
-    file: fileRoutes.includes(route) ? rest.join('/') : '',
+    head: isAnyOf(route, itemRoutes) ? segment : '',
+    file: isAnyOf(route, fileRoutes) ? rest.join('/') : '',
   }
 }
 
@@ -84,7 +91,7 @@ const videoPlayerRatio = '16/9'
 const audioCarrierHeightLimit = 200
 
 const declaresAudioPlayer = (element: Element): boolean => {
-  if (attr(element, 'type')?.startsWith('audio/')) {
+  if (attr(element, 'type')?.toLowerCase().startsWith('audio/')) {
     return true
   }
 
@@ -165,16 +172,16 @@ export const archiveAudioEmbedResolver = createMarkupEmbedResolver('audio', (ele
   return { ...embed, height: audioPlayerHeight }
 })
 
-const flowPlayerPathRegex = /^\/(?:flow|flv)\//
-const xspfPlayerPathRegex = /^\/audio\/xspf_player\.swf$/
+const flowPlayerPathRegex = /^\/(?:flow|flv)\//i
+const xspfPlayerPathRegex = /^\/audio\/xspf_player\.swf$/i
 // The WordPress audio player swf, uploaded into an item of its own or beside the files it plays.
-const itemPlayerPathRegex = /^\/download\/.+\/player\.swf$/
+const itemPlayerPathRegex = /^\/download\/.+\/player\.swf$/i
 // `archive.org/download/{identifier}/{file}`, or `/{n}/items/{identifier}/{file}` on a storage host.
-const itemFilePathRegex = /^\/+(?:download|\d+\/items)\/([^/]+)\/(.+)/
+const itemFilePathRegex = /^\/+(?:download|\d+\/items)\/([^/]+)\/(.+)/i
 // The segment after `archive.org/download/` on any subdomain.
 // Both dialects write the file as `archive.org/download/{identifier}/{file}`, on the playlist
 // entry for a video and on the clip's `baseUrl` for audio.
-const downloadIdentifierRegex = /\/\/(?:[\w-]+\.)*archive\.org\/download\/([^/'"?&]+)\//
+const downloadIdentifierRegex = /\/\/(?:[\w-]+\.)*archive\.org\/download\/([^/'"?&]+)\//i
 
 // A `url` entry in either config dialect, key bare or quoted.
 const configFileRegex = /\burl['"]?\s*:\s*['"]([^'"]+)['"]/g
@@ -188,8 +195,11 @@ const namesAudioFile = (config: string): boolean => {
 
 // The XSPF player loads `audio/xspf-maker.php?identifier={identifier}`, a playlist of the item.
 const readXspfPlayer = (player: URL): EmbedResolverResult | undefined => {
-  const playlist = parseUrlOnHosts(player.searchParams.get('playlist_url') ?? '', archiveHosts)
-  const identifier = playlist?.searchParams.get('identifier')
+  const playlist = parseUrlOnHosts(
+    getQueryParam(player.searchParams, 'playlist_url') ?? '',
+    archiveHosts,
+  )
+  const identifier = getQueryParam(playlist?.searchParams, 'identifier')
 
   if (!identifier) {
     return
@@ -230,7 +240,7 @@ const archiveFlashResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   // The config arrives as the `flashVars` attribute or, on the older player, as a `config` query.
-  const config = flashVars(element) ?? parsed.searchParams.get('config')
+  const config = flashVars(element) ?? getQueryParam(parsed.searchParams, 'config')
   const identifier = config?.match(downloadIdentifierRegex)?.[1]
 
   if (!identifier || !config) {

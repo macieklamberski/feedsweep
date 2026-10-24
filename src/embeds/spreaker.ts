@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
@@ -22,12 +22,12 @@ export const extractSpreakerEmbed = (
 
   // The route is `player` on the widget host and `embed/player/{variant}` on the site host,
   // read as a whole segment so a longer name starting with it is not the player route.
-  if (!parsed || !getPathSegments(parsed).includes('player')) {
+  if (!parsed || !getPathSegments(parsed).some((segment) => isAnyOf(segment, 'player'))) {
     return
   }
 
   for (const [param, kind] of Object.entries(embedKinds)) {
-    const id = parsed.searchParams.get(param)
+    const id = getQueryParam(parsed.searchParams, param)
 
     if (id) {
       return { kind, param, id }

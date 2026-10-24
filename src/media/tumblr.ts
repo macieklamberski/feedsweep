@@ -1,4 +1,4 @@
-import { parseUrl } from 'trousse'
+import { getQueryParam, parseUrl } from 'trousse'
 import type { MediaResolver } from '../types.js'
 import { audioFileRegex, placeholderBaseUrl } from '../utils/urls.js'
 import { readCarrierUrl } from '../utils/widgets.js'
@@ -10,7 +10,7 @@ export const tumblrMediaResolver: MediaResolver = {
   selector: 'iframe.tumblr_audio_player',
   extract: (element) => {
     const parsed = parseUrl(readCarrierUrl(element), placeholderBaseUrl)
-    const file = parsed?.searchParams.get('audio_file')
+    const file = getQueryParam(parsed?.searchParams, 'audio_file')
 
     if (!file || !audioFileRegex.test(file)) {
       return

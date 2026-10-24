@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -30,7 +30,7 @@ export const imdbResolveEmbed: ResolveEmbed = (url) => {
   if (segments.length === 2) {
     const [videoembed, id] = segments
 
-    if (videoembed !== 'videoembed') {
+    if (!isAnyOf(videoembed, 'videoembed')) {
       return
     }
 
@@ -40,7 +40,7 @@ export const imdbResolveEmbed: ResolveEmbed = (url) => {
   if (segments.length === 3) {
     const [video, embed, id] = segments
 
-    if (video !== 'video' || embed !== 'embed') {
+    if (!isAnyOf(video, 'video') || !isAnyOf(embed, 'embed')) {
       return
     }
 
@@ -50,7 +50,7 @@ export const imdbResolveEmbed: ResolveEmbed = (url) => {
   if (segments.length === 5) {
     const [video, , id, imdb, embed] = segments
 
-    if (video !== 'video' || imdb !== 'imdb' || embed !== 'embed') {
+    if (!isAnyOf(video, 'video') || !isAnyOf(imdb, 'imdb') || !isAnyOf(embed, 'embed')) {
       return
     }
 

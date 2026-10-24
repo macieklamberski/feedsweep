@@ -1,4 +1,4 @@
-import { getPathSegments, type Nullish } from 'trousse'
+import { getPathSegments, isAnyOf, type Nullish } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find, isBlockElement, isBr, isElement, jsonAttr, text } from '../utils/dom.js'
 import { readObjectHeight } from '../utils/hints.js'
@@ -71,8 +71,8 @@ const extractBlueskyPostFromUrl = (link: string): BlueskyPost | undefined => {
   // `bsky.app/profile/{authority}/post/{rkey}` is the permalink the blockquote's anchors carry,
   // and `embed.bsky.app/embed/{authority}/app.bsky.feed.post/{rkey}` is the player.
   if (
-    (root === 'profile' && collection === 'post') ||
-    (root === 'embed' && collection === postCollection)
+    (isAnyOf(root, 'profile') && isAnyOf(collection, 'post')) ||
+    (isAnyOf(root, 'embed') && isAnyOf(collection, postCollection))
   ) {
     return { authority, rkey }
   }

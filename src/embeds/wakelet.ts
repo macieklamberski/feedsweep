@@ -11,7 +11,7 @@ const collectionHeight = 760
 
 // `/wakes/{id}`, then an optional layout, `list` or `grid`. Wakelet answers 404 to any other
 // spelling, an uppercase route word included.
-const wakePathRegex = /^\/wakes\/([^/]+)(?:\/[^/]+)?$/
+const wakePathRegex = /^\/wakes\/([^/]+)(?:\/[^/]+)?$/i
 
 // The collection frame Wakelet's embed dialog writes, embed.wakelet.com/wakes/{id}/list.
 // The layout and `border` are display, so every carrier is rebuilt onto the dialog's list.

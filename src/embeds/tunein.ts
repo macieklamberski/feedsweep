@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -18,7 +18,7 @@ export const tuneinResolveEmbed: ResolveEmbed = (url) => {
   const [embed, player, guideId, ...rest] = getPathSegments(url)
   const kind = guideId?.match(guideIdRegex)?.[1]
 
-  if (embed !== 'embed' || player !== 'player' || !guideId || !kind || rest.length) {
+  if (!isAnyOf(embed, 'embed') || !isAnyOf(player, 'player') || !guideId || !kind || rest.length) {
     return
   }
 

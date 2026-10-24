@@ -1,10 +1,11 @@
+import { getQueryParam } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const glomexHosts = ['player.glomex.com']
-const playerPathRegex = /^\/integration\/[^/]+\/(?:integration|iframe-player)\.html$/
+const playerPathRegex = /^\/integration\/[^/]+\/(?:integration|iframe-player)\.html$/i
 
 // The url glomex's own loader builds from a `<glomex-player>` element. The host answers the same
 // shell for any id, so no id can be checked by fetching it.
@@ -42,8 +43,8 @@ const glomexResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const integrationId = parsed.searchParams.get('integrationId') ?? undefined
-  const playlistId = parsed.searchParams.get('playlistId') ?? undefined
+  const integrationId = getQueryParam(parsed.searchParams, 'integrationId')
+  const playlistId = getQueryParam(parsed.searchParams, 'playlistId')
 
   return readEmbed(integrationId, playlistId)
 }

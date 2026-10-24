@@ -3,7 +3,7 @@ import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
 import { createIframe } from '../../utils/widgets.js'
 
-const loaderSelector = 'script[src*="jsfiddle.net/"]'
+const loaderSelector = 'script[src*="jsfiddle.net/" i]'
 
 // JSFiddle's loader script writes the fiddle's frame client side, so the pipeline drops it and
 // the fiddle with it.

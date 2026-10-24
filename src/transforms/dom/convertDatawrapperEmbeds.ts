@@ -2,7 +2,7 @@ import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
 import { createLinkedImage } from '../../utils/widgets.js'
 
-const chartIdRegex = /datawrapper\.dwcdn\.net\/([^/?#]+)/
+const chartIdRegex = /datawrapper\.dwcdn\.net\/([^/?#]+)/i
 const visWrapperIdRegex = /^datawrapper-vis-(.+)$/
 // Datawrapper ships a resize listener next to its iframes: pure noise once the chart is a
 // static image. Every modern minified variant postMessages on `datawrapper-height`. The
@@ -29,12 +29,12 @@ export const convertDatawrapperEmbeds: DomTransform = () => (document) => {
   // Responsive iframe (the dominant form): `<iframe src="dwcdn.net/<id>/<ver>/">`. The alt
   // comes from the iframe's title. Skip `#?secret=` preview URLs: the chart is unpublished,
   // so full.png 404s. Leave those for the generic iframe placeholder, which keeps the secret.
-  for (const iframe of document.querySelectorAll('iframe[src*="datawrapper.dwcdn.net/"]')) {
+  for (const iframe of document.querySelectorAll('iframe[src*="datawrapper.dwcdn.net/" i]')) {
     const src = iframe.getAttribute('src')
     const chartId = getChartId(src)
 
     // A secret= preview url is an unpublished chart whose full.png 404s.
-    if (!chartId || src?.includes('secret=')) {
+    if (!chartId || src?.toLowerCase().includes('secret=')) {
       continue
     }
 
@@ -50,7 +50,7 @@ export const convertDatawrapperEmbeds: DomTransform = () => (document) => {
       continue
     }
 
-    const fallback = wrapper.querySelector('img[src*="datawrapper.dwcdn.net/"]')
+    const fallback = wrapper.querySelector('img[src*="datawrapper.dwcdn.net/" i]')
     wrapper.replaceWith(buildChartImage(document, chartId, attr(fallback, 'alt')))
   }
 
@@ -58,7 +58,7 @@ export const convertDatawrapperEmbeds: DomTransform = () => (document) => {
   // now: rebuildDeferredIframes materialized it upstream, so the iframe pass above handles it.
   // Link form: some feeds ship only <div class="datawrapper-embed"><a href="dwcdn/<id>/">.
   for (const wrapper of document.querySelectorAll('.datawrapper-embed')) {
-    const anchor = wrapper.querySelector('a[href*="datawrapper.dwcdn.net/"]')
+    const anchor = wrapper.querySelector('a[href*="datawrapper.dwcdn.net/" i]')
 
     // A converted image is itself an a[href*=dwcdn] and would be reminted without the img check.
     if (!anchor || anchor.querySelector('img')) {

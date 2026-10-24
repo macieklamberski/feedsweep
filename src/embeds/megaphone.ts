@@ -1,4 +1,4 @@
-import { parseUrl } from 'trousse'
+import { getQueryParam, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import {
@@ -33,7 +33,7 @@ export const extractMegaphoneEmbed = (
   }
 
   for (const [param, { kind, height }] of Object.entries(embedKinds)) {
-    const id = parsed.searchParams.get(param)
+    const id = getQueryParam(parsed.searchParams, param)
 
     if (!id) {
       continue

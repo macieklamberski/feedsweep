@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import { parseUrlOnHosts } from '../utils/urls.js'
 
 const jsfiddleHosts = ['jsfiddle.net']
@@ -10,7 +10,7 @@ export const composeFiddleUrl = (url: string | undefined): string | undefined =>
   const segments = parsed ? getPathSegments(parsed) : []
   // The loader path is `/{author}/{slug}/{version}/embed/{panels}/`, with the author and the
   // version each optional.
-  const route = segments.indexOf('embed')
+  const route = segments.findIndex((segment) => isAnyOf(segment, 'embed'))
   const fiddle = route > 0 ? segments.slice(0, route) : []
 
   if (!fiddle.length) {

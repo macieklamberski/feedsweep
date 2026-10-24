@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import { composeQuery, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, readCarrierUrl } from '../utils/widgets.js'
 
@@ -33,9 +33,9 @@ export const googlebooksEmbedResolver = createMarkupEmbedResolver(
     }
 
     const [route, ...rest] = getPathSegments(parsed)
-    const id = parsed.searchParams.get('id')
+    const id = getQueryParam(parsed.searchParams, 'id')
 
-    if (route !== 'books' || rest.length || !id) {
+    if (!isAnyOf(route, 'books') || rest.length || !id) {
       return
     }
 

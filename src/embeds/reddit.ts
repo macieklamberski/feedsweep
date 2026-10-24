@@ -57,7 +57,7 @@ const parseTarget = (value: string | undefined): RedditTarget | undefined => {
     return scope === 'r' ? { kind: 'subreddit', path: `r/${name}`, publisher } : undefined
   }
 
-  if (comments !== 'comments' || !postId) {
+  if (!isAnyOf(comments, 'comments') || !postId) {
     return
   }
 
@@ -80,7 +80,12 @@ const parseTarget = (value: string | undefined): RedditTarget | undefined => {
 const parseAuthor = (value: string | undefined): string | undefined => {
   const [scope, name, rest] = parseRedditPath(value) ?? []
 
-  if (scope !== 'user' || rest !== undefined || !name || isAnyOf(name, deletedAccountNames)) {
+  if (
+    !isAnyOf(scope, 'user') ||
+    rest !== undefined ||
+    !name ||
+    isAnyOf(name, deletedAccountNames)
+  ) {
     return
   }
 

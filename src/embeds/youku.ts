@@ -1,3 +1,4 @@
+import { getQueryParam } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
 import { encodePathSegment, isFileName, parseUrlOnHosts } from '../utils/urls.js'
@@ -14,9 +15,9 @@ const youkuHosts = ['player.youku.com', 'static.youku.com']
 // The modern player, `/embed/{vid}`, and the two Flash forms that carried the same id:
 // `/player.php/sid/{vid}/v.swf` on the player host and `/v{version}/v/swf/{q}player.swf` on the
 // static host with the id in a `VideoIDS` query.
-const embedPathRegex = /^\/embed\/([^/]+)\/?$/
-const flashPathRegex = /^\/player\.php\/sid\/([^/]+)\/v\.swf$/
-const staticFlashPathRegex = /^\/v[\d.]+\/v\/swf\/\w*player\.swf$/
+const embedPathRegex = /^\/embed\/([^/]+)\/?$/i
+const flashPathRegex = /^\/player\.php\/sid\/([^/]+)\/v\.swf$/i
+const staticFlashPathRegex = /^\/v[\d.]+\/v\/swf\/\w*player\.swf$/i
 
 // The 510x498 and 480x400 boxes the carriers state held the retired player's chrome.
 // The modern player is chromeless and fills its box, and Youku's own watch page sizes it 16:9.
@@ -26,7 +27,7 @@ const readVideoId = (url: string): string | undefined => {
   const parsed = parseUrlOnHosts(url, youkuHosts)
 
   if (parsed?.hostname === 'static.youku.com') {
-    const videoIds = parsed.searchParams.get('VideoIDS')
+    const videoIds = getQueryParam(parsed.searchParams, 'VideoIDS')
 
     // The query value comes out decoded, and it goes into the player path.
     return staticFlashPathRegex.test(parsed.pathname) && videoIds

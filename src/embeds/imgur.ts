@@ -20,7 +20,7 @@ const imgurPageHosts = ['imgur.com', 'www.imgur.com', 'm.imgur.com']
 
 // The routes that name an album: the prefix the platform's own script writes, and the gallery
 // path both the older share links and the current slugged ones take.
-const albumRoutes = new Set(['a', 'gallery'])
+const albumRoutes = ['a', 'gallery']
 
 // `imgur.com/t/{tag}/{slug}-{id}` served byte-for-byte the same page as `imgur.com/gallery/{id}`
 // on 2026-09-08, and served it under a tag that does not exist, so the tag is decoration in
@@ -65,7 +65,7 @@ const sitePathSegments = [
 ]
 
 // The gallery's own listings, sitting where an album id would. `trending` also passes the id shape.
-const galleryListingSegments = new Set(['hot', 'new', 'top', 'trending'])
+const galleryListingSegments = ['hot', 'new', 'top', 'trending']
 
 // The album form is the same id behind an `a/` prefix, which is how the platform's own script
 // tells the two apart.
@@ -89,7 +89,7 @@ type ImgurPost = {
 }
 
 const parsePost = (value: string): ImgurPost | undefined => {
-  const isAlbum = value.startsWith(albumPrefix)
+  const isAlbum = value.toLowerCase().startsWith(albumPrefix)
   const id = isAlbum ? value.slice(albumPrefix.length) : value
 
   if (id) {
@@ -125,7 +125,7 @@ const composeEmbed = (post: ImgurPost, title?: string): EmbedResolverResult => {
 // Only a route word puts the id at a known depth, so only behind one can a slug in front of the
 // id be read off. The bare post page has nothing to say where the id starts.
 const composeAlbumEmbed = (segment: string | undefined): EmbedResolverResult | undefined => {
-  if (!segment || galleryListingSegments.has(segment)) {
+  if (!segment || isAnyOf(segment, galleryListingSegments)) {
     return
   }
 
@@ -164,11 +164,11 @@ export const imgurResolveEmbed: ResolveEmbed = (url) => {
 
   // A tag sits between its route and the post, so a tagged url names the post one segment deeper
   // than an album route does.
-  if (route === tagRoute) {
+  if (isAnyOf(route, tagRoute)) {
     return composeAlbumEmbed(third)
   }
 
-  if (albumRoutes.has(route ?? '')) {
+  if (isAnyOf(route, albumRoutes)) {
     return composeAlbumEmbed(second)
   }
 

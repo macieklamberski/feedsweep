@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { digitsRegex, flashFileRegex, parseUrlOnHosts } from '../utils/urls.js'
@@ -11,7 +11,7 @@ const bbcHosts = ['bbc.com', 'bbc.co.uk']
 // the shape keeps `articles` and the playlist route word `index` out.
 const pidRegex = /^[a-z](?=[0-9a-z]*\d)[0-9a-z]{7}$/
 const pidCharactersRegex = /^[0-9a-z]+$/
-const playlistPathRegex = /\/playlist\/([^/.]+)/
+const playlistPathRegex = /\/playlist\/([^/.]+)/i
 
 // The news and World Service players render at 16:9 of their width. BBC's own embed code states
 // a 400 by 500 box, which pads them with blank below.
@@ -79,16 +79,26 @@ export const bbcResolveEmbed: ResolveEmbed = (url, element) => {
 
   // `/news/av/embed/{pid}/{article}` 301s to `/news/av-embeds/{article}/vpid/{pid}`, and the
   // player answers 404 when either the pid or the article is fabricated.
-  if (first === 'news' && second === 'av' && third === 'embed' && isPidSlot(fourth)) {
+  if (
+    isAnyOf(first, 'news') &&
+    isAnyOf(second, 'av') &&
+    isAnyOf(third, 'embed') &&
+    isPidSlot(fourth)
+  ) {
     return isArticleId(fifth) ? composeNewsEmbed(fifth, fourth) : undefined
   }
 
-  if (first === 'news' && second === 'av-embeds' && isArticleId(third) && fourth === 'vpid') {
+  if (
+    isAnyOf(first, 'news') &&
+    isAnyOf(second, 'av-embeds') &&
+    isArticleId(third) &&
+    isAnyOf(fourth, 'vpid')
+  ) {
     return isPidSlot(fifth) ? composeNewsEmbed(third, fifth) : undefined
   }
 
   // `/ws/av-embeds/articles/{article}/{pid}/{lang}/` is the same player app as the news one.
-  if (first === 'ws' && second === 'av-embeds') {
+  if (isAnyOf(first, 'ws') && isAnyOf(second, 'av-embeds')) {
     const pid = segments.find(isPid)
 
     if (!pid) {
@@ -103,7 +113,7 @@ export const bbcResolveEmbed: ResolveEmbed = (url, element) => {
     }
   }
 
-  if (first === 'programmes' && isPidSlot(second) && third === 'player') {
+  if (isAnyOf(first, 'programmes') && isPidSlot(second) && isAnyOf(third, 'player')) {
     return composeProgrammesEmbed(second)
   }
 }

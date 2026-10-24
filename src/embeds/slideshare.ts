@@ -1,4 +1,4 @@
-import { getPathSegments, type Nullish, parseUrl } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, type Nullish, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, text } from '../utils/dom.js'
 import {
@@ -13,10 +13,10 @@ const slideshareHosts = ['slideshare.net', 'slidesharecdn.com']
 
 // The Flash wrapper spells its id `__ss_{id}` on the div and `__sse{id}` on the object inside and
 // on the embed's `name`. Many carriers name the deck on the div alone.
-const wrapperIdRegex = /^__ss[e_]?(\d+)$/
+const wrapperIdRegex = /^__ss[e_]?(\d+)$/i
 
 // Two players, the presentation one and the document one, sharing a query.
-const flashPlayerPathRegex = /\/swf\/(?:ssplayer\d?|doc_player)\.swf$/
+const flashPlayerPathRegex = /\/swf\/(?:ssplayer\d?|doc_player)\.swf$/i
 
 const deckRatio = '595/485'
 
@@ -38,7 +38,7 @@ export const slideshareResolveEmbed: ResolveEmbed = (url) => {
   }
 
   const segments = getPathSegments(parsed)
-  const marker = segments.indexOf('embed_code')
+  const marker = segments.findIndex((segment) => isAnyOf(segment, 'embed_code'))
 
   if (marker < 0) {
     return
@@ -46,7 +46,7 @@ export const slideshareResolveEmbed: ResolveEmbed = (url) => {
 
   // `/slideshow/embed_code/key/{key}` is the current form and `/slideshow/embed_code/{id}` the
   // one it replaced, which still serves by redirecting to the key form.
-  const isKeyed = segments[marker + 1] === 'key'
+  const isKeyed = isAnyOf(segments[marker + 1], 'key')
   // Some feeds put `&doc=` where the `?` belonged, so the id is cut at the `&`: an id never holds one.
   const deck = (isKeyed ? segments[marker + 2] : segments[marker + 1])?.split('&')[0]
 
@@ -65,7 +65,7 @@ export const slideshareResolveEmbed: ResolveEmbed = (url) => {
     : composeEmbed(deck)
 }
 
-const captionLinkSelector = 'a[href*="slideshare.net/"]'
+const captionLinkSelector = 'a[href*="slideshare.net/" i]'
 
 const readPageSegments = (anchor: Nullish<Element>): Array<string> => {
   const parsed = parseUrlOnHosts(attr(anchor, 'href'), slideshareHosts)
@@ -83,7 +83,7 @@ const findCaptionLinks = (caption: Nullish<Element>): CaptionLinks => {
   const page = find(caption, captionLinkSelector, (anchor) => {
     const segments = readPageSegments(anchor)
 
-    return segments.length > 1 && !segments.includes('embed_code')
+    return segments.length > 1 && !segments.some((segment) => isAnyOf(segment, 'embed_code'))
   })
   const account = readPageSegments(page)[0]
   // A route word has the shape of a handle: the 2008 caption offers `slideshare.net/upload` one
@@ -325,8 +325,8 @@ const slideshareFlashResolveEmbed: ResolveEmbed = (url, element) => {
   // The swf query names the deck's owner and slug, which compose the same page the wrapper
   // links to. It is the fallback for a snippet that kept the player and dropped the wrapper's
   // anchor.
-  const account = parsed.searchParams.get('userName')
-  const slug = parsed.searchParams.get('stripped_title')
+  const account = getQueryParam(parsed.searchParams, 'userName')
+  const slug = getQueryParam(parsed.searchParams, 'stripped_title')
   // Both come out of the query decoded, and each goes into a path segment of its own.
   const composed =
     account && slug

@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getAnyOf, getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
@@ -12,15 +12,17 @@ const rtveHosts = ['rtve.es', 'irtve.es']
 
 type Kind = 'audio' | 'video'
 
+const kinds: Array<Kind> = ['audio', 'video']
+
 // The asset is {id}_{locale}_{audios|videos}, in the swf query or path on v2 and the flashvars
 // on 4.x. The locale says nothing about the asset.
-const flashAssetRegex = /^([^_]+)_[^_]+_(audios|videos)$/
+const flashAssetRegex = /^([^_]+)_[^_]+_(audios|videos)$/i
 
 const flashPlayerPathRegex = /^\/swf\/.*\.swf$/i
 const flashEmbedPathRegex = /^\/swf\/v2\/embed\/([^/]+)\/RTVEPlayer\.swf$/i
 const flvPlayerPathRegex = /^\/swf\/FLVPlayer\.swf$/i
-const nielsenAssetRegex = /(?:^|,)assetID::([^,]+)/
-const nielsenTitleRegex = /(?:^|,)title::(.+)$/
+const nielsenAssetRegex = /(?:^|,)assetID::([^,]+)/i
+const nielsenTitleRegex = /(?:^|,)title::(.+)$/i
 const audioConfigRegex = /\/rtve_config_audio_embed\.xml$/i
 
 // The player fills whatever box it gets, and the Flash video carriers state 425 by 239, 16:9.
@@ -49,9 +51,10 @@ export const rtveResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const [drmn, embed, kind, id] = getPathSegments(parsed)
+  const [drmn, embed, route, id] = getPathSegments(parsed)
+  const kind = getAnyOf(route, kinds)
 
-  if (drmn !== 'drmn' || embed !== 'embed' || (kind !== 'audio' && kind !== 'video')) {
+  if (!isAnyOf(drmn, 'drmn') || !isAnyOf(embed, 'embed') || !kind) {
     return
   }
 
@@ -78,8 +81,8 @@ const rtveFlashResolveEmbed: ResolveEmbed = (url, element) => {
   // The FLVPlayer names its asset only in the nielsen beacon, assetID::{id},title::{title}, and
   // says the asset is audio only through its config file.
   if (flvPlayerPathRegex.test(parsed.pathname)) {
-    const config = parsed.searchParams.get('config') ?? flashVar(element, 'config')
-    const nielsen = parsed.searchParams.get('nielsen') ?? flashVar(element, 'nielsen')
+    const config = getQueryParam(parsed.searchParams, 'config') ?? flashVar(element, 'config')
+    const nielsen = getQueryParam(parsed.searchParams, 'nielsen') ?? flashVar(element, 'nielsen')
     const id = nielsen?.match(nielsenAssetRegex)?.[1]
 
     if (!config || !audioConfigRegex.test(config) || !id) {
@@ -90,7 +93,7 @@ const rtveFlashResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const asset =
-    parsed.searchParams.get('assetID') ??
+    getQueryParam(parsed.searchParams, 'assetID') ??
     flashVar(element, 'assetID') ??
     parsed.pathname.match(flashEmbedPathRegex)?.[1]
   const match = asset?.match(flashAssetRegex)
@@ -102,7 +105,7 @@ const rtveFlashResolveEmbed: ResolveEmbed = (url, element) => {
   // The 4.x snippet writes the asset's page link as the object's fallback, named after it.
   const title = element?.closest('object')?.querySelector(':scope > a')?.textContent?.trim()
 
-  return { ...composeEmbed(match[2] === 'audios' ? 'audio' : 'video', match[1]), title }
+  return { ...composeEmbed(isAnyOf(match[2], 'audios') ? 'audio' : 'video', match[1]), title }
 }
 
 // RTVE's retired Flash player under /swf/, which names its asset as {id}_es_{audios|videos}.

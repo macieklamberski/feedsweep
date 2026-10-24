@@ -1,3 +1,4 @@
+import { getQueryParam, isAnyOf } from 'trousse'
 import type { MediaResolver } from '../types.js'
 import { flashVars } from '../utils/dom.js'
 import { audioFileRegex, imageFileRegex, parseUrlOnHosts } from '../utils/urls.js'
@@ -7,11 +8,11 @@ const weeblyHost = 'weebly.com'
 const audioPlayerPath = '/weebly/apps/audioPlayer2.swf'
 
 // The upload path is /uploads/b/{user}-{pathId}/{name}, which only the poster url carries.
-const posterUrlRegex = /url\(\s*['"]?([^'")]*\/uploads\/[^'")]+)['"]?\s*\)/
+const posterUrlRegex = /url\(\s*['"]?([^'")]*\/uploads\/[^'")]+)['"]?\s*\)/i
 
 // Weebly's feed exporter prepends the site origin to the page's //www.weebly.com/uploads/… poster,
 // giving //www.weebly.comhttp://{site}/uploads/…. The url after the prefix is the one that serves.
-const mangledPosterPrefixRegex = /^\/\/www\.weebly\.com(?=https?:\/\/)/
+const mangledPosterPrefixRegex = /^\/\/www\.weebly\.com(?=https?:\/\/)/i
 
 // A wrapper already holding a real player is a third-party embed sitting in Weebly's video
 // block, not an upload facade. Replacing it would destroy whatever resolved it.
@@ -55,18 +56,18 @@ export const weeblyMediaResolver: MediaResolver = {
 export const weeblyFlashMediaResolver: MediaResolver = {
   kind: 'media',
   selector: [
-    `object[data*="${weeblyHost}${audioPlayerPath}"]`,
-    `embed[src*="${weeblyHost}${audioPlayerPath}"]`,
+    `object[data*="${weeblyHost}${audioPlayerPath}" i]`,
+    `embed[src*="${weeblyHost}${audioPlayerPath}" i]`,
   ].join(', '),
   extract: (element) => {
     const player = parseUrlOnHosts(readCarrierUrl(element), weeblyHost)
 
-    if (player?.pathname !== audioPlayerPath) {
+    if (!player || !isAnyOf(player.pathname, audioPlayerPath)) {
       return
     }
 
     const config = new URLSearchParams(flashVars(element) ?? '')
-    const src = config.get('soundFile')
+    const src = getQueryParam(config, 'soundFile')
 
     if (!src || !audioFileRegex.test(src)) {
       return
@@ -75,7 +76,7 @@ export const weeblyFlashMediaResolver: MediaResolver = {
     return {
       tag: 'audio',
       src,
-      title: config.get('titles') ?? undefined,
+      title: getQueryParam(config, 'titles'),
     }
   },
 }

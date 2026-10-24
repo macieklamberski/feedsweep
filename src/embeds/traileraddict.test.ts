@@ -103,12 +103,6 @@ describe('traileraddictResolveEmbed', () => {
       expect(traileraddictResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should return undefined for the current player in capitals, which the server answers 404', () => {
-      const value = 'https://traileraddict.com/IFRAME.PHP?id=13259'
-
-      expect(traileraddictResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for the short host with no id', () => {
       const value = 'https://v.traileraddict.com/'
 
@@ -135,6 +129,19 @@ describe('traileraddictResolveEmbed', () => {
   })
 
   describe('edge cases', () => {
+    it('should read the current player in capitals and mint it in lowercase', () => {
+      const value = 'https://traileraddict.com/IFRAME.PHP?id=13259'
+      const expected: EmbedResolverResult = {
+        provider: 'traileraddict',
+        id: '13259',
+        src: 'https://traileraddict.com/iframe.php?id=13259',
+        url: 'https://traileraddict.com/watch/13259',
+        ratio: '16/9',
+      }
+
+      expect(traileraddictResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should read the Flash route in any case, as the server redirects it', () => {
       const value = 'https://traileraddict.com/EMD/13259'
       const expected: EmbedResolverResult = {

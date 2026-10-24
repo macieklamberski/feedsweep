@@ -1,4 +1,4 @@
-import { getPathSegments, isPlainObject, trimObject } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, isPlainObject, trimObject } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { readPixels } from '../utils/hints.js'
 import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
@@ -19,12 +19,12 @@ export const donorboxResolveEmbed: ResolveEmbed = (url) => {
 
   const [kind, slug, ...rest] = getPathSegments(parsed)
 
-  if (kind !== 'embed' || !slug || rest.length > 0) {
+  if (!isAnyOf(kind, 'embed') || !slug || rest.length > 0) {
     return
   }
 
   // The amount prefills the donation. The rest of the query is the form's look.
-  const amount = parsed.searchParams.get('amount') ?? undefined
+  const amount = getQueryParam(parsed.searchParams, 'amount')
   const query = composeQuery(trimObject({ amount }, Boolean))
 
   return {

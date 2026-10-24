@@ -177,13 +177,6 @@ describeForEachParser('flipsnackEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a widget route spelled in uppercase', async () => {
-      const value =
-        '<iframe src="https://cdn.flipsnack.com/Widget/v2/Widget.html?hash=fxn3qutra"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
     it('should ignore a widget with no item hash', async () => {
       const value = '<iframe src="https://cdn.flipsnack.com/widget/v2/widget.html"></iframe>'
 
@@ -211,6 +204,19 @@ describeForEachParser('flipsnackEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should read a widget route spelled in uppercase and mint the lowercase widget', async () => {
+      const value =
+        '<iframe src="https://cdn.flipsnack.com/Widget/v2/Widget.html?hash=fxn3qutra"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'flipsnack',
+        id: 'fxn3qutra',
+        src: 'https://cdn.flipsnack.com/widget/v2/widget.html?hash=fxn3qutra',
+        height: 480,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should keep the item hash in the case the feed wrote', async () => {
       const value =
         '<iframe src="https://cdn.flipsnack.com/widget/v2/widget.html?hash=FXN3QUTRA"></iframe>'

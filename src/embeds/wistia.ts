@@ -1,4 +1,4 @@
-import { getPathSegments, toMap } from 'trousse'
+import { getPathSegments, isAnyOf, toMap } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -7,7 +7,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const provider = 'wistia'
 
 // The script form names the media through a JSONP callback, with no page in the url.
-const jsonpSuffixRegex = /\.jsonp$/
+const jsonpSuffixRegex = /\.jsonp$/i
 
 const wistiaHosts = ['wistia.net', 'wistia.com']
 
@@ -32,9 +32,9 @@ export const extractWistiaEmbed = (
   link: string,
 ): { route: string; id: string; page?: string } | undefined => {
   const segments = getPathSegments(link)
-  const start = segments[0] === 'embed' ? 1 : 0
+  const start = isAnyOf(segments[0], 'embed') ? 1 : 0
   const named = segments[start] ?? ''
-  const route = playerRoutes.get(named)
+  const route = playerRoutes.get(named.toLowerCase())
   const id = segments[start + 1]?.replace(jsonpSuffixRegex, '')
 
   // A dot marks a file such as the media JSON, and no route serves a file as a player.
@@ -43,7 +43,9 @@ export const extractWistiaEmbed = (
   }
 
   // Only the account host serves /medias/{id}: the player hosts 404 on it.
-  const host = segments[0] === 'medias' ? parseUrlOnHosts(link, wistiaHosts)?.hostname : undefined
+  const host = isAnyOf(segments[0], 'medias')
+    ? parseUrlOnHosts(link, wistiaHosts)?.hostname
+    : undefined
 
   return { route, id, page: host ? `https://${host}/medias/${id}` : undefined }
 }
