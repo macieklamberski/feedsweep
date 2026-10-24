@@ -151,6 +151,7 @@ export { unwrapDoublyNestedLists } from './transforms/dom/unwrapDoublyNestedList
 export { unwrapDrupalOembedIframes } from './transforms/dom/unwrapDrupalOembedIframes.js'
 export { unwrapHeadingBold } from './transforms/dom/unwrapHeadingBold.js'
 export { unwrapNestedCodeWrappers } from './transforms/dom/unwrapNestedCodeWrappers.js'
+export { unwrapWpcomWidgetFrames } from './transforms/dom/unwrapWpcomWidgetFrames.js'
 export { unwrapWrappers } from './transforms/dom/unwrapWrappers.js'
 export { wrapBareInlineInParagraphs } from './transforms/dom/wrapBareInlineInParagraphs.js'
 export { wrapCargoGalleryImages } from './transforms/dom/wrapCargoGalleryImages.js'

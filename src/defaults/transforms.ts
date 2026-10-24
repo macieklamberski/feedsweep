@@ -92,6 +92,7 @@ import { unwrapDoublyNestedLists } from '../transforms/dom/unwrapDoublyNestedLis
 import { unwrapDrupalOembedIframes } from '../transforms/dom/unwrapDrupalOembedIframes.js'
 import { unwrapHeadingBold } from '../transforms/dom/unwrapHeadingBold.js'
 import { unwrapNestedCodeWrappers } from '../transforms/dom/unwrapNestedCodeWrappers.js'
+import { unwrapWpcomWidgetFrames } from '../transforms/dom/unwrapWpcomWidgetFrames.js'
 import { unwrapWrappers } from '../transforms/dom/unwrapWrappers.js'
 import { wrapBareInlineInParagraphs } from '../transforms/dom/wrapBareInlineInParagraphs.js'
 import { wrapCargoGalleryImages } from '../transforms/dom/wrapCargoGalleryImages.js'
@@ -135,6 +136,10 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // below see the video and not the site's proxy route. Runs before surfaceNoscriptEmbeds,
   // which surfaces only a frame a resolver claims.
   unwrapDrupalOembedIframes,
+
+  // Runs before convertWidgets, whose Flash resolvers claim the rebuilt embed and which drops a
+  // swf none of them claims.
+  unwrapWpcomWidgetFrames,
 
   // Runs after surfaceParkedMarkup and surfaceTemplateEmbeds, which can surface a lazy iframe, and
   // before every pass that reads an iframe's `src`, convertDatawrapperEmbeds and convertGiphyEmbeds
