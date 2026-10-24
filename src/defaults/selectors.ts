@@ -43,6 +43,7 @@ export const defaultNonContentSelectors = [
   // The reCAPTCHA response box beside the fallback frame in its no-script fallback.
   'noscript textarea[name="g-recaptcha-response"]',
   'noscript textarea[name="recaptcha_challenge_field"]', // The same box in reCAPTCHA v1.
+  'noscript label[for="g-recaptcha-response"]', // The box's screen-reader label, written by some themes.
 
   // Ad slots.
   '.adsbygoogle', // Google AdSense ad slot.
