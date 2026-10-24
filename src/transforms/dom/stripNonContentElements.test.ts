@@ -163,6 +163,10 @@ const specimens: Record<string, string | [string, string]> = {
     '<iframe allowtransparency="true" frameborder="0" scrolling="no" src="https://plusone.google.com/_/+1/fastbutton?bsv&size=medium&hl=en-US&url=https%3A%2F%2Fexample.com%2Fa"></iframe>',
   'iframe[src*="tunein.com/embed/follow/"]':
     '<iframe src="https://tunein.com/embed/follow/p950157/?wmode=opaque"></iframe>',
+  'iframe[src*="youtube.com/subscribe_embed"]':
+    '<iframe data-gapiattached="true" frameborder="0" id="I2_1468640673809" marginheight="0" marginwidth="0" name="I2_1468640673809" scrolling="no" src="https://www.youtube.com/subscribe_embed?usegapi=1&amp;channelid=UCZUsI_y_Lyxni9pqSOBb_xw&amp;layout=default&amp;count=default&amp;origin=https%3A%2F%2Fexample.com&amp;gsrc=3p"></iframe>',
+  'iframe[src*="youtube.com/subscribe_widget"]':
+    '<iframe id="fr" src="https://www.youtube.com/subscribe_widget?p=_YVgU7I2NTwgDISHtjk_vA" style="overflow: hidden; height: 105px; border: 0; width: 100%;" scrolling="no" frameborder="0"></iframe>',
   'img[src*="w.sharethis.com/"]':
     '<img src="https://w.sharethis.com/images/facebook_32.png" alt="Share on Facebook">',
   'a.hatena-bookmark-button':
@@ -643,6 +647,11 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    it('should keep the YouTube player that shares the subscribe button host', async () => {
+      const value = '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
     it('should keep a prose link to the Zeno.FM home page away from the player', async () => {
       const value = html`
         <iframe src="https://zeno.fm/player/halshack" width="575" height="250"></iframe>
