@@ -34,14 +34,24 @@ const composeJwplayerEmbed = (id: string, isPlaylist = false): EmbedResolverResu
   return {
     provider,
     id: isPlaylist ? `playlist/${id}` : id,
-    // Rebuilt from the id, so the empty player-id segment some feeds ship
-    // (`{mediaId}-.html`, which 404s) is dropped and the URL loads the default player.
     // JW Player has no public watch page, so no `url`: the placeholder anchors to the src.
     src: `https://cdn.jwplayer.com/players/${id}.html`,
     // A playlist id 404s on the poster endpoint, so the thumbnail is gated on the kind.
     ...(!isPlaylist && { thumbnail: `https://cdn.jwplayer.com/v2/media/${id}/poster.jpg` }),
     ratio: '16/9',
   }
+}
+
+// A player id picks the publisher's saved player, whose config decides ads and autostart. An empty
+// one answers 404, so the default player stands in.
+const composePlayerEmbed = (mediaId: string, playerId?: string): EmbedResolverResult => {
+  const result = composeJwplayerEmbed(mediaId)
+
+  if (!playerId) {
+    return result
+  }
+
+  return { ...result, src: `https://cdn.jwplayer.com/players/${mediaId}-${playerId}.html` }
 }
 
 export const jwplayerResolveEmbed: ResolveEmbed = (url) => {
@@ -51,7 +61,9 @@ export const jwplayerResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  return composeJwplayerEmbed(mediaId)
+  const fileName = getPathSegments(url).at(-1)?.replace(fileExtensionRegex, '') ?? ''
+
+  return composePlayerEmbed(mediaId, fileName.slice(mediaId.length + 1))
 }
 
 // A JW Player iframe, players/{mediaId}-{playerId}.html, some with an empty player id that 404s.
@@ -74,9 +86,8 @@ export const jwplayerScriptEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-// AMP's amp-jwplayer element, which renders nothing without the AMP runtime.
-// The player id in `data-player-id` only picks a skin, and AMP's own builder gives
-// `data-playlist-id` precedence over the media id when both are present.
+// AMP's amp-jwplayer element, which renders nothing without the AMP runtime. AMP's own builder
+// gives `data-playlist-id` precedence over the media id when both are present.
 export const jwplayerAmpEmbedResolver = createMarkupEmbedResolver(
   'amp-jwplayer[data-media-id], amp-jwplayer[data-playlist-id]',
   (element) => {
@@ -195,7 +206,7 @@ export const jwplayerLibraryEmbedResolver = createMarkupEmbedResolver(
 
 // JW's WordPress plugins name the mount `jwplayer_{mediaId}_{playerId}_div`, with a counter before
 // `_div` on Future plc's lazy mount.
-const mountIdRegex = /^jwplayer_([^_]+)_[^_]+(?:_\d+)?_div$/
+const mountIdRegex = /^jwplayer_(?<mediaId>[^_]+)_(?<playerId>[^_]+)(?:_\d+)?_div$/
 
 // A JW mount with no script left beside it: Future plc's lazy `data-key` mount, or a mount copied
 // after the player ran. A mount that holds text keeps it.
@@ -206,14 +217,15 @@ export const jwplayerMountEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    // The mount id comes out of its attribute decoded, and the media id in it goes into a path.
-    const mediaId = encodePathSegment(element.id.match(mountIdRegex)?.[1] ?? '')
+    // The mount id comes out of its attribute decoded, and both ids in it go into a path.
+    const ids = element.id.match(mountIdRegex)?.groups
+    const mediaId = encodePathSegment(ids?.mediaId ?? '')
 
     if (!mediaId) {
       return
     }
 
-    return composeJwplayerEmbed(mediaId)
+    return composePlayerEmbed(mediaId, encodePathSegment(ids?.playerId ?? ''))
   },
 )
 
