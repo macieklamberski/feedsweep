@@ -1,6 +1,6 @@
 import { encodePathSegment, getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, text } from '../utils/dom.js'
+import { attr, setInnerHtml, text } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -158,7 +158,7 @@ const readFallbackAnchors = (element: Element | undefined): Array<Element> => {
   }
 
   const container = element.ownerDocument.createElement('div')
-  container.innerHTML = element.textContent
+  setInnerHtml(container, element.textContent)
 
   return Array.from(container.querySelectorAll('a[href]'))
 }
