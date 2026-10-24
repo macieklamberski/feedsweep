@@ -507,6 +507,7 @@ import { metasliderMediaResolver } from '../media/metaslider.js'
 import { odeoMediaResolver } from '../media/odeo.js'
 import { podbeanFlashMediaResolver } from '../media/podbean.js'
 import { podloveMediaResolver } from '../media/podlove.js'
+import { podomaticFlashMediaResolver } from '../media/podomatic.js'
 import { substackMediaResolver } from '../media/substack.js'
 import { tumblrMediaResolver } from '../media/tumblr.js'
 import { wechatMediaResolver } from '../media/wechat.js'
@@ -881,6 +882,7 @@ const mediaResolvers: Array<MediaResolver> = [
   odeoMediaResolver,
   podbeanFlashMediaResolver,
   podloveMediaResolver,
+  podomaticFlashMediaResolver,
   substackMediaResolver,
   tumblrMediaResolver,
   wechatMediaResolver,
