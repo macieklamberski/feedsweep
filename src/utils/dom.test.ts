@@ -1199,6 +1199,24 @@ describeForEachParser('setInnerHtml', (parseHtml) => {
     expect(element.querySelector('p')?.textContent).toBe('Kosakata.')
   })
 
+  const malformedCases: Array<[string, string]> = [
+    ['a doubled quote', '<a href="x"">link</a>'],
+    ['an apostrophe in a single-quoted value', `<img alt='Don't' src="a.png">`],
+    ['a quote in an unquoted value', '<a title=x"y>link</a>'],
+    ['a quote in an attribute name', '<a b"c>link</a>'],
+    ['an abrupt comment', '<!-->'],
+    ['an abrupt comment with a dash', '<!--->'],
+    ['a script end tag with an attribute', '<script>a</script x>'],
+    ['a custom element named after script', '<script-x>a</script-x>'],
+  ]
+
+  it.each(malformedCases)('should drop a doctype that follows %s', (_name, value) => {
+    const element = parseHtml('').createElement('div')
+    setInnerHtml(element, `${value}<!DOCTYPE html><p>Kosakata.</p>`)
+
+    expect(element.querySelector('p')?.textContent).toBe('Kosakata.')
+  })
+
   it('should scan a long run of unclosed doctypes in linear time', () => {
     const element = parseHtml('').createElement('div')
     const start = performance.now()
