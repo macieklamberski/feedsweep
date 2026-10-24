@@ -243,6 +243,7 @@ describeForEachParser('unwrapRebelmouseEmbedFrames through the pipeline', (parse
         data-embed-provider="twitter"
         data-embed-id="723349244531204096"
         data-embed-url="https://x.com/yeswecode/status/723349244531204096"
+        data-embed-author="@yeswecode"
       ></div>
     `
 
