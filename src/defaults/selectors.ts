@@ -154,6 +154,8 @@ export const defaultNonContentSelectors = [
   'img[src*="digg.com/img/badges"]', // The same badge pasted without its anchor.
   'iframe[src*="plusone.google.com"]', // Google+ +1 button, whose endpoint closed with the service.
   'iframe[src*="tunein.com/embed/follow/"]', // TuneIn follow button for a station or a show.
+  'iframe[src*="youtube.com/subscribe_embed"]', // YouTube subscribe button, as its loader writes it.
+  'iframe[src*="youtube.com/subscribe_widget"]', // YouTube subscribe button, its retired route.
   'img[src*="w.sharethis.com/"]', // ShareThis chicklet icons, the button row's pre-widget form.
 
   // Hatena Bookmark's add button. A bookmark comment carries an author's real text on a
