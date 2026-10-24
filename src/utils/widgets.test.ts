@@ -2307,6 +2307,40 @@ describe('prepareEmbedMetadata', () => {
     expect(prepareEmbedMetadata(value, context)).toEqual(expected)
   })
 
+  it('should clean the thumbnail with the provided cleanUrlFn', () => {
+    const value: Partial<EmbedResolverResult> = {
+      provider: 'example',
+      thumbnail: 'https://cdn.example.com/thumbs/abc.png?time=2017&utm_source=feed',
+    }
+    const expected: Partial<EmbedResolverResult> = {
+      provider: 'example',
+      thumbnail: 'https://cdn.example.com/thumbs/abc.png?time=2017',
+    }
+    const context = {
+      ...baseContext,
+      cleanUrlFn: (url: string) => url.replace(utmParamRegex, ''),
+    }
+
+    expect(prepareEmbedMetadata(value, context)).toEqual(expected)
+  })
+
+  it('should clean the avatar with the provided cleanUrlFn', () => {
+    const value: Partial<EmbedResolverResult> = {
+      provider: 'example',
+      avatar: 'https://cdn.example.com/avatars/jane.png?size=96&utm_source=feed',
+    }
+    const expected: Partial<EmbedResolverResult> = {
+      provider: 'example',
+      avatar: 'https://cdn.example.com/avatars/jane.png?size=96',
+    }
+    const context = {
+      ...baseContext,
+      cleanUrlFn: (url: string) => url.replace(utmParamRegex, ''),
+    }
+
+    expect(prepareEmbedMetadata(value, context)).toEqual(expected)
+  })
+
   it('should keep the src as written when no cleaner is given', () => {
     const value: Partial<EmbedResolverResult> = {
       provider: 'example',
@@ -2421,6 +2455,40 @@ describe('prepareCiteMetadata', () => {
       url: 'https://blog.example.com/article',
     }
     const context = { ...baseContext, cleanUrlFn: (url: string) => url.split('?')[0] ?? url }
+
+    expect(prepareCiteMetadata(value, context)).toEqual(expected)
+  })
+
+  it('should clean the icon once it resolves', () => {
+    const value: Partial<CiteResolverResult> = {
+      provider: 'example',
+      icon: 'https://blog.example.com/favicon.png?v=2&utm_source=feed',
+    }
+    const expected: Partial<CiteResolverResult> = {
+      provider: 'example',
+      icon: 'https://blog.example.com/favicon.png?v=2',
+    }
+    const context = {
+      ...baseContext,
+      cleanUrlFn: (url: string) => url.replace(utmParamRegex, ''),
+    }
+
+    expect(prepareCiteMetadata(value, context)).toEqual(expected)
+  })
+
+  it('should clean the thumbnail once it resolves', () => {
+    const value: Partial<CiteResolverResult> = {
+      provider: 'example',
+      thumbnail: 'https://blog.example.com/thumbs/article.jpg?w=600&utm_source=feed',
+    }
+    const expected: Partial<CiteResolverResult> = {
+      provider: 'example',
+      thumbnail: 'https://blog.example.com/thumbs/article.jpg?w=600',
+    }
+    const context = {
+      ...baseContext,
+      cleanUrlFn: (url: string) => url.replace(utmParamRegex, ''),
+    }
 
     expect(prepareCiteMetadata(value, context)).toEqual(expected)
   })

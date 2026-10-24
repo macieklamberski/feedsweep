@@ -543,8 +543,8 @@ export const prepareEmbedMetadata = (
     ...cleanResultFields(metadata, context),
     src: cleanUrl(src, context),
     url: cleanUrl(resolveOrDropUrl(metadata.url, context), context),
-    thumbnail: resolveOrKeepUrl(metadata.thumbnail, context),
-    avatar: resolveOrKeepUrl(metadata.avatar, context),
+    thumbnail: cleanUrl(resolveOrKeepUrl(metadata.thumbnail, context), context),
+    avatar: cleanUrl(resolveOrKeepUrl(metadata.avatar, context), context),
     date: parseOrKeepDate(metadata.date, context.parseDateFn),
   }
 }
@@ -588,8 +588,8 @@ export const prepareCiteMetadata = (
   return {
     ...cleanResultFields(metadata, context),
     url: cleanUrl(resolveOrKeepUrl(metadata.url, context), context),
-    icon: resolveOrKeepUrl(metadata.icon, context),
-    thumbnail: resolveOrKeepUrl(metadata.thumbnail, context),
+    icon: cleanUrl(resolveOrKeepUrl(metadata.icon, context), context),
+    thumbnail: cleanUrl(resolveOrKeepUrl(metadata.thumbnail, context), context),
     date: parseOrKeepDate(metadata.date, context.parseDateFn),
   }
 }

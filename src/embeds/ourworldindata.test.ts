@@ -90,15 +90,16 @@ describeForEachParser('ourworldindataEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should drop the trackers from a chart and keep the rest of the query', async () => {
+    it('should leave the trackers in a chart query to the cleanUrlFn', async () => {
       const value =
         '<iframe src="https://ourworldindata.org/grapher/co2-by-source?utm_source=newsletter&amp;time=1900..2017&amp;fbclid=IwAR0abc"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'ourworldindata',
         id: 'grapher/co2-by-source',
-        src: 'https://ourworldindata.org/grapher/co2-by-source?time=1900..2017',
-        url: 'https://ourworldindata.org/grapher/co2-by-source?time=1900..2017',
-        thumbnail: 'https://ourworldindata.org/grapher/co2-by-source.png?time=1900..2017',
+        src: 'https://ourworldindata.org/grapher/co2-by-source?utm_source=newsletter&time=1900..2017&fbclid=IwAR0abc',
+        url: 'https://ourworldindata.org/grapher/co2-by-source?utm_source=newsletter&time=1900..2017&fbclid=IwAR0abc',
+        thumbnail:
+          'https://ourworldindata.org/grapher/co2-by-source.png?utm_source=newsletter&time=1900..2017&fbclid=IwAR0abc',
         height: 600,
       }
 
@@ -185,23 +186,6 @@ describeForEachParser('ourworldindataEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
   })
-
-  describe('edge cases', () => {
-    it('should keep a view param whose name only contains a tracker prefix', async () => {
-      const value =
-        '<iframe src="https://ourworldindata.org/grapher/religious-composition?share_utm_rank=1"></iframe>'
-      const expected: EmbedResolverResult = {
-        provider: 'ourworldindata',
-        id: 'grapher/religious-composition',
-        src: 'https://ourworldindata.org/grapher/religious-composition?share_utm_rank=1',
-        url: 'https://ourworldindata.org/grapher/religious-composition?share_utm_rank=1',
-        thumbnail: 'https://ourworldindata.org/grapher/religious-composition.png?share_utm_rank=1',
-        height: 600,
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-  })
 })
 
 describeForEachParser('ourworldindata through the pipeline', (parseHtml) => {
@@ -234,6 +218,28 @@ describeForEachParser('ourworldindata through the pipeline', (parseHtml) => {
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should drop the trackers from every url with the cleanUrlFn', async () => {
+    const value =
+      '<iframe src="https://ourworldindata.org/grapher/co2-by-source?utm_source=newsletter&amp;time=1900..2017"></iframe>'
+    const expected = html`
+      <div
+        data-embed-id="grapher/co2-by-source"
+        data-embed-provider="ourworldindata"
+        data-embed-src="https://ourworldindata.org/grapher/co2-by-source?time=1900..2017"
+        data-embed-url="https://ourworldindata.org/grapher/co2-by-source?time=1900..2017"
+        data-embed-thumbnail="https://ourworldindata.org/grapher/co2-by-source.png?time=1900..2017"
+        data-embed-height="600"
+      ></div>
+    `
+    const output = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      cleanUrlFn: (url) => url.replace('utm_source=newsletter&', ''),
+    })
+
+    expect(output).toEqualHtml(expected)
   })
 
   it('should leave a chart image enclosure an image', async () => {
