@@ -190,11 +190,13 @@ describeForEachParser('podomatic jwplayer44 through the pipeline', (parseHtml) =
     return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
   }
 
-  it('should turn a WordPress.com widget frame around a playlist player into a link', async () => {
+  it('should link the podcast a playlist player names', async () => {
     const value = html`
-      <iframe
-        src="https://wpcomwidgets.com/?src=http%3A%2F%2Fwww.podomatic.com%2Fswf%2Fjwplayer44.swf&#038;flashvars=plugins%3Dviral-1%26viral.link%3Dhttp%3A%2F%2Fmrgranito.podOmatic.com%26height%3D340%26file%3Dhttp%3A%2F%2Fmrgranito.podOmatic.com%2Fmrss_stream.xml%26playlist%3Dbottom%26playlistsize%3D80%26streamer%3Drtmp%3A%2F%2Fstreams.podomatic.com%2Fvod"
-      ></iframe>
+      <embed
+        src="http://www.podomatic.com/swf/jwplayer44.swf"
+        flashvars="plugins=viral-1&amp;viral.link=http://mrgranito.podOmatic.com&amp;height=340&amp;file=http://mrgranito.podOmatic.com/mrss_stream.xml&amp;playlist=bottom&amp;playlistsize=80&amp;streamer=rtmp://streams.podomatic.com/vod"
+        type="application/x-shockwave-flash"
+      >
     `
     const expected = html`
       <p>
@@ -205,11 +207,13 @@ describeForEachParser('podomatic jwplayer44 through the pipeline', (parseHtml) =
     expect(await convert(value)).toEqualHtml(expected)
   })
 
-  it('should drop a WordPress.com widget frame around a player streaming one episode', async () => {
+  it('should drop a player streaming one episode', async () => {
     const value = html`
-      <iframe
-        src="https://wpcomwidgets.com/?src=http%3A%2F%2Fmrgranito.podOmatic.com%2Fswf%2Fjwplayer44.swf&#038;flashvars=height%3D20%26width%3D320%26file%3DUDS9%2F-4%2F31%2F0c%2Fmrgranito%2Fmedia%2Fpublished%2F3055619_stnd.mp3%26streamer%3Drtmp%3A%2F%2Fstreams.podomatic.com%2Fvod"
-      ></iframe>
+      <embed
+        src="http://mrgranito.podOmatic.com/swf/jwplayer44.swf"
+        flashvars="height=20&amp;width=320&amp;file=UDS9/-4/31/0c/mrgranito/media/published/3055619_stnd.mp3&amp;streamer=rtmp://streams.podomatic.com/vod"
+        type="application/x-shockwave-flash"
+      >
     `
 
     expect(await convert(value)).toEqualHtml('')

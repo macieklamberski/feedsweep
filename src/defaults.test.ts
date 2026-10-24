@@ -3,9 +3,12 @@ import {
   defaultEmbedRenderHints,
   defaultFieldCleaners,
   defaultNonContentSelectors,
+  defaultStandardDomTransforms,
   defaultWidgetResolvers,
 } from './defaults.js'
 import { parseHtml } from './parsers/linkedom.js'
+import { linkifyPodomaticPlaylists } from './transforms/dom/linkifyPodomaticPlaylists.js'
+import { unwrapWpcomWidgetFrames } from './transforms/dom/unwrapWpcomWidgetFrames.js'
 import {
   createCitePlaceholder,
   createEmbedPlaceholder,
@@ -187,4 +190,16 @@ describe('defaultFieldCleaners', () => {
       expect(source).toBe(source.toLowerCase())
     },
   )
+})
+
+describe('defaultStandardDomTransforms', () => {
+  // A Podomatic playlist player reaches feeds inside a WordPress.com widget frame, so the
+  // linkify step only sees it once the frame is rebuilt into the Flash object.
+  it('should run linkifyPodomaticPlaylists after unwrapWpcomWidgetFrames', () => {
+    const unwrapIndex = defaultStandardDomTransforms.indexOf(unwrapWpcomWidgetFrames)
+    const linkifyIndex = defaultStandardDomTransforms.indexOf(linkifyPodomaticPlaylists)
+
+    expect(unwrapIndex).toBeGreaterThan(-1)
+    expect(linkifyIndex).toBeGreaterThan(unwrapIndex)
+  })
 })

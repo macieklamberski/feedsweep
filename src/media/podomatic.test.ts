@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'bun:test'
-import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { MediaResolverResult } from '../types.js'
 import { podomaticFlashMediaResolver } from './podomatic.js'
@@ -165,27 +164,5 @@ describeForEachParser('podomaticFlashMediaResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
-  })
-})
-
-describeForEachParser('podomatic joeplayer through the pipeline', (parseHtml) => {
-  const convert = (value: string) => {
-    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
-  }
-
-  it('should turn a WordPress.com widget frame around the player into an audio element', async () => {
-    const value = html`
-      <iframe
-        src="https://wpcomwidgets.com/?src=http%3A%2F%2Fvenitcuento.podomatic.com%2Fswf%2Fjoeplayer_v20.swf&#038;flashvars=minicast%3Dfalse%26jsonLocation%3Dhttp%253A%252F%252Fvenitcuento.podomatic.com%252Fentry%252Fembed_params%252F2014-12-17T19_59_07-08_00%253Fcolor%253D43bee7%2526autoPlay%253Dfalse%2526width%253D440%2526height%253D85%2526objembed%253D0"
-      ></iframe>
-    `
-    const expected = html`
-      <audio
-        controls=""
-        src="https://venitcuento.podomatic.com/enclosure/2014-12-17T19_59_07-08_00.mp3"
-      ></audio>
-    `
-
-    expect(await convert(value)).toEqualHtml(expected)
   })
 })
