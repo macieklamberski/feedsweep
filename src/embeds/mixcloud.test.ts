@@ -294,6 +294,28 @@ describeForEachParser('mixcloudEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
+  it("should read the show from the legacy Flash player's flashvars", async () => {
+    const value = html`
+      <embed
+        src="http://www.mixcloud.com/media/swf/player/mixcloudLoader.swf"
+        flashvars="feed=http%3A%2F%2Fwww.mixcloud.com%2Faysuuygur%2Fseksin-evrimi%2F&amp;embed_uuid=a99519d2-828f-4780-a2f3-3ac4698a95a5&amp;stylecolor=&amp;embed_type=widget_standard"
+        width="480"
+        height="80"
+        type="application/x-shockwave-flash"
+      >
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'mixcloud',
+      id: 'aysuuygur/seksin-evrimi',
+      src: 'https://www.mixcloud.com/widget/iframe/?feed=%2Faysuuygur%2Fseksin-evrimi%2F',
+      url: 'https://www.mixcloud.com/aysuuygur/seksin-evrimi/',
+      height: 120,
+      author: 'aysuuygur',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
   it('should ignore the widget path on a foreign host', async () => {
     const value =
       '<iframe src="https://evil.test/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter%2F"></iframe>'

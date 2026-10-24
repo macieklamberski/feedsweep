@@ -1,6 +1,6 @@
 import { decodeSegment, getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { attr } from '../utils/dom.js'
+import { attr, flashVar } from '../utils/dom.js'
 import { isFileName, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -61,11 +61,11 @@ const readShow = (segments: Array<string>): Show | undefined => {
   return { key: `${user}/${slug}`, path: `${rawUser}/${rawSlug}` }
 }
 
-const readShowUrl = (link: string): Show | undefined => {
+const readShowUrl = (link: string, flashFeed?: string): Show | undefined => {
   const parsed = parseUrl(link)
   // The feed parameter holds a path in the newer embeds and a whole url in the Flash
-  // mixcloudLoader.swf one.
-  const feed = parsed?.searchParams.get('feed')
+  // mixcloudLoader.swf one, which takes it in its query or in its flashvars.
+  const feed = parsed?.searchParams.get('feed') ?? flashFeed
   const source = feed ? parseUrl(feed, placeholderBaseUrl) : parsed
 
   // Mixcloud serves the show audio and the artwork from subdomains of mixcloud.com.
@@ -87,7 +87,7 @@ export const extractMixcloudShow = (link: string): string | undefined => {
 const playerHeight = 120
 
 export const mixcloudResolveEmbed: ResolveEmbed = (url, element) => {
-  const show = readShowUrl(url)
+  const show = readShowUrl(url, flashVar(element, 'feed'))
 
   if (!show) {
     return
