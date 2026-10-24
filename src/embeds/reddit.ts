@@ -16,6 +16,9 @@ const redditHosts = ['reddit.com', 'redditmedia.com']
 // A removed account's byline links `/user/[deleted]/`, which names nobody.
 const deletedAccountNames = ['[deleted]', '%5Bdeleted%5D']
 
+// reddit.com spells an account `u` or `user`, and embed.reddit.com answers only `user`.
+const userScopes = ['user', 'u']
+
 // What a permalink names. A post carries a title, a comment does not, and a subreddit names
 // neither, so the kind decides which fields the widget can fill.
 type RedditTarget = {
@@ -36,6 +39,16 @@ const parseRedditPath = (value: string | undefined): Array<string> | undefined =
   return getPathSegments(parsed)
 }
 
+const readScope = (segment: string | undefined): 'r' | 'user' | undefined => {
+  if (isAnyOf(segment, 'r')) {
+    return 'r'
+  }
+
+  if (isAnyOf(segment, userScopes)) {
+    return 'user'
+  }
+}
+
 const parseTarget = (value: string | undefined): RedditTarget | undefined => {
   const segments = parseRedditPath(value)
 
@@ -43,9 +56,10 @@ const parseTarget = (value: string | undefined): RedditTarget | undefined => {
     return
   }
 
-  const [scope, name, comments, postId] = segments
+  const [segment, name, comments, postId] = segments
+  const scope = readScope(segment)
 
-  if ((scope !== 'r' && scope !== 'user') || !name) {
+  if (!scope || !name) {
     return
   }
 
@@ -78,10 +92,10 @@ const parseTarget = (value: string | undefined): RedditTarget | undefined => {
 
 // A profile link, which names the poster and nothing embeddable.
 const parseAuthor = (value: string | undefined): string | undefined => {
-  const [scope, name, rest] = parseRedditPath(value) ?? []
+  const [segment, name, rest] = parseRedditPath(value) ?? []
 
   if (
-    !isAnyOf(scope, 'user') ||
+    readScope(segment) !== 'user' ||
     rest !== undefined ||
     !name ||
     isAnyOf(name, deletedAccountNames)

@@ -84,28 +84,28 @@ describe('steamResolveEmbed', () => {
       expect(steamResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should use a malformed app id as written, even if the widget answers an error', () => {
+    it('should return undefined for an app id that is not digits', () => {
       const value = 'https://store.steampowered.com/widget/news'
-      const expected: EmbedResolverResult = {
-        provider: 'steam',
-        id: 'news',
-        src: 'https://store.steampowered.com/widget/news/',
-        url: 'https://store.steampowered.com/app/news/',
-        thumbnail: 'https://cdn.akamai.steamstatic.com/steam/apps/news/header.jpg',
-        height: 190,
-      }
 
-      expect(steamResolveEmbed(value)).toEqual(expected)
+      expect(steamResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should use a malformed purchase option as written, even if the widget answers an error', () => {
+    it('should return undefined for a purchase option that is not digits', () => {
       const value = 'https://store.steampowered.com/widget/355060/abc'
+
+      expect(steamResolveEmbed(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should use an app id of unusual length as written', () => {
+      const value = 'https://store.steampowered.com/widget/12345678901'
       const expected: EmbedResolverResult = {
         provider: 'steam',
-        id: '355060',
-        src: 'https://store.steampowered.com/widget/355060/abc/',
-        url: 'https://store.steampowered.com/app/355060/',
-        thumbnail: 'https://cdn.akamai.steamstatic.com/steam/apps/355060/header.jpg',
+        id: '12345678901',
+        src: 'https://store.steampowered.com/widget/12345678901/',
+        url: 'https://store.steampowered.com/app/12345678901/',
+        thumbnail: 'https://cdn.akamai.steamstatic.com/steam/apps/12345678901/header.jpg',
         height: 190,
       }
 

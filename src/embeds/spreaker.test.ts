@@ -94,43 +94,41 @@ describe('spreakerResolveEmbed', () => {
     expect(spreakerResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should use a malformed episode id as written over a named show, even if the player answers an error', () => {
+  it('should refuse a non-digit episode id without falling back to the show', () => {
     const value = 'https://widget.spreaker.com/player?episode_id=abc&show_id=1433865'
+
+    expect(spreakerResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should refuse an episode id that decodes into a second parameter', () => {
+    const value = 'https://widget.spreaker.com/player?episode_id=1%26autoplay%3Dtrue'
+
+    expect(spreakerResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should refuse a non-digit show id', () => {
+    const value = 'https://widget.spreaker.com/player?show_id=abc'
+
+    expect(spreakerResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should use an episode id of unusual length as written', () => {
+    const value = 'https://widget.spreaker.com/player?episode_id=123456789012'
     const expected: EmbedResolverResult = {
       provider: 'spreaker',
-      id: 'episode/abc',
-      src: 'https://widget.spreaker.com/player?episode_id=abc',
-      url: 'https://www.spreaker.com/episode/abc',
+      id: 'episode/123456789012',
+      src: 'https://widget.spreaker.com/player?episode_id=123456789012',
+      url: 'https://www.spreaker.com/episode/123456789012',
       height: 200,
     }
 
     expect(spreakerResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should keep an ampersand in the episode id inside the episode parameter', () => {
-    const value = 'https://widget.spreaker.com/player?episode_id=57436547%26show_id%3D1433865'
-    const expected: EmbedResolverResult = {
-      provider: 'spreaker',
-      id: 'episode/57436547&show_id=1433865',
-      src: 'https://widget.spreaker.com/player?episode_id=57436547%26show_id=1433865',
-      url: 'https://www.spreaker.com/episode/57436547&show_id=1433865',
-      height: 200,
-    }
-
-    expect(spreakerResolveEmbed(value)).toEqual(expected)
-  })
-
-  it('should keep an episode id holding a slash inside one page path segment', () => {
+  it('should return undefined for an episode id holding a slash', () => {
     const value = 'https://widget.spreaker.com/player?episode_id=52842990%2Fx'
-    const expected: EmbedResolverResult = {
-      provider: 'spreaker',
-      id: 'episode/52842990/x',
-      src: 'https://widget.spreaker.com/player?episode_id=52842990/x',
-      url: 'https://www.spreaker.com/episode/52842990%2Fx',
-      height: 200,
-    }
 
-    expect(spreakerResolveEmbed(value)).toEqual(expected)
+    expect(spreakerResolveEmbed(value)).toBeUndefined()
   })
 
   it('should return undefined for a spreaker url naming no episode', () => {
@@ -276,22 +274,15 @@ describeForEachParser('spreakerAnchorEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should use a malformed episode id as written, even if the player answers an error', async () => {
+    it('should return undefined for a non-digit episode id', async () => {
       const value = html`
         <a
           class="spreaker-player"
           data-resource="episode_id=abc"
         >Listen to "An episode" on Spreaker.</a>
       `
-      const expected: EmbedResolverResult = {
-        provider: 'spreaker',
-        id: 'episode/abc',
-        src: 'https://widget.spreaker.com/player?episode_id=abc',
-        url: 'https://www.spreaker.com/episode/abc',
-        height: 200,
-      }
 
-      expect(await extract(value)).toEqual(expected)
+      expect(await extract(value)).toBeUndefined()
     })
 
     // A user player is documented and dead, and nothing else names a resource this resolver

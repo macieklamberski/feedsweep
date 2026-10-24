@@ -24,7 +24,7 @@ const legacyPlayerPathRegex = /^\/slideshow\/index\.gne$/i
 
 const setPathRegex = /^\/photos\/([^/]+)\/(?:sets|albums)\/(\d+)/i
 const streamPathRegex = /^\/photos\/([^/]+)\/show\/?$/i
-const groupPathRegex = /^\/groups\/(\d+@N\d\d)\/pool\/show\/?$/
+const groupPathRegex = /^\/groups\/([^/]+)\/pool\/show\/?$/i
 const groupPagePathRegex = /^\/groups\//i
 const groupAliasPoolPathRegex = /^\/groups\/[^/]+\/pool\/show(?:\/with\/[^/]+)?\/?$/i
 // An owner of `_` names nobody: the player ignores it, and `/photos/_/{photoId}/` answers 404.
@@ -34,7 +34,7 @@ const embedrPhotoPathRegex = /^\/photos\/(\d+)\/?$/i
 // A group and a photostream each resolve by NSID and only by NSID: the player answers 200 for
 // `groups/{nsid}` and for `photostreams/{nsid}`, and 404 for a path alias in either position.
 // An NSID carries `@N` and an alias never does.
-const nsidRegex = /@N/
+const nsidRegex = /^\d+@N\d+$/
 
 // What a carrier names, whichever carrier and whichever spelling: an album needs its set, a
 // group pool its NSID, a photostream only its owner.
@@ -130,7 +130,7 @@ const readPageSubject = (page: string): FlickrSubject | undefined => {
 
   const group = page.match(groupPathRegex)
 
-  if (group) {
+  if (group && nsidRegex.test(group[1])) {
     return { groupId: group[1] }
   }
 
@@ -202,7 +202,11 @@ const readLegacySubject = (parsed: URL): FlickrSubject => {
 // Only the path alias is a name. The NSID spelling of the same owner names nobody a reader
 // could read.
 const readOwnerAlias = (owner: string | undefined): string | undefined => {
-  return owner && !nsidRegex.test(owner) ? owner : undefined
+  if (!owner || owner.includes('@N')) {
+    return
+  }
+
+  return owner
 }
 
 // Flickr's own page player, `/photos/{owner}/{photoId}/player/`, optionally with the browsing
