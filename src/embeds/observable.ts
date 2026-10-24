@@ -1,4 +1,4 @@
-import { decodeSegment, getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
 import { readIframeResizeHeight } from '../utils/hints.js'
@@ -48,19 +48,17 @@ const observableResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  // The decoded names serve the `@` check and the key, and the written segments the page path.
-  const handle = decodeSegment(rawHandle) ?? rawHandle
-  const notebook = (decodeSegment(rawSlug) ?? rawSlug).replace(versionSuffixRegex, '')
+  const notebook = rawSlug.replace(versionSuffixRegex, '')
 
-  if (!handle.startsWith('@') || !notebook) {
+  if (!rawHandle.startsWith('@') || !notebook) {
     return
   }
 
   return {
     provider,
-    id: `${handle}/${notebook}`,
+    id: `${rawHandle}/${notebook}`,
     src,
-    url: `https://observablehq.com/${rawHandle}/${rawSlug.replace(versionSuffixRegex, '')}`,
+    url: `https://observablehq.com/${rawHandle}/${notebook}`,
   }
 }
 

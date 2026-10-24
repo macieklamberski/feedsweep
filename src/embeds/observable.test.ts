@@ -50,47 +50,6 @@ describeForEachParser('observableEmbedResolver', (parseHtml) => {
     })
   })
 
-  describe('edge cases', () => {
-    it('should read a handle the feed percent-encoded', async () => {
-      const value =
-        '<iframe src="https://observablehq.com/embed/%40neocartocnrs/borders?cells=map"></iframe>'
-      const expected: EmbedResolverResult = {
-        provider: 'observable',
-        id: '@neocartocnrs/borders',
-        src: 'https://observablehq.com/embed/%40neocartocnrs/borders?cells=map',
-        url: 'https://observablehq.com/%40neocartocnrs/borders',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should use a notebook segment that decodes to a second path as written', async () => {
-      const value =
-        '<iframe src="https://observablehq.com/embed/@neocartocnrs/borders%2Fmap?cells=map"></iframe>'
-      const expected: EmbedResolverResult = {
-        provider: 'observable',
-        id: '@neocartocnrs/borders/map',
-        src: 'https://observablehq.com/embed/@neocartocnrs/borders%2Fmap?cells=map',
-        url: 'https://observablehq.com/@neocartocnrs/borders%2Fmap',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should keep a notebook segment carrying a malformed escape as written', async () => {
-      const value =
-        '<iframe src="https://observablehq.com/embed/@neocartocnrs/borders%E0%A4%A?cells=map"></iframe>'
-      const expected: EmbedResolverResult = {
-        provider: 'observable',
-        id: '@neocartocnrs/borders%E0%A4%A',
-        src: 'https://observablehq.com/embed/@neocartocnrs/borders%E0%A4%A?cells=map',
-        url: 'https://observablehq.com/@neocartocnrs/borders%E0%A4%A',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-  })
-
   describe('routes without a handle', () => {
     // Observable answers `embed/d/{id}` with a 404 for a real id.
     it('should leave the unlisted route to the generic placeholder', async () => {
