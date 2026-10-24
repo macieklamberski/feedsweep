@@ -73,6 +73,59 @@ describeForEachParser('facebookWidgetEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    // Publishers paste a video url into the post div too. The post plugin refuses to frame some
+    // of those ids and the video plugin plays them, so a video href takes the video plugin.
+    it('should mint the video plugin url from an fb.watch short link', async () => {
+      const value = html`<div class="fb-post" data-href="https://fb.watch/abcDEF123/"></div>`
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://fb.watch/abcDEF123/',
+        src: 'https://www.facebook.com/plugins/video.php?href=https://fb.watch/abcDEF123/',
+        url: 'https://fb.watch/abcDEF123/',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should mint the video plugin url from a video path', async () => {
+      const value = html`<div class="fb-post" data-href="https://www.facebook.com/PageName/videos/123/"></div>`
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/PageName/videos/123/',
+        src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/PageName/videos/123/',
+        url: 'https://www.facebook.com/PageName/videos/123/',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // A page's vanity name may contain a route word, and only a whole label or segment counts.
+    it('should mint the post plugin url for a page named after reels', async () => {
+      const value = html`<div class="fb-post" data-href="https://www.facebook.com/reel-big-fish/posts/123/"></div>`
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/reel-big-fish/posts/123/',
+        src: 'https://www.facebook.com/plugins/post.php?href=https://www.facebook.com/reel-big-fish/posts/123/',
+        url: 'https://www.facebook.com/reel-big-fish/posts/123/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should mint the post plugin url for a dotted page named after videos', async () => {
+      const value = html`<div class="fb-post" data-href="https://www.facebook.com/video.game.news/posts/123/"></div>`
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/video.game.news/posts/123/',
+        src: 'https://www.facebook.com/plugins/post.php?href=https://www.facebook.com/video.game.news/posts/123/',
+        url: 'https://www.facebook.com/video.game.news/posts/123/',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('the video div', () => {
@@ -444,7 +497,7 @@ describeForEachParser('facebookBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should read an fb.watch short link', async () => {
+    it('should read an fb.watch short link as the video plugin', async () => {
       // Constructed: no lab feed cites an fb.watch link in this blockquote.
       const value = html`
         <blockquote
@@ -457,9 +510,51 @@ describeForEachParser('facebookBlockquoteEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'facebook',
         id: 'https://fb.watch/abcDEF123/',
-        src: 'https://www.facebook.com/plugins/post.php?href=https://fb.watch/abcDEF123/',
+        src: 'https://www.facebook.com/plugins/video.php?href=https://fb.watch/abcDEF123/',
         url: 'https://fb.watch/abcDEF123/',
+        ratio: '16/9',
         description: 'A video caption.',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // A page's vanity name may contain a route word, and only a whole label or segment counts.
+    it('should read the post plugin for a page named after reels', async () => {
+      const value = html`
+        <blockquote
+          cite="https://www.facebook.com/reel-big-fish/posts/123/"
+          class="fb-xfbml-parse-ignore"
+        >
+          <p>A post caption.</p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/reel-big-fish/posts/123/',
+        src: 'https://www.facebook.com/plugins/post.php?href=https://www.facebook.com/reel-big-fish/posts/123/',
+        url: 'https://www.facebook.com/reel-big-fish/posts/123/',
+        description: 'A post caption.',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the post plugin for a dotted page named after videos', async () => {
+      const value = html`
+        <blockquote
+          cite="https://www.facebook.com/video.game.news/posts/123/"
+          class="fb-xfbml-parse-ignore"
+        >
+          <p>A post caption.</p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/video.game.news/posts/123/',
+        src: 'https://www.facebook.com/plugins/post.php?href=https://www.facebook.com/video.game.news/posts/123/',
+        url: 'https://www.facebook.com/video.game.news/posts/123/',
+        description: 'A post caption.',
       }
 
       expect(await extract(value)).toEqual(expected)
