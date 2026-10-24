@@ -118,6 +118,19 @@ describe('vkResolveEmbed', () => {
 
       expect(vkResolveEmbed(value)).toEqual(expected)
     })
+
+    it("should carry a start position from a video's page onto the player", () => {
+      const value = 'https://vkvideo.ru/video-42258342_456239658?list=729f142272f3de38ec&t=1m30s'
+      const expected: EmbedResolverResult = {
+        provider: 'vk',
+        id: '-42258342_456239658',
+        src: 'https://vk.ru/video_ext.php?oid=-42258342&id=456239658&t=1m30s',
+        url: 'https://vkvideo.ru/video-42258342_456239658',
+        ratio: '16/9',
+      }
+
+      expect(vkResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {

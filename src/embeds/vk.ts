@@ -65,7 +65,9 @@ export const vkResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const params = page ? { oid: ownerId, id: videoId } : pickQueryParams(parsed.search, playerParams)
+  const params = page
+    ? { oid: ownerId, id: videoId, ...pickQueryParams(parsed.search, ['t']) }
+    : pickQueryParams(parsed.search, playerParams)
   const id = `${ownerId}_${videoId}`
   // See: https://dev.vk.com/ru/widgets/video, which writes the player on vk.ru.
   const src = `https://vk.ru${player.path}${composeQuery(params)}`
