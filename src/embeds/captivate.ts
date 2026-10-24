@@ -7,9 +7,10 @@ const provider = 'captivate'
 
 const captivateHosts = ['captivate.fm']
 
-// Every specimen states 200, and Captivate publishes no oEmbed, so the height is the whole
-// of what this states beyond the provider tag.
+// The boxes Captivate's snippets write: 200 tall for an episode, and 600 for a show, which scrolls
+// its episode list inside the frame. A kind added later gets the episode's.
 const playerHeight = 200
+const showHeight = 600
 
 // A shape, not a list of the two kinds published today, so a kind added later still resolves.
 // The player host answers the same empty shell for every path it does not serve.
@@ -39,7 +40,7 @@ export const captivateResolveEmbed: ResolveEmbed = (url) => {
     provider,
     id: `${embed.kind}/${embed.id}`,
     src: `https://player.captivate.fm/${embed.kind}/${embed.id}`,
-    height: playerHeight,
+    height: embed.kind === 'show' ? showHeight : playerHeight,
   }
 }
 

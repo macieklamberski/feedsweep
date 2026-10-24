@@ -12,7 +12,6 @@ describe('donorboxResolveEmbed', () => {
         id: 'donation-form-248',
         src: 'https://donorbox.org/embed/donation-form-248',
         url: 'https://donorbox.org/donation-form-248',
-        height: 900,
       }
 
       expect(donorboxResolveEmbed(value)).toEqual(expected)
@@ -25,7 +24,6 @@ describe('donorboxResolveEmbed', () => {
         id: 'donation-form-248',
         src: 'https://donorbox.org/embed/donation-form-248?amount=25',
         url: 'https://donorbox.org/donation-form-248',
-        height: 900,
       }
 
       expect(donorboxResolveEmbed(value)).toEqual(expected)
@@ -39,7 +37,6 @@ describe('donorboxResolveEmbed', () => {
         id: 'help-us-rebuild-the-old-town-library-roof-after-the-storm-and-keep-the-reading-room-open-to-every-family-in-the-county-this-winter',
         src: 'https://donorbox.org/embed/help-us-rebuild-the-old-town-library-roof-after-the-storm-and-keep-the-reading-room-open-to-every-family-in-the-county-this-winter',
         url: 'https://donorbox.org/help-us-rebuild-the-old-town-library-roof-after-the-storm-and-keep-the-reading-room-open-to-every-family-in-the-county-this-winter',
-        height: 900,
       }
 
       expect(donorboxResolveEmbed(value)).toEqual(expected)
@@ -72,7 +69,6 @@ describe('donorboxResolveEmbed', () => {
         id: 'donation-form-248%2F..',
         src: 'https://donorbox.org/embed/donation-form-248%2F..',
         url: 'https://donorbox.org/donation-form-248%2F..',
-        height: 900,
       }
 
       expect(donorboxResolveEmbed(value)).toEqual(expected)
@@ -88,7 +84,7 @@ describeForEachParser('donorboxEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, donorboxEmbedResolver)
 
   describe('happy paths', () => {
-    it('should size a frame that states no height', async () => {
+    it('should state no height on a frame that states none, since the form posts its own', async () => {
       const value = html`
         <iframe
           src="https://donorbox.org/embed/global-voices-challenge"
@@ -106,7 +102,6 @@ describeForEachParser('donorboxEmbedResolver', (parseHtml) => {
         id: 'global-voices-challenge',
         src: 'https://donorbox.org/embed/global-voices-challenge',
         url: 'https://donorbox.org/global-voices-challenge',
-        height: 900,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -130,7 +125,6 @@ describeForEachParser('donorboxEmbedResolver', (parseHtml) => {
         id: 'donation-form-248',
         src: 'https://donorbox.org/embed/donation-form-248',
         url: 'https://donorbox.org/donation-form-248',
-        height: 900,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -158,7 +152,6 @@ describeForEachParser('donorboxEmbedResolver', (parseHtml) => {
         id: 'kde-community',
         src: 'https://donorbox.org/embed/kde-community',
         url: 'https://donorbox.org/kde-community',
-        height: 900,
       }
 
       expect(await extract(value)).toEqual(expected)

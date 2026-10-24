@@ -1,7 +1,11 @@
 import { composeEmbedUrl, isFlashPlayerUrl } from '../../embeds/wmaker.js'
 import type { DomTransform } from '../../types.js'
-import { attr, parsePixelSize } from '../../utils/dom.js'
+import { attr } from '../../utils/dom.js'
 import { createIframe, setDimensions } from '../../utils/widgets.js'
+
+// The box WMaker's own snippet writes around a 16:9 video. The player fills its frame, and the dead
+// Flash box was drawn for another player.
+const playerSize = { width: 640, height: 360 }
 
 // WMaker's Flash player is dead and its .swf 404s, so today the item renders a click-to-load
 // placeholder addressing nothing. The modern player lives at {origin}/embed/{articleId}/ and the
@@ -28,11 +32,7 @@ export const rebuildWmakerEmbeds: DomTransform =
 
     const iframe = createIframe(document, src)
 
-    // The publisher's declared box, moved whole from the carrier they chose.
-    setDimensions(iframe, {
-      width: parsePixelSize(attr(element, 'width')),
-      height: parsePixelSize(attr(element, 'height')),
-    })
+    setDimensions(iframe, playerSize)
 
     element.replaceWith(iframe)
   }
