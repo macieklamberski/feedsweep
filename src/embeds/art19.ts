@@ -27,7 +27,7 @@ export const art19ResolveEmbed: ResolveEmbed = (url, element) => {
   if (episode) {
     return {
       provider,
-      id: `${show}/${episode.toLowerCase()}`,
+      id: `${show}/${episode}`,
       src: `https://art19.com/shows/${show}/episodes/${episode}/embed`,
       url: `https://art19.com/shows/${show}/episodes/${episode}`,
       height: 200,

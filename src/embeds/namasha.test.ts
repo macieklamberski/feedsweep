@@ -10,7 +10,7 @@ describe('namashaResolveEmbed', () => {
       const value = 'https://www.namasha.com/embed/TR5Otj9Q'
       const expected: EmbedResolverResult = {
         provider: 'namasha',
-        id: 'tr5otj9q',
+        id: 'TR5Otj9Q',
         src: 'https://www.namasha.com/embed/TR5Otj9Q',
         url: 'https://www.namasha.com/v/TR5Otj9Q',
         ratio: '16/9',
@@ -23,7 +23,7 @@ describe('namashaResolveEmbed', () => {
       const value = 'https://namasha.com/embed/eP9x4n68'
       const expected: EmbedResolverResult = {
         provider: 'namasha',
-        id: 'ep9x4n68',
+        id: 'eP9x4n68',
         src: 'https://www.namasha.com/embed/eP9x4n68',
         url: 'https://www.namasha.com/v/eP9x4n68',
         ratio: '16/9',
@@ -36,7 +36,7 @@ describe('namashaResolveEmbed', () => {
       const value = 'https://www.namasha.com/EMBED/TR5Otj9Q/'
       const expected: EmbedResolverResult = {
         provider: 'namasha',
-        id: 'tr5otj9q',
+        id: 'TR5Otj9Q',
         src: 'https://www.namasha.com/embed/TR5Otj9Q',
         url: 'https://www.namasha.com/v/TR5Otj9Q',
         ratio: '16/9',
@@ -49,7 +49,7 @@ describe('namashaResolveEmbed', () => {
       const value = 'https://www.namasha.com/embed/TR5Otj9Q?t=30&autoplay=true&utm_source=feed'
       const expected: EmbedResolverResult = {
         provider: 'namasha',
-        id: 'tr5otj9q',
+        id: 'TR5Otj9Q',
         src: 'https://www.namasha.com/embed/TR5Otj9Q?t=30',
         url: 'https://www.namasha.com/v/TR5Otj9Q',
         ratio: '16/9',
@@ -102,7 +102,7 @@ describeForEachParser('namashaEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'namasha',
-        id: 'tr5otj9q',
+        id: 'TR5Otj9Q',
         src: 'https://www.namasha.com/embed/TR5Otj9Q',
         url: 'https://www.namasha.com/v/TR5Otj9Q',
         ratio: '16/9',
@@ -124,7 +124,7 @@ describeForEachParser('namashaEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'namasha',
-        id: 'ep9x4n68',
+        id: 'eP9x4n68',
         src: 'https://www.namasha.com/embed/eP9x4n68',
         url: 'https://www.namasha.com/v/eP9x4n68',
         ratio: '16/9',

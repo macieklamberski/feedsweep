@@ -30,7 +30,7 @@ const readFlipBook = (name: string): FlipBook | undefined => {
 
   if (flipBookId) {
     return {
-      id: flipBookId.toLowerCase(),
+      id: flipBookId,
       path: `${flipBookId}.html`,
     }
   }
@@ -40,7 +40,7 @@ const readFlipBook = (name: string): FlipBook | undefined => {
   }
 
   return {
-    id: name.toLowerCase(),
+    id: name,
     path: name,
   }
 }
@@ -53,7 +53,7 @@ const readCustomFlipBook = (name: string): FlipBook | undefined => {
   }
 
   return {
-    id: name.replace(htmlExtensionRegex, '').toLowerCase(),
+    id: name.replace(htmlExtensionRegex, ''),
     path: name,
   }
 }

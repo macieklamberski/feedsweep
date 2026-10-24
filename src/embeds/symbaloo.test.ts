@@ -34,7 +34,7 @@ describe('symbalooResolveEmbed', () => {
       const value = 'http://edu.symbaloo.com/embed/моизакладки9'
       const expected: EmbedResolverResult = {
         provider: 'symbaloo',
-        id: '%d0%bc%d0%be%d0%b8%d0%b7%d0%b0%d0%ba%d0%bb%d0%b0%d0%b4%d0%ba%d0%b89',
+        id: '%D0%BC%D0%BE%D0%B8%D0%B7%D0%B0%D0%BA%D0%BB%D0%B0%D0%B4%D0%BA%D0%B89',
         src: 'https://www.symbaloo.com/embed/%D0%BC%D0%BE%D0%B8%D0%B7%D0%B0%D0%BA%D0%BB%D0%B0%D0%B4%D0%BA%D0%B89',
         url: 'https://www.symbaloo.com/mix/%D0%BC%D0%BE%D0%B8%D0%B7%D0%B0%D0%BA%D0%BB%D0%B0%D0%B4%D0%BA%D0%B89',
         height: 500,
@@ -69,11 +69,11 @@ describe('symbalooResolveEmbed', () => {
       expect(symbalooResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should fold the case of the slug in the key only', () => {
+    it('should keep the case of the slug in the key', () => {
       const value = 'https://www.symbaloo.com/embed/TIC-TACBASICOS-EDU'
       const expected: EmbedResolverResult = {
         provider: 'symbaloo',
-        id: 'tic-tacbasicos-edu',
+        id: 'TIC-TACBASICOS-EDU',
         src: 'https://www.symbaloo.com/embed/TIC-TACBASICOS-EDU',
         url: 'https://www.symbaloo.com/mix/TIC-TACBASICOS-EDU',
         height: 500,

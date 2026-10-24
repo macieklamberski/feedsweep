@@ -24,8 +24,7 @@ export const composePiktochartEmbedUrl = (uid: string): string => {
 const composePiktochartEmbed = (uid: string, title: string | undefined): EmbedResolverResult => {
   return {
     provider,
-    // The server folds the uid's case, and its og:url spells it in lowercase.
-    id: uid.toLowerCase(),
+    id: uid,
     src: composePiktochartEmbedUrl(uid),
     url: `https://create.piktochart.com/output/${uid}`,
     ratio: embedRatio,

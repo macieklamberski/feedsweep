@@ -61,12 +61,12 @@ describe('art19ResolveEmbed', () => {
       expect(art19ResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the episode as written and fold its case in the key', () => {
+    it('should keep the case of the episode in the key', () => {
       const value =
         'https://art19.com/shows/broadcast-dialogue/episodes/949DE556-7D25-406A-8A27-9823364183BD/embed'
       const expected: EmbedResolverResult = {
         provider: 'art19',
-        id: 'broadcast-dialogue/949de556-7d25-406a-8a27-9823364183bd',
+        id: 'broadcast-dialogue/949DE556-7D25-406A-8A27-9823364183BD',
         src: 'https://art19.com/shows/broadcast-dialogue/episodes/949DE556-7D25-406A-8A27-9823364183BD/embed',
         url: 'https://art19.com/shows/broadcast-dialogue/episodes/949DE556-7D25-406A-8A27-9823364183BD',
         height: 200,

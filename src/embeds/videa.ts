@@ -31,7 +31,7 @@ export const videaResolveEmbed: ResolveEmbed = (url, element) => {
 
   return {
     provider,
-    id: id.toLowerCase(),
+    id,
     src: `https://videa.hu/player${query}`,
     ratio: '16/9',
     title: attr(element, 'title'),

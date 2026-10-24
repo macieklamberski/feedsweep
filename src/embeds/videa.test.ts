@@ -10,7 +10,7 @@ describe('videaResolveEmbed', () => {
       const value = 'https://videa.hu/player?v=SHLXcKsORfejnD1a'
       const expected: EmbedResolverResult = {
         provider: 'videa',
-        id: 'shlxcksorfejnd1a',
+        id: 'SHLXcKsORfejnD1a',
         src: 'https://videa.hu/player?v=SHLXcKsORfejnD1a',
         ratio: '16/9',
       }
@@ -22,7 +22,7 @@ describe('videaResolveEmbed', () => {
       const value = 'http://videa.hu/flvplayer.swf?v=C6rvO1ZfIkfLILrI'
       const expected: EmbedResolverResult = {
         provider: 'videa',
-        id: 'c6rvo1zfikflilri',
+        id: 'C6rvO1ZfIkfLILrI',
         src: 'https://videa.hu/player?v=C6rvO1ZfIkfLILrI',
         ratio: '16/9',
       }
@@ -34,7 +34,7 @@ describe('videaResolveEmbed', () => {
       const value = 'https://www.videa.hu/player?v=RJiqVlMkla4Ckqf3'
       const expected: EmbedResolverResult = {
         provider: 'videa',
-        id: 'rjiqvlmkla4ckqf3',
+        id: 'RJiqVlMkla4Ckqf3',
         src: 'https://videa.hu/player?v=RJiqVlMkla4Ckqf3',
         ratio: '16/9',
       }
@@ -47,7 +47,7 @@ describe('videaResolveEmbed', () => {
         'https://videa.hu/player?v=RJiqVlMkla4Ckqf3&start=120&autoplay=1&utm_source=feed'
       const expected: EmbedResolverResult = {
         provider: 'videa',
-        id: 'rjiqvlmkla4ckqf3',
+        id: 'RJiqVlMkla4Ckqf3',
         src: 'https://videa.hu/player?v=RJiqVlMkla4Ckqf3&start=120',
         ratio: '16/9',
       }
@@ -55,12 +55,12 @@ describe('videaResolveEmbed', () => {
       expect(videaResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should use the id as written in the player and fold its case in the key', () => {
-      const value = 'https://videa.hu/player?v=rjiqvlmkla4ckqf3'
+    it('should keep the case of the id in the player and the key', () => {
+      const value = 'https://videa.hu/player?v=WjgvSWHwiKyPOyit'
       const expected: EmbedResolverResult = {
         provider: 'videa',
-        id: 'rjiqvlmkla4ckqf3',
-        src: 'https://videa.hu/player?v=rjiqvlmkla4ckqf3',
+        id: 'WjgvSWHwiKyPOyit',
+        src: 'https://videa.hu/player?v=WjgvSWHwiKyPOyit',
         ratio: '16/9',
       }
 
@@ -125,7 +125,7 @@ describeForEachParser('videaEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'videa',
-        id: 'cify8e3ih3inf2nx',
+        id: 'cIfy8E3IH3INf2Nx',
         src: 'https://videa.hu/player?v=cIfy8E3IH3INf2Nx',
         ratio: '16/9',
       }
@@ -144,7 +144,7 @@ describeForEachParser('videaEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'videa',
-        id: 'ra62ema3ctjrjmym',
+        id: 'ra62eMa3CTjrjmYm',
         src: 'https://videa.hu/player?v=ra62eMa3CTjrjmYm',
         ratio: '16/9',
       }
@@ -180,7 +180,7 @@ describeForEachParser('videa through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-id="c6rvo1zfikflilri"
+        data-embed-id="C6rvO1ZfIkfLILrI"
         data-embed-provider="videa"
         data-embed-src="https://videa.hu/player?v=C6rvO1ZfIkfLILrI"
         data-embed-ratio="16/9"
@@ -202,7 +202,7 @@ describeForEachParser('videa through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-id="qgjdl0tabo6homhv"
+        data-embed-id="qgjdl0tABo6homHV"
         data-embed-provider="videa"
         data-embed-src="https://videa.hu/player?v=qgjdl0tABo6homHV"
         data-embed-ratio="16/9"

@@ -154,69 +154,14 @@ describeForEachParser('zohoworkdriveEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should fold the case of a link id in the key only', async () => {
+    it('should keep the case of a link id in the key', async () => {
       const value =
         '<iframe src="https://workdrive.zohoexternal.com/external/B8C94010215E9F50B3809AA3171A89CED5A60318B6C73663ECA74E7FFAE86D81"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'zohoworkdrive',
-        id: 'external/b8c94010215e9f50b3809aa3171a89ced5a60318b6c73663eca74e7ffae86d81',
+        id: 'external/B8C94010215E9F50B3809AA3171A89CED5A60318B6C73663ECA74E7FFAE86D81',
         src: 'https://workdrive.zohoexternal.com/external/B8C94010215E9F50B3809AA3171A89CED5A60318B6C73663ECA74E7FFAE86D81',
         url: 'https://workdrive.zohoexternal.com/external/B8C94010215E9F50B3809AA3171A89CED5A60318B6C73663ECA74E7FFAE86D81',
-        ratio: '4/3',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should keep the case of a link id that is not 64 hex digits', async () => {
-      const value = '<iframe src="https://workdrive.zohoexternal.com/external/AbC123"></iframe>'
-      const expected: EmbedResolverResult = {
-        provider: 'zohoworkdrive',
-        id: 'external/AbC123',
-        src: 'https://workdrive.zohoexternal.com/external/AbC123',
-        url: 'https://workdrive.zohoexternal.com/external/AbC123',
-        ratio: '4/3',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should keep the case of a link id one digit longer than 64', async () => {
-      const value =
-        '<iframe src="https://workdrive.zohoexternal.com/external/B8C94010215E9F50B3809AA3171A89CED5A60318B6C73663ECA74E7FFAE86D810"></iframe>'
-      const expected: EmbedResolverResult = {
-        provider: 'zohoworkdrive',
-        id: 'external/B8C94010215E9F50B3809AA3171A89CED5A60318B6C73663ECA74E7FFAE86D810',
-        src: 'https://workdrive.zohoexternal.com/external/B8C94010215E9F50B3809AA3171A89CED5A60318B6C73663ECA74E7FFAE86D810',
-        url: 'https://workdrive.zohoexternal.com/external/B8C94010215E9F50B3809AA3171A89CED5A60318B6C73663ECA74E7FFAE86D810',
-        ratio: '4/3',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should keep the case of a link id with a prefix before 64 hex digits', async () => {
-      const value =
-        '<iframe src="https://workdrive.zohoexternal.com/external/XB8C94010215E9F50B3809AA3171A89CED5A60318B6C73663ECA74E7FFAE86D81"></iframe>'
-      const expected: EmbedResolverResult = {
-        provider: 'zohoworkdrive',
-        id: 'external/XB8C94010215E9F50B3809AA3171A89CED5A60318B6C73663ECA74E7FFAE86D81',
-        src: 'https://workdrive.zohoexternal.com/external/XB8C94010215E9F50B3809AA3171A89CED5A60318B6C73663ECA74E7FFAE86D81',
-        url: 'https://workdrive.zohoexternal.com/external/XB8C94010215E9F50B3809AA3171A89CED5A60318B6C73663ECA74E7FFAE86D81',
-        ratio: '4/3',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should keep the case of a link id with a separator among its digits', async () => {
-      const value =
-        '<iframe src="https://workdrive.zohoexternal.com/external/B8C94010215E9F50B3809AA3171A89CED5A60318B6C73663ECA74E7FFAE86D8="></iframe>'
-      const expected: EmbedResolverResult = {
-        provider: 'zohoworkdrive',
-        id: 'external/B8C94010215E9F50B3809AA3171A89CED5A60318B6C73663ECA74E7FFAE86D8=',
-        src: 'https://workdrive.zohoexternal.com/external/B8C94010215E9F50B3809AA3171A89CED5A60318B6C73663ECA74E7FFAE86D8=',
-        url: 'https://workdrive.zohoexternal.com/external/B8C94010215E9F50B3809AA3171A89CED5A60318B6C73663ECA74E7FFAE86D8=',
         ratio: '4/3',
       }
 
