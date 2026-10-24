@@ -68,18 +68,29 @@ const composePluginEmbed = (
   }
 }
 
+// Whole labels and segments, not `\b`: `reel-big-fish` and `video.game.news` are page names.
+// A video, reel or watch path, or the fb.watch short host, is the video player.
+const videoUrlRegex = /(?:^|[/.])(?:videos?|reel|watch)(?:\/|$)/i
+
+const readPlugin = (url: URL, fallback: string): string => {
+  return videoUrlRegex.test(url.hostname + url.pathname) ? 'video' : fallback
+}
+
 const extractEmbed = (
   element: Element,
   plugin: string,
   attribute = 'data-href',
 ): EmbedResolverResult | undefined => {
   const href = attr(element, attribute)
+  const parsed = parseUrlOnHosts(href, facebookHosts)
 
-  if (!href || !parseUrlOnHosts(href, facebookHosts)) {
+  if (!href || !parsed) {
     return
   }
 
-  return composePluginEmbed(plugin, href, readFallback(find(element, fallbackSelector)))
+  const fallback = readFallback(find(element, fallbackSelector))
+
+  return composePluginEmbed(readPlugin(parsed, plugin), href, fallback)
 }
 
 // Facebook's SDK div for a post or a video, empty until a script feeds strip builds the widget.
@@ -119,10 +130,6 @@ const pluginPathRegex = /^(?:\/v\d+(?:\.\d+)?)?\/plugins\/(?:post|video)\.php$/i
 const legacyVideoPathRegex = /^\/video\/embed$/i
 // The Flash player from older posts, naming its video in the path. Facebook answers it with 400.
 const flashVideoPathRegex = /^\/v\/([^/]+)$/i
-
-// Whole segments, not `\b`: `reel-big-fish` and `video.game.news` are page names.
-// A video, reel or watch path is the video player, and everything else Facebook frames is a post.
-const videoPathRegex = /(?:^|\/)(?:videos?|reel|watch)(?:\/|$)/i
 
 // `/reel/{id}`, `/{page}/posts/{id}` or `/{page}/videos/{id}`.
 // `/{page}/posts/` and `/{page}/videos/` with nothing after them are the page's listing tabs.
@@ -175,9 +182,7 @@ export const facebookResolveEmbed: ResolveEmbed = (url) => {
   }
 
   if (contentPathRegex.test(parsed.pathname) || isWatchPage(parsed)) {
-    const plugin = videoPathRegex.test(parsed.pathname) ? 'video' : 'post'
-
-    return composePluginEmbed(plugin, url, {})
+    return composePluginEmbed(readPlugin(parsed, 'post'), url, {})
   }
 
   if (!pluginPathRegex.test(parsed.pathname)) {
@@ -283,14 +288,7 @@ export const facebookBlockquoteEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    // fb.watch links only to videos, so the cite takes the video plugin the fb-video widget mints.
-    if (isHostOrSubdomainOf(parsed, 'fb.watch')) {
-      return composePluginEmbed('video', cite, readFallback(element))
-    }
-
-    const plugin = videoPathRegex.test(parsed.pathname) ? 'video' : 'post'
-
-    return composePluginEmbed(plugin, cite, readFallback(element))
+    return composePluginEmbed(readPlugin(parsed, 'post'), cite, readFallback(element))
   },
 )
 
