@@ -258,6 +258,28 @@ describeForEachParser('audioboomFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read the player served path-style from its bucket on S3', async () => {
+      const value = html`
+        <embed
+          src="https://s3.amazonaws.com/boos.audioboo.fm/swf/fullsize_player.swf"
+          flashvars="mp3=https%3A%2F%2Faudioboo.fm%2Fboos%2F1920440-audio-interview-the-regeneration-of-tottenham.mp3%3Fsource%3Dwordpress&amp;mp3Author=JSandlerClarke&amp;mp3Duration=147.096&amp;mp3LinkURL=https%3A%2F%2Faudioboo.fm%2Fboos%2F1920440-audio-interview-the-regeneration-of-tottenham&amp;mp3Time=06.19pm+13+Feb+2014&amp;mp3Title=Audio+interview%3A+the+regeneration+of+Tottenham"
+          width="400"
+          height="160"
+          type="application/x-shockwave-flash"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'audioboom',
+        id: '1920440',
+        src: 'https://embeds.audioboom.com/posts/1920440/embed',
+        height: 95,
+        title: 'Audio interview: the regeneration of Tottenham',
+        author: 'JSandlerClarke',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should read the post off the audio file when the player names no page', async () => {
       const value = html`
         <object
@@ -328,6 +350,28 @@ describeForEachParser('audioboomFlashEmbedResolver', (parseHtml) => {
             value="mp3LinkURL=http%3A%2F%2Faudioboo.fm%2Fboos%2F695470-9-ways-to-avoid-being-a-victim-of-a-tax-scam"
           />
         </object>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the player in another bucket served path-style from S3', async () => {
+      const value = html`
+        <embed
+          src="https://s3.amazonaws.com/evil-bucket/swf/fullsize_player.swf"
+          flashvars="mp3=https%3A%2F%2Faudioboo.fm%2Fboos%2F1920440-audio-interview-the-regeneration-of-tottenham.mp3%3Fsource%3Dwordpress&amp;mp3Author=JSandlerClarke&amp;mp3Duration=147.096&amp;mp3LinkURL=https%3A%2F%2Faudioboo.fm%2Fboos%2F1920440-audio-interview-the-regeneration-of-tottenham&amp;mp3Time=06.19pm+13+Feb+2014&amp;mp3Title=Audio+interview%3A+the+regeneration+of+Tottenham"
+        >
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it("should ignore the player on another bucket's S3 host", async () => {
+      const value = html`
+        <embed
+          src="https://evil-bucket.s3.amazonaws.com/swf/fullsize_player.swf"
+          flashvars="mp3=https%3A%2F%2Faudioboo.fm%2Fboos%2F1920440-audio-interview-the-regeneration-of-tottenham.mp3%3Fsource%3Dwordpress&amp;mp3Author=JSandlerClarke&amp;mp3Duration=147.096&amp;mp3LinkURL=https%3A%2F%2Faudioboo.fm%2Fboos%2F1920440-audio-interview-the-regeneration-of-tottenham&amp;mp3Time=06.19pm+13+Feb+2014&amp;mp3Title=Audio+interview%3A+the+regeneration+of+Tottenham"
+        >
       `
 
       expect(await extract(value)).toBeUndefined()

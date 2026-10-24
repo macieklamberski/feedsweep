@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, isHostOf, isHostOrSubdomainOf } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -15,7 +15,10 @@ const postIdRegex = /^(\d+)(?:-[^.]*)?$/
 const audioboomHosts = ['audioboom.com', 'audioboo.fm']
 
 // Audioboo's Flash players, on its own host and on its S3 bucket.
-const flashHosts = ['boos.audioboo.fm', 'abfiles.s3.amazonaws.com']
+const flashBucket = 'boos.audioboo.fm'
+const flashHosts = [flashBucket, 'abfiles.s3.amazonaws.com']
+// S3 serves a bucket path-style too, on its own host with the bucket as the first segment.
+const bucketHost = 's3.amazonaws.com'
 
 // The `mp3` flashvar names the audio file, the post page with `.mp3` on its last segment.
 const mp3ExtensionRegex = /\.mp3(?=\?|$)/
@@ -82,7 +85,18 @@ export const audioboomWidgetEmbedResolver = createMarkupEmbedResolver(
 // Audioboo's Flash player, which no browser runs. It names the post only in its flashvars, as the
 // page in `mp3LinkURL` or the audio file in `mp3`. Audioboo's embed code paired it with the
 // compact player, which answers for the same id.
-const audioboomFlashResolveEmbed: ResolveEmbed = (_url, element) => {
+const audioboomFlashResolveEmbed: ResolveEmbed = (url, element) => {
+  const isPathStyle = isHostOf(url, bucketHost)
+
+  if (isPathStyle && getPathSegments(url)[0] !== flashBucket) {
+    return
+  }
+
+  // Another bucket's virtual host passes the host gate as a subdomain of S3's.
+  if (!isPathStyle && !isHostOrSubdomainOf(url, flashHosts)) {
+    return
+  }
+
   const link = flashVar(element, 'mp3LinkURL') ?? flashVar(element, 'mp3')
   const parsed = parseUrlOnHosts(link?.replace(mp3ExtensionRegex, ''), audioboomHosts)
 
@@ -107,7 +121,7 @@ const audioboomFlashResolveEmbed: ResolveEmbed = (_url, element) => {
 }
 
 export const audioboomFlashEmbedResolver = createUrlEmbedResolver(
-  flashHosts,
+  [...flashHosts, bucketHost],
   audioboomFlashResolveEmbed,
 )
 
