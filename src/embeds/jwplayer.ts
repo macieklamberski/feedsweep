@@ -86,9 +86,8 @@ export const jwplayerScriptEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-// AMP's amp-jwplayer element, which renders nothing without the AMP runtime.
-// The player id in `data-player-id` only picks a skin, and AMP's own builder gives
-// `data-playlist-id` precedence over the media id when both are present.
+// AMP's amp-jwplayer element, which renders nothing without the AMP runtime. AMP's own builder
+// gives `data-playlist-id` precedence over the media id when both are present.
 export const jwplayerAmpEmbedResolver = createMarkupEmbedResolver(
   'amp-jwplayer[data-media-id], amp-jwplayer[data-playlist-id]',
   (element) => {
