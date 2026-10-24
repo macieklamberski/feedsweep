@@ -10,6 +10,7 @@ import { defaultFieldCleaners } from './cleaners.js'
 import { defaultAvatarImageHosts, defaultTrackingHosts } from './hosts.js'
 import { defaultEmojiResolvers, defaultWidgetResolvers } from './resolvers.js'
 import {
+  defaultGalleryNoscriptSelectors,
   defaultNonContentSelectors,
   defaultPreservedPreClasses,
   defaultRevealableSelectors,
@@ -30,6 +31,7 @@ export const defaultContext: TransformContext = {
   nonContentSelectors: defaultNonContentSelectors,
   preservedPreClasses: defaultPreservedPreClasses,
   revealableSelectors: defaultRevealableSelectors,
+  galleryNoscriptSelectors: defaultGalleryNoscriptSelectors,
   fieldCleaners: defaultFieldCleaners,
   resolveUrlFn: defaultResolveUrlFn,
   highlightFn: defaultHighlightFn,

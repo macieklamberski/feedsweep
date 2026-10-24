@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 import { defaultLazySrcAttributes, defaultLazySrcsetAttributes } from '../../defaults.js'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
@@ -430,11 +431,233 @@ describeForEachParser('fixLazyImages', (parseHtml) => {
     })
   })
 
+  describe('gallery noscript fallbacks', () => {
+    it('should unwrap the noscript of a named gallery', async () => {
+      const value = html`
+        <div class="lazygal">
+          <noscript>
+            <img src="https://example.com/photos/a.jpeg" alt="A">
+          </noscript>
+        </div>
+      `
+      const expected = html`
+        <div class="lazygal">
+          <img src="https://example.com/photos/a.jpeg" alt="A">
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should carry the alt and caption of each picture', async () => {
+      const value = html`
+        <div class="juicebox-container">
+          <noscript>
+            <p class="jb-image">
+              <img src="https://example.com/files/Kaffeetrinken01.jpg" alt="Wie jedes Jahr begann alles beim Kaffeetrinken..." class="image-field">
+              <br>
+              <span class="jb-title"></span><br>
+              <span class="jb-caption">Wie jedes Jahr begann alles beim Kaffeetrinken...</span>
+            </p>
+          </noscript>
+        </div>
+      `
+      const expected = html`
+        <div class="juicebox-container">
+          <p class="jb-image">
+            <img src="https://example.com/files/Kaffeetrinken01.jpg" alt="Wie jedes Jahr begann alles beim Kaffeetrinken..." class="image-field">
+            <br>
+            <span class="jb-title"></span><br>
+            <span class="jb-caption">Wie jedes Jahr begann alles beim Kaffeetrinken...</span>
+          </p>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep the noscript when the gallery shows the same picture beside it', async () => {
+      const value = html`
+        <div class="sqs-gallery">
+          <div class="image-wrapper" id="5e4a693a8497647c62a37c5a" data-type="image" data-animation-role="image">
+            <p><noscript><img src="https://example.com/nicktalk/z_f0e1d1bad37c57aaa8ba14ce1d7988b1.jpg" alt="1.jpg"></noscript><img class="thumb-image" src="https://example.com/nicktalk/z_f0e1d1bad37c57aaa8ba14ce1d7988b1.jpg" data-image="https://example.com/nicktalk/z_f0e1d1bad37c57aaa8ba14ce1d7988b1.jpg" data-image-dimensions="1920x940" data-image-focal-point="0.5,0.5" alt="1.jpg" data-load="false" data-image-id="5e4a693a8497647c62a37c5a" data-type="image"></p>
+          </div>
+        </div>
+      `
+      const context = { ...baseContext, galleryNoscriptSelectors: ['.sqs-gallery noscript'] }
+
+      expect(await transform(value, context)).toEqualHtml(value)
+    })
+
+    it('should unwrap the noscript when the image beside it is another picture', async () => {
+      const value = html`
+        <div class="sqs-gallery">
+          <a href="https://example.com/gallery">
+            <noscript>
+              <img src="https://images.example.com/content/v1/IMG_7101.jpg" alt="IMG_7101.jpg">
+            </noscript>
+            <img src="https://images.example.com/content/v1/IMG_7102.jpg">
+          </a>
+        </div>
+      `
+      const expected = html`
+        <div class="sqs-gallery">
+          <a href="https://example.com/gallery">
+            <img src="https://images.example.com/content/v1/IMG_7101.jpg" alt="IMG_7101.jpg">
+            <img src="https://images.example.com/content/v1/IMG_7102.jpg">
+          </a>
+        </div>
+      `
+      const context = { ...baseContext, galleryNoscriptSelectors: ['.sqs-gallery noscript'] }
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    // Constructed: no feed in the sample repeats a gallery picture outside the gallery.
+    it('should unwrap the noscript when the same picture shows outside the gallery', async () => {
+      const value = html`
+        <p><img src="https://example.com/files/Teichfest_01.jpg"></p>
+        <div class="juicebox-container">
+          <noscript>
+            <p class="jb-image"><img src="https://example.com/files/Teichfest_01.jpg" alt=""></p>
+          </noscript>
+        </div>
+      `
+      const expected = html`
+        <p><img src="https://example.com/files/Teichfest_01.jpg"></p>
+        <div class="juicebox-container">
+          <p class="jb-image"><img src="https://example.com/files/Teichfest_01.jpg" alt=""></p>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should leave a gallery noscript alone when the list is empty', async () => {
+      const value = html`
+        <div class="lazygal">
+          <noscript>
+            <img src="https://example.com/photos/a.jpeg" alt="A">
+          </noscript>
+        </div>
+      `
+      const context = { ...baseContext, galleryNoscriptSelectors: [] }
+
+      expect(await transform(value, context)).toEqualHtml(value)
+    })
+  })
+
   it('should be idempotent', async () => {
     const value = '<img data-src="photo.jpg">'
     const once = await transform(value)
     const twice = await transform(once)
 
     expect(twice).toEqualHtml(once)
+  })
+})
+
+describeForEachParser('fixLazyImages gallery fallbacks through the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should show a Juicebox gallery', async () => {
+    const value = html`
+      <div class="juicebox-parent">
+        <div id="node--87--field-image--rss" class="juicebox-container">
+          <noscript>
+            <!-- Image gallery content for non-javascript devices -->
+            <p class="jb-image">
+              <img src="https://example.com/sites/default/files/2020-06/Teichfest_01.jpg" alt typeof="foaf:Image" class="image-field">
+              <br>
+              <span class="jb-title"></span><br>
+              <span class="jb-caption"></span>
+            </p>
+            <p class="jb-image">
+              <img src="https://example.com/sites/default/files/2020-06/Teichfest_02.jpg" alt typeof="foaf:Image" class="image-field">
+              <br>
+              <span class="jb-title"></span><br>
+              <span class="jb-caption"></span>
+            </p>
+          </noscript>
+        </div>
+      </div>
+    `
+    const expected = html`
+      <p class="jb-image">
+        <img src="https://example.com/sites/default/files/2020-06/Teichfest_01.jpg" alt="" typeof="foaf:Image" class="image-field">
+      </p>
+      <p class="jb-image">
+        <img src="https://example.com/sites/default/files/2020-06/Teichfest_02.jpg" alt="" typeof="foaf:Image" class="image-field">
+      </p>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should show a Justified Image Grid gallery', async () => {
+    const value = html`
+      <div id="jig1" class="justified-image-grid jig-preset-3 jig-source-nextgen">
+        <div class="jig-clearfix"></div>
+        <noscript id="jig1-html" class="justified-image-grid-html" data-lazy-src="skiplazyload" data-src="skipunveillazyload">
+          <ul>
+            <li><a href="https://example.com/wp-content/gallery/live/EJ-02.jpg"><img decoding="async" src="https://example.com/wp-content/plugins/justified-image-grid/timthumb.php?src=https%3A%2F%2Fexample.com%2Fwp-content%2Fgallery%2Flive%2FEJ-02.jpg&amp;h=310&amp;q=90&amp;f=.jpg" alt="" width="465" height="310"></a></li>
+            <li><a href="https://example.com/wp-content/gallery/live/EJ-03.jpg"><img loading="lazy" decoding="async" src="https://example.com/wp-content/plugins/justified-image-grid/timthumb.php?src=https%3A%2F%2Fexample.com%2Fwp-content%2Fgallery%2Flive%2FEJ-03.jpg&amp;h=310&amp;q=90&amp;f=.jpg" alt="" width="206" height="310"></a></li>
+          </ul>
+        </noscript>
+      </div>
+    `
+    const expected = html`
+      <ul>
+        <li><a href="https://example.com/wp-content/gallery/live/EJ-02.jpg"><img decoding="async" src="https://example.com/wp-content/plugins/justified-image-grid/timthumb.php?src=https%3A%2F%2Fexample.com%2Fwp-content%2Fgallery%2Flive%2FEJ-02.jpg&amp;h=310&amp;q=90&amp;f=.jpg" alt="" width="465" height="310"></a></li>
+        <li><a href="https://example.com/wp-content/gallery/live/EJ-03.jpg"><img loading="lazy" decoding="async" src="https://example.com/wp-content/plugins/justified-image-grid/timthumb.php?src=https%3A%2F%2Fexample.com%2Fwp-content%2Fgallery%2Flive%2FEJ-03.jpg&amp;h=310&amp;q=90&amp;f=.jpg" alt="" width="206" height="310"></a></li>
+      </ul>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should show a Lazygal gallery', async () => {
+    const value = html`
+      <div class="lazygal" id="lazygal-gallery-lazygal_2013__08__18__knieskinderzoo_1">
+        <noscript>
+          <div class="lazygal-image-container" style="width: 49.0%; margin: 0.5%; max-width: 442px;">
+            <div class="lazygal-image-outercont">
+              <a href="https://example.com/photos/2013/08/ckkz-01.jpeg" style="width: 100%;">
+                <span class="lazygal-image-outer" style="width: 100%;"><span class="lazygal-ka" style="padding-top: 66.36%;"></span><img src="https://example.com/photos/2013/08/ckkz-01-bw-440x292.jpeg" class="lazygal-image-scale" alt=""></span>
+              </a>
+            </div>
+          </div>
+        </noscript>
+      </div>
+    `
+    const expected = html`
+      <a href="https://example.com/photos/2013/08/ckkz-01.jpeg" style="width: 100%;">
+        <span class="lazygal-image-outer" style="width: 100%;"><img height="292" width="440" src="https://example.com/photos/2013/08/ckkz-01-bw-440x292.jpeg" class="lazygal-image-scale" alt=""></span>
+      </a>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should show a SimpLy Gallery Block gallery', async () => {
+    const value = html`
+      <div class="pgc-sgb-cb wp-block-pgcsimplygalleryblock-slider" data-gallery-id="72e84381">
+        <div class="simply-gallery-amp pgc_sgb_slider">
+          <noscript>
+            <div class="sgb-gallery">
+              <div class="sgb-item"><a href="https://example.com/?attachment_id=38284" target="_blank"><img decoding="async" alt="" width="300" height="167" loading="lazy" src="https://example.com/wp-content/uploads/2026/06/IMG-20260625-WA0003-300x167.jpg"></a></div>
+              <div class="sgb-item"><a href="https://example.com/?attachment_id=38277" target="_blank"><img decoding="async" alt="" width="300" height="142" loading="lazy" src="https://example.com/wp-content/uploads/2026/06/IMG-20260624-WA0029-300x142.jpg"></a></div>
+            </div>
+          </noscript>
+        </div>
+      </div>
+    `
+    const expected = html`
+      <a href="https://example.com/?attachment_id=38284" target="_blank"><img decoding="async" alt="" width="300" height="167" loading="lazy" src="https://example.com/wp-content/uploads/2026/06/IMG-20260625-WA0003-300x167.jpg"></a>
+      <a href="https://example.com/?attachment_id=38277" target="_blank"><img decoding="async" alt="" width="300" height="142" loading="lazy" src="https://example.com/wp-content/uploads/2026/06/IMG-20260624-WA0029-300x142.jpg"></a>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })

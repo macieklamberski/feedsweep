@@ -76,13 +76,36 @@ const getImageFingerprints = (
   return fingerprints
 }
 
-// An <img> whose real src or srcset sits in a lazy attribute, or in a <noscript> twin beside it.
+// An <img> whose real src or srcset sits in a lazy attribute, or in a <noscript> twin beside it,
+// and a gallery whose pictures sit only in its <noscript> fallback.
 export const fixLazyImages: DomTransform = (context) => {
   const lazySrcSet = new Set(context.lazySrcAttributes)
   const lazySrcsetSet = new Set(context.lazySrcsetAttributes)
   const { lazySrcAttributes, lazySrcsetAttributes } = context
   const srcAttributes = ['src', ...lazySrcAttributes]
   const srcsetAttributes = ['srcset', ...lazySrcsetAttributes]
+  const galleryNoscriptSelector = context.galleryNoscriptSelectors.join(', ')
+
+  // A gallery that also renders its pictures beside the fallback would show each one twice.
+  const hasVisibleTwin = (noscript: Element): boolean => {
+    const visibleFingerprints = new Set<string>()
+
+    for (const image of noscript.parentElement?.querySelectorAll('img') ?? []) {
+      if (image.closest('noscript')) {
+        continue
+      }
+
+      for (const fingerprint of getImageFingerprints(image, srcAttributes, srcsetAttributes)) {
+        visibleFingerprints.add(fingerprint)
+      }
+    }
+
+    return [...noscript.querySelectorAll('img')].some((image) => {
+      const fingerprints = getImageFingerprints(image, srcAttributes, srcsetAttributes)
+
+      return [...fingerprints].some((fingerprint) => visibleFingerprints.has(fingerprint))
+    })
+  }
 
   return (document) => {
     // <source> included: flattenPictureElements reads its srcset next and would drop the AVIF one.
@@ -130,6 +153,16 @@ export const fixLazyImages: DomTransform = (context) => {
     const noscripts = document.querySelectorAll('noscript')
 
     for (const noscript of noscripts) {
+      const isGalleryFallback =
+        galleryNoscriptSelector &&
+        noscript.matches(galleryNoscriptSelector) &&
+        !hasVisibleTwin(noscript)
+
+      if (isGalleryFallback) {
+        noscript.outerHTML = noscript.innerHTML
+        continue
+      }
+
       const sibling = noscript.previousElementSibling
       const image = noscript.querySelector('img')
 
