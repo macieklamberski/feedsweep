@@ -10,7 +10,7 @@ describe('kickstarterResolveEmbed', () => {
       const value = 'https://www.kickstarter.com/projects/78929588/cthulhu-dark/widget/card.html'
       const expected: EmbedResolverResult = {
         provider: 'kickstarter',
-        id: '78929588/cthulhu-dark',
+        id: 'cthulhu-dark',
         src: 'https://www.kickstarter.com/projects/78929588/cthulhu-dark/widget/card.html',
         url: 'https://www.kickstarter.com/projects/78929588/cthulhu-dark',
         height: 420,
@@ -24,7 +24,7 @@ describe('kickstarterResolveEmbed', () => {
         'https://www.kickstarter.com/projects/larianstudios/divinity-original-sin-2/widget/video.html'
       const expected: EmbedResolverResult = {
         provider: 'kickstarter',
-        id: 'larianstudios/divinity-original-sin-2',
+        id: 'divinity-original-sin-2',
         src: 'https://www.kickstarter.com/projects/larianstudios/divinity-original-sin-2/widget/video.html',
         url: 'https://www.kickstarter.com/projects/larianstudios/divinity-original-sin-2',
         ratio: '16/9',
@@ -38,7 +38,7 @@ describe('kickstarterResolveEmbed', () => {
         'https://www.kickstarter.com/projects/78929588/cthulhu-dark/widget/card.html?v=2'
       const expected: EmbedResolverResult = {
         provider: 'kickstarter',
-        id: '78929588/cthulhu-dark',
+        id: 'cthulhu-dark',
         src: 'https://www.kickstarter.com/projects/78929588/cthulhu-dark/widget/card.html',
         url: 'https://www.kickstarter.com/projects/78929588/cthulhu-dark',
         height: 420,
@@ -47,12 +47,12 @@ describe('kickstarterResolveEmbed', () => {
       expect(kickstarterResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should keep the creator and the slug as written', () => {
+    it('should keep the creator in the url as written', () => {
       const value =
         'https://www.kickstarter.com/projects/ConflictRPG/combat-description-cards-for-storytellers-and-gms/widget/video.html'
       const expected: EmbedResolverResult = {
         provider: 'kickstarter',
-        id: 'ConflictRPG/combat-description-cards-for-storytellers-and-gms',
+        id: 'combat-description-cards-for-storytellers-and-gms',
         src: 'https://www.kickstarter.com/projects/ConflictRPG/combat-description-cards-for-storytellers-and-gms/widget/video.html',
         url: 'https://www.kickstarter.com/projects/ConflictRPG/combat-description-cards-for-storytellers-and-gms',
         ratio: '16/9',
@@ -120,7 +120,7 @@ describeForEachParser('kickstarterEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'kickstarter',
-        id: 'larianstudios/divinity-original-sin-2',
+        id: 'divinity-original-sin-2',
         src: 'https://www.kickstarter.com/projects/larianstudios/divinity-original-sin-2/widget/video.html',
         url: 'https://www.kickstarter.com/projects/larianstudios/divinity-original-sin-2',
         ratio: '16/9',
@@ -142,7 +142,7 @@ describeForEachParser('kickstarterEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'kickstarter',
-        id: '2081578473/pillars-of-eternity-lords-of-the-eastern-reach-car',
+        id: 'pillars-of-eternity-lords-of-the-eastern-reach-car',
         src: 'https://www.kickstarter.com/projects/2081578473/pillars-of-eternity-lords-of-the-eastern-reach-car/widget/card.html',
         url: 'https://www.kickstarter.com/projects/2081578473/pillars-of-eternity-lords-of-the-eastern-reach-car',
         height: 420,
@@ -167,7 +167,7 @@ describeForEachParser('kickstarterEmbedResolver', (parseHtml) => {
         '<iframe src="https://www.kickstarter.com/projects/claralehenaff/child-of-the-pyre//widget/card.html?v=2"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'kickstarter',
-        id: 'claralehenaff/child-of-the-pyre',
+        id: 'child-of-the-pyre',
         src: 'https://www.kickstarter.com/projects/claralehenaff/child-of-the-pyre/widget/card.html',
         url: 'https://www.kickstarter.com/projects/claralehenaff/child-of-the-pyre',
         height: 420,
@@ -189,7 +189,7 @@ describeForEachParser('kickstarter frames the pipeline resolves first', (parseHt
     const expected = html`
       <div
         data-embed-provider="kickstarter"
-        data-embed-id="845108579/thanks-to-hank"
+        data-embed-id="thanks-to-hank"
         data-embed-url="https://www.kickstarter.com/projects/845108579/thanks-to-hank"
         data-embed-ratio="16/9"
         data-embed-src="https://www.kickstarter.com/projects/845108579/thanks-to-hank/widget/video.html"

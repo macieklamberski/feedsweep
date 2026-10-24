@@ -21,9 +21,11 @@ export const kickstarterResolveEmbed: ResolveEmbed = (url, element) => {
 
   const project = `${encodePathSegment(creator)}/${encodePathSegment(slug)}`
 
+  // Kickstarter's oEmbed endpoint needs a creator segment but answers for any value, so the slug
+  // alone keys the project, and an enricher writes it as `/projects/anon/{slug}`.
   return {
     provider: 'kickstarter',
-    id: `${creator}/${slug}`,
+    id: slug,
     src: `https://www.kickstarter.com/projects/${project}/widget/${widget}`,
     url: `https://www.kickstarter.com/projects/${project}`,
     height: widget === 'card.html' ? cardHeight : undefined,
