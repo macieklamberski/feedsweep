@@ -26,6 +26,12 @@ const atUriRegex = /^at:\/\/([^/]+)\/([^/]+)\/([^/?#]+)/
 // Whitespace, an en dash, an em dash or a hyphen.
 const authorSeparatorRegex = /^[\s–—-]+/
 
+// A post's record key is a TID: a 64-bit integer in base32-sortable, holding microseconds since
+// the Unix epoch the client set when it wrote the post, then a 10-bit clock id.
+// See: https://atproto.com/specs/tid.
+const tidAlphabet = '234567abcdefghijklmnopqrstuvwxyz'
+const tidRegex = /^[234567abcdefghij][234567abcdefghijklmnopqrstuvwxyz]{12}$/
+
 type BlueskyPost = {
   authority: string
   rkey: string
@@ -75,7 +81,27 @@ const extractBlueskyPostFromUrl = (link: string): BlueskyPost | undefined => {
   }
 }
 
-const composeEmbedResult = (post: BlueskyPost): EmbedResolverResult => {
+// The date a post was written at, read from its record key.
+const readTidDate = (rkey: string): string | undefined => {
+  if (!tidRegex.test(rkey)) {
+    return
+  }
+
+  let value = 0n
+
+  for (const character of rkey) {
+    value = (value << 5n) | BigInt(tidAlphabet.indexOf(character))
+  }
+
+  const milliseconds = Number((value >> 10n) / 1000n)
+
+  return new Date(milliseconds).toISOString()
+}
+
+const composeEmbedResult = (
+  post: BlueskyPost,
+  fields: Partial<EmbedResolverResult> = {},
+): EmbedResolverResult => {
   return {
     provider,
     // A record key is unique only inside one repository, and every endpoint keys on the authority.
@@ -84,6 +110,9 @@ const composeEmbedResult = (post: BlueskyPost): EmbedResolverResult => {
     // The player takes a DID today and answers 400 to the handle form <bluesky-post> ships.
     src: `https://embed.bsky.app/embed/${post.authority}/${postCollection}/${post.rkey}`,
     url: `https://bsky.app/profile/${post.authority}/post/${post.rkey}`,
+    ...fields,
+    // A date the carrier states wins. One it leaves undefined still spreads, so it is read here.
+    date: fields.date ?? readTidDate(post.rkey),
   }
 }
 
@@ -183,7 +212,11 @@ const extractQuotedPost = (
   // Some feeds strip the blockquote's data attributes, and others drop its class and keep them.
   const post = extractBlueskyPost(attr(element, attribute) ?? '') ?? quoted.post
 
-  return post ? { ...composeEmbedResult(post), ...quoted.fields } : undefined
+  if (!post) {
+    return
+  }
+
+  return composeEmbedResult(post, quoted.fields)
 }
 
 // Bluesky's post blockquote, the fallback its embed script replaces and no reader runs.
@@ -227,7 +260,7 @@ export const blueskyIframeEmbedResolver = createUrlEmbedResolver(blueskyHosts, (
     return
   }
 
-  return { ...composeEmbedResult(post), ...readSubstackPost(element) }
+  return composeEmbedResult(post, readSubstackPost(element))
 })
 
 // A forum's s9e MediaEmbed helper iframe on s9e.github.io, naming the post in its url fragment.

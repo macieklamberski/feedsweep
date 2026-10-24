@@ -12,7 +12,7 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, blueskyBlockquoteEmbedResolver)
 
   describe('bare canonical blockquote', () => {
-    it('should read the post, its text and its author but no date from the date link', async () => {
+    it('should read the post, its text, its author and its date from the record key', async () => {
       const value = html`
         <blockquote
           class="bluesky-embed"
@@ -35,30 +35,34 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
         url: 'https://bsky.app/profile/did:plc:z72i7hdynmk6r22z27h6tvur/post/3kq7aeuwbg42k',
         description: 'Just shipped: Bluesky post embeds!',
         author: 'Bluesky (@bsky.app)',
+        date: '2024-04-15T21:48:40.950Z',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should not read a date written in the reader language', async () => {
+    it('should take the date from the record key over one in the reader language', async () => {
       const value = html`
         <blockquote
           class="bluesky-embed"
-          data-bluesky-uri="at://did:plc:5w4eqcxzw5jv5qfnmzxcakfy/app.bsky.feed.post/3m5j5f542422y"
+          data-bluesky-uri="at://did:plc:bgfdt2ekglwcly5wuclxdecw/app.bsky.feed.post/3mpk4zwbyxs2t"
+          data-bluesky-cid="bafyreib5x4xrwuvv7jgw2yb33nh2c36xpr2frzoyipveu2wo4ovufkfxmy"
           data-bluesky-embed-color-mode="system"
         >
-          <p lang="de">Ein Beitrag aus dem Einbettungsdialog.</p>
-          &mdash; Autorin (<a href="https://bsky.app/profile/did:plc:5w4eqcxzw5jv5qfnmzxcakfy?ref_src=embed">@autorin.example</a>)
-          <a href="https://bsky.app/profile/did:plc:5w4eqcxzw5jv5qfnmzxcakfy/post/3m5j5f542422y?ref_src=embed">16. September 2025 um 08:34</a>
+          <p lang="en">Donald Trump uses the office of the president to make billions while American families struggle to afford their basic needs. His infinite greed is disgusting.<br><br><a href="https://bsky.app/profile/did:plc:bgfdt2ekglwcly5wuclxdecw/post/3mpk4zwbyxs2t?ref_src=embed">[image or embed]</a></p>
+          &mdash; Juliana Stratton (<a href="https://bsky.app/profile/did:plc:bgfdt2ekglwcly5wuclxdecw?ref_src=embed">@julianastratton.bsky.social</a>)
+          <a href="https://bsky.app/profile/did:plc:bgfdt2ekglwcly5wuclxdecw/post/3mpk4zwbyxs2t?ref_src=embed">1 July 2026 at 00:15</a>
         </blockquote>
       `
       const expected: EmbedResolverResult = {
         provider: 'bluesky',
-        id: 'did:plc:5w4eqcxzw5jv5qfnmzxcakfy/3m5j5f542422y',
-        src: 'https://embed.bsky.app/embed/did:plc:5w4eqcxzw5jv5qfnmzxcakfy/app.bsky.feed.post/3m5j5f542422y',
-        url: 'https://bsky.app/profile/did:plc:5w4eqcxzw5jv5qfnmzxcakfy/post/3m5j5f542422y',
-        description: 'Ein Beitrag aus dem Einbettungsdialog.',
-        author: 'Autorin (@autorin.example)',
+        id: 'did:plc:bgfdt2ekglwcly5wuclxdecw/3mpk4zwbyxs2t',
+        src: 'https://embed.bsky.app/embed/did:plc:bgfdt2ekglwcly5wuclxdecw/app.bsky.feed.post/3mpk4zwbyxs2t',
+        url: 'https://bsky.app/profile/did:plc:bgfdt2ekglwcly5wuclxdecw/post/3mpk4zwbyxs2t',
+        description:
+          'Donald Trump uses the office of the president to make billions while American families struggle to afford their basic needs. His infinite greed is disgusting.',
+        author: 'Juliana Stratton (@julianastratton.bsky.social)',
+        date: '2026-06-30T23:15:21.731Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -91,6 +95,7 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
         url: 'https://bsky.app/profile/did:plc:ewvi7nxzyoun6zhxrhs64oiz/post/3lbwtqmxbec2p',
         description: 'The block editor pastes the oEmbed html verbatim.',
         author: 'Display Name (@user.bsky.social)',
+        date: '2024-11-27T15:14:47.996Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -117,6 +122,7 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
         src: 'https://embed.bsky.app/embed/did:plc:ewvi7nxzyoun6zhxrhs64oiz/app.bsky.feed.post/3lbwtqmxbec2p',
         url: 'https://bsky.app/profile/did:plc:ewvi7nxzyoun6zhxrhs64oiz/post/3lbwtqmxbec2p',
         description: 'Slug variations live on the figure, not the quote.',
+        date: '2024-11-27T15:14:47.996Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -149,6 +155,7 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
         url: 'https://bsky.app/profile/did:plc:oisofpd7lj26yvgiivf3lxsi/post/3ldz3mmxjks2n',
         description: 'The loader script never runs in a reader.',
         author: 'Theme Author (@theme.example)',
+        date: '2024-12-23T23:31:26.454Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -180,6 +187,7 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
         url: 'https://bsky.app/profile/did:plc:44ybard66vv44zksje25o7dz/post/3lgevqvpjac2u',
         description: 'Ghost keeps the script inside the figure.',
         author: 'Ghost Writer (@ghost.example)',
+        date: '2025-01-23T03:08:47.511Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -208,6 +216,7 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
         url: 'https://bsky.app/profile/did:plc:kdrlfhxenchjqnbtqvxpwsnu/post/3lhk2yq6xzc2f',
         description: 'Some publishers link only the handle.',
         author: 'Display Name (@user.bsky.social)',
+        date: '2025-02-06T21:51:09.191Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -240,6 +249,7 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
         url: 'https://bsky.app/profile/did:plc:tgudj2fjmgcl2w7qzruzxfmy/post/3lj7bvrr4yk2l',
         description: 'A post with a picture attached.',
         author: 'Newsroom (@newsroom.example)',
+        date: '2025-02-28T01:45:52.497Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -272,6 +282,7 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
         url: 'https://bsky.app/profile/did:plc:6xkqmwpqhsbnvmqvdvbjzcyz/post/3lm4lzkrnk22d',
         description: 'Attached media sits in the same paragraph.',
         author: 'Builder (@builder.example)',
+        date: '2025-04-06T04:24:32.478Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -298,6 +309,7 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
         url: 'https://bsky.app/profile/did:plc:5rowmpbfyfhbmpmldxtqzcnj/post/3ln54ry2iwc2x',
         description: 'Ein Beitrag auf Deutsch.',
         author: 'Autorin (@autorin.example)',
+        date: '2025-04-19T02:49:43.203Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -332,6 +344,7 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
         url: 'https://bsky.app/profile/did:plc:qjeavhlw222ppsre4rscd3n2/post/3lpyqevbqvk2j',
         description: 'The editor keeps a second, encoded copy.',
         author: 'Editor (@editor.example)',
+        date: '2025-05-25T13:12:35.115Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -359,6 +372,7 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
         url: 'https://bsky.app/profile/did:plc:hvakvedv6byxhufjl4fwfnyf/post/3lqmk6ipt5v22',
         description: 'An old-fashioned wrapper.',
         author: 'Retro (@retro.example)',
+        date: '2025-06-02T10:14:52.935Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -383,6 +397,7 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
         url: 'https://bsky.app/profile/did:plc:2ka2wpbfyfhbmpmldxtqzcnj/post/3lr7aeuwbg42k',
         description: 'Only the class survived the export.',
         author: 'Stripped (@stripped.example)',
+        date: '2025-06-09T20:40:04.666Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -407,6 +422,7 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
         url: 'https://bsky.app/profile/did:plc:6kz4agnyzcrsvpnprxrbjrpa/post/3lvq7aeuwbg42',
         description: 'Only the attributes survived the export.',
         author: 'Classless (@classless.example)',
+        date: '2025-08-06T12:15:41.949Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -429,6 +445,7 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
         src: 'https://embed.bsky.app/embed/did:plc:3jz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3lsq7aeuwbg42',
         url: 'https://bsky.app/profile/did:plc:3jz4agnyzcrsvpnprxrbjrpa/post/3lsq7aeuwbg42',
         description: 'A theme added its own class.',
+        date: '2025-06-29T08:00:07.065Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -450,6 +467,7 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
         src: 'https://embed.bsky.app/embed/did:plc:4hz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3ltq7aeuwbg42',
         url: 'https://bsky.app/profile/did:plc:4hz4agnyzcrsvpnprxrbjrpa/post/3ltq7aeuwbg42',
         description: 'Aligned the HTML4 way.',
+        date: '2025-07-12T01:25:18.693Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -472,6 +490,7 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
         src: 'https://embed.bsky.app/embed/did:plc:5hz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3luq7aeuwbg42',
         url: 'https://bsky.app/profile/did:plc:5hz4agnyzcrsvpnprxrbjrpa/post/3luq7aeuwbg42',
         description: 'Centred with inline css.',
+        date: '2025-07-24T18:50:30.321Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -496,6 +515,7 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
         src: 'https://embed.bsky.app/embed/did:plc:6hz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3lvq7aeuwbg42',
         url: 'https://bsky.app/profile/did:plc:6hz4agnyzcrsvpnprxrbjrpa/post/3lvq7aeuwbg42',
         description: 'Invalid nesting, still a post.',
+        date: '2025-08-06T12:15:41.949Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -520,6 +540,7 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
         src: 'https://embed.bsky.app/embed/did:plc:7hz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3lwq7aeuwbg42',
         url: 'https://bsky.app/profile/did:plc:7hz4agnyzcrsvpnprxrbjrpa/post/3lwq7aeuwbg42',
         description: 'The hashed class cannot be selected on.',
+        date: '2025-08-19T05:40:53.576Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -544,6 +565,7 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
         src: 'https://embed.bsky.app/embed/did:plc:8hz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3lxq7aeuwbg42',
         url: 'https://bsky.app/profile/did:plc:8hz4agnyzcrsvpnprxrbjrpa/post/3lxq7aeuwbg42',
         description: 'A hand-rolled theme.',
+        date: '2025-08-31T23:06:05.204Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -603,6 +625,86 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
         src: 'https://embed.bsky.app/embed/not%20an%20authority/app.bsky.feed.post/3lzq7%20aeuwbg42',
         url: 'https://bsky.app/profile/not%20an%20authority/post/3lzq7%20aeuwbg42',
         description: 'Nothing addressable here.',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should not read a date from a record key one character short of a TID', async () => {
+      const value = html`
+        <blockquote
+          class="bluesky-embed"
+          data-bluesky-uri="at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3kq7aeuwbg42"
+        >
+          <p lang="en">A post whose record key is not a TID.</p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'did:plc:z72i7hdynmk6r22z27h6tvur/3kq7aeuwbg42',
+        src: 'https://embed.bsky.app/embed/did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3kq7aeuwbg42',
+        url: 'https://bsky.app/profile/did:plc:z72i7hdynmk6r22z27h6tvur/post/3kq7aeuwbg42',
+        description: 'A post whose record key is not a TID.',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should not read a date from a record key one character longer than a TID', async () => {
+      const value = html`
+        <blockquote
+          class="bluesky-embed"
+          data-bluesky-uri="at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/33kq7aeuwbg42k"
+        >
+          <p lang="en">A post whose record key is not a TID.</p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'did:plc:z72i7hdynmk6r22z27h6tvur/33kq7aeuwbg42k',
+        src: 'https://embed.bsky.app/embed/did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/33kq7aeuwbg42k',
+        url: 'https://bsky.app/profile/did:plc:z72i7hdynmk6r22z27h6tvur/post/33kq7aeuwbg42k',
+        description: 'A post whose record key is not a TID.',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should not read a date from a record key too large for 64 bits', async () => {
+      const value = html`
+        <blockquote
+          class="bluesky-embed"
+          data-bluesky-uri="at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/kkq7aeuwbg42k"
+        >
+          <p lang="en">A post whose record key is not a TID.</p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'did:plc:z72i7hdynmk6r22z27h6tvur/kkq7aeuwbg42k',
+        src: 'https://embed.bsky.app/embed/did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/kkq7aeuwbg42k',
+        url: 'https://bsky.app/profile/did:plc:z72i7hdynmk6r22z27h6tvur/post/kkq7aeuwbg42k',
+        description: 'A post whose record key is not a TID.',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should not read a date from a record key carrying a character outside the TID alphabet', async () => {
+      const value = html`
+        <blockquote
+          class="bluesky-embed"
+          data-bluesky-uri="at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3kq7aeuwbg421"
+        >
+          <p lang="en">A post whose record key is not a TID.</p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'did:plc:z72i7hdynmk6r22z27h6tvur/3kq7aeuwbg421',
+        src: 'https://embed.bsky.app/embed/did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3kq7aeuwbg421',
+        url: 'https://bsky.app/profile/did:plc:z72i7hdynmk6r22z27h6tvur/post/3kq7aeuwbg421',
+        description: 'A post whose record key is not a TID.',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -688,6 +790,33 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should take the date from the record key when the payload states none', async () => {
+      const payload = jsonAttrValue({
+        authorHandle: 'author.example',
+        text: 'The wrapper leaves the timestamp out.',
+      })
+      const value = html`
+        <div
+          class="bluesky-wrap outer"
+          data-attrs="${payload}"
+          data-component-name="BlueskyCreateBlueskyEmbed"
+        >
+          <iframe src="https://embed.bsky.app/embed/did:plc:bhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mbq7aeuwbg42"></iframe>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'did:plc:bhz4agnyzcrsvpnprxrbjrpa/3mbq7aeuwbg42',
+        src: 'https://embed.bsky.app/embed/did:plc:bhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mbq7aeuwbg42',
+        url: 'https://bsky.app/profile/did:plc:bhz4agnyzcrsvpnprxrbjrpa/post/3mbq7aeuwbg42',
+        description: 'The wrapper leaves the timestamp out.',
+        author: '@author.example',
+        date: '2026-01-06T05:18:01.482Z',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // A payload writing its media without a scheme still names Bluesky's own host.
     it('should keep a protocol-relative avatar and thumbnail', async () => {
       const payload = jsonAttrValue({
@@ -719,6 +848,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         description: 'The wrapper states its media without a scheme.',
         author: '@author.example',
         avatar: '//cdn.bsky.app/img/avatar/plain/did:plc:bhz4/bafkreiavatar@jpeg',
+        date: '2026-01-06T05:18:01.482Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -782,6 +912,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         author: '@author.example',
         avatar:
           'https://cdn.bsky.social/img/avatar/plain/did:plc:bhz4agnyzcrsvpnprxrbjrpa/bafkreiavatar@jpeg',
+        date: '2026-01-31T16:08:24.738Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -809,6 +940,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         src: 'https://embed.bsky.app/embed/did:plc:dhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mdq7aeuwbg42',
         url: 'https://bsky.app/profile/did:plc:dhz4agnyzcrsvpnprxrbjrpa/post/3mdq7aeuwbg42',
         author: '@author.example',
+        date: '2026-01-31T16:08:24.738Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -833,6 +965,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'did:plc:ehz4agnyzcrsvpnprxrbjrpa/3meq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/did:plc:ehz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3meq7aeuwbg42',
         url: 'https://bsky.app/profile/did:plc:ehz4agnyzcrsvpnprxrbjrpa/post/3meq7aeuwbg42',
+        date: '2026-02-13T09:33:36.365Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -855,6 +988,30 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'did:plc:fhz4agnyzcrsvpnprxrbjrpa/3mfq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/did:plc:fhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mfq7aeuwbg42',
         url: 'https://bsky.app/profile/did:plc:fhz4agnyzcrsvpnprxrbjrpa/post/3mfq7aeuwbg42',
+        date: '2026-02-26T02:58:47.993Z',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the date from a record key whose tail holds an o', async () => {
+      const value = html`
+        <iframe
+          id="bluesky-3mogemliugp2p"
+          data-bluesky-id="6494931896807279"
+          src="https://embed.bsky.app/embed/did:plc:y3cfhqre6iuilnhwp23fgl2v/app.bsky.feed.post/3mogemliugp2p?id=6494931896807279"
+          width="100%"
+          style="display: block; flex-grow: 1;"
+          frameborder="0"
+          scrolling="no"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'did:plc:y3cfhqre6iuilnhwp23fgl2v/3mogemliugp2p',
+        src: 'https://embed.bsky.app/embed/did:plc:y3cfhqre6iuilnhwp23fgl2v/app.bsky.feed.post/3mogemliugp2p',
+        url: 'https://bsky.app/profile/did:plc:y3cfhqre6iuilnhwp23fgl2v/post/3mogemliugp2p',
+        date: '2026-06-16T17:55:13.567Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -873,6 +1030,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'did:plc:z72i7hdynmk6r22z27h6tvur/3kq7aeuwbg42k',
         src: 'https://embed.bsky.app/embed/did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3kq7aeuwbg42k',
         url: 'https://bsky.app/profile/did:plc:z72i7hdynmk6r22z27h6tvur/post/3kq7aeuwbg42k',
+        date: '2024-04-15T21:48:40.950Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -887,6 +1045,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'did:plc:z72i7hdynmk6r22z27h6tvur/3kq7aeuwbg42k',
         src: 'https://embed.bsky.app/embed/did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3kq7aeuwbg42k',
         url: 'https://bsky.app/profile/did:plc:z72i7hdynmk6r22z27h6tvur/post/3kq7aeuwbg42k',
+        date: '2024-04-15T21:48:40.950Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -901,6 +1060,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'did:plc:z72i7hdynmk6r22z27h6tvur/3kq7aeuwbg42k',
         src: 'https://embed.bsky.app/embed/did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3kq7aeuwbg42k',
         url: 'https://bsky.app/profile/did:plc:z72i7hdynmk6r22z27h6tvur/post/3kq7aeuwbg42k',
+        date: '2024-04-15T21:48:40.950Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -916,6 +1076,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'did:web:didweb.watch/3m6p3vi6mlw2r',
         src: 'https://embed.bsky.app/embed/did:web:didweb.watch/app.bsky.feed.post/3m6p3vi6mlw2r',
         url: 'https://bsky.app/profile/did:web:didweb.watch/post/3m6p3vi6mlw2r',
+        date: '2025-11-28T14:30:00.000Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -929,6 +1090,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'did:web:localhost%3A2583/3mkq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/did:web:localhost%3A2583/app.bsky.feed.post/3mkq7aeuwbg42',
         url: 'https://bsky.app/profile/did:web:localhost%3A2583/post/3mkq7aeuwbg42',
+        date: '2026-04-30T18:04:46.132Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -942,6 +1104,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'did:web:news-room.example/3mkq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/did:web:news-room.example/app.bsky.feed.post/3mkq7aeuwbg42',
         url: 'https://bsky.app/profile/did:web:news-room.example/post/3mkq7aeuwbg42',
+        date: '2026-04-30T18:04:46.132Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -955,6 +1118,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'news2day.example/3mkq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/news2day.example/app.bsky.feed.post/3mkq7aeuwbg42',
         url: 'https://bsky.app/profile/news2day.example/post/3mkq7aeuwbg42',
+        date: '2026-04-30T18:04:46.132Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -968,6 +1132,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'news-room.example/3mkq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/news-room.example/app.bsky.feed.post/3mkq7aeuwbg42',
         url: 'https://bsky.app/profile/news-room.example/post/3mkq7aeuwbg42',
+        date: '2026-04-30T18:04:46.132Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -981,6 +1146,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'alice.team2.example/3mkq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/alice.team2.example/app.bsky.feed.post/3mkq7aeuwbg42',
         url: 'https://bsky.app/profile/alice.team2.example/post/3mkq7aeuwbg42',
+        date: '2026-04-30T18:04:46.132Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -994,6 +1160,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: 'alice.news-room.example/3mkq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/alice.news-room.example/app.bsky.feed.post/3mkq7aeuwbg42',
         url: 'https://bsky.app/profile/alice.news-room.example/post/3mkq7aeuwbg42',
+        date: '2026-04-30T18:04:46.132Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1025,6 +1192,7 @@ describeForEachParser('blueskyIframeEmbedResolver', (parseHtml) => {
         id: '@newsroom.example/3mkq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/@newsroom.example/app.bsky.feed.post/3mkq7aeuwbg42',
         url: 'https://bsky.app/profile/@newsroom.example/post/3mkq7aeuwbg42',
+        date: '2026-04-30T18:04:46.132Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1073,6 +1241,7 @@ describeForEachParser('blueskyS9eEmbedResolver', (parseHtml) => {
         id: 'did:plc:hhz4agnyzcrsvpnprxrbjrpa/3mhq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/did:plc:hhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mhq7aeuwbg42',
         url: 'https://bsky.app/profile/did:plc:hhz4agnyzcrsvpnprxrbjrpa/post/3mhq7aeuwbg42',
+        date: '2026-03-23T13:49:11.249Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1090,6 +1259,7 @@ describeForEachParser('blueskyS9eEmbedResolver', (parseHtml) => {
         id: 'did:plc:hhz4agnyzcrsvpnprxrbjrpa/3mhq7aeuwbg42',
         src: 'https://embed.bsky.app/embed/did:plc:hhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mhq7aeuwbg42',
         url: 'https://bsky.app/profile/did:plc:hhz4agnyzcrsvpnprxrbjrpa/post/3mhq7aeuwbg42',
+        date: '2026-03-23T13:49:11.249Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1139,6 +1309,7 @@ describeForEachParser('blueskyPostElementEmbedResolver', (parseHtml) => {
         url: 'https://bsky.app/profile/newsroom.example/post/3miq7aeuwbg42',
         description: 'The web component never mounts in a reader.',
         author: 'Newsroom (@newsroom.example)',
+        date: '2026-04-05T07:14:22.876Z',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1158,6 +1329,7 @@ describeForEachParser('blueskyPostElementEmbedResolver', (parseHtml) => {
         src: 'https://embed.bsky.app/embed/did:plc:jhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mjq7aeuwbg42',
         url: 'https://bsky.app/profile/did:plc:jhz4agnyzcrsvpnprxrbjrpa/post/3mjq7aeuwbg42',
         description: 'A did addresses the player directly.',
+        date: '2026-04-18T00:39:34.504Z',
       }
 
       expect(await extract(value)).toEqual(expected)
