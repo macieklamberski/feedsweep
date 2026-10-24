@@ -24,8 +24,9 @@ const albumRoutes = ['a', 'gallery']
 
 // `imgur.com/t/{tag}/{slug}-{id}` served byte-for-byte the same page as `imgur.com/gallery/{id}`
 // on 2026-09-08, and served it under a tag that does not exist, so the tag is decoration in
-// front of a post one segment deeper. `imgur.com/t/{tag}` alone names no post.
-const tagRoute = 't'
+// front of a post one segment deeper. `imgur.com/t/{tag}` alone names no post. `topic` answers
+// with a 301 to the same path under `t`.
+const tagRoutes = ['t', 'topic']
 
 // Imgur's own pages sit at the same depth as a post. `memes`, `tools` and `viral` are posts a
 // person uploaded, and `topics` serves the not-found shell an untaken id does.
@@ -164,7 +165,7 @@ export const imgurResolveEmbed: ResolveEmbed = (url) => {
 
   // A tag sits between its route and the post, so a tagged url names the post one segment deeper
   // than an album route does.
-  if (isAnyOf(route, tagRoute)) {
+  if (isAnyOf(route, tagRoutes)) {
     return composeAlbumEmbed(third)
   }
 
