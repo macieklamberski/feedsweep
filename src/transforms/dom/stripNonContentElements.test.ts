@@ -44,6 +44,10 @@ const specimens: Record<string, string | [string, string]> = {
     '<form id="searchwp-form-1" role="search" method="get" class="searchwp-form" action="https://example.com/" aria-label="Search"><input type="hidden" name="swp_form[form_id]" value="1"><div class="searchwp-form-input-container swp-items-stretch"><input type="search" class="swp-input--search swp-input" name="swps" aria-label="Search"></div><input type="submit" class="search-submit swp-button" value="archive search"></form>',
   'form:has(input[name="s"]:not([type="submit"]))':
     '<form class="e-search-form" action="https://example.com/blog" method="get"><label class="e-search-label" for="search-f088e24"><span class="elementor-screen-only">Search</span></label><div class="e-search-input-wrapper"><input id="search-f088e24" placeholder="Search" class="e-search-input" type="search" name="s" value=""></div><button class="e-search-submit" type="submit">Search</button></form>',
+  'iframe[src*="google.com/recaptcha/"]':
+    '<iframe src="https://www.google.com/recaptcha/api/fallback?hl=en&amp;k=6LddubAUAAAAAOZ0V8l7NcrIkv58vlZKl6k6b2c_" frameborder="0" scrolling="no" style="width: 302px; height:422px; border-style: none;"></iframe>',
+  'iframe[src*="recaptcha.net/"]':
+    '<iframe src="https://api-secure.recaptcha.net/noscript?k=6LeMVQQAAAAAAE8eiOuwZPcQUIg_1ooYyN7m3Ibx" height="300" width="500" frameborder="0"></iframe>',
   '.adsbygoogle':
     '<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-x" data-ad-slot="123"></ins>',
   'div[id^="div-gpt-ad"]': '<div id="div-gpt-ad-1234567890"></div>',
@@ -720,6 +724,34 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
       },
     )
 
+    it('should keep a Google Maps frame on the reCAPTCHA host', async () => {
+      const value = html`
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d6630.670776322211!2d-118.014912!3d33.803657!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x3b81cb81b8f496e9!2sSushi+World!5e0!3m2!1sen!2sus!4v1457995662141"
+          width="600"
+          height="450"
+        ></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a reCAPTCHA image in a post about it', async () => {
+      const value = html`
+        <p><img src="https://www.google.com/recaptcha/intro/images/hero-recaptcha-invisible.gif" alt="reCAPTCHA" width="200" height="200"></p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a reCAPTCHA logo served from recaptcha.net', async () => {
+      const value = html`
+        <p><img src="http://recaptcha.net/images/logo2-new.gif" alt="reCAPTCHA" width="187" height="125"></p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it.each(flagCounterImageUrls)('should strip the Flag Counter image %s', async (url) => {
       expect(await transform(`<p>Thanks for reading.<img src="${url}"></p>`)).toEqualHtml(
         '<p>Thanks for reading.</p>',
@@ -868,6 +900,22 @@ describeForEachParser('stripNonContentElements through the pipeline', (parseHtml
         data-cookieconsent="marketing"
         data-cookieblock-src="//www.facebook.com/plugins/likebox.php?href=http%3A%2F%2Fwww.facebook.com%2F354052831640272&amp;width=1200&amp;height=258&amp;show_faces=true&amp;header=false"
       ></iframe>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+
+    expect(result).toEqualHtml('')
+  })
+
+  it('should strip a reCAPTCHA fallback frame from its noscript', async () => {
+    const value = html`
+      <noscript>
+        <div style="width: 302px; height: 352px;">
+          <iframe src="https://www.google.com/recaptcha/api/fallback?k=6LckvbkSAAAAAPJ6RqZupEwCGus2nofeEDv80O6s" frameborder="0" scrolling="no" style="width: 302px; height:352px; border-style: none;"></iframe>
+        </div>
+      </noscript>
     `
     const result = await transformContent(value, {
       parseHtmlFn: parseHtml,

@@ -34,6 +34,12 @@ export const defaultNonContentSelectors = [
   'form[role="search"]', // Theme search form with its ARIA role.
   'form:has(input[name="s"]:not([type="submit"]))', // WordPress search form without the role, named by the `s` query WordPress searches on.
 
+  // reCAPTCHA challenge frames, the no-script fallback of a comment or contact form. Google
+  // serves them under `/recaptcha/` on its own host, where Maps and Calendar frames sit beside
+  // them. recaptcha.net, the mirror for regions that block google.com, serves nothing else.
+  'iframe[src*="google.com/recaptcha/"]',
+  'iframe[src*="recaptcha.net/"]',
+
   // Ad slots.
   '.adsbygoogle', // Google AdSense ad slot.
   'div[id^="div-gpt-ad"]', // Google Ad Manager (GPT) ad slot.
