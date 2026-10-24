@@ -57,6 +57,19 @@ describe('airtableResolveEmbed', () => {
 
       expect(airtableResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the embed route in upper case and mint it in lowercase', () => {
+      const value = 'https://airtable.com/EMBED/shrIBFxXbBGxNv8at'
+      const expected: EmbedResolverResult = {
+        provider: 'airtable',
+        id: 'shrIBFxXbBGxNv8at',
+        src: 'https://airtable.com/embed/shrIBFxXbBGxNv8at',
+        url: 'https://airtable.com/shrIBFxXbBGxNv8at',
+        height: 533,
+      }
+
+      expect(airtableResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -74,10 +87,6 @@ describe('airtableResolveEmbed', () => {
 
     it('should ignore a route word that is not the embed route', () => {
       expect(airtableResolveEmbed('https://airtable.com/frame/shrIBFxXbBGxNv8at')).toBeUndefined()
-    })
-
-    it('should ignore the embed route in upper case, which the server answers 404', () => {
-      expect(airtableResolveEmbed('https://airtable.com/EMBED/shrIBFxXbBGxNv8at')).toBeUndefined()
     })
 
     it('should ignore the embed route below a leading segment', () => {

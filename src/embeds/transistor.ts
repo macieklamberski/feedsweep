@@ -27,19 +27,19 @@ export const extractTransistorEmbed = (link: string): Subject | undefined => {
   const subject = segments[1]
 
   // Transistor serves the episode audio on the player host, so a file name is an enclosure.
-  if ((kind !== 'e' && kind !== 's') || !subject || isFileName(subject)) {
+  if (!isAnyOf(kind, ['e', 's']) || !subject || isFileName(subject)) {
     return
   }
 
   const mode = showModes.find((named) => isAnyOf(segments[2], named))
 
-  if (kind === 'e' && mode) {
+  if (isAnyOf(kind, 'e') && mode) {
     return { kind: mode, id: subject }
   }
 
   // A share page is `/s/{id}` and takes nothing after it. A third segment is a transcript:
   // Transistor writes sidecars at `/s/{id}/{token}.{ext}`.
-  if (kind === 's' && segments[2]) {
+  if (isAnyOf(kind, 's') && segments[2]) {
     return
   }
 

@@ -1,3 +1,4 @@
+import { getQueryParam } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
 import { parseUrlOnHosts } from '../../utils/urls.js'
@@ -17,18 +18,18 @@ export const unwrapWpcomWidgetFrames: DomTransform = () => {
       }
 
       const query = wrapper.searchParams
-      const src = query.get('src')
+      const src = getQueryParam(query, 'src')
 
       if (!src) {
         continue
       }
 
-      const flashvars = query.get('flashvars')
+      const flashvars = getQueryParam(query, 'flashvars')
       const attributes = {
         src,
         flashvars,
-        width: query.get('width'),
-        height: query.get('height'),
+        width: getQueryParam(query, 'width'),
+        height: getQueryParam(query, 'height'),
         type: 'application/x-shockwave-flash',
       }
       const embed = document.createElement('embed')

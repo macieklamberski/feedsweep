@@ -10,8 +10,8 @@ const provider = 'strawpoll'
 // Exact: `cdn.strawpoll.com` serves the loader script and the preview images.
 const strawpollHosts = ['strawpoll.com']
 
-// The route words are case-sensitive, and so is the id.
-const embedPathRegex = /^\/embed\/(?:polls\/)?([^/]+)\/?$/
+// The id is case-sensitive.
+const embedPathRegex = /^\/embed\/(?:polls\/)?([^/]+)\/?$/i
 
 const mountIdPrefix = 'strawpoll_'
 

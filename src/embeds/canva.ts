@@ -1,4 +1,4 @@
-import { isHostOf, parseUrl } from 'trousse'
+import { getAnyOf, isHostOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -7,7 +7,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const canvaHosts = ['canva.com', 'www.canva.com']
 
 // /design/{designId}/{shareToken}/{view|watch}, where older snippets leave the token out.
-const designPathRegex = /^\/design\/([^/]+(?:\/[^/]+)?)\/(view|watch)\/?$/
+const designPathRegex = /^\/design\/([^/]+(?:\/[^/]+)?)\/(view|watch)\/?$/i
 
 const designRatio = '16/9'
 
@@ -27,7 +27,8 @@ export const canvaResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const [, id, route] = match
+  const [, id, routeWord] = match
+  const route = getAnyOf(routeWord, ['view', 'watch'])
 
   return {
     provider: 'canva',

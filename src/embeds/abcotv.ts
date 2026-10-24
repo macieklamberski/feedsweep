@@ -1,4 +1,4 @@
-import { composeQuery, stripWww } from 'trousse'
+import { composeQuery, getQueryParam, stripWww } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -29,7 +29,7 @@ export const abcotvResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const pid = parsed.searchParams.get('pid')
+  const pid = getQueryParam(parsed.searchParams, 'pid')
 
   if (!pid) {
     return

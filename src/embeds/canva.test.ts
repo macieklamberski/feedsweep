@@ -111,6 +111,32 @@ describe('canvaResolveEmbed', () => {
 
       expect(canvaResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read an uppercase view route and mint it in lowercase', () => {
+      const value = 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/VIEW?embed'
+      const expected: EmbedResolverResult = {
+        provider: 'canva',
+        id: 'DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw',
+        src: 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view?embed',
+        url: 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view',
+        ratio: '16/9',
+      }
+
+      expect(canvaResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read an uppercase design route and mint it in lowercase', () => {
+      const value = 'https://www.canva.com/DESIGN/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view?embed'
+      const expected: EmbedResolverResult = {
+        provider: 'canva',
+        id: 'DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw',
+        src: 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view?embed',
+        url: 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view',
+        ratio: '16/9',
+      }
+
+      expect(canvaResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -155,18 +181,6 @@ describe('canvaResolveEmbed', () => {
 
     it('should ignore a page below the view route', () => {
       const value = 'https://www.canva.com/design/DAHLowacSd4/view/comments'
-
-      expect(canvaResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore an uppercase view route', () => {
-      const value = 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/VIEW?embed'
-
-      expect(canvaResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore an uppercase design route', () => {
-      const value = 'https://www.canva.com/DESIGN/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view?embed'
 
       expect(canvaResolveEmbed(value)).toBeUndefined()
     })
