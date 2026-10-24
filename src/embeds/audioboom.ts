@@ -84,7 +84,7 @@ export const audioboomWidgetEmbedResolver = createMarkupEmbedResolver(
 // Audioboo's Flash player, which no browser runs. It names the post only in its flashvars, as the
 // page in `mp3LinkURL` or the audio file in `mp3`. Audioboo's embed code paired it with the
 // compact player, which answers for the same id.
-const audioboomFlashResolveEmbed: ResolveEmbed = (url, element) => {
+export const audioboomFlashResolveEmbed: ResolveEmbed = (url, element) => {
   const player = parseUrlOnHosts(url, [...flashHosts, bucketHost])
 
   if (!player) {
