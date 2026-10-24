@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 import { hexRegex } from '../utils/urls.js'
@@ -13,9 +13,8 @@ const geniallyHosts = ['genially.com', 'genial.ly']
 export const extractGeniallyViewId = (link: string): string | undefined => {
   const segments = getPathSegments(link)
 
-  // Genially redirects this retired route only as `View/Index`, `view/index` or `VIEW/INDEX`, and
-  // answers a mixed spelling such as `View/index` with 404.
-  if (segments[0] === 'View' && segments[1] === 'Index') {
+  // The retired `View/Index/{id}` route.
+  if (isAnyOf(segments[0], 'view') && isAnyOf(segments[1], 'index')) {
     return keepIfMatches(segments[2], hexRegex)
   }
 
@@ -24,7 +23,7 @@ export const extractGeniallyViewId = (link: string): string | undefined => {
     return keepIfMatches(segments[0], hexRegex)
   }
 
-  const viewId = segments[0] === 'view' ? segments[1] : segments[0]
+  const viewId = isAnyOf(segments[0], 'view') ? segments[1] : segments[0]
 
   return keepIfMatches(viewId, safeViewIdRegex)
 }

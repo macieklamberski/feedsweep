@@ -44,6 +44,19 @@ describe('dvidsResolveEmbed', () => {
 
       expect(dvidsResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the route in capitals and mint it in lowercase', () => {
+      const value = 'https://www.dvidshub.net/VIDEO/EMBED/549765'
+      const expected: EmbedResolverResult = {
+        provider: 'dvids',
+        id: '549765',
+        src: 'https://www.dvidshub.net/video/embed/549765',
+        url: 'https://www.dvidshub.net/video/549765',
+        ratio: '16/9',
+      }
+
+      expect(dvidsResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -61,12 +74,6 @@ describe('dvidsResolveEmbed', () => {
 
     it('should return undefined for a segment after the id', () => {
       const value = 'https://www.dvidshub.net/video/embed/549765/extra'
-
-      expect(dvidsResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for the route in capitals, which the server answers 404', () => {
-      const value = 'https://www.dvidshub.net/VIDEO/EMBED/549765'
 
       expect(dvidsResolveEmbed(value)).toBeUndefined()
     })

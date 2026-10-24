@@ -1,7 +1,7 @@
 import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
 
-const secretRegex = /\?secret=(?<secret>[A-Za-z0-9]+)/g
+const secretRegex = /\?secret=(?<secret>[A-Za-z0-9]+)/gi
 
 const readFrameSecrets = (frame: Element): Array<string> => {
   const secrets = [...(attr(frame, 'src') ?? '').matchAll(secretRegex)].map((match) => {

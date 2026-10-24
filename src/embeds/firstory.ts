@@ -9,7 +9,7 @@ const provider = 'firstory'
 // The player moved from `open.firstory.me`, which redirects every path onto `open.firstory.fm`.
 const firstoryHosts = ['open.firstory.fm', 'open.firstory.me']
 
-const storyPathRegex = /^\/embed\/story\/([^/]+)\/?$/
+const storyPathRegex = /^\/embed\/story\/([^/]+)\/?$/i
 
 // The episode bar stays this tall at any width.
 const playerHeight = 182

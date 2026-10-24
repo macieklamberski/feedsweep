@@ -48,6 +48,20 @@ describe('dailymailResolveEmbed', () => {
 
       expect(dailymailResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the route in capitals and mint it in lowercase', () => {
+      const value = 'https://www.dailymail.co.uk/EMBED/VIDEO/1763642.html'
+      const expected: EmbedResolverResult = {
+        provider: 'dailymail',
+        id: '1763642',
+        src: 'https://www.dailymail.co.uk/embed/video/1763642.html',
+        url: 'https://www.dailymail.co.uk/video/video-1763642.html',
+        ratio: '16/9',
+        ratioHeightOffset: 234,
+      }
+
+      expect(dailymailResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -65,12 +79,6 @@ describe('dailymailResolveEmbed', () => {
 
     it('should return undefined for a segment after the id', () => {
       const value = 'https://www.dailymail.co.uk/embed/video/1763642.html/related'
-
-      expect(dailymailResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for the route in capitals, which the player answers 404', () => {
-      const value = 'https://www.dailymail.co.uk/EMBED/VIDEO/1763642.html'
 
       expect(dailymailResolveEmbed(value)).toBeUndefined()
     })

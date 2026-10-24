@@ -9,7 +9,7 @@ const provider = 'dailymail'
 const dailymailHosts = ['dailymail.co.uk', 'dailymail.com']
 
 // The server matches the path in its own case only.
-const playerPathRegex = /^\/embed\/video\/([^/]+)\.html$/
+const playerPathRegex = /^\/embed\/video\/([^/]+)\.html$/i
 
 // A 16:9 video between a header and title bar above and a control bar and headline below.
 const playerRatio = '16/9'

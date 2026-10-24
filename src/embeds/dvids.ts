@@ -7,7 +7,7 @@ const provider = 'dvids'
 const dvidsHosts = ['dvidshub.net']
 
 // The server matches the path in its own case only.
-const playerPathRegex = /^\/video\/embed\/([^/]+)\/?$/
+const playerPathRegex = /^\/video\/embed\/([^/]+)\/?$/i
 
 // DVIDS' video player, `/video/embed/{id}`, the url its share dialog writes. The page
 // `/video/{id}` 301s to the video's slugged page.

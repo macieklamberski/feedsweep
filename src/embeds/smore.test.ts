@@ -152,6 +152,19 @@ describeForEachParser('smoreEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should read the uppercase route word and mint it in lowercase', async () => {
+      const value = '<iframe src="https://app.smore.com/N/5h2uw?embedded"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'smore',
+        id: '5h2uw',
+        src: 'https://app.smore.com/n/5h2uw?embedded',
+        url: 'https://app.smore.com/n/5h2uw',
+        height: 600,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -163,12 +176,6 @@ describeForEachParser('smoreEmbedResolver', (parseHtml) => {
 
     it('should ignore a route word other than the newsletter one', async () => {
       const value = '<iframe src="https://app.smore.com/x/5h2uw?embedded"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore the uppercase route word the server sends to sign-in', async () => {
-      const value = '<iframe src="https://app.smore.com/N/5h2uw?embedded"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

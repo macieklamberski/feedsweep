@@ -212,6 +212,41 @@ describeForEachParser('threadsBlockquoteEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should read an uppercase route word and mint it in lowercase', async () => {
+      const value = html`
+        <blockquote
+          class="text-post-media"
+          data-text-post-permalink="https://www.threads.com/T/Cu0kxb8vjmv"
+        ></blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'threads',
+        id: 'Cu0kxb8vjmv',
+        src: 'https://www.threads.com/t/Cu0kxb8vjmv/embed/',
+        url: 'https://www.threads.com/t/Cu0kxb8vjmv',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the post route word in capitals and mint it in lowercase', async () => {
+      const value = html`
+        <blockquote
+          class="text-post-media"
+          data-text-post-permalink="https://www.threads.com/@jeremyburge/POST/DM1953uN6IJ"
+        ></blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'threads',
+        id: 'DM1953uN6IJ',
+        src: 'https://www.threads.com/@jeremyburge/post/DM1953uN6IJ/embed/',
+        url: 'https://www.threads.com/@jeremyburge/post/DM1953uN6IJ',
+        author: '@jeremyburge',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -242,17 +277,6 @@ describeForEachParser('threadsBlockquoteEmbedResolver', (parseHtml) => {
         <blockquote
           class="text-post-media"
           data-text-post-permalink="https://www.threads.com/@jeremyburge/reply/DM1953uN6IJ"
-        ></blockquote>
-      `
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore an uppercase route word, which threads.com answers 404', async () => {
-      const value = html`
-        <blockquote
-          class="text-post-media"
-          data-text-post-permalink="https://www.threads.com/T/Cu0kxb8vjmv"
         ></blockquote>
       `
 

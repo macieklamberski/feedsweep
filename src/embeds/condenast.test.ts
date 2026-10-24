@@ -103,6 +103,18 @@ describe('condenastResolveEmbed', () => {
 
       expect(condenastResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the route in capitals and mint it in lowercase', () => {
+      const value = 'https://player.cnevids.com/IFRAME/VIDEO/5ce439aa34e7941264b4701c'
+      const expected: EmbedResolverResult = {
+        provider: 'condenast',
+        id: '5ce439aa34e7941264b4701c',
+        src: 'https://player.cnevids.com/iframe/video/5ce439aa34e7941264b4701c',
+        ratio: '16/9',
+      }
+
+      expect(condenastResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -134,12 +146,6 @@ describe('condenastResolveEmbed', () => {
     it('should return undefined for a segment after the oldest frame', () => {
       const value =
         'https://player.cnevids.com/embed/54627cfc61646d2fc1030000/52f2ad0169702d21a5080000/extra'
-
-      expect(condenastResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for the route in capitals, which the server answers 404', () => {
-      const value = 'https://player.cnevids.com/IFRAME/VIDEO/5ce439aa34e7941264b4701c'
 
       expect(condenastResolveEmbed(value)).toBeUndefined()
     })
@@ -204,6 +210,19 @@ describeForEachParser('condenastScriptEmbedResolver', (parseHtml) => {
           src="//player-backend.cnevids.com/script/video/5ce439aa34e7941264b4701c.js?iu=/3379/vanityfair.dart/share"
         ></script>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'condenast',
+        id: '5ce439aa34e7941264b4701c',
+        src: 'https://player.cnevids.com/iframe/video/5ce439aa34e7941264b4701c',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should claim the script embed with its host in capitals', async () => {
+      const value =
+        '<script src="//PLAYER-BACKEND.CNEVIDS.COM/script/video/5ce439aa34e7941264b4701c.js"></script>'
       const expected: EmbedResolverResult = {
         provider: 'condenast',
         id: '5ce439aa34e7941264b4701c',

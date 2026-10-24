@@ -171,6 +171,24 @@ describeForEachParser('stripWordpressEmbedFrames', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should read the secret parameter name in capitals', async () => {
+      const value = html`
+        <blockquote class="wp-embedded-content" data-secret="pVPjmSz7KP">
+          <p><a href="https://example.com/2020/09/medical-training/">Medical training</a></p>
+        </blockquote>
+        <p>
+          <iframe class="wp-embedded-content" src="https://example.com/2020/09/medical-training/embed/#?SECRET=pVPjmSz7KP"></iframe>
+        </p>
+      `
+      const expected = html`
+        <blockquote class="wp-embedded-content" data-secret="pVPjmSz7KP">
+          <p><a href="https://example.com/2020/09/medical-training/">Medical training</a></p>
+        </blockquote>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     // WordPress 4.4 wrote its inline loader script into the paragraph ahead of the frame.
     it('should strip a secretless frame after the loader script in the next paragraph', async () => {
       const value = html`

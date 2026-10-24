@@ -37,10 +37,16 @@ describe('extractGeniallyViewId', () => {
     expect(extractGeniallyViewId(value)).toBe('59cc0e1689ef4914f441596a')
   })
 
-  it('should return undefined for a View/Index route spelled in mixed case', () => {
+  it('should read the id from a View/Index route spelled in mixed case', () => {
     const value = 'https://www.genial.ly/View/index/59cc0e1689ef4914f441596a'
 
-    expect(extractGeniallyViewId(value)).toBeUndefined()
+    expect(extractGeniallyViewId(value)).toBe('59cc0e1689ef4914f441596a')
+  })
+
+  it('should read the id from a /view/ path in capitals', () => {
+    const value = `https://genially.com/VIEW/${viewId}`
+
+    expect(extractGeniallyViewId(value)).toBe(viewId)
   })
 
   it('should return undefined for a View route with another second word', () => {
