@@ -109,7 +109,7 @@ describeForEachParser('tuneinEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, tuneinEmbedResolver)
 
   describe('happy paths', () => {
-    it('should keep the height the player declares', async () => {
+    it('should build the placeholder from the player iframe', async () => {
       const value = html`
         <iframe
           src="http://tunein.com/embed/player/s285269/"
@@ -135,6 +135,28 @@ describeForEachParser('tuneinEmbedResolver', (parseHtml) => {
       const value = '<iframe src="https://evil.test/embed/player/s285269/"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it("should state the player's 100 pixel height whatever the carrier declares", async () => {
+      const value = html`
+        <iframe
+          src="http://tunein.com/embed/player/s285269/"
+          style="width:100%;height:300px;"
+          scrolling="no"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tunein',
+        id: 's285269',
+        src: 'https://tunein.com/embed/player/s285269/',
+        url: 'https://tunein.com/radio/s285269/',
+        thumbnail: 'https://cdn-radiotime-logos.tunein.com/s285269d.png',
+        height: 100,
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })
