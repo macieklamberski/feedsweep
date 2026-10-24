@@ -191,6 +191,7 @@ import { iheartEmbedResolver } from '../embeds/iheart.js'
 import { imdbEmbedResolver } from '../embeds/imdb.js'
 import {
   imgurBlockquoteEmbedResolver,
+  imgurGifvEmbedResolver,
   imgurIframeEmbedResolver,
   imgurS9eEmbedResolver,
 } from '../embeds/imgur.js'
@@ -661,6 +662,7 @@ const embedResolvers: Array<EmbedResolver> = [
   iheartEmbedResolver,
   imdbEmbedResolver,
   imgurBlockquoteEmbedResolver,
+  imgurGifvEmbedResolver,
   imgurIframeEmbedResolver,
   imgurS9eEmbedResolver,
   inaEmbedResolver,

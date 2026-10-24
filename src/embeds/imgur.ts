@@ -180,6 +180,29 @@ export const imgurResolveEmbed: ResolveEmbed = (url) => {
 
 export const imgurIframeEmbedResolver = createUrlEmbedResolver(imgurHosts, imgurResolveEmbed)
 
+const gifvPathRegex = /^\/(?<id>[a-zA-Z0-9]+)\.gifv$/
+
+// Imgur's older gifv embed, `iframe.imgur-embed` on `i.imgur.com/{id}.gifv#embed`. The same id
+// plays on the post embed.
+export const imgurGifvEmbedResolver = createMarkupEmbedResolver(
+  'iframe.imgur-embed[src*="i.imgur.com/"]',
+  (element) => {
+    const parsed = parseUrl(attr(element, 'src') ?? '', placeholderBaseUrl)
+
+    if (!parsed || !isHostOf(parsed, 'i.imgur.com')) {
+      return
+    }
+
+    const id = parsed.pathname.match(gifvPathRegex)?.groups?.id
+
+    if (!id) {
+      return
+    }
+
+    return composeEmbed({ id, isAlbum: false })
+  },
+)
+
 // A forum's s9e MediaEmbed helper frame, naming the post or album in its url fragment. The helper
 // page reads an encoded `%2F` as the slash it stands for.
 export const imgurS9eEmbedResolver = createS9eEmbedResolver('imgur', (path) => {
