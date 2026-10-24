@@ -16,6 +16,8 @@ const audioboomHosts = ['audioboom.com', 'audioboo.fm']
 
 // Audioboo's Flash players, on its own host and on its S3 bucket.
 const flashHosts = ['boos.audioboo.fm', 'abfiles.s3.amazonaws.com']
+// S3 serves a bucket path-style too, on its own host with the bucket as the first segment.
+const bucketHost = 's3.amazonaws.com'
 
 // The `mp3` flashvar names the audio file, the post page with `.mp3` on its last segment.
 const mp3ExtensionRegex = /\.mp3(?=\?|$)/
@@ -82,7 +84,20 @@ export const audioboomWidgetEmbedResolver = createMarkupEmbedResolver(
 // Audioboo's Flash player, which no browser runs. It names the post only in its flashvars, as the
 // page in `mp3LinkURL` or the audio file in `mp3`. Audioboo's embed code paired it with the
 // compact player, which answers for the same id.
-const audioboomFlashResolveEmbed: ResolveEmbed = (_url, element) => {
+const audioboomFlashResolveEmbed: ResolveEmbed = (url, element) => {
+  const player = parseUrlOnHosts(url, [...flashHosts, bucketHost])
+
+  if (!player) {
+    return
+  }
+
+  // Another bucket, path-style or on its own subdomain of S3's host, is not Audioboo's.
+  const bucket = player.hostname === bucketHost ? getPathSegments(player)[0] : player.hostname
+
+  if (!bucket || !flashHosts.includes(bucket)) {
+    return
+  }
+
   const link = flashVar(element, 'mp3LinkURL') ?? flashVar(element, 'mp3')
   const parsed = parseUrlOnHosts(link?.replace(mp3ExtensionRegex, ''), audioboomHosts)
 
@@ -107,7 +122,7 @@ const audioboomFlashResolveEmbed: ResolveEmbed = (_url, element) => {
 }
 
 export const audioboomFlashEmbedResolver = createUrlEmbedResolver(
-  flashHosts,
+  [...flashHosts, bucketHost],
   audioboomFlashResolveEmbed,
 )
 
