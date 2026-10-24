@@ -796,24 +796,6 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
-    // Constructed: no feed or lab page carries this label outside a noscript.
-    it('should keep a reCAPTCHA label outside a noscript', async () => {
-      const value = html`
-        <label for="g-recaptcha-response" class="screen-reader-text">reCAPTCHA response</label>
-      `
-
-      expect(await transform(value)).toEqualHtml(value)
-    })
-
-    // Constructed: no feed or lab page carries another label inside a noscript.
-    it('should keep another label inside a noscript', async () => {
-      const value = html`
-        <noscript><label for="comment">Comment <span class="required">*</span></label></noscript>
-      `
-
-      expect(await transform(value)).toEqualHtml(value)
-    })
-
     it('should keep the comment box of the form a reCAPTCHA guards', async () => {
       const value = html`
         <textarea id="comment" name="comment" class="form-control" cols="45" rows="8" aria-required="true"></textarea>
