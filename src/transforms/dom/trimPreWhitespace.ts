@@ -1,5 +1,5 @@
 import type { DomTransform } from '../../types.js'
-import { isText } from '../../utils/dom.js'
+import { isText, setInnerHtml } from '../../utils/dom.js'
 
 const trailingWhitespaceRegex = /\s+$/
 const leadingBlankLinesRegex = /^(\s*\n)+/
@@ -71,7 +71,7 @@ export const trimPreWhitespace: DomTransform = () => {
           .join('\n')
 
         if (result !== original) {
-          target.innerHTML = result
+          setInnerHtml(target, result)
         }
 
         continue
