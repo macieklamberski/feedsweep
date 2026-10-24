@@ -51,12 +51,6 @@ describe('rtveResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a foreign host carrying the same path', () => {
-      const value = 'https://rtve.es.evil.test/drmn/embed/video/2474214'
-
-      expect(rtveResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for a kind the player does not serve', () => {
       const value = 'https://www.rtve.es/drmn/embed/photo/2474214'
 

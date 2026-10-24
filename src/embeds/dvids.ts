@@ -1,5 +1,6 @@
+import { parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'dvids'
@@ -12,7 +13,7 @@ const playerPathRegex = /^\/video\/embed\/([^/]+)\/?$/i
 // DVIDS' video player, `/video/embed/{id}`, the url its share dialog writes. The page
 // `/video/{id}` 301s to the video's slugged page.
 export const dvidsResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, dvidsHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
   const id = parsed?.pathname.match(playerPathRegex)?.[1]
 
   if (!id) {

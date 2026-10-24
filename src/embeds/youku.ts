@@ -1,6 +1,6 @@
-import { encodePathSegment, getQueryParam } from 'trousse'
+import { encodePathSegment, getQueryParam, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
+import { isFileName, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'youku'
@@ -19,7 +19,7 @@ const staticFlashPathRegex = /^\/v[\d.]+\/v\/swf\/\w*player\.swf$/i
 const playerRatio = '16/9'
 
 const readVideoId = (url: string): string | undefined => {
-  const parsed = parseUrlOnHosts(url, youkuHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (parsed?.hostname === 'static.youku.com') {
     const videoIds = getQueryParam(parsed.searchParams, 'VideoIDS')

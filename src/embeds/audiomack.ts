@@ -1,7 +1,7 @@
-import { composeQuery, getPathSegments, isAnyOf, toMap } from 'trousse'
+import { composeQuery, getPathSegments, isAnyOf, parseUrl, toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
+import { pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const audiomackHost = 'audiomack.com'
@@ -52,7 +52,7 @@ const readTrack = (url: URL): Track | undefined => {
 }
 
 export const audiomackResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrlOnHosts(url, audiomackHost)
+  const parsed = parseUrl(url, placeholderBaseUrl)
   const track = parsed && readTrack(parsed)
 
   if (!track || !audiomackHeights.has(track.kind)) {

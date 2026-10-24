@@ -1,6 +1,6 @@
-import { composeQuery, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const cnbcHosts = ['player.cnbc.com']
@@ -13,7 +13,7 @@ const playerRatio = '16/9'
 // It answers 200 for any guid, with a not-found page in the body for a fabricated one. The
 // Flash-era `plus.cnbc.com/rssvideosearch/…/id/{id}` ids are another space and get that page.
 export const cnbcResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, cnbcHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
   const [route, account, player, extra] = parsed ? getPathSegments(parsed) : []
   const guid = getQueryParam(parsed?.searchParams, 'byGuid')
 

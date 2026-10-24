@@ -1,6 +1,6 @@
-import { composeQuery, getQueryParam, isHostOrSubdomainOf, toMap } from 'trousse'
+import { composeQuery, getQueryParam, isHostOrSubdomainOf, parseUrl, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
+import { pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'srgplay'
@@ -65,7 +65,7 @@ const composeEmbed = (urn: string | undefined, search: string): EmbedResolverRes
 }
 
 const srgplayResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, srgplayHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return

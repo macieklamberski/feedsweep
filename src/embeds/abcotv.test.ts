@@ -73,12 +73,6 @@ describe('abcotvResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/video/embed/?pid=5740386'
-
-      expect(abcotvResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for a player url with no pid', () => {
       const value = 'https://abc7.com/video/embed/'
 

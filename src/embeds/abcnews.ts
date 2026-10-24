@@ -1,6 +1,6 @@
-import { composeQuery, encodePathSegment, getQueryParam } from 'trousse'
+import { composeQuery, encodePathSegment, getQueryParam, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'abcnews'
@@ -15,7 +15,7 @@ const playerPathRegex = /^\/video\/embed\/?$/i
 // ABC News' video player, `/video/embed?id={id}`. The site's own script builds it on the site's
 // host, which is `abcnews.com` today.
 export const abcnewsResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, abcnewsHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed || !playerPathRegex.test(parsed.pathname)) {
     return

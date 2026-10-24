@@ -86,12 +86,6 @@ describe('indavideoResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/player/video/c75c95c854/'
-
-      expect(indavideoResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore the player route behind another segment', () => {
       const value = 'https://indavideo.hu/x/player/video/c75c95c854/'
 

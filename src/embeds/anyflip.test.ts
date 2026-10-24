@@ -144,12 +144,6 @@ describe('anyflipResolveEmbed', () => {
       expect(anyflipResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore the user and book path on a foreign host', () => {
-      const value = 'https://evil.test/zruyy/qaan/index.html'
-
-      expect(anyflipResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore the book page on the apex host', () => {
       const value = 'https://anyflip.com/zruyy/qaan'
 

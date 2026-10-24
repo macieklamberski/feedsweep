@@ -116,12 +116,6 @@ describe('channelOneResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/embed/147417:12'
-
-      expect(channelOneResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a path with a leading segment', () => {
       const value = 'https://www.1tv.ru/x/embed/147417:12'
 

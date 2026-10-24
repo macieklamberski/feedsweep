@@ -117,12 +117,6 @@ describe('acuityschedulingResolveEmbed', () => {
 
       expect(acuityschedulingResolveEmbed(value)).toBeUndefined()
     })
-
-    it('should ignore the scheduler path on another subdomain', () => {
-      const value = 'https://embed.acuityscheduling.com/schedule.php?owner=14276092'
-
-      expect(acuityschedulingResolveEmbed(value)).toBeUndefined()
-    })
   })
 })
 

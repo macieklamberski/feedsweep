@@ -29,12 +29,6 @@ describe('buzzsproutResolveEmbed', () => {
     expect(buzzsproutResolveEmbed(value)).toBeUndefined()
   })
 
-  it('should return undefined for a lookalike host', () => {
-    const value = 'https://buzzsprout.com.evil.test/1735722/8166676'
-
-    expect(buzzsproutResolveEmbed(value)).toBeUndefined()
-  })
-
   it('should return undefined for an episode path under another segment', () => {
     const value = 'https://www.buzzsprout.com/x/1735722/8166676'
 

@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'audioboom'
@@ -81,7 +81,7 @@ export const audioboomWidgetEmbedResolver = createMarkupEmbedResolver(
 // Audioboo's Flash player, which no browser runs. It names the post only in its flashvars, as the
 // page in `mp3LinkURL` or the audio file in `mp3`.
 const audioboomFlashResolveEmbed: ResolveEmbed = (url, element) => {
-  const player = parseUrlOnHosts(url, [...flashHosts, bucketHost])
+  const player = parseUrl(url, placeholderBaseUrl)
 
   if (!player) {
     return

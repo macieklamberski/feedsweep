@@ -1,6 +1,6 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const tmzHosts = ['share.tmz.com']
@@ -11,7 +11,7 @@ const playerRoutes = ['videos', 'watch']
 // TMZ's syndication player, `share.tmz.com/videos/{slug}/`. The server matches the slug in any
 // case, so the key folds it.
 export const tmzResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, tmzHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return

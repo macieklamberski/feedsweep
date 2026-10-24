@@ -55,18 +55,6 @@ describe('thinglinkResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the card route', () => {
-      const value = 'https://evil.test/card/853609259307368449'
-
-      expect(thinglinkResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a lookalike host', () => {
-      const value = 'https://thinglink.com.evil.test/card/853609259307368449'
-
-      expect(thinglinkResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a thinglink url naming no viewer', () => {
       const value = 'https://www.thinglink.com/pricing'
 

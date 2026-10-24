@@ -1,6 +1,6 @@
-import { getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'radioradicale'
@@ -46,7 +46,7 @@ const readFlashId = (parsed: URL): string | undefined => {
 // recording's slug inserted. The page `/scheda/{id}` does the same. The server folds the case of
 // the route words. The Flash player took the same id, so it is rebuilt onto the current one.
 export const radioradicaleResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, radioradicaleHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return

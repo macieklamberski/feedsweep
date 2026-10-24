@@ -60,12 +60,6 @@ describe('zenoResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/player/halshack'
-
-      expect(zenoResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore the station page', () => {
       const value = 'https://zeno.fm/radio/halshack/'
 

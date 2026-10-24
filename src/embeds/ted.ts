@@ -1,7 +1,14 @@
-import { encodePathSegment, getPathSegments, getQueryParam, isAnyOf, isHostOf } from 'trousse'
+import {
+  encodePathSegment,
+  getPathSegments,
+  getQueryParam,
+  isAnyOf,
+  isHostOf,
+  parseUrl,
+} from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, flashVars, keepIfMatches, parseFlashVars } from '../utils/dom.js'
-import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
+import { digitsRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ted'
@@ -41,7 +48,7 @@ const readFlashTalk = (
   url: string,
   element: Element | undefined,
 ): { slug: string; thumbnail?: string } | undefined => {
-  const parsed = parseUrlOnHosts(url, tedHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
     return

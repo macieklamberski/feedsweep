@@ -1,7 +1,7 @@
-import { composeQuery, getQueryParam, isAnyOf, trimObject } from 'trousse'
+import { composeQuery, getQueryParam, isAnyOf, parseUrl, trimObject } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const podetizeHosts = ['player.podetize.com']
@@ -26,7 +26,7 @@ const composeEmbed = (id: string, isEpisodeMode: boolean): EmbedResolverResult =
 }
 
 export const podetizeResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, podetizeHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
   const id = getQueryParam(parsed?.searchParams, 'id')
 
   if (parsed?.pathname !== '/' || !id) {

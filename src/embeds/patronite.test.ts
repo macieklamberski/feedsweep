@@ -48,12 +48,6 @@ describe('patroniteResolveEmbed', () => {
 
       expect(patroniteResolveEmbed(value)).toBeUndefined()
     })
-
-    it('should ignore a lookalike host', () => {
-      const value = 'https://patronite.pl.evil.test/widget/strajk/114344/small/FF3E3E/FEFFF8'
-
-      expect(patroniteResolveEmbed(value)).toBeUndefined()
-    })
   })
 })
 

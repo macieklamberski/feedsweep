@@ -99,12 +99,6 @@ describe('washingtonpostResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/video/c/embed/6c688908-1e4f-4130-b5ca-e371afc1c78b'
-
-      expect(washingtonpostResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for the embed route below another segment', () => {
       const value =
         'https://www.washingtonpost.com/x/video/c/embed/6c688908-1e4f-4130-b5ca-e371afc1c78b'

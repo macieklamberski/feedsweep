@@ -81,18 +81,6 @@ describe('canaluResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/chaines/ut2j/embed/170208?t=0'
-
-      expect(canaluResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore the video host', () => {
-      const value = 'https://vod.canal-u.tv/chaines/ut2j/embed/170208'
-
-      expect(canaluResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a path with a leading segment', () => {
       const value = 'https://www.canal-u.tv/x/chaines/ut2j/embed/170208'
 

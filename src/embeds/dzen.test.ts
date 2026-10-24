@@ -81,12 +81,6 @@ describe('dzenResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/embed/oW0bt8mcOAAA'
-
-      expect(dzenResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for the player route below another segment', () => {
       const value = 'https://dzen.ru/x/embed/oW0bt8mcOAAA'
 

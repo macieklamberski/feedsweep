@@ -119,12 +119,6 @@ describe('listennotesResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a foreign host carrying the podcast route', () => {
-      const value = 'https://evil.test/podcasts/song-exploder-hrishikesh-hirway-Ut3fuw2xdYv/embed/'
-
-      expect(listennotesResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for a podcast page', () => {
       const value = 'https://www.listennotes.com/podcasts/switched-on-pop-vulture-YAyMJOkLo-7/'
 

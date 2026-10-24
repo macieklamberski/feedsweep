@@ -1,5 +1,6 @@
+import { parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
+import { isFileName, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const padletHosts = ['padlet.com']
@@ -13,7 +14,7 @@ const boardPathRegex = /^\/[^/]+\/[^/]*-([^/-]+)\/?$/
 const boardHeight = 608
 
 const padletResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, padletHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
   const boardId =
     parsed?.pathname.match(embedPathRegex)?.[1] ??
     parsed?.pathname.match(previewPathRegex)?.[1] ??

@@ -4,10 +4,11 @@ import {
   getPathSegments,
   getQueryParam,
   isAnyOf,
+  parseUrl,
   toMap,
 } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const nprHosts = ['www.npr.org']
@@ -49,7 +50,7 @@ const videoRoutes = toMap({
 // NPR's story player, `npr.org/player/embed/{storyId}/{mediaId}`, and its video player,
 // `npr.org/embedded-video?storyId={storyId}&mediaId={mediaId}`.
 export const nprResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, nprHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return
@@ -78,7 +79,7 @@ export const nprResolveEmbed: ResolveEmbed = (url) => {
 
 // The retired Flash player, `npr.org/v2/?i={storyId}&m={mediaId}&t={kind}`.
 export const nprFlashResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, nprHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return

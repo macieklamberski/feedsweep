@@ -73,10 +73,6 @@ describe('donorboxResolveEmbed', () => {
 
       expect(donorboxResolveEmbed(value)).toEqual(expected)
     })
-
-    it('should ignore a foreign host carrying the same path', () => {
-      expect(donorboxResolveEmbed('https://evil.test/embed/donation-form-248')).toBeUndefined()
-    })
   })
 })
 

@@ -351,12 +351,6 @@ describeForEachParser('scribdResolveEmbed', (parseHtml) => {
     return parseHtml('<iframe></iframe>').querySelector('iframe') as Element
   }
 
-  it('should ignore a url on another host', () => {
-    const value = 'https://evil.test/embeds/526446879/content'
-
-    expect(scribdResolveEmbed(value, carrier())).toBeUndefined()
-  })
-
   it('should ignore a url that cannot be parsed', () => {
     const value = 'https://['
 

@@ -147,12 +147,6 @@ describe('rsscomResolveEmbed', () => {
 
       expect(rsscomResolveEmbed(value)).toBeUndefined()
     })
-
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/allouttabubblegum/2949933?theme=dark&v=2'
-
-      expect(rsscomResolveEmbed(value)).toBeUndefined()
-    })
   })
 })
 

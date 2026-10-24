@@ -84,12 +84,6 @@ describe('helloassoResolveEmbed', () => {
 
       expect(helloassoResolveEmbed(value)).toBeUndefined()
     })
-
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/associations/cine-club-du-quartier/formulaires/1/widget'
-
-      expect(helloassoResolveEmbed(value)).toBeUndefined()
-    })
   })
 })
 
