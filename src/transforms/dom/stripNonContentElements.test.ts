@@ -972,4 +972,30 @@ describeForEachParser('stripNonContentElements through the pipeline', (parseHtml
 
     expect(result).toEqualHtml('')
   })
+
+  it('should strip a reCAPTCHA response box with its fallback frame from its noscript', async () => {
+    const value = html`
+      <noscript>
+        <div style="width: 302px; height: 422px;">
+          <div style="width: 302px; height: 422px; position: relative;">
+            <div style="width: 302px; height: 422px; position: absolute;">
+              <iframe src="https://www.google.com/recaptcha/api/fallback?k=6LfmLHAUAAAAAMJLL9jGO0TNQ7620FIPmTROYCZd" frameborder="0" scrolling="no" style="width: 302px; height:422px; border-style: none;" title="reCAPTCHA challenge"></iframe>
+            </div>
+            <div style="width: 300px; height: 60px; border-style: none; bottom: 12px; left: 25px; margin: 0px; padding: 0px; right: 25px; background: #f9f9f9; border: 1px solid #c1c1c1; border-radius: 3px;">
+              <label for="g-recaptcha-response" class="screen-reader-text">reCAPTCHA response</label>
+              <textarea id="g-recaptcha-response" name="g-recaptcha-response" class="g-recaptcha-response" style="width: 250px; height: 40px; border: 1px solid #c1c1c1; margin: 10px 25px; padding: 0px; resize: none;"></textarea>
+            </div>
+          </div>
+        </div>
+      </noscript>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+
+    expect(result).toEqualHtml(
+      '<p><label for="g-recaptcha-response" class="screen-reader-text">reCAPTCHA response</label></p>',
+    )
+  })
 })
