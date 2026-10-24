@@ -184,6 +184,8 @@ const specimens: Record<string, string | [string, string]> = {
     '<a class="read-more-link" href="/post">Read more</a>',
   'a[class*="continue-reading"]': '<a class="continue-reading" href="/post">Continue reading</a>',
   '.fb-comments': '<div class="fb-comments" data-href="https://example.com/p"></div>',
+  'iframe[src*="jetpack.wordpress.com/jetpack-comment/"]':
+    '<iframe title="Comment Form" src="https://jetpack.wordpress.com/jetpack-comment/?blogid=163164229&amp;postid=6215&amp;comment_registration=0&amp;require_name_email=1&amp;stc_enabled=0&amp;stb_enabled=1&amp;show_avatars=0&amp;avatar_default=identicon&amp;greeting=Bir+Cevap+Yaz%C4%B1n#parent=https%3A%2F%2Fexample.com%2Fpost%2F" name="jetpack_remote_comment" style="width:100%; height: 430px; border:0;" class="jetpack_remote_comment" id="jetpack_remote_comment" sandbox="allow-same-origin allow-top-navigation allow-scripts allow-forms allow-popups"></iframe>',
   '.printfriendly': '<a class="printfriendly" href="#">Print</a>',
   '.pf-button': '<button class="pf-button">Print</button>',
   'nav.breadcrumb':

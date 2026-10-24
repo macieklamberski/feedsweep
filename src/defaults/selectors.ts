@@ -186,6 +186,9 @@ export const defaultNonContentSelectors = [
   // Comment-system embeds (JS mounts that render nothing without their loader script).
   '.fb-comments', // Facebook Comments.
 
+  // Comment form frames, which take a reply on the publisher's site and show nothing else.
+  'iframe[src*="jetpack.wordpress.com/jetpack-comment/"]', // Jetpack Comments.
+
   // Breadcrumb trails, carried into the item by themes that put the page hero into the content
   // field. Gated on a navigation element or a plugin class, because the bare word also names
   // recipes and articles about breadcrumbs.
