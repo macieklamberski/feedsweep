@@ -112,20 +112,20 @@ describe('canvaResolveEmbed', () => {
       expect(canvaResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should read an uppercase view route and mint it in lowercase', () => {
+    it('should read an uppercase view route and mint it as written', () => {
       const value = 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/VIEW?embed'
       const expected: EmbedResolverResult = {
         provider: 'canva',
         id: 'DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw',
-        src: 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view?embed',
-        url: 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view',
+        src: 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/VIEW?embed',
+        url: 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/VIEW',
         ratio: '16/9',
       }
 
       expect(canvaResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should read an uppercase design route and mint it in lowercase', () => {
+    it('should read an uppercase design route', () => {
       const value = 'https://www.canva.com/DESIGN/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view?embed'
       const expected: EmbedResolverResult = {
         provider: 'canva',

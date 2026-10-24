@@ -1,4 +1,4 @@
-import { encodePathSegment, getAnyOf, isHostOf } from 'trousse'
+import { encodePathSegment, isHostOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -28,8 +28,7 @@ export const canvaResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const [, id, routeWord] = match
-  const route = getAnyOf(routeWord, ['view', 'watch'])
+  const [, id, route] = match
 
   return {
     provider: 'canva',

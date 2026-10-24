@@ -1,4 +1,4 @@
-import { getAnyOf, isAnyOf, parseUrl } from 'trousse'
+import { isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { filterUrlQuery, isFileName } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -7,8 +7,7 @@ const provider = 'ourworldindata'
 
 const ourworldindataHosts = ['ourworldindata.org']
 
-// The site serves the route words in lowercase only, and answers 404 to `/GRAPHER/{slug}`, so
-// the route word is minted in lowercase.
+// The site serves the route words in lowercase only, and answers 404 to `/GRAPHER/{slug}`.
 const chartPathRegex = /^\/(grapher|explorers)\/([^/]+)$/i
 
 // See: https://github.com/owid/owid-grapher/blob/master/packages/@ourworldindata/explorer/src/ExplorerConstants.ts.
@@ -52,15 +51,14 @@ const ourworldindataResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const kind = getAnyOf(match[1], ['grapher', 'explorers'])
-  const slug = match[2]
+  const [, kind, slug] = match
 
   // The site serves `/grapher/{slug}.png` and `.svg` beside the chart page.
   if (isFileName(slug)) {
     return
   }
 
-  const isChart = kind === 'grapher'
+  const isChart = isAnyOf(kind, 'grapher')
   const query = filterUrlQuery(parsed, (name) => {
     return !isAnyOf(name, displayParams)
   })
