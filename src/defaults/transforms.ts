@@ -93,6 +93,7 @@ import { unwrapDoublyNestedLists } from '../transforms/dom/unwrapDoublyNestedLis
 import { unwrapDrupalOembedIframes } from '../transforms/dom/unwrapDrupalOembedIframes.js'
 import { unwrapHeadingBold } from '../transforms/dom/unwrapHeadingBold.js'
 import { unwrapNestedCodeWrappers } from '../transforms/dom/unwrapNestedCodeWrappers.js'
+import { unwrapRebelmouseEmbedFrames } from '../transforms/dom/unwrapRebelmouseEmbedFrames.js'
 import { unwrapWpcomWidgetFrames } from '../transforms/dom/unwrapWpcomWidgetFrames.js'
 import { unwrapWrappers } from '../transforms/dom/unwrapWrappers.js'
 import { wrapBareInlineInParagraphs } from '../transforms/dom/wrapBareInlineInParagraphs.js'
@@ -141,6 +142,10 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // Runs before convertWidgets, whose Flash resolvers claim the rebuilt embed and which drops a
   // swf none of them claims.
   unwrapWpcomWidgetFrames,
+
+  // Points a RebelMouse embed frame at the player or tweet it wraps, so the provider resolvers
+  // below see it. Runs before surfaceNoscriptEmbeds, which surfaces only a frame a resolver claims.
+  unwrapRebelmouseEmbedFrames,
 
   // Runs after surfaceParkedMarkup and surfaceTemplateEmbeds, which can surface a lazy iframe, and
   // before every pass that reads an iframe's `src`, convertDatawrapperEmbeds and convertGiphyEmbeds

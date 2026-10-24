@@ -72,6 +72,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `surfaceTemplateEmbeds` | Hoist a video embed out of a lazy-load `<template>` (e.g. Better Core Video Embeds) so it renders in a reader |
 | `unwrapDrupalOembedIframes` | Point a Drupal media oEmbed proxy frame (`/media/oembed?url=`) at the page url it wraps |
 | `unwrapWpcomWidgetFrames` | Rebuild a WordPress.com `wpcomwidgets.com` frame into the Flash `<embed>` it wraps, so a Flash resolver can claim it |
+| `unwrapRebelmouseEmbedFrames` | Point a RebelMouse embed frame (`/res/scraper/embed/`, `/res/community/twitter_embed/`) at the player or tweet it wraps |
 | `surfaceNoscriptEmbeds` | Hoist a video `<iframe>` out of a `<noscript>` lazy-load fallback (e.g. WP Rocket, a3 Lazy Load); ignores non-video noscript iframes like Google Tag Manager |
 | `rebuildEmbedPlusEmbeds` | Rebuild a real `<iframe>` from an "Embed Plus for YouTube" facade (`.epyt-facade[data-facadesrc]`) |
 | `rebuildIframelyEmbeds` | Rebuild an Iframely anchor facade (an empty `a[data-iframely-url]`) into the destination's frame or a plain link |

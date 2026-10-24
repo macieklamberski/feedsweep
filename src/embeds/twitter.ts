@@ -132,12 +132,16 @@ const readContent = (element: Element, anchor: Element | undefined) => {
   }
 }
 
+export const composeTwitterStatusUrl = (handle: string, id: string): string => {
+  return `https://x.com/${handle}/status/${id}`
+}
+
 const composeEmbed = (status: Status, extra: Partial<EmbedResolverResult>): EmbedResolverResult => {
   return {
     provider,
     id: status.id,
     src: `https://platform.twitter.com/embed/Tweet.html${composeQuery({ id: status.id })}`,
-    url: status.handle ? `https://x.com/${status.handle}/status/${status.id}` : undefined,
+    url: status.handle ? composeTwitterStatusUrl(status.handle, status.id) : undefined,
     ...extra,
   }
 }

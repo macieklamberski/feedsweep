@@ -6,7 +6,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const fileExtensionRegex = /\.[a-z]+$/i
 
-const jwplayerHosts = ['jwplayer.com', 'jwplatform.com']
+export const jwplayerHosts = ['jwplayer.com', 'jwplatform.com']
 const libraryHosts = ['jwplatform.com', 'jwpsrv.com']
 
 // `players` is the embed and `previews` its share page, and both serve the same player for the
