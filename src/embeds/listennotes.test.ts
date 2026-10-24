@@ -102,6 +102,20 @@ describe('listennotesResolveEmbed', () => {
 
       expect(listennotesResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read a route word in another case and mint it in lowercase', () => {
+      const value =
+        'https://www.listennotes.com/PODCASTS/nokia-chronicles/david-wood-symbian-psion-XGD3Cq8pn9j/embed/'
+      const expected: EmbedResolverResult = {
+        provider: 'listennotes',
+        id: 'episode/XGD3Cq8pn9j',
+        src: 'https://www.listennotes.com/podcasts/nokia-chronicles/david-wood-symbian-psion-XGD3Cq8pn9j/embed/',
+        url: 'https://www.listennotes.com/podcasts/nokia-chronicles/david-wood-symbian-psion-XGD3Cq8pn9j/',
+        height: 180,
+      }
+
+      expect(listennotesResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -163,13 +177,6 @@ describe('listennotesResolveEmbed', () => {
 
     it('should return undefined for a segment with no short id after a hyphen', () => {
       const value = 'https://www.listennotes.com/podcasts/songexploder/embed/'
-
-      expect(listennotesResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for a route word in another case, which the server answers 404', () => {
-      const value =
-        'https://www.listennotes.com/PODCASTS/nokia-chronicles/david-wood-symbian-psion-XGD3Cq8pn9j/embed/'
 
       expect(listennotesResolveEmbed(value)).toBeUndefined()
     })

@@ -102,6 +102,19 @@ describe('streamableResolveEmbed', () => {
 
       expect(streamableResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read a route word in another case and mint it in lowercase', () => {
+      const value = 'https://streamable.com/E/qun2ij'
+      const expected: EmbedResolverResult = {
+        provider: 'streamable',
+        id: 'qun2ij',
+        src: 'https://streamable.com/e/qun2ij',
+        url: 'https://streamable.com/qun2ij',
+        ratio: '16/9',
+      }
+
+      expect(streamableResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -113,12 +126,6 @@ describe('streamableResolveEmbed', () => {
 
     it('should ignore a file host of the platform', () => {
       const value = 'https://cdn-cf-east.streamable.com/qun2ij'
-
-      expect(streamableResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a route word in another case, which the server does not serve', () => {
-      const value = 'https://streamable.com/E/qun2ij'
 
       expect(streamableResolveEmbed(value)).toBeUndefined()
     })

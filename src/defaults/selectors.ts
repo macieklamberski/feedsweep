@@ -5,14 +5,14 @@ export const defaultNonContentSelectors = [
 
   // The same subscribe form as the wrap below, arriving as Substack's other snippet. The path is
   // anchored so a post embed (`/embed/post/{id}`) is not caught by it.
-  'iframe[src*=".substack.com/"][src$="/embed"]',
+  'iframe[src*=".substack.com/" i][src$="/embed" i]',
   '.wp-block-jetpack-subscriptions', // Jetpack Gutenberg subscribe block.
   '.kg-signup-card', // Ghost (Koenig) signup card.
   '.mc4wp-form', // Mailchimp for WordPress plugin form.
   '.formkit-form', // ConvertKit / Kit subscribe form.
-  'iframe[src*="embeds.beehiiv.com"]', // Beehiiv embed iframe.
+  'iframe[src*="embeds.beehiiv.com" i]', // Beehiiv embed iframe.
   '.jetpack_subscription_widget', // Jetpack legacy sidebar subscribe widget.
-  'form[action*="buttondown.email"]', // Buttondown embed-subscribe form; mentions of the host are nearly all plain links.
+  'form[action*="buttondown.email" i]', // Buttondown embed-subscribe form; mentions of the host are nearly all plain links.
   '.sqs-block-newsletter', // Squarespace newsletter block.
 
   // Bloom (Elegant Themes) optin. The bare `.et_bloom` class does not exist on any element in
@@ -23,7 +23,7 @@ export const defaultNonContentSelectors = [
   '[class*="et_bloom"]',
   '.wpforms-container', // WPForms.
   '[class*="tve-leads"]', // Thrive Leads optin.
-  'form[action*=".list-manage"]:not(:has(img, picture, video, iframe))', // Mailchimp embedded signup form, posting to `{account}.us{n}.list-manage.com`, unless the author put media in it.
+  'form[action*=".list-manage" i]:not(:has(img, picture, video, iframe))', // Mailchimp embedded signup form, posting to `{account}.us{n}.list-manage.com`, unless the author put media in it.
 
   // Rating and voting widgets, whose controls do nothing in a reader and whose count survives as
   // a stray line of text.
@@ -37,8 +37,8 @@ export const defaultNonContentSelectors = [
   // reCAPTCHA challenge frames, the no-script fallback of a comment or contact form. Google
   // serves them under `/recaptcha/` on its own host, where Maps and Calendar frames sit beside
   // them. recaptcha.net, the mirror for regions that block google.com, serves only reCAPTCHA.
-  'iframe[src*="google.com/recaptcha/"]',
-  'iframe[src*="recaptcha.net/"]',
+  'iframe[src*="google.com/recaptcha/" i]',
+  'iframe[src*="recaptcha.net/" i]',
 
   // The reCAPTCHA response box beside the fallback frame in its no-script fallback.
   'noscript textarea[name="g-recaptcha-response"]',
@@ -59,14 +59,14 @@ export const defaultNonContentSelectors = [
   // Amazon Associates names its ad unit by route, `/e/cm` on the legacy one and `/widgets/q` on
   // the current, and a dozen regional hosts serve both, so the route carries the discrimination
   // and the host is matched loosely. Neither is tag-qualified: both arrive on every carrier.
-  '[src*="amazon"][src*="/e/cm"]',
-  '[src*="amazon"][src*="/widgets/q"]',
-  'object[data*="amazon"][data*="/widgets/q"]',
-  'iframe[src*="ad.duga.jp/"]', // DUGA affiliate banner frame.
+  '[src*="amazon" i][src*="/e/cm" i]',
+  '[src*="amazon" i][src*="/widgets/q" i]',
+  'object[data*="amazon" i][data*="/widgets/q" i]',
+  'iframe[src*="ad.duga.jp/" i]', // DUGA affiliate banner frame.
 
   // ShopSense product grid. Its loader survives where a wrapper held it, so both carriers go.
-  'iframe[src*="shopsensewidget.shopstyle.com"]',
-  'script[src*="shopsensewidget.shopstyle.com"]',
+  'iframe[src*="shopsensewidget.shopstyle.com" i]',
+  'script[src*="shopsensewidget.shopstyle.com" i]',
 
   // Tracking beacons, which render nothing at all.
   'amp-pixel', // AMP tracking pixel.
@@ -79,9 +79,9 @@ export const defaultNonContentSelectors = [
   // author-authored buttons too (donation links, "Read <post title>"), and Elementor emits the
   // same button-wrapper class, so the platform action in the href is what is matched rather than
   // the component or the class.
-  '[data-component-name="ButtonCreateButton"]:has(> a[href*="/subscribe"])',
-  '[data-component-name="ButtonCreateButton"]:has(> a[href*="/comments"])',
-  '[data-component-name="ButtonCreateButton"]:has(> a[href*="action=share"])',
+  '[data-component-name="ButtonCreateButton"]:has(> a[href*="/subscribe" i])',
+  '[data-component-name="ButtonCreateButton"]:has(> a[href*="/comments" i])',
+  '[data-component-name="ButtonCreateButton"]:has(> a[href*="action=share" i])',
   '[class*="social-share"]', // Generic social-share button cluster.
   '[class*="share-buttons"]', // Generic social-share button cluster.
   '.sharethis-inline-share-buttons', // ShareThis inline share buttons.
@@ -100,7 +100,7 @@ export const defaultNonContentSelectors = [
   // The rendered form of the same button, and of the follow button and the share counter beside
   // it. Every class the corpus puts on one of these frames names a button, so the path is the
   // whole platform's button namespace; the player lives under `/embed/` and is untouched.
-  'iframe[src*="platform.twitter.com/widgets/"]',
+  'iframe[src*="platform.twitter.com/widgets/" i]',
 
   // Drupal Easy Social. The widget is chrome, but the pipeline cannot tell, so its Facebook
   // Like iframe becomes an embed placeholder card and the chrome is promoted to content.
@@ -113,7 +113,7 @@ export const defaultNonContentSelectors = [
   // The Like button pasted on its own, a 25 pixel iframe that would otherwise reach the reader
   // as a click-to-play placeholder for a button. Matched in both spellings for the same reason
   // as the plugins below.
-  'iframe:is([src*="facebook.com/plugins/like.php"], [src*="facebook.com/v"][src*="/plugins/like.php"])',
+  'iframe:is([src*="facebook.com/plugins/like.php" i], [src*="facebook.com/v" i][src*="/plugins/like.php" i])',
 
   // The rest of the plugin namespace that is chrome rather than a post: the Page box in both its
   // spellings, and the Share button. The resolver already refuses each of these as an embed, and
@@ -124,9 +124,9 @@ export const defaultNonContentSelectors = [
   // the file (`facebook.com/v2.3/plugins/page.php`), which a generator can write and which still
   // serves. The host is anchored to the path so a WordPress plugin file of the same name, with
   // facebook.com somewhere in its query, stays.
-  'iframe:is([src*="facebook.com/plugins/page.php"], [src*="facebook.com/v"][src*="/plugins/page.php"])',
-  'iframe:is([src*="facebook.com/plugins/likebox.php"], [src*="facebook.com/v"][src*="/plugins/likebox.php"])',
-  'iframe:is([src*="facebook.com/plugins/share_button.php"], [src*="facebook.com/v"][src*="/plugins/share_button.php"])',
+  'iframe:is([src*="facebook.com/plugins/page.php" i], [src*="facebook.com/v" i][src*="/plugins/page.php" i])',
+  'iframe:is([src*="facebook.com/plugins/likebox.php" i], [src*="facebook.com/v" i][src*="/plugins/likebox.php" i])',
+  'iframe:is([src*="facebook.com/plugins/share_button.php" i], [src*="facebook.com/v" i][src*="/plugins/share_button.php" i])',
   '.a2a_kit', // AddToAny share icons (higher-prevalence marker than the wrapper).
   '[class*="addthis_"]', // AddThis share toolbox.
   '.shareaholic-canvas', // Shareaholic share/related widget.
@@ -161,13 +161,13 @@ export const defaultNonContentSelectors = [
   '.swp_social_panel', // Social Warfare share panel.
   'div.ya-share2', // Yandex share2 button row, whose data-image otherwise arrives as content.
   'div.zemanta-pixie', // Zemanta "Reblog this post" badge: a dead attribution link and its pixel.
-  'a[href*="digg.com/submit"]', // Digg submit button, and the badge image nested inside it.
-  'img[src*="digg.com/img/badges"]', // The same badge pasted without its anchor.
-  'iframe[src*="plusone.google.com"]', // Google+ +1 button, whose endpoint closed with the service.
-  'iframe[src*="tunein.com/embed/follow/"]', // TuneIn follow button for a station or a show.
-  'iframe[src*="youtube.com/subscribe_embed"]', // YouTube subscribe button, as its loader writes it.
-  'iframe[src*="youtube.com/subscribe_widget"]', // YouTube subscribe button, its retired route.
-  'img[src*="w.sharethis.com/"]', // ShareThis chicklet icons, the button row's pre-widget form.
+  'a[href*="digg.com/submit" i]', // Digg submit button, and the badge image nested inside it.
+  'img[src*="digg.com/img/badges" i]', // The same badge pasted without its anchor.
+  'iframe[src*="plusone.google.com" i]', // Google+ +1 button, whose endpoint closed with the service.
+  'iframe[src*="tunein.com/embed/follow/" i]', // TuneIn follow button for a station or a show.
+  'iframe[src*="youtube.com/subscribe_embed" i]', // YouTube subscribe button, as its loader writes it.
+  'iframe[src*="youtube.com/subscribe_widget" i]', // YouTube subscribe button, its retired route.
+  'img[src*="w.sharethis.com/" i]', // ShareThis chicklet icons, the button row's pre-widget form.
 
   // Hatena Bookmark's add button. A bookmark comment carries an author's real text on a
   // blockquote of its own, so neither entry is widened to the class prefix.
@@ -178,8 +178,8 @@ export const defaultNonContentSelectors = [
   // Flag Counter's counter image and the link around it, matched on the counter's routes. The
   // same host serves the flag icons and the logo that a post listing its visitors or reviewing
   // the service carries.
-  'img:is([src*="flagcounter.com/count"], [src*="flagcounter.com/mini/"], [src*="flagcounter.com/map/"])',
-  'a[href*="flagcounter.com/"]:has(img:is([src*="flagcounter.com/count"], [src*="flagcounter.com/mini/"], [src*="flagcounter.com/map/"]))',
+  'img:is([src*="flagcounter.com/count" i], [src*="flagcounter.com/mini/" i], [src*="flagcounter.com/map/" i])',
+  'a[href*="flagcounter.com/" i]:has(img:is([src*="flagcounter.com/count" i], [src*="flagcounter.com/mini/" i], [src*="flagcounter.com/map/" i]))',
 
   // Related-posts widgets.
   '.yarpp-related', // YARPP related-posts widget (WordPress).
@@ -200,7 +200,7 @@ export const defaultNonContentSelectors = [
   '.fb-comments', // Facebook Comments.
 
   // Comment form frames, which take a reply on the publisher's site and show nothing else.
-  'iframe[src*="jetpack.wordpress.com/jetpack-comment/"]', // Jetpack Comments.
+  'iframe[src*="jetpack.wordpress.com/jetpack-comment/" i]', // Jetpack Comments.
 
   // Breadcrumb trails, carried into the item by themes that put the page hero into the content
   // field. Gated on a navigation element or a plugin class, because the bare word also names
@@ -241,19 +241,19 @@ export const defaultNonContentSelectors = [
 
   // The card's "Enter Giveaway" button, which publishers also paste on its own beside the cover
   // and title they copied out of the card.
-  'a.goodreadsGiveawayWidgetEnterLink[href*="goodreads.com/giveaway/"]',
+  'a.goodreadsGiveawayWidgetEnterLink[href*="goodreads.com/giveaway/" i]',
 
   // Ticketing and payment widgets, which are chrome around a transaction rather than anything
   // the item is about.
-  'iframe[src*="eventbrite."][src*="/tickets-external"]', // Eventbrite checkout frame.
-  'iframe[src*="eventbrite."][src*="/countdown-widget"]', // Eventbrite countdown widget.
-  'form[action*="paypal.com/cgi-bin/webscr"]', // PayPal buy, cart or subscribe form, or a donate form naming no button.
-  'img[src*="paypal.com/"][src*="/i/btn/"]:not(a img)', // The PayPal button image pasted without its form.
+  'iframe[src*="eventbrite." i][src*="/tickets-external" i]', // Eventbrite checkout frame.
+  'iframe[src*="eventbrite." i][src*="/countdown-widget" i]', // Eventbrite countdown widget.
+  'form[action*="paypal.com/cgi-bin/webscr" i]', // PayPal buy, cart or subscribe form, or a donate form naming no button.
+  'img[src*="paypal.com/" i][src*="/i/btn/" i]:not(a img)', // The PayPal button image pasted without its form.
   'form.edd_download_purchase_form', // Easy Digital Downloads buy button and price.
 
   // Affiliate booking widgets, which render a map or a form to sell the reader a stay or a
   // ticket and carry none of the post.
-  'iframe[src*="stay22.com/embed"]', // Stay22 hotel map.
+  'iframe[src*="stay22.com/embed" i]', // Stay22 hotel map.
 
   // GetYourGuide activity and availability widgets. The mount is an empty paragraph or div the
   // partner script fills, or one holding only a "Powered by GetYourGuide" credit anchor.
@@ -268,12 +268,12 @@ export const defaultNonContentSelectors = [
 
   // Zeno.FM's widget snippet writes a link to the Zeno home page right after the player. Matched
   // on that position and href only, since publishers rewrite its text.
-  'iframe[src*="zeno.fm/player/"] + a:is([href$="//zeno.fm/"], [href$="//www.zeno.fm/"], [href$="//www.zeno.fm"], [href$="//www.zenomedia.com/"])',
+  'iframe[src*="zeno.fm/player/" i] + a:is([href$="//zeno.fm/" i], [href$="//www.zeno.fm/" i], [href$="//www.zeno.fm" i], [href$="//www.zenomedia.com/" i])',
   '.image-link-expand', // Substack restack/zoom buttons next to images.
   'drupal-render-placeholder', // Drupal lazy-render markers for comments/forms/flag widgets.
   '.mcnPreviewText', // Mailchimp hidden email preheader text.
   '.tmblr-alt-text-helper', // Tumblr badge rendering a stray "ALT" beside an image that keeps its own alt attribute.
-  'img[src*="steamcommunity.com"][src*="placeholder"]', // Steam news static poster gif shown before its JS swaps in the YouTube iframe.
+  'img[src*="steamcommunity.com" i][src*="placeholder" i]', // Steam news static poster gif shown before its JS swaps in the YouTube iframe.
 
   // uCoz spoiler toggle with no title, reading "Open spoiler" over text that is already revealed.
   // A titled one reads `[+] Title` and becomes its title in convertUcozSpoilerButtons.

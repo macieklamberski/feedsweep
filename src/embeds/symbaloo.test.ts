@@ -81,6 +81,30 @@ describe('symbalooResolveEmbed', () => {
 
       expect(symbalooResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the embed route in uppercase and mint it in lowercase', () => {
+      const value = 'https://www.symbaloo.com/EMBED/tic-tacbasicos-edu'
+      const expected: EmbedResolverResult = {
+        provider: 'symbaloo',
+        id: 'tic-tacbasicos-edu',
+        src: 'https://www.symbaloo.com/embed/tic-tacbasicos-edu',
+        url: 'https://www.symbaloo.com/mix/tic-tacbasicos-edu',
+        height: 500,
+      }
+
+      expect(symbalooResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the shared route word in uppercase and mint it in lowercase', () => {
+      const value = 'https://www.symbaloo.com/embed/SHARED/AAAAAtohsPUAA41_HDPALA=='
+      const expected: EmbedResolverResult = {
+        provider: 'symbaloo',
+        src: 'https://www.symbaloo.com/embed/shared/AAAAAtohsPUAA41_HDPALA==',
+        height: 500,
+      }
+
+      expect(symbalooResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -102,20 +126,8 @@ describe('symbalooResolveEmbed', () => {
       expect(symbalooResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore the embed route in uppercase', () => {
-      const value = 'https://www.symbaloo.com/EMBED/tic-tacbasicos-edu'
-
-      expect(symbalooResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a trailing segment after a published webmix', () => {
       const value = 'https://www.symbaloo.com/embed/tic-tacbasicos-edu/extra'
-
-      expect(symbalooResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore the shared route word in uppercase', () => {
-      const value = 'https://www.symbaloo.com/embed/SHARED/AAAAAtohsPUAA41_HDPALA=='
 
       expect(symbalooResolveEmbed(value)).toBeUndefined()
     })

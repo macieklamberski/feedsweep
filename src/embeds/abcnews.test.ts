@@ -44,6 +44,19 @@ describe('abcnewsResolveEmbed', () => {
 
       expect(abcnewsResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the id under an uppercase name and mint it in lowercase', () => {
+      const value = 'https://abcnews.com/video/embed?ID=39415146'
+      const expected: EmbedResolverResult = {
+        provider: 'abcnews',
+        id: '39415146',
+        src: 'https://abcnews.com/video/embed?id=39415146',
+        url: 'https://abcnews.com/video/39415146',
+        ratio: '16/9',
+      }
+
+      expect(abcnewsResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -67,12 +80,6 @@ describe('abcnewsResolveEmbed', () => {
 
     it('should return undefined for a segment after the route', () => {
       const value = 'https://abcnews.go.com/video/embed/clip?id=39415146'
-
-      expect(abcnewsResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for an id under an uppercase name, which the player answers 404', () => {
-      const value = 'https://abcnews.com/video/embed?ID=39415146'
 
       expect(abcnewsResolveEmbed(value)).toBeUndefined()
     })

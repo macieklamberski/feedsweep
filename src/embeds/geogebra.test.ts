@@ -112,6 +112,32 @@ describe('geogebraResolveEmbed', () => {
 
       expect(geogebraResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the material iframe route words in another case and mint them in lowercase', () => {
+      const value = 'https://www.geogebra.org/material/IFRAME/id/yqZMrWXI'
+      const expected: EmbedResolverResult = {
+        provider: 'geogebra',
+        id: 'yqZMrWXI',
+        src: 'https://www.geogebra.org/material/iframe/id/yqZMrWXI',
+        url: 'https://www.geogebra.org/m/yqZMrWXI',
+        ratio: '4/3',
+      }
+
+      expect(geogebraResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the Classic app route word in another case', () => {
+      const value = 'https://www.geogebra.org/CLASSIC/gjencrn6?embed'
+      const expected: EmbedResolverResult = {
+        provider: 'geogebra',
+        id: 'gjencrn6',
+        src: 'https://www.geogebra.org/material/iframe/id/gjencrn6',
+        url: 'https://www.geogebra.org/m/gjencrn6',
+        ratio: '4/3',
+      }
+
+      expect(geogebraResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -129,18 +155,6 @@ describe('geogebraResolveEmbed', () => {
 
     it('should ignore the material iframe with its options before the id', () => {
       const value = 'https://www.geogebra.org/material/iframe/width/500/id/yqZMrWXI'
-
-      expect(geogebraResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore the material iframe route words in another case', () => {
-      const value = 'https://www.geogebra.org/material/IFRAME/id/yqZMrWXI'
-
-      expect(geogebraResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore the Classic app route word in another case', () => {
-      const value = 'https://www.geogebra.org/CLASSIC/gjencrn6?embed'
 
       expect(geogebraResolveEmbed(value)).toBeUndefined()
     })
