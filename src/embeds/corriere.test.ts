@@ -180,6 +180,13 @@ describeForEachParser('corriereEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should leave the regional host alone', async () => {
+      const value =
+        '<iframe src="https://video.corrieredelmezzogiorno.corriere.it/video-embed/68cff9f4-e814-11e4-a298-5bf537ea878f"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a Flash file outside the widget players', async () => {
       const value = html`
         <embed

@@ -221,6 +221,13 @@ describeForEachParser('guardianEmbedResolver', (parseHtml) => {
 
     expect(await extract(value)).toBeUndefined()
   })
+
+  it('should ignore the player path on the www host', async () => {
+    const value =
+      '<iframe src="https://www.theguardian.com/embed/video/world/video/2015/sep/21/viola-davis-speech-2015-emmys-video"></iframe>'
+
+    expect(await extract(value)).toBeUndefined()
+  })
 })
 
 describeForEachParser('guardianFlashEmbedResolver', (parseHtml) => {
