@@ -52,7 +52,7 @@ describeForEachParser('unwrapWpcomWidgetFrames', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should drop the Gigya tracking keys from the flashvars', async () => {
+  it('should keep the flashvars as written', async () => {
     const value = html`
       <iframe
         frameborder="0"
@@ -62,28 +62,9 @@ describeForEachParser('unwrapWpcomWidgetFrames', (parseHtml) => {
     const expected = html`
       <embed
         src="http://static.example.com/express/embed/pxplayer.swf"
-        flashvars="uid=home_760b194c93794e5998b9fcda08dd31b1&amp;gid=83bf91d3dbe0497a9a445036475ae62e"
+        flashvars="uid=home_760b194c93794e5998b9fcda08dd31b1&amp;gid=83bf91d3dbe0497a9a445036475ae62e&amp;gig_lt=1250952913867&amp;gig_pt=1250952954089&amp;gig_g=2&amp;gig_n=wordpress"
         width="320"
         height="260"
-        type="application/x-shockwave-flash"
-      >
-    `
-
-    expect(await transform(value)).toEqualHtml(expected)
-  })
-
-  it('should leave out flashvars holding only the Gigya tracking keys', async () => {
-    const value = html`
-      <iframe
-        frameborder="0"
-        src="https://wpcomwidgets.com/?width=425&#038;height=355&#038;src=http%3A%2F%2Fstatic.example.com%2Fswf%2Fssplayer2.swf%3Fdoc%3Dmataciliar-101209103913-phpapp02&#038;quality=high&#038;flashvars=gig_lt%3D1291935491892%26gig_pt%3D1291935561012%26gig_g%3D1%26gig_n%3Dwordpress&#038;_tag=gigya&#038;_hash=80346ad3e512b4b3fdb93ec74ad98bc2"
-      ></iframe>
-    `
-    const expected = html`
-      <embed
-        src="http://static.example.com/swf/ssplayer2.swf?doc=mataciliar-101209103913-phpapp02"
-        width="425"
-        height="355"
         type="application/x-shockwave-flash"
       >
     `
@@ -193,6 +174,16 @@ describeForEachParser('unwrapWpcomWidgetFrames through the pipeline', (parseHtml
       ></div>
       <p>View more <a href="http://www.slideshare.net/">documents</a> from <a href="http://www.slideshare.net/redmuseoschlima">redmuseoschlima</a></p>
     `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should frame the inner url when it is not a swf', async () => {
+    const value = html`
+      <iframe src="https://wpcomwidgets.com/?src=http%3A%2F%2Fvideo.rutube.ru%2Fc7cadcdf05ecd5edb6b22745663ab1db&#038;_tag=gigya"></iframe>
+    `
+    const expected =
+      '<div data-embed-src="http://video.rutube.ru/c7cadcdf05ecd5edb6b22745663ab1db"></div>'
 
     expect(await convert(value)).toEqualHtml(expected)
   })

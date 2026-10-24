@@ -23,12 +23,7 @@ export const unwrapWpcomWidgetFrames: DomTransform = () => {
         continue
       }
 
-      // Gigya's `gig_*` tracking keys ride on the player's own flashvars. The other pairs are kept
-      // as written, escaping included.
-      const flashvars = (query.get('flashvars') ?? '')
-        .split('&')
-        .filter((pair) => !pair.startsWith('gig_'))
-        .join('&')
+      const flashvars = query.get('flashvars')
       const attributes = {
         src,
         flashvars,
