@@ -42,24 +42,28 @@ const composeJwplayerEmbed = (id: string, isPlaylist = false): EmbedResolverResu
   }
 }
 
-export const jwplayerResolveEmbed: ResolveEmbed = (url, element) => {
+// A player id picks the publisher's saved player, whose config decides ads and autostart. An empty
+// one answers 404, so the default player stands in.
+const composePlayerEmbed = (mediaId: string, playerId?: string): EmbedResolverResult => {
+  const result = composeJwplayerEmbed(mediaId)
+
+  if (!playerId) {
+    return result
+  }
+
+  return { ...result, src: `https://cdn.jwplayer.com/players/${mediaId}-${playerId}.html` }
+}
+
+export const jwplayerResolveEmbed: ResolveEmbed = (url) => {
   const mediaId = extractJwplayerId(url)
 
   if (!mediaId) {
     return
   }
 
-  const result = composeJwplayerEmbed(mediaId)
   const fileName = getPathSegments(url).at(-1)?.replace(fileExtensionRegex, '') ?? ''
-  const playerId = fileName.slice(mediaId.length + 1)
 
-  // A frame keeps the publisher's player, whose saved config decides ads and autostart. An empty
-  // player id answers 404, so that frame gets the default player.
-  if (element?.localName !== 'iframe' || !playerId) {
-    return result
-  }
-
-  return { ...result, src: `https://cdn.jwplayer.com/players/${mediaId}-${playerId}.html` }
+  return composePlayerEmbed(mediaId, fileName.slice(mediaId.length + 1))
 }
 
 // A JW Player iframe, players/{mediaId}-{playerId}.html, some with an empty player id that 404s.
@@ -203,7 +207,7 @@ export const jwplayerLibraryEmbedResolver = createMarkupEmbedResolver(
 
 // JW's WordPress plugins name the mount `jwplayer_{mediaId}_{playerId}_div`, with a counter before
 // `_div` on Future plc's lazy mount.
-const mountIdRegex = /^jwplayer_([^_]+)_[^_]+(?:_\d+)?_div$/
+const mountIdRegex = /^jwplayer_(?<mediaId>[^_]+)_(?<playerId>[^_]+)(?:_\d+)?_div$/
 
 // A JW mount with no script left beside it: Future plc's lazy `data-key` mount, or a mount copied
 // after the player ran. A mount that holds text keeps it.
@@ -214,14 +218,15 @@ export const jwplayerMountEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    // The mount id comes out of its attribute decoded, and the media id in it goes into a path.
-    const mediaId = encodePathSegment(element.id.match(mountIdRegex)?.[1] ?? '')
+    // The mount id comes out of its attribute decoded, and both ids in it go into a path.
+    const ids = element.id.match(mountIdRegex)?.groups
+    const mediaId = encodePathSegment(ids?.mediaId ?? '')
 
     if (!mediaId) {
       return
     }
 
-    return composeJwplayerEmbed(mediaId)
+    return composePlayerEmbed(mediaId, encodePathSegment(ids?.playerId ?? ''))
   },
 )
 

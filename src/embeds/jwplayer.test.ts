@@ -91,13 +91,13 @@ describe('extractJwplayerId', () => {
 })
 
 describe('jwplayerResolveEmbed', () => {
-  it('should build the embed with a thumbnail', () => {
-    const value = 'https://cdn.jwplayer.com/players/H4GXr873-abc12345.html'
+  it('should build the embed with the player id and a thumbnail', () => {
+    const value = 'https://cdn.jwplayer.com/players/WhyBTEB0-s7K47A6Z.html'
     const expected: EmbedResolverResult = {
       provider: 'jwplayer',
-      id: 'H4GXr873',
-      src: 'https://cdn.jwplayer.com/players/H4GXr873.html',
-      thumbnail: 'https://cdn.jwplayer.com/v2/media/H4GXr873/poster.jpg',
+      id: 'WhyBTEB0',
+      src: 'https://cdn.jwplayer.com/players/WhyBTEB0-s7K47A6Z.html',
+      thumbnail: 'https://cdn.jwplayer.com/v2/media/WhyBTEB0/poster.jpg',
       ratio: '16/9',
     }
 
@@ -191,18 +191,18 @@ describeForEachParser('jwplayerIframeEmbedResolver', (parseHtml) => {
 describeForEachParser('jwplayerScriptEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, jwplayerScriptEmbedResolver)
 
-  it('should resolve the script embed to the default-player placeholder', async () => {
+  it('should keep the player id the script embed names', async () => {
     const value = html`
       <script
         type="application/javascript"
-        src="https://cdn.jwplayer.com/players/H4GXr873-abc12345.js"
+        src="https://cdn.jwplayer.com/players/3yxeA1jN-owKqLLyJ.js"
       ></script>
     `
     const expected: EmbedResolverResult = {
       provider: 'jwplayer',
-      id: 'H4GXr873',
-      src: 'https://cdn.jwplayer.com/players/H4GXr873.html',
-      thumbnail: 'https://cdn.jwplayer.com/v2/media/H4GXr873/poster.jpg',
+      id: '3yxeA1jN',
+      src: 'https://cdn.jwplayer.com/players/3yxeA1jN-owKqLLyJ.html',
+      thumbnail: 'https://cdn.jwplayer.com/v2/media/3yxeA1jN/poster.jpg',
       ratio: '16/9',
     }
 
@@ -737,7 +737,7 @@ describeForEachParser('jwplayerMountEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, jwplayerMountEmbedResolver)
 
   describe('happy paths', () => {
-    it('should read the media id out of a lazy data-key mount', async () => {
+    it('should read the media and player ids out of a lazy data-key mount', async () => {
       const value = html`
         <div
           data-player="fuSXM6PS"
@@ -750,7 +750,7 @@ describeForEachParser('jwplayerMountEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'jwplayer',
         id: '0DG8htfR',
-        src: 'https://cdn.jwplayer.com/players/0DG8htfR.html',
+        src: 'https://cdn.jwplayer.com/players/0DG8htfR-fuSXM6PS.html',
         thumbnail: 'https://cdn.jwplayer.com/v2/media/0DG8htfR/poster.jpg',
         ratio: '16/9',
       }
@@ -768,7 +768,7 @@ describeForEachParser('jwplayerMountEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'jwplayer',
         id: '0DG8%2FhtfR',
-        src: 'https://cdn.jwplayer.com/players/0DG8%2FhtfR.html',
+        src: 'https://cdn.jwplayer.com/players/0DG8%2FhtfR-fuSXM6PS.html',
         thumbnail: 'https://cdn.jwplayer.com/v2/media/0DG8%2FhtfR/poster.jpg',
         ratio: '16/9',
       }
@@ -776,7 +776,25 @@ describeForEachParser('jwplayerMountEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should read the media id out of a mount copied after the player ran', async () => {
+    it('should keep a mount player id holding a slash inside one path segment', async () => {
+      const value = html`
+        <div
+          class="jwplayer"
+          id="jwplayer_0DG8htfR_fuSX/M6PS_20_div"
+        ></div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jwplayer',
+        id: '0DG8htfR',
+        src: 'https://cdn.jwplayer.com/players/0DG8htfR-fuSX%2FM6PS.html',
+        thumbnail: 'https://cdn.jwplayer.com/v2/media/0DG8htfR/poster.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the media and player ids out of a mount copied after the player ran', async () => {
       const value = html`
         <div id="jwplayer_XtkmEUkk_mFslriqe_div" class="jwplayer jw-reset jw-state-paused jw-stretch-uniform jw-breakpoint-4" role="application" aria-label="Video Player">
           <div class="jw-aspect jw-reset"></div>
@@ -785,7 +803,7 @@ describeForEachParser('jwplayerMountEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'jwplayer',
         id: 'XtkmEUkk',
-        src: 'https://cdn.jwplayer.com/players/XtkmEUkk.html',
+        src: 'https://cdn.jwplayer.com/players/XtkmEUkk-mFslriqe.html',
         thumbnail: 'https://cdn.jwplayer.com/v2/media/XtkmEUkk/poster.jpg',
         ratio: '16/9',
       }
@@ -1000,7 +1018,7 @@ describeForEachParser('jwplayerMountEmbedResolver through the pipeline', (parseH
     const expected = html`
       <div
         data-embed-thumbnail="https://cdn.jwplayer.com/v2/media/0DG8htfR/poster.jpg"
-        data-embed-src="https://cdn.jwplayer.com/players/0DG8htfR.html"
+        data-embed-src="https://cdn.jwplayer.com/players/0DG8htfR-fuSXM6PS.html"
         data-embed-ratio="16/9"
         data-embed-provider="jwplayer"
         data-embed-id="0DG8htfR"
