@@ -449,7 +449,7 @@ describeForEachParser('pbsFlashEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, pbsFlashEmbedResolver)
 
   describe('happy paths', () => {
-    it('should repair the Flash player onto the viral player and keep its end', async () => {
+    it('should repair the Flash player onto the viral player', async () => {
       const value = html`
         <embed
           src="http://www-tc.pbs.org/video/media/swf/PBSPlayer.swf"
@@ -462,7 +462,26 @@ describeForEachParser('pbsFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pbs',
         id: 'viralplayer/2155877110',
-        src: 'https://player.pbs.org/viralplayer/2155877110/?end=0',
+        src: 'https://player.pbs.org/viralplayer/2155877110/',
+        ratio: '16/9',
+        ratioHeightOffset: 40,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a nonzero start and end from the flashvars', async () => {
+      const value = html`
+        <embed
+          src="http://www-tc.pbs.org/video/media/swf/PBSPlayer.swf"
+          flashvars="video=2079469075&player=viral&start=30&end=36"
+          type="application/x-shockwave-flash"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'pbs',
+        id: 'viralplayer/2079469075',
+        src: 'https://player.pbs.org/viralplayer/2079469075/?start=30&end=36',
         ratio: '16/9',
         ratioHeightOffset: 40,
       }
@@ -483,7 +502,7 @@ describeForEachParser('pbsFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pbs',
         id: 'viralplayer/2245886699',
-        src: 'https://player.pbs.org/viralplayer/2245886699/?end=0',
+        src: 'https://player.pbs.org/viralplayer/2245886699/',
         ratio: '16/9',
         ratioHeightOffset: 40,
       }
@@ -506,7 +525,7 @@ describeForEachParser('pbsFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pbs',
         id: 'viralplayer/2104663380',
-        src: 'https://player.pbs.org/viralplayer/2104663380/?end=0',
+        src: 'https://player.pbs.org/viralplayer/2104663380/',
         ratio: '16/9',
         ratioHeightOffset: 40,
       }
@@ -568,7 +587,7 @@ describeForEachParser('pbsFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'pbs',
         id: 'partnerplayer/4NNV3qAO5mfQ_x-7ruXhEw==',
-        src: 'https://player.pbs.org/partnerplayer/4NNV3qAO5mfQ_x-7ruXhEw==/?start=0&end=0',
+        src: 'https://player.pbs.org/partnerplayer/4NNV3qAO5mfQ_x-7ruXhEw==/',
         ratio: '16/9',
       }
 
