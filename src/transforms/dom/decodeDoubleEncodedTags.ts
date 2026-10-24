@@ -1,5 +1,5 @@
 import type { DomTransform } from '../../types.js'
-import { hasAncestorWithTagName, isText, NodeFilter } from '../../utils/dom.js'
+import { hasAncestorWithTagName, isText, NodeFilter, setInnerHtml } from '../../utils/dom.js'
 import { isEscapedHtmlFragment } from '../../utils/html.js'
 
 // Real elements whose entity-escaped contents are intentional text (a tutorial showing
@@ -42,7 +42,7 @@ export const decodeDoubleEncodedTags: DomTransform = () => {
         tempDiv = document.createElement('div')
       }
 
-      tempDiv.innerHTML = node.data
+      setInnerHtml(tempDiv, node.data)
 
       // An escaped <pre> or <code> is a code sample, so the tags inside it are meant as text.
       for (const element of tempDiv.querySelectorAll('code')) {

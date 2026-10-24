@@ -21,6 +21,7 @@ import {
   parsePixelSize,
   parseRatio,
   removeWithEmptyWrappers,
+  setInnerHtml,
   text,
   textNode,
   walkElements,
@@ -1090,6 +1091,32 @@ describeForEachParser('isEmptyElement', (parseHtml) => {
     const element = queryElement(document, 'div')
 
     expect(isEmptyElement(element)).toBe(false)
+  })
+})
+
+describeForEachParser('setInnerHtml', (parseHtml) => {
+  it('should parse markup that follows a doctype', () => {
+    const element = parseHtml('').createElement('div')
+    setInnerHtml(element, '<!DOCTYPE html>\n<p>Kosakata alat kesehatan.</p>')
+
+    expect(element.querySelector('p')?.textContent).toBe('Kosakata alat kesehatan.')
+  })
+
+  it('should parse markup that follows a lowercase doctype', () => {
+    const element = parseHtml('').createElement('div')
+    setInnerHtml(element, '<!doctype html>\n<p>Kosakata alat kesehatan.</p>')
+
+    expect(element.querySelector('p')?.textContent).toBe('Kosakata alat kesehatan.')
+  })
+
+  it('should parse markup that follows a doctype with a public identifier', () => {
+    const element = parseHtml('').createElement('div')
+    setInnerHtml(
+      element,
+      '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n<p>Kosakata alat kesehatan.</p>',
+    )
+
+    expect(element.querySelector('p')?.textContent).toBe('Kosakata alat kesehatan.')
   })
 })
 

@@ -1,6 +1,6 @@
 import { getQueryParam, isAnyOf, isHostOrSubdomainOf, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, find, jsonAttr, text } from '../utils/dom.js'
+import { attr, find, jsonAttr, setInnerHtml, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
 import {
@@ -191,7 +191,7 @@ const readTweetText = (element: Element, fullText: string | undefined): string |
   }
 
   const container = element.ownerDocument.createElement('div')
-  container.innerHTML = fullText
+  setInnerHtml(container, fullText)
 
   return text(container)
 }
