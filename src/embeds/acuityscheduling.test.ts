@@ -150,6 +150,13 @@ describeForEachParser('acuityschedulingEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+
+    it('should ignore the scheduler path on another subdomain', async () => {
+      const value =
+        '<iframe src="https://embed.acuityscheduling.com/schedule.php?owner=14276092"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 })
 

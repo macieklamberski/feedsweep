@@ -156,4 +156,18 @@ describeForEachParser('cnbcIframeEmbedResolver', (parseHtml) => {
 
     expect(await extract(value)).toBeUndefined()
   })
+
+  it('should ignore the player path on another cnbc.com host', async () => {
+    const value =
+      '<iframe src="https://www.cnbc.com/p/gZWlPC/cnbc_global?playertype=synd&amp;byGuid=7000344703"></iframe>'
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
+  it('should ignore the Flash-era player on the other host', async () => {
+    const value =
+      '<iframe src="http://plus.cnbc.com/rssvideosearch/action/player/id/3000025230/code/cnbcplayershare"></iframe>'
+
+    expect(await extract(value)).toBeUndefined()
+  })
 })

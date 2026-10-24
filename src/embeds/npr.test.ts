@@ -432,6 +432,13 @@ describeForEachParser('nprIframeEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+
+    it('should ignore the player path on the file host', async () => {
+      const value =
+        '<iframe src="https://ondemand.npr.org/player/embed/550179668/551339989"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 })
 

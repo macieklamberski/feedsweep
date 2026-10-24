@@ -192,6 +192,12 @@ describeForEachParser('canaluEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+
+    it('should ignore the video host', async () => {
+      const value = '<iframe src="https://vod.canal-u.tv/chaines/ut2j/embed/170208"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 })
 
