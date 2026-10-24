@@ -59,6 +59,19 @@ export const blockElements = new Set([
   'xmp',
 ])
 
+// Elements whose content the HTML parser reads as text, not markup: a parser can keep it as one
+// text node, so a transform writing an element into it writes markup a browser shows as text.
+export const rawTextElements = [
+  'iframe',
+  'noembed',
+  'noframes',
+  'script',
+  'style',
+  'textarea',
+  'title',
+  'xmp',
+]
+
 // The first descendant matching `selector`, or the first one also satisfying `predicate`.
 // The predicate form replaces `Array.from(element.querySelectorAll(…)).find(…)`: it builds
 // no intermediate array and stops at the first match.

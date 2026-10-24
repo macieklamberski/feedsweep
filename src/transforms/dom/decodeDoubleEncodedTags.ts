@@ -1,10 +1,17 @@
 import type { DomTransform } from '../../types.js'
-import { hasAncestorWithTagName, isText, NodeFilter, setInnerHtml } from '../../utils/dom.js'
+import {
+  hasAncestorWithTagName,
+  isText,
+  NodeFilter,
+  rawTextElements,
+  setInnerHtml,
+} from '../../utils/dom.js'
 import { isEscapedHtmlFragment } from '../../utils/html.js'
 
 // Real elements whose entity-escaped contents are intentional text (a tutorial showing
-// `<img>`), so their descendants are left untouched.
-const opaqueTags = new Set(['code', 'pre', 'script', 'style', 'textarea', 'noscript'])
+// `<img>`), and raw-text elements a browser never reads as markup, so their descendants are left
+// untouched.
+const opaqueTags = new Set(['code', 'pre', 'noscript', ...rawTextElements])
 
 // A paragraph whose `<p>` pair was escaped while the elements inside it were not, so the two tags
 // arrive as text on either side of them: `<p>&lt;p&gt;The post <a>…</a>.&lt;/p&gt;</p>`.

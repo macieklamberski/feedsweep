@@ -1,7 +1,14 @@
 import type { DomTransform } from '../../types.js'
-import { collectTextNodes, isBlockElement, isBr, isElement, isText } from '../../utils/dom.js'
+import {
+  collectTextNodes,
+  isBlockElement,
+  isBr,
+  isElement,
+  isText,
+  rawTextElements,
+} from '../../utils/dom.js'
 
-const timestampIgnoreTags = new Set(['a', 'pre', 'code', 'kbd', 'samp', 'var', 'script', 'style'])
+const timestampIgnoreTags = new Set(['a', 'pre', 'code', 'kbd', 'samp', 'var', 'noscript'])
 const tableCellTags = ['td', 'th']
 
 // MM:SS or HH:MM:SS, with the seconds always two digits.
@@ -49,8 +56,12 @@ export const parseTimestampSeconds = (timestamp: string): number | undefined => 
 }
 
 const shouldSkipElement = (element: Element): boolean => {
+  const tag = element.tagName.toLowerCase()
+
   return (
-    timestampIgnoreTags.has(element.tagName.toLowerCase()) || element.hasAttribute('data-timestamp')
+    timestampIgnoreTags.has(tag) ||
+    rawTextElements.includes(tag) ||
+    element.hasAttribute('data-timestamp')
   )
 }
 

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
+import { rawTextElements } from '../../utils/dom.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { decodeDoubleEncodedTags } from './decodeDoubleEncodedTags.js'
 
@@ -237,6 +238,27 @@ describeForEachParser('decodeDoubleEncodedTags', (parseHtml) => {
         '<pre><p>&lt;p&gt;The post <a href="https://example.com">Example</a>&lt;/p&gt;</p></pre>'
 
       expect(await transform(value)).toEqualHtml(value)
+    })
+
+    // A parser can keep a raw-text element's content as one text node, and a serializer writes it
+    // back raw, so only the element count shows what the transform wrote.
+    it.each(rawTextElements)('should not decode tags inside %s', async (tag) => {
+      const value = `<${tag}><b>bold</b></${tag}>`
+      const parsedCount = parseHtml(value).querySelectorAll('b').length
+      const document = parseHtml(value)
+
+      await decodeDoubleEncodedTags(baseContext)(document)
+
+      expect(document.querySelectorAll('b')).toHaveLength(parsedCount)
+    })
+
+    it.each(rawTextElements)('should not decode escaped tags inside %s', async (tag) => {
+      const value = `<${tag}>&lt;b&gt;bold&lt;/b&gt;</${tag}>`
+      const document = parseHtml(value)
+
+      await decodeDoubleEncodedTags(baseContext)(document)
+
+      expect(document.querySelectorAll('b')).toHaveLength(0)
     })
   })
 
