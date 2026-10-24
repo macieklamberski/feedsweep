@@ -1,3 +1,4 @@
+import { toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -13,8 +14,8 @@ const playerPathRegex = /^\/embed\/video\/([^/]+\/video\/[^/]+\/[^/]+\/[^/]+\/[^
 // The path dates the video, and the month is the three-letter English abbreviation on every
 // edition. A path states a day and not a moment, so `date` carries the calendar day alone, and
 // a name outside the twelve months leaves it unstated.
-const pathDateRegex = /^[a-z0-9-]+\/video\/(\d{4})\/([a-z]{3})\/(0[1-9]|[12]\d|3[01])\//
-const monthNumbers: Record<string, string | undefined> = {
+const pathDateRegex = /^[a-z0-9-]+\/video\/(\d{4})\/([a-z]+)\/(0[1-9]|[12]\d|3[01])\//
+const monthNumbers = toMap({
   jan: '01',
   feb: '02',
   mar: '03',
@@ -27,7 +28,7 @@ const monthNumbers: Record<string, string | undefined> = {
   oct: '10',
   nov: '11',
   dec: '12',
-}
+})
 
 const readDate = (path: string): string | undefined => {
   const parts = path.match(pathDateRegex)
@@ -36,9 +37,13 @@ const readDate = (path: string): string | undefined => {
     return
   }
 
-  const month = monthNumbers[parts[2]]
+  const month = monthNumbers.get(parts[2])
 
-  return month ? `${parts[1]}-${month}-${parts[3]}` : undefined
+  if (!month) {
+    return
+  }
+
+  return `${parts[1]}-${month}-${parts[3]}`
 }
 
 // Measured 2026-09-07 in a browser at 300, 600 and 900 pixels wide: the `<video>` is 169, 338

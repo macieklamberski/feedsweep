@@ -129,6 +129,34 @@ describe('guardianResolveEmbed', () => {
       expect(guardianResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should state no date for a word that starts like a month', () => {
+      const value =
+        'https://embed.theguardian.com/embed/video/society/video/2015/market/18/superbugs-video'
+      const expected: EmbedResolverResult = {
+        provider: 'guardian',
+        id: 'society/video/2015/market/18/superbugs-video',
+        src: 'https://embed.theguardian.com/embed/video/society/video/2015/market/18/superbugs-video',
+        url: 'https://www.theguardian.com/society/video/2015/market/18/superbugs-video',
+        ratio: '16/9',
+      }
+
+      expect(guardianResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should state no date for a month named after an object key', () => {
+      const value =
+        'https://embed.theguardian.com/embed/video/society/video/2015/constructor/18/superbugs-video'
+      const expected: EmbedResolverResult = {
+        provider: 'guardian',
+        id: 'society/video/2015/constructor/18/superbugs-video',
+        src: 'https://embed.theguardian.com/embed/video/society/video/2015/constructor/18/superbugs-video',
+        url: 'https://www.theguardian.com/society/video/2015/constructor/18/superbugs-video',
+        ratio: '16/9',
+      }
+
+      expect(guardianResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should state no date for a day outside the calendar', () => {
       const value =
         'https://embed.theguardian.com/embed/video/society/video/2015/jun/45/superbugs-video'
