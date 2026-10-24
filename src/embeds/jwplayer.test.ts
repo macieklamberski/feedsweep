@@ -1009,9 +1009,7 @@ describe('isJwplayerReady', () => {
     expect(isJwplayerReady(value)).toBe(false)
   })
 
-  it('should refuse a ready event sent as a string', () => {
-    const value = 'ready'
-
-    expect(isJwplayerReady(value)).toBe(false)
+  it('should refuse a message with no payload', () => {
+    expect(isJwplayerReady(null)).toBe(false)
   })
 })
