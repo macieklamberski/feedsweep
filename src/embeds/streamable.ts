@@ -12,8 +12,8 @@ const streamableHosts = ['streamable.com', 'www.streamable.com']
 // The embed `/e/{id}` and the frame the oEmbed answer writes, `/o/{id}`.
 const embedRoutes = new Set(['e', 'o'])
 
-// The player loops unless `loop=0` turns it off.
-const streamableEmbedParams = ['loop']
+// The player loops unless `loop=0` turns it off, and seeks to `t`, in seconds, once loaded.
+const streamableEmbedParams = ['loop', 't']
 
 const playerRatio = '16/9'
 

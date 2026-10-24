@@ -13,21 +13,21 @@ import {
 describe('extractAudioboomPost', () => {
   it('should read the current player', () => {
     const value = 'https://embeds.audioboom.com/posts/8292430/embed/v4'
-    const expected = { id: '8292430', isCurrent: true }
+    const expected = '8292430'
 
     expect(extractAudioboomPost(value)).toEqual(expected)
   })
 
   it('should read the compact player', () => {
     const value = 'https://embeds.audioboom.com/posts/8292430/embed'
-    const expected = { id: '8292430', isCurrent: false }
+    const expected = '8292430'
 
     expect(extractAudioboomPost(value)).toEqual(expected)
   })
 
   it('should read the pre-rename boos spelling', () => {
     const value = 'https://audioboo.fm/boos/123456/embed'
-    const expected = { id: '123456', isCurrent: false }
+    const expected = '123456'
 
     expect(extractAudioboomPost(value)).toEqual(expected)
   })
@@ -35,14 +35,14 @@ describe('extractAudioboomPost', () => {
   it('should drop the episode slug the share code hangs off the id', () => {
     const value =
       'https://embeds.audioboom.com/posts/6479208-eddie-jones-england-s-forward-power/embed/v4'
-    const expected = { id: '6479208', isCurrent: true }
+    const expected = '6479208'
 
     expect(extractAudioboomPost(value)).toEqual(expected)
   })
 
   it('should drop the episode slug on the pre-rename boos spelling too', () => {
     const value = 'https://audioboo.fm/boos/2682680-joyous-jingles/embed'
-    const expected = { id: '2682680', isCurrent: false }
+    const expected = '2682680'
 
     expect(extractAudioboomPost(value)).toEqual(expected)
   })
@@ -67,7 +67,6 @@ describe('extractAudioboomPost', () => {
 })
 
 describe('audioboomResolveEmbed', () => {
-  // The url names the player version and the version decides the height.
   it('should size the current player at its own height', () => {
     const value = 'https://embeds.audioboom.com/posts/8292430/embed/v4'
     const expected: EmbedResolverResult = {
@@ -80,13 +79,13 @@ describe('audioboomResolveEmbed', () => {
     expect(audioboomResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should size the compact player shorter', () => {
+  it('should rebuild the compact player onto the current one', () => {
     const value = 'https://embeds.audioboom.com/posts/8292430/embed'
     const expected: EmbedResolverResult = {
       provider: 'audioboom',
       id: '8292430',
-      src: 'https://embeds.audioboom.com/posts/8292430/embed',
-      height: 95,
+      src: 'https://embeds.audioboom.com/posts/8292430/embed/v4',
+      height: 300,
     }
 
     expect(audioboomResolveEmbed(value)).toEqual(expected)
@@ -128,8 +127,8 @@ describeForEachParser('audioboomWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'audioboom',
         id: '2158735',
-        src: 'https://embeds.audioboom.com/posts/2158735/embed',
-        height: 95,
+        src: 'https://embeds.audioboom.com/posts/2158735/embed/v4',
+        height: 300,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -198,8 +197,8 @@ describeForEachParser('audioboomFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'audioboom',
         id: '88571',
-        src: 'https://embeds.audioboom.com/posts/88571/embed',
-        height: 95,
+        src: 'https://embeds.audioboom.com/posts/88571/embed/v4',
+        height: 300,
         title: 'Andrew S, tech entrepreneur, Silicon Valley',
         author: 'maaritroiha',
       }
@@ -226,8 +225,8 @@ describeForEachParser('audioboomFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'audioboom',
         id: '695470',
-        src: 'https://embeds.audioboom.com/posts/695470/embed',
-        height: 95,
+        src: 'https://embeds.audioboom.com/posts/695470/embed/v4',
+        height: 300,
         title: '9 Ways to Avoid Being a Victim of a Tax Scam',
         author: 'TechAccountant',
       }
@@ -249,8 +248,8 @@ describeForEachParser('audioboomFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'audioboom',
         id: '1078895',
-        src: 'https://embeds.audioboom.com/posts/1078895/embed',
-        height: 95,
+        src: 'https://embeds.audioboom.com/posts/1078895/embed/v4',
+        height: 300,
         title: 'Test Audioboo',
         author: 'ropofam',
       }
@@ -271,8 +270,8 @@ describeForEachParser('audioboomFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'audioboom',
         id: '1920440',
-        src: 'https://embeds.audioboom.com/posts/1920440/embed',
-        height: 95,
+        src: 'https://embeds.audioboom.com/posts/1920440/embed/v4',
+        height: 300,
         title: 'Audio interview: the regeneration of Tottenham',
         author: 'JSandlerClarke',
       }
@@ -295,8 +294,8 @@ describeForEachParser('audioboomFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'audioboom',
         id: '10535',
-        src: 'https://embeds.audioboom.com/posts/10535/embed',
-        height: 95,
+        src: 'https://embeds.audioboom.com/posts/10535/embed/v4',
+        height: 300,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -314,8 +313,8 @@ describeForEachParser('audioboomFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'audioboom',
         id: '695470',
-        src: 'https://embeds.audioboom.com/posts/695470/embed',
-        height: 95,
+        src: 'https://embeds.audioboom.com/posts/695470/embed/v4',
+        height: 300,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -333,8 +332,8 @@ describeForEachParser('audioboomFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'audioboom',
         id: '695470',
-        src: 'https://embeds.audioboom.com/posts/695470/embed',
-        height: 95,
+        src: 'https://embeds.audioboom.com/posts/695470/embed/v4',
+        height: 300,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -464,8 +463,8 @@ describeForEachParser('audioboom through the pipeline', (parseHtml) => {
       <div
         data-embed-id="88571"
         data-embed-provider="audioboom"
-        data-embed-src="https://embeds.audioboom.com/posts/88571/embed"
-        data-embed-height="95"
+        data-embed-src="https://embeds.audioboom.com/posts/88571/embed/v4"
+        data-embed-height="300"
         data-embed-title="Andrew S, tech entrepreneur, Silicon Valley"
         data-embed-author="maaritroiha"
       ></div>
@@ -482,8 +481,8 @@ describeForEachParser('audioboom through the pipeline', (parseHtml) => {
       <div
         data-embed-id="1078557"
         data-embed-provider="audioboom"
-        data-embed-src="https://embeds.audioboom.com/posts/1078557/embed"
-        data-embed-height="95"
+        data-embed-src="https://embeds.audioboom.com/posts/1078557/embed/v4"
+        data-embed-height="300"
         data-embed-title="La minute gourmande du 27 novembre : la faim, on peut la convoquer !"
         data-embed-author="ArianeGrumbach"
       ></div>
@@ -583,8 +582,8 @@ describeForEachParser('audioboomIframeEmbedResolver carrier title', (parseHtml) 
     const expected: EmbedResolverResult = {
       provider: 'audioboom',
       id: '8388499',
-      src: 'https://embeds.audioboom.com/posts/8388499/embed',
-      height: 95,
+      src: 'https://embeds.audioboom.com/posts/8388499/embed/v4',
+      height: 300,
     }
 
     expect(await extract(value)).toEqual(expected)

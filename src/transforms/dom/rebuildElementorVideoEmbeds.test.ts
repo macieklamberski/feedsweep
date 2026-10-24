@@ -100,6 +100,28 @@ describeForEachParser('rebuildElementorVideoEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should keep the hash of an unlisted vimeo video', async () => {
+    const value = html`
+      <div
+        class="elementor-widget elementor-widget-video"
+        data-settings='{"vimeo_url":"https://vimeo.com/76979871/a52724358e","video_type":"vimeo"}'
+      >
+        <div class="elementor-widget-container">
+          <div class="elementor-video"></div>
+        </div>
+      </div>
+    `
+    const expected = html`
+      <div class="elementor-widget elementor-widget-video">
+        <div class="elementor-widget-container">
+          <iframe src="https://player.vimeo.com/video/76979871?h=a52724358e"></iframe>
+        </div>
+      </div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should rebuild a dailymotion iframe from the widget settings', async () => {
     const value = html`
       <div

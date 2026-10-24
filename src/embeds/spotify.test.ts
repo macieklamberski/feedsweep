@@ -191,6 +191,34 @@ describe('spotifyResolveEmbed', () => {
 
       expect(spotifyResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should keep the start position and drop the generator tag', () => {
+      const value =
+        'https://open.spotify.com/embed/episode/3NWIdbGMrQNgbTSVAGUXTA?utm_source=generator&t=919492'
+      const expected: EmbedResolverResult = {
+        provider: 'spotify',
+        id: 'episode/3NWIdbGMrQNgbTSVAGUXTA',
+        src: 'https://open.spotify.com/embed/episode/3NWIdbGMrQNgbTSVAGUXTA?t=919492',
+        url: 'https://open.spotify.com/episode/3NWIdbGMrQNgbTSVAGUXTA',
+        height: 152,
+      }
+
+      expect(spotifyResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should keep a start position of 0 as written', () => {
+      const value =
+        'https://open.spotify.com/embed/episode/7Mx4tCwxAI8AKXs4c81YyM?utm_source=generator&t=0'
+      const expected: EmbedResolverResult = {
+        provider: 'spotify',
+        id: 'episode/7Mx4tCwxAI8AKXs4c81YyM',
+        src: 'https://open.spotify.com/embed/episode/7Mx4tCwxAI8AKXs4c81YyM?t=0',
+        url: 'https://open.spotify.com/episode/7Mx4tCwxAI8AKXs4c81YyM',
+        height: 152,
+      }
+
+      expect(spotifyResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('edge cases', () => {

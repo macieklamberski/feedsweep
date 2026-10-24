@@ -88,7 +88,24 @@ describeForEachParser('peertubeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should carry over the subtitle track', async () => {
+    it('should carry over the loop', async () => {
+      const value = html`
+        <iframe
+          src="https://tube.funfacts.de/videos/embed/4RnoEXF5EfXb8iZCjnJsx9?loop=1&amp;autoplay=1"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'peertube',
+        id: '4RnoEXF5EfXb8iZCjnJsx9',
+        src: 'https://tube.funfacts.de/videos/embed/4RnoEXF5EfXb8iZCjnJsx9?loop=1',
+        url: 'https://tube.funfacts.de/w/4RnoEXF5EfXb8iZCjnJsx9',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should carry over the subtitle language', async () => {
       const value = html`
         <iframe src="https://tube.funfacts.de/w/4RnoEXF5EfXb8iZCjnJsx9?subtitle=de"></iframe>
       `

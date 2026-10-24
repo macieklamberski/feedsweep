@@ -1,7 +1,7 @@
 import { getPathSegments, getQueryParam, isAnyOf, isPlainObject, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The player is fluid-width and fixed-height: a compact bar for a single item, a taller box for
@@ -65,6 +65,9 @@ const readSubstackItem = (element: Element, type: string): Partial<EmbedResolver
   }
 }
 
+// The start position Spotify's embed generator writes for an episode, in seconds.
+const spotifyEmbedParams = ['t']
+
 // The path both the carrier and the `uri` parameter spell the same way: an optional route prefix,
 // then the ownership form, then the type and id.
 const readPathPair = (url: URL | undefined): [string, string] | undefined => {
@@ -111,7 +114,7 @@ export const spotifyResolveEmbed: ResolveEmbed = (url, element) => {
   return {
     provider,
     id: `${type}/${id}`,
-    src: `https://open.spotify.com/embed/${type}/${id}`,
+    src: `https://open.spotify.com/embed/${type}/${id}${pickUrlParams(url, spotifyEmbedParams)}`,
     url: `https://open.spotify.com/${type}/${id}`,
     thumbnail: card.thumbnail,
     height: spotifyHeights.get(type),

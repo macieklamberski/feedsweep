@@ -251,29 +251,26 @@ export const extractVimeoId = (link: string): string | undefined => {
 
 // The player url every caller that recovers an id has to build. Params are given as values, not
 // as a ready query string, so one carrying an `&` cannot open a parameter of its own. A start
-// offset is not one of them: it travels in the fragment, in Vimeo's `{n}s` form.
+// offset is not one of them: the player reads it from the fragment only.
 export const composeEmbedUrl = (
   videoId: string,
   params?: Record<string, string>,
-  startSeconds?: string,
+  start?: string,
 ): string => {
   const query = composeQuery(params)
-  const start = startSeconds ? `#t=${startSeconds}s` : ''
+  const fragment = start ? `#${new URLSearchParams({ t: start })}` : ''
 
-  return `https://player.vimeo.com/video/${videoId}${query}${start}`
+  return `https://player.vimeo.com/video/${videoId}${query}${fragment}`
 }
 
-// The player url for a caller holding a url nothing has checked: a page builder stores whatever
-// the publisher pasted, so the host is checked here the way the factory checks it for a carrier.
-export const readVimeoEmbedSrc = (link: string): string | undefined => {
-  const url = parseUrlOnHosts(link, vimeoHosts)
-  const videoId = url && extractVimeoId(url.href)
+// Whether the player loops. The start offset is read apart, since it travels in the fragment.
+const vimeoEmbedParams = ['loop']
 
-  return videoId ? composeEmbedUrl(encodePathSegment(videoId)) : undefined
+// The player seeks to `t` in the fragment, `#t=30s`, and ignores a `t` in the query, which a page
+// url shared with a start carries.
+const readStart = (url: URL): string | undefined => {
+  return pickQueryParams(url.hash.slice(1), ['t']).t ?? pickQueryParams(url.search, ['t']).t
 }
-
-// `t` is the start offset, in Vimeo's `{n}s` form.
-const vimeoEmbedParams = ['t']
 
 // The `title` a share snippet writes is usually the video's own title, but sometimes a player
 // label. The labels are not filtered. They are localised into at least five languages and some
@@ -289,23 +286,36 @@ export const vimeoResolveEmbed: ResolveEmbed = (url, element) => {
   // A `clip_id` comes out of the query decoded, and it goes into a path.
   const segment = encodePathSegment(videoId)
   const title = element ? attr(element, 'title') : undefined
+  const parsed = parseUrl(url, placeholderBaseUrl)
   const params = {
     // The player takes the hash only as h=: the /video/{id}/{hash} path spelling is a 404.
     ...trimObject({ h: hash }, Boolean),
-    ...pickQueryParams(parseUrl(url, placeholderBaseUrl)?.search ?? '', vimeoEmbedParams),
+    ...pickQueryParams(parsed?.search ?? '', vimeoEmbedParams),
   }
 
   return {
     provider,
     // The hash travels in the id: an oEmbed lookup for the bare id answers 404.
     id: hash ? `${videoId}:${hash}` : videoId,
-    src: composeEmbedUrl(segment, params),
+    src: composeEmbedUrl(segment, params, parsed ? readStart(parsed) : undefined),
     // Without the hash the page loses its title and its video, so it stays on the url too.
     url: `https://vimeo.com/${segment}${hash ? `/${encodePathSegment(hash)}` : ''}`,
     ratio: playerRatio,
     title,
     // TODO: no thumbnail. Vimeo posters are not derivable from the id and need an oEmbed lookup.
   }
+}
+
+// The player url for a caller holding a url nothing has checked: a page builder stores whatever
+// the publisher pasted, so the host is checked here the way the factory checks it for a carrier.
+export const readVimeoEmbedSrc = (link: string): string | undefined => {
+  const url = parseUrlOnHosts(link, vimeoHosts)
+
+  if (!url) {
+    return
+  }
+
+  return vimeoResolveEmbed(url.href)?.src
 }
 
 // A Vimeo player iframe, a frame of a video, showcase or event page, or the Flash moogaloop player.

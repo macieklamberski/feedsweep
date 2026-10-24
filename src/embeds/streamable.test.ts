@@ -161,6 +161,19 @@ describe('streamableResolveEmbed', () => {
   })
 
   describe('the query', () => {
+    it('should keep the start position and drop a tracker', () => {
+      const value = 'https://streamable.com/e/qun2ij?t=12&utm_source=feed'
+      const expected: EmbedResolverResult = {
+        provider: 'streamable',
+        id: 'qun2ij',
+        src: 'https://streamable.com/e/qun2ij?t=12',
+        url: 'https://streamable.com/qun2ij',
+        ratio: '16/9',
+      }
+
+      expect(streamableResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should keep loop and drop a tracker', () => {
       const value = 'https://streamable.com/e/p2jw4u?loop=0&utm_source=feed'
       const expected: EmbedResolverResult = {

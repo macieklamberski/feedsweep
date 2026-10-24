@@ -8,7 +8,7 @@ import {
   parseUrl,
 } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, flashVar } from '../utils/dom.js'
+import { attr, flashVar, flashVars } from '../utils/dom.js'
 import { parseUrlOnHosts, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -37,8 +37,9 @@ const composeEmbed = (document: string, search = ''): EmbedResolverResult => {
     provider: 'scribd',
     id: document,
     src: `https://www.scribd.com/embeds/${segment}/content${composeQuery(params)}`,
-    // The document page takes no key, so a private document gets no page url.
-    url: params.access_key ? undefined : `https://www.scribd.com/document/${segment}`,
+    // A public document's page opens without the key. A private one answers 410 with or without
+    // it, and nothing offline tells the two apart.
+    url: `https://www.scribd.com/document/${segment}`,
     height: 600,
   }
 }
@@ -85,14 +86,15 @@ export const scribdFlashResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const document =
-    getQueryParam(parsed.searchParams, 'document_id') ?? flashVar(element, 'document_id')
+  const queryDocument = getQueryParam(parsed.searchParams, 'document_id')
+  const document = queryDocument ?? flashVar(element, 'document_id')
 
   if (!document) {
     return
   }
 
-  return composeEmbed(document)
+  // The access key sits beside the document id, in the swf query or in the flashvars.
+  return composeEmbed(document, queryDocument ? parsed.search : flashVars(element))
 }
 
 // Scribd's Flash viewer, scribdviewer.swf, dead since 2020 and naming its document in document_id.

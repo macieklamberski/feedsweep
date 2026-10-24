@@ -15,10 +15,13 @@ const embedSources = toMap<EmbedSource>({
     params: youtubeEmbedParams,
     compose: (id, params) => composeYoutubeUrl(id, params),
   },
-  // Vimeo's player takes the offset as a #t= fragment and reads nothing else.
+  // Vimeo's player takes the offset as a #t= fragment and reads nothing else. lite-vimeo's
+  // `start` counts seconds.
   'lite-vimeo': {
     params: ['start'],
-    compose: (id, params) => composeVimeoUrl(id, undefined, params.start),
+    compose: (id, params) => {
+      return composeVimeoUrl(id, undefined, params.start ? `${params.start}s` : undefined)
+    },
   },
 })
 

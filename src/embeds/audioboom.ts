@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf } from 'trousse'
-import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -25,41 +25,38 @@ const mp3ExtensionRegex = /\.mp3(?=\?|$)/i
 // `/posts/{id}/embed[/v4]` is current. `/boos/{id}/embed` is the pre-rename spelling.
 const postIdMarkers = ['posts', 'boos']
 
-// `/embed/v4` is the full player at 300, and `/posts/{id}/embed` is the compact bar at 95. Both
-// fill whatever frame they get, so these are the smallest box each accepts.
-const playerHeights = { v4: 300, legacy: 95 }
+// `/embed/v4`, the current player, fills whatever frame it gets, so this is the smallest box it
+// accepts.
+const playerHeight = 300
 
-export const extractAudioboomPost = (
-  link: string,
-): { id: string; isCurrent: boolean } | undefined => {
+export const extractAudioboomPost = (link: string): string | undefined => {
   const segments = getPathSegments(link)
   const marker = segments.findIndex((segment) => isAnyOf(segment, postIdMarkers))
-  const id = marker >= 0 ? segments[marker + 1]?.match(postIdRegex)?.[1] : undefined
 
-  if (!id) {
-    return
+  return marker >= 0 ? segments[marker + 1]?.match(postIdRegex)?.[1] : undefined
+}
+
+// Every carrier, the older compact player and the Flash player included, is minted onto v4.
+const composeEmbed = (postId: string): EmbedResolverResult => {
+  return {
+    provider,
+    id: postId,
+    src: `https://embeds.audioboom.com/posts/${postId}/embed/v4`,
+    height: playerHeight,
   }
-
-  return { id, isCurrent: segments.some((segment) => isAnyOf(segment, 'v4')) }
 }
 
 // No metadata offline: Audioboom's oEmbed accepts only `audioboom.com` page urls, not the
 // `embeds.` player url the markup carries, so a title needs a lookup the enricher would do.
 export const audioboomResolveEmbed: ResolveEmbed = (url, element) => {
-  const post = extractAudioboomPost(url)
+  const postId = extractAudioboomPost(url)
 
-  if (!post) {
+  if (!postId) {
     return
   }
 
   return {
-    provider,
-    id: post.id,
-    // Not upgraded to v4: that would put a 300px player inside the 95px the publisher chose.
-    src: post.isCurrent
-      ? `https://embeds.audioboom.com/posts/${post.id}/embed/v4`
-      : `https://embeds.audioboom.com/posts/${post.id}/embed`,
-    height: post.isCurrent ? playerHeights.v4 : playerHeights.legacy,
+    ...composeEmbed(postId),
     title: attr(element, 'title'),
   }
 }
@@ -82,8 +79,7 @@ export const audioboomWidgetEmbedResolver = createMarkupEmbedResolver(
 )
 
 // Audioboo's Flash player, which no browser runs. It names the post only in its flashvars, as the
-// page in `mp3LinkURL` or the audio file in `mp3`. Audioboo's embed code paired it with the
-// compact player, which answers for the same id.
+// page in `mp3LinkURL` or the audio file in `mp3`.
 const audioboomFlashResolveEmbed: ResolveEmbed = (url, element) => {
   const player = parseUrlOnHosts(url, [...flashHosts, bucketHost])
 
@@ -105,17 +101,14 @@ const audioboomFlashResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const post = extractAudioboomPost(parsed.href)
+  const postId = extractAudioboomPost(parsed.href)
 
-  if (!post) {
+  if (!postId) {
     return
   }
 
   return {
-    provider,
-    id: post.id,
-    src: `https://embeds.audioboom.com/posts/${post.id}/embed`,
-    height: playerHeights.legacy,
+    ...composeEmbed(postId),
     title: flashVar(element, 'mp3Title'),
     author: flashVar(element, 'mp3Author'),
   }

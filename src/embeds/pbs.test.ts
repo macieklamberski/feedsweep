@@ -470,6 +470,25 @@ describeForEachParser('pbsFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should keep a nonzero start and end from the flashvars', async () => {
+      const value = html`
+        <embed
+          src="http://www-tc.pbs.org/video/media/swf/PBSPlayer.swf"
+          flashvars="video=2079469075&player=viral&start=30&end=36"
+          type="application/x-shockwave-flash"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'pbs',
+        id: 'viralplayer/2079469075',
+        src: 'https://player.pbs.org/viralplayer/2079469075/?start=30&end=36',
+        ratio: '16/9',
+        ratioHeightOffset: 40,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should repair the Flash player on the s3 path onto the viral player', async () => {
       const value = html`
         <embed
@@ -528,6 +547,26 @@ describeForEachParser('pbsFlashEmbedResolver', (parseHtml) => {
         provider: 'pbs',
         id: 'viralplayer/2296255481',
         src: 'https://player.pbs.org/viralplayer/2296255481/',
+        ratio: '16/9',
+        ratioHeightOffset: 40,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the start and end on a station portal url', async () => {
+      // Constructed: every real portal carrier writes a zero start and end.
+      const value = html`
+        <embed
+          src="http://dgjigvacl6ipj.cloudfront.net/media/swf/PBSPlayer.swf"
+          flashvars="video=http://video.pbs.org/videoPlayerInfo/2296255481&amp;player=viral&amp;start=30&amp;end=36"
+          type="application/x-shockwave-flash"
+        >
+      `
+      const expected = {
+        provider: 'pbs',
+        id: 'viralplayer/2296255481',
+        src: 'https://player.pbs.org/viralplayer/2296255481/?start=30&end=36',
         ratio: '16/9',
         ratioHeightOffset: 40,
       }

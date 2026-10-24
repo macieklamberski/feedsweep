@@ -1,4 +1,5 @@
 import {
+  composeQuery,
   encodePathSegment,
   getPathSegments,
   getQueryParam,
@@ -9,7 +10,7 @@ import {
 } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { flashVars } from '../utils/dom.js'
-import { absoluteUrlRegex, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { absoluteUrlRegex, parseUrlOnHosts, pickQueryParams, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'pbs'
@@ -92,7 +93,8 @@ const composeEmbed = (
 }
 
 // The Flash player names the video in its `video` flashvar, as the numeric id the viral player
-// serves or as a station portal's url.
+// serves or as a station portal's url. It reads `start` and `end` from its flashvars as the viral
+// player reads them from its query.
 // Every carrier writes `player=viral`, so no other player is known to map onto it.
 const readFlashCarrier = (url: URL, element?: Element): EmbedResolverResult | undefined => {
   const params = new URLSearchParams(flashVars(element))
@@ -105,17 +107,20 @@ const readFlashCarrier = (url: URL, element?: Element): EmbedResolverResult | un
   }
 
   const video = getQueryParam(params, 'video')
+  // The viral player ignores a zero `start` or `end`, which every real Flash carrier writes.
+  const picked = Object.entries(pickQueryParams(flashVars(element) ?? '', playbackParams))
+  const query = composeQuery(Object.fromEntries(picked.filter(([, value]) => Number(value) !== 0)))
 
   // A station portal's url holds the numeric id or the partner slug after its route word.
   if (video && absoluteUrlRegex.test(video)) {
     const [portalRoute = '', videoId] = getPathSegments(video)
     const route = flashPortalRoutes.get(portalRoute.toLowerCase())
 
-    return route ? composeEmbed(route, videoId) : undefined
+    return route ? composeEmbed(route, videoId, query) : undefined
   }
 
   // The flashvar comes out decoded, and it goes into a path beside the raw path spelling.
-  return composeEmbed('viralplayer', video ? encodePathSegment(video) : undefined)
+  return composeEmbed('viralplayer', video ? encodePathSegment(video) : undefined, query)
 }
 
 // PBS's offsite player, which renders on its own but names no page and no poster.

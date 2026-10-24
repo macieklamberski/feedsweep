@@ -101,6 +101,23 @@ describeForEachParser('buzzsproutScriptEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should keep the tag filter on the show player and drop the rest', async () => {
+      const value = html`
+        <script
+          src="https://www.buzzsprout.com/784577.js?artist=&amp;container_id=buzzsprout-large-player-tags-season-10&amp;player=large&amp;tags=season+10"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'buzzsprout',
+        id: '784577',
+        src: 'https://www.buzzsprout.com/784577?iframe=true&tags=season%2010',
+        url: 'https://www.buzzsprout.com/784577',
+        height: 375,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('edge cases', () => {

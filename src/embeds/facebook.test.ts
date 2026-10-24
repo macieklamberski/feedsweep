@@ -382,6 +382,89 @@ describeForEachParser('facebookBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read a photo route that names its post in the query', async () => {
+      const value = html`
+        <blockquote
+          cite="https://www.facebook.com/photo.php?fbid=2957968630947197&amp;type=3"
+          class="fb-xfbml-parse-ignore"
+        >
+          <p>A photo caption.</p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/photo.php?fbid=2957968630947197&type=3',
+        src: 'https://www.facebook.com/plugins/post.php?href=https://www.facebook.com/photo.php?fbid=2957968630947197%26type=3',
+        url: 'https://www.facebook.com/photo.php?fbid=2957968630947197&type=3',
+        description: 'A photo caption.',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the photo route without .php', async () => {
+      // Constructed: the lab holds one `photo.php` cite and no `photo/?fbid=` one.
+      const value = html`
+        <blockquote
+          cite="https://www.facebook.com/photo/?fbid=1234567890&amp;set=a.1"
+          class="fb-xfbml-parse-ignore"
+        >
+          <p>A photo caption.</p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/photo/?fbid=1234567890&set=a.1',
+        src: 'https://www.facebook.com/plugins/post.php?href=https://www.facebook.com/photo/?fbid=1234567890%26set=a.1',
+        url: 'https://www.facebook.com/photo/?fbid=1234567890&set=a.1',
+        description: 'A photo caption.',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the watch route as the video plugin', async () => {
+      const value = html`
+        <blockquote
+          cite="https://www.facebook.com/watch/?v=10153231379946729"
+          class="fb-xfbml-parse-ignore"
+        >
+          <p>A video caption.</p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/watch/?v=10153231379946729',
+        src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=10153231379946729',
+        url: 'https://www.facebook.com/watch/?v=10153231379946729',
+        ratio: '16/9',
+        description: 'A video caption.',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read an fb.watch short link', async () => {
+      // Constructed: no lab feed cites an fb.watch link in this blockquote.
+      const value = html`
+        <blockquote
+          cite="https://fb.watch/abcDEF123/"
+          class="fb-xfbml-parse-ignore"
+        >
+          <p>A video caption.</p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://fb.watch/abcDEF123/',
+        src: 'https://www.facebook.com/plugins/post.php?href=https://fb.watch/abcDEF123/',
+        url: 'https://fb.watch/abcDEF123/',
+        description: 'A video caption.',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // Nothing in the pipeline absolutises a `cite`, so a CMS that rewrites urls to `//` hands
     // the resolver one with no scheme.
     it('should read a protocol-relative cite', async () => {
@@ -414,6 +497,24 @@ describeForEachParser('facebookBlockquoteEmbedResolver', (parseHtml) => {
         >
           <p>Not a facebook post.</p>
         </blockquote>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should leave the Page plugin fallback, which cites a page', async () => {
+      const value = html`
+        <div
+          class="fb-page"
+          data-href="https://www.facebook.com/spiritalivegr/"
+        >
+          <blockquote
+            cite="https://www.facebook.com/spiritalivegr/"
+            class="fb-xfbml-parse-ignore"
+          >
+            <a href="https://www.facebook.com/spiritalivegr/">Spirit Alive</a>
+          </blockquote>
+        </div>
       `
 
       expect(await extract(value)).toBeUndefined()

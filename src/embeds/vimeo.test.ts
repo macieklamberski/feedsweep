@@ -154,6 +154,13 @@ describe('extractVimeoId', () => {
 })
 
 describe('readVimeoEmbedSrc', () => {
+  it('should keep the hash an unlisted video needs', () => {
+    const value = 'https://vimeo.com/76979871/a52724358e'
+    const expected = 'https://player.vimeo.com/video/76979871?h=a52724358e'
+
+    expect(readVimeoEmbedSrc(value)).toEqual(expected)
+  })
+
   it('should keep a decoded clip_id carrying a query in one path segment', () => {
     const value = 'http://vimeo.com/moogaloop.swf?clip_id=123%3Fautoplay%3D1%26muted%3D1'
     const expected = 'https://player.vimeo.com/video/123%3Fautoplay=1&muted=1'
@@ -312,12 +319,12 @@ describe('vimeoResolveEmbed', () => {
     expect(vimeoResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should keep the hash ahead of the start offset', () => {
+  it('should move the start offset a page url carries into the fragment', () => {
     const value = 'https://vimeo.com/76979871/a52724358e?t=30s'
     const expected: EmbedResolverResult = {
       provider: 'vimeo',
       id: '76979871:a52724358e',
-      src: 'https://player.vimeo.com/video/76979871?h=a52724358e&t=30s',
+      src: 'https://player.vimeo.com/video/76979871?h=a52724358e#t=30s',
       url: 'https://vimeo.com/76979871/a52724358e',
       ratio: '16/9',
     }
@@ -325,12 +332,64 @@ describe('vimeoResolveEmbed', () => {
     expect(vimeoResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should preserve the start offset', () => {
+  it('should move the start offset the query carries into the fragment', () => {
     const value = 'https://player.vimeo.com/video/76979871?t=30s'
     const expected: EmbedResolverResult = {
       provider: 'vimeo',
       id: '76979871',
-      src: 'https://player.vimeo.com/video/76979871?t=30s',
+      src: 'https://player.vimeo.com/video/76979871#t=30s',
+      url: 'https://vimeo.com/76979871',
+      ratio: '16/9',
+    }
+
+    expect(vimeoResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should keep the start offset the fragment carries as written', () => {
+    const value = 'https://player.vimeo.com/video/39880751#t=64'
+    const expected: EmbedResolverResult = {
+      provider: 'vimeo',
+      id: '39880751',
+      src: 'https://player.vimeo.com/video/39880751#t=64',
+      url: 'https://vimeo.com/39880751',
+      ratio: '16/9',
+    }
+
+    expect(vimeoResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should read the fragment start offset ahead of the query one', () => {
+    const value = 'https://player.vimeo.com/video/39880751?t=10s#t=64'
+    const expected: EmbedResolverResult = {
+      provider: 'vimeo',
+      id: '39880751',
+      src: 'https://player.vimeo.com/video/39880751#t=64',
+      url: 'https://vimeo.com/39880751',
+      ratio: '16/9',
+    }
+
+    expect(vimeoResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should drop an empty start offset', () => {
+    const value = 'https://player.vimeo.com/video/327244228?loop=0&title=1#t='
+    const expected: EmbedResolverResult = {
+      provider: 'vimeo',
+      id: '327244228',
+      src: 'https://player.vimeo.com/video/327244228?loop=0',
+      url: 'https://vimeo.com/327244228',
+      ratio: '16/9',
+    }
+
+    expect(vimeoResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should keep the loop and drop the look', () => {
+    const value = 'https://player.vimeo.com/video/76979871?loop=1&color=ff0000'
+    const expected: EmbedResolverResult = {
+      provider: 'vimeo',
+      id: '76979871',
+      src: 'https://player.vimeo.com/video/76979871?loop=1',
       url: 'https://vimeo.com/76979871',
       ratio: '16/9',
     }
@@ -865,7 +924,7 @@ describeForEachParser('vimeo pages in a media element', (parseHtml) => {
         data-embed-url="https://vimeo.com/89946577"
         data-embed-id="89946577"
         data-embed-provider="vimeo"
-        data-embed-src="https://player.vimeo.com/video/89946577"
+        data-embed-src="https://player.vimeo.com/video/89946577?loop=0"
       ></div>
     `
 
