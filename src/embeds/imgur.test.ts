@@ -282,6 +282,19 @@ describe('imgurResolveEmbed', () => {
     expect(imgurResolveEmbed(value)).toEqual(expected)
   })
 
+  it('should read a post the topic alias of the tag route carries', () => {
+    const value = 'http://imgur.com/topic/Funny/N8rOudd'
+    const expected: EmbedResolverResult = {
+      provider: 'imgur',
+      id: 'a/N8rOudd',
+      src: 'https://imgur.com/a/N8rOudd/embed',
+      url: 'https://imgur.com/a/N8rOudd',
+      height: 500,
+    }
+
+    expect(imgurResolveEmbed(value)).toEqual(expected)
+  })
+
   // The accepted limit of reading the last word: a slug word can be id-shaped, and this one is
   // read as the id. Imgur does not serve a slug without an id after it, so the shape only
   // arrives hand-written, and the word addresses nothing rather than another post: `flights`,
