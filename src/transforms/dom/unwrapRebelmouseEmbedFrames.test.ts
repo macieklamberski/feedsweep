@@ -79,6 +79,14 @@ describeForEachParser('unwrapRebelmouseEmbedFrames', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should point the frame at a player on any host in video_url', async () => {
+      const value =
+        '<iframe src="https://www.gbnews.com/res/scraper/embed/?video_url=https%3A%2F%2Fplayer.example.com%2Fembed%2F123"></iframe>'
+      const expected = '<iframe src="https://player.example.com/embed/123"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should point the tweet frame at the status its id and screen_name name', async () => {
       const value = html`
         <iframe
@@ -122,6 +130,13 @@ describeForEachParser('unwrapRebelmouseEmbedFrames', (parseHtml) => {
     it('should keep a frame naming a player host under another scheme', async () => {
       const value =
         '<iframe src="https://www.out.com/res/scraper/embed/?jwplayer_video_url=ftp%3A%2F%2Fcontent.jwplatform.com%2Fplayers%2FVJuVAhyj-4mfZ1NcF.js"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a frame naming a non-http url in video_url', async () => {
+      const value =
+        '<iframe src="https://www.gbnews.com/res/scraper/embed/?video_url=javascript%3Aalert(1)"></iframe>'
 
       expect(await transform(value)).toEqualHtml(value)
     })

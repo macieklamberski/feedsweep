@@ -8,21 +8,26 @@ import { digitsRegex, placeholderBaseUrl } from '../../utils/urls.js'
 const playerPath = '/res/scraper/embed/'
 const tweetPath = '/res/community/twitter_embed/'
 
-// The wrapper writes any url into its page, so only a player host is let through.
-const playerHosts = [
-  ...jwplayerHosts,
-  'video.primis.tech', // GB News HLS streams
-  'mm-v2.simplestream.com', // GB News player
-]
-
+// The wrapper writes `jwplayer_video_url` into a script, so only a JW script is let through.
+// It writes `video_url` into an iframe, so any http url is framed as written.
 const readPlayerUrl = (query: URLSearchParams): string | undefined => {
-  const url = query.get('jwplayer_video_url') ?? query.get('video_url')
+  const scriptUrl = query.get('jwplayer_video_url')
 
-  if (!url || !isHttpUrl(url) || !isHostOrSubdomainOf(url, playerHosts)) {
+  if (scriptUrl) {
+    if (!isHttpUrl(scriptUrl) || !isHostOrSubdomainOf(scriptUrl, jwplayerHosts)) {
+      return
+    }
+
+    return scriptUrl
+  }
+
+  const frameUrl = query.get('video_url')
+
+  if (!frameUrl || !isHttpUrl(frameUrl)) {
     return
   }
 
-  return url
+  return frameUrl
 }
 
 const readTweetUrl = (query: URLSearchParams): string | undefined => {
