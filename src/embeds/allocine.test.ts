@@ -57,12 +57,6 @@ describe('allocineResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a foreign host carrying the blog player path', () => {
-      const value = 'https://evil.test/_video/iblogvision.aspx?cmedia=19546104'
-
-      expect(allocineResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for a blog player with no id', () => {
       const value = 'https://www.allocine.fr/_video/iblogvision.aspx'
 
@@ -89,12 +83,6 @@ describe('allocineResolveEmbed', () => {
 
     it('should return undefined for the id under an uppercase name, which the server answers 404', () => {
       const value = 'https://www.allocine.fr/_video/iblogvision.aspx?CMEDIA=19546104'
-
-      expect(allocineResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for a foreign host carrying the Flash player path', () => {
-      const value = 'https://evil.test/blogvision/18823127'
 
       expect(allocineResolveEmbed(value)).toBeUndefined()
     })

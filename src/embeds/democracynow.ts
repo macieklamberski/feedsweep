@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'democracynow'
@@ -23,7 +23,7 @@ const composeEmbed = (path: string, page: string): EmbedResolverResult => {
 // its headlines, or one story when a slug follows the date. The server matches the route words in
 // their own case only.
 export const democracynowResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, democracynowHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return

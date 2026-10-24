@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { readObjectHeight } from '../utils/hints.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'helloasso'
@@ -12,7 +12,7 @@ const helloassoHosts = ['helloasso.com']
 // `/associations/{org}/{type}/{slug}/{kind}`, where the kind is `widget` or a `widget-` variant
 // such as `widget-bouton` or `widget-vignette-horizontale`. The form page drops the kind segment.
 export const helloassoResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, helloassoHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return

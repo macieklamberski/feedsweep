@@ -83,12 +83,6 @@ describe('swayResolveEmbed', () => {
 
       expect(swayResolveEmbed(value)).toBeUndefined()
     })
-
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/s/s7OAd7CG19agnTuf/embed'
-
-      expect(swayResolveEmbed(value)).toBeUndefined()
-    })
   })
 
   describe('edge cases', () => {

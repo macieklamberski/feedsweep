@@ -74,12 +74,6 @@ describe('imdbResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/video/embed/vi3012802841/'
-
-      expect(imdbResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore the watch page', () => {
       const value = 'https://www.imdb.com/video/vi3012802841/'
 

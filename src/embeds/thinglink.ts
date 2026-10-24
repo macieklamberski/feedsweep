@@ -1,6 +1,6 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
+import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const thinglinkHost = 'thinglink.com'
@@ -32,7 +32,7 @@ const composePosterUrl = (id: string): string | undefined => {
 }
 
 export const thinglinkResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, thinglinkHost)
+  const parsed = parseUrl(url, placeholderBaseUrl)
   const id = parsed && readSceneId(parsed)
 
   if (!id) {

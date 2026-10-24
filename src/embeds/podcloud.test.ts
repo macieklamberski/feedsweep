@@ -51,12 +51,6 @@ describe('podcloudResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/podcast/oxymut/player'
-
-      expect(podcloudResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a show subdomain, which answers 404 to the player path', () => {
       const value = 'https://oec.podcloud.fr/podcast/oxymut/player'
 

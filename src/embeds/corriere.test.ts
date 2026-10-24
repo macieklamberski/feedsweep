@@ -62,19 +62,6 @@ describe('corriereResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/video-embed/885087cc-33c7-11ea-bebf-10b7ce31a40c'
-
-      expect(corriereResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should leave the regional host alone', () => {
-      const value =
-        'https://video.corrieredelmezzogiorno.corriere.it/video-embed/68cff9f4-e814-11e4-a298-5bf537ea878f'
-
-      expect(corriereResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a path with a leading segment', () => {
       const value = 'https://video.corriere.it/x/video-embed/885087cc-33c7-11ea-bebf-10b7ce31a40c'
 

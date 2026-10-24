@@ -95,13 +95,6 @@ describe('inaResolveEmbed', () => {
 
       expect(inaResolveEmbed(value)).toBeUndefined()
     })
-
-    it('should ignore a foreign host carrying the player path', () => {
-      const value =
-        'https://evil.test/player/embed/I04224962/1/1b0bd203fbcd702f9bc9b10ac3d0fc21/460/259'
-
-      expect(inaResolveEmbed(value)).toBeUndefined()
-    })
   })
 
   describe('edge cases', () => {

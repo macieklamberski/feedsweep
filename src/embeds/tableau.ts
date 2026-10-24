@@ -1,8 +1,8 @@
-import { decodeSegment } from 'trousse'
+import { decodeSegment, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, paramValue, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 type View = {
@@ -123,7 +123,7 @@ const readProfileView = (parsed: URL | undefined): RegExpMatchArray | null | und
 }
 
 const tableauResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrlOnHosts(url, tableauHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
   const match = parsed?.pathname.match(viewPathRegex) ?? readProfileView(parsed)
 
   if (!match) {

@@ -1,7 +1,7 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { composeQuery, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
+import { composeQuery, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'listennotes'
@@ -56,7 +56,7 @@ const composeSlugged = (slugged: Slugged): EmbedResolverResult | undefined => {
 }
 
 export const listennotesResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrlOnHosts(url, listennotesHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
   const segments = parsed ? getPathSegments(parsed) : []
 
   if (localeRegex.test(segments[0] ?? '')) {

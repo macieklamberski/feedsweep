@@ -1,7 +1,7 @@
-import { getPathSegments, getQueryParam, isAnyOf, isPlainObject, toMap } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, isPlainObject, parseUrl, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The player is fluid-width and fixed-height: a compact bar for a single item, a taller box for
@@ -82,7 +82,7 @@ const readPathPair = (url: URL | undefined): [string, string] | undefined => {
 
 // Spotify's player iframe, in the modern path form and the pre-2017 embed.spotify.com/?uri= form.
 export const spotifyResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrlOnHosts(url, spotifyHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return

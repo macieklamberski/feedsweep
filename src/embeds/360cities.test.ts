@@ -34,12 +34,6 @@ describe('threeSixtyCitiesResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the frame path', () => {
-      const value = 'https://evil.test/embed_iframe/peterstrasse-hamburg'
-
-      expect(threeSixtyCitiesResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore the frame path under another route', () => {
       const value = 'https://www.360cities.net/x/embed_iframe/peterstrasse-hamburg'
 

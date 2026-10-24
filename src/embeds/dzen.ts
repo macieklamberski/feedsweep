@@ -1,5 +1,6 @@
+import { parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'dzen'
@@ -10,7 +11,7 @@ const embedPathRegex = /^\/embed\/([^/]+)\/?$/i
 
 // Dzen's video player, `dzen.ru/embed/{id}`. The player reads `t` as the start position.
 export const dzenResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, dzenHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return

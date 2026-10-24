@@ -1,7 +1,7 @@
-import { getQueryParam, isAnyOf } from 'trousse'
+import { getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'indavideo'
@@ -34,7 +34,7 @@ const readVideoId = (url: URL, element?: Element): string | undefined => {
 // An Indavideo player: the iframe on indavideo.hu or embed.indavideo.hu, or the retired Flash
 // player, whose video id plays on the current one.
 export const indavideoResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrlOnHosts(url, indavideoHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return

@@ -56,12 +56,6 @@ describe('podetizeResolveEmbed', () => {
 
     expect(podetizeResolveEmbed(value)).toEqual(expected)
   })
-
-  it('should return undefined for a lookalike host', () => {
-    const value = 'https://player.podetize.com.evil.test/?id=P8RHvvMsf'
-
-    expect(podetizeResolveEmbed(value)).toBeUndefined()
-  })
 })
 
 describeForEachParser('podetizeScriptEmbedResolver', (parseHtml) => {

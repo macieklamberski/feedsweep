@@ -1,11 +1,19 @@
-import { getPathSegments, getQueryParam, isAnyOf, isHostOf, type Nullish, toMap } from 'trousse'
+import {
+  getPathSegments,
+  getQueryParam,
+  isAnyOf,
+  isHostOf,
+  type Nullish,
+  parseUrl,
+  toMap,
+} from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { flashVars } from '../utils/dom.js'
 import {
   absoluteUrlRegex,
   encodePathSegment,
-  parseUrlOnHosts,
   pickUrlParams,
+  placeholderBaseUrl,
 } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -39,8 +47,6 @@ const flashPlayerPaths = [
 ]
 
 const flashHosts = [flashHost, flashCdnHost]
-
-const pbsHosts = [playerHost, legacyPlayerHost, ...stationPlayerHosts, ...flashHosts]
 
 // The route a carrier names, against the id space it belongs to. `viralplayer` and
 // `widget/partnerplayer` serve each other's numeric ids; `partnerplayer` takes a base64url slug
@@ -117,7 +123,7 @@ const readFlashCarrier = (url: URL, element?: Element): EmbedResolverResult | un
 
 // PBS's offsite player, which renders on its own but names no page and no poster.
 export const pbsResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrlOnHosts(url, pbsHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return

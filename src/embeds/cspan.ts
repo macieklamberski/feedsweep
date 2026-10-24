@@ -1,6 +1,6 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
+import { pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const cspanHosts = ['c-span.org']
@@ -11,7 +11,7 @@ const idEndRegex = /[/&]/
 // clip or `{program}-{n}` for a program and leads the query with no name. The player plays the
 // id without its slug and reads `start` as the position.
 export const cspanResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, cspanHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return

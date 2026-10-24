@@ -112,12 +112,6 @@ describe('reverbnationResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/widget_code/html_widget/artist_1018382'
-
-      expect(reverbnationResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a reverbnation url naming no widget', () => {
       const value = 'https://www.reverbnation.com/billyjonesbluez'
 

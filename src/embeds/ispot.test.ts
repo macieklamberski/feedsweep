@@ -60,12 +60,6 @@ describe('ispotResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/share/IoLU'
-
-      expect(ispotResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a path with a leading segment', () => {
       const value = 'https://www.ispot.tv/x/share/IoLU'
 

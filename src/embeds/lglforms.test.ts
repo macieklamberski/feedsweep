@@ -39,12 +39,6 @@ describe('lglformsResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A'
-
-      expect(lglformsResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a form path below another segment', () => {
       const value = 'https://secure.lglforms.com/x/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A'
 

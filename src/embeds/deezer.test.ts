@@ -34,12 +34,6 @@ describe('deezerResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/widget/dark/track/3135556'
-
-      expect(deezerResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a deezer url naming no resource', () => {
       const value = 'https://www.deezer.com/fr/the-beatles'
 

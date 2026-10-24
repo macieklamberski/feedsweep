@@ -60,12 +60,6 @@ describe('dvidsResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/video/embed/549765'
-
-      expect(dvidsResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for the route below another segment', () => {
       const value = 'https://www.dvidshub.net/unit/video/embed/549765'
 

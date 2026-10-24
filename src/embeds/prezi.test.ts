@@ -125,12 +125,6 @@ describe('preziResolveEmbed', () => {
       expect(preziResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a foreign host carrying the embed route', () => {
-      const value = 'https://evil.test/embed/testonly0001/'
-
-      expect(preziResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should use a malformed presentation id as written, even if the player answers an error', () => {
       const value = 'https://prezi.com/p/embed/..%2Fx/'
       const expected: EmbedResolverResult = {

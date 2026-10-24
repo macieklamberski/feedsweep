@@ -1,6 +1,6 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'subsplash'
@@ -29,7 +29,7 @@ const composeEmbed = (id: string, src: string): EmbedResolverResult => {
 // query, `audio`, `video`, `info`, `logoWatermark`, `shareable` and `embeddable`, only changes
 // the display or is ignored.
 export const subsplashResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, subsplashHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return

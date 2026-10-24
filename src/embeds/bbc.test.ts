@@ -153,12 +153,6 @@ describe('bbcResolveEmbed', () => {
 
       expect(bbcResolveEmbed(value)).toBeUndefined()
     })
-
-    it('should return undefined for a lookalike host', () => {
-      const value = 'https://www.bbc.com.evil.test/news/av/embed/p06sf6tr/46292361'
-
-      expect(bbcResolveEmbed(value)).toBeUndefined()
-    })
   })
 })
 

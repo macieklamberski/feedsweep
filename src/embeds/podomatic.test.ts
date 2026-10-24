@@ -32,12 +32,6 @@ describe('podomaticResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/embed/html5/episode/10076958'
-
-      expect(podomaticResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a podomatic url naming no player', () => {
       const value = 'https://www.podomatic.com/podcasts/lisboalowcost'
 

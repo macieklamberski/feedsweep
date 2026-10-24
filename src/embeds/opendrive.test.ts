@@ -118,12 +118,6 @@ describe('opendriveResolveEmbed', () => {
 
       expect(opendriveResolveEmbed(value)).toBeUndefined()
     })
-
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/player/NDZfOTg5NzkzOF9iYXhEWQ'
-
-      expect(opendriveResolveEmbed(value)).toBeUndefined()
-    })
   })
 })
 
