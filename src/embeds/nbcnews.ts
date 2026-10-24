@@ -23,7 +23,6 @@ const nbcnewsRoutes = toMap({
   'news/embedded-video': {
     idRegex: embeddedVideoIdRegex,
     srcPrefix: 'https://www.nbcnews.com/news/embedded-video/mmvo',
-    isCaseInsensitive: true,
   },
   offsite: {
     idRegex: offsiteIdRegex,
@@ -32,7 +31,6 @@ const nbcnewsRoutes = toMap({
   'today/embedded-video': {
     idRegex: embeddedVideoIdRegex,
     srcPrefix: 'https://www.today.com/today/embedded-video/mmvo',
-    isCaseInsensitive: true,
   },
   'widget/video-embed': {
     srcPrefix: 'https://www.nbcnews.com/widget/video-embed/',
@@ -45,10 +43,6 @@ const nbcnewsResolveEmbed: ResolveEmbed = (url) => {
   const route = nbcnewsRoutes.get(routePath.toLowerCase())
 
   if (!route) {
-    return
-  }
-
-  if (!route.isCaseInsensitive && routePath !== routePath.toLowerCase()) {
     return
   }
 

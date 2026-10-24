@@ -10,8 +10,8 @@ const condenastHosts = ['player.cnevids.com', 'player-backend.cnevids.com']
 // The loader's own url grammar, with the route words in the only case the server answers.
 // `/script/video/{id}.js`, `/iframe/video/{id}` and `/embedjs/{player}/video/{id}.js` end in
 // the video, and the oldest `/embed/{id}/{player}` starts with it.
-const videoPathRegex = /^\/(?:script|iframe|embed(?:js)?\/[^/]+)\/video\/([^/]+?)(?:\.js)?\/?$/
-const legacyPathRegex = /^\/embed(?:js)?\/([^/]+)\/[^/]+\/?$/
+const videoPathRegex = /^\/(?:script|iframe|embed(?:js)?\/[^/]+)\/video\/([^/]+?)(?:\.js)?\/?$/i
+const legacyPathRegex = /^\/embed(?:js)?\/([^/]+)\/[^/]+\/?$/i
 
 // Condé Nast's video player, shared by The New Yorker, Vanity Fair, Wired and the other brands.
 // The script embed its share dialog writes names no frame url. `/iframe/video/{id}` is the frame
@@ -45,7 +45,7 @@ export const condenastIframeEmbedResolver = createUrlEmbedResolver(
 
 // The script embed, which writes a frame with no `src` and renders nothing in a feed.
 export const condenastScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="cnevids.com/"]',
+  'script[src*="cnevids.com/" i]',
   (element) => {
     return condenastResolveEmbed(attr(element, 'src') ?? '')
   },

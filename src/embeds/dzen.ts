@@ -6,7 +6,7 @@ const provider = 'dzen'
 
 const dzenHosts = ['dzen.ru']
 
-const embedPathRegex = /^\/embed\/([^/]+)\/?$/
+const embedPathRegex = /^\/embed\/([^/]+)\/?$/i
 
 // Dzen's video player, `dzen.ru/embed/{id}`. The player reads `t` as the start position.
 export const dzenResolveEmbed: ResolveEmbed = (url) => {

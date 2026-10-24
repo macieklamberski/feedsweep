@@ -31,6 +31,17 @@ describeForEachParser('gmailEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should decode the filename with its prefix in capitals', async () => {
+    const value = html`
+      <p>
+        <img src="//ssl.gstatic.com/mail/emoji/v7/png48/EMOJI_U1F601.png" alt="">
+      </p>
+    `
+    const expected = '<p>😁</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should replace an image off another host by its goomoji attribute', async () => {
     const value = '<p><img src="https://example.com/proxy/e.png" alt="" goomoji="1f44d"></p>'
     const expected = '<p>👍</p>'

@@ -164,20 +164,32 @@ describeForEachParser('nbcnewsEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should refuse uppercase widget route words the platform does not serve', async () => {
+    it('should read uppercase widget route words and mint them in lowercase', async () => {
       const value = html`
         <iframe src="https://www.nbcnews.com/WIDGET/VIDEO-EMBED/265460805743"></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'nbcnews',
+        id: 'mmvo265460805743',
+        src: 'https://www.nbcnews.com/widget/video-embed/265460805743',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
-    it('should refuse an uppercase offsite route word the platform does not serve', async () => {
+    it('should read an uppercase offsite route word and mint the player it redirects to', async () => {
       const value = html`
         <iframe src="https://www.today.com/OFFSITE/yard-pong-games-1244547139528"></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'nbcnews',
+        id: 'mmvo1244547139528',
+        src: 'https://www.today.com/embedded-video/mmvo1244547139528',
+        ratio: '16/9',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should refuse a bare number on the embedded-video route', async () => {

@@ -107,6 +107,19 @@ describeForEachParser('educaplayEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should read a game route in uppercase and mint it in lowercase', async () => {
+      const value = '<iframe src="https://es.educaplay.com/JUEGO/5225243-profissoes.html"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'educaplay',
+        id: '5225243',
+        src: 'https://www.educaplay.com/game/5225243-profissoes.html',
+        url: 'https://www.educaplay.com/learning-resources/5225243-profissoes.html',
+        height: 690,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -126,12 +139,6 @@ describeForEachParser('educaplayEmbedResolver', (parseHtml) => {
     it('should ignore a route word that is not a game', async () => {
       const value =
         '<iframe src="https://es.educaplay.com/coleccionx/5225243-profissoes.html"></iframe>'
-
-      expect(await extract(value)).toBeUndefined()
-    })
-
-    it('should ignore a game route spelled in uppercase', async () => {
-      const value = '<iframe src="https://es.educaplay.com/JUEGO/5225243-profissoes.html"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -215,6 +222,20 @@ describeForEachParser('educaplayEmbedResolver', (parseHtml) => {
   })
 
   describe('the retired html5 player', () => {
+    it('should read the html5 route in capitals', async () => {
+      const value =
+        '<iframe src="https://es.educaplay.com/es/recursoseducativos/4297362/HTML5/lessico.HTM"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'educaplay',
+        id: '4297362',
+        src: 'https://www.educaplay.com/game/4297362-lessico.html',
+        url: 'https://www.educaplay.com/learning-resources/4297362-lessico.html',
+        height: 690,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should rebuild the Spanish resource onto the game', async () => {
       const value = html`
         <iframe

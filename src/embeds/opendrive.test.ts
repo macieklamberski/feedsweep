@@ -71,6 +71,19 @@ describe('opendriveResolveEmbed', () => {
 
       expect(opendriveResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the route word in another case and mint it in lowercase', () => {
+      const value = 'https://www.opendrive.com/PLAYER/NDZfOTg5NzkzOF9iYXhEWQ'
+      const expected: EmbedResolverResult = {
+        provider: 'opendrive',
+        id: 'NDZfOTg5NzkzOF9iYXhEWQ',
+        src: 'https://www.opendrive.com/player/NDZfOTg5NzkzOF9iYXhEWQ',
+        url: 'https://od.lk/f/NDZfOTg5NzkzOF9iYXhEWQ',
+        height: 25,
+      }
+
+      expect(opendriveResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -83,12 +96,6 @@ describe('opendriveResolveEmbed', () => {
     it('should ignore the download page', () => {
       const value =
         'https://www.opendrive.com/download/OTdfODE2MDkxODJfaFZ0d20?folder_id=OTdfNzA1NjM3NF9zOTJnOA'
-
-      expect(opendriveResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore the route word in another case', () => {
-      const value = 'https://www.opendrive.com/PLAYER/NDZfOTg5NzkzOF9iYXhEWQ'
 
       expect(opendriveResolveEmbed(value)).toBeUndefined()
     })

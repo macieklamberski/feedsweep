@@ -66,6 +66,18 @@ describe('dzenResolveEmbed', () => {
 
       expect(dzenResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the route in capitals and mint it in lowercase', () => {
+      const value = 'https://dzen.ru/EMBED/oW0bt8mcOAAA'
+      const expected: EmbedResolverResult = {
+        provider: 'dzen',
+        id: 'oW0bt8mcOAAA',
+        src: 'https://dzen.ru/embed/oW0bt8mcOAAA',
+        ratio: '16/9',
+      }
+
+      expect(dzenResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -83,12 +95,6 @@ describe('dzenResolveEmbed', () => {
 
     it('should return undefined for a segment after the video', () => {
       const value = 'https://dzen.ru/embed/oW0bt8mcOAAA/extra'
-
-      expect(dzenResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for the route in capitals, which the server answers 404', () => {
-      const value = 'https://dzen.ru/EMBED/oW0bt8mcOAAA'
 
       expect(dzenResolveEmbed(value)).toBeUndefined()
     })

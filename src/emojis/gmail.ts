@@ -8,7 +8,7 @@ import {
   resolveEmojiImage,
 } from '../utils/emojis.js'
 
-const notoFilePrefixRegex = /^emoji_u/
+const notoFilePrefixRegex = /^emoji_u/i
 // Google's own id, bare like `1B6`, as its U+FExxx code like `fe4ea`, or after the drawing set it
 // picks, like `ezweb_ne_jp/B61`.
 const legacyIdRegex = /(?:^|[./])(?:fe)?([0-9a-f]{3})$/i

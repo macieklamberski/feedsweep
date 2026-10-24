@@ -84,6 +84,19 @@ describe('firstoryResolveEmbed', () => {
 
       expect(firstoryResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the story route in capitals and mint it in lowercase', () => {
+      const value = 'https://open.firstory.fm/EMBED/STORY/cmm2q46gw0o4d01y9g95lctm9'
+      const expected: EmbedResolverResult = {
+        provider: 'firstory',
+        id: 'cmm2q46gw0o4d01y9g95lctm9',
+        src: 'https://open.firstory.fm/embed/story/cmm2q46gw0o4d01y9g95lctm9',
+        url: 'https://open.firstory.fm/story/cmm2q46gw0o4d01y9g95lctm9',
+        height: 182,
+      }
+
+      expect(firstoryResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -101,12 +114,6 @@ describe('firstoryResolveEmbed', () => {
 
     it('should ignore the story route with no id', () => {
       const value = 'https://open.firstory.fm/embed/story/'
-
-      expect(firstoryResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore the story route in capitals', () => {
-      const value = 'https://open.firstory.fm/EMBED/STORY/cmm2q46gw0o4d01y9g95lctm9'
 
       expect(firstoryResolveEmbed(value)).toBeUndefined()
     })

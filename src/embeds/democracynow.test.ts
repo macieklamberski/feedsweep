@@ -62,6 +62,32 @@ describe('democracynowResolveEmbed', () => {
 
       expect(democracynowResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the route word in capitals and mint it in lowercase', () => {
+      const value = 'https://www.democracynow.org/EMBED/show/2023/6/27'
+      const expected: EmbedResolverResult = {
+        provider: 'democracynow',
+        id: 'show/2023/6/27',
+        src: 'https://www.democracynow.org/embed/show/2023/6/27',
+        url: 'https://www.democracynow.org/shows/2023/6/27',
+        ratio: '16/9',
+      }
+
+      expect(democracynowResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the kind in capitals and mint it in lowercase', () => {
+      const value = 'https://www.democracynow.org/embed/HEADLINES/2014/2/19'
+      const expected: EmbedResolverResult = {
+        provider: 'democracynow',
+        id: 'headlines/2014/2/19',
+        src: 'https://www.democracynow.org/embed/headlines/2014/2/19',
+        url: 'https://www.democracynow.org/2014/2/19/headlines',
+        ratio: '16/9',
+      }
+
+      expect(democracynowResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -73,12 +99,6 @@ describe('democracynowResolveEmbed', () => {
 
     it('should return undefined for the route below another segment', () => {
       const value = 'https://www.democracynow.org/es/embed/show/2023/6/27'
-
-      expect(democracynowResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for the route word in capitals, which the server answers 404', () => {
-      const value = 'https://www.democracynow.org/EMBED/show/2023/6/27'
 
       expect(democracynowResolveEmbed(value)).toBeUndefined()
     })
@@ -214,6 +234,24 @@ describeForEachParser('democracynowScriptEmbedResolver', (parseHtml) => {
         <script
           type="text/javascript"
           src="http://www.democracynow.org/embed_show_v2/300/2011/5/19/story/manning_marables_controversial_new_biography_refuels?utm_source=feed"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'democracynow',
+        id: 'story/2011/5/19/manning_marables_controversial_new_biography_refuels',
+        src: 'https://www.democracynow.org/embed/story/2011/5/19/manning_marables_controversial_new_biography_refuels',
+        url: 'https://www.democracynow.org/2011/5/19/manning_marables_controversial_new_biography_refuels',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the loader and kind in capitals and mint them in lowercase', async () => {
+      const value = html`
+        <script
+          type="text/javascript"
+          src="http://www.democracynow.org/EMBED_SHOW_V2/300/2011/5/19/STORY/manning_marables_controversial_new_biography_refuels"
         ></script>
       `
       const expected: EmbedResolverResult = {
