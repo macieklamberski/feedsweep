@@ -222,6 +222,7 @@ import {
   jwplayerSetupEmbedResolver,
 } from '../embeds/jwplayer.js'
 import { kalturaIframeEmbedResolver, kalturaScriptEmbedResolver } from '../embeds/kaltura.js'
+import { kickstarterEmbedResolver } from '../embeds/kickstarter.js'
 import { kindleEmbedResolver } from '../embeds/kindle.js'
 import { komootEmbedResolver } from '../embeds/komoot.js'
 import { learningappsEmbedResolver } from '../embeds/learningapps.js'
@@ -690,6 +691,7 @@ const embedResolvers: Array<EmbedResolver> = [
   jwplayerMountEmbedResolver,
   kalturaIframeEmbedResolver,
   kalturaScriptEmbedResolver,
+  kickstarterEmbedResolver,
   kindleEmbedResolver,
   komootEmbedResolver,
   learningappsEmbedResolver,
