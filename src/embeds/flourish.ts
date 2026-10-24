@@ -22,7 +22,7 @@ const widgetSrcRegex = /^([^/]+)\/([^/?]+)(?:\?.*)?$/
 // `visualisation` and `story` are the two kinds feeds carry. The endpoint answers 403 for a wrong
 // kind, an unknown kind or a fabricated id.
 const composeEmbed = (resource: string, id: string): EmbedResolverResult | undefined => {
-  if (!resource || resource === nonEmbeddableResource || !id) {
+  if (!resource || isAnyOf(resource, nonEmbeddableResource) || !id) {
     return
   }
 
