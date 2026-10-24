@@ -576,20 +576,20 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should keep an authority holding spaces inside one path segment', async () => {
+    it('should keep an authority and a record key holding spaces inside one path segment each', async () => {
       const value = html`
         <blockquote
           class="bluesky-embed"
-          data-bluesky-uri="at://not an authority/app.bsky.feed.post/3lzq7aeuwbg42"
+          data-bluesky-uri="at://not an authority/app.bsky.feed.post/3lzq7 aeuwbg42"
         >
           <p lang="en">Nothing addressable here.</p>
         </blockquote>
       `
       const expected: EmbedResolverResult = {
         provider: 'bluesky',
-        id: 'not%20an%20authority/3lzq7aeuwbg42',
-        src: 'https://embed.bsky.app/embed/not%20an%20authority/app.bsky.feed.post/3lzq7aeuwbg42',
-        url: 'https://bsky.app/profile/not%20an%20authority/post/3lzq7aeuwbg42',
+        id: 'not%20an%20authority/3lzq7%20aeuwbg42',
+        src: 'https://embed.bsky.app/embed/not%20an%20authority/app.bsky.feed.post/3lzq7%20aeuwbg42',
+        url: 'https://bsky.app/profile/not%20an%20authority/post/3lzq7%20aeuwbg42',
         description: 'Nothing addressable here.',
       }
 

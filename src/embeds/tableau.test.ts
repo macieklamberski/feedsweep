@@ -439,15 +439,15 @@ describeForEachParser('tableauIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep a hash workbook holding a fragment sign inside one path segment', async () => {
+    it('should keep a hash workbook and sheet holding a fragment sign inside one path segment each', async () => {
       const value = html`
-        <iframe src="https://public.tableau.com/profile/vizimpact#!/vizhome/HackerTeamClients#x/Sheet1"></iframe>
+        <iframe src="https://public.tableau.com/profile/vizimpact#!/vizhome/HackerTeamClients#x/Sheet1#y"></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'tableau',
         id: 'HackerTeamClients%23x',
-        src: 'https://public.tableau.com/views/HackerTeamClients%23x/Sheet1?:embed=y&:showVizHome=no',
-        url: 'https://public.tableau.com/views/HackerTeamClients%23x/Sheet1',
+        src: 'https://public.tableau.com/views/HackerTeamClients%23x/Sheet1%23y?:embed=y&:showVizHome=no',
+        url: 'https://public.tableau.com/views/HackerTeamClients%23x/Sheet1%23y',
       }
 
       expect(await extract(value)).toEqual(expected)

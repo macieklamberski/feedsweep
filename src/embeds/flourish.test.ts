@@ -150,18 +150,18 @@ describeForEachParser('flourishWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep a widget id holding a fragment sign inside one path segment', async () => {
+    it('should keep a widget kind and id holding a fragment sign inside one path segment each', async () => {
       const value = html`
         <div
           class="flourish-embed"
-          data-src="visualisation/1234#x"
+          data-src="visualisation#k/1234#x"
         ></div>
       `
       const expected: EmbedResolverResult = {
         provider: 'flourish',
-        id: 'visualisation/1234%23x',
-        src: 'https://flo.uri.sh/visualisation/1234%23x/embed',
-        url: 'https://public.flourish.studio/visualisation/1234%23x/',
+        id: 'visualisation%23k/1234%23x',
+        src: 'https://flo.uri.sh/visualisation%23k/1234%23x/embed',
+        url: 'https://public.flourish.studio/visualisation%23k/1234%23x/',
       }
 
       expect(await extract(value)).toEqual(expected)
