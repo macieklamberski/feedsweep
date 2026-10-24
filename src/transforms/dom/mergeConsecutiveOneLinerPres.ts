@@ -1,5 +1,5 @@
 import type { DomTransform } from '../../types.js'
-import { hasText, isElement, isText } from '../../utils/dom.js'
+import { hasText, isElement, isText, setInnerHtml } from '../../utils/dom.js'
 
 const trailingBrRegex = /<br\s*\/?>\s*$/i
 // A trailing match starts only at the head of a run, so a long run before text fails once.
@@ -97,7 +97,7 @@ export const mergeConsecutiveOneLinerPres: DomTransform = ({ preservedPreClasses
         )
         .join('\n')
 
-      contentElement(pre).innerHTML = merged
+      setInnerHtml(contentElement(pre), merged)
 
       for (const element of run.slice(1)) {
         element.remove()

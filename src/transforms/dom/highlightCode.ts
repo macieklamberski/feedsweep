@@ -1,6 +1,13 @@
 import { toMap } from 'trousse'
 import type { DomTransform } from '../../types.js'
-import { hasAncestorWithTagName, isElement, isText, text, walkElements } from '../../utils/dom.js'
+import {
+  hasAncestorWithTagName,
+  isElement,
+  isText,
+  setInnerHtml,
+  text,
+  walkElements,
+} from '../../utils/dom.js'
 import labels from './highlightCode.json' with { type: 'json' }
 
 // The languages feedsweep recognizes, keyed by token (and alias). Used both to
@@ -357,7 +364,7 @@ export const highlightCode: DomTransform = ({ highlightFn }) => {
         continue
       }
 
-      target.innerHTML = highlighted
+      setInnerHtml(target, highlighted)
       target.classList.add('hljs')
 
       // Expose the resolved language for a frontend badge. The attributes stay on
