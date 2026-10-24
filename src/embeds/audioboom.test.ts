@@ -4,6 +4,7 @@ import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
   audioboomFlashEmbedResolver,
+  audioboomFlashResolveEmbed,
   audioboomIframeEmbedResolver,
   audioboomResolveEmbed,
   audioboomWidgetEmbedResolver,
@@ -109,6 +110,14 @@ describe('audioboomResolveEmbed', () => {
     const value = 'https://audioboom.com/about'
 
     expect(audioboomResolveEmbed(value)).toBeUndefined()
+  })
+})
+
+describe('audioboomFlashResolveEmbed', () => {
+  it('should return undefined for a player off its hosts', () => {
+    const value = 'https://www.example.com/swf/fullsize_player.swf'
+
+    expect(audioboomFlashResolveEmbed(value)).toBeUndefined()
   })
 })
 
