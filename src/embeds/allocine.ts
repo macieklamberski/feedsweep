@@ -7,6 +7,7 @@ const provider = 'allocine'
 
 const allocineHosts = ['allocine.fr']
 
+// The server answers every route in lowercase only, so `src` mints the route words that way.
 const blogPlayerPathRegex = /^\/_video\/iblogvision\.aspx$/i
 const flashPlayerPathRegex = /^\/blogvision\/([^/]+)$/i
 const playerPathRegex = /^\/([^/]+)\.html$/i

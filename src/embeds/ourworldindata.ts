@@ -1,4 +1,4 @@
-import { isAnyOf, parseUrl } from 'trousse'
+import { getAnyOf, isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { filterUrlQuery, isFileName } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -52,7 +52,7 @@ const ourworldindataResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const kind = match[1].toLowerCase()
+  const kind = getAnyOf(match[1], ['grapher', 'explorers'])
   const slug = match[2]
 
   // The site serves `/grapher/{slug}.png` and `.svg` beside the chart page.

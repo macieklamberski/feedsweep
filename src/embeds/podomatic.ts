@@ -1,4 +1,4 @@
-import { composeQuery, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import { composeQuery, getAnyOf, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -24,7 +24,7 @@ const readPlayer = (url: URL): Player | undefined => {
 
   // `embed/html5/{episode|podcast}/{id}`. Any other kind answers 404.
   if (isAnyOf(segments[1], 'html5') && segments[2]) {
-    const kind = segments[2]
+    const kind = getAnyOf(segments[2], ['episode', 'podcast']) ?? segments[2]
     const id = segments[3] ?? ''
 
     return {
