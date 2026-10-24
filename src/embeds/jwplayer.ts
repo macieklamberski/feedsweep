@@ -34,8 +34,6 @@ const composeJwplayerEmbed = (id: string, isPlaylist = false): EmbedResolverResu
   return {
     provider,
     id: isPlaylist ? `playlist/${id}` : id,
-    // Rebuilt from the id, so the empty player-id segment some feeds ship
-    // (`{mediaId}-.html`, which 404s) is dropped and the URL loads the default player.
     // JW Player has no public watch page, so no `url`: the placeholder anchors to the src.
     src: `https://cdn.jwplayer.com/players/${id}.html`,
     // A playlist id 404s on the poster endpoint, so the thumbnail is gated on the kind.
@@ -44,14 +42,24 @@ const composeJwplayerEmbed = (id: string, isPlaylist = false): EmbedResolverResu
   }
 }
 
-export const jwplayerResolveEmbed: ResolveEmbed = (url) => {
+export const jwplayerResolveEmbed: ResolveEmbed = (url, element) => {
   const mediaId = extractJwplayerId(url)
 
   if (!mediaId) {
     return
   }
 
-  return composeJwplayerEmbed(mediaId)
+  const result = composeJwplayerEmbed(mediaId)
+  const fileName = getPathSegments(url).at(-1)?.replace(fileExtensionRegex, '') ?? ''
+  const playerId = fileName.slice(mediaId.length + 1)
+
+  // A frame keeps the publisher's player, whose saved config decides ads and autostart. An empty
+  // player id answers 404, so that frame gets the default player.
+  if (element?.localName !== 'iframe' || !playerId) {
+    return result
+  }
+
+  return { ...result, src: `https://cdn.jwplayer.com/players/${mediaId}-${playerId}.html` }
 }
 
 // A JW Player iframe, players/{mediaId}-{playerId}.html, some with an empty player id that 404s.

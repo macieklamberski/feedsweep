@@ -212,7 +212,7 @@ describeForEachParser('unwrapRebelmouseEmbedFrames through the pipeline', (parse
     `
     const expected = html`
       <div
-        data-embed-src="https://cdn.jwplayer.com/players/hVoHh4GA.html"
+        data-embed-src="https://cdn.jwplayer.com/players/hVoHh4GA-FvQKszTI.html"
         data-embed-provider="jwplayer"
         data-embed-id="hVoHh4GA"
         data-embed-thumbnail="https://cdn.jwplayer.com/v2/media/hVoHh4GA/poster.jpg"
