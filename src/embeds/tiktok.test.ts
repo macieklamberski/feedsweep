@@ -487,7 +487,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
     })
 
     // TikTok's own snippet wrote the account's opaque secUid where the handle goes.
-    it('should read a clip whose cite names the account by its secUid', async () => {
+    it('should read a clip whose cite names the account by its secUid, with the author from the link title', async () => {
       const value = html`
         <blockquote
           class="tiktok-embed"
@@ -690,7 +690,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep a byline handle holding a slash inside one path segment', async () => {
+    it('should read the handle from the profile link over a byline holding a slash', async () => {
       const value = html`
         <blockquote
           class="tiktok-embed"
@@ -703,11 +703,11 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'tiktok',
-        id: '@lynja%2Fcooks/video/7001234567890123456',
+        id: '@lynja-cooks/video/7001234567890123456',
         src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
-        url: 'https://www.tiktok.com/@lynja%2Fcooks/video/7001234567890123456',
+        url: 'https://www.tiktok.com/@lynja-cooks/video/7001234567890123456',
         height: 738,
-        author: '@lynja/cooks',
+        author: '@lynja-cooks',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -908,6 +908,39 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       `
 
       expect(await convert(value)).toEqualHtml(expected)
+    })
+  })
+
+  describe('the author the byline names', () => {
+    // Constructed: TikTok's snippet writes one handle in the href, the title and the text, so
+    // only a fixture that splits them shows which one is read.
+    it('should read the handle from the profile link, not its text', async () => {
+      const value = html`
+        <blockquote
+          class="tiktok-embed"
+          cite="https://www.tiktok.com/@realname/video/7001234567890123456"
+          data-video-id="7001234567890123456"
+        >
+          <section>
+            <a
+              target="_blank"
+              title="@shown"
+              href="https://www.tiktok.com/@realname?refer=embed"
+              >@shown</a
+            >
+          </section>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@realname/video/7001234567890123456',
+        src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
+        url: 'https://www.tiktok.com/@realname/video/7001234567890123456',
+        author: '@realname',
+        height: 738,
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })

@@ -54,7 +54,7 @@ const composePlayerEmbed = (mediaId: string, playerId?: string): EmbedResolverRe
   return { ...result, src: `https://cdn.jwplayer.com/players/${mediaId}-${playerId}.html` }
 }
 
-export const jwplayerResolveEmbed: ResolveEmbed = (url) => {
+export const jwplayerResolveEmbed: ResolveEmbed = (url, element) => {
   const mediaId = extractJwplayerId(url)
 
   if (!mediaId) {
@@ -63,7 +63,10 @@ export const jwplayerResolveEmbed: ResolveEmbed = (url) => {
 
   const fileName = getPathSegments(url).at(-1)?.replace(fileExtensionRegex, '') ?? ''
 
-  return composePlayerEmbed(mediaId, fileName.slice(mediaId.length + 1))
+  return {
+    ...composePlayerEmbed(mediaId, fileName.slice(mediaId.length + 1)),
+    title: attr(element, 'title'),
+  }
 }
 
 // A JW Player iframe, players/{mediaId}-{playerId}.html, some with an empty player id that 404s.

@@ -1,4 +1,5 @@
 import { acastFieldCleaners } from '../embeds/acast.js'
+import { anchorFieldCleaners } from '../embeds/anchor.js'
 import { appleFieldCleaners } from '../embeds/apple.js'
 import { archiveFieldCleaners } from '../embeds/archive.js'
 import { audioboomFieldCleaners } from '../embeds/audioboom.js'
@@ -12,6 +13,7 @@ import { deezerFieldCleaners } from '../embeds/deezer.js'
 import { firstoryFieldCleaners } from '../embeds/firstory.js'
 import { flourishFieldCleaners } from '../embeds/flourish.js'
 import { googleformsFieldCleaners } from '../embeds/googleforms.js'
+import { imgurFieldCleaners } from '../embeds/imgur.js'
 import { indavideoFieldCleaners } from '../embeds/indavideo.js'
 import { instagramFieldCleaners } from '../embeds/instagram.js'
 import { issuuFieldCleaners } from '../embeds/issuu.js'
@@ -36,6 +38,7 @@ import type { FieldCleaner } from '../types.js'
 // beside the resolver that knows the platform.
 export const defaultFieldCleaners: Array<FieldCleaner> = [
   ...acastFieldCleaners,
+  ...anchorFieldCleaners,
   ...appleFieldCleaners,
   ...archiveFieldCleaners,
   ...audioboomFieldCleaners,
@@ -49,6 +52,7 @@ export const defaultFieldCleaners: Array<FieldCleaner> = [
   ...firstoryFieldCleaners,
   ...flourishFieldCleaners,
   ...googleformsFieldCleaners,
+  ...imgurFieldCleaners,
   ...indavideoFieldCleaners,
   ...instagramFieldCleaners,
   ...issuuFieldCleaners,

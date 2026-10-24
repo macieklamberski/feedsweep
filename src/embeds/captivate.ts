@@ -1,5 +1,6 @@
 import { getPathSegments } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { attr } from '../utils/dom.js'
 import { lettersRegex, uuidRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -26,7 +27,7 @@ export const extractCaptivateEmbed = (link: string): { kind: string; id: string 
 }
 
 // Captivate's player iframe, a kind and a uuid, with no oEmbed to size it.
-export const captivateResolveEmbed: ResolveEmbed = (url) => {
+export const captivateResolveEmbed: ResolveEmbed = (url, element) => {
   const embed = extractCaptivateEmbed(url)
 
   if (!embed) {
@@ -38,6 +39,7 @@ export const captivateResolveEmbed: ResolveEmbed = (url) => {
     id: `${embed.kind}/${embed.id}`,
     src: `https://player.captivate.fm/${embed.kind}/${embed.id}`,
     height: embed.kind === 'show' ? showHeight : playerHeight,
+    title: attr(element, 'title'),
   }
 }
 

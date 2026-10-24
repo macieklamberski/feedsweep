@@ -292,6 +292,36 @@ describeForEachParser('calameoEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
   })
+
+  describe('the title the carrier states', () => {
+    it('should read the book name WordPress writes on the frame', async () => {
+      const value = html`
+        <iframe
+          loading="lazy"
+          class="wp-embedded-content"
+          sandbox="allow-scripts"
+          security="restricted"
+          title="Revista Trencalòs 2021"
+          src="https://v.calameo.com/?bkcode=003091129e04613cb9af5#?secret=2DHDfsehu3"
+          data-secret="2DHDfsehu3"
+          width="1416"
+          height="1000"
+          frameborder="0"
+          scrolling="no"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'calameo',
+        id: '003091129e04613cb9af5',
+        src: 'https://v.calameo.com/?bkcode=003091129e04613cb9af5',
+        url: 'https://www.calameo.com/books/003091129e04613cb9af5',
+        ratio: '300/194',
+        title: 'Revista Trencalòs 2021',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
 })
 
 // Only the whole run proves the Flash object reaches this resolver ahead of every other reader

@@ -123,6 +123,7 @@ describeForEachParser('crowdsignalIframeEmbedResolver', (parseHtml) => {
         src: 'https://poll.fm/17125374/embed',
         url: 'https://poll.fm/17125374',
         height: 533,
+        title: 'A question?',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -678,6 +679,7 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
       <figure class="wp-block-embed is-provider-crowdsignal">
         <p><script>var pd_tags = new Array;pd_tags["17125374-src"]="poll-oembed-simple";</script></p>
         <div
+          data-embed-title="A question?"
           data-embed-height="533"
           data-embed-provider="crowdsignal"
           data-embed-id="17125374"

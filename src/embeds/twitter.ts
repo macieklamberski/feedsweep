@@ -7,10 +7,11 @@ import {
   parseUrl,
 } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, find, jsonAttr, setInnerHtml, text } from '../utils/dom.js'
+import { attr, find, jsonAttr, keepIfMatches, setInnerHtml, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
 import {
+  atUsername,
   createMarkupEmbedResolver,
   createS9eEmbedResolver,
   createUrlEmbedResolver,
@@ -55,10 +56,6 @@ const handlelessPathRegex =
 // Twitter takes `i` where a handle belongs and redirects to the real one, so a status recovered
 // without a handle still yields a url a reader can follow.
 const handleStandIn = 'i'
-// The dash class is an em dash, an en dash and a hyphen.
-// The byline reads "— Display Name (@user)" beside a dated anchor to the status. A skeleton
-// blockquote keeps the byline's punctuation and fills in neither half, so it holds `—  (@)`.
-const bylineRegex = /^[—–-]\s*(.*?)\s*\(@[a-zA-Z0-9_]*\)\s*$/
 
 type Status = { handle: string; id: string }
 
@@ -103,29 +100,26 @@ const findStatus = (element: Element): { status: Status; anchor?: Element } | un
     attr(element, 'data-tweet-id') ??
     attr(element, 'data-tweetid') ??
     framed
+  // A status id is digits, the same alphabet the status path takes.
+  const id = keepIfMatches(declared, digitsRegex)
 
-  return declared ? { status: { handle: '', id: declared } } : undefined
+  return id ? { status: { handle: '', id } } : undefined
 }
 
-// A byline the embed dialog wrote gives up its display name. Anything else is taken whole, since
-// a publisher who hand-wrote the line still named someone.
-const readAuthor = (bylineText: string | undefined): string | undefined => {
-  const byline = bylineText?.match(bylineRegex)
+// The handle in the status url. The byline and the dated anchor are display text the embed
+// dialog writes in the page's language, such as `13. Februar 2016`.
+const readAuthor = (status: Status): string | undefined => {
+  if (!status.handle || isAnyOf(status.handle, handleStandIn)) {
+    return
+  }
 
-  // biome-ignore lint/nursery/useNullishCoalescing: A byline left empty reads as absent.
-  return byline ? byline[1] || undefined : bylineText || undefined
+  return atUsername(status.handle)
 }
 
-// The tweet text and the byline, which by this point are sibling paragraphs: whatever shape
-// the source used, the bare byline has been wrapped into a paragraph of its own upstream.
-// A long tweet spans several paragraphs, so every one that is not the byline is tweet text.
-const readContent = (element: Element, anchor: Element | undefined) => {
+// The tweet text: every paragraph but the one holding the dated anchor, which is the byline once
+// the pipeline has wrapped it. A long tweet spans several paragraphs.
+const readContent = (element: Element, status: Status, anchor: Element | undefined) => {
   const byline = anchor?.parentElement
-  const bylineText = byline
-    ? text(byline)
-        ?.replace(text(anchor) ?? '', '')
-        .trim()
-    : undefined
   const body = Array.from(element.querySelectorAll('p'))
     .filter((paragraph) => paragraph !== byline)
     .map((paragraph) => text(paragraph))
@@ -134,8 +128,7 @@ const readContent = (element: Element, anchor: Element | undefined) => {
 
   return {
     description: body || undefined,
-    author: readAuthor(bylineText),
-    date: text(anchor),
+    author: readAuthor(status),
   }
 }
 
@@ -148,7 +141,7 @@ const composeEmbed = (status: Status, extra: Partial<EmbedResolverResult>): Embe
     provider,
     id: status.id,
     src: `https://platform.twitter.com/embed/Tweet.html${composeQuery({ id: status.id })}`,
-    url: status.handle ? composeTwitterStatusUrl(status.handle, status.id) : undefined,
+    url: composeTwitterStatusUrl(status.handle || handleStandIn, status.id),
     ...extra,
   }
 }
@@ -162,7 +155,7 @@ const extractTweet = (element: Element): EmbedResolverResult | undefined => {
     return
   }
 
-  return composeEmbed(found.status, readContent(element, found.anchor))
+  return composeEmbed(found.status, readContent(element, found.status, found.anchor))
 }
 
 // Twitter's oEmbed blockquote: tweet text and a byline that only widgets.js turns into a player.
@@ -218,6 +211,22 @@ const readPhotoUrl = (photos: SubstackTweetAttrs['photos']): string | undefined 
   return parsed?.search === '' ? url : undefined
 }
 
+const readSubstackAuthor = (attrs: SubstackTweetAttrs): string | undefined => {
+  const name = attrs.name?.trim()
+
+  if (name) {
+    return name
+  }
+
+  const username = attrs.username?.trim()
+
+  if (!username) {
+    return
+  }
+
+  return atUsername(username)
+}
+
 const extractSubstackTweet = (element: Element): EmbedResolverResult | undefined => {
   const attrs = jsonAttr<SubstackTweetAttrs>(element, 'data-attrs')
 
@@ -233,7 +242,7 @@ const extractSubstackTweet = (element: Element): EmbedResolverResult | undefined
 
   return composeEmbed(status, {
     description: readTweetText(element, attrs.full_text),
-    author: attrs.name?.trim() || attrs.username?.trim() || undefined,
+    author: readSubstackAuthor(attrs),
     avatar: attrs.profile_image_url?.trim() || undefined,
     date: attrs.date?.trim() || undefined,
     thumbnail: readPhotoUrl(attrs.photos),
@@ -257,10 +266,11 @@ const playerPaths = ['/embed/Tweet.html', '/embed/index.html']
 // or `X Post`.
 export const twitterResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url)
-  const id =
+  const framed =
     parsed && isAnyOf(parsed.pathname, playerPaths)
       ? getQueryParam(parsed.searchParams, 'id')
       : undefined
+  const id = keepIfMatches(framed, digitsRegex)
 
   if (id) {
     return composeEmbed({ handle: '', id }, {})
@@ -268,7 +278,7 @@ export const twitterResolveEmbed: ResolveEmbed = (url) => {
 
   const status = readStatusUrl(url)
 
-  return status ? composeEmbed(status, {}) : undefined
+  return status ? composeEmbed(status, { author: readAuthor(status) }) : undefined
 }
 
 // A Twitter player iframe, or a frame of the status page, which refuses framing.
