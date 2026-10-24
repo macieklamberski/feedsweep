@@ -40,10 +40,10 @@ export const defaultNonContentSelectors = [
   'iframe[src*="google.com/recaptcha/"]',
   'iframe[src*="recaptcha.net/"]',
 
-  // The reCAPTCHA response box beside the fallback frame, and its copy in a rendered widget.
-  // MailPoet renames it but keeps the class.
-  'textarea:is([name="g-recaptcha-response"], .g-recaptcha-response)',
-  'textarea[name="recaptcha_challenge_field"]', // The same box in reCAPTCHA v1's no-script fallback.
+  // The reCAPTCHA response box beside the fallback frame in its no-script fallback.
+  'noscript textarea[name="g-recaptcha-response"]',
+  'noscript textarea[name="recaptcha_challenge_field"]', // The same box in reCAPTCHA v1.
+  'noscript label[for="g-recaptcha-response"]', // The box's screen-reader label, written by some themes.
 
   // Ad slots.
   '.adsbygoogle', // Google AdSense ad slot.

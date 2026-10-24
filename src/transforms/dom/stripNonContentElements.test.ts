@@ -48,10 +48,18 @@ const specimens: Record<string, string | [string, string]> = {
     '<iframe src="https://www.google.com/recaptcha/api/fallback?hl=en&amp;k=6LddubAUAAAAAOZ0V8l7NcrIkv58vlZKl6k6b2c_" frameborder="0" scrolling="no" style="width: 302px; height:422px; border-style: none;"></iframe>',
   'iframe[src*="recaptcha.net/"]':
     '<iframe src="https://api-secure.recaptcha.net/noscript?k=6LeMVQQAAAAAAE8eiOuwZPcQUIg_1ooYyN7m3Ibx" height="300" width="500" frameborder="0"></iframe>',
-  'textarea:is([name="g-recaptcha-response"], .g-recaptcha-response)':
-    '<textarea id="g-recaptcha-response" name="g-recaptcha-response" class="recaptcha_challenge_field" style="width: 250px; height: 80px; border: 1px solid #c1c1c1; margin: 0px; padding: 0px; resize: none;" value=""></textarea>',
-  'textarea[name="recaptcha_challenge_field"]':
-    '<textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>',
+  'noscript textarea[name="g-recaptcha-response"]': [
+    '<noscript><div style="width: 250px; height: 80px; position: absolute; border-style: none; bottom: 21px; left: 25px; margin: 0px; padding: 0px; right: 25px;"><textarea id="g-recaptcha-response" name="g-recaptcha-response" class="recaptcha_challenge_field" style="width: 250px; height: 80px; border: 1px solid #c1c1c1; margin: 0px; padding: 0px; resize: none;" value=""></textarea></div></noscript>',
+    '<noscript><div style="width: 250px; height: 80px; position: absolute; border-style: none; bottom: 21px; left: 25px; margin: 0px; padding: 0px; right: 25px;"></div></noscript>',
+  ],
+  'noscript textarea[name="recaptcha_challenge_field"]': [
+    '<noscript><textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea></noscript>',
+    '<noscript></noscript>',
+  ],
+  'noscript label[for="g-recaptcha-response"]': [
+    '<noscript><div style="width: 300px; height: 60px; border-style: none;"><label for="g-recaptcha-response" class="screen-reader-text">reCAPTCHA response</label></div></noscript>',
+    '<noscript><div style="width: 300px; height: 60px; border-style: none;"></div></noscript>',
+  ],
   '.adsbygoogle':
     '<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-x" data-ad-slot="123"></ins>',
   'div[id^="div-gpt-ad"]': '<div id="div-gpt-ad-1234567890"></div>',
@@ -768,16 +776,42 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
-    it('should strip the reCAPTCHA response box MailPoet renames', async () => {
+    it('should keep the reCAPTCHA response box MailPoet renames', async () => {
       const value = html`
-        <div class="mailpoet_recaptcha_noscript_input">
-          <textarea id="g-recaptcha-response" name="data[recaptcha]" class="g-recaptcha-response"></textarea>
-        </div>
+        <noscript>
+          <div class="mailpoet_recaptcha_noscript_input">
+            <textarea id="g-recaptcha-response" name="data[recaptcha]" class="g-recaptcha-response"></textarea>
+          </div>
+        </noscript>
       `
 
-      expect(await transform(value)).toEqualHtml(
-        '<div class="mailpoet_recaptcha_noscript_input"></div>',
-      )
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a reCAPTCHA response box outside a noscript', async () => {
+      const value = html`
+        <textarea name="g-recaptcha-response" class="g-recaptcha-response" aria-hidden="true"></textarea>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    // Constructed: no feed or lab page carries this label outside a noscript.
+    it('should keep a reCAPTCHA label outside a noscript', async () => {
+      const value = html`
+        <label for="g-recaptcha-response" class="screen-reader-text">reCAPTCHA response</label>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    // Constructed: no feed or lab page carries another label inside a noscript.
+    it('should keep another label inside a noscript', async () => {
+      const value = html`
+        <noscript><label for="comment">Comment <span class="required">*</span></label></noscript>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
     })
 
     it('should keep the comment box of the form a reCAPTCHA guards', async () => {
@@ -950,6 +984,30 @@ describeForEachParser('stripNonContentElements through the pipeline', (parseHtml
       <noscript>
         <div style="width: 302px; height: 352px;">
           <iframe src="https://www.google.com/recaptcha/api/fallback?k=6LckvbkSAAAAAPJ6RqZupEwCGus2nofeEDv80O6s" frameborder="0" scrolling="no" style="width: 302px; height:352px; border-style: none;"></iframe>
+        </div>
+      </noscript>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+
+    expect(result).toEqualHtml('')
+  })
+
+  it('should strip a reCAPTCHA response box with its fallback frame from its noscript', async () => {
+    const value = html`
+      <noscript>
+        <div style="width: 302px; height: 422px;">
+          <div style="width: 302px; height: 422px; position: relative;">
+            <div style="width: 302px; height: 422px; position: absolute;">
+              <iframe src="https://www.google.com/recaptcha/api/fallback?k=6LfmLHAUAAAAAMJLL9jGO0TNQ7620FIPmTROYCZd" frameborder="0" scrolling="no" style="width: 302px; height:422px; border-style: none;" title="reCAPTCHA challenge"></iframe>
+            </div>
+            <div style="width: 300px; height: 60px; border-style: none; bottom: 12px; left: 25px; margin: 0px; padding: 0px; right: 25px; background: #f9f9f9; border: 1px solid #c1c1c1; border-radius: 3px;">
+              <label for="g-recaptcha-response" class="screen-reader-text">reCAPTCHA response</label>
+              <textarea id="g-recaptcha-response" name="g-recaptcha-response" class="g-recaptcha-response" style="width: 250px; height: 40px; border: 1px solid #c1c1c1; margin: 10px 25px; padding: 0px; resize: none;"></textarea>
+            </div>
+          </div>
         </div>
       </noscript>
     `
