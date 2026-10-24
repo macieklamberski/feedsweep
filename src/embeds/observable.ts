@@ -48,17 +48,16 @@ const observableResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  // The decoded names serve the `@` check and the key, and the written segments the page path.
-  const handle = decodeSegment(rawHandle) ?? rawHandle
+  // The decoded notebook serves the key, and the written segment the page path.
   const notebook = (decodeSegment(rawSlug) ?? rawSlug).replace(versionSuffixRegex, '')
 
-  if (!handle.startsWith('@') || !notebook) {
+  if (!rawHandle.startsWith('@') || !notebook) {
     return
   }
 
   return {
     provider,
-    id: `${handle}/${notebook}`,
+    id: `${rawHandle}/${notebook}`,
     src,
     url: `https://observablehq.com/${rawHandle}/${rawSlug.replace(versionSuffixRegex, '')}`,
   }
