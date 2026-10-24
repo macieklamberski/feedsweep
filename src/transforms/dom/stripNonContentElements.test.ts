@@ -48,6 +48,10 @@ const specimens: Record<string, string | [string, string]> = {
     '<iframe src="https://www.google.com/recaptcha/api/fallback?hl=en&amp;k=6LddubAUAAAAAOZ0V8l7NcrIkv58vlZKl6k6b2c_" frameborder="0" scrolling="no" style="width: 302px; height:422px; border-style: none;"></iframe>',
   'iframe[src*="recaptcha.net/"]':
     '<iframe src="https://api-secure.recaptcha.net/noscript?k=6LeMVQQAAAAAAE8eiOuwZPcQUIg_1ooYyN7m3Ibx" height="300" width="500" frameborder="0"></iframe>',
+  'textarea:is([name="g-recaptcha-response"], .g-recaptcha-response)':
+    '<textarea id="g-recaptcha-response" name="g-recaptcha-response" class="recaptcha_challenge_field" style="width: 250px; height: 80px; border: 1px solid #c1c1c1; margin: 0px; padding: 0px; resize: none;" value=""></textarea>',
+  'textarea[name="recaptcha_challenge_field"]':
+    '<textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>',
   '.adsbygoogle':
     '<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-x" data-ad-slot="123"></ins>',
   'div[id^="div-gpt-ad"]': '<div id="div-gpt-ad-1234567890"></div>',
@@ -652,6 +656,7 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(value)
     })
+
     it('should keep a prose link to the Zeno.FM home page away from the player', async () => {
       const value = html`
         <iframe src="https://zeno.fm/player/halshack" width="575" height="250"></iframe>
@@ -758,6 +763,26 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
     it('should keep a reCAPTCHA logo served from recaptcha.net', async () => {
       const value = html`
         <p><img src="http://recaptcha.net/images/logo2-new.gif" alt="reCAPTCHA" width="187" height="125"></p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should strip the reCAPTCHA response box MailPoet renames', async () => {
+      const value = html`
+        <div class="mailpoet_recaptcha_noscript_input">
+          <textarea id="g-recaptcha-response" name="data[recaptcha]" class="g-recaptcha-response"></textarea>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(
+        '<div class="mailpoet_recaptcha_noscript_input"></div>',
+      )
+    })
+
+    it('should keep the comment box of the form a reCAPTCHA guards', async () => {
+      const value = html`
+        <textarea id="comment" name="comment" class="form-control" cols="45" rows="8" aria-required="true"></textarea>
       `
 
       expect(await transform(value)).toEqualHtml(value)

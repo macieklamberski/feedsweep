@@ -36,9 +36,14 @@ export const defaultNonContentSelectors = [
 
   // reCAPTCHA challenge frames, the no-script fallback of a comment or contact form. Google
   // serves them under `/recaptcha/` on its own host, where Maps and Calendar frames sit beside
-  // them. recaptcha.net, the mirror for regions that block google.com, serves nothing else.
+  // them. recaptcha.net, the mirror for regions that block google.com, serves only reCAPTCHA.
   'iframe[src*="google.com/recaptcha/"]',
   'iframe[src*="recaptcha.net/"]',
+
+  // The reCAPTCHA response box beside the fallback frame, and its copy in a rendered widget.
+  // MailPoet renames it but keeps the class.
+  'textarea:is([name="g-recaptcha-response"], .g-recaptcha-response)',
+  'textarea[name="recaptcha_challenge_field"]', // The same box in reCAPTCHA v1's no-script fallback.
 
   // Ad slots.
   '.adsbygoogle', // Google AdSense ad slot.
