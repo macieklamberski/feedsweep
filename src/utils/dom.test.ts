@@ -1118,6 +1118,120 @@ describeForEachParser('setInnerHtml', (parseHtml) => {
 
     expect(element.querySelector('p')?.textContent).toBe('Kosakata alat kesehatan.')
   })
+
+  it('should keep a doctype written inside an attribute value', () => {
+    const element = parseHtml('').createElement('div')
+    const value = html`
+      <p>
+        You can <a href="#respond">leave a response</a>, or
+        <a href="<!DOCTYPE html>" rel="trackback">trackback</a>
+        from your own site.
+      </p>
+    `
+    setInnerHtml(element, value)
+
+    expect(element.querySelector('[rel="trackback"]')?.getAttribute('href')).toBe('<!DOCTYPE html>')
+  })
+
+  it('should keep a doctype written inside a comment', () => {
+    const element = parseHtml('').createElement('div')
+    setInnerHtml(element, '<p>Start</p><!-- <p>Draft</p> <!DOCTYPE html> --><p>End</p>')
+
+    expect(element.innerHTML).toBe('<p>Start</p><!-- <p>Draft</p> <!DOCTYPE html> --><p>End</p>')
+  })
+
+  it('should keep a doctype written inside an svg CDATA section', () => {
+    const element = parseHtml('').createElement('div')
+    setInnerHtml(element, '<svg><![CDATA[ a > <!DOCTYPE html> ]]></svg>')
+    const section = element.querySelector('svg')?.firstChild as CharacterData | null
+
+    expect(section?.data).toContain('<!DOCTYPE html>')
+  })
+
+  it('should keep a doctype written inside a processing instruction', () => {
+    const element = parseHtml('').createElement('div')
+    setInnerHtml(element, "<p>Start</p><?php echo '<!DOCTYPE html>'; ?><p>End</p>")
+
+    expect(element.textContent).toBe("Start'; ?>End")
+  })
+
+  it('should keep a doctype written inside a script', () => {
+    const element = parseHtml('').createElement('div')
+    setInnerHtml(element, '<script>frame.document.write("<!DOCTYPE html><html>")</script>')
+
+    expect(element.querySelector('script')?.textContent).toBe(
+      'frame.document.write("<!DOCTYPE html><html>")',
+    )
+  })
+
+  it('should keep a doctype written inside a style', () => {
+    const element = parseHtml('').createElement('div')
+    setInnerHtml(element, '<style>/* <!DOCTYPE html> */</style>')
+
+    expect(element.querySelector('style')?.textContent).toBe('/* <!DOCTYPE html> */')
+  })
+
+  it('should keep a doctype written inside a textarea', () => {
+    const element = parseHtml('').createElement('div')
+    setInnerHtml(element, '<textarea><!DOCTYPE html></textarea>')
+
+    expect(element.querySelector('textarea')?.textContent).toBe('<!DOCTYPE html>')
+  })
+
+  it('should keep a doctype written inside a title', () => {
+    const element = parseHtml('').createElement('div')
+    setInnerHtml(element, '<title><!DOCTYPE html></title>')
+
+    expect(element.querySelector('title')?.textContent).toBe('<!DOCTYPE html>')
+  })
+
+  it('should keep a doctype written inside an xmp', () => {
+    const element = parseHtml('').createElement('div')
+    setInnerHtml(element, '<xmp><!DOCTYPE html></xmp>')
+
+    expect(element.querySelector('xmp')?.textContent).toBe('<!DOCTYPE html>')
+  })
+
+  it('should drop a doctype that follows raw text, a comment and a tag', () => {
+    const element = parseHtml('').createElement('div')
+    setInnerHtml(element, '<xmp>a</xmp><!-- b --><br title="c"><!DOCTYPE html><p>Kosakata.</p>')
+
+    expect(element.querySelector('p')?.textContent).toBe('Kosakata.')
+  })
+
+  const malformedCases: Array<[string, string]> = [
+    ['a doubled quote', '<a href="x"">link</a>'],
+    ['an apostrophe in a single-quoted value', `<img alt='Don't' src="a.png">`],
+    ['a quote in an unquoted value', '<a title=x"y>link</a>'],
+    ['a quote in an attribute name', '<a b"c>link</a>'],
+    ['an abrupt comment', '<!-->'],
+    ['an abrupt comment with a dash', '<!--->'],
+    ['a script end tag with an attribute', '<script>a</script x>'],
+    ['a custom element named after script', '<script-x>a</script-x>'],
+  ]
+
+  it.each(malformedCases)('should drop a doctype that follows %s', (_name, value) => {
+    const element = parseHtml('').createElement('div')
+    setInnerHtml(element, `${value}<!DOCTYPE html><p>Kosakata.</p>`)
+
+    expect(element.querySelector('p')?.textContent).toBe('Kosakata.')
+  })
+
+  it('should scan a long run of unclosed doctypes in linear time', () => {
+    const element = parseHtml('').createElement('div')
+    const start = performance.now()
+    setInnerHtml(element, '<!DOCTYPE html'.repeat(20_000))
+
+    expect(performance.now() - start).toBeLessThan(1000)
+  })
+
+  it('should scan a long run of tags before an unclosed quote in linear time', () => {
+    const element = parseHtml('').createElement('div')
+    const start = performance.now()
+    setInnerHtml(element, `${'<a '.repeat(100_000)}"`)
+
+    expect(performance.now() - start).toBeLessThan(1000)
+  })
 })
 
 describeForEachParser('removeWithEmptyWrappers', (parseHtml) => {
