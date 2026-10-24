@@ -1,9 +1,10 @@
+import { toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { glyphFromShortcode, resolveEmojiElement } from '../utils/emojis.js'
 
 // The code Thunderbird and SeaMonkey's composer writes for each numbered smiley class.
-const smileyCodes: Record<string, string> = {
+const smileyCodes = toMap({
   s1: ':-)',
   s2: ':-(',
   s3: ';-)',
@@ -20,7 +21,7 @@ const smileyCodes: Record<string, string> = {
   s14: 'O:-)',
   s15: ":'(",
   s16: ':-X',
-}
+})
 
 const classRegex = /(?:^|\s)moz-smiley-(s\d+)(?:\s|$)/
 
@@ -30,7 +31,7 @@ export const mozillaEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: 'span[class*="moz-smiley-s" i]',
   extract: (element) => {
-    const code = smileyCodes[attr(element, 'class')?.match(classRegex)?.[1] ?? '']
+    const code = smileyCodes.get(attr(element, 'class')?.match(classRegex)?.[1] ?? '')
     const title = attr(element, 'title')
     const text = element.textContent?.trim()
 

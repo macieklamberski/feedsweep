@@ -1,3 +1,4 @@
+import { toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
 import { type EmojiCarrier, glyphFromCarrierEmoji } from '../utils/carrierEmoji.js'
 import { type EmojiGlyph, getFileStem, noEmojiNames, resolveEmojiImage } from '../utils/emojis.js'
@@ -10,20 +11,21 @@ const selectors = [
 // Mail's older set names each file by the carrier's letter and its own number for the emoji, like
 // `ew_icon_a257` for au's 257, beside Yahoo's own drawings like `ew_icon_exclamation`.
 const carrierIconRegex = /^ew_icon_([ads])(\d+)$/
-const carriers: Record<string, EmojiCarrier> = {
+const carriers = toMap<EmojiCarrier>({
   a: 'au',
   d: 'docomo',
   s: 'softbank',
-}
+})
 
 const getGlyph = (src: string): EmojiGlyph | undefined => {
   const [, letter, number] = getFileStem(src).match(carrierIconRegex) ?? []
+  const carrier = carriers.get(letter ?? '')
 
-  if (!letter) {
+  if (!carrier) {
     return
   }
 
-  return glyphFromCarrierEmoji(carriers[letter], Number(number))
+  return glyphFromCarrierEmoji(carrier, Number(number))
 }
 
 // Yahoo Japan's emoticons and Mail emoji, as blogs and mail pasted them straight from its image

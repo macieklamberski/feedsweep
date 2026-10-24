@@ -1,4 +1,4 @@
-import { getPathSegments, type Nullish, parseUrl, trimObject } from 'trousse'
+import { getPathSegments, type Nullish, parseUrl, toMap, trimObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr, text } from '../utils/dom.js'
 import { isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
@@ -139,11 +139,11 @@ const shortLinkHostRegex = /^on\./
 
 // The classic player is a bar for a single track and a scrolling list for anything holding
 // several. These are the heights SoundCloud's own embed config carries per player.
-const classicPlayerHeights: Record<string, number | undefined> = {
+const classicPlayerHeights = toMap({
   tracks: 166,
   playlists: 450,
   users: 450,
-}
+})
 
 // Any carrier, because the Flash player shipped the same `url=` reference on an `<embed>` and an
 // `<object>`: `player.soundcloud.com/player.swf?url=api.soundcloud.com/tracks/{id}`. The host
@@ -258,8 +258,8 @@ const soundcloudResolveEmbed: ResolveEmbed = (url, element) => {
   // A kind the carrier does not name, such as a share link's, gets the single-track bar, which
   // the classic player draws for a list too.
   result.height =
-    classicPlayerHeights[reference?.[1] ?? (streamTrackId && 'tracks') ?? pageKind ?? ''] ??
-    classicPlayerHeights.tracks
+    classicPlayerHeights.get(reference?.[1] ?? (streamTrackId && 'tracks') ?? pageKind ?? '') ??
+    classicPlayerHeights.get('tracks')
 
   const title = attr(element, 'title')
 
