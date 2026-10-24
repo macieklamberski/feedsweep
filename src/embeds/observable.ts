@@ -1,4 +1,4 @@
-import { getPathSegments, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
 import { readIframeResizeHeight } from '../utils/hints.js'
@@ -17,7 +17,7 @@ const observableResolveEmbed: ResolveEmbed = (url) => {
   const parsed = parseUrl(url)
   const segments = getPathSegments(url)
 
-  if (!parsed || segments[0] !== 'embed') {
+  if (!parsed || !isAnyOf(segments[0], 'embed')) {
     return
   }
 

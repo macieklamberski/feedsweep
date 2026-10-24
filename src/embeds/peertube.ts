@@ -1,4 +1,4 @@
-import { getPathSegments, isHttpUrl, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, isHttpUrl, parseUrl } from 'trousse'
 import type { EmbedRenderHint } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { pickUrlParams, uuidRegex } from '../utils/urls.js'
@@ -18,7 +18,7 @@ type PeertubeVideo = {
 const shortIdRegex = /^[1-9A-HJ-NP-Za-km-z]{22}$/
 
 // `/videos/watch/{id}` is the watch page PeerTube served before 4.0 and still answers on.
-const videoRoutes = new Set(['embed', 'watch'])
+const videoRoutes = ['embed', 'watch']
 
 // A vertical upload gets the same landscape player as any other: an instance's oEmbed answers
 // 560x315 for a video whose own aspectRatio is 0.5625, so a carrier's portrait box never fills.
@@ -29,11 +29,11 @@ const isVideoId = (segment: string | undefined): segment is string => {
 }
 
 const readPathId = (segments: Array<string>): string | undefined => {
-  if (segments[0] === 'w') {
+  if (isAnyOf(segments[0], 'w')) {
     return segments[1]
   }
 
-  if (segments[0] === 'videos' && videoRoutes.has(segments[1])) {
+  if (isAnyOf(segments[0], 'videos') && isAnyOf(segments[1], videoRoutes)) {
     return segments[2]
   }
 }
@@ -62,7 +62,7 @@ const peertubeEmbedParams = ['start', 'stop', 'subtitle']
 // A PeerTube video, framed as the bare player or as the watch page. A framed watch page loads the
 // instance's whole page, header and comments around the player, so the src is rebuilt either way.
 export const peertubeEmbedResolver = createMarkupEmbedResolver(
-  'iframe[src*="/videos/embed/"], iframe[src*="/videos/watch/"], iframe[src*="/w/"]',
+  'iframe[src*="/videos/embed/" i], iframe[src*="/videos/watch/" i], iframe[src*="/w/" i]',
   (element) => {
     const link = readCarrierUrl(element)
     const video = parseVideo(link)
