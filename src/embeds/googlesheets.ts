@@ -1,7 +1,7 @@
-import { getAnyOf, getPathSegments, isAnyOf, parseUrl } from 'trousse'
+import { composeQuery, getAnyOf, getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr, getElementDimensions } from '../utils/dom.js'
-import { composeQuery, pickQueryParams, pickUrlParams } from '../utils/urls.js'
+import { pickQueryParams, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 import { composeDriveThumbnail } from './googledrive.js'
 

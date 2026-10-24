@@ -259,7 +259,7 @@ describeForEachParser('linkifyPaypalDonateForms', (parseHtml) => {
         </form>
       `
       const expected = html`
-        <a href="https://www.paypal.com/donate/?hosted_button_id=2BXZQLFUKNZ3Y%26business%3Devil%40example.com">
+        <a href="https://www.paypal.com/donate/?hosted_button_id=2BXZQLFUKNZ3Y%26business=evil@example.com">
           <img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif">
         </a>
       `

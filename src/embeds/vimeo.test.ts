@@ -196,7 +196,7 @@ describe('vimeoResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'vimeo',
       id: '76979871:../../showcase/1',
-      src: 'https://player.vimeo.com/video/76979871?h=..%2F..%2Fshowcase%2F1',
+      src: 'https://player.vimeo.com/video/76979871?h=../../showcase/1',
       url: 'https://vimeo.com/76979871/..%2F..%2Fshowcase%2F1',
       ratio: '16/9',
     }

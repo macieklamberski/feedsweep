@@ -1,3 +1,4 @@
+import { composeQuery, trimObject } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -81,15 +82,18 @@ export const readWidgetConfig = (source: string): WidgetConfig | undefined => {
 // The signature is bound to the item: a config's own url answers 200, and the same url carrying
 // another specimen's signature 400. Signatures do not appear to expire.
 export const composeWidgetEmbedUrl = (config: WidgetConfig): string => {
-  const query = new URLSearchParams({ et: config.et })
-
   // The signature covers `tld` only when the config wrote it: a `tld` added to a url signed
   // without one answers "Incorrect or invalid URL".
-  if (config.tld) {
-    query.set('tld', config.tld)
-  }
+  const query = composeQuery(
+    trimObject(
+      {
+        et: config.et,
+        tld: config.tld,
+        sig: config.sig,
+      },
+      Boolean,
+    ),
+  )
 
-  query.set('sig', config.sig)
-
-  return `https://embed.gettyimages.com/embed/${config.items}?${query}`
+  return `https://embed.gettyimages.com/embed/${config.items}${query}`
 }

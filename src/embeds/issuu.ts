@@ -1,4 +1,5 @@
 import {
+  composeQuery,
   decodeSegment,
   getPathSegments,
   getQueryParam,
@@ -11,7 +12,7 @@ import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.j
 const provider = 'issuu'
 
 import { attr, flashVars } from '../utils/dom.js'
-import { composeQuery, encodePathSegment, isFileName, parseUrlOnHosts } from '../utils/urls.js'
+import { encodePathSegment, isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const issuuHosts = ['issuu.com']

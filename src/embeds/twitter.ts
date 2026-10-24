@@ -1,8 +1,15 @@
-import { getQueryParam, isAnyOf, isHostOrSubdomainOf, isPlainObject, parseUrl } from 'trousse'
+import {
+  composeQuery,
+  getQueryParam,
+  isAnyOf,
+  isHostOrSubdomainOf,
+  isPlainObject,
+  parseUrl,
+} from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, jsonAttr, setInnerHtml, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createS9eEmbedResolver,

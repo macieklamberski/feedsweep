@@ -1,11 +1,14 @@
-import { decodeSegment, getPathSegments, getQueryParam, isAnyOf, parseUrl, toMap } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import {
   composeQuery,
-  encodePathSegment,
-  pickQueryParams,
-  placeholderBaseUrl,
-} from '../utils/urls.js'
+  decodeSegment,
+  getPathSegments,
+  getQueryParam,
+  isAnyOf,
+  parseUrl,
+  toMap,
+} from 'trousse'
+import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { encodePathSegment, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 type EmbedShape = {

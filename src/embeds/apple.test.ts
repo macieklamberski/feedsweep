@@ -185,8 +185,8 @@ describe('appleResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'applemusic',
         id: 'album/../../evil',
-        src: 'https://embed.music.apple.com/us/album/thriller/1440857781?i=..%2F..%2Fevil',
-        url: 'https://music.apple.com/us/album/thriller/1440857781?i=..%2F..%2Fevil',
+        src: 'https://embed.music.apple.com/us/album/thriller/1440857781?i=../../evil',
+        url: 'https://music.apple.com/us/album/thriller/1440857781?i=../../evil',
         height: 175,
       }
 

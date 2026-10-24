@@ -340,7 +340,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'twitter',
         id: '../evil',
-        src: 'https://platform.twitter.com/embed/Tweet.html?id=..%2Fevil',
+        src: 'https://platform.twitter.com/embed/Tweet.html?id=../evil',
         description: 'Text.',
       }
 
@@ -1479,7 +1479,7 @@ describeForEachParser('twitterS9eEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'twitter',
         id: '123&lang=en',
-        src: 'https://platform.twitter.com/embed/Tweet.html?id=123%26lang%3Den',
+        src: 'https://platform.twitter.com/embed/Tweet.html?id=123%26lang=en',
       }
 
       expect(await extract(value)).toEqual(expected)

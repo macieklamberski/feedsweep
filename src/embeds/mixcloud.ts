@@ -1,4 +1,4 @@
-import { decodeSegment, getPathSegments, getQueryParam, parseUrl } from 'trousse'
+import { composeQuery, decodeSegment, getPathSegments, getQueryParam, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { isFileName, placeholderBaseUrl } from '../utils/urls.js'
@@ -93,7 +93,7 @@ export const mixcloudResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const query = new URLSearchParams({ feed: `/${show.key}/` })
+  const query = composeQuery({ feed: `/${show.key}/` })
 
   const title = attr(element, 'title')
   const [author] = show.key.split('/')
@@ -102,7 +102,7 @@ export const mixcloudResolveEmbed: ResolveEmbed = (url, element) => {
     provider,
     id: show.key,
     // The www url 301s to player-widget.mixcloud.com, a host one redirect away from changing.
-    src: `https://www.mixcloud.com/widget/iframe/?${query}`,
+    src: `https://www.mixcloud.com/widget/iframe/${query}`,
     url: `https://www.mixcloud.com/${show.path}/`,
     height: playerHeight,
     author,

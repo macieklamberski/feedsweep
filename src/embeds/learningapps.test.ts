@@ -86,7 +86,7 @@ describe('learningappsResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'learningapps',
         id: '../appicons',
-        src: 'https://learningapps.org/watch?app=..%2Fappicons',
+        src: 'https://learningapps.org/watch?app=../appicons',
         height: 500,
       }
 
@@ -98,7 +98,7 @@ describe('learningappsResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'learningapps',
         id: 'abc&v=1',
-        src: 'https://learningapps.org/watch?app=abc%26v%3D1',
+        src: 'https://learningapps.org/watch?app=abc%26v=1',
         height: 500,
       }
 

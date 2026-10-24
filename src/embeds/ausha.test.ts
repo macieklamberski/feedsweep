@@ -69,7 +69,7 @@ describe('aushaResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'ausha',
         id: 'podcast/podcast/BGKwJUJG8D9m',
-        src: 'https://player.ausha.co/?podcastId=podcast%2FBGKwJUJG8D9m&v=3',
+        src: 'https://player.ausha.co/?podcastId=podcast/BGKwJUJG8D9m&v=3',
         height: 220,
       }
 

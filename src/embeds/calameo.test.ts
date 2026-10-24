@@ -96,7 +96,7 @@ describe('calameoResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'calameo',
         id: '../books',
-        src: 'https://v.calameo.com/?bkcode=..%2Fbooks',
+        src: 'https://v.calameo.com/?bkcode=../books',
         url: 'https://www.calameo.com/books/..%2Fbooks',
         ratio: '300/194',
       }

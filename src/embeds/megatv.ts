@@ -1,6 +1,6 @@
-import { getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { composeQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const megatvHosts = ['megatv.com']
@@ -34,7 +34,7 @@ const megatvResolveEmbed: ResolveEmbed = (url) => {
     provider: 'megatv',
     id,
     src: `https://www.megatv.com/embed/${composeQuery({ p: id })}`,
-    url: post ? `https://www.megatv.com/?p=${post}` : undefined,
+    url: post ? `https://www.megatv.com/${composeQuery({ p: post })}` : undefined,
     // The player is Video.js in fluid mode, and the share dialog boxes it 560 by 315.
     ratio: '16/9',
   }

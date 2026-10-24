@@ -1,8 +1,16 @@
-import { getPathSegments, getQueryParam, isAnyOf, isHostOf, parseUrl, trimObject } from 'trousse'
+import {
+  composeQuery,
+  getPathSegments,
+  getQueryParam,
+  isAnyOf,
+  isHostOf,
+  parseUrl,
+  trimObject,
+} from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readIframeResizeHeight } from '../utils/hints.js'
-import { composeQuery, isFileName, placeholderBaseUrl } from '../utils/urls.js'
+import { isFileName, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'codesandbox'

@@ -1,7 +1,7 @@
-import { getPathSegments, getQueryParam, isAnyOf, trimObject } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParam, isAnyOf, trimObject } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ausha'

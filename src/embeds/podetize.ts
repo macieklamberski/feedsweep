@@ -1,4 +1,4 @@
-import { getQueryParam, isAnyOf } from 'trousse'
+import { composeQuery, getQueryParam, isAnyOf, trimObject } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -15,16 +15,12 @@ const playerHeight = 200
 // episode, which is where the id space shows: a real episode returns its params and an invented
 // or deleted one an empty body or a 404 (2026-09-06).
 const composeEmbed = (id: string, isEpisodeMode: boolean): EmbedResolverResult => {
-  const query = new URLSearchParams({ id })
-
-  if (isEpisodeMode) {
-    query.set('epmode', 'true')
-  }
+  const query = composeQuery(trimObject({ id, epmode: isEpisodeMode ? 'true' : undefined }))
 
   return {
     provider: 'podetize',
     id,
-    src: `https://player.podetize.com/?${query}`,
+    src: `https://player.podetize.com/${query}`,
     height: playerHeight,
   }
 }

@@ -43,7 +43,7 @@ describeForEachParser('Facebook', (parseHtml) => {
       <div
         data-embed-provider="facebook"
         data-embed-id="https://www.facebook.com/PageName/posts/123"
-        data-embed-src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123"
+        data-embed-src="https://www.facebook.com/plugins/post.php?href=https://www.facebook.com/PageName/posts/123"
         data-embed-url="https://www.facebook.com/PageName/posts/123"
         data-embed-description="Caption text about the thing."
         data-embed-author="PageName"
@@ -70,7 +70,7 @@ describeForEachParser('Facebook', (parseHtml) => {
       <div
         data-embed-provider="facebook"
         data-embed-id="https://www.facebook.com/PageName/videos/123/"
-        data-embed-src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fvideos%2F123%2F"
+        data-embed-src="https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/PageName/videos/123/"
         data-embed-url="https://www.facebook.com/PageName/videos/123/"
         data-embed-ratio="16/9"
       ></div>
@@ -90,7 +90,7 @@ describeForEachParser('Facebook', (parseHtml) => {
       <div
         data-embed-provider="facebook"
         data-embed-id="https://www.facebook.com/PageName/posts/123"
-        data-embed-src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123"
+        data-embed-src="https://www.facebook.com/plugins/post.php?href=https://www.facebook.com/PageName/posts/123"
         data-embed-url="https://www.facebook.com/PageName/posts/123"
       ></div>
       <p>Closing line.</p>
@@ -114,7 +114,7 @@ describeForEachParser('Facebook', (parseHtml) => {
       <div
         data-embed-provider="facebook"
         data-embed-id="https://www.facebook.com/PageName/posts/123"
-        data-embed-src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123"
+        data-embed-src="https://www.facebook.com/plugins/post.php?href=https://www.facebook.com/PageName/posts/123"
         data-embed-url="https://www.facebook.com/PageName/posts/123"
       ></div>
     `
@@ -154,7 +154,7 @@ describeForEachParser('Facebook', (parseHtml) => {
         data-embed-provider="facebook"
         data-embed-id="https://www.facebook.com/reel/123/"
         data-embed-ratio="16/9"
-        data-embed-src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Freel%2F123%2F"
+        data-embed-src="https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/reel/123/"
         data-embed-url="https://www.facebook.com/reel/123/"
       ></div>
     `
@@ -181,13 +181,13 @@ describeForEachParser('Facebook', (parseHtml) => {
       <div
         data-embed-provider="facebook"
         data-embed-id="https://www.facebook.com/PageName/posts/123"
-        data-embed-src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123"
+        data-embed-src="https://www.facebook.com/plugins/post.php?href=https://www.facebook.com/PageName/posts/123"
         data-embed-url="https://www.facebook.com/PageName/posts/123"
       ></div>
       <div
         data-embed-provider="facebook"
         data-embed-id="https://www.facebook.com/PageName/posts/123"
-        data-embed-src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123"
+        data-embed-src="https://www.facebook.com/plugins/post.php?href=https://www.facebook.com/PageName/posts/123"
         data-embed-url="https://www.facebook.com/PageName/posts/123"
       ></div>
     `
@@ -213,7 +213,7 @@ describeForEachParser('Facebook', (parseHtml) => {
       <div
         data-embed-provider="facebook"
         data-embed-id="https://www.facebook.com/PageName/videos/123/"
-        data-embed-src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fvideos%2F123%2F"
+        data-embed-src="https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/PageName/videos/123/"
         data-embed-url="https://www.facebook.com/PageName/videos/123/"
         data-embed-ratio="16/9"
         data-embed-description="A video caption."
@@ -425,7 +425,7 @@ describeForEachParser('Facebook', (parseHtml) => {
         data-embed-url="https://www.facebook.com/watch/?v=1010445561578533"
         data-embed-id="https://www.facebook.com/watch/?v=1010445561578533"
         data-embed-provider="facebook"
-        data-embed-src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D1010445561578533"
+        data-embed-src="https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=1010445561578533"
         data-embed-ratio="16/9"
       ></div>
     `
@@ -461,7 +461,7 @@ describeForEachParser('Facebook', (parseHtml) => {
       <div
         data-embed-provider="facebook"
         data-embed-id="377994148950512"
-        data-embed-src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D377994148950512"
+        data-embed-src="https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=377994148950512"
         data-embed-url="https://www.facebook.com/watch/?v=377994148950512"
         data-embed-ratio="16/9"
       ></div>
@@ -494,7 +494,7 @@ describeForEachParser('Facebook', (parseHtml) => {
       <div
         data-embed-provider="facebook"
         data-embed-id="17731186132"
-        data-embed-src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D17731186132"
+        data-embed-src="https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=17731186132"
         data-embed-url="https://www.facebook.com/watch/?v=17731186132"
         data-embed-ratio="16/9"
         data-embed-title="BADHDHALVUMUM VEJJE DHEEVAANA"
@@ -519,7 +519,7 @@ describeForEachParser('Facebook', (parseHtml) => {
       <div
         data-embed-provider="facebook"
         data-embed-id="https://www.facebook.com/example/posts/10150000000000001"
-        data-embed-src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fexample%2Fposts%2F10150000000000001"
+        data-embed-src="https://www.facebook.com/plugins/post.php?href=https://www.facebook.com/example/posts/10150000000000001"
         data-embed-url="https://www.facebook.com/example/posts/10150000000000001"
       ></div>
     `

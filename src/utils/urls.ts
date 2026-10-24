@@ -1,5 +1,6 @@
 import {
   audioExtensions,
+  composeQuery,
   documentExtensions,
   flashExtensions,
   getQueryParam,
@@ -229,15 +230,6 @@ export const pickQueryParams = (
 // `:` the value holds reads as written.
 export const encodePathSegment = (value: string): string => {
   return value.replace(/[%/?#\s]/g, (character) => encodeURIComponent(character))
-}
-
-// The other half of `pickQueryParams`: the pairs it returns, back into a query ready to append.
-// A resolver that has nothing to carry over gets an empty string, so its src stays bare rather
-// than ending on a lone `?`.
-export const composeQuery = (params?: Record<string, string>): string => {
-  const query = new URLSearchParams(params).toString()
-
-  return query ? `?${query}` : ''
 }
 
 // The publisher's query with only the parameters a player reads left in it. Each pair stays as

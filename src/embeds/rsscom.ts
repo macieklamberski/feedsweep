@@ -1,8 +1,8 @@
-import { getPathSegments } from 'trousse'
+import { composeQuery, getPathSegments } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readObjectHeight } from '../utils/hints.js'
-import { composeQuery, digitsRegex, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
+import { digitsRegex, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'rsscom'

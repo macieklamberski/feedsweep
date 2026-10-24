@@ -144,6 +144,21 @@ describeForEachParser('tencentEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should keep an ampersand in the id inside the vid parameter', async () => {
+      const value =
+        '<iframe src="https://v.qq.com/txp/iframe/player.html?vid=v03604lrvan%26autoplay%3D1"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'tencent',
+        id: 'v03604lrvan&autoplay=1',
+        src: 'https://v.qq.com/txp/iframe/player.html?vid=v03604lrvan%26autoplay=1',
+        url: 'https://v.qq.com/x/page/v03604lrvan&autoplay=1.html',
+        thumbnail: 'https://puui.qpic.cn/qqvideo_ori/0/v03604lrvan&autoplay=1_496_280/0',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // A snippet pasted with the route word still standing in for the id: `cover` names Tencent's
     // series route, and the poster and page urls minted from it are both dead.
     it('should ignore the route word left in the vid parameter', async () => {

@@ -60,7 +60,7 @@ describeForEachParser('wechatMediaResolver', (parseHtml) => {
       const value = '<mpvoice voice_encode_fileid="../../etc/passwd"></mpvoice>'
       const expected: MediaResolverResult = {
         tag: 'audio',
-        src: 'https://res.wx.qq.com/voice/getvoice?mediaid=..%2F..%2Fetc%2Fpasswd',
+        src: 'https://res.wx.qq.com/voice/getvoice?mediaid=../../etc/passwd',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -71,7 +71,7 @@ describeForEachParser('wechatMediaResolver', (parseHtml) => {
         '<mpvoice voice_encode_fileid="MjM5NjYyMjM0MF8yNjUwOTc3MjQy&mediaid=stolen"></mpvoice>'
       const expected: MediaResolverResult = {
         tag: 'audio',
-        src: 'https://res.wx.qq.com/voice/getvoice?mediaid=MjM5NjYyMjM0MF8yNjUwOTc3MjQy%26mediaid%3Dstolen',
+        src: 'https://res.wx.qq.com/voice/getvoice?mediaid=MjM5NjYyMjM0MF8yNjUwOTc3MjQy%26mediaid=stolen',
       }
 
       expect(await extract(value)).toEqual(expected)

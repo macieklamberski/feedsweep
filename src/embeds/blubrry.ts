@@ -1,4 +1,4 @@
-import { getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 
@@ -58,7 +58,7 @@ export const blubrryResolveEmbed: ResolveEmbed = (url, element) => {
     src:
       kind === 'episode'
         ? `https://player.blubrry.com/id/${id}/`
-        : `https://player.blubrry.com/?media_url=${encodeURIComponent(id)}`,
+        : `https://player.blubrry.com/${composeQuery({ media_url: id })}`,
     height: playerHeight,
     title: attr(element, 'title'),
   }

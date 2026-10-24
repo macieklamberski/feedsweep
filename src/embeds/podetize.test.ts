@@ -50,7 +50,7 @@ describe('podetizeResolveEmbed', () => {
     const expected: EmbedResolverResult = {
       provider: 'podetize',
       id: 'P8RH/../vvMsf',
-      src: 'https://player.podetize.com/?id=P8RH%2F..%2FvvMsf',
+      src: 'https://player.podetize.com/?id=P8RH/../vvMsf',
       height: 200,
     }
 
@@ -128,7 +128,7 @@ describeForEachParser('podetizeScriptEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'podetize',
         id: 'P8RH vvMsf',
-        src: 'https://player.podetize.com/?id=P8RH+vvMsf',
+        src: 'https://player.podetize.com/?id=P8RH%20vvMsf',
         height: 200,
       }
 

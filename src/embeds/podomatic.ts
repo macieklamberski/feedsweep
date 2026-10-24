@@ -1,6 +1,6 @@
-import { getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const podomaticHost = 'podomatic.com'

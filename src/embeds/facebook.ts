@@ -1,5 +1,6 @@
 import {
   coerceNumber,
+  composeQuery,
   getQueryParam,
   isAnyOf,
   isHostOrSubdomainOf,
@@ -10,7 +11,7 @@ import {
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, flashVar, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { composeQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
@@ -254,7 +255,7 @@ export const facebookS9eEmbedResolver = createMarkupEmbedResolver(
 
     const [, page, kind, id] = match
     const href = s9eWatchKindRegex.test(kind)
-      ? `https://www.facebook.com/watch/?v=${id}`
+      ? `https://www.facebook.com/watch/${composeQuery({ v: id })}`
       : `https://www.facebook.com/${page || s9ePlaceholderPage}/posts/${id}`
 
     return facebookResolveEmbed(href)

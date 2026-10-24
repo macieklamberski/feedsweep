@@ -2,7 +2,6 @@ import { describe, expect, it } from 'bun:test'
 import { baseContext } from '../tests.js'
 import {
   cleanUrl,
-  composeQuery,
   dropUrlParams,
   encodePathSegment,
   filterUrlQuery,
@@ -242,47 +241,6 @@ describe('encodePathSegment', () => {
   })
 })
 
-describe('composeQuery', () => {
-  it('should return an empty string for an empty record', () => {
-    expect(composeQuery({})).toBe('')
-  })
-
-  it('should return an empty string when nothing is passed', () => {
-    expect(composeQuery()).toBe('')
-  })
-
-  it('should prefix a single parameter with a question mark', () => {
-    const value = { start: '90' }
-    const expected = '?start=90'
-
-    expect(composeQuery(value)).toBe(expected)
-  })
-
-  it('should join several parameters in the order given', () => {
-    const value = { start: '90', list: 'PLabc', index: '4' }
-    const expected = '?start=90&list=PLabc&index=4'
-
-    expect(composeQuery(value)).toBe(expected)
-  })
-
-  it('should encode a value that needs it', () => {
-    const value = { clipt: 'a+b/c' }
-    const expected = '?clipt=a%2Bb%2Fc'
-
-    expect(composeQuery(value)).toBe(expected)
-  })
-
-  // `pickQueryParams` drops an empty value, so this only arrives from a caller that built the
-  // record itself. The pair is still stated, since the platform's player may read the parameter's
-  // presence rather than its value.
-  it('should state a parameter whose value is empty', () => {
-    const value = { theme: '' }
-    const expected = '?theme='
-
-    expect(composeQuery(value)).toBe(expected)
-  })
-})
-
 describe('dropUrlParams', () => {
   it('should drop the named parameter and keep the rest as written', () => {
     const value = 'https://vk.com/video_ext.php?oid=-1&id=2&hash=abc&autoplay=1'
@@ -385,9 +343,9 @@ describe('pickUrlParams', () => {
     expect(pickUrlParams('//example.com/e/x?start=90', ['start'])).toBe('')
   })
 
-  it('should encode a value that needs it', () => {
+  it('should escape a decoded plus sign and write a decoded slash back bare', () => {
     const value = 'https://example.com/e/x?clipt=a%2Bb%2Fc'
-    const expected = '?clipt=a%2Bb%2Fc'
+    const expected = '?clipt=a%2Bb/c'
 
     expect(pickUrlParams(value, ['clipt'])).toBe(expected)
   })

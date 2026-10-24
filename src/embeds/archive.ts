@@ -1,4 +1,5 @@
 import {
+  composeQuery,
   fixMalformedQuery,
   getPathSegments,
   getQueryParam,
@@ -10,7 +11,6 @@ import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed }
 import { attr, flashVar, flashVars } from '../utils/dom.js'
 import {
   audioFileRegex,
-  composeQuery,
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
