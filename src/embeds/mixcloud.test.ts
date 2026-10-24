@@ -316,6 +316,28 @@ describeForEachParser('mixcloudEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
+  it("should read the show before the embed options in the legacy Flash player's flashvars", async () => {
+    const value = html`
+      <embed
+        src="http://www.mixcloud.com/media/swf/player/mixcloudLoader.swf"
+        flashvars="feed=http://www.mixcloud.com/Flashflooder/a-state-of-trap-episode-34/;embed_uuid=ea497379-74ae-4c3f-a574-509a39f36499&amp;stylecolor=f6a851&amp;embed_type=widget_standard"
+        width="550"
+        height="480"
+        type="application/x-shockwave-flash"
+      >
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'mixcloud',
+      id: 'Flashflooder/a-state-of-trap-episode-34',
+      src: 'https://www.mixcloud.com/widget/iframe/?feed=%2FFlashflooder%2Fa-state-of-trap-episode-34%2F',
+      url: 'https://www.mixcloud.com/Flashflooder/a-state-of-trap-episode-34/',
+      height: 120,
+      author: 'Flashflooder',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
   it('should ignore the widget path on a foreign host', async () => {
     const value =
       '<iframe src="https://evil.test/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter%2F"></iframe>'
@@ -367,6 +389,53 @@ describeForEachParser('mixcloud through the pipeline', (parseHtml) => {
         data-embed-url="https://www.mixcloud.com/photogmusic/no-filter/"
         data-embed-height="120"
         data-embed-author="photogmusic"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should claim the legacy Flash player inside a WordPress.com widget frame', async () => {
+    const value = html`
+      <iframe
+        frameborder="0"
+        width="550"
+        height="480"
+        src="https://wpcomwidgets.com/?src=http%3A%2F%2Fwww.mixcloud.com%2Fmedia%2Fswf%2Fplayer%2FmixcloudLoader.swf&#038;flashvars=feed%3Dhttp%3A%2F%2Fwww.mixcloud.com%2FFlashflooder%2Fa-state-of-trap-episode-34%2F%3Bembed_uuid%3Dea497379-74ae-4c3f-a574-509a39f36499%26stylecolor%3Df6a851%26embed_type%3Dwidget_standard&#038;wmode=opaque&#038;allowscriptaccess=always&#038;allowfullscreen=true&#038;width=550&#038;height=480&#038;_tag=gigya&#038;_hash=c584d70c8a6df37ac7bef2ee6d511ec6"
+        id="wpcom-iframe-c584d70c8a6df37ac7bef2ee6d511ec6"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-src="https://www.mixcloud.com/widget/iframe/?feed=%2FFlashflooder%2Fa-state-of-trap-episode-34%2F"
+        data-embed-provider="mixcloud"
+        data-embed-id="Flashflooder/a-state-of-trap-episode-34"
+        data-embed-url="https://www.mixcloud.com/Flashflooder/a-state-of-trap-episode-34/"
+        data-embed-height="120"
+        data-embed-author="Flashflooder"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should claim a plain show inside a WordPress.com widget frame unchanged', async () => {
+    const value = html`
+      <iframe
+        frameborder="0"
+        width="480"
+        height="80"
+        src="https://wpcomwidgets.com/?src=http%3A%2F%2Fwww.mixcloud.com%2Fmedia%2Fswf%2Fplayer%2FmixcloudLoader.swf&#038;flashvars=feed%3Dhttp%253A%252F%252Fwww.mixcloud.com%252Faysuuygur%252Fseksin-evrimi%252F%26embed_uuid%3Da99519d2-828f-4780-a2f3-3ac4698a95a5%26stylecolor%3D%26embed_type%3Dwidget_standard&#038;width=480&#038;height=80&#038;_tag=gigya"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-src="https://www.mixcloud.com/widget/iframe/?feed=%2Faysuuygur%2Fseksin-evrimi%2F"
+        data-embed-provider="mixcloud"
+        data-embed-id="aysuuygur/seksin-evrimi"
+        data-embed-url="https://www.mixcloud.com/aysuuygur/seksin-evrimi/"
+        data-embed-height="120"
+        data-embed-author="aysuuygur"
       ></div>
     `
 
