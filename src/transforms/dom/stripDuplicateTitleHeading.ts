@@ -1,5 +1,11 @@
 import type { DomTransform } from '../../types.js'
-import { headingSelector, isElement, isNonWhitespaceText, NodeFilter } from '../../utils/dom.js'
+import {
+  headingSelector,
+  isElement,
+  isNonWhitespaceText,
+  NodeFilter,
+  setInnerHtml,
+} from '../../utils/dom.js'
 
 const mediaSelector = 'img, picture, video, audio, iframe, svg'
 
@@ -15,7 +21,7 @@ const getTitleText = (document: Document, value: string): string => {
   }
 
   const container = document.createElement('div')
-  container.innerHTML = value
+  setInnerHtml(container, value)
 
   return container.textContent ?? ''
 }

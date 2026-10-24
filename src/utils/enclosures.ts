@@ -1,5 +1,6 @@
 import { parseUrl } from 'trousse'
 import type { CleanUrlFn, Enclosure, TransformContext } from '../types.js'
+import { setInnerHtml } from './dom.js'
 import { getImageFingerprint, getSizeKeywordRank, getUrlSizeHint } from './images.js'
 import { absoluteUrlRegex, cleanUrl, resolveOrKeepUrl } from './urls.js'
 import { getEmbedSize } from './widgets.js'
@@ -296,7 +297,7 @@ const extractEnclosureFromEmbed = (enclosure: Enclosure, document: Document): En
 
   const { playerEmbed, ...rest } = enclosure
   const container = document.createElement('div')
-  container.innerHTML = playerEmbed
+  setInnerHtml(container, playerEmbed)
 
   const frame = container.querySelector('iframe[src], embed[src]')
 

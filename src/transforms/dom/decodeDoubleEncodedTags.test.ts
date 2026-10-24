@@ -63,6 +63,15 @@ describeForEachParser('decodeDoubleEncodedTags', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml('<center><font color="red">hello</font></center>')
     })
+
+    it('should decode a whole escaped page that opens with a doctype', async () => {
+      const value =
+        '&lt;/div&gt;\n&lt;!DOCTYPE html&gt;\n&lt;p&gt;Kosakata alat kesehatan dalam bahasa Jepang.&lt;/p&gt;'
+
+      expect(await transform(value)).toEqualHtml(
+        '\n\n<p>Kosakata alat kesehatan dalam bahasa Jepang.</p>',
+      )
+    })
   })
 
   describe('strips an escaped paragraph pair around real elements', () => {

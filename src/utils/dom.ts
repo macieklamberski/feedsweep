@@ -229,6 +229,15 @@ export const isEmptyElement = (element: Element): boolean => {
   return element.children.length === 0 && !hasText(element)
 }
 
+// linkedom takes a <!DOCTYPE> met in a fragment as the document's doctype and splices it into the
+// document's node list, leaving a null sibling the next query throws on. A browser ignores it.
+const doctypeRegex = /<!doctype\b[^>]*>/gi
+
+// Parses markup that did not come from the document, such as decoded text or a feed field.
+export const setInnerHtml = (element: Element, html: string): void => {
+  element.innerHTML = html.replace(doctypeRegex, '')
+}
+
 const removableWrappers = ['a', 'figure']
 
 // Remove an element along with any wrapper it leaves empty, so a removed image doesn't leave a

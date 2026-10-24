@@ -1,5 +1,6 @@
 import { decodeSegment } from 'trousse'
 import type { DomTransform } from '../../types.js'
+import { setInnerHtml } from '../../utils/dom.js'
 import { isUrlShaped } from '../../utils/urls.js'
 import { createLink } from '../../utils/widgets.js'
 
@@ -61,7 +62,7 @@ export const surfaceParkedMarkup: DomTransform = () => (document) => {
 
       const holder = document.createElement('div')
       // The decoded string still carries HTML entities in its attribute values.
-      holder.innerHTML = markup
+      setInnerHtml(holder, markup)
 
       // A load-later container states the embed's address as well as its markup. When the parked
       // element was itself stripped of every link, that address is the only thing left to reach the
