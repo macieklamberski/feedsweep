@@ -5,7 +5,6 @@ import {
   getQueryParam,
   isAnyOf,
   isHostOf,
-  parseUrl,
   trimObject,
 } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
@@ -15,7 +14,7 @@ import {
   encodePathSegment,
   foldEscapedAmpersands,
   isFileName,
-  placeholderBaseUrl,
+  parseUrlOnHosts,
   uuidRegex,
 } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -81,9 +80,9 @@ const readUser = (value: string | undefined): string | undefined => {
 
 const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
   // A twice-encoded feed leaves a literal `&amp;` that hides the `key` parameter after it.
-  const parsed = parseUrl(foldEscapedAmpersands(value ?? ''), placeholderBaseUrl)
+  const parsed = parseUrlOnHosts(foldEscapedAmpersands(value ?? ''), codepenHosts, isHostOf)
 
-  if (!parsed || !isHostOf(parsed, codepenHosts)) {
+  if (!parsed) {
     return
   }
 

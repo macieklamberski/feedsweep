@@ -1,6 +1,6 @@
 import { composeQuery, getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { localePairRegex, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
+import { hyphenatedLettersRegex, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 type Resource = {
@@ -43,7 +43,7 @@ export const komootResolveEmbed: ResolveEmbed = (url) => {
   const [first = '', ...rest] = getPathSegments(parsed)
   // In any case: the mint drops the locale, so `/DE-DE/tour/{tourId}/embed`, which answers 404,
   // still names the tour.
-  const hasLocale = localePairRegex.test(first)
+  const hasLocale = hyphenatedLettersRegex.test(first)
   const resource = readResource(hasLocale ? rest : [first, ...rest])
 
   if (!resource) {

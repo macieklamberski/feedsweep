@@ -1,8 +1,8 @@
-import { isHostOf, isPlainObject, parseUrl } from 'trousse'
+import { isHostOf, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'strawpoll'
@@ -27,9 +27,9 @@ const composeEmbed = (pollId: string): EmbedResolverResult => {
 
 // StrawPoll's poll frame, `/embed/{id}`, and the older `/embed/polls/{id}` it still serves.
 export const strawpollResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
+  const parsed = parseUrlOnHosts(url, strawpollHosts, isHostOf)
 
-  if (!parsed || !isHostOf(parsed, strawpollHosts)) {
+  if (!parsed) {
     return
   }
 

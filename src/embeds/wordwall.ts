@@ -1,7 +1,7 @@
 import { getPathSegments, isAnyOf, isHostOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
-import { hexRegex, localePairRegex, localeWordRegex, pickUrlParams } from '../utils/urls.js'
+import { hexRegex, hyphenatedLettersRegex, lettersRegex, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `screens.cdn.wordwall.net` serves the activity images, so only the page hosts are claimed.
@@ -38,7 +38,7 @@ const extractActivityId = (link: string): string | undefined => {
     return
   }
 
-  if (locale && !localeWordRegex.test(locale) && !localePairRegex.test(locale)) {
+  if (locale && !lettersRegex.test(locale) && !hyphenatedLettersRegex.test(locale)) {
     return
   }
 

@@ -1,7 +1,7 @@
-import { getPathSegments, isHostOf, parseUrl } from 'trousse'
+import { getPathSegments, isHostOf } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, find } from '../utils/dom.js'
-import { pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'streamable'
@@ -39,9 +39,9 @@ const readVideoId = (segments: Array<string>): string | undefined => {
 // the watch page, and an MLB clip by its slug on `/m/{slug}`, which oEmbed does not answer for.
 // No thumbnail: the unsigned image sits on an east or a west CDN host the carrier does not name.
 export const streamableResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
+  const parsed = parseUrlOnHosts(url, streamableHosts, isHostOf)
 
-  if (!parsed || !isHostOf(parsed, streamableHosts)) {
+  if (!parsed) {
     return
   }
 
@@ -85,9 +85,9 @@ export const streamableIframeEmbedResolver = createUrlEmbedResolver(
 export const streamableMlbEmbedResolver = createMarkupEmbedResolver(
   'div.mlb\\.com-embed, div.mlb-com-embed',
   (element) => {
-    const parsed = parseUrl(attr(find(element, 'a[href]'), 'href') ?? '', placeholderBaseUrl)
+    const parsed = parseUrlOnHosts(attr(find(element, 'a[href]'), 'href'), 'www.mlb.com', isHostOf)
 
-    if (!parsed || !isHostOf(parsed, 'www.mlb.com')) {
+    if (!parsed) {
       return
     }
 

@@ -1,6 +1,12 @@
 import { composeQuery, getPathSegments, getQueryParam, isAnyOf, isHostOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { alphanumericRegex, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  alphanumericRegex,
+  lettersRegex,
+  parseUrlOnHosts,
+  pickQueryParams,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const figmaHost = 'figma.com'
@@ -9,10 +15,6 @@ const figmaEmbedHost = 'embed.figma.com'
 // Other figma subdomains serve pages the wrapper never frames: `help.figma.com/hc/articles/{id}`
 // has three segments and would mint a 404.
 const figmaFileHosts = ['figma.com', 'www.figma.com']
-
-// Figma keeps opening kinds: `design`, `make` and `slides` sit beside the `file`, `proto`,
-// `board` and `deck` the feeds carry, and every one of them takes the same route shape.
-const kindRegex = /^[a-z]+$/
 
 // `node-id` names the frame the embed opens on, `page-id` the page that holds it,
 // `starting-point-node-id` the node that starts a prototype's flow, and `version-id` the version.
@@ -27,15 +29,15 @@ const catalogueKind = 'community'
 // A figma url names a file as `{kind}/{key}/{name}` and nothing else.
 const readFileEmbed = (url: URL): EmbedResolverResult | undefined => {
   const segments = getPathSegments(url)
-  const [rawKind, key, name] = segments
-  const kind = rawKind?.toLowerCase()
+  const [kind, key, name] = segments
 
   if (segments.length !== 3 || !kind || !key || !name) {
     return
   }
 
-  // A file key is base62, so a hyphenated marketing slug sitting in the same position is not one.
-  if (!kindRegex.test(kind) || kind === catalogueKind || !alphanumericRegex.test(key)) {
+  // Figma keeps opening kinds beside the `file`, `proto`, `board` and `deck` the feeds carry, and
+  // every one takes the same route shape. A file key is base62, so a hyphenated slug is not one.
+  if (!lettersRegex.test(kind) || kind === catalogueKind || !alphanumericRegex.test(key)) {
     return
   }
 
@@ -67,9 +69,13 @@ const resolveEmbed: ResolveEmbed = (url) => {
 
   if (segments.length === 1 && isAnyOf(segments[0], 'embed')) {
     // The wrapper frames whatever its `url` names, so a value off figma is refused and never minted.
-    const wrapped = parseUrl(getQueryParam(parsed.searchParams, 'url') ?? '', placeholderBaseUrl)
+    const wrapped = parseUrlOnHosts(
+      getQueryParam(parsed.searchParams, 'url'),
+      figmaFileHosts,
+      isHostOf,
+    )
 
-    if (!wrapped || !isHostOf(wrapped, figmaFileHosts)) {
+    if (!wrapped) {
       return
     }
 

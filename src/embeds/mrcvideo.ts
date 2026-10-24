@@ -1,7 +1,7 @@
-import { getPathSegments, getQueryParam, isAnyOf, isHostOf, parseUrl } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, isHostOf } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { flashVar } from '../utils/dom.js'
-import { encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
+import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'mrcvideo'
@@ -23,17 +23,9 @@ const composeEmbed = (id: string): EmbedResolverResult => {
   }
 }
 
-const parseOnHosts = (url: string | undefined): URL | undefined => {
-  const parsed = url ? parseUrl(url, placeholderBaseUrl) : undefined
-
-  if (parsed && isHostOf(parsed, mrcvideoHosts)) {
-    return parsed
-  }
-}
-
 // The route word answers in any case.
 const readEmbedId = (url: string | undefined): string | undefined => {
-  const parsed = parseOnHosts(url)
+  const parsed = parseUrlOnHosts(url, mrcvideoHosts, isHostOf)
 
   if (!parsed) {
     return
@@ -55,7 +47,7 @@ const readSharingId = (element: Element | undefined): string | undefined => {
 }
 
 const readCallbackId = (element: Element | undefined): string | undefined => {
-  const parsed = parseOnHosts(flashVar(element, 'yourlytics.callback'))
+  const parsed = parseUrlOnHosts(flashVar(element, 'yourlytics.callback'), mrcvideoHosts, isHostOf)
 
   return getQueryParam(parsed?.searchParams, 'nodeid')
 }
@@ -74,7 +66,7 @@ const mrcvideoResolveEmbed: ResolveEmbed = (url) => {
 export const mrcvideoEmbedResolver = createUrlEmbedResolver(mrcvideoHosts, mrcvideoResolveEmbed)
 
 const mrcvideoFlashResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseOnHosts(url)
+  const parsed = parseUrlOnHosts(url, mrcvideoHosts, isHostOf)
 
   if (!parsed) {
     return

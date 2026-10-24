@@ -1,6 +1,7 @@
-import { isHostOf, parseUrl } from 'trousse'
+import { isHostOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 // Exact: `document-export.canva.com` serves the files a design exports.
@@ -15,9 +16,9 @@ const designRatio = '16/9'
 // the id nor the token addresses the design alone, so the id carries both. No thumbnail: its
 // route answers a challenge page to every client, a real browser included.
 export const canvaResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url)
+  const parsed = parseUrlOnHosts(url, canvaHosts, isHostOf)
 
-  if (!parsed || !isHostOf(parsed, canvaHosts)) {
+  if (!parsed) {
     return
   }
 

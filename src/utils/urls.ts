@@ -32,8 +32,8 @@ export const absoluteUrlRegex = /^[a-z][a-z0-9+.-]*:/i
 export const digitsRegex = /^\d+$/
 export const alphanumericRegex = /^[A-Za-z0-9]+$/
 export const hexRegex = /^[0-9a-f]+$/i
-export const localeWordRegex = /^[a-z]+$/i
-export const localePairRegex = /^[a-z]+-[a-z]+$/i
+export const lettersRegex = /^[a-z]+$/i
+export const hyphenatedLettersRegex = /^[a-z]+-[a-z]+$/i
 
 // A browser trims C0 controls and spaces from both ends, so \x01javascript: runs. Inside the
 // url it drops only tabs and newlines: java\tscript: runs, java script: is a relative path.
@@ -193,13 +193,16 @@ export const isUrlShaped = (value: string): boolean => {
   return urlShapeRegex.test(value)
 }
 
+// A host whose subdomains serve files or other sites takes `isHostOf`, which matches the listed
+// hosts alone.
 export const parseUrlOnHosts = (
-  url: string | undefined,
+  url: string | null | undefined,
   hosts: string | ReadonlyArray<string>,
+  isOnHost: (url: URL, hosts: string | ReadonlyArray<string>) => boolean = isHostOrSubdomainOf,
 ): URL | undefined => {
   const parsed = url ? parseUrl(url, placeholderBaseUrl) : undefined
 
-  if (parsed && isHostOrSubdomainOf(parsed, hosts)) {
+  if (parsed && isOnHost(parsed, hosts)) {
     return parsed
   }
 }

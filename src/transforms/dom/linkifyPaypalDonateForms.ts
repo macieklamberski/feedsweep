@@ -1,7 +1,7 @@
 import { composeQuery, getPathSegments, isHostOf, parseUrl } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
-import { placeholderBaseUrl } from '../../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../../utils/urls.js'
 
 // Listed exactly: a www.sandbox.paypal.com form is a test button that takes no real payment.
 const paypalHosts = ['paypal.com', 'www.paypal.com']
@@ -16,9 +16,9 @@ const donateFormSelector = [
 ].join(', ')
 
 const readDonateButtonId = (form: Element, imageSrc: string): string | undefined => {
-  const action = parseUrl(attr(form, 'action') ?? '', placeholderBaseUrl)
+  const action = parseUrlOnHosts(attr(form, 'action'), paypalHosts, isHostOf)
 
-  if (!action || !isHostOf(action, paypalHosts)) {
+  if (!action) {
     return
   }
 

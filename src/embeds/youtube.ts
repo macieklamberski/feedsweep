@@ -5,6 +5,7 @@ import {
   getPathSegments,
   getQueryParam,
   isAnyOf,
+  isHostOrSubdomainOf,
   parseUrl,
 } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
@@ -80,7 +81,7 @@ export const composeEmbedUrl = (videoId: string, params?: Record<string, string>
 const readPathId = (url: URL): string | undefined => {
   const segments = getPathSegments(url)
 
-  if (url.hostname === 'youtu.be' || url.hostname.endsWith('.youtu.be')) {
+  if (isHostOrSubdomainOf(url, 'youtu.be')) {
     return segments[0]
   }
 

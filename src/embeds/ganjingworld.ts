@@ -1,7 +1,7 @@
 import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
-import { localePairRegex } from '../utils/urls.js'
+import { hyphenatedLettersRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `ganjing.com` 301s onto `www.ganjingworld.com/embed/{same id}`, so both hosts name one embed.
@@ -29,7 +29,7 @@ const readVideo = (url: string): Video | undefined => {
   }
 
   // The hyphen tells a locale from the route words that share its slot, such as `live`.
-  const locale = keepIfMatches(first, localePairRegex)
+  const locale = keepIfMatches(first, hyphenatedLettersRegex)
 
   if (!locale || !third) {
     return

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { isHostOf } from 'trousse'
 import { baseContext } from '../tests.js'
 import {
   cleanUrl,
@@ -26,6 +27,18 @@ describe('parseUrlOnHosts', () => {
     const value = 'https://open.platform.example/track/123'
 
     expect(parseUrlOnHosts(value, hosts)?.hostname).toBe('open.platform.example')
+  })
+
+  it('should accept a listed host with an exact host check', () => {
+    const value = 'https://platform.example/watch/123'
+
+    expect(parseUrlOnHosts(value, hosts, isHostOf)?.hostname).toBe('platform.example')
+  })
+
+  it('should return undefined for a subdomain with an exact host check', () => {
+    const value = 'https://cdn.platform.example/watch/123'
+
+    expect(parseUrlOnHosts(value, hosts, isHostOf)).toBeUndefined()
   })
 
   it('should accept a protocol-relative url on a host', () => {

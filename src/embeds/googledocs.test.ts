@@ -132,13 +132,6 @@ describe('googledocsResolveEmbed', () => {
 
       expect(googledocsResolveEmbed(value)).toBeUndefined()
     })
-
-    it('should ignore a published doc behind a Workspace prefix', () => {
-      const value =
-        'https://docs.google.com/a/example.com/document/d/e/2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN/pub?embedded=true'
-
-      expect(googledocsResolveEmbed(value)).toBeUndefined()
-    })
   })
 
   describe('the share routes of a doc shared by link', () => {
@@ -302,6 +295,34 @@ describe('googledocsResolveEmbed', () => {
   })
 
   describe('edge cases', () => {
+    it('should drop the Workspace prefix in front of a doc framed by its file id', () => {
+      const value =
+        'https://docs.google.com/a/example.com/document/d/1T9IUy-4pn8IoSF26mqbFf3m4CmzdJDYxtY6lWtUTlmM/pub?embedded=true'
+      const expected: EmbedResolverResult = {
+        provider: 'googledocs',
+        id: '1T9IUy-4pn8IoSF26mqbFf3m4CmzdJDYxtY6lWtUTlmM',
+        src: 'https://docs.google.com/document/d/1T9IUy-4pn8IoSF26mqbFf3m4CmzdJDYxtY6lWtUTlmM/pub?embedded=true',
+        url: 'https://docs.google.com/document/d/1T9IUy-4pn8IoSF26mqbFf3m4CmzdJDYxtY6lWtUTlmM/pub',
+        height: 500,
+      }
+
+      expect(googledocsResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should drop the Workspace prefix in front of a published doc', () => {
+      const value =
+        'https://docs.google.com/a/example.com/document/d/e/2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN/pub?embedded=true'
+      const expected: EmbedResolverResult = {
+        provider: 'googledocs',
+        id: '2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN',
+        src: 'https://docs.google.com/document/d/e/2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN/pub?embedded=true',
+        url: 'https://docs.google.com/document/d/e/2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN/pub',
+        height: 500,
+      }
+
+      expect(googledocsResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should frame a doc whose path doubles the slash before the route', () => {
       const value =
         'https://docs.google.com/document/d/1rv6jOzKF6j6KV-faPE_xC6Z8-1EaEbCSJ7lIAyh5BuE//pub?embedded=true'
