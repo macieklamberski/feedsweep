@@ -4,6 +4,7 @@ import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
   extractJwplayerId,
+  isJwplayerReady,
   jwplayerAmpEmbedResolver,
   jwplayerIframeEmbedResolver,
   jwplayerLibraryEmbedResolver,
@@ -982,5 +983,33 @@ describeForEachParser('jwplayerMountEmbedResolver through the pipeline', (parseH
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+describe('isJwplayerReady', () => {
+  it('should accept the ready event the AMP channel posts', () => {
+    const value = {
+      event: 'ready',
+      detail: {
+        playlistItem: {
+          duration: 562.582,
+          title: "The Descendants | Hollywood's Hawai'i - FLUX TV",
+          mediaid: 'WhyBTEB0',
+        },
+        muted: false,
+      },
+    }
+
+    expect(isJwplayerReady(value)).toBe(true)
+  })
+
+  it('should refuse the setup event the AMP channel posts before it', () => {
+    const value = { event: 'setup' }
+
+    expect(isJwplayerReady(value)).toBe(false)
+  })
+
+  it('should refuse a message with no payload', () => {
+    expect(isJwplayerReady(null)).toBe(false)
   })
 })

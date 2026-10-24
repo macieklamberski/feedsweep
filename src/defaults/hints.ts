@@ -39,6 +39,7 @@ import { inaRenderHint } from '../embeds/ina.js'
 import { indavideoRenderHint } from '../embeds/indavideo.js'
 import { infogramRenderHint } from '../embeds/infogram.js'
 import { instagramRenderHint } from '../embeds/instagram.js'
+import { jwplayerRenderHint } from '../embeds/jwplayer.js'
 import { kalturaRenderHint } from '../embeds/kaltura.js'
 import { mailruRenderHint } from '../embeds/mailru.js'
 import { mastodonRenderHint } from '../embeds/mastodon.js'
@@ -139,6 +140,7 @@ export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   indavideoRenderHint,
   infogramRenderHint,
   instagramRenderHint,
+  jwplayerRenderHint,
   kalturaRenderHint,
   mailruRenderHint,
   mastodonRenderHint,

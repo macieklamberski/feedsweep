@@ -1,8 +1,10 @@
-import { encodePathSegment, getPathSegments, isAnyOf } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { encodePathSegment, getPathSegments, isAnyOf, isPlainObject } from 'trousse'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, findConfigScript } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'jwplayer'
 
 const fileExtensionRegex = /\.[a-z]+$/i
 
@@ -30,7 +32,7 @@ export const extractJwplayerId = (link: string): string | undefined => {
 // when the element names a media.
 const composeJwplayerEmbed = (id: string, isPlaylist = false): EmbedResolverResult => {
   return {
-    provider: 'jwplayer',
+    provider,
     id: isPlaylist ? `playlist/${id}` : id,
     // Rebuilt from the id, so the empty player-id segment some feeds ship
     // (`{mediaId}-.html`, which 404s) is dropped and the URL loads the default player.
@@ -214,3 +216,18 @@ export const jwplayerMountEmbedResolver = createMarkupEmbedResolver(
     return composeJwplayerEmbed(mediaId)
   },
 )
+
+// The player posts `{ event: 'ready' }` to its parent once it has loaded, on the AMP channel only.
+export const isJwplayerReady = (data: unknown): boolean => {
+  return isPlainObject(data) && data.event === 'ready'
+}
+
+// `isAMP` opens the player's AMP channel, which runs `{ method }` from the parent as a player
+// call. The hosted page reads no autoplay parameter, and its own `play` message never matches.
+export const jwplayerRenderHint: EmbedRenderHint = {
+  provider,
+  origin: 'https://cdn.jwplayer.com',
+  autoplayParams: { isAMP: 'true' },
+  isReady: isJwplayerReady,
+  requestPlay: { method: 'play' },
+}
