@@ -1140,6 +1140,14 @@ describeForEachParser('setInnerHtml', (parseHtml) => {
     expect(element.innerHTML).toBe('<p>Start</p><!-- <p>Draft</p> <!DOCTYPE html> --><p>End</p>')
   })
 
+  it('should keep a doctype written inside an svg CDATA section', () => {
+    const element = parseHtml('').createElement('div')
+    setInnerHtml(element, '<svg><![CDATA[ a > <!DOCTYPE html> ]]></svg>')
+    const section = element.querySelector('svg')?.firstChild as CharacterData | null
+
+    expect(section?.data).toContain('<!DOCTYPE html>')
+  })
+
   it('should keep a doctype written inside a processing instruction', () => {
     const element = parseHtml('').createElement('div')
     setInnerHtml(element, "<p>Start</p><?php echo '<!DOCTYPE html>'; ?><p>End</p>")

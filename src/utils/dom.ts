@@ -235,15 +235,17 @@ export const isEmptyElement = (element: Element): boolean => {
   return element.children.length === 0 && !hasText(element)
 }
 
-// A doctype, or a token a doctype can sit inside without being one: a comment, a start or end tag
-// with its attribute values, the text of an element both parsers keep as text, and a bogus comment
-// such as `<?php …>`. An unclosed one runs to the end of the input, as the tokenizer reads it.
+// A doctype, or a token a doctype can sit inside without being one: a comment, a CDATA section, a
+// start or end tag with its attribute values, the text of an element both parsers keep as text, and
+// a bogus comment such as `<?php …>`. An unclosed one runs to the end of the input, as the
+// tokenizer reads it.
 const tagRest = `(?:"[^"]*(?:"|$)|'[^']*(?:'|$)|[^"'>])*`
 const rawText = String.raw`[\s\S]*?(?:<\/\k<rawTag>\s*>|$)`
 const markupTokenRegex = new RegExp(
   [
     String.raw`<!doctype\b[^>]*>`,
     String.raw`<!--[\s\S]*?(?:-->|$)`,
+    String.raw`<!\[CDATA\[[\s\S]*?(?:\]\]>|$)`,
     String.raw`<(?<rawTag>script|style|textarea|title|xmp)\b${tagRest}(?:>${rawText}|$)`,
     String.raw`<\/?[a-z]${tagRest}(?:>|$)`,
     '<[!?][^>]*(?:>|$)',
@@ -254,7 +256,8 @@ const doctypeRegex = /^<!doctype\b/i
 
 // linkedom takes a <!DOCTYPE> met in a fragment as the document's doctype and splices it into the
 // document's node list, leaving a null sibling the next query throws on. A browser ignores it. One
-// inside a comment, an attribute value or raw text is not a doctype token, so it stays.
+// inside a comment, a CDATA section, an attribute value or raw text is not a doctype token, so it
+// stays.
 const stripDoctypes = (html: string): string => {
   return html.replace(markupTokenRegex, (token) => (doctypeRegex.test(token) ? '' : token))
 }
