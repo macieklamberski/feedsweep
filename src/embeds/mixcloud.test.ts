@@ -316,6 +316,28 @@ describeForEachParser('mixcloudEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
+  it("should read the show before the embed options in the legacy Flash player's flashvars", async () => {
+    const value = html`
+      <embed
+        src="http://www.mixcloud.com/media/swf/player/mixcloudLoader.swf"
+        flashvars="feed=http://www.mixcloud.com/Flashflooder/a-state-of-trap-episode-34/;embed_uuid=ea497379-74ae-4c3f-a574-509a39f36499&amp;stylecolor=f6a851&amp;embed_type=widget_standard"
+        width="550"
+        height="480"
+        type="application/x-shockwave-flash"
+      >
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'mixcloud',
+      id: 'Flashflooder/a-state-of-trap-episode-34',
+      src: 'https://www.mixcloud.com/widget/iframe/?feed=%2FFlashflooder%2Fa-state-of-trap-episode-34%2F',
+      url: 'https://www.mixcloud.com/Flashflooder/a-state-of-trap-episode-34/',
+      height: 120,
+      author: 'Flashflooder',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
   it('should ignore the widget path on a foreign host', async () => {
     const value =
       '<iframe src="https://evil.test/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter%2F"></iframe>'
