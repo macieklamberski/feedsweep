@@ -182,7 +182,7 @@ import { googledriveEmbedResolver } from '../embeds/googledrive.js'
 import { googleformsEmbedResolver } from '../embeds/googleforms.js'
 import { googlesheetsEmbedResolver } from '../embeds/googlesheets.js'
 import { googleslidesEmbedResolver } from '../embeds/googleslides.js'
-import { guardianEmbedResolver } from '../embeds/guardian.js'
+import { guardianEmbedResolver, guardianFlashEmbedResolver } from '../embeds/guardian.js'
 import { hearthisEmbedResolver } from '../embeds/hearthis.js'
 import { helloassoEmbedResolver } from '../embeds/helloasso.js'
 import { heyzineEmbedResolver } from '../embeds/heyzine.js'
@@ -652,6 +652,7 @@ const embedResolvers: Array<EmbedResolver> = [
   googlesheetsEmbedResolver,
   googleslidesEmbedResolver,
   guardianEmbedResolver,
+  guardianFlashEmbedResolver,
   hearthisEmbedResolver,
   helloassoEmbedResolver,
   heyzineEmbedResolver,

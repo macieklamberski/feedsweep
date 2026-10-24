@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { guardianEmbedResolver, guardianResolveEmbed } from './guardian.js'
+import {
+  guardianEmbedResolver,
+  guardianFlashEmbedResolver,
+  guardianResolveEmbed,
+} from './guardian.js'
 
 describe('guardianResolveEmbed', () => {
   describe('happy paths', () => {
@@ -202,5 +206,81 @@ describeForEachParser('guardianEmbedResolver', (parseHtml) => {
       '<iframe src="https://evil.test/embed/video/world/video/2015/oct/08/syria-video"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
+  })
+})
+
+describeForEachParser('guardianFlashEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, guardianFlashEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should read the video page out of the endpoint flashvar', async () => {
+      const value = html`
+        <embed
+          src="http://www.guardian.co.uk/video/embed"
+          type="application/x-shockwave-flash"
+          allowscriptaccess="always"
+          allowfullscreen="true"
+          width="460"
+          height="370"
+          flashvars="endpoint=http://www.guardian.co.uk/uk/video/2011/aug/09/london-riots-london/json"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'guardian',
+        id: 'uk/video/2011/aug/09/london-riots-london',
+        src: 'https://embed.theguardian.com/embed/video/uk/video/2011/aug/09/london-riots-london',
+        url: 'https://www.theguardian.com/uk/video/2011/aug/09/london-riots-london',
+        ratio: '16/9',
+        date: '2011-08-09',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a foreign host carrying the player path', async () => {
+      const value = html`
+        <embed
+          src="https://evil.test/video/embed"
+          flashvars="endpoint=http://www.guardian.co.uk/uk/video/2011/aug/09/london-riots-london/json"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore an endpoint on a foreign host', async () => {
+      const value = html`
+        <embed
+          src="http://www.guardian.co.uk/video/embed"
+          flashvars="endpoint=https://evil.test/uk/video/2011/aug/09/london-riots-london/json"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore an endpoint that is not the json route', async () => {
+      const value = html`
+        <embed
+          src="http://www.guardian.co.uk/video/embed"
+          flashvars="endpoint=http://www.guardian.co.uk/uk/video/2011/aug/09/london-riots-london"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore another player path on the host', async () => {
+      const value = html`
+        <embed
+          src="http://www.guardian.co.uk/video/other"
+          flashvars="endpoint=http://www.guardian.co.uk/uk/video/2011/aug/09/london-riots-london/json"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 })
