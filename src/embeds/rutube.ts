@@ -1,7 +1,7 @@
-import { getQueryParam } from 'trousse'
+import { getQueryParam, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
-import { encodePathSegment, hexRegex, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { encodePathSegment, hexRegex, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'rutube'
@@ -35,7 +35,7 @@ const composeEmbed = (videoId: string, parsed: URL): EmbedResolverResult => {
 }
 
 export const rutubeResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrlOnHosts(url, rutubeHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return

@@ -1,6 +1,6 @@
-import { getQueryParam, isAnyOf } from 'trousse'
+import { getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
+import { isFileName, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'tencent'
@@ -22,7 +22,7 @@ const flashPathRegex = /\/TPout\.swf$/i
 const playerRatio = '16/9'
 
 const readVideoId = (url: string): string | undefined => {
-  const parsed = parseUrlOnHosts(url, tencentHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
   const pathRegex = parsed?.hostname === 'v.qq.com' ? playerPathRegex : flashPathRegex
 
   if (!parsed || !pathRegex.test(parsed.pathname)) {

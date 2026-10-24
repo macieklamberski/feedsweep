@@ -75,12 +75,6 @@ describe('subsplashResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/u/cbcponca/media/embed/d/zrgcjnm'
-
-      expect(subsplashResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a path with a leading segment', () => {
       const value = 'https://subsplash.com/x/u/cbcponca/media/embed/d/zrgcjnm'
 

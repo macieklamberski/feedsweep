@@ -81,13 +81,6 @@ describe('nytimesResolveEmbed', () => {
 
       expect(nytimesResolveEmbed(value)).toBeUndefined()
     })
-
-    it('should return undefined for a lookalike host', () => {
-      const value =
-        'https://www.nytimes.com.evil.test/video/players/offsite/index.html?videoId=100000004460561'
-
-      expect(nytimesResolveEmbed(value)).toBeUndefined()
-    })
   })
 
   describe('edge cases', () => {

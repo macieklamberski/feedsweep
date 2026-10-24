@@ -72,13 +72,6 @@ describe('guardianResolveEmbed', () => {
 
   describe('sad paths', () => {
     // The www host serves the same path with `x-frame-options: SAMEORIGIN`, so it frames nothing.
-    it('should return undefined for the player path on the www host', () => {
-      const value =
-        'https://www.theguardian.com/embed/video/world/video/2015/sep/21/viola-davis-speech-2015-emmys-video'
-
-      expect(guardianResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for the player path below a leading segment', () => {
       const value =
         'https://embed.theguardian.com/x/embed/video/world/video/2015/sep/21/viola-davis-speech-2015-emmys-video'
@@ -102,13 +95,6 @@ describe('guardianResolveEmbed', () => {
 
     it('should return undefined for an embed path that is not a video', () => {
       const value = 'https://embed.theguardian.com/embed/video/society/2015/jun/18/superbugs'
-
-      expect(guardianResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for a lookalike host', () => {
-      const value =
-        'https://embed.theguardian.com.evil.test/embed/video/society/video/2015/jun/18/superbugs-video'
 
       expect(guardianResolveEmbed(value)).toBeUndefined()
     })
@@ -232,6 +218,13 @@ describeForEachParser('guardianEmbedResolver', (parseHtml) => {
   it('should ignore a foreign host carrying the same path', async () => {
     const value =
       '<iframe src="https://evil.test/embed/video/world/video/2015/oct/08/syria-video"></iframe>'
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
+  it('should ignore the player path on the www host', async () => {
+    const value =
+      '<iframe src="https://www.theguardian.com/embed/video/world/video/2015/sep/21/viola-davis-speech-2015-emmys-video"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
   })

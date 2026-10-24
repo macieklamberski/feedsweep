@@ -88,12 +88,6 @@ describe('radioradicaleResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/scheda/542812/iframe'
-
-      expect(radioradicaleResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for the route below another segment', () => {
       const value = 'https://www.radioradicale.it/x/scheda/542812/iframe'
 

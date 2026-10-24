@@ -1,8 +1,8 @@
-import { getPathSegments } from 'trousse'
+import { getPathSegments, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readObjectHeight } from '../utils/hints.js'
-import { composeQuery, digitsRegex, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
+import { composeQuery, digitsRegex, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'rsscom'
@@ -19,7 +19,7 @@ const playerParams = { v: '2' }
 // An RSS.com podcast player, framed as `/{slug}/{episodeId}` for an episode and `/{slug}` for the
 // show with its episode list, which `/{slug}/{word}` plays too.
 export const rsscomResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrlOnHosts(url, rsscomHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return

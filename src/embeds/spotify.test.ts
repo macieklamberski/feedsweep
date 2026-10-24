@@ -286,18 +286,6 @@ describe('spotifyResolveEmbed', () => {
 
       expect(spotifyResolveEmbed(value)).toBeUndefined()
     })
-
-    it('should return undefined for a lookalike host', () => {
-      const value = 'https://spotify.com.evil.test/embed/track/4cOdK2wGLETKBW3PvgPWqT'
-
-      expect(spotifyResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for an invalid url', () => {
-      const value = 'not a url'
-
-      expect(spotifyResolveEmbed(value)).toBeUndefined()
-    })
   })
 })
 

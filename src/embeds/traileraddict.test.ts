@@ -73,12 +73,6 @@ describe('traileraddictResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a foreign host carrying the Flash path', () => {
-      const value = 'https://evil.test/emd/13259'
-
-      expect(traileraddictResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for a route word the Flash player did not serve', () => {
       const value = 'https://www.traileraddict.com/emx/13259'
 

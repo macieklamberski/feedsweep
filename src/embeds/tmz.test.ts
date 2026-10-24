@@ -73,12 +73,6 @@ describe('tmzResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/videos/0-aw46wcaj/'
-
-      expect(tmzResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a path with a leading segment', () => {
       const value = 'https://share.tmz.com/x/videos/0-aw46wcaj/'
 

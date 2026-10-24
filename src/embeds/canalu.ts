@@ -1,6 +1,6 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'canalu'
@@ -12,7 +12,7 @@ const canaluHosts = ['www.canal-u.tv']
 // redirects to the channel the id belongs to. The id is the video's node id, so it is the key on
 // both routes. The player reads `t` as the start position and nothing else from its query.
 export const canaluResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, canaluHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return

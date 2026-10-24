@@ -1,5 +1,6 @@
+import { parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const figshareHosts = ['figshare.com']
@@ -9,7 +10,7 @@ const widgetPathRegex = /^\/articles\/([^/]+)\/embed\/?$/i
 // answers 200 with the title, the authors, the files and a poster for a real id and 404 for a
 // fabricated one, with no key.
 const figshareResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, figshareHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
   const articleId = parsed?.pathname.match(widgetPathRegex)?.[1]
 
   if (!parsed || !articleId) {

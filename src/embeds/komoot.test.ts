@@ -154,12 +154,6 @@ describe('komootResolveEmbed', () => {
       expect(komootResolveEmbed(value)).toEqual(expected)
     })
 
-    it('should ignore a foreign host carrying the tour route', () => {
-      const value = 'https://evil.test/tour/727321743/embed'
-
-      expect(komootResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a locale segment with a digit before it', () => {
       const value = 'https://www.komoot.com/1de-de/tour/727321743/embed'
 

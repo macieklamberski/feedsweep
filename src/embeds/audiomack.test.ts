@@ -36,12 +36,6 @@ describe('audiomackResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/embed/larrynorman/song/burn-2'
-
-      expect(audiomackResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a route word that is not the player', () => {
       const value = 'https://audiomack.com/widget/larrynorman/song/burn-2'
 

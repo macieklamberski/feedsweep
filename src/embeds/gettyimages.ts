@@ -1,5 +1,6 @@
+import { parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The asset id Getty calls `items`, and the opaque embed token it calls `et`.
@@ -27,7 +28,7 @@ const readSignedQuery = (url: URL): string => {
 }
 
 const gettyImagesResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, gettyImagesHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
   const itemId = parsed?.pathname.match(embedPathRegex)?.[1]
 
   if (!parsed || !itemId) {

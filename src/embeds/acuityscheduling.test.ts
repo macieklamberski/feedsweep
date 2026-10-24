@@ -117,12 +117,6 @@ describe('acuityschedulingResolveEmbed', () => {
 
       expect(acuityschedulingResolveEmbed(value)).toBeUndefined()
     })
-
-    it('should ignore the scheduler path on another subdomain', () => {
-      const value = 'https://embed.acuityscheduling.com/schedule.php?owner=14276092'
-
-      expect(acuityschedulingResolveEmbed(value)).toBeUndefined()
-    })
   })
 })
 
@@ -153,6 +147,13 @@ describeForEachParser('acuityschedulingEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
       const value = '<iframe src="https://evil.test/schedule.php?owner=14276092"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the scheduler path on another subdomain', async () => {
+      const value =
+        '<iframe src="https://embed.acuityscheduling.com/schedule.php?owner=14276092"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

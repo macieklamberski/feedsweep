@@ -1,6 +1,11 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { composeQuery, localePairRegex, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
+import {
+  composeQuery,
+  localePairRegex,
+  pickQueryParams,
+  placeholderBaseUrl,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 type Resource = {
@@ -34,7 +39,7 @@ const readResource = (segments: Array<string>): Resource | undefined => {
 // Komoot's tour map, `komoot.com/tour/{tourId}/embed`, and its collection map,
 // `komoot.com/collection/{collectionId}/{slug}/embed`, sometimes behind a locale segment.
 export const komootResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, komootHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return

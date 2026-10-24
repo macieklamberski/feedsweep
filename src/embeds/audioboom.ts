@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'audioboom'
@@ -85,7 +85,7 @@ export const audioboomWidgetEmbedResolver = createMarkupEmbedResolver(
 // page in `mp3LinkURL` or the audio file in `mp3`. Audioboo's embed code paired it with the
 // compact player, which answers for the same id.
 const audioboomFlashResolveEmbed: ResolveEmbed = (url, element) => {
-  const player = parseUrlOnHosts(url, [...flashHosts, bucketHost])
+  const player = parseUrl(url, placeholderBaseUrl)
 
   if (!player) {
     return

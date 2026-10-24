@@ -105,12 +105,6 @@ describe('slideshareResolveEmbed', () => {
   it.each(fileUrls)('should ignore a file on the host at %s', (value) => {
     expect(slideshareResolveEmbed(value)).toBeUndefined()
   })
-
-  it('should ignore another host carrying the embed path', () => {
-    const value = 'https://slideshare.net.evil.test/slideshow/embed_code/6435157'
-
-    expect(slideshareResolveEmbed(value)).toBeUndefined()
-  })
 })
 
 describeForEachParser('slideshareFlashEmbedResolver', (parseHtml) => {

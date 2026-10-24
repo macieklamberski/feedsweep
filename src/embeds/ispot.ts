@@ -1,6 +1,6 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const ispotHosts = ['www.ispot.tv']
@@ -9,7 +9,7 @@ const ispotHosts = ['www.ispot.tv']
 // casing names another spot or none. The `/ad/{id}` page answers 404 without its slug, so no page
 // url composes from the id.
 export const ispotResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, ispotHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return

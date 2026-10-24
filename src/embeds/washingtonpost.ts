@@ -1,6 +1,7 @@
+import { parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
-import { parseUrlOnHosts, uuidRegex } from '../utils/urls.js'
+import { placeholderBaseUrl, uuidRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'washingtonpost'
@@ -13,7 +14,7 @@ const inlinePathRegex = /\/([^/]+)_inline\.html$/i
 // The Washington Post video player. The 2012 inline player, `{id}_inline.html`, is rebuilt onto
 // the embed route when its id is a video uuid. The older `gJQA…` ids name no uuid.
 export const washingtonpostResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, washingtonpostHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return
