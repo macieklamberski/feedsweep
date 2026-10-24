@@ -7,8 +7,9 @@ const provider = 'ourworldindata'
 
 const ourworldindataHosts = ['ourworldindata.org']
 
-// The site serves the route words in lowercase only, and answers 404 to `/GRAPHER/{slug}`.
-const chartPathRegex = /^\/(grapher|explorers)\/([^/]+)$/
+// The site serves the route words in lowercase only, and answers 404 to `/GRAPHER/{slug}`, so
+// the route word is minted in lowercase.
+const chartPathRegex = /^\/(grapher|explorers)\/([^/]+)$/i
 
 // See: https://github.com/owid/owid-grapher/blob/master/packages/@ourworldindata/explorer/src/ExplorerConstants.ts.
 // An explorer and a multi-dimensional chart pick their view with params of their own, so only the
@@ -51,7 +52,8 @@ const ourworldindataResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const [, kind, slug] = match
+  const kind = match[1].toLowerCase()
+  const slug = match[2]
 
   // The site serves `/grapher/{slug}.png` and `.svg` beside the chart page.
   if (isFileName(slug)) {

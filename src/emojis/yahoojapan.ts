@@ -10,7 +10,7 @@ const selectors = [
 
 // Mail's older set names each file by the carrier's letter and its own number for the emoji, like
 // `ew_icon_a257` for au's 257, beside Yahoo's own drawings like `ew_icon_exclamation`.
-const carrierIconRegex = /^ew_icon_([ads])(\d+)$/
+const carrierIconRegex = /^ew_icon_([ads])(\d+)$/i
 const carriers = toMap<EmojiCarrier>({
   a: 'au',
   d: 'docomo',

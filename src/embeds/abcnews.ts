@@ -1,4 +1,4 @@
-import { composeQuery, encodePathSegment } from 'trousse'
+import { composeQuery, encodePathSegment, getQueryParam } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -21,7 +21,7 @@ export const abcnewsResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const id = parsed.searchParams.get('id')
+  const id = getQueryParam(parsed.searchParams, 'id')
 
   if (!id) {
     return

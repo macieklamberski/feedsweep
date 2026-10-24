@@ -57,6 +57,19 @@ describe('abcotvResolveEmbed', () => {
 
       expect(abcotvResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the pid under an uppercase name and mint it in lowercase', () => {
+      const value = 'https://abc7.com/video/embed/?PID=5740386'
+      const expected: EmbedResolverResult = {
+        provider: 'abcotv',
+        id: '5740386',
+        src: 'https://abc7.com/video/embed?pid=5740386',
+        url: 'https://abc7.com/videoClip/5740386/',
+        ratio: '16/9',
+      }
+
+      expect(abcotvResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -80,12 +93,6 @@ describe('abcotvResolveEmbed', () => {
 
     it('should return undefined for a segment after the route', () => {
       const value = 'https://abc7.com/video/embed/clip/?pid=5740386'
-
-      expect(abcotvResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for a pid under an uppercase name, which the player refuses', () => {
-      const value = 'https://abc7.com/video/embed/?PID=5740386'
 
       expect(abcotvResolveEmbed(value)).toBeUndefined()
     })

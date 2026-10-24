@@ -9,7 +9,7 @@ const guardianHosts = ['embed.theguardian.com']
 // `/embed/video/{section}/video/{yyyy}/{mon}/{dd}/{slug}`.
 // The video's page is the same path on `www`, and a real path answers 200 where a fabricated
 // slug 404s.
-const playerPathRegex = /^\/embed\/video\/([^/]+\/video\/[^/]+\/[^/]+\/[^/]+\/[^/]+)$/
+const playerPathRegex = /^\/embed\/video\/([^/]+\/video\/[^/]+\/[^/]+\/[^/]+\/[^/]+)$/i
 
 // The path dates the video, and the month is the three-letter English abbreviation on every
 // edition. A path states a day and not a moment, so `date` carries the calendar day alone, and
@@ -71,8 +71,8 @@ export const guardianResolveEmbed: ResolveEmbed = (url) => {
 export const guardianEmbedResolver = createUrlEmbedResolver(guardianHosts, guardianResolveEmbed)
 
 const guardianFlashHosts = ['guardian.co.uk', 'theguardian.com']
-const flashPlayerPathRegex = /^\/video\/embed\/?$/
-const endpointPathRegex = /^(?<path>\/.+)\/json$/
+const flashPlayerPathRegex = /^\/video\/embed\/?$/i
+const endpointPathRegex = /^(?<path>\/.+)\/json$/i
 
 // The retired Flash player, `guardian.co.uk/video/embed`, names the video in its `endpoint`
 // flashvar, `{page}/json`, and the page's path plays on today's player.

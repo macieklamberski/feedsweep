@@ -190,12 +190,12 @@ export const imgurResolveEmbed: ResolveEmbed = (url) => {
 
 export const imgurIframeEmbedResolver = createUrlEmbedResolver(imgurHosts, imgurResolveEmbed)
 
-const gifvPathRegex = /^\/(?<id>[a-zA-Z0-9]+)\.gifv$/
+const gifvPathRegex = /^\/(?<id>[a-zA-Z0-9]+)\.gifv$/i
 
 // Imgur's older gifv embed, `iframe.imgur-embed` on `i.imgur.com/{id}.gifv#embed`. The same id
 // plays on the post embed.
 export const imgurGifvEmbedResolver = createMarkupEmbedResolver(
-  'iframe.imgur-embed[src*="i.imgur.com/"]',
+  'iframe.imgur-embed[src*="i.imgur.com/" i]',
   (element) => {
     const parsed = parseUrlOnHosts(attr(element, 'src'), 'i.imgur.com', isHostOf)
 
