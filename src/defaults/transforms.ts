@@ -25,6 +25,7 @@ import { fixLazyAudios } from '../transforms/dom/fixLazyAudios.js'
 import { fixLazyIframes } from '../transforms/dom/fixLazyIframes.js'
 import { fixLazyImages } from '../transforms/dom/fixLazyImages.js'
 import { fixLazyVideos } from '../transforms/dom/fixLazyVideos.js'
+import { fixMojibakeEncoding } from '../transforms/dom/fixMojibakeEncoding.js'
 import { fixSubstackImageLinks } from '../transforms/dom/fixSubstackImageLinks.js'
 import { fixSubstackMentions } from '../transforms/dom/fixSubstackMentions.js'
 import { flattenPictureElements } from '../transforms/dom/flattenPictureElements.js'
@@ -123,6 +124,10 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // kind, so every pass below (comment and hidden-element stripping, the rebuilds, convertWidgets,
   // the cite pass) has to see it.
   surfaceParkedMarkup,
+  // Runs after the two recovery passes above so text recovered from escaped markup is
+  // repaired too, and before every transform that reads text content (linkifyUrls,
+  // markTimestamps, highlightCode) so they see the restored characters.
+  fixMojibakeEncoding,
   stripComments,
 
   // Runs before stripHiddenElements, which deletes an album div the plugin hides with inline
