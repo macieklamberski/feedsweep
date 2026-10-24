@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf, toMap } from 'trousse'
+import { encodePathSegment, getPathSegments, isAnyOf, toMap } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { pickUrlParams } from '../utils/urls.js'
@@ -48,7 +48,10 @@ const composeEmbed = (
 export const stravaPlaceholderEmbedResolver = createMarkupEmbedResolver(
   'div.strava-embed-placeholder[data-embed-type][data-embed-id]',
   (element) => {
-    return composeEmbed(attr(element, 'data-embed-type'), attr(element, 'data-embed-id'))
+    // The id comes out of its attribute decoded, and it goes into a path.
+    const id = encodePathSegment(attr(element, 'data-embed-id') ?? '')
+
+    return composeEmbed(attr(element, 'data-embed-type'), id)
   },
 )
 

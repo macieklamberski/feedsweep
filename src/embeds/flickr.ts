@@ -1,8 +1,15 @@
-import { decodeSegment, getQueryParam, isHostOf, type Nullish, parseUrl } from 'trousse'
+import {
+  decodeSegment,
+  encodePathSegment,
+  getQueryParam,
+  isHostOf,
+  type Nullish,
+  parseUrl,
+} from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar, flashVars, keepIfMatches } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { digitsRegex, encodePathSegment, placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'flickr'
@@ -275,11 +282,14 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
       return
     }
 
+    // A query or flashvars group id comes out decoded, and it goes into a path.
+    const groupSegment = encodePathSegment(subject.groupId)
+
     return {
       provider,
       id: `groups/${subject.groupId}`,
-      src: composeGroupPlayer(subject.groupId),
-      url: `https://www.flickr.com/groups/${subject.groupId}/`,
+      src: composeGroupPlayer(groupSegment),
+      url: `https://www.flickr.com/groups/${groupSegment}/`,
     }
   }
 

@@ -33,6 +33,19 @@ describeForEachParser('telegramScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should keep a channel and a message id holding url separators inside one path segment each', async () => {
+      const value = '<script data-telegram-post="tochkapress?x/111424#y"></script>'
+      const expected: EmbedResolverResult = {
+        provider: 'telegram',
+        id: 'tochkapress%3Fx/111424%23y',
+        src: 'https://t.me/tochkapress%3Fx/111424%23y?embed=1',
+        url: 'https://t.me/tochkapress%3Fx/111424%23y',
+        author: '@tochkapress%3Fx',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should resolve a script that carries no src', async () => {
       const value = '<script data-telegram-post="rybar/54321"></script>'
       const expected: EmbedResolverResult = {

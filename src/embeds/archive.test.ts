@@ -1061,6 +1061,46 @@ describeForEachParser('archiveFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
   })
+
+  describe('edge cases', () => {
+    it('should keep an XSPF identifier holding a slash inside one path segment', async () => {
+      const value = html`
+        <embed
+          src="http://www.archive.org/audio/xspf_player.swf?autoload=true&amp;playlist_url=http%3A%2F%2Fwww.archive.org%2Faudio%2Fxspf-maker.php%3Fidentifier%3DWeezy%252FSwish"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'archive',
+        id: 'Weezy%2FSwish',
+        src: 'https://archive.org/embed/Weezy%2FSwish',
+        url: 'https://archive.org/details/Weezy%2FSwish',
+        thumbnail: 'https://archive.org/services/img/Weezy%2FSwish',
+        height: 30,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a config identifier holding a fragment sign inside one path segment', async () => {
+      const value = html`
+        <embed
+          type="application/x-shockwave-flash"
+          src="http://www.archive.org/flow/flowplayer.commercial-3.2.1.swf"
+          flashvars='config={"playlist":[{"url":"http://www.archive.org/download/nasa#hubble/clip.mp4"}]}'
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'archive',
+        id: 'nasa%23hubble',
+        src: 'https://archive.org/embed/nasa%23hubble',
+        url: 'https://archive.org/details/nasa%23hubble',
+        thumbnail: 'https://archive.org/services/img/nasa%23hubble',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
 })
 
 // The placeholder's src is what every consumer of the feed gets, so what the query carries has

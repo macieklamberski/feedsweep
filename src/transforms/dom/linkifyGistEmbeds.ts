@@ -1,3 +1,4 @@
+import { encodePathSegment } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr, isElement, isSkippable, isText } from '../../utils/dom.js'
 import { absoluteUrlRegex } from '../../utils/urls.js'
@@ -25,18 +26,24 @@ const gistCarrierSelector = [
   ...gistMountSelectors,
 ].join(', ')
 
+// An attribute names the gist decoded, as an id or an `{owner}/{id}` path, and each of its
+// segments goes into the link as one.
+const encodeGistPath = (value: string): string => {
+  return value.split('/').map(encodePathSegment).join('/')
+}
+
 const readGistPath = (element: Element): string | undefined => {
   // <amp-gist> names the gist by id alone, with no owner. `gist.github.com/{id}` redirects to
   // the owned URL, so the bare id makes the same link the script form does.
   if (element.localName === 'amp-gist') {
-    return element.getAttribute('data-gistid') || undefined
+    return encodeGistPath(element.getAttribute('data-gistid') ?? '')
   }
 
   if (element.matches(gistMountSelector)) {
     const value = attr(element, 'data-gist-id') ?? attr(element, 'data-id')
 
     if (value) {
-      return value
+      return encodeGistPath(value)
     }
 
     // gist-oembed writes the path of the gist's .json endpoint.
@@ -53,7 +60,7 @@ const readGistPath = (element: Element): string | undefined => {
       return
     }
 
-    return gist
+    return encodeGistPath(gist)
   }
 
   const match = element.getAttribute('src')?.match(gistScriptRegex)

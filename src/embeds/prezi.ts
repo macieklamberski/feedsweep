@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { encodePathSegment, getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const preziHosts = ['prezi.com']
@@ -69,10 +69,9 @@ export const preziResolveEmbed: ResolveEmbed = (url, element) => {
 
   if (loaderPathRegex.test(parsed.pathname)) {
     const flashId = flashVar(element, 'prezi_id')
-    // The flashvar comes out decoded, and it goes into a path beside the raw path spelling.
-    const id = flashId
-      ? encodePathSegment(flashId)
-      : attr(element, 'id')?.match(elementIdRegex)?.[1]
+    const declaredId = flashId ? flashId : attr(element, 'id')?.match(elementIdRegex)?.[1]
+    // The flashvar and the element id come out decoded, and the id goes into a path.
+    const id = encodePathSegment(declaredId ?? '')
 
     if (!id) {
       return

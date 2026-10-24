@@ -1,9 +1,8 @@
-import { getQueryParam, isHostOrSubdomainOf, parseUrl } from 'trousse'
+import { encodePathSegment, getQueryParam, isHostOrSubdomainOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 import {
   absoluteUrlRegex,
-  encodePathSegment,
   parseUrlOnHosts,
   pickUrlParams,
   placeholderBaseUrl,

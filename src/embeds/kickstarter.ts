@@ -1,7 +1,6 @@
-import { getAnyOf, getPathSegments, isAnyOf } from 'trousse'
+import { encodePathSegment, getAnyOf, getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { encodePathSegment } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const widgets = ['card.html', 'video.html']

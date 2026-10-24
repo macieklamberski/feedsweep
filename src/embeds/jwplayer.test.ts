@@ -237,15 +237,15 @@ describeForEachParser('jwplayerAmpEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toEqual(expected)
   })
 
-  it('should use a malformed media id as written, even if the player answers an error', async () => {
+  it('should keep a media id holding slashes inside one path segment', async () => {
     const value = html`
       <amp-jwplayer data-media-id="../../evil" data-player-id="abc12345"></amp-jwplayer>
     `
     const expected: EmbedResolverResult = {
       provider: 'jwplayer',
-      id: '../../evil',
-      src: 'https://cdn.jwplayer.com/players/../../evil.html',
-      thumbnail: 'https://cdn.jwplayer.com/v2/media/../../evil/poster.jpg',
+      id: '..%2F..%2Fevil',
+      src: 'https://cdn.jwplayer.com/players/..%2F..%2Fevil.html',
+      thumbnail: 'https://cdn.jwplayer.com/v2/media/..%2F..%2Fevil/poster.jpg',
       ratio: '16/9',
     }
 
@@ -383,6 +383,24 @@ describeForEachParser('jwplayerSetupEmbedResolver', (parseHtml) => {
     `
 
     expect(await extract(value)).toBeUndefined()
+  })
+
+  it('should keep a media id running into a fragment inside one path segment', async () => {
+    const value = html`
+      <div class="jwplayer" id="botr_hwhuyhFf_h5bP9bKQ_div"></div>
+      <script>
+        jwplayer("botr_hwhuyhFf_h5bP9bKQ_div").setup({"playlist":"https://cdn.jwplayer.com/v2/media/hwhuyhFf#t"});
+      </script>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'jwplayer',
+      id: 'hwhuyhFf%23t',
+      src: 'https://cdn.jwplayer.com/players/hwhuyhFf%23t.html',
+      thumbnail: 'https://cdn.jwplayer.com/v2/media/hwhuyhFf%23t/poster.jpg',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 
   it('should return undefined for a player div carrying no script', async () => {
@@ -637,6 +655,23 @@ describeForEachParser('jwplayerLibraryEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should keep a media id running into a fragment inside one path segment', async () => {
+      const value = html`
+        <div id="jwppp-video-169721" class="jwplayer"></div>
+        <script src="https://content.jwplatform.com/libraries/Aq9gyX5k.js"></script>
+        <script>jwplayer("jwppp-video-169721").setup({playlist: "https://cdn.jwplayer.com/v2/media/NEnylXdA#t"})</script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jwplayer',
+        id: 'NEnylXdA%23t',
+        src: 'https://cdn.jwplayer.com/players/NEnylXdA%23t.html',
+        thumbnail: 'https://cdn.jwplayer.com/v2/media/NEnylXdA%23t/poster.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should return undefined for a setup call that names no mount', async () => {
       const value = html`
         <script src="https://content.jwplatform.com/libraries/Aq9gyX5k.js"></script>
@@ -690,6 +725,24 @@ describeForEachParser('jwplayerMountEmbedResolver', (parseHtml) => {
         id: '0DG8htfR',
         src: 'https://cdn.jwplayer.com/players/0DG8htfR.html',
         thumbnail: 'https://cdn.jwplayer.com/v2/media/0DG8htfR/poster.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a mount media id holding a slash inside one path segment', async () => {
+      const value = html`
+        <div
+          class="jwplayer"
+          id="jwplayer_0DG8/htfR_fuSXM6PS_20_div"
+        ></div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jwplayer',
+        id: '0DG8%2FhtfR',
+        src: 'https://cdn.jwplayer.com/players/0DG8%2FhtfR.html',
+        thumbnail: 'https://cdn.jwplayer.com/v2/media/0DG8%2FhtfR/poster.jpg',
         ratio: '16/9',
       }
 

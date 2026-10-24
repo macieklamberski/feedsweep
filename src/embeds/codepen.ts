@@ -1,5 +1,6 @@
 import {
   composeQuery,
+  encodePathSegment,
   getAnyOf,
   getPathSegments,
   getQueryParam,
@@ -11,7 +12,6 @@ import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.j
 import { attr, text } from '../utils/dom.js'
 import {
   alphanumericRegex,
-  encodePathSegment,
   foldEscapedAmpersands,
   isFileName,
   parseUrlOnHosts,
@@ -179,7 +179,8 @@ const readPenReference = (element: Element): CodepenTarget | undefined => {
   const slug = attr(element, 'data-slug-hash')
 
   if (slug) {
-    return { kind: 'embed', slug }
+    // The attribute comes out decoded, and the slug goes into a path.
+    return { kind: 'embed', slug: encodePathSegment(slug) }
   }
 
   const href = attr(element, 'data-href')
@@ -205,7 +206,9 @@ const readWidget = (element: Element): EmbedResolverResult | undefined => {
   const { slug, key } = reference
   // The loader appends the block's token to the slug of the player it builds, so a private pen
   // embedded this way names its token here, not in a url.
-  const token = attr(element, 'data-token') ?? reference.token
+  const declaredToken = attr(element, 'data-token')
+  // The block's attributes come out decoded, and the token and the user go into a path.
+  const token = declaredToken ? encodePathSegment(declaredToken) : reference.token
   let user = reference.user
   let ownerPath = reference.ownerPath
   let linkedTitle: string | undefined
@@ -225,7 +228,12 @@ const readWidget = (element: Element): EmbedResolverResult | undefined => {
 
   // After the link: `data-user` goes stale when a block is copied and the two disagree.
   // `data-user` names a person and has no way to say team.
-  user ??= readUser(attr(element, 'data-user'))
+  const declaredUser = readUser(attr(element, 'data-user'))
+
+  if (!user && declaredUser) {
+    user = encodePathSegment(declaredUser)
+  }
+
   ownerPath ??= user
 
   const title = attr(element, 'data-pen-title') ?? linkedTitle

@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf, type Nullish } from 'trousse'
+import { encodePathSegment, getPathSegments, isAnyOf, type Nullish } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find, isBlockElement, isBr, isElement, jsonAttr, text } from '../utils/dom.js'
 import { readObjectHeight } from '../utils/hints.js'
@@ -52,7 +52,8 @@ const extractBlueskyPost = (uri: string): BlueskyPost | undefined => {
     return
   }
 
-  return { authority: match[1], rkey: match[3] }
+  // The URI is never parsed as a url, so a space or a `?` in it survives.
+  return { authority: encodePathSegment(match[1]), rkey: encodePathSegment(match[3]) }
 }
 
 const extractBlueskyPostFromUrl = (link: string): BlueskyPost | undefined => {

@@ -92,6 +92,14 @@ describeForEachParser('linkifyGistEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should keep a gist id holding a query separator inside its path segment', async () => {
+    const value = '<amp-gist data-gistid="b9bb35bc68df68259af94430f012425f?x"></amp-gist>'
+    const expected =
+      '<a href="https://gist.github.com/b9bb35bc68df68259af94430f012425f%3Fx">https://gist.github.com/b9bb35bc68df68259af94430f012425f%3Fx</a>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should use a gist id carrying a trailing path as written', async () => {
     const value = '<amp-gist data-gistid="b9bb35bc68df68259af94430f012425f/raw"></amp-gist>'
     const expected =

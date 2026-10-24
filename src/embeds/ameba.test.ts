@@ -217,7 +217,7 @@ describeForEachParser('amebaReblogCardEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should use a malformed stated entry id as written, even if the player answers an error', async () => {
+    it('should keep a stated entry id holding slashes inside one path segment', async () => {
       const value = html`
         <iframe
           src="https://ameblo.jp/s/embed/reblog-card/ncbar/entry-latest.html"
@@ -227,9 +227,9 @@ describeForEachParser('amebaReblogCardEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'ameba',
-        id: 'ncbar/entry-12423195042/../1',
-        src: 'https://ameblo.jp/s/embed/reblog-card/ncbar/entry-12423195042/../1.html',
-        url: 'https://ameblo.jp/ncbar/entry-12423195042/../1.html',
+        id: 'ncbar/entry-12423195042%2F..%2F1',
+        src: 'https://ameblo.jp/s/embed/reblog-card/ncbar/entry-12423195042%2F..%2F1.html',
+        url: 'https://ameblo.jp/ncbar/entry-12423195042%2F..%2F1.html',
         height: 234,
       }
 
@@ -257,7 +257,7 @@ describeForEachParser('amebaReblogCardEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should use a malformed stated blog id as written, even if the player answers an error', async () => {
+    it('should keep a stated blog id holding a slash inside one path segment', async () => {
       const value = html`
         <iframe
           src="https://ameblo.jp/s/embed/reblog-card/ncbar/entry-12423195042.html"
@@ -267,9 +267,9 @@ describeForEachParser('amebaReblogCardEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'ameba',
-        id: '../hijacked/entry-12423195042',
-        src: 'https://ameblo.jp/s/embed/reblog-card/../hijacked/entry-12423195042.html',
-        url: 'https://ameblo.jp/../hijacked/entry-12423195042.html',
+        id: '..%2Fhijacked/entry-12423195042',
+        src: 'https://ameblo.jp/s/embed/reblog-card/..%2Fhijacked/entry-12423195042.html',
+        url: 'https://ameblo.jp/..%2Fhijacked/entry-12423195042.html',
         height: 234,
       }
 

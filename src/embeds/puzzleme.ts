@@ -1,4 +1,4 @@
-import { composeQuery, getQueryParam, isHostOf } from 'trousse'
+import { composeQuery, encodePathSegment, getQueryParam, isHostOf } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, isEmptyElement } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -67,6 +67,7 @@ export const puzzlemeWidgetEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    return composePuzzlemeEmbed(kind, id, set)
+    // The puzzle type comes out of its attribute decoded, and it goes into a path.
+    return composePuzzlemeEmbed(encodePathSegment(kind), id, set)
   },
 )

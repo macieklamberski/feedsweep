@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
+import { encodePathSegment, getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -99,29 +99,38 @@ const readYandexMusicItem = (url: string): YandexMusicItem | undefined => {
   return readRoute(rest)
 }
 
+// The values come out of a fragment or a `{track}:{album}` pair, and each goes into a path.
 const composeYandexMusicEmbed = (item: YandexMusicItem): EmbedResolverResult => {
   if (item.kind === 'album') {
+    const album = encodePathSegment(item.album)
+
     return {
       provider,
       id: `album/${item.album}`,
-      src: `https://music.yandex.ru/iframe/album/${item.album}`,
-      url: `https://music.yandex.ru/album/${item.album}`,
+      src: `https://music.yandex.ru/iframe/album/${album}`,
+      url: `https://music.yandex.ru/album/${album}`,
       height: listHeight,
     }
   }
 
   if (item.kind === 'playlist') {
+    const owner = encodePathSegment(item.owner)
+    const playlist = encodePathSegment(item.playlist)
+
     return {
       provider,
       id: `playlist/${item.owner}/${item.playlist}`,
-      src: `https://music.yandex.ru/iframe/playlist/${item.owner}/${item.playlist}`,
-      url: `https://music.yandex.ru/users/${item.owner}/playlists/${item.playlist}`,
+      src: `https://music.yandex.ru/iframe/playlist/${owner}/${playlist}`,
+      url: `https://music.yandex.ru/users/${owner}/playlists/${playlist}`,
       height: listHeight,
     }
   }
 
+  const track = encodePathSegment(item.track)
+  const album = item.album ? encodePathSegment(item.album) : undefined
+
   // The track id alone addresses the track, so the album stays out of the key.
-  const path = item.album ? `album/${item.album}/track/${item.track}` : `track/${item.track}`
+  const path = album ? `album/${album}/track/${track}` : `track/${track}`
 
   return {
     provider,

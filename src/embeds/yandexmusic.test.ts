@@ -293,6 +293,73 @@ describeForEachParser('yandexMusicEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should keep a hash album holding a query separator inside one path segment', async () => {
+      const value = '<iframe src="https://music.yandex.ru/iframe/#album/222130?x"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'yandexmusic',
+        id: 'album/222130?x',
+        src: 'https://music.yandex.ru/iframe/album/222130%3Fx',
+        url: 'https://music.yandex.ru/album/222130%3Fx',
+        height: 556,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a hash playlist owner holding a query separator inside one path segment', async () => {
+      const value =
+        '<iframe src="https://music.yandex.ru/iframe/#playlist/uid-33vqrjsl?x/1000"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'yandexmusic',
+        id: 'playlist/uid-33vqrjsl?x/1000',
+        src: 'https://music.yandex.ru/iframe/playlist/uid-33vqrjsl%3Fx/1000',
+        url: 'https://music.yandex.ru/users/uid-33vqrjsl%3Fx/playlists/1000',
+        height: 556,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a hash playlist kind holding a query separator inside one path segment', async () => {
+      const value =
+        '<iframe src="https://music.yandex.ru/iframe/#playlist/uid-33vqrjsl/1000?x"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'yandexmusic',
+        id: 'playlist/uid-33vqrjsl/1000?x',
+        src: 'https://music.yandex.ru/iframe/playlist/uid-33vqrjsl/1000%3Fx',
+        url: 'https://music.yandex.ru/users/uid-33vqrjsl/playlists/1000%3Fx',
+        height: 556,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a hash track holding a query separator inside one path segment', async () => {
+      const value = '<iframe src="https://music.yandex.ru/iframe/#track/27037167?x"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'yandexmusic',
+        id: 'track/27037167?x',
+        src: 'https://music.yandex.ru/iframe/track/27037167%3Fx',
+        url: 'https://music.yandex.ru/track/27037167%3Fx',
+        height: 244,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a hash track album holding a query separator inside one path segment', async () => {
+      const value = '<iframe src="https://music.yandex.ru/iframe/#track/2223513:221094?x"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'yandexmusic',
+        id: 'track/2223513',
+        src: 'https://music.yandex.ru/iframe/album/221094%3Fx/track/2223513',
+        url: 'https://music.yandex.ru/album/221094%3Fx/track/2223513',
+        height: 244,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('the retired Flash track player', () => {

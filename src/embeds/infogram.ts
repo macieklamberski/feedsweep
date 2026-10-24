@@ -1,4 +1,4 @@
-import { getQueryParam, parseUrl } from 'trousse'
+import { encodePathSegment, getQueryParam, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 import { readIframeResizeHeight } from '../utils/hints.js'
@@ -20,9 +20,10 @@ const infogramHosts = [
 ]
 
 // Every host and spelling serves the chart on `e.infogram.com`, whose bare route redirects to
-// `?src=embed`.
+// `?src=embed`. The path is the chart id as a url spells it.
 const composeInfogramEmbed = (
   chartId: string,
+  path: string,
   query: string,
   title: string | undefined,
 ): EmbedResolverResult => {
@@ -31,10 +32,18 @@ const composeInfogramEmbed = (
   return {
     provider,
     id: chartId,
-    src: `https://e.infogram.com/${chartId}?src=embed${live}`,
-    url: `https://infogram.com/${chartId}`,
+    src: `https://e.infogram.com/${path}?src=embed${live}`,
+    url: `https://infogram.com/${path}`,
     title,
   }
+}
+
+// An attribute's chart id comes out decoded. The `_/` in front of a current id is a segment of
+// its own, and the rest goes into the path as one.
+const encodeChartId = (chartId: string): string => {
+  const prefix = chartId.startsWith('_/') ? '_/' : ''
+
+  return `${prefix}${encodePathSegment(chartId.slice(prefix.length))}`
 }
 
 // Infogram ships a chart as an empty div its loader fills, so stripEmptyTags deletes the div and
@@ -50,7 +59,7 @@ export const infogramWidgetEmbedResolver = createMarkupEmbedResolver(
 
     const [, chartId, query = ''] = match
 
-    return composeInfogramEmbed(chartId, query, attr(element, 'data-title'))
+    return composeInfogramEmbed(chartId, encodeChartId(chartId), query, attr(element, 'data-title'))
   },
 )
 
@@ -69,7 +78,7 @@ export const infogramScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    return composeInfogramEmbed(chartId, '', attr(element, 'title'))
+    return composeInfogramEmbed(chartId, encodeChartId(chartId), '', attr(element, 'title'))
   },
 )
 
@@ -81,7 +90,7 @@ const infogramResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  return composeInfogramEmbed(chartId, parsed.search, undefined)
+  return composeInfogramEmbed(chartId, chartId, parsed.search, undefined)
 }
 
 // The chart frame on either domain, and the retired `infogr.am/{id}` page.

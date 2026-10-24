@@ -1,4 +1,11 @@
-import { composeQuery, decodeSegment, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import {
+  composeQuery,
+  decodeSegment,
+  encodePathSegment,
+  getPathSegments,
+  getQueryParam,
+  isAnyOf,
+} from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
@@ -24,8 +31,11 @@ const readFileId = (
     return segments[2]
   }
 
+  // A query id comes out decoded, and it goes into a path beside a path id's raw spelling.
   if (isAudio && segments.length === 1 && isAnyOf(segments[0], 'open')) {
-    return getQueryParam(parseUrlOnHosts(url, 'drive.google.com')?.searchParams, 'id')
+    return encodePathSegment(
+      getQueryParam(parseUrlOnHosts(url, 'drive.google.com')?.searchParams, 'id') ?? '',
+    )
   }
 }
 

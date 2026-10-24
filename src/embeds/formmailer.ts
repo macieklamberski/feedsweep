@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf, isPlainObject } from 'trousse'
+import { encodePathSegment, getPathSegments, isAnyOf, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
@@ -47,13 +47,15 @@ export const formmailerWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.formmailer-embed[data-form-host][data-form-hash]',
   (element) => {
     const host = attr(element, 'data-form-host')
-    const hash = attr(element, 'data-form-hash')
+    const [hash = '', ...prefill] = attr(element, 'data-form-hash')?.split('?') ?? []
 
     if (!hash) {
       return
     }
 
-    return formmailerResolveEmbed(`https://${host}/fms/${hash}`)
+    const query = prefill.length ? `?${prefill.join('?')}` : ''
+
+    return formmailerResolveEmbed(`https://${host}/fms/${encodePathSegment(hash)}${query}`)
   },
 )
 

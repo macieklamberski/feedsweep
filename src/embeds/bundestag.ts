@@ -1,4 +1,4 @@
-import { composeQuery, getPathSegments, getQueryParam, toMap } from 'trousse'
+import { composeQuery, encodePathSegment, getPathSegments, getQueryParam, toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -39,7 +39,8 @@ export const bundestagResolveEmbed: ResolveEmbed = (url) => {
     provider: 'bundestag',
     id,
     src: `https://webtv.bundestag.de/pservices/player/embed/nokey${query}`,
-    url: `https://dbtg.tv/cvid/${id}`,
+    // The query id comes out decoded, and it goes into the page path.
+    url: `https://dbtg.tv/cvid/${encodePathSegment(id)}`,
     ratio: '16/9',
   }
 }

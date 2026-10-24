@@ -1,3 +1,4 @@
+import { encodePathSegment } from 'trousse'
 import type { MediaResolver } from '../types.js'
 import { jsonAttr } from '../utils/dom.js'
 
@@ -18,7 +19,8 @@ export const substackMediaResolver: MediaResolver = {
   selector: '.native-video-embed, .native-audio-embed',
   extract: (element) => {
     const attrs = jsonAttr<MediaAttrs>(element, 'data-attrs')
-    const mediaUploadId = attrs?.mediaUploadId
+    // The payload's id comes out decoded, and it goes into a path.
+    const mediaUploadId = encodePathSegment(attrs?.mediaUploadId ?? '')
 
     if (!mediaUploadId) {
       return

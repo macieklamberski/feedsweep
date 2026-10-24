@@ -145,7 +145,7 @@ describeForEachParser('tenorWidgetEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    it('should use a malformed post id as written, even if the player answers an error', async () => {
+    it('should keep a post id holding slashes inside one path segment', async () => {
       const value = html`
         <div
           class="tenor-gif-embed"
@@ -154,9 +154,9 @@ describeForEachParser('tenorWidgetEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'tenor',
-        id: '../../search/cats',
-        src: 'https://tenor.com/embed/../../search/cats',
-        url: 'https://tenor.com/view/../../search/cats',
+        id: '..%2F..%2Fsearch%2Fcats',
+        src: 'https://tenor.com/embed/..%2F..%2Fsearch%2Fcats',
+        url: 'https://tenor.com/view/..%2F..%2Fsearch%2Fcats',
         ratio: '1.33/1',
       }
 

@@ -166,9 +166,7 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
-  })
 
-  describe('edge cases', () => {
     it('should use a malformed claim as written, even if the player answers an error', async () => {
       const value = '<iframe src="https://odysee.com/%24%2Fembed%2F.."></iframe>'
       const expected: EmbedResolverResult = {
@@ -176,6 +174,34 @@ describeForEachParser('odyseeEmbedResolver', (parseHtml) => {
         id: '..',
         src: 'https://odysee.com/$/embed/..',
         url: 'https://odysee.com/..',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should leave a percent sign in a decoded claim as written', async () => {
+      const value = '<iframe src="https://odysee.com/%24%2Fembed%2Fwebb%2520talk%3A7"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'odysee',
+        id: 'webb%20talk:7',
+        src: 'https://odysee.com/$/embed/webb%20talk:7',
+        url: 'https://odysee.com/webb%20talk:7',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a decoded claim holding a query separator inside one path segment', async () => {
+      const value = '<iframe src="https://odysee.com/$/embed/webb%3Ftalk:7"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'odysee',
+        id: 'webb%3Ftalk:7',
+        src: 'https://odysee.com/$/embed/webb%3Ftalk:7',
+        url: 'https://odysee.com/webb%3Ftalk:7',
         ratio: '16/9',
       }
 

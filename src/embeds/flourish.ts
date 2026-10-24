@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf, isHostOf, isPlainObject } from 'trousse'
+import { encodePathSegment, getPathSegments, isAnyOf, isHostOf, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
@@ -45,7 +45,8 @@ export const flourishWidgetEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const result = composeEmbed(match[1], match[2])
+    // The src is read unparsed, and both halves go into a path.
+    const result = composeEmbed(encodePathSegment(match[1]), encodePathSegment(match[2]))
     // The div usually wraps a static thumbnail img, bare or inside a <noscript>.
     const thumbnail = attr(element.querySelector('img'), 'src')
 

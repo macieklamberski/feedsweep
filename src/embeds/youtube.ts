@@ -1,6 +1,7 @@
 import {
   composeQuery,
   decodeSegment,
+  encodePathSegment,
   fixMalformedQuery,
   getPathSegments,
   getQueryParam,
@@ -10,12 +11,7 @@ import {
 } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import {
-  encodePathSegment,
-  parseUrlOnHosts,
-  pickQueryParams,
-  placeholderBaseUrl,
-} from '../utils/urls.js'
+import { parseUrlOnHosts, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'youtube'
@@ -224,19 +220,23 @@ const composeVideoEmbed = (
   videoId: string,
   params?: Record<string, string>,
 ): EmbedResolverResult => {
+  // An attribute or query id comes out decoded, and it goes into the player and poster paths.
+  const segment = encodePathSegment(videoId)
+
   return {
     provider,
     id: videoId,
-    src: composeEmbedUrl(videoId, params),
+    src: composeEmbedUrl(segment, params),
     url: `https://www.youtube.com/watch${composeQuery({ v: videoId })}`,
-    thumbnail: composeThumbnailUrl(videoId),
+    thumbnail: composeThumbnailUrl(segment),
     ratio: playerRatio,
   }
 }
 
-// `segment` is the channel as the page path takes it: AMP's attribute goes in as written, and a
-// query value comes out decoded, so its caller encodes it.
-const composeChannelEmbed = (channel: string, segment = channel): EmbedResolverResult => {
+// AMP's attribute and the query value both come out decoded, and the channel goes into a path.
+const composeChannelEmbed = (channel: string): EmbedResolverResult => {
+  const segment = encodePathSegment(channel)
+
   return {
     provider,
     id: `channel/${channel}`,
@@ -255,7 +255,7 @@ const resolveCollectionEmbed = (
   const channel = getQueryParam(parsed.searchParams, 'channel')
 
   if (isAnyOf(segments[1], 'live_stream')) {
-    return channel ? composeChannelEmbed(channel, encodePathSegment(channel)) : undefined
+    return channel ? composeChannelEmbed(channel) : undefined
   }
 
   // `/embed/videoseries?list=`, `/embed/playlist?list=` and the bare `/embed/?list=` some

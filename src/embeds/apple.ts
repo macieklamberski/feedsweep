@@ -1,4 +1,5 @@
 import {
+  encodePathSegment,
   getPathSegments,
   getQueryParam,
   isHostOrSubdomainOf,
@@ -8,12 +9,7 @@ import {
 } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr } from '../utils/dom.js'
-import {
-  encodePathSegment,
-  parseUrlOnHosts,
-  pickUrlParams,
-  placeholderBaseUrl,
-} from '../utils/urls.js'
+import { parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const musicProvider = 'applemusic'

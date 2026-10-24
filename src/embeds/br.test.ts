@@ -99,6 +99,18 @@ describeForEachParser('brEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should keep a token carrying an encoded query separator inside the path', async () => {
+      const value = html`<iframe src="https://www.br.de/mediathek/embed/av:5dc0%3Fx"></iframe>`
+      const expected: EmbedResolverResult = {
+        provider: 'br',
+        id: 'av:5dc0?x',
+        src: 'https://www.br.de/mediathek/embed/av:5dc0%3Fx',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should ignore a token carrying an encoded path separator', async () => {
       const value = html`<iframe src="https://www.br.de/mediathek/embed/av:5dc0%2Fabc"></iframe>`
 

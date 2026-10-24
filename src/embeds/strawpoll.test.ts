@@ -184,6 +184,24 @@ describeForEachParser('strawpollMountEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should keep a wrapper poll id holding a slash inside one path segment', async () => {
+      const value = html`
+        <div
+          id="strawpoll_kjn1/DJlNxyQ"
+          class="strawpoll-embed"
+        ></div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'strawpoll',
+        id: 'kjn1%2FDJlNxyQ',
+        src: 'https://strawpoll.com/embed/kjn1%2FDJlNxyQ',
+        url: 'https://strawpoll.com/kjn1%2FDJlNxyQ',
+        thumbnail: 'https://cdn.strawpoll.com/images/polls/previews/kjn1%2FDJlNxyQ-c.png',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should read a wrapper holding only a non-breaking space', async () => {
       const value = html`
         <div

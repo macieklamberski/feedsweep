@@ -58,6 +58,19 @@ describe('indavideoResolveEmbed', () => {
       expect(indavideoResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should keep a Flash video id holding a slash inside one path segment', () => {
+      const value = 'http://files.indavideo.hu/player/vc_o.swf?vID=06aceb75c8%2Fx'
+      const expected: EmbedResolverResult = {
+        provider: 'indavideo',
+        id: '06aceb75c8%2Fx',
+        src: 'https://indavideo.hu/player/video/06aceb75c8%2Fx/',
+        url: 'https://indavideo.hu/video/06aceb75c8%2Fx',
+        ratio: '16/9',
+      }
+
+      expect(indavideoResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should use the id as written, even if the player answers an empty page', () => {
       const value = 'https://embed.indavideo.hu/player/video/C75C95C854/'
       const expected: EmbedResolverResult = {

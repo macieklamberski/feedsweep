@@ -1,7 +1,7 @@
-import { composeQuery, getQueryParam, isAnyOf } from 'trousse'
+import { composeQuery, encodePathSegment, getQueryParam, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { encodePathSegment, filterUrlQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { filterUrlQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'kaltura'

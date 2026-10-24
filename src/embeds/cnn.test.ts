@@ -107,6 +107,20 @@ describe('cnnResolveEmbed', () => {
       expect(cnnResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should keep a slug holding a query separator inside its page path segment', () => {
+      const value = 'https://fave.api.cnn.io/v1/fav/?video=arts/2018/07/09/spencer-tunick%3Fx.cnn'
+      const expected: EmbedResolverResult = {
+        provider: 'cnn',
+        id: 'arts/2018/07/09/spencer-tunick?x.cnn',
+        src: 'https://fave.api.cnn.io/v1/fav/?video=arts/2018/07/09/spencer-tunick?x.cnn&customer=cnn&edition=domestic&env=prod',
+        url: 'https://www.cnn.com/videos/arts/2018/07/09/spencer-tunick%3Fx.cnn',
+        ratio: '16/9',
+        date: '2018-07-09',
+      }
+
+      expect(cnnResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should return undefined for an id followed by another query pair', () => {
       const value =
         'https://fave.api.cnn.io/v1/fav/?video=arts/2018/07/09/spencer-tunick-nude-art-melbourne.cnn%26env%3Ddev'

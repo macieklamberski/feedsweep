@@ -1,4 +1,4 @@
-import { isHostOf } from 'trousse'
+import { encodePathSegment, isHostOf } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -51,11 +51,14 @@ export const canvaWidgetEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
+    // The id comes out of its attribute decoded, and it goes into a path.
+    const segment = encodePathSegment(id)
+
     return {
       provider: 'canva',
       id,
-      src: `https://www.canva.com/design/${id}/view?embed`,
-      url: `https://www.canva.com/design/${id}/view`,
+      src: `https://www.canva.com/design/${segment}/view?embed`,
+      url: `https://www.canva.com/design/${segment}/view`,
       ratio: designRatio,
     }
   },

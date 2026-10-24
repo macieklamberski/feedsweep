@@ -1176,27 +1176,27 @@ describeForEachParser('youtubeAmpEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should use a malformed videoid as written, even if the player answers an error', async () => {
+    it('should keep a videoid holding slashes inside one path segment', async () => {
       const value = '<amp-youtube data-videoid="../../evil"></amp-youtube>'
       const expected: EmbedResolverResult = {
         provider: 'youtube',
         id: '../../evil',
-        src: 'https://www.youtube.com/embed/../../evil',
+        src: 'https://www.youtube.com/embed/..%2F..%2Fevil',
         url: 'https://www.youtube.com/watch?v=../../evil',
-        thumbnail: 'https://i.ytimg.com/vi/../../evil/hqdefault.jpg',
+        thumbnail: 'https://i.ytimg.com/vi/..%2F..%2Fevil/hqdefault.jpg',
         ratio: '16/9',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should use a malformed live channel id as written, even if the player answers an error', async () => {
+    it('should keep a live channel id holding slashes inside one path segment', async () => {
       const value = '<amp-youtube data-live-channelid="../../evil"></amp-youtube>'
       const expected: EmbedResolverResult = {
         provider: 'youtube',
         id: 'channel/../../evil',
         src: 'https://www.youtube.com/embed/live_stream?channel=../../evil',
-        url: 'https://www.youtube.com/channel/../../evil',
+        url: 'https://www.youtube.com/channel/..%2F..%2Fevil',
         ratio: '16/9',
       }
 

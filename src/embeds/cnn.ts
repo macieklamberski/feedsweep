@@ -1,4 +1,4 @@
-import { composeQuery, getQueryParam, isAnyOf, parseUrl } from 'trousse'
+import { composeQuery, encodePathSegment, getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
@@ -32,12 +32,14 @@ const playerRatio = '16/9'
 // some real ones.
 const composeEmbed = (id: string): EmbedResolverResult => {
   const query = composeQuery({ video: id, customer: 'cnn', edition: 'domestic', env: 'prod' })
+  // The id is a path read decoded out of a query, so each of its segments goes in as one.
+  const pagePath = id.split('/').map(encodePathSegment).join('/')
 
   return {
     provider,
     id,
     src: `https://fave.api.cnn.io/v1/fav/${query}`,
-    url: `https://www.cnn.com/videos/${id}`,
+    url: `https://www.cnn.com/videos/${pagePath}`,
     ratio: playerRatio,
     date: readDate(id),
   }

@@ -1,12 +1,14 @@
-import { getPathSegments, getQueryParam, isAnyOf, type Nullish, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { attr, find, text } from '../utils/dom.js'
 import {
   encodePathSegment,
-  isFileName,
-  parseUrlOnHosts,
-  placeholderBaseUrl,
-} from '../utils/urls.js'
+  getPathSegments,
+  getQueryParam,
+  isAnyOf,
+  type Nullish,
+  parseUrl,
+} from 'trousse'
+import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { attr, find, text } from '../utils/dom.js'
+import { isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const slideshareHosts = ['slideshare.net', 'slidesharecdn.com']

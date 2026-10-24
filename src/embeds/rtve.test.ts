@@ -361,6 +361,26 @@ describeForEachParser('rtveFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should keep a beacon asset holding a slash inside one path segment', async () => {
+      const value = html`
+        <embed
+          src="http://www.rtve.es/swf/FLVPlayer.swf"
+          flashvars="nielsen=assetID::420589/x,title::Videodrome&amp;config=http://www.rtve.es/swf/data/rtve_config_audio_embed.xml"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'rtve',
+        id: 'audio/420589%2Fx',
+        src: 'https://www.rtve.es/drmn/embed/audio/420589%2Fx/',
+        url: 'https://www.rtve.es/a/420589%2Fx/',
+        thumbnail: 'https://img.rtve.es/a/420589%2Fx/',
+        ratio: '16/9',
+        title: 'Videodrome',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should return undefined for the video config the muchachadanui carriers write', async () => {
       const value = html`
         <embed
@@ -523,16 +543,16 @@ describeForEachParser('rtveFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should use a malformed asset id as written, even if the player answers an error', async () => {
+    it('should keep an asset id holding a slash inside one path segment', async () => {
       const value = html`
         <embed src="http://www.rtve.es/swf/v2/RTVEPlayer.swf?assetID=../evil_es_videos" />
       `
       const expected: EmbedResolverResult = {
         provider: 'rtve',
-        id: 'video/../evil',
-        src: 'https://www.rtve.es/drmn/embed/video/../evil/',
-        url: 'https://www.rtve.es/v/../evil/',
-        thumbnail: 'https://img.rtve.es/v/../evil/',
+        id: 'video/..%2Fevil',
+        src: 'https://www.rtve.es/drmn/embed/video/..%2Fevil/',
+        url: 'https://www.rtve.es/v/..%2Fevil/',
+        thumbnail: 'https://img.rtve.es/v/..%2Fevil/',
         ratio: '16/9',
       }
 

@@ -37,6 +37,19 @@ describe('cognitoformsResolveEmbed', () => {
       expect(cognitoformsResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should keep a query form number holding a slash inside one path segment', () => {
+      const value = 'https://services.cognitoforms.com/f/udBVZe3Z5EWT79cmnukmOA?id=2%2Fx'
+      const expected: EmbedResolverResult = {
+        provider: 'cognitoforms',
+        id: 'udBVZe3Z5EWT79cmnukmOA/2%2Fx',
+        src: 'https://www.cognitoforms.com/f/udBVZe3Z5EWT79cmnukmOA/2%2Fx',
+        url: 'https://www.cognitoforms.com/f/udBVZe3Z5EWT79cmnukmOA/2%2Fx',
+        height: 600,
+      }
+
+      expect(cognitoformsResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should keep the prefill entry in the frame only', () => {
       const value =
         'https://www.cognitoforms.com/f/yExCAh1c_E2nq69zMpV9RA/48?entry=%7B%22Name%22%3A%22Jane%22%7D&utm_source=post'
@@ -115,6 +128,44 @@ describeForEachParser('cognitoformsScriptEmbedResolver', (parseHtml) => {
         id: 'IW7SzJYLPEa96K8jyNcDaw/346',
         src: 'https://www.cognitoforms.com/f/IW7SzJYLPEa96K8jyNcDaw/346',
         url: 'https://www.cognitoforms.com/f/IW7SzJYLPEa96K8jyNcDaw/346',
+        height: 600,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a data-key holding a slash inside one path segment', async () => {
+      const value = html`
+        <script
+          src="https://www.cognitoforms.com/f/seamless.js"
+          data-key="IW7SzJYLPEa96K8jyNcDaw/x"
+          data-form="346"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'cognitoforms',
+        id: 'IW7SzJYLPEa96K8jyNcDaw%2Fx/346',
+        src: 'https://www.cognitoforms.com/f/IW7SzJYLPEa96K8jyNcDaw%2Fx/346',
+        url: 'https://www.cognitoforms.com/f/IW7SzJYLPEa96K8jyNcDaw%2Fx/346',
+        height: 600,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a data-form holding a slash inside one path segment', async () => {
+      const value = html`
+        <script
+          src="https://www.cognitoforms.com/f/seamless.js"
+          data-key="IW7SzJYLPEa96K8jyNcDaw"
+          data-form="346/x"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'cognitoforms',
+        id: 'IW7SzJYLPEa96K8jyNcDaw/346%2Fx',
+        src: 'https://www.cognitoforms.com/f/IW7SzJYLPEa96K8jyNcDaw/346%2Fx',
+        url: 'https://www.cognitoforms.com/f/IW7SzJYLPEa96K8jyNcDaw/346%2Fx',
         height: 600,
       }
 
@@ -389,6 +440,24 @@ Cognito.load("forms", { id: "41" });
         id: 'Lt1_lEG75k-lbJUheZ0tSg/2a',
         src: 'https://www.cognitoforms.com/f/Lt1_lEG75k-lbJUheZ0tSg/2a',
         url: 'https://www.cognitoforms.com/f/Lt1_lEG75k-lbJUheZ0tSg/2a',
+        height: 600,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a load call form number holding a slash inside one path segment', async () => {
+      const value = html`
+        <div class="cognito">
+          <script src="https://services.cognitoforms.com/s/Lt1_lEG75k-lbJUheZ0tSg"></script>
+          <script>Cognito.load("forms", { id: "2/x" });</script>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'cognitoforms',
+        id: 'Lt1_lEG75k-lbJUheZ0tSg/2%2Fx',
+        src: 'https://www.cognitoforms.com/f/Lt1_lEG75k-lbJUheZ0tSg/2%2Fx',
+        url: 'https://www.cognitoforms.com/f/Lt1_lEG75k-lbJUheZ0tSg/2%2Fx',
         height: 600,
       }
 

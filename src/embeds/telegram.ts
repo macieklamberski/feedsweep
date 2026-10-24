@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf, isPlainObject } from 'trousse'
+import { encodePathSegment, getPathSegments, isAnyOf, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
@@ -52,7 +52,8 @@ const readDeclaredPost = (value: string | undefined): EmbedResolverResult | unde
     return
   }
 
-  return composePost(channel, messageId)
+  // Each half comes out of the attribute decoded, and each goes into a path.
+  return composePost(encodePathSegment(channel), encodePathSegment(messageId))
 }
 
 // Telegram ships a post as a bare <script data-telegram-post> whose widget.js builds the iframe.

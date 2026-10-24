@@ -1,6 +1,7 @@
 import {
   composeQuery,
   decodeSegment,
+  encodePathSegment,
   getPathSegments,
   getQueryParam,
   isAnyOf,
@@ -8,12 +9,7 @@ import {
 } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import {
-  encodePathSegment,
-  parseUrlOnHosts,
-  pickQueryParams,
-  placeholderBaseUrl,
-} from '../utils/urls.js'
+import { parseUrlOnHosts, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The embed routes are the site's own. `scribdassets.com` served the Flash player and serves the

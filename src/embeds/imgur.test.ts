@@ -174,7 +174,7 @@ describeForEachParser('imgurBlockquoteEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should use a malformed id as written, even if the player answers an error', async () => {
+    it('should keep an id holding a slash inside one path segment', async () => {
       const value = html`
         <blockquote
           class="imgur-embed-pub"
@@ -183,16 +183,16 @@ describeForEachParser('imgurBlockquoteEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'imgur',
-        id: '../evil',
-        src: 'https://imgur.com/../evil/embed',
-        url: 'https://imgur.com/../evil',
-        thumbnail: 'https://i.imgur.com/../evilm.jpg',
+        id: '..%2Fevil',
+        src: 'https://imgur.com/..%2Fevil/embed',
+        url: 'https://imgur.com/..%2Fevil',
+        thumbnail: 'https://i.imgur.com/..%2Fevilm.jpg',
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should use a malformed id carrying an encoded slash as written, even if the player answers an error', async () => {
+    it('should leave the percent sign of an id carrying an encoded slash as written', async () => {
       const value = html`
         <blockquote
           class="imgur-embed-pub"

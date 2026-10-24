@@ -475,6 +475,20 @@ describe('arcgisResolveEmbed', () => {
 
       expect(arcgisResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should keep a fragment dashboard holding a fragment sign inside one path segment', () => {
+      const value =
+        'https://www.arcgis.com/apps/dashboards/index.html#/bda7594740fd40299423467b48e9ecf6#home'
+      const expected: EmbedResolverResult = {
+        provider: 'arcgis',
+        id: 'bda7594740fd40299423467b48e9ecf6%23home',
+        src: 'https://www.arcgis.com/apps/dashboards/bda7594740fd40299423467b48e9ecf6%23home',
+        url: 'https://www.arcgis.com/apps/dashboards/bda7594740fd40299423467b48e9ecf6%23home',
+        height: 500,
+      }
+
+      expect(arcgisResolveEmbed(value)).toEqual(expected)
+    })
   })
 })
 

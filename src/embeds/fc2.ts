@@ -1,7 +1,7 @@
-import { getQueryParam, parseUrl } from 'trousse'
+import { encodePathSegment, getQueryParam, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { encodePathSegment, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'fc2'
@@ -72,7 +72,9 @@ export const fc2PlayerScriptEmbedResolver = createMarkupEmbedResolver(
 
     // The loader plays `data-id` whenever it is present, whatever `url` names.
     const page = parseUrlOnHosts(attr(element, 'url'), videoHosts)?.pathname.match(contentPageRegex)
-    const contentId = attr(element, 'data-id') ?? page?.[1]
+    const declaredId = attr(element, 'data-id')
+    // The attribute comes out decoded, and it goes into a path beside the raw path spelling.
+    const contentId = declaredId ? encodePathSegment(declaredId) : page?.[1]
 
     if (!contentId) {
       return

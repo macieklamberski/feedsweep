@@ -1,7 +1,7 @@
-import { getPathSegments, getQueryParam, isAnyOf, toMap } from 'trousse'
+import { encodePathSegment, getPathSegments, getQueryParam, isAnyOf, toMap } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'deezer'

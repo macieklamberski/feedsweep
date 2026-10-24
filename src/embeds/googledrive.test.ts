@@ -288,6 +288,24 @@ describeForEachParser('googledriveEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should keep an open link id holding a slash inside one path segment', async () => {
+      const value = html`
+        <iframe
+          src="https://drive.google.com/open?id=1-Y-8cPyGXZKDSo4wl4HgZ6-t2c1pH10_%2Fx"
+          type="audio/mpeg"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'googledrive',
+        id: '1-Y-8cPyGXZKDSo4wl4HgZ6-t2c1pH10_%2Fx',
+        src: 'https://drive.google.com/file/d/1-Y-8cPyGXZKDSo4wl4HgZ6-t2c1pH10_%2Fx/preview',
+        url: 'https://drive.google.com/file/d/1-Y-8cPyGXZKDSo4wl4HgZ6-t2c1pH10_%2Fx/view',
+        height: 252,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should keep the file ratio for a file typed video', async () => {
       const value = html`
         <iframe

@@ -1,5 +1,6 @@
 import {
   composeQuery,
+  encodePathSegment,
   getPathSegments,
   getQueryParam,
   isAnyOf,
@@ -10,7 +11,6 @@ import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed }
 import { attr, flashVar, keepIfMatches } from '../utils/dom.js'
 import {
   digitsRegex,
-  encodePathSegment,
   flashFileRegex,
   hexRegex,
   parseUrlOnHosts,

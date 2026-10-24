@@ -1,7 +1,7 @@
-import { getPathSegments } from 'trousse'
+import { encodePathSegment, getPathSegments } from 'trousse'
 import type { MediaResolver } from '../types.js'
 import { flashVar } from '../utils/dom.js'
-import { encodePathSegment, parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { readCarrierUrl } from '../utils/widgets.js'
 
 const podomaticHost = 'podomatic.com'

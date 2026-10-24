@@ -1,4 +1,4 @@
-import { composeQuery, getQueryParam, parseUrl } from 'trousse'
+import { composeQuery, encodePathSegment, getQueryParam, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
@@ -51,8 +51,11 @@ export const amebaReblogCardEmbedResolver = createUrlEmbedResolver(amebloHosts, 
     return
   }
 
+  const blogId = attr(element, 'data-ameba-id')
+  const entryId = attr(element, 'data-entry-id')
+  // A stated pair comes out of its attributes decoded, and both halves go into a path.
   const id =
-    readReblogCardId(attr(element, 'data-ameba-id'), attr(element, 'data-entry-id')) ??
+    readReblogCardId(encodePathSegment(blogId ?? ''), encodePathSegment(entryId ?? '')) ??
     readReblogCardId(match[1], match[2])
 
   if (!id) {

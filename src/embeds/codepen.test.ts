@@ -851,6 +851,28 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should keep a data-token holding a query separator inside one path segment', async () => {
+      const value = html`
+        <p
+          class="codepen"
+          data-slug-hash="XJpKqXm"
+          data-user="argyleink"
+          data-token="c8ec7595b68381e99d38441487db546f?autoplay=1"
+        ></p>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'XJpKqXm',
+        src: 'https://codepen.io/argyleink/embed/XJpKqXm/c8ec7595b68381e99d38441487db546f%3Fautoplay=1',
+        url: 'https://codepen.io/argyleink/pen/XJpKqXm/c8ec7595b68381e99d38441487db546f%3Fautoplay=1',
+        thumbnail: 'https://shots.codepen.io/argyleink/pen/XJpKqXm-512.jpg',
+        height: 300,
+        author: '@argyleink',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should read a bare slug in data-href', async () => {
       const value = html`
         <p
@@ -903,13 +925,34 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should keep a data-user holding a query inside one path segment', async () => {
+      const value = html`
+        <p
+          class="codepen"
+          data-slug-hash="XJpKqXm"
+          data-user="argyle?ink"
+        ></p>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'codepen',
+        id: 'XJpKqXm',
+        src: 'https://codepen.io/argyle%3Fink/embed/XJpKqXm',
+        url: 'https://codepen.io/argyle%3Fink/pen/XJpKqXm',
+        thumbnail: 'https://shots.codepen.io/argyle%3Fink/pen/XJpKqXm-512.jpg',
+        height: 300,
+        author: '@argyle%3Fink',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should ignore a block naming no pen', async () => {
       const value = '<p class="codepen"><span>See the Pen on CodePen.</span></p>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should use a malformed slug hash as written, even if the player answers an error', async () => {
+    it('should keep a slug hash holding spaces inside one path segment', async () => {
       const value = html`
         <p
           class="codepen"
@@ -920,17 +963,17 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'codepen',
-        id: 'not a slug',
-        src: 'https://codepen.io/anon/embed/not a slug',
-        url: 'https://codepen.io/anon/pen/not a slug',
-        thumbnail: 'https://shots.codepen.io/anon/pen/not a slug-512.jpg',
+        id: 'not%20a%20slug',
+        src: 'https://codepen.io/anon/embed/not%20a%20slug',
+        url: 'https://codepen.io/anon/pen/not%20a%20slug',
+        thumbnail: 'https://shots.codepen.io/anon/pen/not%20a%20slug-512.jpg',
         height: 300,
       }
 
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should use a malformed slug hash carrying a query as written, even if the player answers an error', async () => {
+    it('should keep a slug hash carrying a query inside one path segment', async () => {
       const value = html`
         <p
           class="codepen"
@@ -941,10 +984,10 @@ describeForEachParser('codepenWidgetEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'codepen',
-        id: 'XJpKqXm?x=1',
-        src: 'https://codepen.io/anon/embed/XJpKqXm?x=1',
-        url: 'https://codepen.io/anon/pen/XJpKqXm?x=1',
-        thumbnail: 'https://shots.codepen.io/anon/pen/XJpKqXm?x=1-512.jpg',
+        id: 'XJpKqXm%3Fx=1',
+        src: 'https://codepen.io/anon/embed/XJpKqXm%3Fx=1',
+        url: 'https://codepen.io/anon/pen/XJpKqXm%3Fx=1',
+        thumbnail: 'https://shots.codepen.io/anon/pen/XJpKqXm%3Fx=1-512.jpg',
         height: 300,
       }
 

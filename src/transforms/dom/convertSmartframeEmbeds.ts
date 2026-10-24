@@ -1,3 +1,4 @@
+import { encodePathSegment } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
 import { createImage } from '../../utils/widgets.js'
@@ -5,8 +6,9 @@ import { createImage } from '../../utils/widgets.js'
 // A SmartFrame picture shipped as a childless <smartframe-embed> that renders nothing unupgraded.
 export const convertSmartframeEmbeds: DomTransform = () => (document) => {
   for (const embed of document.querySelectorAll('smartframe-embed[customer-id][image-id]')) {
-    const customerId = attr(embed, 'customer-id')
-    const imageId = attr(embed, 'image-id')
+    // Both come out of their attributes decoded, and both go into a path.
+    const customerId = encodePathSegment(attr(embed, 'customer-id') ?? '')
+    const imageId = encodePathSegment(attr(embed, 'image-id') ?? '')
 
     if (!customerId || !imageId) {
       continue

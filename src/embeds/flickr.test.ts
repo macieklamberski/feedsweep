@@ -1340,14 +1340,14 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should use a malformed group id opening with an encoded traversal as written, even if the player answers an error', async () => {
+    it('should keep a group id opening with an encoded traversal inside one path segment', async () => {
       const value =
         '<iframe src="https://www.flickr.com/slideShow/index.gne?group_id=..%2F797770@N21"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'groups/../797770@N21',
-        src: 'https://embedr.flickr.com/groups/../797770@N21?width=400&height=300',
-        url: 'https://www.flickr.com/groups/../797770@N21/',
+        src: 'https://embedr.flickr.com/groups/..%2F797770@N21?width=400&height=300',
+        url: 'https://www.flickr.com/groups/..%2F797770@N21/',
         width: 400,
         height: 300,
       }
@@ -1355,14 +1355,14 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should use a malformed group id closing with an encoded traversal as written, even if the player answers an error', async () => {
+    it('should keep a group id closing with an encoded traversal inside one path segment', async () => {
       const value =
         '<iframe src="https://www.flickr.com/slideShow/index.gne?group_id=797770@N21%2F.."></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'groups/797770@N21/..',
-        src: 'https://embedr.flickr.com/groups/797770@N21/..?width=400&height=300',
-        url: 'https://www.flickr.com/groups/797770@N21/../',
+        src: 'https://embedr.flickr.com/groups/797770@N21%2F..?width=400&height=300',
+        url: 'https://www.flickr.com/groups/797770@N21%2F../',
         width: 400,
         height: 300,
       }

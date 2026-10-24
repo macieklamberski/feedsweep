@@ -690,7 +690,30 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should use a malformed data-video-id as written over the cite, even if the player answers an error', async () => {
+    it('should keep a byline handle holding a slash inside one path segment', async () => {
+      const value = html`
+        <blockquote
+          class="tiktok-embed"
+          data-video-id="7001234567890123456"
+        >
+          <section>
+            <a href="https://www.tiktok.com/@lynja-cooks?refer=embed">@lynja/cooks</a>
+          </section>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@lynja%2Fcooks/video/7001234567890123456',
+        src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
+        url: 'https://www.tiktok.com/@lynja%2Fcooks/video/7001234567890123456',
+        height: 738,
+        author: '@lynja/cooks',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a data-video-id holding a slash inside one path segment over the cite', async () => {
       const value = html`
         <blockquote
           class="tiktok-embed"
@@ -700,8 +723,8 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'tiktok',
-        id: '@user/video/../evil',
-        src: 'https://www.tiktok.com/embed/v2/../evil',
+        id: '@user/video/..%2Fevil',
+        src: 'https://www.tiktok.com/embed/v2/..%2Fevil',
         url: 'https://www.tiktok.com/@user/video/7001234567890123456',
         height: 738,
       }
@@ -709,7 +732,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should use a malformed data-unique-id as written, even if the player answers an error', async () => {
+    it('should keep a data-unique-id holding a slash inside one path segment', async () => {
       const value = html`
         <blockquote
           class="tiktok-embed"
@@ -725,7 +748,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'tiktok',
         id: '@../evil',
-        src: 'https://www.tiktok.com/embed/@../evil',
+        src: 'https://www.tiktok.com/embed/@..%2Fevil',
         url: 'https://www.tiktok.com/@user',
         height: 478,
         author: '@../evil',
@@ -1394,6 +1417,25 @@ describeForEachParser('tiktokMetasliderEmbedResolver', (parseHtml) => {
         provider: 'tiktok',
         id: '7636550859958045972',
         src: 'https://www.tiktok.com/embed/v2/7636550859958045972',
+        height: 738,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a slide video id holding a slash inside one path segment', async () => {
+      const value = html`
+        <li class="ms-tiktok">
+          <div
+            class="tiktok"
+            data-video-id="7636550859958045972/x"
+          ></div>
+        </li>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '7636550859958045972/x',
+        src: 'https://www.tiktok.com/embed/v2/7636550859958045972%2Fx',
         height: 738,
       }
 

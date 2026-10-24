@@ -1,4 +1,11 @@
-import { composeQuery, getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
+import {
+  composeQuery,
+  encodePathSegment,
+  getPathSegments,
+  getQueryParam,
+  isAnyOf,
+  parseUrl,
+} from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
@@ -52,7 +59,8 @@ export const spreakerResolveEmbed: ResolveEmbed = (url, element) => {
     provider,
     id: `${embed.kind}/${embed.id}`,
     src: `https://widget.spreaker.com/player${composeQuery({ [embed.param]: embed.id })}`,
-    url: `https://www.spreaker.com/${embed.kind}/${embed.id}`,
+    // The query id comes out decoded, and it goes into the page path.
+    url: `https://www.spreaker.com/${embed.kind}/${encodePathSegment(embed.id)}`,
     height: playerHeight,
     title,
   }

@@ -576,41 +576,21 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should use a malformed authority as written, even if the player answers an error', async () => {
+    it('should keep an authority and a record key holding spaces inside one path segment each', async () => {
       const value = html`
         <blockquote
           class="bluesky-embed"
-          data-bluesky-uri="at://not an authority/app.bsky.feed.post/3lzq7aeuwbg42"
+          data-bluesky-uri="at://not an authority/app.bsky.feed.post/3lzq7 aeuwbg42"
         >
           <p lang="en">Nothing addressable here.</p>
         </blockquote>
       `
       const expected: EmbedResolverResult = {
         provider: 'bluesky',
-        id: 'not an authority/3lzq7aeuwbg42',
-        src: 'https://embed.bsky.app/embed/not an authority/app.bsky.feed.post/3lzq7aeuwbg42',
-        url: 'https://bsky.app/profile/not an authority/post/3lzq7aeuwbg42',
+        id: 'not%20an%20authority/3lzq7%20aeuwbg42',
+        src: 'https://embed.bsky.app/embed/not%20an%20authority/app.bsky.feed.post/3lzq7%20aeuwbg42',
+        url: 'https://bsky.app/profile/not%20an%20authority/post/3lzq7%20aeuwbg42',
         description: 'Nothing addressable here.',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should use a malformed record key as written, even if the player answers an error', async () => {
-      const value = html`
-        <blockquote
-          class="bluesky-embed"
-          data-bluesky-uri="at://did:plc:9hz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/.."
-        >
-          <p lang="en">The record key would climb out of the collection.</p>
-        </blockquote>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'bluesky',
-        id: 'did:plc:9hz4agnyzcrsvpnprxrbjrpa/..',
-        src: 'https://embed.bsky.app/embed/did:plc:9hz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/..',
-        url: 'https://bsky.app/profile/did:plc:9hz4agnyzcrsvpnprxrbjrpa/post/..',
-        description: 'The record key would climb out of the collection.',
       }
 
       expect(await extract(value)).toEqual(expected)

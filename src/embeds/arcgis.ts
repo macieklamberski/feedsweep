@@ -1,5 +1,6 @@
 import {
   composeQuery,
+  encodePathSegment,
   getAnyOf,
   getPathSegments,
   getQueryParam,
@@ -71,8 +72,11 @@ const composeItem = (id: string, src: string): Item => {
 }
 
 const readDashboardId = (url: URL): string | undefined => {
+  // A fragment is never decoded or resolved, and the id goes into a path.
   if (isAnyOf(url.pathname, dashboardShellPaths)) {
-    return url.hash.match(dashboardFragmentRegex)?.[1]
+    const fragmentId = url.hash.match(dashboardFragmentRegex)?.[1]
+
+    return fragmentId ? encodePathSegment(fragmentId) : undefined
   }
 
   return url.pathname.match(dashboardPathRegex)?.[1]

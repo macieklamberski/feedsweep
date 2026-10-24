@@ -1,5 +1,6 @@
 import {
   composeQuery,
+  encodePathSegment,
   fixMalformedQuery,
   getPathSegments,
   getQueryParam,
@@ -205,7 +206,8 @@ const readXspfPlayer = (player: URL): EmbedResolverResult | undefined => {
     return
   }
 
-  return { ...composeEmbedResult(identifier), height: audioPlayerHeight }
+  // A query identifier comes out decoded, and it goes into a path.
+  return { ...composeEmbedResult(encodePathSegment(identifier)), height: audioPlayerHeight }
 }
 
 // The `soundFile` flashvar names one file of an item that can hold hundreds, so the file is kept.
@@ -247,7 +249,7 @@ const archiveFlashResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const result = composeEmbedResult(identifier)
+  const result = composeEmbedResult(encodePathSegment(identifier))
 
   if (namesAudioFile(config)) {
     return { ...result, height: audioPlayerHeight }

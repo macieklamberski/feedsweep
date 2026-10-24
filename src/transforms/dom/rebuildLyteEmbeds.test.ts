@@ -73,14 +73,14 @@ describeForEachParser('rebuildLyteEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
-  it('should use a malformed video id as written, even if the player answers an error', async () => {
+  it('should keep a video id carrying a query separator inside one path segment', async () => {
     const value = html`
       <div
         id="WYL_dQw4w9WgXcQ?list=x"
         class="lyMe"
       ></div>
     `
-    const expected = '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?list=x"></iframe>'
+    const expected = '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ%3Flist=x"></iframe>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })

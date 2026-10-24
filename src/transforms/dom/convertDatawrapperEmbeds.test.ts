@@ -61,6 +61,17 @@ describeForEachParser('convertDatawrapperEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should keep an iframe chart id holding a backslash inside one path segment', async () => {
+    const value = '<iframe src="https://datawrapper.dwcdn.net/ab\\cd/1/"></iframe>'
+    const expected = html`
+      <a href="https://datawrapper.dwcdn.net/ab%5Ccd/">
+        <img src="https://datawrapper.dwcdn.net/ab%5Ccd/full.png">
+      </a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should remove the sibling resize listener script', async () => {
     const value = html`
       <iframe src="https://datawrapper.dwcdn.net/bdqZJ/2/" title="Egg prices"></iframe>
@@ -120,6 +131,17 @@ describeForEachParser('convertDatawrapperEmbeds', (parseHtml) => {
     const expected = html`
       <a href="https://datawrapper.dwcdn.net/ab_cd/">
         <img src="https://datawrapper.dwcdn.net/ab_cd/full.png">
+      </a>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a wrapper chart id holding a slash inside one path segment', async () => {
+    const value = '<div id="datawrapper-vis-ab/cd"></div>'
+    const expected = html`
+      <a href="https://datawrapper.dwcdn.net/ab%2Fcd/">
+        <img src="https://datawrapper.dwcdn.net/ab%2Fcd/full.png">
       </a>
     `
 

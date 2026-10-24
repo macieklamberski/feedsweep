@@ -79,6 +79,18 @@ describeForEachParser('rebuildRocketYoutubePreviews', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should keep a data-id holding a slash inside one path segment', async () => {
+    const value = html`
+      <div
+        class="rll-youtube-player"
+        data-id="dQw4w9WgXcQ/x"
+      ></div>
+    `
+    const expected = '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ%2Fx"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should leave the element untouched when it states no video at all', async () => {
     const value = html`
       <div class="rll-youtube-player" data-query="feature=oembed"></div>

@@ -1,4 +1,4 @@
-import { decodeSegment, getPathSegments, isAnyOf } from 'trousse'
+import { decodeSegment, encodePathSegment, getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -22,7 +22,8 @@ const brResolveEmbed: ResolveEmbed = (url) => {
   return {
     provider,
     id: token,
-    src: `https://www.br.de/mediathek/embed/${token}`,
+    // The token is read decoded, and it goes back into the path.
+    src: `https://www.br.de/mediathek/embed/${encodePathSegment(token)}`,
     ratio: '16/9',
   }
 }
