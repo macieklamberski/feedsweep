@@ -234,7 +234,7 @@ describeForEachParser('facebookWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'facebook',
         id: 'https://www.facebook.com/PageName/posts/123',
-        src: 'https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123',
+        src: 'https://www.facebook.com/plugins/post.php?href=https://www.facebook.com/PageName/posts/123',
         url: 'https://www.facebook.com/PageName/posts/123',
         description: 'Caption text about the thing.',
       }
