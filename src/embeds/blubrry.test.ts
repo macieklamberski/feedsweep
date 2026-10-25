@@ -646,6 +646,18 @@ describeForEachParser('blubrryPowerpressEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should trim a trailing space off the episode value', async () => {
+      const value = '<iframe src="https://example.com/?powerpress_embed=1234-podcast%20"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'blubrry',
+        id: 'example.com/1234-podcast',
+        src: 'https://example.com/?powerpress_embed=1234-podcast',
+        height: 40,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should state the audio height for a frame naming no player', async () => {
       const value = '<iframe src="https://example.com/?powerpress_embed=3443-podcast"></iframe>'
       const expected: EmbedResolverResult = {

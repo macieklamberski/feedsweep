@@ -1,5 +1,4 @@
 import {
-  fixMalformedQuery,
   isAnyOf,
   isHostOrSubdomainOf,
   type MaybePromise,
@@ -37,6 +36,7 @@ import {
   foldEscapedAmpersands,
   parseUrlOnHosts,
   prepareUrl,
+  repairCarrierUrl,
   resolveOrDropUrl,
   resolveOrKeepUrl,
 } from './urls.js'
@@ -116,6 +116,12 @@ export const readCarrierUrl = (element: Element): string => {
   const url = element.localName === 'object' ? readObjectUrl(element) : element.getAttribute('src')
 
   return collapseSlashRuns(foldEscapedAmpersands(url ?? ''))
+}
+
+// The carrier url a resolver reads, with the class repairs applied. A frame no resolver claims
+// keeps the url `readCarrierUrl` gives.
+export const readRepairedCarrierUrl = (element: Element): string => {
+  return repairCarrierUrl(readCarrierUrl(element))
 }
 
 type ResolverOptions = {
@@ -270,9 +276,9 @@ export const createUrlEmbedResolver = (
         return
       }
 
-      // Only a resolver reads the glued-query repair. Every frame, claimed or not, reads the
-      // ampersands readCarrierUrl folded.
-      return decideSize(element, extract(fixMalformedQuery(src), element), options.readCarrierSize)
+      // Only a resolver reads the glued-query and whitespace repairs. Every frame, claimed or not,
+      // reads the ampersands readCarrierUrl folded.
+      return decideSize(element, extract(repairCarrierUrl(src), element), options.readCarrierSize)
     },
   }
 }

@@ -137,6 +137,20 @@ describe('archiveResolveEmbed', () => {
       expect(archiveResolveEmbed(value)).toEqual(expected)
     })
 
+    it('should trim whitespace around the identifier', () => {
+      const value = 'https://archive.org/embed/some_album%20'
+      const expected: EmbedResolverResult = {
+        provider: 'archive',
+        id: 'some_album',
+        src: 'https://archive.org/embed/some_album',
+        url: 'https://archive.org/details/some_album',
+        thumbnail: 'https://archive.org/services/img/some_album',
+        ratio: '16/9',
+      }
+
+      expect(archiveResolveEmbed(value)).toEqual(expected)
+    })
+
     it('should keep every stranded parameter, not just the first', () => {
       const value = 'https://archive.org/embed/some_album&playlist=1&list_height=150'
       const expected: EmbedResolverResult = {

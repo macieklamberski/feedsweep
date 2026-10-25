@@ -6,7 +6,7 @@ import {
   startsWithAnyOf,
 } from 'trousse'
 import * as styles from './styles.js'
-import { isUrlShaped } from './urls.js'
+import { foldEscapedAmpersands, isUrlShaped } from './urls.js'
 
 // Linkedom mis-types Node as `() => void` in facades.d.ts (WebReflection/linkedom#167).
 export const Node = { ELEMENT_NODE: 1, TEXT_NODE: 3, COMMENT_NODE: 8 } as const
@@ -176,9 +176,21 @@ export const flashVars = (element: Nullish<Element>): string | undefined => {
   return attr(element, 'flashvars') ?? paramValue(paramOwner(element), 'flashvars')
 }
 
+// A flashvars query string read as pairs, its twice-escaped `&amp;` folded and each value without
+// the whitespace a publisher left around it, so the id and the minted url name the same item.
+export const parseFlashVars = (query: Nullish<string>): URLSearchParams => {
+  const params = new URLSearchParams()
+
+  for (const [name, value] of new URLSearchParams(foldEscapedAmpersands(query ?? ''))) {
+    params.append(name, value.trim())
+  }
+
+  return params
+}
+
 // One named value out of that configuration, for a carrier that names a single thing.
 export const flashVar = (element: Nullish<Element>, name: string): string | undefined => {
-  return getQueryParam(new URLSearchParams(flashVars(element)), name)
+  return getQueryParam(parseFlashVars(flashVars(element)), name)
 }
 
 // Publishers spell a `<param>` name in every case, so `name` arrives lowercased.

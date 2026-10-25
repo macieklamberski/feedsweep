@@ -1,7 +1,6 @@
 import {
   composeQuery,
   encodePathSegment,
-  fixMalformedQuery,
   getPathSegments,
   getQueryParam,
   isAnyOf,
@@ -15,6 +14,7 @@ import {
   parseUrlOnHosts,
   pickQueryParams,
   placeholderBaseUrl,
+  repairCarrierUrl,
 } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
@@ -42,7 +42,7 @@ type SegmentParts = {
 // an ampersand where the query should begin. Its player still served that spelling in 2023 and
 // answers 404 for it now, while `?playlist=1` answers 200.
 const parseArchiveUrl = (link: string): URL | undefined => {
-  return parseUrl(fixMalformedQuery(link), placeholderBaseUrl)
+  return parseUrl(repairCarrierUrl(link), placeholderBaseUrl)
 }
 
 const readSegmentParts = (url: URL | undefined): SegmentParts => {

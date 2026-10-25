@@ -2,7 +2,6 @@ import {
   composeQuery,
   decodeSegment,
   encodePathSegment,
-  fixMalformedQuery,
   getPathSegments,
   getQueryParam,
   getQueryParams,
@@ -18,7 +17,12 @@ import { attr, find } from '../utils/dom.js'
 
 const provider = 'dailymotion'
 
-import { parseUrlOnHosts, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  parseUrlOnHosts,
+  pickQueryParams,
+  placeholderBaseUrl,
+  repairCarrierUrl,
+} from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 // Listed one by one: `dailymotion.de` is third-party, and a tld pattern would trust it.
@@ -86,7 +90,7 @@ const readId = (candidate: Nullish<string>): string | undefined => {
 // The Flash player wrote `/swf/{id}&colors=…`, the query glued onto the id, and transforms outside
 // the resolver factory read urls here too.
 const parseDailymotionUrl = (link: string): URL | undefined => {
-  return parseUrl(fixMalformedQuery(link), placeholderBaseUrl)
+  return parseUrl(repairCarrierUrl(link), placeholderBaseUrl)
 }
 
 const wallWords = ['videowall', 'videozap']

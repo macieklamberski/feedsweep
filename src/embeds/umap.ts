@@ -1,7 +1,7 @@
 import { parseUrl } from 'trousse'
 import { attr } from '../utils/dom.js'
 import { pickUrlParams, readOrigin } from '../utils/urls.js'
-import { createMarkupEmbedResolver, readCarrierUrl } from '../utils/widgets.js'
+import { createMarkupEmbedResolver, readRepairedCarrierUrl } from '../utils/widgets.js'
 
 const provider = 'umap'
 
@@ -19,7 +19,7 @@ const mapHeight = 300
 // A uMap map framed from any instance. The hash, `#{zoom}/{lat}/{lng}`, is the view the map opens
 // on, so it travels with the src.
 export const umapEmbedResolver = createMarkupEmbedResolver('iframe[src*="/map/"]', (element) => {
-  const link = readCarrierUrl(element)
+  const link = readRepairedCarrierUrl(element)
   const url = parseUrl(link)
 
   if (!url || !readOrigin(url)) {

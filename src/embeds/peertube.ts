@@ -2,7 +2,7 @@ import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { pickUrlParams, readOrigin, uuidRegex } from '../utils/urls.js'
-import { createMarkupEmbedResolver, readCarrierUrl } from '../utils/widgets.js'
+import { createMarkupEmbedResolver, readRepairedCarrierUrl } from '../utils/widgets.js'
 
 const provider = 'peertube'
 
@@ -86,7 +86,7 @@ const peertubePlaylistParams = ['playlistPosition']
 export const peertubeEmbedResolver = createMarkupEmbedResolver(
   'iframe[src*="/videos/embed/" i], iframe[src*="/videos/watch/" i], iframe[src*="/w/" i], iframe[src*="/video-playlists/embed/" i]',
   (element) => {
-    const link = readCarrierUrl(element)
+    const link = readRepairedCarrierUrl(element)
     const video = parseVideo(link)
 
     if (!video) {

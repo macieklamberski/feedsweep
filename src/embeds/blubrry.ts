@@ -15,7 +15,7 @@ import { filterUrlQuery, placeholderBaseUrl } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
-  readCarrierUrl,
+  readRepairedCarrierUrl,
 } from '../utils/widgets.js'
 
 const blubrryHosts = ['blubrry.com']
@@ -132,7 +132,7 @@ export const blubrryEmbedResolver = createUrlEmbedResolver(blubrryHosts, blubrry
 export const blubrryPowerpressEmbedResolver = createMarkupEmbedResolver(
   'iframe[src*="powerpress_embed="]',
   (element) => {
-    const link = readCarrierUrl(element)
+    const link = readRepairedCarrierUrl(element)
     const url = parseUrl(link)
 
     if (!url) {

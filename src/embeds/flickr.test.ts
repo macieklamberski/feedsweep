@@ -167,6 +167,28 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should strip the whitespace around an owner named only in user_id', async () => {
+      const value = html`
+        <embed
+          type="application/x-shockwave-flash"
+          src="http://www.flickr.com/apps/slideshow/show.swf?v=109615"
+          flashvars="offsite=true&amp;user_id=17367418@N03 &amp;jump_to="
+          width="400"
+          height="300"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photostreams/17367418@N03',
+        src: 'https://embedr.flickr.com/photostreams/17367418@N03?width=400&height=300',
+        url: 'https://www.flickr.com/photos/17367418@N03/',
+        width: 400,
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should map a group pool page path onto the group player', async () => {
       const value = html`
         <embed
@@ -556,8 +578,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    // Flickr redirects this query to `/photos/17367418@N03%20/player`, which answers 404.
-    it('should use a malformed user carrying a trailing space as written, even if the player answers an error', async () => {
+    it('should trim a trailing space off a user read from the query', async () => {
       const value = html`
         <iframe
           src="http://www.flickr.com/slideShow/index.gne?user_id=17367418@N03 &amp;tags=&amp;set_id=&amp;bgcolor=transparent"
@@ -569,9 +590,9 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'flickr',
-        id: 'photostreams/17367418@N03 ',
-        src: 'https://www.flickr.com/photos/17367418@N03%20/player?width=400&height=300',
-        url: 'https://www.flickr.com/photos/17367418@N03%20/',
+        id: 'photostreams/17367418@N03',
+        src: 'https://embedr.flickr.com/photostreams/17367418@N03?width=400&height=300',
+        url: 'https://www.flickr.com/photos/17367418@N03/',
         width: 400,
         height: 300,
       }
@@ -871,7 +892,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should use a malformed secret as written, even if the url answers an error', async () => {
+    it('should trim a trailing space off a secret', async () => {
       const value = html`
         <iframe
           src="https://www.flickr.com/photos/hankthetank/15637343340/player/2d3295bc6d%20"
@@ -884,7 +905,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         id: 'p/pPPtnW',
         src: 'https://www.flickr.com/photos/hankthetank/15637343340/player/',
         url: 'https://www.flickr.com/photos/hankthetank/15637343340/',
-        thumbnail: 'https://live.staticflickr.com/0/15637343340_2d3295bc6d%20_b.jpg',
+        thumbnail: 'https://live.staticflickr.com/0/15637343340_2d3295bc6d_b.jpg',
         author: 'hankthetank',
         ratio: '4/3',
       }

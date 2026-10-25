@@ -10,13 +10,7 @@ import {
 } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
-import {
-  alphanumericRegex,
-  foldEscapedAmpersands,
-  isFileName,
-  parseUrlOnHosts,
-  uuidRegex,
-} from '../utils/urls.js'
+import { alphanumericRegex, isFileName, parseUrlOnHosts, uuidRegex } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'codepen'
@@ -79,8 +73,7 @@ const readUser = (value: string | undefined): string | undefined => {
 }
 
 const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
-  // A twice-encoded feed leaves a literal `&amp;` that hides the `key` parameter after it.
-  const parsed = parseUrlOnHosts(foldEscapedAmpersands(value ?? ''), codepenHosts, isHostOf)
+  const parsed = parseUrlOnHosts(value, codepenHosts, isHostOf)
 
   if (!parsed) {
     return

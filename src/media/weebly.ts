@@ -1,8 +1,8 @@
 import { getQueryParam, isAnyOf } from 'trousse'
 import type { MediaResolver } from '../types.js'
-import { flashVars } from '../utils/dom.js'
+import { flashVars, parseFlashVars } from '../utils/dom.js'
 import { audioFileRegex, imageFileRegex, parseUrlOnHosts } from '../utils/urls.js'
-import { readCarrierUrl } from '../utils/widgets.js'
+import { readRepairedCarrierUrl } from '../utils/widgets.js'
 
 const weeblyHost = 'weebly.com'
 const audioPlayerPath = '/weebly/apps/audioPlayer2.swf'
@@ -60,13 +60,13 @@ export const weeblyFlashMediaResolver: MediaResolver = {
     `embed[src*="${weeblyHost}${audioPlayerPath}" i]`,
   ].join(', '),
   extract: (element) => {
-    const player = parseUrlOnHosts(readCarrierUrl(element), weeblyHost)
+    const player = parseUrlOnHosts(readRepairedCarrierUrl(element), weeblyHost)
 
     if (!player || !isAnyOf(player.pathname, audioPlayerPath)) {
       return
     }
 
-    const config = new URLSearchParams(flashVars(element) ?? '')
+    const config = parseFlashVars(flashVars(element))
     const src = getQueryParam(config, 'soundFile')
 
     if (!src || !audioFileRegex.test(src)) {
