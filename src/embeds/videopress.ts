@@ -46,7 +46,7 @@ const videopressResolveEmbed: ResolveEmbed = (url, element) => {
   return {
     ...composeEmbed(guid, pickUrlParams(url, videopressEmbedParams)),
     // The block editor writes the poster the publisher chose into the player url.
-    thumbnail: parseUrl(url, placeholderBaseUrl)?.searchParams.get('posterUrl') ?? undefined,
+    thumbnail: getQueryParam(parseUrl(url, placeholderBaseUrl)?.searchParams, 'posterUrl'),
     title: attr(element, 'title'),
   }
 }
