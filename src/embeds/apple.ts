@@ -9,7 +9,7 @@ import {
 } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr } from '../utils/dom.js'
-import { parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
+import { pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const musicProvider = 'applemusic'
@@ -41,7 +41,7 @@ const appleHeights = toMap({
 })
 
 export const appleResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, appleHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return
