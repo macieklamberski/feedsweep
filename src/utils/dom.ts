@@ -253,7 +253,7 @@ export const isEmptyElement = (element: Element): boolean => {
 // a bogus comment such as `<?php …>`. An unclosed one runs to the end of the input, as the
 // tokenizer reads it.
 const tagRest = String.raw`(?:=\s*"[^"]*"|=\s*'[^']*'|[^>])*`
-const rawText = String.raw`[\s\S]*?(?:<\/\k<rawTag>(?:\s[^>]*)?>|$)`
+const rawText = String.raw`[\s\S]*?(?:<\/\k<rawTag>(?=[\s/>]|$)[^>]*(?:>|$)|$)`
 const markupTokenRegex = new RegExp(
   [
     String.raw`<!doctype\b[^>]*>`,

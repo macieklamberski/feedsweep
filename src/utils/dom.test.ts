@@ -1228,7 +1228,15 @@ describeForEachParser('setInnerHtml', (parseHtml) => {
   it('should scan a long run of tags before an unclosed quote in linear time', () => {
     const element = parseHtml('').createElement('div')
     const start = performance.now()
-    setInnerHtml(element, `${'<a '.repeat(100_000)}"`)
+    setInnerHtml(element, `${'<a '.repeat(100_000)}="`)
+
+    expect(performance.now() - start).toBeLessThan(1000)
+  })
+
+  it('should scan a long run of unfinished raw-text end tags in linear time', () => {
+    const element = parseHtml('').createElement('div')
+    const start = performance.now()
+    setInnerHtml(element, `<script>${'</script x'.repeat(20_000)}`)
 
     expect(performance.now() - start).toBeLessThan(1000)
   })
