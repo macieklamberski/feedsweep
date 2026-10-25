@@ -377,9 +377,9 @@ describeForEachParser('yandexMapsIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yandexmaps',
         id: 'constructor:56f6b30938b701761416476fec0fe35e1bbe8a78cf22463ba3977ec6c75398f4',
-        src: 'https://yandex.com/map-widget/v1/?um=constructor%3A56f6b30938b701761416476fec0fe35e1bbe8a78cf22463ba3977ec6c75398f4&source=constructor',
+        src: 'https://yandex.com/map-widget/v1/?um=constructor:56f6b30938b701761416476fec0fe35e1bbe8a78cf22463ba3977ec6c75398f4&source=constructor',
         thumbnail:
-          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3A56f6b30938b701761416476fec0fe35e1bbe8a78cf22463ba3977ec6c75398f4&width=650&height=400',
+          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor:56f6b30938b701761416476fec0fe35e1bbe8a78cf22463ba3977ec6c75398f4&width=650&height=400',
         height: 400,
       }
 
@@ -399,9 +399,9 @@ describeForEachParser('yandexMapsIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yandexmaps',
         id: 'constructor:0242b1593be31838cd4117b8071e0f6d04082335598e31436a84d2e2a02ddd17',
-        src: 'https://yandex.by/map-widget/v1/?um=constructor%3A0242b1593be31838cd4117b8071e0f6d04082335598e31436a84d2e2a02ddd17&source=constructor&ll=27.562149%2C53.939212&z=16',
+        src: 'https://yandex.by/map-widget/v1/?um=constructor:0242b1593be31838cd4117b8071e0f6d04082335598e31436a84d2e2a02ddd17&source=constructor&ll=27.562149,53.939212&z=16',
         thumbnail:
-          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3A0242b1593be31838cd4117b8071e0f6d04082335598e31436a84d2e2a02ddd17&width=650&height=400',
+          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor:0242b1593be31838cd4117b8071e0f6d04082335598e31436a84d2e2a02ddd17&width=650&height=400',
         height: 400,
       }
 
@@ -421,9 +421,9 @@ describeForEachParser('yandexMapsIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yandexmaps',
         id: 'constructor:cdaf1d35825766e91a2eecbac1476a02c410ff570830efd17ecaffeb5effbfb9',
-        src: 'https://yandex.ru/map-widget/v1/?um=constructor%3Acdaf1d35825766e91a2eecbac1476a02c410ff570830efd17ecaffeb5effbfb9&source=constructor&lang=ru_RU',
+        src: 'https://yandex.ru/map-widget/v1/?um=constructor:cdaf1d35825766e91a2eecbac1476a02c410ff570830efd17ecaffeb5effbfb9&source=constructor&lang=ru_RU',
         thumbnail:
-          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor%3Acdaf1d35825766e91a2eecbac1476a02c410ff570830efd17ecaffeb5effbfb9&width=650&height=400',
+          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor:cdaf1d35825766e91a2eecbac1476a02c410ff570830efd17ecaffeb5effbfb9&width=650&height=400',
         height: 400,
       }
 
@@ -483,7 +483,7 @@ describeForEachParser('yandexMapsIframeEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'yandexmaps',
-        src: 'https://yandex.com/map-widget/v1/?ll=37.612000%2C55.752000&z=13&l=map',
+        src: 'https://yandex.com/map-widget/v1/?ll=37.612000,55.752000&z=13&l=map',
         height: 400,
         title: 'Yandex map of central Moscow',
       }
@@ -496,7 +496,7 @@ describeForEachParser('yandexMapsIframeEmbedResolver', (parseHtml) => {
         '<iframe src="https://yandex.ru/map-widget/v1/?ll=37.612000%2C55.752000&z=13&l=map"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'yandexmaps',
-        src: 'https://yandex.ru/map-widget/v1/?ll=37.612000%2C55.752000&z=13&l=map',
+        src: 'https://yandex.ru/map-widget/v1/?ll=37.612000,55.752000&z=13&l=map',
         height: 400,
       }
 

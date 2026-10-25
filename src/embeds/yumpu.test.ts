@@ -80,7 +80,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yumpu',
         id: 'HItJxtpSy3tdyhFd',
-        src: 'https://www.yumpu.com/es/embed/view/HItJxtpSy3tdyhFd',
+        src: 'https://www.yumpu.com/en/embed/view/HItJxtpSy3tdyhFd',
         ratio: '4/3',
       }
 
