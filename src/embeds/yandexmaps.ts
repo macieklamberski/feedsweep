@@ -123,6 +123,7 @@ export const yandexMapsIframeEmbedResolver = createUrlEmbedResolver(
         provider,
         id: `-/${code}`,
         src: `https://${parsed.hostname}${widgetPath}-/${code}`,
+        url: `https://${parsed.hostname}/maps/-/${code}`,
         height: mapHeight,
       }
     }

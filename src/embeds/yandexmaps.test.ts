@@ -445,6 +445,7 @@ describeForEachParser('yandexMapsIframeEmbedResolver', (parseHtml) => {
         provider: 'yandexmaps',
         id: '-/CCUnYRDQkD',
         src: 'https://yandex.ru/map-widget/v1/-/CCUnYRDQkD',
+        url: 'https://yandex.ru/maps/-/CCUnYRDQkD',
         height: 400,
       }
 
@@ -465,6 +466,7 @@ describeForEachParser('yandexMapsIframeEmbedResolver', (parseHtml) => {
         provider: 'yandexmaps',
         id: '-/CCUmMWx~KA',
         src: 'https://yandex.by/map-widget/v1/-/CCUmMWx~KA',
+        url: 'https://yandex.by/maps/-/CCUmMWx~KA',
         height: 400,
       }
 
@@ -509,6 +511,19 @@ describeForEachParser('yandexMapsIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yandexmaps',
         src: 'https://yandex.com/map-widget/v1/?ll=37.612000,55.752000&z=13',
+        height: 400,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // Constructed: every lab layer value is letters.
+    it('should keep a percent sign in the layer value', async () => {
+      const value =
+        '<iframe src="https://yandex.com/map-widget/v1/?ll=37.612000%2C55.752000&z=13&l=map%2595"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'yandexmaps',
+        src: 'https://yandex.com/map-widget/v1/?ll=37.612000,55.752000&z=13&l=map%2595',
         height: 400,
       }
 
