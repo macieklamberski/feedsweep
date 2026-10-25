@@ -105,14 +105,14 @@ describeForEachParser('peertubeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should carry over the subtitle language', async () => {
+    it('should drop the subtitle language', async () => {
       const value = html`
         <iframe src="https://tube.funfacts.de/w/4RnoEXF5EfXb8iZCjnJsx9?subtitle=de"></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'peertube',
         id: '4RnoEXF5EfXb8iZCjnJsx9',
-        src: 'https://tube.funfacts.de/videos/embed/4RnoEXF5EfXb8iZCjnJsx9?subtitle=de',
+        src: 'https://tube.funfacts.de/videos/embed/4RnoEXF5EfXb8iZCjnJsx9',
         url: 'https://tube.funfacts.de/w/4RnoEXF5EfXb8iZCjnJsx9',
         ratio: '16/9',
       }
