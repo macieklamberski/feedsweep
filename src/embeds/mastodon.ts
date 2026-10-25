@@ -17,7 +17,6 @@ export type MastodonStatus = {
 // Six or more digits keep brunch.co.kr/@{user}/{n} posts out of the Discourse cite path.
 const statusPathRegex = /^\/@(?<user>[\w.-]+)\/(?<id>\d{6,})(?:\/embed)?\/?$/i
 // The ActivityPub spelling of the same status, which plays the same embed.
-// length: keeps another site's short numbering out
 const usersStatusPathRegex = /^\/users\/(?<user>[\w.-]+)\/statuses\/(?<id>\d{6,})(?:\/embed)?\/?$/i
 
 // Any host filing posts under an author and a number takes this shape, brunch.co.kr among them.
