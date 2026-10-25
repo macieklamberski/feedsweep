@@ -31,6 +31,7 @@ describeForEachParser('WordPress', (parseHtml) => {
         data-embed-id="1234567890123456789"
         data-embed-provider="twitter"
         data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=1234567890123456789"
+        data-embed-author="@someone"
       ></div>
     `
 
