@@ -40,10 +40,11 @@ describe('extractBlubrryEmbed', () => {
     expect(extractBlubrryEmbed(value)).toEqual(expected)
   })
 
-  it('should return undefined for a podcast id that is not digits', () => {
+  it('should keep an escaped slash in the podcast id inside one segment', () => {
     const value = 'https://player.blubrry.com/?podcast_id=..%2Fpricing&modern=1'
+    const expected: BlubrryPlayer = { kind: 'episode', id: '..%2Fpricing' }
 
-    expect(extractBlubrryEmbed(value)).toBeUndefined()
+    expect(extractBlubrryEmbed(value)).toEqual(expected)
   })
 
   it('should read an episode id that is not digits by its route', () => {
@@ -55,14 +56,24 @@ describe('extractBlubrryEmbed', () => {
 
   it('should read the show of a latest episode player', () => {
     const value = 'https://player.blubrry.com/3954807/latest/'
-    const expected: BlubrryPlayer = { kind: 'latest', id: '3954807', position: '' }
+    const expected: BlubrryPlayer = {
+      kind: 'show',
+      id: '3954807',
+      route: 'latest',
+      position: '',
+    }
 
     expect(extractBlubrryEmbed(value)).toEqual(expected)
   })
 
   it('should read a show named by its program keyword', () => {
     const value = 'https://player.blubrry.com/the_posecon_podcast/latest/'
-    const expected: BlubrryPlayer = { kind: 'latest', id: 'the_posecon_podcast', position: '' }
+    const expected: BlubrryPlayer = {
+      kind: 'show',
+      id: 'the_posecon_podcast',
+      route: 'latest',
+      position: '',
+    }
 
     expect(extractBlubrryEmbed(value)).toEqual(expected)
   })
@@ -71,17 +82,23 @@ describe('extractBlubrryEmbed', () => {
     const value =
       'https://player.blubrry.com/3739323/playlist/?episodes=5&scroll=0&selectedId=132994802'
     const expected: BlubrryPlayer = {
-      kind: 'playlist',
+      kind: 'show',
       id: '3739323',
+      route: 'playlist',
       position: '?selectedId=132994802',
     }
 
     expect(extractBlubrryEmbed(value)).toEqual(expected)
   })
 
-  it('should read a show route word in any case', () => {
+  it('should read a show route word in any case and keep it as written', () => {
     const value = 'https://player.blubrry.com/3954807/LATEST/'
-    const expected: BlubrryPlayer = { kind: 'latest', id: '3954807', position: '' }
+    const expected: BlubrryPlayer = {
+      kind: 'show',
+      id: '3954807',
+      route: 'LATEST',
+      position: '',
+    }
 
     expect(extractBlubrryEmbed(value)).toEqual(expected)
   })
@@ -100,18 +117,6 @@ describe('extractBlubrryEmbed', () => {
 
   it('should return undefined for a show route followed by another segment', () => {
     const value = 'https://player.blubrry.com/3954807/latest/extra/'
-
-    expect(extractBlubrryEmbed(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a program keyword that climbs to the parent path', () => {
-    const value = 'https://player.blubrry.com/..%2Fpricing/latest/'
-
-    expect(extractBlubrryEmbed(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a program keyword holding an escaped slash', () => {
-    const value = 'https://player.blubrry.com/3954807%2Fpricing/latest/'
 
     expect(extractBlubrryEmbed(value)).toBeUndefined()
   })
@@ -179,12 +184,36 @@ describe('blubrryResolveEmbed', () => {
     expect(blubrryResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should write a show route word in the case the player serves', () => {
+  it('should write a show route word as the feed wrote it', () => {
     const value = 'https://player.blubrry.com/3954807/Latest/'
     const expected: EmbedResolverResult = {
       provider: 'blubrry',
-      id: '3954807/latest',
-      src: 'https://player.blubrry.com/3954807/latest/',
+      id: '3954807/Latest',
+      src: 'https://player.blubrry.com/3954807/Latest/',
+      height: 164,
+    }
+
+    expect(blubrryResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should keep an escaped slash in the program keyword inside one segment', () => {
+    const value = 'https://player.blubrry.com/..%2Fpricing/latest/'
+    const expected: EmbedResolverResult = {
+      provider: 'blubrry',
+      id: '..%2Fpricing/latest',
+      src: 'https://player.blubrry.com/..%2Fpricing/latest/',
+      height: 164,
+    }
+
+    expect(blubrryResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should keep an escaped slash in the podcast id inside one segment', () => {
+    const value = 'https://player.blubrry.com/?podcast_id=..%2Fpricing'
+    const expected: EmbedResolverResult = {
+      provider: 'blubrry',
+      id: '..%2Fpricing',
+      src: 'https://player.blubrry.com/id/..%2Fpricing/',
       height: 164,
     }
 

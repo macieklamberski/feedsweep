@@ -1,10 +1,17 @@
-import { composeQuery, getAnyOf, getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
+import {
+  composeQuery,
+  encodePathSegment,
+  getPathSegments,
+  getQueryParam,
+  isAnyOf,
+  parseUrl,
+} from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 
 const provider = 'blubrry'
 
-import { digitsRegex, filterUrlQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { filterUrlQuery, placeholderBaseUrl } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
@@ -31,15 +38,13 @@ const powerpressAudioHeight = 40
 const powerpressVideoRatio = '16/9'
 
 // A show's player follows its newest episode, and its playlist lists the show's episodes.
-// The player answers 404 for either word in any other case.
-const showRoutes = ['latest', 'playlist'] as const
-const programKeywordRegex = /^[\w-]+$/
+const showRoutes = ['latest', 'playlist']
 // `selectedId` opens the playlist on that episode.
 const playlistPositionParams = ['selectedId']
 
 export type BlubrryPlayer =
   | { kind: 'episode' | 'media'; id: string }
-  | { kind: (typeof showRoutes)[number]; id: string; position: string }
+  | { kind: 'show'; id: string; route: string; position: string }
 
 // Two forms: `/id/{episodeId}/` names the episode, while `/?media_url={mp3}` names the file
 // directly. The media url is not promoted to a native <audio>: a provider's player iframe stays
@@ -58,15 +63,13 @@ export const extractBlubrryEmbed = (link: string): BlubrryPlayer | undefined => 
   }
 
   const [keyword, route] = segments
-  const showRoute = getAnyOf(route, showRoutes)
 
-  if (segments.length === 2 && keyword && programKeywordRegex.test(keyword) && showRoute) {
-    const position =
-      showRoute === 'playlist'
-        ? filterUrlQuery(parsed, (name) => isAnyOf(name, playlistPositionParams))
-        : ''
+  if (segments.length === 2 && keyword && route && isAnyOf(route, showRoutes)) {
+    const position = isAnyOf(route, 'playlist')
+      ? filterUrlQuery(parsed, (name) => isAnyOf(name, playlistPositionParams))
+      : ''
 
-    return { kind: showRoute, id: keyword, position }
+    return { kind: 'show', id: encodePathSegment(keyword), route, position }
   }
 
   // A `podcast_id` beside a media url can name another episode: one feed writes the same id
@@ -79,11 +82,11 @@ export const extractBlubrryEmbed = (link: string): BlubrryPlayer | undefined => 
 
   const podcastId = getQueryParam(parsed.searchParams, 'podcast_id')
 
-  if (!podcastId || !digitsRegex.test(podcastId)) {
+  if (!podcastId) {
     return
   }
 
-  return { kind: 'episode', id: podcastId }
+  return { kind: 'episode', id: encodePathSegment(podcastId) }
 }
 
 // Blubrry's player iframe, by episode id, media url or show, with no oEmbed to size it.
@@ -94,14 +97,14 @@ export const blubrryResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  if (player.kind === 'latest' || player.kind === 'playlist') {
-    const { kind, id, position } = player
+  if (player.kind === 'show') {
+    const { id, route, position } = player
 
     return {
       provider,
-      id: `${id}/${kind}`,
-      src: `https://player.blubrry.com/${id}/${kind}/${position}`,
-      height: kind === 'playlist' ? playlistHeight : playerHeight,
+      id: `${id}/${route}`,
+      src: `https://player.blubrry.com/${id}/${route}/${position}`,
+      height: isAnyOf(route, 'playlist') ? playlistHeight : playerHeight,
       title: attr(element, 'title'),
     }
   }
