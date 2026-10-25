@@ -222,6 +222,20 @@ describe('calameoResolveEmbed', () => {
 
       expect(calameoResolveEmbed(value)).toEqual(expected)
     })
+
+    // Constructed: every lab account id is digits.
+    it('should keep a percent sign in the account id and escape its slash in the page path', () => {
+      const value = 'https://v.calameo.com/library/?type=account&id=58%2F07%2595'
+      const expected: EmbedResolverResult = {
+        provider: 'calameo',
+        id: 'library/account/58/07%95',
+        src: 'https://v.calameo.com/library/?type=account&id=58/07%2595',
+        url: 'https://www.calameo.com/accounts/58%2F07%95',
+        height: 185,
+      }
+
+      expect(calameoResolveEmbed(value)).toEqual(expected)
+    })
   })
 })
 
