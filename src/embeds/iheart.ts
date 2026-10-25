@@ -12,7 +12,7 @@ const iheartHosts = ['iheart.com']
 // A route segment is the bare id or a slug hanging before it, `{slug}-{id}`.
 const episodePathRegex = /^\/podcast\/(?:[^/]*-)?(\d+)\/episode\/(?:[^/]*-)?(\d+)\/?$/i
 const showPathRegex = /^\/podcast\/(?:[^/]*-)?(\d+)\/?$/i
-const stationPathRegex = /^\/(?<kind>live|artist)\/(?:[^/]*-)?(?<id>\d+)\/?$/
+const stationPathRegex = /^\/(?<kind>live|artist)\/(?:[^/]*-)?(?<id>\d+)\/?$/i
 
 // The episode player fills its frame and switches to a compact bar, drawn whole at 120 tall. The
 // show and station players keep the 300 and 200 their embed code writes.

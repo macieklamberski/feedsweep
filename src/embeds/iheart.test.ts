@@ -176,6 +176,21 @@ describe('iheartResolveEmbed', () => {
       expect(iheartResolveEmbed(value)).toBeUndefined()
     })
   })
+
+  describe('edge cases', () => {
+    it('should read an uppercase station route word and write it as the feed wrote it', () => {
+      const value = 'https://www.iheart.com/LIVE/kfi-am-640-177/?embed=true'
+      const expected: EmbedResolverResult = {
+        provider: 'iheart',
+        id: 'LIVE/177',
+        src: 'https://www.iheart.com/LIVE/177/?embed=true',
+        url: 'https://www.iheart.com/LIVE/177/',
+        height: 200,
+      }
+
+      expect(iheartResolveEmbed(value)).toEqual(expected)
+    })
+  })
 })
 
 describeForEachParser('iheartEmbedResolver', (parseHtml) => {
