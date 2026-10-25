@@ -75,7 +75,10 @@ const resolveCoordinateMap = (
 ): EmbedResolverResult | undefined => {
   const names = [...query.keys()]
 
-  if (!query.has('ll') || !names.every((name) => positionParams.includes(name))) {
+  if (
+    getQueryParam(query, 'll') === undefined ||
+    !names.every((name) => isAnyOf(name, positionParams))
+  ) {
     return
   }
 

@@ -502,6 +502,18 @@ describeForEachParser('yandexMapsIframeEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should read the coordinate parameter names in any case', async () => {
+      const value =
+        '<iframe src="https://yandex.com/map-widget/v1/?LL=37.612000%2C55.752000&Z=13"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'yandexmaps',
+        src: 'https://yandex.com/map-widget/v1/?ll=37.612000,55.752000&z=13',
+        height: 400,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
