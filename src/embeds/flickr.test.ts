@@ -627,7 +627,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'flickr',
-        id: '53116286@N07/72157627116531602',
+        id: 'photosets/72157627116531602',
         src: 'https://embedr.flickr.com/photosets/72157627116531602?width=400&height=300',
         url: 'https://www.flickr.com/photos/53116286@N07/sets/72157627116531602',
         width: 400,
