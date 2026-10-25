@@ -738,7 +738,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'soundcloud',
         id: 'tracks/1857599997',
-        src: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1857599997',
+        src: 'https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/1857599997',
         height: 166,
       }
 
@@ -759,7 +759,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'soundcloud',
         id: 'tracks/1857599997',
-        src: 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1857599997',
+        src: 'https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/1857599997',
         height: 166,
       }
 
