@@ -19,7 +19,8 @@ const subjectNames = { e: 'episode', latest: 'latest', playlist: 'playlist' }
 // Every other trailing segment, `/dark` among them, is a display option on an episode id.
 const showModes = ['latest', 'playlist'] as const
 
-type Subject = { kind: keyof typeof playerHeights; id: string }
+// `mode` is the show mode segment as the feed wrote it, for a show player only.
+type Subject = { kind: keyof typeof playerHeights; id: string; mode?: string }
 
 export const extractTransistorEmbed = (link: string): Subject | undefined => {
   const segments = getPathSegments(link)
@@ -34,7 +35,7 @@ export const extractTransistorEmbed = (link: string): Subject | undefined => {
   const mode = showModes.find((named) => isAnyOf(segments[2], named))
 
   if (isAnyOf(kind, 'e') && mode) {
-    return { kind: mode, id: subject }
+    return { kind: mode, id: subject, mode: segments[2] }
   }
 
   // A share page is `/s/{id}` and takes nothing after it. A third segment is a transcript:
@@ -54,7 +55,7 @@ export const transistorResolveEmbed: ResolveEmbed = (url) => {
   }
 
   // Dropping the mode mints /e/{slug}, an episode by a show's name, which answers 404.
-  const path = embed.kind === 'e' ? `e/${embed.id}` : `e/${embed.id}/${embed.kind}`
+  const path = embed.mode ? `e/${embed.id}/${embed.mode}` : `e/${embed.id}`
 
   return {
     provider,
