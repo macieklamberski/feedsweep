@@ -1,12 +1,9 @@
 import { parseUrl } from 'trousse'
 import { vimeoResolveEmbed } from '../../embeds/vimeo.js'
 import { youtubeResolveEmbed } from '../../embeds/youtube.js'
-import type { DomTransform, ResolveUrlEmbed } from '../../types.js'
-import { placeholderBaseUrl } from '../../utils/urls.js'
+import type { DomTransform } from '../../types.js'
+import { placeholderBaseUrl, repairCarrierUrl } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
-
-// A hand-built embed url drops the ?h= hash an unlisted Vimeo needs.
-const resolveEmbedSource: Array<ResolveUrlEmbed> = [youtubeResolveEmbed, vimeoResolveEmbed]
 
 // Lazy Load for Videos ships a facade anchor with the watch url and builds the iframe on click.
 export const rebuildLazyLoadForVideos: DomTransform = () => (document) => {
@@ -27,18 +24,16 @@ export const rebuildLazyLoadForVideos: DomTransform = () => (document) => {
       }
 
       const parsed = parseUrl(url, placeholderBaseUrl)
+      const repaired = parseUrl(repairCarrierUrl(url), placeholderBaseUrl)
 
-      if (!parsed) {
+      if (!parsed || !repaired) {
         continue
       }
 
-      for (const resolveEmbed of resolveEmbedSource) {
-        source = resolveEmbed(parsed)?.src
-
-        if (source) {
-          break
-        }
-      }
+      // The YouTube reader takes its url past the glued-query and whitespace repairs a frame src
+      // gets, and the Vimeo reader takes it as written. A hand-built embed url drops the ?h= hash
+      // an unlisted Vimeo needs.
+      source = youtubeResolveEmbed(repaired)?.src ?? vimeoResolveEmbed(parsed)?.src
     }
 
     if (!source) {
