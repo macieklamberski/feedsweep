@@ -1,6 +1,7 @@
 import {
   coerceNumber,
   composeQuery,
+  getPathSegments,
   getQueryParam,
   isAnyOf,
   isHostOrSubdomainOf,
@@ -11,7 +12,7 @@ import {
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, find, flashVar, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
@@ -44,6 +45,39 @@ const readFallback = (blockquote: Nullish<Element>): Partial<EmbedResolverResult
 
 const fallbackSelector = '.fb-xfbml-parse-ignore blockquote, blockquote.fb-xfbml-parse-ignore'
 
+const readDigits = (value: string | undefined): string | undefined => {
+  if (!value || !digitsRegex.test(value)) {
+    return
+  }
+
+  return value
+}
+
+// The video id behind a watch page's `v`, a reel's segment or the last numeric segment after
+// `videos`, since `/{page}/videos/{slug}/{id}/` and `/videos/vb.{n}/{id}/` put another segment
+// first. An `fb.watch` short link names no id offline.
+const readVideoId = (url: URL): string | undefined => {
+  if (!isHostOrSubdomainOf(url, 'facebook.com')) {
+    return
+  }
+
+  const segments = getPathSegments(url)
+
+  if (isWatchPage(url)) {
+    return readDigits(getQueryParam(url.searchParams, 'v'))
+  }
+
+  if (isAnyOf(segments[0], 'reel')) {
+    return readDigits(segments[1])
+  }
+
+  if (isAnyOf(segments[1], 'videos')) {
+    const trailing = segments.slice(2).reverse()
+
+    return trailing.find((segment) => digitsRegex.test(segment))
+  }
+}
+
 // Every carrier resolves to a plugin url built around the page it names, which is the only form
 // Facebook frames. The page is also the canonical url, so a caller that knows a better id than
 // the href states it in `extra`. `t`, where a video starts, is kept as the carrier wrote it.
@@ -55,12 +89,17 @@ const composePluginEmbed = (
 ): EmbedResolverResult => {
   // Absolutised here: `resolveUrlFn` never touches the id or a query, so a bare href would reach
   // enrichment with no scheme and address nothing.
-  const absoluteHref = parseUrl(href, 'https://www.facebook.com')?.href ?? href
+  const parsed = parseUrl(href, 'https://www.facebook.com')
+  const absoluteHref = parsed?.href ?? href
+  const videoId = parsed && readVideoId(parsed)
+  // A video enriches from its id: Facebook's video oEmbed takes `video.php?v={id}`, and the
+  // watch url stays the `url`, since `video.php` sends an anonymous visitor to the login page.
+  const videoKey = videoId && `https://www.facebook.com/video.php${composeQuery({ v: videoId })}`
   const query = composeQuery(trimObject({ href: absoluteHref, t }))
 
   return {
     provider,
-    id: absoluteHref,
+    id: videoKey ?? absoluteHref,
     src: `https://www.facebook.com/plugins/${plugin}.php${query}`,
     url: href,
     ratio: plugin === 'video' ? '16/9' : undefined,
