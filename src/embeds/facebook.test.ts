@@ -93,7 +93,7 @@ describeForEachParser('facebookWidgetEmbedResolver', (parseHtml) => {
       const value = html`<div class="fb-post" data-href="https://www.facebook.com/PageName/videos/123/"></div>`
       const expected: EmbedResolverResult = {
         provider: 'facebook',
-        id: 'https://www.facebook.com/PageName/videos/123/',
+        id: 'https://www.facebook.com/video.php?v=123',
         src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/PageName/videos/123/',
         url: 'https://www.facebook.com/PageName/videos/123/',
         ratio: '16/9',
@@ -140,7 +140,7 @@ describeForEachParser('facebookWidgetEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'facebook',
-        id: 'https://www.facebook.com/WillowbankRaceway/videos/732638203506014/',
+        id: 'https://www.facebook.com/video.php?v=732638203506014',
         src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/WillowbankRaceway/videos/732638203506014/',
         url: 'https://www.facebook.com/WillowbankRaceway/videos/732638203506014/',
         ratio: '16/9',
@@ -394,7 +394,7 @@ describeForEachParser('facebookAmpEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'facebook',
-        id: 'https://www.facebook.com/PageName/videos/123/',
+        id: 'https://www.facebook.com/video.php?v=123',
         src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/PageName/videos/123/',
         url: 'https://www.facebook.com/PageName/videos/123/',
         ratio: '16/9',
@@ -448,7 +448,7 @@ describeForEachParser('facebookBlockquoteEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'facebook',
-        id: 'https://www.facebook.com/PageName/videos/123/',
+        id: 'https://www.facebook.com/video.php?v=123',
         src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/PageName/videos/123/',
         url: 'https://www.facebook.com/PageName/videos/123/',
         ratio: '16/9',
@@ -531,7 +531,7 @@ describeForEachParser('facebookBlockquoteEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'facebook',
-        id: 'https://www.facebook.com/watch/?v=10153231379946729',
+        id: 'https://www.facebook.com/video.php?v=10153231379946729',
         src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=10153231379946729',
         url: 'https://www.facebook.com/watch/?v=10153231379946729',
         ratio: '16/9',
@@ -730,7 +730,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'facebook',
-        id: 'https://www.facebook.com/dale.ghent/videos/1547460739144960/',
+        id: 'https://www.facebook.com/video.php?v=1547460739144960',
         src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/dale.ghent/videos/1547460739144960/&t=1',
         url: 'https://www.facebook.com/dale.ghent/videos/1547460739144960/',
         ratio: '16/9',
@@ -747,7 +747,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'facebook',
-        id: 'https://www.facebook.com/nolimitblades/videos/835543906514182/',
+        id: 'https://www.facebook.com/video.php?v=835543906514182',
         src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/nolimitblades/videos/835543906514182/&t=0',
         url: 'https://www.facebook.com/nolimitblades/videos/835543906514182/',
         ratio: '16/9',
@@ -764,7 +764,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'facebook',
-        id: 'https://www.facebook.com/seantierney/videos/10153391162780883/',
+        id: 'https://www.facebook.com/video.php?v=10153391162780883',
         src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/seantierney/videos/10153391162780883/',
         url: 'https://www.facebook.com/seantierney/videos/10153391162780883/',
         ratio: '16/9',
@@ -781,7 +781,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'facebook',
-        id: 'https://www.facebook.com/PageName/videos/123/',
+        id: 'https://www.facebook.com/video.php?v=123',
         src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/PageName/videos/123/',
         url: 'https://www.facebook.com/PageName/videos/123/',
         ratio: '16/9',
@@ -816,7 +816,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'facebook',
-        id: 'https://www.facebook.com/PageName/videos/123/',
+        id: 'https://www.facebook.com/video.php?v=123',
         src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/PageName/videos/123/',
         url: 'https://www.facebook.com/PageName/videos/123/',
         ratio: '16/9',
@@ -831,7 +831,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
       const value = '<iframe src="https://www.facebook.com/video/embed?video_id=123456"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'facebook',
-        id: 'https://www.facebook.com/watch/?v=123456',
+        id: 'https://www.facebook.com/video.php?v=123456',
         src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=123456',
         url: 'https://www.facebook.com/watch/?v=123456',
         ratio: '16/9',
@@ -852,7 +852,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'facebook',
-        id: 'https://www.facebook.com/watch/?v=377994148950512',
+        id: 'https://www.facebook.com/video.php?v=377994148950512',
         src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=377994148950512',
         url: 'https://www.facebook.com/watch/?v=377994148950512',
         ratio: '16/9',
@@ -872,7 +872,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'facebook',
-        id: 'https://www.facebook.com/watch/?v=203603585296',
+        id: 'https://www.facebook.com/video.php?v=203603585296',
         src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=203603585296',
         url: 'https://www.facebook.com/watch/?v=203603585296',
         ratio: '16/9',
@@ -911,7 +911,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'facebook',
-        id: 'https://www.facebook.com/PageName/videos/123/',
+        id: 'https://www.facebook.com/video.php?v=123',
         src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/PageName/videos/123/',
         url: 'https://www.facebook.com/PageName/videos/123/',
         ratio: '16/9',
@@ -930,7 +930,7 @@ describeForEachParser('facebookIframeEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'facebook',
-        id: 'https://www.facebook.com/reel/123/',
+        id: 'https://www.facebook.com/video.php?v=123',
         src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/reel/123/',
         url: 'https://www.facebook.com/reel/123/',
         ratio: '16/9',
@@ -1046,7 +1046,7 @@ describeForEachParser('facebookFlashEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'facebook',
-        id: 'https://www.facebook.com/watch/?v=17731186132',
+        id: 'https://www.facebook.com/video.php?v=17731186132',
         src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=17731186132',
         url: 'https://www.facebook.com/watch/?v=17731186132',
         ratio: '16/9',
@@ -1079,7 +1079,7 @@ describeForEachParser('facebookFlashEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'facebook',
-        id: 'https://www.facebook.com/watch/?v=9169571469',
+        id: 'https://www.facebook.com/video.php?v=9169571469',
         src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=9169571469',
         url: 'https://www.facebook.com/watch/?v=9169571469',
         ratio: '16/9',
@@ -1101,7 +1101,7 @@ describeForEachParser('facebookFlashEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'facebook',
-        id: 'https://www.facebook.com/watch/?v=17731186132',
+        id: 'https://www.facebook.com/video.php?v=17731186132',
         src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=17731186132',
         url: 'https://www.facebook.com/watch/?v=17731186132',
         ratio: '16/9',
@@ -1203,7 +1203,7 @@ describeForEachParser('facebookS9eEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'facebook',
-        id: 'https://www.facebook.com/watch/?v=506931837457674',
+        id: 'https://www.facebook.com/video.php?v=506931837457674',
         src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=506931837457674',
         url: 'https://www.facebook.com/watch/?v=506931837457674',
         ratio: '16/9',
@@ -1272,7 +1272,7 @@ describeForEachParser('facebookS9eEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'facebook',
-        id: 'https://www.facebook.com/watch/?v=1574979536826284',
+        id: 'https://www.facebook.com/video.php?v=1574979536826284',
         src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=1574979536826284',
         url: 'https://www.facebook.com/watch/?v=1574979536826284',
         ratio: '16/9',
@@ -1290,7 +1290,7 @@ describeForEachParser('facebookS9eEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'facebook',
-        id: 'https://www.facebook.com/watch/?v=1574979536826284',
+        id: 'https://www.facebook.com/video.php?v=1574979536826284',
         src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=1574979536826284',
         url: 'https://www.facebook.com/watch/?v=1574979536826284',
         ratio: '16/9',
@@ -1450,17 +1450,17 @@ describe('facebookResolveEmbed', () => {
   // Facebook refuses to be framed, so each of these has to become a plugin url or the reader
   // gets a blank frame. The path decides which plugin: the watch page, a page's video and a
   // reel are the player, a page's post is the post.
-  const videoPageUrls = [
-    'https://www.facebook.com/watch/?v=1010445561578533',
-    'https://www.facebook.com/100067727304035/videos/797784661900446/',
-    'https://www.facebook.com/balloonspider/videos/vb.609918550/10153047276/',
-    'https://www.facebook.com/reel/873906321076441',
+  const videoPageUrls: Array<[string, string]> = [
+    ['https://www.facebook.com/watch/?v=1010445561578533', '1010445561578533'],
+    ['https://www.facebook.com/100067727304035/videos/797784661900446/', '797784661900446'],
+    ['https://www.facebook.com/balloonspider/videos/vb.609918550/10153047276/', '10153047276'],
+    ['https://www.facebook.com/reel/873906321076441', '873906321076441'],
   ]
 
-  it.each(videoPageUrls)('should mint the video plugin url from %s', (value) => {
+  it.each(videoPageUrls)('should mint the video plugin url from %s', (value, videoId) => {
     const expected = {
       provider: 'facebook',
-      id: value,
+      id: `https://www.facebook.com/video.php?v=${videoId}`,
       src: `https://www.facebook.com/plugins/video.php?href=${value}`,
       url: value,
       ratio: '16/9',

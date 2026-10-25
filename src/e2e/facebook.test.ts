@@ -68,7 +68,7 @@ describeForEachParser('Facebook', (parseHtml) => {
     const expected = html`
       <div
         data-embed-provider="facebook"
-        data-embed-id="https://www.facebook.com/PageName/videos/123/"
+        data-embed-id="https://www.facebook.com/video.php?v=123"
         data-embed-src="https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/PageName/videos/123/"
         data-embed-url="https://www.facebook.com/PageName/videos/123/"
         data-embed-ratio="16/9"
@@ -151,7 +151,7 @@ describeForEachParser('Facebook', (parseHtml) => {
     const expected = html`
       <div
         data-embed-provider="facebook"
-        data-embed-id="https://www.facebook.com/reel/123/"
+        data-embed-id="https://www.facebook.com/video.php?v=123"
         data-embed-ratio="16/9"
         data-embed-src="https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/reel/123/"
         data-embed-url="https://www.facebook.com/reel/123/"
@@ -211,7 +211,7 @@ describeForEachParser('Facebook', (parseHtml) => {
     const expected = html`
       <div
         data-embed-provider="facebook"
-        data-embed-id="https://www.facebook.com/PageName/videos/123/"
+        data-embed-id="https://www.facebook.com/video.php?v=123"
         data-embed-src="https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/PageName/videos/123/"
         data-embed-url="https://www.facebook.com/PageName/videos/123/"
         data-embed-ratio="16/9"
@@ -421,7 +421,7 @@ describeForEachParser('Facebook', (parseHtml) => {
     const expected = html`
       <div
         data-embed-url="https://www.facebook.com/watch/?v=1010445561578533"
-        data-embed-id="https://www.facebook.com/watch/?v=1010445561578533"
+        data-embed-id="https://www.facebook.com/video.php?v=1010445561578533"
         data-embed-provider="facebook"
         data-embed-src="https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=1010445561578533"
         data-embed-ratio="16/9"
@@ -458,7 +458,7 @@ describeForEachParser('Facebook', (parseHtml) => {
     const expected = html`
       <div
         data-embed-provider="facebook"
-        data-embed-id="https://www.facebook.com/watch/?v=377994148950512"
+        data-embed-id="https://www.facebook.com/video.php?v=377994148950512"
         data-embed-src="https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=377994148950512"
         data-embed-url="https://www.facebook.com/watch/?v=377994148950512"
         data-embed-ratio="16/9"
@@ -491,7 +491,7 @@ describeForEachParser('Facebook', (parseHtml) => {
     const expected = html`
       <div
         data-embed-provider="facebook"
-        data-embed-id="https://www.facebook.com/watch/?v=17731186132"
+        data-embed-id="https://www.facebook.com/video.php?v=17731186132"
         data-embed-src="https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=17731186132"
         data-embed-url="https://www.facebook.com/watch/?v=17731186132"
         data-embed-ratio="16/9"
