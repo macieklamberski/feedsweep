@@ -25,7 +25,7 @@ export const standfmResolveEmbed: ResolveEmbed = (url) => {
     id: `${kind}/${id}`,
     src: `https://stand.fm/embed/${kind}/${id}`,
     url: `https://stand.fm/${kind}/${id}`,
-    height: playerHeights.get(kind),
+    height: playerHeights.get(kind.toLowerCase()),
   }
 }
 
