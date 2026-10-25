@@ -218,6 +218,7 @@ const readReference = (link: string): VimeoReference | undefined => {
 
   return {
     id,
+    // biome-ignore lint/nursery/useNullishCoalescing: An empty hash reads as absent.
     hash: queryHash || undefined,
   }
 }

@@ -190,6 +190,7 @@ const readLegacySubject = (parsed: URL): FlickrSubject => {
   const setId = getQueryParam(parsed.searchParams, 'set_id')
 
   return {
+    // biome-ignore lint/nursery/useNullishCoalescing: An empty set id reads as absent.
     setId: setId || undefined,
     owner: getQueryParam(parsed.searchParams, 'user_id'),
     groupId: getQueryParam(parsed.searchParams, 'group_id'),
