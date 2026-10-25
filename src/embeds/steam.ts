@@ -11,7 +11,7 @@ const widgetParams = ['t']
 
 // Steam's store widget, `store.steampowered.com/widget/{appId}`, with an optional purchase option
 // after the app and a `t=` description in the query.
-export const steamResolveEmbed: ResolveUrlEmbed = (url, _element, parsed) => {
+export const steamResolveEmbed: ResolveUrlEmbed = (url) => {
   const [route, appId, subId] = getPathSegments(url)
 
   if (!isAnyOf(route, 'widget') || !digitsRegex.test(appId)) {
@@ -24,7 +24,7 @@ export const steamResolveEmbed: ResolveUrlEmbed = (url, _element, parsed) => {
 
   const widget = subId ? `${appId}/${subId}` : appId
   // The widget prints `t` in place of the game's own blurb, so it is the publisher's text.
-  const description = getQueryParam(parsed.searchParams, 't')?.trim() || undefined
+  const description = getQueryParam(url.searchParams, 't')?.trim() || undefined
 
   return {
     provider: 'steam',

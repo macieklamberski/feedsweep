@@ -1314,7 +1314,7 @@ describe('twitterResolveEmbed', () => {
       url: standInUrl,
     }
 
-    expect(twitterResolveEmbed(playerUrl, undefined, new URL(playerUrl))).toEqual(expected)
+    expect(twitterResolveEmbed(new URL(playerUrl))).toEqual(expected)
   })
 
   it('should resolve the newer player path onto the same placeholder', () => {
@@ -1326,25 +1326,25 @@ describe('twitterResolveEmbed', () => {
       url: standInUrl,
     }
 
-    expect(twitterResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(twitterResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for another path on the player host', () => {
     const value = 'https://platform.twitter.com/widgets.js'
 
-    expect(twitterResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+    expect(twitterResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a player url with no id', () => {
     const value = 'https://platform.twitter.com/embed/Tweet.html'
 
-    expect(twitterResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+    expect(twitterResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a player id outside the digits', () => {
     const value = 'https://platform.twitter.com/embed/Tweet.html?id=20x'
 
-    expect(twitterResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+    expect(twitterResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should resolve a status page whose handle runs past fifteen characters', () => {
@@ -1357,7 +1357,7 @@ describe('twitterResolveEmbed', () => {
       author: '@sixteencharacter',
     }
 
-    expect(twitterResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(twitterResolveEmbed(new URL(value))).toEqual(expected)
   })
 })
 

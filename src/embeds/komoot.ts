@@ -33,8 +33,8 @@ const readResource = (segments: Array<string>): Resource | undefined => {
 
 // Komoot's tour map, `komoot.com/tour/{tourId}/embed`, and its collection map,
 // `komoot.com/collection/{collectionId}/{slug}/embed`, sometimes behind a locale segment.
-export const komootResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const [first = '', ...rest] = getPathSegments(parsed)
+export const komootResolveEmbed: ResolveUrlEmbed = (url) => {
+  const [first = '', ...rest] = getPathSegments(url)
   // In any case: the mint drops the locale, so `/DE-DE/tour/{tourId}/embed`, which answers 404,
   // still names the tour.
   const hasLocale = hyphenatedLettersRegex.test(first)
@@ -44,7 +44,7 @@ export const komootResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
     return
   }
 
-  const params = pickQueryParams(parsed.search, accessParams)
+  const params = pickQueryParams(url.search, accessParams)
   const result: EmbedResolverResult = {
     provider: 'komoot',
     id: resource.id,

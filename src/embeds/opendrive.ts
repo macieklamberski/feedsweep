@@ -14,8 +14,8 @@ const playerRoutes = ['player', 'listen']
 const playerHeight = 25
 
 // An OpenDrive file player, framed as `/player/{fileId}`.
-export const opendriveResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const [route, fileId, ...rest] = getPathSegments(parsed)
+export const opendriveResolveEmbed: ResolveUrlEmbed = (url) => {
+  const [route, fileId, ...rest] = getPathSegments(url)
 
   if (!fileId || rest.length > 0 || !isAnyOf(route, playerRoutes)) {
     return

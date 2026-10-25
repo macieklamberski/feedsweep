@@ -26,8 +26,8 @@ const readSignedQuery = (url: URL): string => {
   return signedPairs.length > 0 ? `?${signedPairs.join('&')}` : ''
 }
 
-const gettyImagesResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const itemId = parsed.pathname.match(embedPathRegex)?.[1]
+const gettyImagesResolveEmbed: ResolveUrlEmbed = (url) => {
+  const itemId = url.pathname.match(embedPathRegex)?.[1]
 
   if (!itemId) {
     return
@@ -38,7 +38,7 @@ const gettyImagesResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
     // `embed.gettyimages.com/oembed?url=http://gty.im/{items}` answers title, caption,
     // photographer, collection and a thumbnail with no key, and 404s on an invented id.
     id: itemId,
-    src: `https://embed.gettyimages.com/embed/${itemId}${readSignedQuery(parsed)}`,
+    src: `https://embed.gettyimages.com/embed/${itemId}${readSignedQuery(url)}`,
     url: `https://www.gettyimages.com/detail/${itemId}`,
     ratio: '3/2',
   }

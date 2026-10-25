@@ -21,19 +21,19 @@ const playerPathRegex = /^\/video\/embed\/?$/i
 
 // The stations' video player, `/video/embed?pid={pid}`, which the site's own script builds on the
 // station's host. A pid plays on every station's host, each with its own branding.
-export const abcotvResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  if (!playerPathRegex.test(parsed.pathname)) {
+export const abcotvResolveEmbed: ResolveUrlEmbed = (url) => {
+  if (!playerPathRegex.test(url.pathname)) {
     return
   }
 
-  const pid = getQueryParam(parsed.searchParams, 'pid')
+  const pid = getQueryParam(url.searchParams, 'pid')
 
   if (!pid) {
     return
   }
 
   // A `www.` host answers with a redirect to the apex, or with a certificate that fails.
-  const host = stripWww(parsed.hostname)
+  const host = stripWww(url.hostname)
 
   return {
     provider,

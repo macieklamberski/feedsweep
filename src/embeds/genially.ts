@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { ResolveUrlEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 import { hexRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -10,7 +10,7 @@ const safeViewIdRegex = /^[0-9a-f]{24}$/i
 
 const geniallyHosts = ['genially.com', 'genial.ly']
 
-export const extractGeniallyViewId = (link: string): string | undefined => {
+export const extractGeniallyViewId = (link: URL): string | undefined => {
   const segments = getPathSegments(link)
 
   // The retired `View/Index/{id}` route.
@@ -30,7 +30,7 @@ export const extractGeniallyViewId = (link: string): string | undefined => {
 
 // Genially's presentation iframe, on the retired `view.genial.ly` host as often as the current one,
 // and on the retired `www.genial.ly/View/Index/{id}` route.
-export const geniallyResolveEmbed: ResolveEmbed = (url, element) => {
+export const geniallyResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const viewId = extractGeniallyViewId(url)
 
   if (!viewId) {

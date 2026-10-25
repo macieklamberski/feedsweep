@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf, isHostOf } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { ResolveUrlEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
 import { hexRegex, hyphenatedLettersRegex, lettersRegex, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -10,7 +10,7 @@ const wordwallHosts = ['wordwall.net', 'www.wordwall.net']
 // `templateId` picks the game the activity is played as, over the one the activity stores.
 const playParams = ['templateId']
 
-const extractActivityId = (link: string): string | undefined => {
+const extractActivityId = (link: URL): string | undefined => {
   if (!isHostOf(link, wordwallHosts)) {
     return
   }
@@ -46,7 +46,7 @@ const extractActivityId = (link: string): string | undefined => {
 }
 
 // Wordwall's activity player, a classroom quiz or game a teacher's post pastes under a lesson.
-const wordwallResolveEmbed: ResolveEmbed = (url) => {
+const wordwallResolveEmbed: ResolveUrlEmbed = (url) => {
   const activityId = extractActivityId(url)
 
   if (!activityId) {

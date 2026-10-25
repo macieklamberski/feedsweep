@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf, isPlainObject } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -21,7 +21,7 @@ const videoIdMarkers = ['thumb_watch', 'thumb', 'watch', 'embed']
 // The video player starts at `from`, in seconds.
 const nicovideoEmbedParams = ['from']
 
-export const extractNicovideoId = (link: string): string | undefined => {
+export const extractNicovideoId = (link: string | URL): string | undefined => {
   // The script selector matches on a substring, so any host can spell `nicovideo.jp/thumb_watch`
   // inside its own path and reach this. The path shape alone must not mint a nicovideo url.
   const parsed = parseUrlOnHosts(link, nicovideoHosts)
@@ -41,7 +41,7 @@ export const extractNicovideoId = (link: string): string | undefined => {
   return videoId
 }
 
-export const nicovideoResolveEmbed: ResolveEmbed = (url) => {
+export const nicovideoResolveEmbed: ResolveUrlEmbed = (url) => {
   const videoId = extractNicovideoId(url)
 
   if (!videoId) {
@@ -70,6 +70,17 @@ export const nicovideoResolveEmbed: ResolveEmbed = (url) => {
   }
 }
 
+// The player url for a caller holding a url nothing has checked, such as a page builder's config.
+export const readNicovideoEmbedSrc = (link: string): string | undefined => {
+  const url = parseUrlOnHosts(link, nicovideoHosts)
+
+  if (!url) {
+    return
+  }
+
+  return nicovideoResolveEmbed(url)?.src
+}
+
 // The legacy ext.nicovideo.jp/thumb/{id} iframe card, an info card rather than a player, which
 // serves only readers in Japan.
 export const nicovideoIframeEmbedResolver = createUrlEmbedResolver(
@@ -82,7 +93,13 @@ export const nicovideoIframeEmbedResolver = createUrlEmbedResolver(
 export const nicovideoScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="nicovideo.jp/thumb_watch" i], script[src*="embed.nicovideo.jp/watch" i]',
   (element) => {
-    return nicovideoResolveEmbed(attr(element, 'src') ?? '')
+    const url = parseUrlOnHosts(attr(element, 'src'), nicovideoHosts)
+
+    if (!url) {
+      return
+    }
+
+    return nicovideoResolveEmbed(url)
   },
 )
 

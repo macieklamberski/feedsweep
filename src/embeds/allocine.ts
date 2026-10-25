@@ -27,8 +27,8 @@ const readCmedia = (parsed: URL): string | null | undefined => {
 // AlloCiné's trailer player, `player.allocine.fr/{cmedia}.html`, the embed the video page names.
 // The blog player, `/_video/iblogvision.aspx?cmedia={cmedia}`, and the retired Flash player,
 // `/blogvision/{cmedia}`, take the same id. The video page also needs the film's id, so no `url`.
-export const allocineResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const cmedia = readCmedia(parsed)
+export const allocineResolveEmbed: ResolveUrlEmbed = (url) => {
+  const cmedia = readCmedia(url)
 
   if (!cmedia) {
     return

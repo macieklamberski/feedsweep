@@ -18,16 +18,16 @@ const sizingMessageRegex = /^sizing:(\d+)$/
 
 // The scheduler, `schedule.php?owner={id}`, as the embed code writes it. It redirects to a
 // `/schedule/{hash}` path that only the server can derive from the owner.
-export const acuityschedulingResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const owner = getQueryParam(parsed.searchParams, 'owner')
+export const acuityschedulingResolveEmbed: ResolveUrlEmbed = (url) => {
+  const owner = getQueryParam(url.searchParams, 'owner')
 
-  if (!isAnyOf(parsed.pathname, '/schedule.php') || !owner) {
+  if (!isAnyOf(url.pathname, '/schedule.php') || !owner) {
     return
   }
 
   // The embed code repeats `owner`, and the first one is kept.
-  const query = pickUrlParams(parsed.href, schedulerParams)
-  const appointmentType = getQueryParam(parsed.searchParams, 'appointmentType')
+  const query = pickUrlParams(url.href, schedulerParams)
+  const appointmentType = getQueryParam(url.searchParams, 'appointmentType')
 
   return {
     provider,

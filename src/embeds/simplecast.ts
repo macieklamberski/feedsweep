@@ -12,7 +12,7 @@ const simplecastHosts = ['simplecast.com']
 const playerHeight = 200
 
 export const extractSimplecastEpisode = (
-  link: string,
+  link: URL,
 ): { id: string; isCurrent: boolean } | undefined => {
   const segments = getPathSegments(link)
   const id = isAnyOf(segments[0], 'e') ? segments[1] : segments[0]
@@ -30,7 +30,7 @@ export const extractSimplecastEpisode = (
   }
 }
 
-export const simplecastResolveEmbed: ResolveUrlEmbed = (url, element, parsed) => {
+export const simplecastResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const episode = extractSimplecastEpisode(url)
 
   if (!episode) {
@@ -38,7 +38,7 @@ export const simplecastResolveEmbed: ResolveUrlEmbed = (url, element, parsed) =>
   }
 
   // The legacy query holds only display values, such as `style` and `color`.
-  const legacySource = `${parsed.origin}${parsed.pathname}`
+  const legacySource = `${url.origin}${url.pathname}`
 
   return {
     provider: 'simplecast',

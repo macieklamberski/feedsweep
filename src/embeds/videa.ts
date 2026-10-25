@@ -14,18 +14,18 @@ const playerPaths = ['/player', '/flvplayer.swf']
 
 // A Videa video player, the iframe or the retired Flash player in an `<embed>` or `<object>`.
 // The player reads the start position from `start`. The server answers an id in any case.
-export const videaResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  if (!isAnyOf(parsed.pathname, playerPaths)) {
+export const videaResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  if (!isAnyOf(url.pathname, playerPaths)) {
     return
   }
 
-  const id = getQueryParam(parsed.searchParams, 'v')
+  const id = getQueryParam(url.searchParams, 'v')
 
   if (!id) {
     return
   }
 
-  const query = composeQuery({ v: id, ...pickQueryParams(parsed.search, ['start']) })
+  const query = composeQuery({ v: id, ...pickQueryParams(url.search, ['start']) })
 
   return {
     provider,

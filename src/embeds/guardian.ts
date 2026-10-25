@@ -50,8 +50,8 @@ const readDate = (path: string): string | undefined => {
 // and 506 tall and is the whole page, so the height is 16:9 of the width with nothing around it.
 const playerRatio = '16/9'
 
-export const guardianResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const path = parsed.pathname.match(playerPathRegex)?.[1]
+export const guardianResolveEmbed: ResolveUrlEmbed = (url) => {
+  const path = url.pathname.match(playerPathRegex)?.[1]
 
   if (!path) {
     return
@@ -77,8 +77,8 @@ const endpointPathRegex = /^(?<path>\/.+)\/json$/i
 // flashvar, `{page}/json`, and the page's path plays on today's player.
 export const guardianFlashEmbedResolver = createUrlEmbedResolver(
   guardianFlashHosts,
-  (_url, element, parsed) => {
-    if (!flashPlayerPathRegex.test(parsed.pathname)) {
+  (url, element) => {
+    if (!flashPlayerPathRegex.test(url.pathname)) {
       return
     }
 
@@ -89,8 +89,6 @@ export const guardianFlashEmbedResolver = createUrlEmbedResolver(
       return
     }
 
-    const videoUrl = `https://embed.theguardian.com/embed/video${path}`
-
-    return guardianResolveEmbed(videoUrl, undefined, new URL(videoUrl))
+    return guardianResolveEmbed(new URL(`https://embed.theguardian.com/embed/video${path}`))
   },
 )

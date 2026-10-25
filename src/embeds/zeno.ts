@@ -9,8 +9,8 @@ const zenoHosts = ['zeno.fm']
 
 // Zeno.FM's station widget, `zeno.fm/player/{slug}`. The widget reads the slug from the second
 // path segment and loads the station by it, case included, so a later segment changes nothing.
-export const zenoResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const [route, slug] = getPathSegments(parsed)
+export const zenoResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const [route, slug] = getPathSegments(url)
 
   if (!isAnyOf(route, 'player') || !slug) {
     return

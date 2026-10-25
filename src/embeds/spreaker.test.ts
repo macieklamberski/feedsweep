@@ -18,7 +18,7 @@ describe('extractSpreakerEmbed', () => {
       id: '52842990',
     }
 
-    expect(extractSpreakerEmbed(value)).toEqual(expected)
+    expect(extractSpreakerEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read a show player', () => {
@@ -29,19 +29,19 @@ describe('extractSpreakerEmbed', () => {
       id: '1234567',
     }
 
-    expect(extractSpreakerEmbed(value)).toEqual(expected)
+    expect(extractSpreakerEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined when the player names nothing', () => {
     const value = 'https://widget.spreaker.com/player?theme=dark'
 
-    expect(extractSpreakerEmbed(value)).toBeUndefined()
+    expect(extractSpreakerEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a spreaker url that is not a player', () => {
     const value = 'https://www.spreaker.com/show/some-show'
 
-    expect(extractSpreakerEmbed(value)).toBeUndefined()
+    expect(extractSpreakerEmbed(new URL(value))).toBeUndefined()
   })
 
   // This route is gone: it answers 404 for a live episode id and for a fabricated one alike,
@@ -55,13 +55,13 @@ describe('extractSpreakerEmbed', () => {
       id: '4901266',
     }
 
-    expect(extractSpreakerEmbed(value)).toEqual(expected)
+    expect(extractSpreakerEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a segment that merely starts with the player route', () => {
     const value = 'https://www.spreaker.com/user/foo/players?episode_id=42'
 
-    expect(extractSpreakerEmbed(value)).toBeUndefined()
+    expect(extractSpreakerEmbed(new URL(value))).toBeUndefined()
   })
 })
 
@@ -78,7 +78,7 @@ describe('spreakerResolveEmbed', () => {
       height: 200,
     }
 
-    expect(spreakerResolveEmbed(value)).toEqual(expected)
+    expect(spreakerResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should mint the show page for a show player', () => {
@@ -91,25 +91,25 @@ describe('spreakerResolveEmbed', () => {
       height: 200,
     }
 
-    expect(spreakerResolveEmbed(value)).toEqual(expected)
+    expect(spreakerResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should refuse a non-digit episode id without falling back to the show', () => {
     const value = 'https://widget.spreaker.com/player?episode_id=abc&show_id=1433865'
 
-    expect(spreakerResolveEmbed(value)).toBeUndefined()
+    expect(spreakerResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should refuse an episode id that decodes into a second parameter', () => {
     const value = 'https://widget.spreaker.com/player?episode_id=1%26autoplay%3Dtrue'
 
-    expect(spreakerResolveEmbed(value)).toBeUndefined()
+    expect(spreakerResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should refuse a non-digit show id', () => {
     const value = 'https://widget.spreaker.com/player?show_id=abc'
 
-    expect(spreakerResolveEmbed(value)).toBeUndefined()
+    expect(spreakerResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should use an episode id of unusual length as written', () => {
@@ -122,19 +122,19 @@ describe('spreakerResolveEmbed', () => {
       height: 200,
     }
 
-    expect(spreakerResolveEmbed(value)).toEqual(expected)
+    expect(spreakerResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for an episode id holding a slash', () => {
     const value = 'https://widget.spreaker.com/player?episode_id=52842990%2Fx'
 
-    expect(spreakerResolveEmbed(value)).toBeUndefined()
+    expect(spreakerResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a spreaker url naming no episode', () => {
     const value = 'https://widget.spreaker.com/player?x=1'
 
-    expect(spreakerResolveEmbed(value)).toBeUndefined()
+    expect(spreakerResolveEmbed(new URL(value))).toBeUndefined()
   })
 })
 

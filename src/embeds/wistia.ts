@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf, toMap } from 'trousse'
-import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -29,7 +29,7 @@ export const composeEmbedUrl = (route: string, mediaId: string): string => {
 }
 
 export const extractWistiaEmbed = (
-  link: string,
+  link: URL,
 ): { route: string; id: string; page?: string } | undefined => {
   const segments = getPathSegments(link)
   const start = isAnyOf(segments[0], 'embed') ? 1 : 0
@@ -56,11 +56,11 @@ export const extractWistiaEmbed = (
 export const readSrcMediaId = (src: string | undefined): string | undefined => {
   const url = parseUrlOnHosts(src, wistiaHosts)
 
-  return url ? extractWistiaEmbed(url.href)?.id : undefined
+  return url ? extractWistiaEmbed(url)?.id : undefined
 }
 
 // No thumbnail: the poster needs Wistia's media JSON hop.
-export const wistiaResolveEmbed: ResolveEmbed = (url, element) => {
+export const wistiaResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const embed = extractWistiaEmbed(url)
 
   if (!embed) {

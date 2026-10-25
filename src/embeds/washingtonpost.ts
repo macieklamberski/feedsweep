@@ -12,10 +12,10 @@ const inlinePathRegex = /\/([^/]+)_inline\.html$/i
 
 // The Washington Post video player. The 2012 inline player, `{id}_inline.html`, is rebuilt onto
 // the embed route when its id is a video uuid. The older `gJQA…` ids name no uuid.
-export const washingtonpostResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
+export const washingtonpostResolveEmbed: ResolveUrlEmbed = (url) => {
   const id =
-    parsed.pathname.match(embedPathRegex)?.[1] ??
-    keepIfMatches(parsed.pathname.match(inlinePathRegex)?.[1], uuidRegex)
+    url.pathname.match(embedPathRegex)?.[1] ??
+    keepIfMatches(url.pathname.match(inlinePathRegex)?.[1], uuidRegex)
 
   if (!id) {
     return

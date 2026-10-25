@@ -16,7 +16,7 @@ describe('threeSixtyCitiesResolveEmbed', () => {
         ratio: '425/315',
       }
 
-      expect(threeSixtyCitiesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(threeSixtyCitiesResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass the slug through as written', () => {
@@ -29,7 +29,7 @@ describe('threeSixtyCitiesResolveEmbed', () => {
         ratio: '425/315',
       }
 
-      expect(threeSixtyCitiesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(threeSixtyCitiesResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -37,19 +37,19 @@ describe('threeSixtyCitiesResolveEmbed', () => {
     it('should ignore the frame path under another route', () => {
       const value = 'https://www.360cities.net/x/embed_iframe/peterstrasse-hamburg'
 
-      expect(threeSixtyCitiesResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(threeSixtyCitiesResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the frame path with a trailing segment', () => {
       const value = 'https://www.360cities.net/embed_iframe/peterstrasse-hamburg/extra'
 
-      expect(threeSixtyCitiesResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(threeSixtyCitiesResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should leave the PRO frame alone', () => {
       const value = 'http://www.360cities.net/pro_embed_iframe/af17c22e64/hotel-colon'
 
-      expect(threeSixtyCitiesResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(threeSixtyCitiesResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

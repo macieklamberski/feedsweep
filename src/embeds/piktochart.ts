@@ -30,8 +30,8 @@ const composePiktochartEmbed = (uid: string, title: string | undefined): EmbedRe
   }
 }
 
-const piktochartResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const uid = parsed.pathname.match(embedPathRegex)?.[1]
+const piktochartResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const uid = url.pathname.match(embedPathRegex)?.[1]
 
   if (!uid) {
     return

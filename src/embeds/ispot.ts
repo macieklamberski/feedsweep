@@ -7,8 +7,8 @@ const ispotHosts = ['www.ispot.tv']
 // iSpot.tv's TV commercial player, `www.ispot.tv/share/{id}`. The id is case-sensitive: another
 // casing names another spot or none. The `/ad/{id}` page answers 404 without its slug, so no page
 // url composes from the id.
-export const ispotResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const [route, id, ...rest] = getPathSegments(parsed)
+export const ispotResolveEmbed: ResolveUrlEmbed = (url) => {
+  const [route, id, ...rest] = getPathSegments(url)
 
   if (!isAnyOf(route, 'share') || !id || rest.length > 0) {
     return

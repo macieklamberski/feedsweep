@@ -26,8 +26,8 @@ const composeEmbed = (contentId: string): EmbedResolverResult => {
   }
 }
 
-const fc2IframeResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const contentId = parsed.pathname.match(embedPlayerRegex)?.[1]
+const fc2IframeResolveEmbed: ResolveUrlEmbed = (url) => {
+  const contentId = url.pathname.match(embedPlayerRegex)?.[1]
 
   if (!contentId) {
     return
@@ -36,12 +36,12 @@ const fc2IframeResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
   return composeEmbed(contentId)
 }
 
-const fc2FlashResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  if (!flashPlayerRegex.test(parsed.pathname)) {
+const fc2FlashResolveEmbed: ResolveUrlEmbed = (url) => {
+  if (!flashPlayerRegex.test(url.pathname)) {
     return
   }
 
-  const videoId = getQueryParam(parsed.searchParams, 'i')
+  const videoId = getQueryParam(url.searchParams, 'i')
 
   if (!videoId) {
     return
@@ -50,11 +50,11 @@ const fc2FlashResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
   // The id comes out of the query decoded, and it goes into a path.
   const contentId = encodePathSegment(videoId)
 
-  const duration = Number(getQueryParam(parsed.searchParams, 'd'))
+  const duration = Number(getQueryParam(url.searchParams, 'd'))
 
   return {
     ...composeEmbed(contentId),
-    title: getQueryParam(parsed.searchParams, 'tl'),
+    title: getQueryParam(url.searchParams, 'tl'),
     duration: duration > 0 ? duration : undefined,
   }
 }

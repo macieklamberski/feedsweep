@@ -207,15 +207,15 @@ export const isSoundcloudStream = (url: string): boolean => {
 }
 
 // SoundCloud's widget iframe, the dead Flash player and a framed track page answering SAMEORIGIN.
-const soundcloudResolveEmbed: ResolveUrlEmbed = (url, element, parsed) => {
-  const params = parsed.searchParams
+const soundcloudResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const params = url.searchParams
   const inner = getQueryParam(params, 'url')
   const reference = inner?.match(referenceRegex)
   const referenceKind = reference?.[1].toLowerCase()
-  const streamTrackId = parsed.pathname.match(streamPathRegex)?.[1]
+  const streamTrackId = url.pathname.match(streamPathRegex)?.[1]
   const queryToken = readQueryToken(params, inner)
   const startTrack = getQueryParam(params, 'start_track')
-  const result: EmbedResolverResult = { provider, src: url }
+  const result: EmbedResolverResult = { provider, src: url.href }
 
   if (reference) {
     result.id = `${referenceKind}/${reference[2]}`
@@ -258,11 +258,11 @@ const soundcloudResolveEmbed: ResolveUrlEmbed = (url, element, parsed) => {
     result.src = composeWidgetUrl(inner, queryToken, startTrack)
   }
 
-  if (flashPlayerHostRegex.test(parsed.hostname) && !inner) {
+  if (flashPlayerHostRegex.test(url.hostname) && !inner) {
     return
   }
 
-  if (!result.id && !pageKind && isFileName(parsed.pathname)) {
+  if (!result.id && !pageKind && isFileName(url.pathname)) {
     return
   }
 

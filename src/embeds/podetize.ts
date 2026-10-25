@@ -25,14 +25,14 @@ const composeEmbed = (id: string, isEpisodeMode: boolean): EmbedResolverResult =
   }
 }
 
-export const podetizeResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const id = getQueryParam(parsed.searchParams, 'id')
+export const podetizeResolveEmbed: ResolveUrlEmbed = (url) => {
+  const id = getQueryParam(url.searchParams, 'id')
 
-  if (parsed.pathname !== '/' || !id) {
+  if (url.pathname !== '/' || !id) {
     return
   }
 
-  return composeEmbed(id, isAnyOf(getQueryParam(parsed.searchParams, 'epmode'), 'true'))
+  return composeEmbed(id, isAnyOf(getQueryParam(url.searchParams, 'epmode'), 'true'))
 }
 
 // Podetize's ShowCastR loader script mounts the player where it stands, and a reader strips it.

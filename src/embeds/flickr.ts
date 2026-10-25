@@ -1,15 +1,8 @@
-import {
-  decodeSegment,
-  encodePathSegment,
-  getQueryParam,
-  isHostOf,
-  type Nullish,
-  parseUrl,
-} from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { decodeSegment, encodePathSegment, getQueryParam, isHostOf, type Nullish } from 'trousse'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVar, flashVars, keepIfMatches, parseFlashVars } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'flickr'
@@ -332,30 +325,21 @@ const composePlayerEmbed = (
   return subject && composeEmbed(subject)
 }
 
-const resolveTarget = (
-  link: string,
-  element: Nullish<Element>,
-): EmbedResolverResult | undefined => {
-  const parsed = parseUrl(link, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
-  const player = readPhotoPlayer(parsed)
+const resolveTarget = (url: URL, element: Nullish<Element>): EmbedResolverResult | undefined => {
+  const player = readPhotoPlayer(url)
 
   if (player) {
     return composePhotoEmbed(player.src, player.photo)
   }
 
-  const result = composePlayerEmbed(parsed, element)
+  const result = composePlayerEmbed(url, element)
 
   if (!result) {
     return
   }
 
   // The size always travels in the src: with no query every image renders at NaN.
-  if (flashVideoPathRegex.test(parsed.pathname)) {
+  if (flashVideoPathRegex.test(url.pathname)) {
     const { width, height } = videoSize
 
     return { ...result, src: `${result.src}?width=${width}&height=${height}`, ratio: '16/9' }
@@ -366,7 +350,7 @@ const resolveTarget = (
   return { ...result, src: `${result.src}?width=${width}&height=${height}`, width, height }
 }
 
-export const flickrResolveEmbed: ResolveEmbed = (url, element) => {
+export const flickrResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const target = resolveTarget(url, element)
 
   return target && { ...target, title: target.title ?? attr(element, 'title') }

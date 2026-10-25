@@ -1,5 +1,5 @@
-import { getPathSegments, isAnyOf, isHostOrSubdomainOf, parseUrl } from 'trousse'
-import type { FieldCleaner, ResolveEmbed } from '../types.js'
+import { getPathSegments, isAnyOf, isHostOrSubdomainOf } from 'trousse'
+import type { FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -18,7 +18,7 @@ const playerHeight = 100
 // `anchor.fm/{show}/embed/episodes/{slug}`,
 // `podcasters.spotify.com/pod/show/{show}/embed/episodes/{slug}`,
 // `creators.spotify.com/pod/profile/{user}/embed/episodes/{slug}/{audioId}`.
-export const extractAnchorEpisode = (link: string): string | undefined => {
+export const extractAnchorEpisode = (link: URL): string | undefined => {
   const segments = getPathSegments(link)
   const marker = segments.findIndex((segment) => isAnyOf(segment, 'embed'))
 
@@ -42,29 +42,21 @@ const spotifyShowPathRegex = /^\/pod\/(?:show|profile)\/([^/]+)\/embed\/?$/i
 
 // `anchor.fm/{show}/embed`, `podcasters.spotify.com/pod/show/{show}/embed`,
 // `creators.spotify.com/pod/profile/{show}/embed`.
-const extractAnchorShow = (link: string): string | undefined => {
-  const parsed = parseUrl(link)
-
-  if (!parsed) {
-    return
-  }
-
-  const pathRegex = isHostOrSubdomainOf(parsed, ['anchor.fm'])
+const extractAnchorShow = (url: URL): string | undefined => {
+  const pathRegex = isHostOrSubdomainOf(url, ['anchor.fm'])
     ? anchorShowPathRegex
     : spotifyShowPathRegex
 
-  return parsed.pathname.match(pathRegex)?.[1]
+  return url.pathname.match(pathRegex)?.[1]
 }
 
 // The episode page, `anchor.fm/{show}/episodes/{slug}`, names the same episode as its player.
-const extractAnchorEpisodePage = (link: string): string | undefined => {
-  const parsed = parseUrl(link)
-
-  if (!parsed || !isHostOrSubdomainOf(parsed, ['anchor.fm'])) {
+const extractAnchorEpisodePage = (url: URL): string | undefined => {
+  if (!isHostOrSubdomainOf(url, ['anchor.fm'])) {
     return
   }
 
-  const page = parsed.pathname.match(anchorEpisodePagePathRegex)?.groups
+  const page = url.pathname.match(anchorEpisodePagePathRegex)?.groups
 
   if (!page?.show || !page.slug) {
     return
@@ -74,7 +66,7 @@ const extractAnchorEpisodePage = (link: string): string | undefined => {
 }
 
 // The player carries no metadata, and Anchor's old oEmbed endpoint is gone.
-export const anchorResolveEmbed: ResolveEmbed = (url, element) => {
+export const anchorResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const episode = extractAnchorEpisode(url) ?? extractAnchorEpisodePage(url)
 
   if (episode) {

@@ -1,14 +1,7 @@
-import {
-  encodePathSegment,
-  getPathSegments,
-  getQueryParam,
-  isAnyOf,
-  isHostOf,
-  parseUrl,
-} from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { encodePathSegment, getPathSegments, getQueryParam, isAnyOf, isHostOf } from 'trousse'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVars, keepIfMatches, parseFlashVars } from '../utils/dom.js'
-import { digitsRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ted'
@@ -23,7 +16,7 @@ const tedTalkHosts = ['embed.ted.com', 'embed-ssl.ted.com', 'www.ted.com', 'ted.
 // `embed.ted.com/talks/{slug}.html`, and a localized variant that inserts the language:
 // `embed.ted.com/talks/lang/{lang}/{slug}.html`. The slug is the talk's canonical id on
 // ted.com, so a watch url follows from it without a lookup.
-export const extractTedTalk = (link: string): string | undefined => {
+export const extractTedTalk = (link: URL): string | undefined => {
   if (!isHostOf(link, tedTalkHosts)) {
     return
   }
@@ -45,12 +38,10 @@ const flashPlayerPathRegex = /\/assets\/player\/swf\/embedplayer\.swf$/i
 const adKeysTalkRegex = /(?:^|;)talk=([^;]+)/i
 
 const readFlashTalk = (
-  url: string,
+  url: URL,
   element: Element | undefined,
 ): { slug: string; thumbnail?: string } | undefined => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
+  if (!flashPlayerPathRegex.test(url.pathname)) {
     return
   }
 
@@ -77,7 +68,7 @@ const readFlashTalk = (
 }
 
 // TED's embed.ted.com iframe, and the dead Flash player that names the talk only in its flashVars.
-export const tedResolveEmbed: ResolveEmbed = (url, element) => {
+export const tedResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const slug = extractTedTalk(url)
   const talk = slug ? { slug } : readFlashTalk(url, element)
 

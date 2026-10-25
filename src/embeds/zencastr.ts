@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -12,7 +12,7 @@ const zencastrHosts = ['zencastr.com', 'zen.ai']
 // to `1/1`, which is what Zencastr's recorder writes.
 const playerRatio = '1/1'
 
-export const zencastrResolveEmbed: ResolveEmbed = (url) => {
+export const zencastrResolveEmbed: ResolveUrlEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, zencastrHosts)
   const [route, id, ...rest] = parsed ? getPathSegments(parsed) : []
 
@@ -37,7 +37,13 @@ export const zencastrResolveEmbed: ResolveEmbed = (url) => {
 export const zencastrBlockquoteEmbedResolver = createMarkupEmbedResolver(
   'blockquote.zenplayer[data-episode-href]',
   (element) => {
-    return zencastrResolveEmbed(attr(element, 'data-episode-href') ?? '')
+    const url = parseUrlOnHosts(attr(element, 'data-episode-href'), zencastrHosts)
+
+    if (!url) {
+      return
+    }
+
+    return zencastrResolveEmbed(url)
   },
 )
 

@@ -1,15 +1,8 @@
-import {
-  composeQuery,
-  decodeSegment,
-  getPathSegments,
-  getQueryParam,
-  isAnyOf,
-  parseUrl,
-} from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { composeQuery, decodeSegment, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { isMediaFile, placeholderBaseUrl } from '../utils/urls.js'
+import { isMediaFile } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'podbean'
@@ -25,16 +18,14 @@ const legacyRouteWords = ['audio', 'multi']
 // Podbean retired.
 const defaultPlayerHeight = 150
 
-export const extractPodbeanId = (link: string): string | undefined => {
-  const parsed = parseUrl(link, placeholderBaseUrl)
-
+export const extractPodbeanId = (url: URL): string | undefined => {
   // Podbean serves the episode audio from the same domain as the players.
   // An mp3 on the host can carry a publisher's ?i=, and the enclosure would lose its audio.
-  if (!parsed || isMediaFile(parsed.pathname)) {
+  if (isMediaFile(url.pathname)) {
     return
   }
 
-  const segments = getPathSegments(parsed)
+  const segments = getPathSegments(url)
 
   // `/media/player/{id}` is the legacy form, `/player-v2/?i={id}` the current one.
   // /media/player/{id} 301s to /player-v2/?i={id}-pb for a real id and 404s an invented one, while
@@ -51,11 +42,11 @@ export const extractPodbeanId = (link: string): string | undefined => {
   }
 
   if (isAnyOf(segments[0], 'player-v2')) {
-    return getQueryParam(parsed.searchParams, 'i')
+    return getQueryParam(url.searchParams, 'i')
   }
 }
 
-export const podbeanResolveEmbed: ResolveEmbed = (url, element) => {
+export const podbeanResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const id = extractPodbeanId(url)
 
   if (!id) {

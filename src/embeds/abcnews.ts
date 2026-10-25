@@ -13,12 +13,12 @@ const playerPathRegex = /^\/video\/embed\/?$/i
 
 // ABC News' video player, `/video/embed?id={id}`. The site's own script builds it on the site's
 // host, which is `abcnews.com` today.
-export const abcnewsResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  if (!playerPathRegex.test(parsed.pathname)) {
+export const abcnewsResolveEmbed: ResolveUrlEmbed = (url) => {
+  if (!playerPathRegex.test(url.pathname)) {
     return
   }
 
-  const id = getQueryParam(parsed.searchParams, 'id')
+  const id = getQueryParam(url.searchParams, 'id')
 
   if (!id) {
     return

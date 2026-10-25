@@ -41,7 +41,7 @@ describe('codesandboxResolveEmbed', () => {
         height: 500,
       }
 
-      expect(codesandboxResolveEmbed(value)).toEqual(expected)
+      expect(codesandboxResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should take the id from the hash behind a human-readable slug', () => {
@@ -54,7 +54,7 @@ describe('codesandboxResolveEmbed', () => {
         height: 500,
       }
 
-      expect(codesandboxResolveEmbed(value)).toEqual(expected)
+      expect(codesandboxResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the apex host for an embed url on the www host', () => {
@@ -67,7 +67,7 @@ describe('codesandboxResolveEmbed', () => {
         height: 500,
       }
 
-      expect(codesandboxResolveEmbed(value)).toEqual(expected)
+      expect(codesandboxResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the font size, the navigation and the theme', () => {
@@ -81,7 +81,7 @@ describe('codesandboxResolveEmbed', () => {
         height: 500,
       }
 
-      expect(codesandboxResolveEmbed(value)).toEqual(expected)
+      expect(codesandboxResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the file the editor opens on', () => {
@@ -95,7 +95,7 @@ describe('codesandboxResolveEmbed', () => {
         height: 500,
       }
 
-      expect(codesandboxResolveEmbed(value)).toEqual(expected)
+      expect(codesandboxResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the pane and the module view', () => {
@@ -109,29 +109,31 @@ describe('codesandboxResolveEmbed', () => {
         height: 500,
       }
 
-      expect(codesandboxResolveEmbed(value)).toEqual(expected)
+      expect(codesandboxResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
   describe('sad paths', () => {
     it('should ignore the host root, which names no sandbox', () => {
-      expect(codesandboxResolveEmbed('https://codesandbox.io/')).toBeUndefined()
+      expect(codesandboxResolveEmbed(new URL('https://codesandbox.io/'))).toBeUndefined()
     })
 
     it('should ignore the running preview a sandbox serves on its own subdomain', () => {
-      expect(codesandboxResolveEmbed('https://k3201jy9jo.sse.codesandbox.io/')).toBeUndefined()
+      expect(
+        codesandboxResolveEmbed(new URL('https://k3201jy9jo.sse.codesandbox.io/')),
+      ).toBeUndefined()
     })
 
     it('should ignore a foreign host carrying the same path', () => {
       const value = 'https://evil.test/embed/83wzkj'
 
-      expect(codesandboxResolveEmbed(value)).toBeUndefined()
+      expect(codesandboxResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a subdomain even when the path names a sandbox', () => {
       const value = 'https://sse.codesandbox.io/embed/83wzkj'
 
-      expect(codesandboxResolveEmbed(value)).toBeUndefined()
+      expect(codesandboxResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed hash as written, even if the player answers an error', () => {
@@ -144,7 +146,7 @@ describe('codesandboxResolveEmbed', () => {
         height: 500,
       }
 
-      expect(codesandboxResolveEmbed(value)).toEqual(expected)
+      expect(codesandboxResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -159,7 +161,7 @@ describe('codesandboxResolveEmbed', () => {
         height: 500,
       }
 
-      expect(codesandboxResolveEmbed(value)).toEqual(expected)
+      expect(codesandboxResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -174,7 +176,7 @@ describe('codesandboxResolveEmbed', () => {
         height: 500,
       }
 
-      expect(codesandboxResolveEmbed(value)).toEqual(expected)
+      expect(codesandboxResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the mixed-case nine-character hash of the 2018 era', () => {
@@ -187,7 +189,7 @@ describe('codesandboxResolveEmbed', () => {
         height: 500,
       }
 
-      expect(codesandboxResolveEmbed(value)).toEqual(expected)
+      expect(codesandboxResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the ten-character hash written without a slug', () => {
@@ -200,7 +202,7 @@ describe('codesandboxResolveEmbed', () => {
         height: 500,
       }
 
-      expect(codesandboxResolveEmbed(value)).toEqual(expected)
+      expect(codesandboxResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the embed renderer for the legacy user url', () => {
@@ -213,7 +215,7 @@ describe('codesandboxResolveEmbed', () => {
         height: 500,
       }
 
-      expect(codesandboxResolveEmbed(value)).toEqual(expected)
+      expect(codesandboxResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should link a DevBox route to its own page rather than the sandbox route', () => {
@@ -226,7 +228,7 @@ describe('codesandboxResolveEmbed', () => {
         height: 500,
       }
 
-      expect(codesandboxResolveEmbed(value)).toEqual(expected)
+      expect(codesandboxResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the file and the embed flag on a DevBox route', () => {
@@ -240,7 +242,7 @@ describe('codesandboxResolveEmbed', () => {
         height: 500,
       }
 
-      expect(codesandboxResolveEmbed(value)).toEqual(expected)
+      expect(codesandboxResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should link a DevBox sandbox route to its own page too', () => {
@@ -253,7 +255,7 @@ describe('codesandboxResolveEmbed', () => {
         height: 500,
       }
 
-      expect(codesandboxResolveEmbed(value)).toEqual(expected)
+      expect(codesandboxResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -262,29 +264,29 @@ describe('codesandboxResolveEmbed', () => {
       const value =
         'https://codesandbox.io/embed/github/crimx/observable-hooks/tree/master/examples/pomodoro-timer'
 
-      expect(codesandboxResolveEmbed(value)).toBeUndefined()
+      expect(codesandboxResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should refuse a repository embed on the legacy user route', () => {
       const value = 'https://codesandbox.io/s/github/reduxjs/redux-essentials-example-app'
 
-      expect(codesandboxResolveEmbed(value)).toBeUndefined()
+      expect(codesandboxResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should refuse the Define API, which carries a payload and no sandbox', () => {
       const value = 'https://codesandbox.io/api/v1/sandboxes/define?parameters=N4IgZglgNgpg'
 
-      expect(codesandboxResolveEmbed(value)).toBeUndefined()
+      expect(codesandboxResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should refuse the starter-template route, which saves no sandbox', () => {
-      expect(codesandboxResolveEmbed('https://codesandbox.io/embed/new')).toBeUndefined()
+      expect(codesandboxResolveEmbed(new URL('https://codesandbox.io/embed/new'))).toBeUndefined()
     })
 
     it('should refuse the fork route, which names no sandbox', () => {
       const value = 'https://codesandbox.io/embed/fork'
 
-      expect(codesandboxResolveEmbed(value)).toBeUndefined()
+      expect(codesandboxResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

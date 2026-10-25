@@ -22,10 +22,10 @@ const footerHeight = 71
 // The video page is `/video/{section}/{id}/{slug}.html`, and neither the section nor the slug is
 // in the embed, so no `url` is minted. The player discriminates in a browser only: a fabricated
 // id answers 200 with the same 695 byte shell and renders "Video Data Failed to Load".
-export const nytimesResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const id = getQueryParam(parsed.searchParams, 'videoId')
+export const nytimesResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const id = getQueryParam(url.searchParams, 'videoId')
 
-  if (!isAnyOf(parsed.pathname, [playerPath, legacyPlayerPath])) {
+  if (!isAnyOf(url.pathname, [playerPath, legacyPlayerPath])) {
     return
   }
 

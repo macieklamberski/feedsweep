@@ -16,7 +16,7 @@ describe('indavideoResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(indavideoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(indavideoResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the player on the main host without a trailing slash', () => {
@@ -29,7 +29,7 @@ describe('indavideoResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(indavideoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(indavideoResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the display settings and the autostart the publisher wrote', () => {
@@ -42,7 +42,7 @@ describe('indavideoResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(indavideoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(indavideoResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should move the Flash player whose query names the video onto the current player', () => {
@@ -55,7 +55,7 @@ describe('indavideoResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(indavideoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(indavideoResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep a Flash video id holding a slash inside one path segment', () => {
@@ -68,7 +68,7 @@ describe('indavideoResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(indavideoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(indavideoResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use the id as written, even if the player answers an empty page', () => {
@@ -81,7 +81,7 @@ describe('indavideoResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(indavideoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(indavideoResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -89,32 +89,32 @@ describe('indavideoResolveEmbed', () => {
     it('should ignore the player route behind another segment', () => {
       const value = 'https://indavideo.hu/x/player/video/c75c95c854/'
 
-      expect(indavideoResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(indavideoResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the player route followed by another segment', () => {
       const value = 'https://indavideo.hu/player/video/c75c95c854/extra'
 
-      expect(indavideoResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(indavideoResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a route word that is not the video player', () => {
       const value = 'https://indavideo.hu/player/clip/c75c95c854/'
 
-      expect(indavideoResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(indavideoResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a swf that is not one of the video players', () => {
       const value = 'http://files.indavideo.hu/player/other.swf?vID=06aceb75c8'
 
-      expect(indavideoResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(indavideoResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the channel strip, which names a feed and no video', () => {
       const value =
         'http://files.indavideo.hu/player/indavideo_strip.swf?align=landscape&feed=http%3A%2F%2Fwww.indavideo.hu%2F%3Faction%3Drss%26profile%3D1%26user_name%3DChaoyang'
 
-      expect(indavideoResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(indavideoResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

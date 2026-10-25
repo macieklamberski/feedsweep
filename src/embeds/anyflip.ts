@@ -16,9 +16,9 @@ const viewerPaths = ['', 'index.html', 'mobile/index.html']
 
 // AnyFlip's flipbook viewer, `online.anyflip.com/{user}/{book}/index.html`, with the `#p=` start
 // page the embed dialog writes.
-export const anyflipResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const segments = getPathSegments(parsed)
-  const bucket = parsed.hostname === bucketHost ? segments.shift() : parsed.hostname
+export const anyflipResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const segments = getPathSegments(url)
+  const bucket = url.hostname === bucketHost ? segments.shift() : url.hostname
   const [user, book, ...rest] = segments
 
   if (!isAnyOf(bucket, viewerHost) || !book || !isAnyOf(rest.join('/'), viewerPaths)) {
@@ -26,7 +26,7 @@ export const anyflipResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
   }
 
   const viewerUrl = `https://online.anyflip.com/${user}/${book}/`
-  const { p: page } = pickQueryParams(parsed.hash.slice(1), ['p'])
+  const { p: page } = pickQueryParams(url.hash.slice(1), ['p'])
 
   return {
     provider,

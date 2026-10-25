@@ -52,13 +52,13 @@ const readFileEmbed = (url: URL): EmbedResolverResult | undefined => {
   }
 }
 
-const resolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const segments = getPathSegments(parsed)
+const resolveEmbed: ResolveUrlEmbed = (url) => {
+  const segments = getPathSegments(url)
 
   if (segments.length === 1 && isAnyOf(segments[0], 'embed')) {
     // The wrapper frames whatever its `url` names, so a value off figma is refused and never minted.
     const wrapped = parseUrlOnHosts(
-      getQueryParam(parsed.searchParams, 'url'),
+      getQueryParam(url.searchParams, 'url'),
       figmaFileHosts,
       isHostOf,
     )
@@ -70,11 +70,11 @@ const resolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
     return readFileEmbed(wrapped)
   }
 
-  if (!isHostOf(parsed, figmaEmbedHost)) {
+  if (!isHostOf(url, figmaEmbedHost)) {
     return
   }
 
-  return readFileEmbed(parsed)
+  return readFileEmbed(url)
 }
 
 // Figma's two embed codes: the older `figma.com/embed?embed_host=share&url={encoded figma url}`,

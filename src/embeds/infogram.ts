@@ -82,14 +82,14 @@ export const infogramScriptEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-const infogramResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const chartId = keepIfMatches(parsed.pathname.slice(1), chartIdRegex)
+const infogramResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const chartId = keepIfMatches(url.pathname.slice(1), chartIdRegex)
 
   if (!chartId) {
     return
   }
 
-  return composeInfogramEmbed(chartId, chartId, parsed.search, attr(element, 'title'))
+  return composeInfogramEmbed(chartId, chartId, url.search, attr(element, 'title'))
 }
 
 // The chart frame on either domain, and the retired `infogr.am/{id}` page.

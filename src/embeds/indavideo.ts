@@ -35,8 +35,8 @@ const readVideoId = (url: URL, element?: Element): string | undefined => {
 
 // An Indavideo player: the iframe on indavideo.hu or embed.indavideo.hu, or the retired Flash
 // player, whose video id plays on the current one.
-export const indavideoResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const id = readVideoId(parsed, element)
+export const indavideoResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const id = readVideoId(url, element)
 
   if (!id) {
     return

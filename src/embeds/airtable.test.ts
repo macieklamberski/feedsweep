@@ -15,7 +15,7 @@ describe('airtableResolveEmbed', () => {
         height: 533,
       }
 
-      expect(airtableResolveEmbed(value)).toEqual(expected)
+      expect(airtableResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should build the placeholder from a bare shared view', () => {
@@ -28,7 +28,7 @@ describe('airtableResolveEmbed', () => {
         height: 533,
       }
 
-      expect(airtableResolveEmbed(value)).toEqual(expected)
+      expect(airtableResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the colour, the view controls and a tracker', () => {
@@ -42,7 +42,7 @@ describe('airtableResolveEmbed', () => {
         height: 533,
       }
 
-      expect(airtableResolveEmbed(value)).toEqual(expected)
+      expect(airtableResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the card layout', () => {
@@ -55,7 +55,7 @@ describe('airtableResolveEmbed', () => {
         height: 533,
       }
 
-      expect(airtableResolveEmbed(value)).toEqual(expected)
+      expect(airtableResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the embed route in upper case and mint it in lowercase', () => {
@@ -68,7 +68,7 @@ describe('airtableResolveEmbed', () => {
         height: 533,
       }
 
-      expect(airtableResolveEmbed(value)).toEqual(expected)
+      expect(airtableResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -76,88 +76,96 @@ describe('airtableResolveEmbed', () => {
     it('should ignore a foreign host carrying the same path', () => {
       const value = 'https://evil.test/embed/appmHSMnV4Q1S4cWh/shrMnUTYyzmsdX8JT'
 
-      expect(airtableResolveEmbed(value)).toBeUndefined()
+      expect(airtableResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the static subdomain, which serves files', () => {
       const value = 'https://static.airtable.com/embed/shrIBFxXbBGxNv8at'
 
-      expect(airtableResolveEmbed(value)).toBeUndefined()
+      expect(airtableResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a route word that is not the embed route', () => {
-      expect(airtableResolveEmbed('https://airtable.com/frame/shrIBFxXbBGxNv8at')).toBeUndefined()
+      expect(
+        airtableResolveEmbed(new URL('https://airtable.com/frame/shrIBFxXbBGxNv8at')),
+      ).toBeUndefined()
     })
 
     it('should ignore the embed route below a leading segment', () => {
-      expect(airtableResolveEmbed('https://airtable.com/x/embed/shrIBFxXbBGxNv8at')).toBeUndefined()
+      expect(
+        airtableResolveEmbed(new URL('https://airtable.com/x/embed/shrIBFxXbBGxNv8at')),
+      ).toBeUndefined()
     })
 
     it('should ignore the embed route naming no share', () => {
-      expect(airtableResolveEmbed('https://airtable.com/embed')).toBeUndefined()
+      expect(airtableResolveEmbed(new URL('https://airtable.com/embed'))).toBeUndefined()
     })
 
     it('should ignore a shared view with a trailing segment', () => {
       const value = 'https://airtable.com/embed/appmHSMnV4Q1S4cWh/shrMnUTYyzmsdX8JT/extra'
 
-      expect(airtableResolveEmbed(value)).toBeUndefined()
+      expect(airtableResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an interface page, which is not a shared view', () => {
       const value = 'https://airtable.com/embed/appNrensvKp1phKGL/pag2pXXhhCSeiIsNS'
 
-      expect(airtableResolveEmbed(value)).toBeUndefined()
+      expect(airtableResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an interface page whose id holds the share prefix inside it', () => {
       const value = 'https://airtable.com/embed/appNrensvKp1phKGL/pag2pXshrSeiIsNS'
 
-      expect(airtableResolveEmbed(value)).toBeUndefined()
+      expect(airtableResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an interface form', () => {
       const value = 'https://airtable.com/embed/appNrensvKp1phKGL/pag2pXXhhCSeiIsNS/form'
 
-      expect(airtableResolveEmbed(value)).toBeUndefined()
+      expect(airtableResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a table below a bare share', () => {
       const value = 'https://airtable.com/embed/shr4cqFL8GrgRs3bw/tblintCULGzj4AyEW?blocks=hide'
 
-      expect(airtableResolveEmbed(value)).toBeUndefined()
+      expect(airtableResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a bare base, which names no share', () => {
-      expect(airtableResolveEmbed('https://airtable.com/embed/appmHSMnV4Q1S4cWh')).toBeUndefined()
+      expect(
+        airtableResolveEmbed(new URL('https://airtable.com/embed/appmHSMnV4Q1S4cWh')),
+      ).toBeUndefined()
     })
 
     it('should ignore a share id in upper case, which the server answers 404', () => {
-      expect(airtableResolveEmbed('https://airtable.com/embed/SHRIBFxXbBGxNv8at')).toBeUndefined()
+      expect(
+        airtableResolveEmbed(new URL('https://airtable.com/embed/SHRIBFxXbBGxNv8at')),
+      ).toBeUndefined()
     })
 
     it('should ignore a share under a segment that is not a base', () => {
       const value = 'https://airtable.com/embed/tblintCULGzj4AyEW/shrMnUTYyzmsdX8JT'
 
-      expect(airtableResolveEmbed(value)).toBeUndefined()
+      expect(airtableResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a share under a segment that holds the base prefix inside it', () => {
       const value = 'https://airtable.com/embed/tblappCULGzj4AyEW/shrMnUTYyzmsdX8JT'
 
-      expect(airtableResolveEmbed(value)).toBeUndefined()
+      expect(airtableResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a share under two segments', () => {
       const value =
         'https://airtable.com/embed/appmHSMnV4Q1S4cWh/appmHSMnV4Q1S4cWh/shrMnUTYyzmsdX8JT'
 
-      expect(airtableResolveEmbed(value)).toBeUndefined()
+      expect(airtableResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a base in upper case, which the server answers 404', () => {
       const value = 'https://airtable.com/embed/APPpn49lnv0PpxG1q/shrXmb9QweRXyZEx5'
 
-      expect(airtableResolveEmbed(value)).toBeUndefined()
+      expect(airtableResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed share id as written, even if the frame answers an error', () => {
@@ -170,7 +178,7 @@ describe('airtableResolveEmbed', () => {
         height: 533,
       }
 
-      expect(airtableResolveEmbed(value)).toEqual(expected)
+      expect(airtableResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

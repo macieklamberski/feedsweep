@@ -16,7 +16,7 @@ describe('inaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(inaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(inaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the archive route of the same player', () => {
@@ -30,7 +30,7 @@ describe('inaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(inaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(inaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read a numeric id the same way', () => {
@@ -44,7 +44,7 @@ describe('inaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(inaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(inaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should repair the dead Flash ticket route', () => {
@@ -58,7 +58,7 @@ describe('inaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(inaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(inaResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -66,34 +66,34 @@ describe('inaResolveEmbed', () => {
     it('should ignore the archive page itself', () => {
       const value = 'https://www.ina.fr/video/I04224962'
 
-      expect(inaResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(inaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore another route on the player host', () => {
       const value =
         'https://player.ina.fr/player/watch/I04224962/1/1b0bd203fbcd702f9bc9b10ac3d0fc21/460/259'
 
-      expect(inaResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(inaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore another route under the archive video path', () => {
       const value =
         'https://www.ina.fr/video/watch/CPC82053053/1019544/f6d4ef1e5d2a7f5359b350d693da3394/425/319/0'
 
-      expect(inaResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(inaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an embed route under another first segment', () => {
       const value =
         'https://www.ina.fr/audio/embed/CPC82053053/1019544/f6d4ef1e5d2a7f5359b350d693da3394/425/319/0'
 
-      expect(inaResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(inaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a player url naming no player id or key', () => {
       const value = 'https://player.ina.fr/player/embed/I04224962'
 
-      expect(inaResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(inaResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -109,7 +109,7 @@ describe('inaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(inaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(inaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use a malformed id carrying a query separator as written, even if the player answers an error', () => {
@@ -123,7 +123,7 @@ describe('inaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(inaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(inaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use a malformed player id as written, even if the player answers an error', () => {
@@ -137,7 +137,7 @@ describe('inaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(inaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(inaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use a malformed key as written, even if the player answers an error', () => {
@@ -151,7 +151,7 @@ describe('inaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(inaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(inaResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

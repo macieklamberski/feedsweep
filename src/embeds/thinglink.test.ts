@@ -37,7 +37,7 @@ describe('thinglinkResolveEmbed', () => {
         ratio: '3/2',
       }
 
-      expect(thinglinkResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(thinglinkResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the card viewer for a scene framed on the view route', () => {
@@ -50,7 +50,7 @@ describe('thinglinkResolveEmbed', () => {
         ratio: '3/2',
       }
 
-      expect(thinglinkResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(thinglinkResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -58,7 +58,7 @@ describe('thinglinkResolveEmbed', () => {
     it('should ignore a thinglink url naming no viewer', () => {
       const value = 'https://www.thinglink.com/pricing'
 
-      expect(thinglinkResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(thinglinkResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -66,7 +66,7 @@ describe('thinglinkResolveEmbed', () => {
     it('should refuse a card route with no id after it', () => {
       const value = 'https://www.thinglink.com/card'
 
-      expect(thinglinkResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(thinglinkResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed scene id as written, even if the player answers an error', () => {
@@ -79,19 +79,19 @@ describe('thinglinkResolveEmbed', () => {
         ratio: '3/2',
       }
 
-      expect(thinglinkResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(thinglinkResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should refuse a route that is not a viewer', () => {
       const value = 'https://www.thinglink.com/scene/853609259307368449'
 
-      expect(thinglinkResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(thinglinkResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should refuse the view route without the scene word', () => {
       const value = 'https://www.thinglink.com/view/other/853609259307368449'
 
-      expect(thinglinkResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(thinglinkResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -107,7 +107,7 @@ describe('thinglinkResolveEmbed', () => {
         ratio: '3/2',
       }
 
-      expect(thinglinkResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(thinglinkResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the card viewer for a videocard', () => {
@@ -120,7 +120,7 @@ describe('thinglinkResolveEmbed', () => {
         ratio: '3/2',
       }
 
-      expect(thinglinkResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(thinglinkResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -136,7 +136,7 @@ describe('thinglinkResolveEmbed', () => {
         ratio: '3/2',
       }
 
-      expect(thinglinkResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(thinglinkResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the secret fragment the WordPress embed appends', () => {
@@ -150,7 +150,7 @@ describe('thinglinkResolveEmbed', () => {
         ratio: '3/2',
       }
 
-      expect(thinglinkResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(thinglinkResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the card viewer for the accessibility viewer', () => {
@@ -163,7 +163,7 @@ describe('thinglinkResolveEmbed', () => {
         ratio: '3/2',
       }
 
-      expect(thinglinkResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(thinglinkResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -179,7 +179,7 @@ describe('thinglinkResolveEmbed', () => {
         ratio: '3/2',
       }
 
-      expect(thinglinkResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(thinglinkResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the poster for the highest scene below the ceiling', () => {
@@ -193,7 +193,7 @@ describe('thinglinkResolveEmbed', () => {
         ratio: '3/2',
       }
 
-      expect(thinglinkResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(thinglinkResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should state no thumbnail for a scene at the ceiling', () => {
@@ -206,7 +206,7 @@ describe('thinglinkResolveEmbed', () => {
         ratio: '3/2',
       }
 
-      expect(thinglinkResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(thinglinkResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should state no thumbnail for a scene above the ceiling', () => {
@@ -219,7 +219,7 @@ describe('thinglinkResolveEmbed', () => {
         ratio: '3/2',
       }
 
-      expect(thinglinkResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(thinglinkResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

@@ -17,7 +17,7 @@ describe('corriereResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(corriereResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(corriereResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the player over https from an http carrier', () => {
@@ -30,7 +30,7 @@ describe('corriereResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(corriereResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(corriereResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should repair the widget player from the feed in its query', () => {
@@ -44,7 +44,7 @@ describe('corriereResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(corriereResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(corriereResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass the id through as written', () => {
@@ -57,7 +57,7 @@ describe('corriereResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(corriereResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(corriereResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -65,62 +65,62 @@ describe('corriereResolveEmbed', () => {
     it('should ignore a path with a leading segment', () => {
       const value = 'https://video.corriere.it/x/video-embed/885087cc-33c7-11ea-bebf-10b7ce31a40c'
 
-      expect(corriereResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(corriereResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path with a trailing segment', () => {
       const value =
         'https://video.corriere.it/video-embed/885087cc-33c7-11ea-bebf-10b7ce31a40c/extra/x'
 
-      expect(corriereResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(corriereResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the watch page', () => {
       const value = 'https://video.corriere.it/x/885087cc-33c7-11ea-bebf-10b7ce31a40c'
 
-      expect(corriereResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(corriereResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a widget route under another section', () => {
       const value =
         'https://video.corriere.it/x/players/player_tv_video_iFrame.shtml?videoId=http://static2.video.corriereobjects.it/widget/content/video/rss/video_184654.rss'
 
-      expect(corriereResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(corriereResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a widget asset that is not a player', () => {
       const value =
         'https://video.corriere.it/widget/content/adv.xml?videoId=http://static2.video.corriereobjects.it/widget/content/video/rss/video_184654.rss'
 
-      expect(corriereResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(corriereResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a widget player whose feed is on a foreign host', () => {
       const value =
         'https://video.corriere.it/widget/players/player_tv_video_iFrame.shtml?videoId=http://evil.test/widget/content/video/rss/video_184654.rss'
 
-      expect(corriereResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(corriereResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a feed file with a prefix before its name', () => {
       const value =
         'https://video.corriere.it/widget/players/player_tv_video_iFrame.shtml?videoId=http://static2.video.corriereobjects.it/widget/content/video/rss/old_video_184654.rss'
 
-      expect(corriereResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(corriereResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a feed file with a suffix after its extension', () => {
       const value =
         'https://video.corriere.it/widget/players/player_tv_video_iFrame.shtml?videoId=http://static2.video.corriereobjects.it/widget/content/video/rss/video_184654.rss.bak'
 
-      expect(corriereResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(corriereResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a widget player whose feed names no video', () => {
       const value =
         'https://video.corriere.it/widget/players/player_tv_video_iFrame.shtml?videoId=http://static2.video.corriereobjects.it/widget/content/conf/PolymediaCorriere_4.xml'
 
-      expect(corriereResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(corriereResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

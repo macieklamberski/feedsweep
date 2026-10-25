@@ -39,24 +39,24 @@ const readVideoId = (parsed: URL): string | undefined => {
   }
 }
 
-export const cloudflarestreamResolveEmbed: ResolveUrlEmbed = (url, _element, parsed) => {
-  const videoId = readVideoId(parsed)
+export const cloudflarestreamResolveEmbed: ResolveUrlEmbed = (url) => {
+  const videoId = readVideoId(url)
 
   if (!videoId) {
     return
   }
 
-  const isDelivery = parsed.hostname === deliveryPlayerHost
+  const isDelivery = url.hostname === deliveryPlayerHost
   const playerPath = isDelivery ? `/${videoId}` : `/${videoId}/iframe`
-  const thumbnailHost = isDelivery ? deliveryThumbnailHost : parsed.hostname
+  const thumbnailHost = isDelivery ? deliveryThumbnailHost : url.hostname
   // A relative `poster` would resolve against the feed, not the player, so it is not read.
-  const poster = keepIfMatches(getQueryParam(parsed.searchParams, 'poster'), absoluteUrlRegex)
+  const poster = keepIfMatches(getQueryParam(url.searchParams, 'poster'), absoluteUrlRegex)
 
   return {
     provider,
     // The bare `videodelivery.net` serves every account's video, so the id needs no account code.
     id: videoId,
-    src: `https://${parsed.hostname}${playerPath}${pickUrlParams(url, playbackParams)}`,
+    src: `https://${url.hostname}${playerPath}${pickUrlParams(url, playbackParams)}`,
     thumbnail: poster ?? composeThumbnail(videoId, thumbnailHost),
     ratio: playerRatio,
   }

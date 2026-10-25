@@ -13,14 +13,14 @@ describe('extractCaptivateEmbed', () => {
     const value = 'https://player.captivate.fm/episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6/'
     const expected = { kind: 'episode', id: 'db5bc483-785d-4c8c-9f7b-c0ff2fab72e6' }
 
-    expect(extractCaptivateEmbed(value)).toEqual(expected)
+    expect(extractCaptivateEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read a show player', () => {
     const value = 'https://player.captivate.fm/show/7fa2e8ef-c3e0-4d27-aad0-35dad879c65c'
     const expected = { kind: 'show', id: '7fa2e8ef-c3e0-4d27-aad0-35dad879c65c' }
 
-    expect(extractCaptivateEmbed(value)).toEqual(expected)
+    expect(extractCaptivateEmbed(new URL(value))).toEqual(expected)
   })
 
   // Nothing downstream reads which kind it is, so a kind Captivate adds later reaches the same
@@ -29,43 +29,37 @@ describe('extractCaptivateEmbed', () => {
     const value = 'https://player.captivate.fm/clip/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6'
     const expected = { kind: 'clip', id: 'db5bc483-785d-4c8c-9f7b-c0ff2fab72e6' }
 
-    expect(extractCaptivateEmbed(value)).toEqual(expected)
+    expect(extractCaptivateEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for an id that is not a uuid', () => {
     const value = 'https://player.captivate.fm/episode/12345'
 
-    expect(extractCaptivateEmbed(value)).toBeUndefined()
+    expect(extractCaptivateEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a captivate url that is not a player', () => {
     const value = 'https://captivate.fm/pricing'
 
-    expect(extractCaptivateEmbed(value)).toBeUndefined()
+    expect(extractCaptivateEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a kind with a digit after the word', () => {
     const value = 'https://player.captivate.fm/episode1/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6'
 
-    expect(extractCaptivateEmbed(value)).toBeUndefined()
+    expect(extractCaptivateEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a kind with a digit before the word', () => {
     const value = 'https://player.captivate.fm/1episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6'
 
-    expect(extractCaptivateEmbed(value)).toBeUndefined()
+    expect(extractCaptivateEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a first segment that is not a route word', () => {
     const value = 'https://player.captivate.fm/2024/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6'
 
-    expect(extractCaptivateEmbed(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a url that cannot be parsed', () => {
-    const value = 'https://['
-
-    expect(extractCaptivateEmbed(value)).toBeUndefined()
+    expect(extractCaptivateEmbed(new URL(value))).toBeUndefined()
   })
 })
 
@@ -79,13 +73,13 @@ describe('captivateResolveEmbed', () => {
       height: 200,
     }
 
-    expect(captivateResolveEmbed(value)).toEqual(expected)
+    expect(captivateResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a captivate url naming no episode', () => {
     const value = 'https://player.captivate.fm/about'
 
-    expect(captivateResolveEmbed(value)).toBeUndefined()
+    expect(captivateResolveEmbed(new URL(value))).toBeUndefined()
   })
 })
 

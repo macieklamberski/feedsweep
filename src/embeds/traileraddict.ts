@@ -27,9 +27,9 @@ const composeEmbed = (id: string): EmbedResolverResult => {
 // Trailer Addict's player, `/iframe.php?id={id}`, the `embedUrl` its watch pages name. The Flash
 // player, `/emd/{id}` or `/emb/{id}`, and the short `v.traileraddict.com/{id}` took the same id,
 // so both are rebuilt onto the current one.
-export const traileraddictResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  if (parsed.hostname === shortHost) {
-    const [id, ...rest] = getPathSegments(parsed)
+export const traileraddictResolveEmbed: ResolveUrlEmbed = (url) => {
+  if (url.hostname === shortHost) {
+    const [id, ...rest] = getPathSegments(url)
 
     if (!id || rest.length > 0) {
       return
@@ -38,8 +38,8 @@ export const traileraddictResolveEmbed: ResolveUrlEmbed = (_url, _element, parse
     return composeEmbed(id)
   }
 
-  if (isAnyOf(parsed.pathname, playerPath)) {
-    const id = getQueryParam(parsed.searchParams, 'id')
+  if (isAnyOf(url.pathname, playerPath)) {
+    const id = getQueryParam(url.searchParams, 'id')
 
     if (!id) {
       return
@@ -48,7 +48,7 @@ export const traileraddictResolveEmbed: ResolveUrlEmbed = (_url, _element, parse
     return composeEmbed(id)
   }
 
-  const [route, id, ...rest] = getPathSegments(parsed)
+  const [route, id, ...rest] = getPathSegments(url)
 
   if (!isAnyOf(route, flashRoutes) || !id || rest.length > 0) {
     return

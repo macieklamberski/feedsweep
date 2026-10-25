@@ -281,10 +281,9 @@ export const createUrlEmbedResolver = (
       // Only a resolver reads the glued-query and whitespace repairs. Every frame, claimed or not,
       // reads the ampersands readCarrierUrl folded. The repairs rewrite only after the host, so
       // the repaired url parses whenever the carrier did.
-      const url = repairCarrierUrl(src)
-      const parsed = parseUrl(url) ?? carrier
+      const url = parseUrl(repairCarrierUrl(src)) ?? carrier
 
-      return decideSize(element, extract(url, element, parsed), options.readCarrierSize)
+      return decideSize(element, extract(url, element), options.readCarrierSize)
     },
   }
 }

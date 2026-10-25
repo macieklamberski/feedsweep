@@ -59,8 +59,8 @@ const readFrameId = ([route, second, third]: Array<string>): string | undefined 
 // The Flash loader `prezi.com/bin/preziloader.swf`, which renders nothing, the frames
 // `prezi.com/embed/{id}/`, `prezi.com/p/{id}/embed`, `prezi.com/view/{id}/embed` and Prezi Video's
 // `prezi.com/v/embed/{id}/`, and `prezi.com/p/embed/{id}/`, which asks for a login.
-export const preziResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  if (loaderPathRegex.test(parsed.pathname)) {
+export const preziResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  if (loaderPathRegex.test(url.pathname)) {
     const flashId = flashVar(element, 'prezi_id')
     const declaredId = flashId ? flashId : attr(element, 'id')?.match(elementIdRegex)?.[1]
     // The flashvar and the element id come out decoded, and the id goes into a path.
@@ -73,7 +73,7 @@ export const preziResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
     return composeEmbed(id)
   }
 
-  const segments = getPathSegments(parsed)
+  const segments = getPathSegments(url)
   const [route, second, third] = segments
 
   if (isAnyOf(route, 'view') && isAnyOf(third, 'embed')) {

@@ -15,7 +15,7 @@ describe('extractTransistorEmbed', () => {
       id: 'c3be87f9',
     } as const
 
-    expect(extractTransistorEmbed(value)).toEqual(expected)
+    expect(extractTransistorEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read an episode embed carrying display options', () => {
@@ -25,7 +25,7 @@ describe('extractTransistorEmbed', () => {
       id: 'c3be87f9',
     } as const
 
-    expect(extractTransistorEmbed(value)).toEqual(expected)
+    expect(extractTransistorEmbed(new URL(value))).toEqual(expected)
   })
 
   // Transistor has minted eight-character episode ids so far, and the length selects nothing.
@@ -36,7 +36,7 @@ describe('extractTransistorEmbed', () => {
       id: 'a1b2c3d4e5f6g7h8',
     } as const
 
-    expect(extractTransistorEmbed(value)).toEqual(expected)
+    expect(extractTransistorEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read an episode id shorter than the ones minted so far', () => {
@@ -46,7 +46,7 @@ describe('extractTransistorEmbed', () => {
       id: 'a1b2c',
     } as const
 
-    expect(extractTransistorEmbed(value)).toEqual(expected)
+    expect(extractTransistorEmbed(new URL(value))).toEqual(expected)
   })
 
   // The share page and the player take the same id, so the share url reads as the episode.
@@ -57,7 +57,7 @@ describe('extractTransistorEmbed', () => {
       id: '668ca5be',
     } as const
 
-    expect(extractTransistorEmbed(value)).toEqual(expected)
+    expect(extractTransistorEmbed(new URL(value))).toEqual(expected)
   })
 
   // Transistor writes an episode's transcript beside it as `/s/{id}/{token}.{ext}`. The share
@@ -73,7 +73,7 @@ describe('extractTransistorEmbed', () => {
   it.each(transcriptSidecarUrls)(
     'should return undefined for the transcript sidecar %s',
     (value) => {
-      expect(extractTransistorEmbed(value)).toBeUndefined()
+      expect(extractTransistorEmbed(new URL(value))).toBeUndefined()
     },
   )
 
@@ -87,7 +87,7 @@ describe('extractTransistorEmbed', () => {
       mode: 'latest',
     } as const
 
-    expect(extractTransistorEmbed(value)).toEqual(expected)
+    expect(extractTransistorEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read a show playlist player as its own subject', () => {
@@ -98,7 +98,7 @@ describe('extractTransistorEmbed', () => {
       mode: 'playlist',
     } as const
 
-    expect(extractTransistorEmbed(value)).toEqual(expected)
+    expect(extractTransistorEmbed(new URL(value))).toEqual(expected)
   })
 
   // A show slug is the publisher's own words, so it hyphenates where an episode id never does.
@@ -110,7 +110,7 @@ describe('extractTransistorEmbed', () => {
       mode: 'latest',
     } as const
 
-    expect(extractTransistorEmbed(value)).toEqual(expected)
+    expect(extractTransistorEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read a show slug led by a digit', () => {
@@ -121,7 +121,7 @@ describe('extractTransistorEmbed', () => {
       mode: 'playlist',
     } as const
 
-    expect(extractTransistorEmbed(value)).toEqual(expected)
+    expect(extractTransistorEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read a show slug carrying a digit past its start', () => {
@@ -132,7 +132,7 @@ describe('extractTransistorEmbed', () => {
       mode: 'latest',
     } as const
 
-    expect(extractTransistorEmbed(value)).toEqual(expected)
+    expect(extractTransistorEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read a single-character show slug', () => {
@@ -143,7 +143,7 @@ describe('extractTransistorEmbed', () => {
       mode: 'playlist',
     } as const
 
-    expect(extractTransistorEmbed(value)).toEqual(expected)
+    expect(extractTransistorEmbed(new URL(value))).toEqual(expected)
   })
 
   // Transistor serves the episode audio on the player host, and the file-name check is what keeps
@@ -155,7 +155,7 @@ describe('extractTransistorEmbed', () => {
   ]
 
   it.each(fileUrls)('should return undefined for a file on the host at %s', (value) => {
-    expect(extractTransistorEmbed(value)).toBeUndefined()
+    expect(extractTransistorEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should use a malformed episode id as written, even if the player answers an error', () => {
@@ -165,7 +165,7 @@ describe('extractTransistorEmbed', () => {
       id: 'c3be87f9%2Fx',
     } as const
 
-    expect(extractTransistorEmbed(value)).toEqual(expected)
+    expect(extractTransistorEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read a show mode in any case and keep it as the feed wrote it', () => {
@@ -176,7 +176,7 @@ describe('extractTransistorEmbed', () => {
       mode: 'Latest',
     } as const
 
-    expect(extractTransistorEmbed(value)).toEqual(expected)
+    expect(extractTransistorEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should use a malformed show slug as written, even if the player answers an error', () => {
@@ -187,25 +187,19 @@ describe('extractTransistorEmbed', () => {
       mode: 'latest',
     } as const
 
-    expect(extractTransistorEmbed(value)).toEqual(expected)
+    expect(extractTransistorEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for the player route with no id behind it', () => {
     const value = 'https://share.transistor.fm/e'
 
-    expect(extractTransistorEmbed(value)).toBeUndefined()
+    expect(extractTransistorEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a transistor url naming nothing', () => {
     const value = 'https://share.transistor.fm/pricing'
 
-    expect(extractTransistorEmbed(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a url that cannot be parsed', () => {
-    const value = 'https://['
-
-    expect(extractTransistorEmbed(value)).toBeUndefined()
+    expect(extractTransistorEmbed(new URL(value))).toBeUndefined()
   })
 })
 
@@ -222,7 +216,7 @@ describe('transistorResolveEmbed', () => {
       height: 180,
     }
 
-    expect(transistorResolveEmbed(value)).toEqual(expected)
+    expect(transistorResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // 180 across 49 of 49 sampled corpus iframes, and their oEmbed agrees.
@@ -236,7 +230,7 @@ describe('transistorResolveEmbed', () => {
       height: 180,
     }
 
-    expect(transistorResolveEmbed(value)).toEqual(expected)
+    expect(transistorResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // The share page refuses framing, so the mint has to be the `/e/` player it fronts, which
@@ -251,7 +245,7 @@ describe('transistorResolveEmbed', () => {
       height: 180,
     }
 
-    expect(transistorResolveEmbed(value)).toEqual(expected)
+    expect(transistorResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // A show mode states no url, because the embed slug names no page on the platform.
@@ -264,7 +258,7 @@ describe('transistorResolveEmbed', () => {
       height: 180,
     }
 
-    expect(transistorResolveEmbed(value)).toEqual(expected)
+    expect(transistorResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // Transistor answers `/Latest` with 404, so the player shows broken as the feed wrote it.
@@ -277,7 +271,7 @@ describe('transistorResolveEmbed', () => {
       height: 180,
     }
 
-    expect(transistorResolveEmbed(value)).toEqual(expected)
+    expect(transistorResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // The whole show rather than one episode, so it takes the taller player.
@@ -290,13 +284,13 @@ describe('transistorResolveEmbed', () => {
       height: 390,
     }
 
-    expect(transistorResolveEmbed(value)).toEqual(expected)
+    expect(transistorResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a transistor url naming no episode', () => {
     const value = 'https://share.transistor.fm/about'
 
-    expect(transistorResolveEmbed(value)).toBeUndefined()
+    expect(transistorResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   // `injectEnclosures` offers every enclosure to every url resolver, so a transcript listed as
@@ -304,7 +298,7 @@ describe('transistorResolveEmbed', () => {
   it('should return undefined for a transcript listed as an enclosure', () => {
     const value = 'https://share.transistor.fm/s/668ca5be/8a7b6c5d.vtt'
 
-    expect(transistorResolveEmbed(value)).toBeUndefined()
+    expect(transistorResolveEmbed(new URL(value))).toBeUndefined()
   })
 })
 

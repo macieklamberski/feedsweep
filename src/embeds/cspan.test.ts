@@ -17,7 +17,7 @@ describe('cspanResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cspanResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(cspanResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the program player without the slug', () => {
@@ -30,7 +30,7 @@ describe('cspanResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cspanResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(cspanResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the start position', () => {
@@ -44,7 +44,7 @@ describe('cspanResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cspanResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(cspanResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a tracker beside the start position', () => {
@@ -57,7 +57,7 @@ describe('cspanResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cspanResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(cspanResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass the id through as written', () => {
@@ -70,7 +70,7 @@ describe('cspanResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cspanResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(cspanResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -78,37 +78,37 @@ describe('cspanResolveEmbed', () => {
     it('should ignore a path with a leading segment', () => {
       const value = 'https://www.c-span.org/x/video/standalone/?c4509010'
 
-      expect(cspanResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(cspanResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path with a trailing segment', () => {
       const value = 'https://www.c-span.org/video/standalone/extra/?c4509010'
 
-      expect(cspanResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(cspanResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the video page', () => {
       const value = 'https://www.c-span.org/video/?c4509010'
 
-      expect(cspanResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(cspanResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a standalone route under another section', () => {
       const value = 'https://www.c-span.org/x/standalone/?c4509010'
 
-      expect(cspanResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(cspanResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the player with no id', () => {
       const value = 'https://www.c-span.org/video/standalone/'
 
-      expect(cspanResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(cspanResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a named parameter in the lead position', () => {
       const value = 'https://www.c-span.org/video/standalone/?start=10'
 
-      expect(cspanResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(cspanResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

@@ -62,12 +62,12 @@ const composeEmbed = (
 // player reads every segment after `player` as an option. `guid:` and `playlist:` pick what
 // plays and are kept, and the rest, such as `fixed-size` or `list:opened`, are display options
 // and are dropped. The `title` its embed dialog writes is the show's or the episode's name.
-export const podcloudResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  if (parsed.hostname !== podcloudHost) {
+export const podcloudResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  if (url.hostname !== podcloudHost) {
     return
   }
 
-  const segments = getPathSegments(parsed)
+  const segments = getPathSegments(url)
   const [route, show, kind, episode, player] = segments
 
   if (!isAnyOf(route, 'podcast')) {

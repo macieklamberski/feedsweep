@@ -15,14 +15,14 @@ describe('extractBlubrryEmbed', () => {
     const value = 'https://player.blubrry.com/id/12345678/'
     const expected: BlubrryPlayer = { kind: 'episode', id: '12345678' }
 
-    expect(extractBlubrryEmbed(value)).toEqual(expected)
+    expect(extractBlubrryEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read a media url', () => {
     const value = 'https://player.blubrry.com/?media_url=https://media.blubrry.com/show/ep.mp3'
     const expected: BlubrryPlayer = { kind: 'media', id: 'https://media.blubrry.com/show/ep.mp3' }
 
-    expect(extractBlubrryEmbed(value)).toEqual(expected)
+    expect(extractBlubrryEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read the media url over the podcast id beside it', () => {
@@ -30,28 +30,28 @@ describe('extractBlubrryEmbed', () => {
       'https://player.blubrry.com/?podcast_id=154118283&media_url=https%3A%2F%2Fmedia.blubrry.com%2Fshow%2Fep.mp3&modern=1'
     const expected: BlubrryPlayer = { kind: 'media', id: 'https://media.blubrry.com/show/ep.mp3' }
 
-    expect(extractBlubrryEmbed(value)).toEqual(expected)
+    expect(extractBlubrryEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read the episode id of a player naming no media url', () => {
     const value = 'https://player.blubrry.com/?podcast_id=96123983&modern=1'
     const expected: BlubrryPlayer = { kind: 'episode', id: '96123983' }
 
-    expect(extractBlubrryEmbed(value)).toEqual(expected)
+    expect(extractBlubrryEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should keep an escaped slash in the podcast id inside one segment', () => {
     const value = 'https://player.blubrry.com/?podcast_id=..%2Fpricing&modern=1'
     const expected: BlubrryPlayer = { kind: 'episode', id: '..%2Fpricing' }
 
-    expect(extractBlubrryEmbed(value)).toEqual(expected)
+    expect(extractBlubrryEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read an episode id that is not digits by its route', () => {
     const value = 'https://player.blubrry.com/id/abc123x/'
     const expected: BlubrryPlayer = { kind: 'episode', id: 'abc123x' }
 
-    expect(extractBlubrryEmbed(value)).toEqual(expected)
+    expect(extractBlubrryEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read the show of a latest episode player', () => {
@@ -63,7 +63,7 @@ describe('extractBlubrryEmbed', () => {
       position: '',
     }
 
-    expect(extractBlubrryEmbed(value)).toEqual(expected)
+    expect(extractBlubrryEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read a show named by its program keyword', () => {
@@ -75,7 +75,7 @@ describe('extractBlubrryEmbed', () => {
       position: '',
     }
 
-    expect(extractBlubrryEmbed(value)).toEqual(expected)
+    expect(extractBlubrryEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read the show of a playlist with the episode it opens on', () => {
@@ -88,7 +88,7 @@ describe('extractBlubrryEmbed', () => {
       position: '?selectedId=132994802',
     }
 
-    expect(extractBlubrryEmbed(value)).toEqual(expected)
+    expect(extractBlubrryEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read a show route word in any case and keep it as written', () => {
@@ -100,37 +100,31 @@ describe('extractBlubrryEmbed', () => {
       position: '',
     }
 
-    expect(extractBlubrryEmbed(value)).toEqual(expected)
+    expect(extractBlubrryEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a show path with a word that names no player', () => {
     const value = 'https://player.blubrry.com/3954807/archive/'
 
-    expect(extractBlubrryEmbed(value)).toBeUndefined()
+    expect(extractBlubrryEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a show route below another segment', () => {
     const value = 'https://player.blubrry.com/embed/3954807/latest/'
 
-    expect(extractBlubrryEmbed(value)).toBeUndefined()
+    expect(extractBlubrryEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a show route followed by another segment', () => {
     const value = 'https://player.blubrry.com/3954807/latest/extra/'
 
-    expect(extractBlubrryEmbed(value)).toBeUndefined()
+    expect(extractBlubrryEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a blubrry url naming nothing', () => {
     const value = 'https://blubrry.com/pricing'
 
-    expect(extractBlubrryEmbed(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a url that cannot be parsed', () => {
-    const value = 'https://['
-
-    expect(extractBlubrryEmbed(value)).toBeUndefined()
+    expect(extractBlubrryEmbed(new URL(value))).toBeUndefined()
   })
 })
 
@@ -144,7 +138,7 @@ describe('blubrryResolveEmbed', () => {
       height: 164,
     }
 
-    expect(blubrryResolveEmbed(value)).toEqual(expected)
+    expect(blubrryResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // The raw file stays inside the player url: form fidelity keeps a provider's player an embed.
@@ -157,7 +151,7 @@ describe('blubrryResolveEmbed', () => {
       height: 164,
     }
 
-    expect(blubrryResolveEmbed(value)).toEqual(expected)
+    expect(blubrryResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should use an episode id that is not digits as written, even if the player answers an error', () => {
@@ -169,7 +163,7 @@ describe('blubrryResolveEmbed', () => {
       height: 164,
     }
 
-    expect(blubrryResolveEmbed(value)).toEqual(expected)
+    expect(blubrryResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should key a latest episode player by the show, not an episode', () => {
@@ -181,7 +175,7 @@ describe('blubrryResolveEmbed', () => {
       height: 164,
     }
 
-    expect(blubrryResolveEmbed(value)).toEqual(expected)
+    expect(blubrryResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should write a show route word as the feed wrote it', () => {
@@ -193,7 +187,7 @@ describe('blubrryResolveEmbed', () => {
       height: 164,
     }
 
-    expect(blubrryResolveEmbed(value)).toEqual(expected)
+    expect(blubrryResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should keep an escaped slash in the program keyword inside one segment', () => {
@@ -205,7 +199,7 @@ describe('blubrryResolveEmbed', () => {
       height: 164,
     }
 
-    expect(blubrryResolveEmbed(value)).toEqual(expected)
+    expect(blubrryResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should keep an escaped slash in the podcast id inside one segment', () => {
@@ -217,7 +211,7 @@ describe('blubrryResolveEmbed', () => {
       height: 164,
     }
 
-    expect(blubrryResolveEmbed(value)).toEqual(expected)
+    expect(blubrryResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should state the playlist height for a playlist', () => {
@@ -229,7 +223,7 @@ describe('blubrryResolveEmbed', () => {
       height: 568,
     }
 
-    expect(blubrryResolveEmbed(value)).toEqual(expected)
+    expect(blubrryResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should keep the episode a playlist opens on and drop a tracker', () => {
@@ -242,7 +236,7 @@ describe('blubrryResolveEmbed', () => {
       height: 568,
     }
 
-    expect(blubrryResolveEmbed(value)).toEqual(expected)
+    expect(blubrryResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should not carry a playlist position onto a latest episode player', () => {
@@ -254,13 +248,13 @@ describe('blubrryResolveEmbed', () => {
       height: 164,
     }
 
-    expect(blubrryResolveEmbed(value)).toEqual(expected)
+    expect(blubrryResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a blubrry url naming no episode', () => {
     const value = 'https://blubrry.com/about'
 
-    expect(blubrryResolveEmbed(value)).toBeUndefined()
+    expect(blubrryResolveEmbed(new URL(value))).toBeUndefined()
   })
 })
 

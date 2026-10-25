@@ -15,7 +15,7 @@ describe('rsscomResolveEmbed', () => {
         url: 'https://rss.com/podcasts/allouttabubblegum/2949933/',
       }
 
-      expect(rsscomResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rsscomResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should rebuild the older player onto the current one', () => {
@@ -27,7 +27,7 @@ describe('rsscomResolveEmbed', () => {
         url: 'https://rss.com/podcasts/annotations/1590822/',
       }
 
-      expect(rsscomResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rsscomResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the show player with its episode list', () => {
@@ -39,7 +39,7 @@ describe('rsscomResolveEmbed', () => {
         url: 'https://rss.com/podcasts/duckrabbits-talk-back/',
       }
 
-      expect(rsscomResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rsscomResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // The player plays the whole show for any word in place of the episode id.
@@ -52,7 +52,7 @@ describe('rsscomResolveEmbed', () => {
         url: 'https://rss.com/podcasts/allouttabubblegum/',
       }
 
-      expect(rsscomResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rsscomResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the show player for an episode id with a prefix', () => {
@@ -64,7 +64,7 @@ describe('rsscomResolveEmbed', () => {
         url: 'https://rss.com/podcasts/allouttabubblegum/',
       }
 
-      expect(rsscomResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rsscomResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the show player for an episode id with a suffix', () => {
@@ -76,7 +76,7 @@ describe('rsscomResolveEmbed', () => {
         url: 'https://rss.com/podcasts/allouttabubblegum/',
       }
 
-      expect(rsscomResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rsscomResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the show player for the newest-episode segment in capitals', () => {
@@ -88,7 +88,7 @@ describe('rsscomResolveEmbed', () => {
         url: 'https://rss.com/podcasts/allouttabubblegum/',
       }
 
-      expect(rsscomResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rsscomResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the start position', () => {
@@ -100,7 +100,7 @@ describe('rsscomResolveEmbed', () => {
         url: 'https://rss.com/podcasts/thecosafashow/2909608/',
       }
 
-      expect(rsscomResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rsscomResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a trailing slash', () => {
@@ -112,7 +112,7 @@ describe('rsscomResolveEmbed', () => {
         url: 'https://rss.com/podcasts/duckrabbits-talk-back/2882683/',
       }
 
-      expect(rsscomResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rsscomResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass the slug on as written', () => {
@@ -124,7 +124,7 @@ describe('rsscomResolveEmbed', () => {
         url: 'https://rss.com/podcasts/AllOuttaBubbleGum/2949933/',
       }
 
-      expect(rsscomResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rsscomResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -133,19 +133,19 @@ describe('rsscomResolveEmbed', () => {
     it('should ignore the newest-episode segment', () => {
       const value = 'https://player.rss.com/allouttabubblegum/latest?v=2'
 
-      expect(rsscomResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(rsscomResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an episode path with a trailing segment', () => {
       const value = 'https://player.rss.com/allouttabubblegum/2949933/extra?v=2'
 
-      expect(rsscomResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(rsscomResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the player root', () => {
       const value = 'https://player.rss.com/?v=2'
 
-      expect(rsscomResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(rsscomResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

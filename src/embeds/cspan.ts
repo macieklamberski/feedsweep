@@ -10,21 +10,21 @@ const idEndRegex = /[/&]/
 // C-SPAN's standalone player, `/video/standalone/?{id}/{slug}`, where the id is `c{n}` for a
 // clip or `{program}-{n}` for a program and leads the query with no name. The player plays the
 // id without its slug and reads `start` as the position.
-export const cspanResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const [video, standalone, ...rest] = getPathSegments(parsed)
+export const cspanResolveEmbed: ResolveUrlEmbed = (url) => {
+  const [video, standalone, ...rest] = getPathSegments(url)
 
   if (!isAnyOf(video, 'video') || !isAnyOf(standalone, 'standalone') || rest.length > 0) {
     return
   }
 
-  const [id] = parsed.search.slice(1).split(idEndRegex)
+  const [id] = url.search.slice(1).split(idEndRegex)
 
   // A named parameter in the lead position is no id: the player answers it with an empty page.
   if (!id || id.includes('=')) {
     return
   }
 
-  const params = new URLSearchParams(pickQueryParams(parsed.search, ['start']))
+  const params = new URLSearchParams(pickQueryParams(url.search, ['start']))
   const query = params.size ? `&${params}` : ''
 
   return {

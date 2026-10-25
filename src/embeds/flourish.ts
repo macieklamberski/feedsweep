@@ -1,5 +1,10 @@
 import { encodePathSegment, getPathSegments, isAnyOf, isHostOf, isPlainObject } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
+import type {
+  EmbedRenderHint,
+  EmbedResolverResult,
+  FieldCleaner,
+  ResolveUrlEmbed,
+} from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
@@ -61,7 +66,7 @@ export const flourishWidgetEmbedResolver = createMarkupEmbedResolver(
 // The pasted player iframe, the form that reaches a feed when the publisher skipped the script, or
 // the chart's share page, framed whole.
 // The WordPress oEmbed wrapper points at the same url with a `#?secret=` fragment appended.
-export const flourishResolveEmbed: ResolveEmbed = (url, element) => {
+export const flourishResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, flourishHosts, isHostOf)
 
   if (!parsed) {

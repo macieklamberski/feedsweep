@@ -17,7 +17,7 @@ describe('rtveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(rtveResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rtveResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should build the placeholder from an audio player url with its poster', () => {
@@ -31,7 +31,7 @@ describe('rtveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(rtveResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rtveResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // RTVE's asset ids have been growing since 2008, and the length is not what names one.
@@ -46,7 +46,7 @@ describe('rtveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(rtveResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rtveResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -54,7 +54,7 @@ describe('rtveResolveEmbed', () => {
     it('should return undefined for a kind the player does not serve', () => {
       const value = 'https://www.rtve.es/drmn/embed/photo/2474214'
 
-      expect(rtveResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(rtveResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed asset id as written, even if the player answers an error', () => {
@@ -68,31 +68,31 @@ describe('rtveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(rtveResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rtveResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should return undefined for a player url naming no asset', () => {
       const value = 'https://www.rtve.es/drmn/embed/video/'
 
-      expect(rtveResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(rtveResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the embed path outside the drmn directory', () => {
       const value = 'https://www.rtve.es/player/embed/video/2474214'
 
-      expect(rtveResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(rtveResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a drmn path that is not the embed', () => {
       const value = 'https://www.rtve.es/drmn/share/video/2474214'
 
-      expect(rtveResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(rtveResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for an rtve url that is not the player', () => {
       const value = 'https://www.rtve.es/play/videos/la-aventura-del-saber/copyleft/2474214/'
 
-      expect(rtveResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(rtveResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

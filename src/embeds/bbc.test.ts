@@ -15,7 +15,7 @@ describe('bbcResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(bbcResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(bbcResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should take the news player on the uk host', () => {
@@ -27,7 +27,7 @@ describe('bbcResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(bbcResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(bbcResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass the World Service player through', () => {
@@ -39,7 +39,7 @@ describe('bbcResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(bbcResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(bbcResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should take the programmes player with no size', () => {
@@ -51,7 +51,7 @@ describe('bbcResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(bbcResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(bbcResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // The article numbers in the corpus are eight digits and BBC keeps adding them.
@@ -64,7 +64,7 @@ describe('bbcResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(bbcResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(bbcResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass a word in the pid slot of the news player as written', () => {
@@ -76,7 +76,7 @@ describe('bbcResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(bbcResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(bbcResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass a nine-character pid on the pasted news player as written', () => {
@@ -88,7 +88,7 @@ describe('bbcResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(bbcResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(bbcResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass a nine-character pid on the programmes player as written', () => {
@@ -100,7 +100,7 @@ describe('bbcResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(bbcResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(bbcResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -109,49 +109,49 @@ describe('bbcResolveEmbed', () => {
     it('should return undefined for a lettered article id on the news player', () => {
       const value = 'https://www.bbc.com/news/av-embeds/cx2g0z9q7lno/vpid/p06sf6tr'
 
-      expect(bbcResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(bbcResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a route word standing where the article number goes', () => {
       const value = 'https://www.bbc.com/news/av/embed/p06sf6tr/av-embeds'
 
-      expect(bbcResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(bbcResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the news page itself', () => {
       const value = 'https://www.bbc.com/news/av/science-environment-47799042'
 
-      expect(bbcResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(bbcResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a news player naming no article', () => {
       const value = 'https://www.bbc.com/news/av/embed/p06sf6tr'
 
-      expect(bbcResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(bbcResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a pid opening on a percent sign', () => {
       const value = 'https://www.bbc.com/news/av/embed/%06sf6tr/46292361'
 
-      expect(bbcResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(bbcResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a pid carrying an encoded slash', () => {
       const value = 'https://www.bbc.com/news/av/embed/p06s%2fr/46292361'
 
-      expect(bbcResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(bbcResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a World Service player naming no pid', () => {
       const value = 'https://www.bbc.com/ws/av-embeds/articles/cy8k2nd7e9no/en-GB/'
 
-      expect(bbcResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(bbcResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the programme page itself', () => {
       const value = 'https://www.bbc.co.uk/programmes/p01tclqw'
 
-      expect(bbcResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(bbcResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

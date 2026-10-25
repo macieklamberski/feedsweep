@@ -55,8 +55,8 @@ const readPlayer = (url: URL): Player | undefined => {
   }
 }
 
-export const podomaticResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const player = readPlayer(parsed)
+export const podomaticResolveEmbed: ResolveUrlEmbed = (url) => {
+  const player = readPlayer(url)
 
   if (!player?.id) {
     return

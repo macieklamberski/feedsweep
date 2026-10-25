@@ -278,7 +278,7 @@ describe('speakerdeckResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(speakerdeckResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(speakerdeckResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // Speaker Deck has minted 24 and 32 character ids, and the length is not what names a deck.
@@ -291,7 +291,7 @@ describe('speakerdeckResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(speakerdeckResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(speakerdeckResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // The script form has always kept the slide, so the same deck at two slides collapsed into
@@ -305,7 +305,7 @@ describe('speakerdeckResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(speakerdeckResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(speakerdeckResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should use a malformed slide as written, even if the player answers an error', () => {
@@ -317,19 +317,19 @@ describe('speakerdeckResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(speakerdeckResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(speakerdeckResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should ignore a deck page rather than a player', () => {
     const value = 'https://speakerdeck.com/user/some-deck'
 
-    expect(speakerdeckResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+    expect(speakerdeckResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should ignore an embed route with no deck id', () => {
     const value = 'https://speakerdeck.com/embed/'
 
-    expect(speakerdeckResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+    expect(speakerdeckResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should use a malformed deck id as written, even if the player answers an error', () => {
@@ -341,7 +341,7 @@ describe('speakerdeckResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(speakerdeckResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(speakerdeckResolveEmbed(new URL(value))).toEqual(expected)
   })
 })
 

@@ -162,8 +162,8 @@ const federatedPathRegex = /\/services\/viewer\/federated_/i
 
 // The account sits in the url as `publisherID` and the video id in `flashVars`. The federated
 // player id in the path is not a modern player id.
-const brightcoveFlashResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  if (!federatedPathRegex.test(parsed.pathname)) {
+const brightcoveFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  if (!federatedPathRegex.test(url.pathname)) {
     return
   }
 
@@ -172,11 +172,11 @@ const brightcoveFlashResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => 
   // the url query.
   const videoId =
     getQueryParam(params, '@videoPlayer') ??
-    getQueryParam(parsed.searchParams, '@videoPlayer') ??
+    getQueryParam(url.searchParams, '@videoPlayer') ??
     getQueryParam(params, 'videoId') ??
-    getQueryParam(parsed.searchParams, 'videoId')
+    getQueryParam(url.searchParams, 'videoId')
   const account =
-    getQueryParam(parsed.searchParams, 'publisherID') ??
+    getQueryParam(url.searchParams, 'publisherID') ??
     getQueryParam(params, 'publisherID') ??
     readPlayerKeyAccount(getQueryParam(params, 'playerKey'))
 
@@ -224,13 +224,13 @@ export const brightcoveExperienceEmbedResolver = createMarkupEmbedResolver(
 const playerPathRegex = /^([^_]+)_(.+)$/
 
 // The players.brightcove.net player page as an ordinary iframe.
-export const brightcoveResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  if (!parsed.hostname.startsWith('players.')) {
+export const brightcoveResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  if (!url.hostname.startsWith('players.')) {
     return
   }
 
-  const [account, player] = getPathSegments(parsed)
-  const videoId = getQueryParam(parsed.searchParams, 'videoId')
+  const [account, player] = getPathSegments(url)
+  const videoId = getQueryParam(url.searchParams, 'videoId')
 
   if (!account || !player || !videoId) {
     return

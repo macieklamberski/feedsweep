@@ -4,7 +4,6 @@ import {
   getPathSegments,
   getQueryParam,
   isAnyOf,
-  parseUrl,
   trimObject,
 } from 'trousse'
 import type {
@@ -20,7 +19,6 @@ import {
   hexRegex,
   parseUrlOnHosts,
   pickQueryParams,
-  placeholderBaseUrl,
 } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -103,9 +101,8 @@ const composeShowcaseEmbed = (showcaseId: string): EmbedResolverResult => {
   }
 }
 
-const resolveShowcaseEmbed = (link: string): EmbedResolverResult | undefined => {
-  const url = parseUrl(link, placeholderBaseUrl)
-  const segments = url ? getPathSegments(url) : []
+const resolveShowcaseEmbed = (url: URL): EmbedResolverResult | undefined => {
+  const segments = getPathSegments(url)
 
   if (!isAnyOf(segments[0], showcasePaths)) {
     return
@@ -122,11 +119,10 @@ const eventLayoutSegments = ['interaction']
 // A livestream event, `vimeo.com/event/{id}`, played by `vimeo.com/event/{id}/embed`. The page
 // refuses framing, and an unlisted event's player and oEmbed both need its hash.
 const resolveEventEmbed = (
-  link: string,
+  url: URL,
   element: Element | undefined,
 ): EmbedResolverResult | undefined => {
-  const url = parseUrl(link, placeholderBaseUrl)
-  const segments = url ? getPathSegments(url) : []
+  const segments = getPathSegments(url)
 
   if (!isAnyOf(segments[0], 'event')) {
     return
@@ -164,10 +160,8 @@ type VimeoReference = {
   hash?: string
 }
 
-const readReference = (link: string): VimeoReference | undefined => {
-  const url = parseUrl(link, placeholderBaseUrl)
-
-  if (!url || !vimeoPageHosts.includes(url.hostname)) {
+const readReference = (url: URL): VimeoReference | undefined => {
+  if (!vimeoPageHosts.includes(url.hostname)) {
     return
   }
 
@@ -230,11 +224,8 @@ const readReference = (link: string): VimeoReference | undefined => {
 
 // The Flash player could also take the clip from its flashvars, and `moogaloop_local.swf` names
 // it nowhere in its src.
-const readFlashReference = (
-  link: string,
-  element: Element | undefined,
-): VimeoReference | undefined => {
-  if (!flashFileRegex.test(link)) {
+const readFlashReference = (url: URL, element: Element | undefined): VimeoReference | undefined => {
+  if (!flashFileRegex.test(url.href)) {
     return
   }
 
@@ -247,8 +238,8 @@ const readFlashReference = (
   return { id: clipId }
 }
 
-export const extractVimeoId = (link: string): string | undefined => {
-  return readReference(link)?.id
+export const extractVimeoId = (url: URL): string | undefined => {
+  return readReference(url)?.id
 }
 
 // The player url every caller that recovers an id has to build. Params are given as values, not
@@ -277,7 +268,7 @@ const readStart = (url: URL): string | undefined => {
 // The `title` a share snippet writes is usually the video's own title, but sometimes a player
 // label. The labels are not filtered. They are localised into at least five languages and some
 // name a plugin, not the platform, so any list of them goes stale.
-export const vimeoResolveEmbed: ResolveUrlEmbed = (url, element, parsed) => {
+export const vimeoResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const reference = readReference(url) ?? readFlashReference(url, element)
 
   if (!reference) {
@@ -291,14 +282,14 @@ export const vimeoResolveEmbed: ResolveUrlEmbed = (url, element, parsed) => {
   const params = {
     // The player takes the hash only as h=: the /video/{id}/{hash} path spelling is a 404.
     ...trimObject({ h: hash }, Boolean),
-    ...pickQueryParams(parsed.search, vimeoEmbedParams),
+    ...pickQueryParams(url.search, vimeoEmbedParams),
   }
 
   return {
     provider,
     // The hash travels in the id: an oEmbed lookup for the bare id answers 404.
     id: hash ? `${videoId}:${hash}` : videoId,
-    src: composeEmbedUrl(segment, params, readStart(parsed)),
+    src: composeEmbedUrl(segment, params, readStart(url)),
     // Without the hash the page loses its title and its video, so it stays on the url too.
     url: `https://vimeo.com/${segment}${hash ? `/${encodePathSegment(hash)}` : ''}`,
     ratio: playerRatio,
@@ -316,7 +307,7 @@ export const readVimeoEmbedSrc = (link: string): string | undefined => {
     return
   }
 
-  return vimeoResolveEmbed(url.href, undefined, url)?.src
+  return vimeoResolveEmbed(url)?.src
 }
 
 // A Vimeo player iframe, a frame of a video, showcase or event page, or the Flash moogaloop player.
@@ -332,9 +323,7 @@ export const vimeoMetasliderEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const url = `https://vimeo.com/${encodePathSegment(videoId)}`
-
-    return vimeoResolveEmbed(url, undefined, new URL(url))
+    return vimeoResolveEmbed(new URL(`https://vimeo.com/${encodePathSegment(videoId)}`))
   },
 )
 

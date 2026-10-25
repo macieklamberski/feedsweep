@@ -16,7 +16,7 @@ describe('calameoResolveEmbed', () => {
         ratio: '300/194',
       }
 
-      expect(calameoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(calameoResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should lift the code off the retired Flash viewer', () => {
@@ -29,7 +29,7 @@ describe('calameoResolveEmbed', () => {
         ratio: '300/194',
       }
 
-      expect(calameoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(calameoResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the access token of a private publication in the viewer url only', () => {
@@ -41,7 +41,7 @@ describe('calameoResolveEmbed', () => {
         ratio: '300/194',
       }
 
-      expect(calameoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(calameoResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the access token in any case', () => {
@@ -53,7 +53,7 @@ describe('calameoResolveEmbed', () => {
         ratio: '300/194',
       }
 
-      expect(calameoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(calameoResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the language of a private publication', () => {
@@ -66,7 +66,7 @@ describe('calameoResolveEmbed', () => {
         ratio: '300/194',
       }
 
-      expect(calameoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(calameoResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the viewer options the publisher chose', () => {
@@ -80,7 +80,7 @@ describe('calameoResolveEmbed', () => {
         ratio: '300/194',
       }
 
-      expect(calameoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(calameoResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the row count of an account library and state its height', () => {
@@ -94,7 +94,7 @@ describe('calameoResolveEmbed', () => {
         height: 925,
       }
 
-      expect(calameoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(calameoResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should state one row for an account library naming no row count', () => {
@@ -107,7 +107,7 @@ describe('calameoResolveEmbed', () => {
         height: 185,
       }
 
-      expect(calameoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(calameoResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -115,7 +115,7 @@ describe('calameoResolveEmbed', () => {
     it('should ignore a library shelf naming no publication', () => {
       const value = 'https://v.calameo.com/library?subscriptionid=123'
 
-      expect(calameoResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(calameoResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed code as written, even if the player answers an error', () => {
@@ -128,7 +128,7 @@ describe('calameoResolveEmbed', () => {
         ratio: '300/194',
       }
 
-      expect(calameoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(calameoResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a tracker beside the viewer options', () => {
@@ -142,31 +142,31 @@ describe('calameoResolveEmbed', () => {
         ratio: '300/194',
       }
 
-      expect(calameoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(calameoResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should ignore a library of a type other than an account', () => {
       const value = 'https://v.calameo.com/library/?type=zzfabricated&id=5807295&rows=1'
 
-      expect(calameoResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(calameoResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an account library naming no account', () => {
       const value = 'https://v.calameo.com/library/?type=account&rows=1'
 
-      expect(calameoResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(calameoResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the library route under another path', () => {
       const value = 'https://v.calameo.com/x/library/?type=account&id=5807295&rows=1'
 
-      expect(calameoResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(calameoResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path below the library route', () => {
       const value = 'https://v.calameo.com/library/extra?type=account&id=5807295&rows=1'
 
-      expect(calameoResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(calameoResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -181,7 +181,7 @@ describe('calameoResolveEmbed', () => {
         height: 185,
       }
 
-      expect(calameoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(calameoResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should state one row for a row count below one', () => {
@@ -194,7 +194,7 @@ describe('calameoResolveEmbed', () => {
         height: 185,
       }
 
-      expect(calameoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(calameoResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the library query names in any case', () => {
@@ -207,7 +207,7 @@ describe('calameoResolveEmbed', () => {
         height: 370,
       }
 
-      expect(calameoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(calameoResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the library type in any case and write it as the widget takes it', () => {
@@ -220,7 +220,7 @@ describe('calameoResolveEmbed', () => {
         height: 185,
       }
 
-      expect(calameoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(calameoResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // Constructed: every lab account id is digits.
@@ -234,7 +234,7 @@ describe('calameoResolveEmbed', () => {
         height: 185,
       }
 
-      expect(calameoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(calameoResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

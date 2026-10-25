@@ -36,8 +36,8 @@ const composeEmbed = (id: string, playerId: string, key: string): EmbedResolverR
 }
 
 // INA's player urls, whose iframe routes redirect into autoplay and whose Flash route is dead.
-export const inaResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const segments = getPathSegments(parsed)
+export const inaResolveEmbed: ResolveUrlEmbed = (url) => {
+  const segments = getPathSegments(url)
   const [route, kind, id, playerId, key] = segments
 
   if (!isAnyOf(`${route}/${kind}`, playerPaths) || !id || !playerId || !key) {

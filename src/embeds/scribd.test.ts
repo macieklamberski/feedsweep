@@ -351,7 +351,7 @@ describe('scribdFlashResolveEmbed', () => {
   it('should ignore a scribd url that is not the flash player', () => {
     const value = 'https://www.scribd.com/embeds/526446879/content?document_id=526446879'
 
-    expect(scribdFlashResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+    expect(scribdFlashResolveEmbed(new URL(value))).toBeUndefined()
   })
 })
 

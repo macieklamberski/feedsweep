@@ -1,6 +1,6 @@
-import { encodePathSegment, getQueryParam, parseUrl } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { isFileName, placeholderBaseUrl } from '../utils/urls.js'
+import { encodePathSegment, getQueryParam } from 'trousse'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
+import { isFileName } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'youku'
@@ -18,20 +18,17 @@ const staticFlashPathRegex = /^\/v[\d.]+\/v\/swf\/\w*player\.swf$/i
 // The modern player is chromeless and fills its box, and Youku's own watch page sizes it 16:9.
 const playerRatio = '16/9'
 
-const readVideoId = (url: string): string | undefined => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (parsed?.hostname === 'static.youku.com') {
-    const videoIds = getQueryParam(parsed.searchParams, 'VideoIDS')
+const readVideoId = (url: URL): string | undefined => {
+  if (url.hostname === 'static.youku.com') {
+    const videoIds = getQueryParam(url.searchParams, 'VideoIDS')
 
     // The query value comes out decoded, and it goes into the player path.
-    return staticFlashPathRegex.test(parsed.pathname) && videoIds
+    return staticFlashPathRegex.test(url.pathname) && videoIds
       ? encodePathSegment(videoIds)
       : undefined
   }
 
-  const videoId =
-    parsed?.pathname.match(embedPathRegex)?.[1] ?? parsed?.pathname.match(flashPathRegex)?.[1]
+  const videoId = url.pathname.match(embedPathRegex)?.[1] ?? url.pathname.match(flashPathRegex)?.[1]
 
   // The enclosure probe offers a file on the player host, such as `/embed/{id}.mp4`, to this
   // resolver, and the file has to stay playable.
@@ -42,7 +39,7 @@ const readVideoId = (url: string): string | undefined => {
   return videoId
 }
 
-const youkuResolveEmbed: ResolveEmbed = (url) => {
+const youkuResolveEmbed: ResolveUrlEmbed = (url) => {
   const videoId = readVideoId(url)
 
   if (!videoId) {

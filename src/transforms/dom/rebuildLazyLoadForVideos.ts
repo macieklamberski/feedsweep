@@ -33,7 +33,7 @@ export const rebuildLazyLoadForVideos: DomTransform = () => (document) => {
       }
 
       for (const resolveEmbed of resolveEmbedSource) {
-        source = resolveEmbed(url, undefined, parsed)?.src
+        source = resolveEmbed(parsed)?.src
 
         if (source) {
           break

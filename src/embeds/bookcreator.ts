@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { filterUrlQuery } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -19,7 +19,7 @@ const readerRatio = '900/675'
 
 // Book Creator's reader frame, read.bookcreator.com/{userId}/{bookId}, as its oEmbed writes it.
 // The ids are case-sensitive, and a book id under another user answers 404.
-const bookcreatorResolveEmbed: ResolveEmbed = (url, element) => {
+const bookcreatorResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const [userId, bookId, ...rest] = getPathSegments(url)
 
   if (!bookId || rest.length > 0 || isAnyOf(userId, readerRoutes)) {

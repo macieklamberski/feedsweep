@@ -34,18 +34,18 @@ const composeEmbed = (videoId: string, parsed: URL): EmbedResolverResult => {
   }
 }
 
-export const rutubeResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
+export const rutubeResolveEmbed: ResolveUrlEmbed = (url, element) => {
   // An id is a uuid with the dashes stripped, and the player still plays the all-digit ids the same
   // routes carried before.
-  const videoId = playlistPathRegex.test(parsed.pathname)
-    ? getQueryParam(parsed.searchParams, 'pl_video')
-    : keepIfMatches(parsed.pathname.match(embedPathRegex)?.[1], hexRegex)
+  const videoId = playlistPathRegex.test(url.pathname)
+    ? getQueryParam(url.searchParams, 'pl_video')
+    : keepIfMatches(url.pathname.match(embedPathRegex)?.[1], hexRegex)
 
   if (!videoId) {
     return
   }
 
-  const result = composeEmbed(videoId, parsed)
+  const result = composeEmbed(videoId, url)
   const title = attr(element, 'title')
 
   return title ? { ...result, title } : result

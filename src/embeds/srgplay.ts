@@ -64,25 +64,25 @@ const composeEmbed = (urn: string | undefined, search: string): EmbedResolverRes
   }
 }
 
-const srgplayResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  if (urnPlayerPathRegex.test(parsed.pathname)) {
-    return composeEmbed(getQueryParam(parsed.searchParams, 'urn'), parsed.search)
+const srgplayResolveEmbed: ResolveUrlEmbed = (url) => {
+  if (urnPlayerPathRegex.test(url.pathname)) {
+    return composeEmbed(getQueryParam(url.searchParams, 'urn'), url.search)
   }
 
-  const isRetired = retiredPlayerPathRegex.test(parsed.pathname)
+  const isRetired = retiredPlayerPathRegex.test(url.pathname)
 
-  if (!isRetired && !popupPlayerPathRegex.test(parsed.pathname)) {
+  if (!isRetired && !popupPlayerPathRegex.test(url.pathname)) {
     return
   }
 
-  const mediaId = getQueryParam(parsed.searchParams, 'id')
+  const mediaId = getQueryParam(url.searchParams, 'id')
 
   if (!mediaId) {
     return
   }
 
   // The shared host names no business unit, so its urn names none either and has no host.
-  return composeEmbed(`urn:${readBusinessUnit(parsed)}:video:${mediaId}`, parsed.search)
+  return composeEmbed(`urn:${readBusinessUnit(url)}:video:${mediaId}`, url.search)
 }
 
 // SRG SSR's shared player, serving SRF, RTS, RSI and RTR. The retired per-show player is

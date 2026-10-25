@@ -1,5 +1,5 @@
 import { encodePathSegment, getPathSegments, isAnyOf, isPlainObject } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { filterUrlQuery, parseUrlOnHosts } from '../utils/urls.js'
@@ -25,7 +25,7 @@ const composeEmbed = (form: URL, hash: string): EmbedResolverResult => {
 }
 
 // The form page, `{ssl|pro}.form-mailer.jp/fms/{hash}`.
-export const formmailerResolveEmbed: ResolveEmbed = (url) => {
+export const formmailerResolveEmbed: ResolveUrlEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, formmailerHosts)
 
   if (!parsed) {
@@ -55,7 +55,16 @@ export const formmailerWidgetEmbedResolver = createMarkupEmbedResolver(
 
     const query = prefill.length ? `?${prefill.join('?')}` : ''
 
-    return formmailerResolveEmbed(`https://${host}/fms/${encodePathSegment(hash)}${query}`)
+    const url = parseUrlOnHosts(
+      `https://${host}/fms/${encodePathSegment(hash)}${query}`,
+      formmailerHosts,
+    )
+
+    if (!url) {
+      return
+    }
+
+    return formmailerResolveEmbed(url)
   },
 )
 

@@ -17,7 +17,7 @@ describe('bunnystreamResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(bunnystreamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(bunnystreamResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the muting from the current player', () => {
@@ -31,7 +31,7 @@ describe('bunnystreamResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(bunnystreamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(bunnystreamResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should turn the publisher autoplay off on the direct play page', () => {
@@ -45,7 +45,7 @@ describe('bunnystreamResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(bunnystreamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(bunnystreamResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the direct play page on the current host', () => {
@@ -59,7 +59,7 @@ describe('bunnystreamResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(bunnystreamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(bunnystreamResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the start position as written', () => {
@@ -73,7 +73,7 @@ describe('bunnystreamResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(bunnystreamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(bunnystreamResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -82,27 +82,27 @@ describe('bunnystreamResolveEmbed', () => {
       const value =
         'https://iframe.mediadelivery.net/watch/490164/808903b8-30ff-49df-b389-1f2baeef0ea7'
 
-      expect(bunnystreamResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(bunnystreamResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the player route under a prefix', () => {
       const value =
         'https://iframe.mediadelivery.net/x/embed/490164/808903b8-30ff-49df-b389-1f2baeef0ea7'
 
-      expect(bunnystreamResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(bunnystreamResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the player route followed by another segment', () => {
       const value =
         'https://player.mediadelivery.net/embed/490164/808903b8-30ff-49df-b389-1f2baeef0ea7/extra'
 
-      expect(bunnystreamResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(bunnystreamResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a player url naming no video', () => {
       const value = 'https://player.mediadelivery.net/embed/490164'
 
-      expect(bunnystreamResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(bunnystreamResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -118,7 +118,7 @@ describe('bunnystreamResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(bunnystreamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(bunnystreamResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a tracking parameter', () => {
@@ -132,7 +132,7 @@ describe('bunnystreamResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(bunnystreamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(bunnystreamResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the token pair in the src and leave the page url unset', () => {
@@ -145,7 +145,7 @@ describe('bunnystreamResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(bunnystreamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(bunnystreamResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

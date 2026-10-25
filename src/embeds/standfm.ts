@@ -10,8 +10,8 @@ const standfmHosts = ['stand.fm']
 const playerHeights = toMap({ episodes: 190, channels: 390 })
 
 // stand.fm's player iframe, or a framed page url, which answers SAMEORIGIN and shows nothing.
-export const standfmResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const segments = getPathSegments(parsed)
+export const standfmResolveEmbed: ResolveUrlEmbed = (url) => {
+  const segments = getPathSegments(url)
   const [kind, id] = isAnyOf(segments[0], 'embed') ? segments.slice(1) : segments
 
   // The hex alphabet keeps a route word such as `/episodes/new`, a live page, out of the id slot.

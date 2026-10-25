@@ -21,7 +21,7 @@ describe('democracynowResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(democracynowResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(democracynowResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint a show player and its page', () => {
@@ -34,7 +34,7 @@ describe('democracynowResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(democracynowResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(democracynowResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint a headlines player and its page', () => {
@@ -47,7 +47,7 @@ describe('democracynowResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(democracynowResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(democracynowResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a query the player does not read', () => {
@@ -60,7 +60,7 @@ describe('democracynowResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(democracynowResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(democracynowResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the route word in capitals and mint it in lowercase', () => {
@@ -73,7 +73,7 @@ describe('democracynowResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(democracynowResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(democracynowResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the kind in capitals and mint it in lowercase', () => {
@@ -86,7 +86,7 @@ describe('democracynowResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(democracynowResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(democracynowResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -94,45 +94,45 @@ describe('democracynowResolveEmbed', () => {
     it('should return undefined for the route below another segment', () => {
       const value = 'https://www.democracynow.org/es/embed/show/2023/6/27'
 
-      expect(democracynowResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(democracynowResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a kind the player does not serve', () => {
       const value =
         'https://www.democracynow.org/embed/clip/2014/10/22/in_un_speech_noam_chomsky_blasts'
 
-      expect(democracynowResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(democracynowResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a date with no day', () => {
       const value = 'https://www.democracynow.org/embed/show/2023/6'
 
-      expect(democracynowResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(democracynowResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a story with no slug', () => {
       const value = 'https://www.democracynow.org/embed/story/2014/10/22'
 
-      expect(democracynowResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(democracynowResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a show with a slug', () => {
       const value = 'https://www.democracynow.org/embed/show/2023/6/27/extra'
 
-      expect(democracynowResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(democracynowResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for headlines with a slug', () => {
       const value = 'https://www.democracynow.org/embed/headlines/2014/2/19/extra'
 
-      expect(democracynowResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(democracynowResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a segment after the story slug', () => {
       const value =
         'https://www.democracynow.org/embed/story/2014/10/22/in_un_speech_noam_chomsky_blasts/extra'
 
-      expect(democracynowResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(democracynowResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -148,7 +148,7 @@ describe('democracynowResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(democracynowResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(democracynowResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass the date as written', () => {
@@ -161,7 +161,7 @@ describe('democracynowResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(democracynowResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(democracynowResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

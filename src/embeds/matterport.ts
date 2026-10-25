@@ -14,18 +14,18 @@ const showPathRegex = /^\/show\/?$/i
 const navigationParams = ['start', 'sm', 'sp', 'sq', 'sr', 'ss', 'sf', 'sz']
 
 // A Matterport 3D Showcase, `my.matterport.com/show/?m={id}`, a walk-through of a scanned space.
-const matterportResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  if (!showPathRegex.test(parsed.pathname)) {
+const matterportResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  if (!showPathRegex.test(url.pathname)) {
     return
   }
 
-  const id = getQueryParam(parsed.searchParams, 'm')
+  const id = getQueryParam(url.searchParams, 'm')
 
   if (!id) {
     return
   }
 
-  const query = composeQuery({ m: id, ...pickQueryParams(parsed.search, navigationParams) })
+  const query = composeQuery({ m: id, ...pickQueryParams(url.search, navigationParams) })
 
   return {
     provider,

@@ -20,7 +20,7 @@ describe('lglformsResolveEmbed', () => {
         height: 600,
       }
 
-      expect(lglformsResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(lglformsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the host page address the loader passes in the query', () => {
@@ -34,7 +34,7 @@ describe('lglformsResolveEmbed', () => {
         height: 600,
       }
 
-      expect(lglformsResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(lglformsResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -42,13 +42,13 @@ describe('lglformsResolveEmbed', () => {
     it('should ignore a form path below another segment', () => {
       const value = 'https://secure.lglforms.com/x/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A'
 
-      expect(lglformsResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(lglformsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a route below the form', () => {
       const value = 'https://secure.lglforms.com/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A/extra'
 
-      expect(lglformsResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(lglformsResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

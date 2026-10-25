@@ -18,14 +18,14 @@ const playerParams = { v: '2' }
 
 // An RSS.com podcast player, framed as `/{slug}/{episodeId}` for an episode and `/{slug}` for the
 // show with its episode list, which `/{slug}/{word}` plays too.
-export const rsscomResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const [slug, episodeId, ...rest] = getPathSegments(parsed)
+export const rsscomResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const [slug, episodeId, ...rest] = getPathSegments(url)
 
   if (!slug || rest.length > 0) {
     return
   }
 
-  const query = composeQuery({ ...playerParams, ...pickQueryParams(parsed.search, ['time']) })
+  const query = composeQuery({ ...playerParams, ...pickQueryParams(url.search, ['time']) })
   const title = attr(element, 'title')
 
   if (episodeId === latestSegment) {

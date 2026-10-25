@@ -14,7 +14,7 @@ describe('donorboxResolveEmbed', () => {
         url: 'https://donorbox.org/donation-form-248',
       }
 
-      expect(donorboxResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(donorboxResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the amount the publisher prefilled', () => {
@@ -26,7 +26,7 @@ describe('donorboxResolveEmbed', () => {
         url: 'https://donorbox.org/donation-form-248',
       }
 
-      expect(donorboxResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(donorboxResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read a slug longer than the campaign names in circulation', () => {
@@ -39,7 +39,7 @@ describe('donorboxResolveEmbed', () => {
         url: 'https://donorbox.org/help-us-rebuild-the-old-town-library-roof-after-the-storm-and-keep-the-reading-room-open-to-every-family-in-the-county-this-winter',
       }
 
-      expect(donorboxResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(donorboxResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -47,25 +47,25 @@ describe('donorboxResolveEmbed', () => {
     it('should ignore the campaign page, which is a link and not a form', () => {
       const value = 'https://donorbox.org/donation-form-248'
 
-      expect(donorboxResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(donorboxResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a blog post on the same host', () => {
       const value = 'https://donorbox.org/nonprofit-blog/end-of-year-giving-statistics'
 
-      expect(donorboxResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(donorboxResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a form path with a trailing segment', () => {
       const value = 'https://donorbox.org/embed/donation-form-248/x'
 
-      expect(donorboxResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(donorboxResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a form path naming no campaign', () => {
       const value = 'https://donorbox.org/embed'
 
-      expect(donorboxResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(donorboxResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed slug as written, even if the player answers an error', () => {
@@ -77,7 +77,7 @@ describe('donorboxResolveEmbed', () => {
         url: 'https://donorbox.org/donation-form-248%2F..',
       }
 
-      expect(donorboxResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(donorboxResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

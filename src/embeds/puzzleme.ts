@@ -1,5 +1,5 @@
 import { composeQuery, encodePathSegment, getQueryParam, isHostOf } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, isEmptyElement } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -31,7 +31,7 @@ const composePuzzlemeEmbed = (kind: string, id: string, set: string): EmbedResol
   }
 }
 
-const puzzlemeResolveEmbed: ResolveEmbed = (url) => {
+const puzzlemeResolveEmbed: ResolveUrlEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, puzzlemeHosts, isHostOf)
 
   if (!parsed) {

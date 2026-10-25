@@ -11,8 +11,8 @@ const widgetHeight = 306
 
 // Patronite's support widget, framed from `/widget/{slug}/{id}/{size}/{colors}`. The widget
 // renders by the numeric id alone, and the slug names the creator page.
-export const patroniteResolveEmbed: ResolveUrlEmbed = (url, _element, parsed) => {
-  const [route, slug, id] = getPathSegments(parsed)
+export const patroniteResolveEmbed: ResolveUrlEmbed = (url) => {
+  const [route, slug, id] = getPathSegments(url)
 
   if (!isAnyOf(route, 'widget') || !id) {
     return
@@ -21,7 +21,7 @@ export const patroniteResolveEmbed: ResolveUrlEmbed = (url, _element, parsed) =>
   return {
     provider,
     id,
-    src: url,
+    src: url.href,
     url: `https://patronite.pl/${slug}`,
     height: widgetHeight,
   }

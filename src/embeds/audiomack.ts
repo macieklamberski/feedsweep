@@ -51,8 +51,8 @@ const readTrack = (url: URL): Track | undefined => {
     : { artist: second, kind: third, slug: fourth, search: url.search }
 }
 
-export const audiomackResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const track = readTrack(parsed)
+export const audiomackResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const track = readTrack(url)
 
   if (!track || !audiomackHeights.has(track.kind.toLowerCase())) {
     return

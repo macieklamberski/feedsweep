@@ -13,8 +13,8 @@ const playerPathRegex = /^\/player\/([^/]+)\/?$/i
 const playerHeight = 60
 
 // A Pinecast episode player.
-export const pinecastResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const pathname = parsed.pathname
+export const pinecastResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const pathname = url.pathname
   const id = pathname.match(playerPathRegex)?.[1]
 
   if (!id) {

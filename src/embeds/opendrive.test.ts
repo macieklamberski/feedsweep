@@ -16,7 +16,7 @@ describe('opendriveResolveEmbed', () => {
         height: 25,
       }
 
-      expect(opendriveResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(opendriveResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass the older unencoded file id on as written', () => {
@@ -29,7 +29,7 @@ describe('opendriveResolveEmbed', () => {
         height: 25,
       }
 
-      expect(opendriveResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(opendriveResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should rebuild the listen route onto the player', () => {
@@ -42,7 +42,7 @@ describe('opendriveResolveEmbed', () => {
         height: 25,
       }
 
-      expect(opendriveResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(opendriveResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the publisher autoplay and tracking', () => {
@@ -56,7 +56,7 @@ describe('opendriveResolveEmbed', () => {
         height: 25,
       }
 
-      expect(opendriveResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(opendriveResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a trailing slash', () => {
@@ -69,7 +69,7 @@ describe('opendriveResolveEmbed', () => {
         height: 25,
       }
 
-      expect(opendriveResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(opendriveResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the route word in another case and mint it in lowercase', () => {
@@ -82,7 +82,7 @@ describe('opendriveResolveEmbed', () => {
         height: 25,
       }
 
-      expect(opendriveResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(opendriveResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -90,33 +90,33 @@ describe('opendriveResolveEmbed', () => {
     it('should ignore a route that is not a player', () => {
       const value = 'https://www.opendrive.com/clip/NDZfOTg5NzkzOF9iYXhEWQ'
 
-      expect(opendriveResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(opendriveResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the download page', () => {
       const value =
         'https://www.opendrive.com/download/OTdfODE2MDkxODJfaFZ0d20?folder_id=OTdfNzA1NjM3NF9zOTJnOA'
 
-      expect(opendriveResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(opendriveResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the player route with no file id', () => {
       const value = 'https://www.opendrive.com/player'
 
-      expect(opendriveResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(opendriveResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a player path with a trailing segment', () => {
       const value = 'https://www.opendrive.com/player/NDZfOTg5NzkzOF9iYXhEWQ/extra'
 
-      expect(opendriveResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(opendriveResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the file host', () => {
       const value =
         'https://web.opendrive.com/api/v1/download/file.json/NDZfOTg5NzkzOF9iYXhEWQ?inline=1'
 
-      expect(opendriveResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(opendriveResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

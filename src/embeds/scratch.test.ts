@@ -17,7 +17,7 @@ describe('scratchResolveEmbed', () => {
         height: 402,
       }
 
-      expect(scratchResolveEmbed(value)).toEqual(expected)
+      expect(scratchResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should fold the legacy spelling onto the current one', () => {
@@ -32,7 +32,7 @@ describe('scratchResolveEmbed', () => {
         height: 402,
       }
 
-      expect(scratchResolveEmbed(value)).toEqual(expected)
+      expect(scratchResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -40,19 +40,19 @@ describe('scratchResolveEmbed', () => {
     it('should ignore the project page, which is not the player', () => {
       const value = 'https://scratch.mit.edu/projects/115786700/'
 
-      expect(scratchResolveEmbed(value)).toBeUndefined()
+      expect(scratchResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the editor, which names the same project', () => {
       const value = 'https://scratch.mit.edu/projects/115786700/editor'
 
-      expect(scratchResolveEmbed(value)).toBeUndefined()
+      expect(scratchResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a studio, which names its own id space', () => {
       const value = 'https://scratch.mit.edu/studios/115786700/embed'
 
-      expect(scratchResolveEmbed(value)).toBeUndefined()
+      expect(scratchResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed project id as written, even if the player answers an error', () => {
@@ -67,7 +67,7 @@ describe('scratchResolveEmbed', () => {
         height: 402,
       }
 
-      expect(scratchResolveEmbed(value)).toEqual(expected)
+      expect(scratchResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use a malformed legacy project id as written, even if the player answers an error', () => {
@@ -82,25 +82,25 @@ describe('scratchResolveEmbed', () => {
         height: 402,
       }
 
-      expect(scratchResolveEmbed(value)).toEqual(expected)
+      expect(scratchResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should ignore a file host, which answers the player route with an image', () => {
       const value = 'https://assets.scratch.mit.edu/projects/1308798589/embed'
 
-      expect(scratchResolveEmbed(value)).toBeUndefined()
+      expect(scratchResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the project route below another segment', () => {
       const value = 'https://scratch.mit.edu/x/projects/1/embed'
 
-      expect(scratchResolveEmbed(value)).toBeUndefined()
+      expect(scratchResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a segment after the player', () => {
       const value = 'https://scratch.mit.edu/projects/1/embed/extra'
 
-      expect(scratchResolveEmbed(value)).toBeUndefined()
+      expect(scratchResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

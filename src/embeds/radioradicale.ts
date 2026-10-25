@@ -45,20 +45,20 @@ const readFlashId = (parsed: URL): string | undefined => {
 // Radio Radicale's archive player, `/scheda/{id}/iframe`, which 301s to the same path with the
 // recording's slug inserted. The page `/scheda/{id}` does the same. The server folds the case of
 // the route words. The Flash player took the same id, so it is rebuilt onto the current one.
-export const radioradicaleResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const flashId = readFlashId(parsed)
+export const radioradicaleResolveEmbed: ResolveUrlEmbed = (url) => {
+  const flashId = readFlashId(url)
 
   if (flashId) {
     return composeEmbed(flashId)
   }
 
-  const [scheda, id, iframe, ...rest] = getPathSegments(parsed)
+  const [scheda, id, iframe, ...rest] = getPathSegments(url)
 
   if (!isAnyOf(scheda, 'scheda') || !isAnyOf(iframe, 'iframe') || rest.length > 0) {
     return
   }
 
-  return composeEmbed(id, pickUrlParams(parsed.href, playbackParams))
+  return composeEmbed(id, pickUrlParams(url.href, playbackParams))
 }
 
 export const radioradicaleEmbedResolver = createUrlEmbedResolver(

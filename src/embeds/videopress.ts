@@ -37,7 +37,7 @@ const composeEmbed = (guid: string, query = ''): EmbedResolverResult => {
 
 // The poster where the player url names none, and the title where the carrier states none, live
 // behind `public-api.wordpress.com/rest/v1.1/videos/{guid}`, which answers with no key.
-const videopressResolveEmbed: ResolveUrlEmbed = (url, element, parsed) => {
+const videopressResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const [route, guid] = getPathSegments(url)
 
   if (!isAnyOf(route, ['embed', 'v'])) {
@@ -51,7 +51,7 @@ const videopressResolveEmbed: ResolveUrlEmbed = (url, element, parsed) => {
   return {
     ...composeEmbed(guid, pickUrlParams(url, videopressEmbedParams)),
     // The block editor writes the poster the publisher chose into the player url.
-    thumbnail: getQueryParam(parsed.searchParams, 'posterUrl'),
+    thumbnail: getQueryParam(url.searchParams, 'posterUrl'),
     title: attr(element, 'title'),
   }
 }
@@ -67,7 +67,7 @@ export const videopressIframeEmbedResolver = createUrlEmbedResolver(
 export const readVideopressEmbedSrc = (link: string): string | undefined => {
   const url = parseUrlOnHosts(link, videopressHosts)
 
-  return url ? videopressResolveEmbed(url.href, undefined, url)?.src : undefined
+  return url ? videopressResolveEmbed(url)?.src : undefined
 }
 
 // `player.swf`, and `flvplayer.swf` under the video plugin path of the first WordPress.com snippet.
@@ -76,11 +76,11 @@ const flashPlayerPathRegex = /\/(?:flv)?player\.swf$/i
 // The host that served the swf at a bare `/{guid}` path, the snippet's other spelling.
 const guidPathHost = 'v.wordpress.com'
 
-const videopressFlashResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  if (flashPlayerPathRegex.test(parsed.pathname)) {
+const videopressFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  if (flashPlayerPathRegex.test(url.pathname)) {
     // The guid comes out of its flashvar or query decoded, and it goes into a path.
     const guid = encodePathSegment(
-      flashVar(element, 'guid') ?? getQueryParam(parsed.searchParams, 'guid') ?? '',
+      flashVar(element, 'guid') ?? getQueryParam(url.searchParams, 'guid') ?? '',
     )
 
     if (!guid) {
@@ -90,10 +90,10 @@ const videopressFlashResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => 
     return composeEmbed(guid)
   }
 
-  const [guid, extra] = getPathSegments(parsed.href)
+  const [guid, extra] = getPathSegments(url.href)
 
   // A guid never holds a dot, so a segment with one is a file at the root, such as a swf.
-  if (parsed.hostname !== guidPathHost || !guid || extra || guid.includes('.')) {
+  if (url.hostname !== guidPathHost || !guid || extra || guid.includes('.')) {
     return
   }
 

@@ -15,7 +15,7 @@ describe('standfmResolveEmbed', () => {
         height: 190,
       }
 
-      expect(standfmResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(standfmResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // A channel is a scrolling list with no height of its own, so it states none, and the kind
@@ -30,7 +30,7 @@ describe('standfmResolveEmbed', () => {
         height: 390,
       }
 
-      expect(standfmResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(standfmResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // A kind stand.fm has not published yet still gets the prefix, which is the whole point of
@@ -45,7 +45,7 @@ describe('standfmResolveEmbed', () => {
         url: 'https://stand.fm/lives/645af1b90b5e6b2d87ce1dc9',
       }
 
-      expect(standfmResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(standfmResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // The player url is what a CMS saves once it has run note.com's client, so it arrives too.
@@ -59,7 +59,7 @@ describe('standfmResolveEmbed', () => {
         height: 190,
       }
 
-      expect(standfmResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(standfmResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass an id of another length inside the hex alphabet as written', () => {
@@ -72,7 +72,7 @@ describe('standfmResolveEmbed', () => {
         height: 190,
       }
 
-      expect(standfmResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(standfmResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use an uppercase hex id as written, even if the player answers an error', () => {
@@ -85,7 +85,7 @@ describe('standfmResolveEmbed', () => {
         height: 190,
       }
 
-      expect(standfmResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(standfmResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -93,49 +93,49 @@ describe('standfmResolveEmbed', () => {
     it('should state nothing for a first segment that is not a route word', () => {
       const value = 'https://stand.fm/2024/6a8065825e9572e804f8a5cb'
 
-      expect(standfmResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(standfmResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should state nothing for an id outside the hex alphabet', () => {
       const value = 'https://stand.fm/episodes/not-an-object-id'
 
-      expect(standfmResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(standfmResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should state nothing for the route word in the id slot of the episode page', () => {
       const value = 'https://stand.fm/episodes/new'
 
-      expect(standfmResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(standfmResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should state nothing for a kind led by an encoded slash', () => {
       const value = 'https://stand.fm/%2Fepisodes/6a8065825e9572e804f8a5cb'
 
-      expect(standfmResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(standfmResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should state nothing for a kind followed by an encoded slash', () => {
       const value = 'https://stand.fm/episodes%2F..%2Fx/6a8065825e9572e804f8a5cb'
 
-      expect(standfmResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(standfmResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should state nothing for an id led by an encoded slash', () => {
       const value = 'https://stand.fm/episodes/%2F6a8065825e9572e804f8a5cb'
 
-      expect(standfmResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(standfmResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should state nothing for an id followed by an encoded slash', () => {
       const value = 'https://stand.fm/episodes/6a8065825e9572e804f8a5cb%2f'
 
-      expect(standfmResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(standfmResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should state nothing for the site root', () => {
       const value = 'https://stand.fm/'
 
-      expect(standfmResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(standfmResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

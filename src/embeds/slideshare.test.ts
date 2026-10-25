@@ -18,7 +18,7 @@ describe('slideshareResolveEmbed', () => {
       ratio: '595/485',
     }
 
-    expect(slideshareResolveEmbed(value)).toEqual(expected)
+    expect(slideshareResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should cut a numeric id at the query a feed wrote into the path', () => {
@@ -31,7 +31,7 @@ describe('slideshareResolveEmbed', () => {
       ratio: '595/485',
     }
 
-    expect(slideshareResolveEmbed(value)).toEqual(expected)
+    expect(slideshareResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // Both spaces have grown since 2011, and neither length is what selects a deck.
@@ -44,7 +44,7 @@ describe('slideshareResolveEmbed', () => {
       ratio: '595/485',
     }
 
-    expect(slideshareResolveEmbed(value)).toEqual(expected)
+    expect(slideshareResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should keep a numeric deck id longer than the ones minted so far', () => {
@@ -56,31 +56,31 @@ describe('slideshareResolveEmbed', () => {
       ratio: '595/485',
     }
 
-    expect(slideshareResolveEmbed(value)).toEqual(expected)
+    expect(slideshareResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should ignore a slideshare url that names no deck', () => {
     const value = 'https://www.slideshare.net/haraldf'
 
-    expect(slideshareResolveEmbed(value)).toBeUndefined()
+    expect(slideshareResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should ignore a numeric path that names no embed route', () => {
     const value = 'https://www.slideshare.net/6435157'
 
-    expect(slideshareResolveEmbed(value)).toBeUndefined()
+    expect(slideshareResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should ignore an embed path that stops before the deck', () => {
     const value = 'https://www.slideshare.net/slideshow/embed_code/'
 
-    expect(slideshareResolveEmbed(value)).toBeUndefined()
+    expect(slideshareResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should ignore a keyed path that stops before the key', () => {
     const value = 'https://www.slideshare.net/slideshow/embed_code/key/'
 
-    expect(slideshareResolveEmbed(value)).toBeUndefined()
+    expect(slideshareResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should use a malformed key as written, even if the player answers an error', () => {
@@ -92,7 +92,7 @@ describe('slideshareResolveEmbed', () => {
       ratio: '595/485',
     }
 
-    expect(slideshareResolveEmbed(value)).toEqual(expected)
+    expect(slideshareResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // SlideShare serves files on slidesharecdn.com, and the file-name check is what keeps one from
@@ -103,7 +103,7 @@ describe('slideshareResolveEmbed', () => {
   ]
 
   it.each(fileUrls)('should ignore a file on the host at %s', (value) => {
-    expect(slideshareResolveEmbed(value)).toBeUndefined()
+    expect(slideshareResolveEmbed(new URL(value))).toBeUndefined()
   })
 })
 

@@ -18,8 +18,8 @@ const legacyRouteTypes = toMap({
 // legacy news id, `15` as a legacy video, `11` as a news item and `12` as a video, and the same
 // number names a different item in each, so the key keeps both halves. The player reads `t` as
 // the start position.
-export const channelOneResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const [route, id, ...rest] = getPathSegments(parsed)
+export const channelOneResolveEmbed: ResolveUrlEmbed = (url) => {
+  const [route, id, ...rest] = getPathSegments(url)
   const legacyType = legacyRouteTypes.get(route?.toLowerCase())
 
   if ((!isAnyOf(route, 'embed') && !legacyType) || !id || rest.length > 0) {
@@ -33,7 +33,7 @@ export const channelOneResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) 
     return
   }
 
-  const query = pickUrlParams(parsed.href, ['t'])
+  const query = pickUrlParams(url.href, ['t'])
 
   return {
     provider: '1tv',

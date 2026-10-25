@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -15,7 +15,7 @@ const videoRoutes = new Set(['watch', 'embed'])
 
 const iframeSrcRegex = /<iframe\s[^>]*?\bsrc="([^"]+)"/i
 
-export const lividResolveEmbed: ResolveEmbed = (url, element) => {
+export const lividResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const segments = getPathSegments(url)
   const route = segments[0]?.toLowerCase()
 
@@ -73,7 +73,7 @@ export const lividMetasliderEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const result = lividResolveEmbed(url.href)
+    const result = lividResolveEmbed(url)
 
     if (!result) {
       return

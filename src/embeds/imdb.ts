@@ -17,8 +17,8 @@ const composeEmbed = (id: string): EmbedResolverResult => {
 // IMDb's trailer player, `/video/embed/{vi}/` today, and the older `/videoembed/{vi}` and
 // `/video/{source}/{vi}/imdb/embed`, which both redirect onto it. The server ignores the source
 // word, written as `imdb`, `wab` or `user`.
-export const imdbResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const segments = getPathSegments(parsed)
+export const imdbResolveEmbed: ResolveUrlEmbed = (url) => {
+  const segments = getPathSegments(url)
 
   if (segments.length === 2) {
     const [videoembed, id] = segments

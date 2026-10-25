@@ -33,12 +33,12 @@ const resolveLibrary = (url: URL): EmbedResolverResult | undefined => {
 // Calaméo's viewer, `v.calameo.com/?bkcode={code}`, and the retired Flash players before it,
 // `cviewer.swf` and `cmini.swf`, take the same code in the same query parameter, or in the
 // player's flashvars when the `<embed src>` names a bare `cmini.swf`.
-export const calameoResolveEmbed: ResolveUrlEmbed = (_url, element, parsedUrl) => {
-  if (libraryPathRegex.test(parsedUrl.pathname)) {
-    return resolveLibrary(parsedUrl)
+export const calameoResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  if (libraryPathRegex.test(url.pathname)) {
+    return resolveLibrary(url)
   }
 
-  const urlParams = parsedUrl.searchParams
+  const urlParams = url.searchParams
   const params =
     urlParams && getQueryParam(urlParams, 'bkcode') !== undefined
       ? urlParams

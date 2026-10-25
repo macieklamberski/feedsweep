@@ -13,7 +13,7 @@ describe('extractLibsynEmbed', () => {
       id: '5508311',
     }
 
-    expect(extractLibsynEmbed(value)).toEqual(expected)
+    expect(extractLibsynEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read the modern player host', () => {
@@ -24,7 +24,7 @@ describe('extractLibsynEmbed', () => {
       id: '41612765',
     }
 
-    expect(extractLibsynEmbed(value)).toEqual(expected)
+    expect(extractLibsynEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read a destination player', () => {
@@ -34,7 +34,7 @@ describe('extractLibsynEmbed', () => {
       id: '12345',
     }
 
-    expect(extractLibsynEmbed(value)).toEqual(expected)
+    expect(extractLibsynEmbed(new URL(value))).toEqual(expected)
   })
 
   // `show` reads like a kind and is not one. Given a real show id the player renders the same
@@ -43,7 +43,7 @@ describe('extractLibsynEmbed', () => {
   it('should not read a show player, which does not exist', () => {
     const value = 'https://play.libsyn.com/embed/show/id/12345/height/200/'
 
-    expect(extractLibsynEmbed(value)).toBeUndefined()
+    expect(extractLibsynEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should read an embed that states no height', () => {
@@ -54,19 +54,19 @@ describe('extractLibsynEmbed', () => {
       height: undefined,
     }
 
-    expect(extractLibsynEmbed(value)).toEqual(expected)
+    expect(extractLibsynEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a libsyn url that is not a player', () => {
     const value = 'https://traffic.libsyn.com/show/episode.mp3'
 
-    expect(extractLibsynEmbed(value)).toBeUndefined()
+    expect(extractLibsynEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a player path under another first segment', () => {
     const value = 'https://play.libsyn.com/player/episode/id/5508311/'
 
-    expect(extractLibsynEmbed(value)).toBeUndefined()
+    expect(extractLibsynEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should read an id of unusual length as written', () => {
@@ -76,19 +76,13 @@ describe('extractLibsynEmbed', () => {
       id: '123',
     }
 
-    expect(extractLibsynEmbed(value)).toEqual(expected)
+    expect(extractLibsynEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a non-numeric id', () => {
     const value = 'https://play.libsyn.com/embed/episode/id/abc/'
 
-    expect(extractLibsynEmbed(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a url that cannot be parsed', () => {
-    const value = 'https://['
-
-    expect(extractLibsynEmbed(value)).toBeUndefined()
+    expect(extractLibsynEmbed(new URL(value))).toBeUndefined()
   })
 })
 
@@ -106,7 +100,7 @@ describe('libsynResolveEmbed', () => {
       height: 128,
     }
 
-    expect(libsynResolveEmbed(value)).toEqual(expected)
+    expect(libsynResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should state the player height when the path names none', () => {
@@ -118,7 +112,7 @@ describe('libsynResolveEmbed', () => {
       height: 128,
     }
 
-    expect(libsynResolveEmbed(value)).toEqual(expected)
+    expect(libsynResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should keep the start position the path names as written', () => {
@@ -131,13 +125,13 @@ describe('libsynResolveEmbed', () => {
       height: 128,
     }
 
-    expect(libsynResolveEmbed(value)).toEqual(expected)
+    expect(libsynResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a libsyn url naming no episode', () => {
     const value = 'https://play.libsyn.com/about'
 
-    expect(libsynResolveEmbed(value)).toBeUndefined()
+    expect(libsynResolveEmbed(new URL(value))).toBeUndefined()
   })
 })
 

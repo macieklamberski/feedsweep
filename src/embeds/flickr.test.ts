@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { flickrEmbedResolver, flickrResolveEmbed } from './flickr.js'
+import { flickrEmbedResolver } from './flickr.js'
 
 describeForEachParser('flickrEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, flickrEmbedResolver)
@@ -1433,16 +1433,6 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
-  })
-})
-
-// The factory checks the host before calling in, so this guard is only reachable by calling
-// the function itself, which is importable on its own.
-describeForEachParser('flickrResolveEmbed', (parseHtml) => {
-  it('should return undefined for a url that cannot be parsed', () => {
-    const element = parseHtml('<embed></embed>').querySelector('embed') as Element
-
-    expect(flickrResolveEmbed('https://[', element)).toBeUndefined()
   })
 })
 

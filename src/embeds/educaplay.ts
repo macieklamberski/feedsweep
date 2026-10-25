@@ -46,8 +46,8 @@ const readGame = (pathname: string): { id: string; slug: string } | undefined =>
 
 // An Educaplay game: the current player in any language, or the retired html5 player, whose id
 // and slug play on the current one.
-const educaplayResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const game = readGame(parsed.pathname)
+const educaplayResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const game = readGame(url.pathname)
 
   if (!game) {
     return

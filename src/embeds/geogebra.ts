@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf, isHostOf } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { ResolveUrlEmbed } from '../types.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -66,7 +66,7 @@ const readMaterial = (segments: Array<string>): Material | undefined => {
 // GeoGebra's material iframe, `/material/iframe/id/{id}` with its options as `/{key}/{value}`
 // pairs, and the material page `/m/{id}` and the Classic app `/classic/{id}` framed instead.
 // The ids are case-sensitive.
-export const geogebraResolveEmbed: ResolveEmbed = (url) => {
+export const geogebraResolveEmbed: ResolveUrlEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, geogebraHosts, isHostOf)
 
   if (!parsed) {

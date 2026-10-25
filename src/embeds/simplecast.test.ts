@@ -18,7 +18,7 @@ describe('extractSimplecastEpisode', () => {
       isCurrent: true,
     }
 
-    expect(extractSimplecastEpisode(value)).toEqual(expected)
+    expect(extractSimplecastEpisode(new URL(value))).toEqual(expected)
   })
 
   it('should read the legacy embed id', () => {
@@ -28,7 +28,7 @@ describe('extractSimplecastEpisode', () => {
       isCurrent: false,
     }
 
-    expect(extractSimplecastEpisode(value)).toEqual(expected)
+    expect(extractSimplecastEpisode(new URL(value))).toEqual(expected)
   })
 
   it('should read the legacy numeric form', () => {
@@ -38,13 +38,13 @@ describe('extractSimplecastEpisode', () => {
       isCurrent: false,
     }
 
-    expect(extractSimplecastEpisode(value)).toEqual(expected)
+    expect(extractSimplecastEpisode(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a simplecast url naming no episode', () => {
     const value = 'https://simplecast.com/pricing'
 
-    expect(extractSimplecastEpisode(value)).toBeUndefined()
+    expect(extractSimplecastEpisode(new URL(value))).toBeUndefined()
   })
 
   it('should keep a legacy segment of another length as written', () => {
@@ -54,31 +54,25 @@ describe('extractSimplecastEpisode', () => {
       isCurrent: false,
     }
 
-    expect(extractSimplecastEpisode(value)).toEqual(expected)
+    expect(extractSimplecastEpisode(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a legacy segment holding a character outside the hex class', () => {
     const value = 'https://embed.simplecast.com/x-a1b2c3d4'
 
-    expect(extractSimplecastEpisode(value)).toBeUndefined()
+    expect(extractSimplecastEpisode(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a legacy segment carrying an encoded separator', () => {
     const value = 'https://embed.simplecast.com/ab%2Fc3d'
 
-    expect(extractSimplecastEpisode(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a url that cannot be parsed', () => {
-    const value = 'https://['
-
-    expect(extractSimplecastEpisode(value)).toBeUndefined()
+    expect(extractSimplecastEpisode(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a simplecast url naming no path', () => {
     const value = 'https://simplecast.com/'
 
-    expect(extractSimplecastEpisode(value)).toBeUndefined()
+    expect(extractSimplecastEpisode(new URL(value))).toBeUndefined()
   })
 })
 
@@ -93,7 +87,7 @@ describe('simplecastResolveEmbed', () => {
       height: 200,
     }
 
-    expect(simplecastResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(simplecastResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should mint the player host from the share host, which names the same uuid', () => {
@@ -105,7 +99,7 @@ describe('simplecastResolveEmbed', () => {
       height: 200,
     }
 
-    expect(simplecastResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(simplecastResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // The legacy id is a separate id space: the server maps `fc9a4d22` to a uuid we cannot
@@ -119,7 +113,7 @@ describe('simplecastResolveEmbed', () => {
       height: 200,
     }
 
-    expect(simplecastResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(simplecastResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should keep a legacy numeric url', () => {
@@ -131,7 +125,7 @@ describe('simplecastResolveEmbed', () => {
       height: 200,
     }
 
-    expect(simplecastResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(simplecastResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should drop the display style from a legacy numeric url', () => {
@@ -143,7 +137,7 @@ describe('simplecastResolveEmbed', () => {
       height: 200,
     }
 
-    expect(simplecastResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(simplecastResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should drop the display color from a legacy embed url', () => {
@@ -155,13 +149,13 @@ describe('simplecastResolveEmbed', () => {
       height: 200,
     }
 
-    expect(simplecastResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(simplecastResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a simplecast url naming no episode', () => {
     const value = 'https://simplecast.com/pricing'
 
-    expect(simplecastResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+    expect(simplecastResolveEmbed(new URL(value))).toBeUndefined()
   })
 })
 

@@ -22,8 +22,8 @@ const readStartFragment = (parsed: URL): string => {
 
 // The player of a media.ccc.de talk, the iframe its oEmbed answer writes. The talk page refuses
 // framing.
-export const mediacccResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const slug = parsed.pathname.match(playerPathRegex)?.[1]
+export const mediacccResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const slug = url.pathname.match(playerPathRegex)?.[1]
 
   if (!slug) {
     return
@@ -32,7 +32,7 @@ export const mediacccResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => 
   return {
     provider,
     id: slug,
-    src: `https://media.ccc.de/v/${slug}/oembed${readStartFragment(parsed)}`,
+    src: `https://media.ccc.de/v/${slug}/oembed${readStartFragment(url)}`,
     url: `https://media.ccc.de/v/${slug}`,
     ratio: '16/9',
     title: attr(element, 'title'),

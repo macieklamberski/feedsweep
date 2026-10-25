@@ -15,7 +15,7 @@ describe('allocineResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(allocineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(allocineResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should claim the player on its own host', () => {
@@ -27,7 +27,7 @@ describe('allocineResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(allocineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(allocineResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should rebuild the Flash player onto the current one', () => {
@@ -39,7 +39,7 @@ describe('allocineResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(allocineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(allocineResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop everything in the query but the id', () => {
@@ -52,7 +52,7 @@ describe('allocineResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(allocineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(allocineResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the blog player in capitals and mint the player in lowercase', () => {
@@ -64,7 +64,7 @@ describe('allocineResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(allocineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(allocineResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the id under an uppercase name', () => {
@@ -76,7 +76,7 @@ describe('allocineResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(allocineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(allocineResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the Flash player in capitals and mint the player in lowercase', () => {
@@ -88,7 +88,7 @@ describe('allocineResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(allocineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(allocineResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -96,61 +96,61 @@ describe('allocineResolveEmbed', () => {
     it('should return undefined for a blog player with no id', () => {
       const value = 'https://www.allocine.fr/_video/iblogvision.aspx'
 
-      expect(allocineResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(allocineResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the blog player below another segment', () => {
       const value = 'https://www.allocine.fr/fr/_video/iblogvision.aspx?cmedia=19546104'
 
-      expect(allocineResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(allocineResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a segment after the blog player', () => {
       const value = 'https://www.allocine.fr/_video/iblogvision.aspx/extra?cmedia=19546104'
 
-      expect(allocineResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(allocineResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the Flash player below another segment', () => {
       const value = 'https://www.allocine.fr/video/blogvision/18823127'
 
-      expect(allocineResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(allocineResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a segment after the Flash player id', () => {
       const value = 'https://www.allocine.fr/blogvision/18823127/extra'
 
-      expect(allocineResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(allocineResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the Flash player with no id', () => {
       const value = 'https://www.allocine.fr/blogvision/'
 
-      expect(allocineResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(allocineResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the player below another segment', () => {
       const value = 'https://player.allocine.fr/video/19546104.html'
 
-      expect(allocineResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(allocineResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a segment after the player', () => {
       const value = 'https://player.allocine.fr/19546104.html/extra'
 
-      expect(allocineResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(allocineResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the player without its extension', () => {
       const value = 'https://player.allocine.fr/19546104'
 
-      expect(allocineResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(allocineResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a page on the main host shaped like the player', () => {
       const value = 'https://www.allocine.fr/19546104.html'
 
-      expect(allocineResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(allocineResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -164,7 +164,7 @@ describe('allocineResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(allocineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(allocineResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass a Flash player id that is not a number as written', () => {
@@ -176,7 +176,7 @@ describe('allocineResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(allocineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(allocineResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

@@ -37,8 +37,8 @@ const readModelUid = (parsed: URL): string | undefined => {
 
 // The thumbnail sits under a per-model hash that the uid does not yield, and
 // `sketchfab.com/oembed?url=…` answers with it and the title, with no key.
-const sketchfabResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const uid = readModelUid(parsed)
+const sketchfabResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const uid = readModelUid(url)
 
   if (!uid) {
     return

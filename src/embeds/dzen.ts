@@ -9,8 +9,8 @@ const dzenHosts = ['dzen.ru']
 const embedPathRegex = /^\/embed\/([^/]+)\/?$/i
 
 // Dzen's video player, `dzen.ru/embed/{id}`. The player reads `t` as the start position.
-export const dzenResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const id = parsed.pathname.match(embedPathRegex)?.[1]
+export const dzenResolveEmbed: ResolveUrlEmbed = (url) => {
+  const id = url.pathname.match(embedPathRegex)?.[1]
 
   if (!id) {
     return
@@ -19,7 +19,7 @@ export const dzenResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
   return {
     provider,
     id,
-    src: `https://dzen.ru/embed/${id}${pickUrlParams(parsed.href, ['t'])}`,
+    src: `https://dzen.ru/embed/${id}${pickUrlParams(url.href, ['t'])}`,
     ratio: '16/9',
   }
 }

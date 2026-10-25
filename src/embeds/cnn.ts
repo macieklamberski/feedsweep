@@ -1,7 +1,7 @@
-import { composeQuery, encodePathSegment, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed, ResolveUrlEmbed } from '../types.js'
+import { composeQuery, encodePathSegment, getQueryParam, isAnyOf } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'cnn'
@@ -54,23 +54,21 @@ const resolveVideoId = (value: string | null | undefined): EmbedResolverResult |
   return id && videoIdRegex.test(id) ? composeEmbed(id) : undefined
 }
 
-const resolveTarget = (url: string): EmbedResolverResult | undefined => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (parsed && isAnyOf(parsed.pathname, '/v1/fav/')) {
-    return resolveVideoId(getQueryParam(parsed.searchParams, 'video'))
+const resolveTarget = (url: URL): EmbedResolverResult | undefined => {
+  if (isAnyOf(url.pathname, '/v1/fav/')) {
+    return resolveVideoId(getQueryParam(url.searchParams, 'video'))
   }
 
-  if (parsed && isAnyOf(parsed.pathname, '/video/api/embed.html')) {
-    return resolveVideoId(parsed.hash.slice(1))
+  if (isAnyOf(url.pathname, '/video/api/embed.html')) {
+    return resolveVideoId(url.hash.slice(1))
   }
 
-  if (parsed && isAnyOf(parsed.pathname, '/video/savp/evp/')) {
-    return resolveVideoId(getQueryParam(parsed.searchParams, 'vid'))
+  if (isAnyOf(url.pathname, '/video/savp/evp/')) {
+    return resolveVideoId(getQueryParam(url.searchParams, 'vid'))
   }
 }
 
-export const cnnResolveEmbed: ResolveEmbed = (url, element) => {
+export const cnnResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const target = resolveTarget(url)
 
   if (!target) {
@@ -92,14 +90,12 @@ export const cnnIframeEmbedResolver = createUrlEmbedResolver(cnnHosts, cnnResolv
 // `flashVars` on none, but the player read both so both are read here.
 const flashPlayerPathRegex = /^\/cnn\/\.element\/apps\/cvp\/.*\.swf$/i
 
-export const cnnFlashResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  if (!flashPlayerPathRegex.test(parsed.pathname)) {
+export const cnnFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  if (!flashPlayerPathRegex.test(url.pathname)) {
     return
   }
 
-  return resolveVideoId(
-    getQueryParam(parsed.searchParams, 'videoId') ?? flashVar(element, 'videoId'),
-  )
+  return resolveVideoId(getQueryParam(url.searchParams, 'videoId') ?? flashVar(element, 'videoId'))
 }
 
 // CNN's Flash player swf as an <embed> or an <object>, which no browser runs today.

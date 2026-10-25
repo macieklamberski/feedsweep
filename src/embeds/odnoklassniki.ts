@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'odnoklassniki'
@@ -7,7 +7,7 @@ const provider = 'odnoklassniki'
 // The player fills its box, and the watch page sizes it 16:9.
 const playerRatio = '16/9'
 
-export const odnoklassnikiResolveEmbed: ResolveEmbed = (url) => {
+export const odnoklassnikiResolveEmbed: ResolveUrlEmbed = (url) => {
   const [route, videoId, ...rest] = getPathSegments(url)
 
   if (!isAnyOf(route, 'videoembed') || !videoId || rest.length) {

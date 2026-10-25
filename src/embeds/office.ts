@@ -24,10 +24,10 @@ const readFileName = (documentUrl: string): string | undefined => {
 
 // Microsoft's Office viewer, which renders somebody else's document and carries the whole payload
 // as the `src` query parameter.
-export const officeResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const documentUrl = getQueryParam(parsed.searchParams, 'src')
+export const officeResolveEmbed: ResolveUrlEmbed = (url) => {
+  const documentUrl = getQueryParam(url.searchParams, 'src')
 
-  if (!documentUrl || !viewerPathRegex.test(parsed.pathname)) {
+  if (!documentUrl || !viewerPathRegex.test(url.pathname)) {
     return
   }
 

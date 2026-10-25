@@ -1,5 +1,5 @@
 import { isString } from 'trousse'
-import { nicovideoResolveEmbed } from '../../embeds/nicovideo.js'
+import { readNicovideoEmbedSrc } from '../../embeds/nicovideo.js'
 import { readYoutubeEmbedSrc } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
 import { createIframe } from '../../utils/widgets.js'
@@ -53,7 +53,7 @@ export const rebuildExternalVideoEmbeds: DomTransform = () => {
         continue
       }
 
-      const src = readYoutubeEmbedSrc(config.url) ?? nicovideoResolveEmbed(config.url)?.src
+      const src = readYoutubeEmbedSrc(config.url) ?? readNicovideoEmbedSrc(config.url)
 
       if (!src) {
         continue

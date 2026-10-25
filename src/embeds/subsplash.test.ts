@@ -17,7 +17,7 @@ describe('subsplashResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(subsplashResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(subsplashResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the audio layout flag the player ignores', () => {
@@ -30,7 +30,7 @@ describe('subsplashResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(subsplashResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(subsplashResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the start position', () => {
@@ -43,7 +43,7 @@ describe('subsplashResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(subsplashResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(subsplashResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should fold the case of the short code in the key only', () => {
@@ -56,7 +56,7 @@ describe('subsplashResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(subsplashResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(subsplashResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the older app route and key it by the short code', () => {
@@ -70,7 +70,7 @@ describe('subsplashResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(subsplashResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(subsplashResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -78,68 +78,68 @@ describe('subsplashResolveEmbed', () => {
     it('should ignore a path with a leading segment', () => {
       const value = 'https://subsplash.com/x/u/cbcponca/media/embed/d/zrgcjnm'
 
-      expect(subsplashResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(subsplashResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path with a trailing segment', () => {
       const value = 'https://subsplash.com/u/cbcponca/media/embed/d/zrgcjnm/extra'
 
-      expect(subsplashResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(subsplashResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a media path under another first route word', () => {
       const value = 'https://subsplash.com/x/cbcponca/media/embed/d/zrgcjnm'
 
-      expect(subsplashResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(subsplashResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an embed path under another section', () => {
       const value = 'https://subsplash.com/u/cbcponca/x/embed/d/zrgcjnm'
 
-      expect(subsplashResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(subsplashResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a media path that is not an embed', () => {
       const value = 'https://subsplash.com/u/cbcponca/media/x/d/zrgcjnm'
 
-      expect(subsplashResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(subsplashResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an embed of another kind than a media item', () => {
       const value = 'https://subsplash.com/u/cbcponca/media/embed/x/zrgcjnm'
 
-      expect(subsplashResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(subsplashResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the giving form', () => {
       const value = 'https://subsplash.com/u/cbcponca/give?embed=true'
 
-      expect(subsplashResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(subsplashResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an older route whose app key has no plus sign', () => {
       const value = 'https://subsplash.com/754a/embed/mi/+r58c2x5?audio'
 
-      expect(subsplashResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(subsplashResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the lightbox, which opens the media page', () => {
       const value = 'https://subsplash.com/+754a/lb/mi/+r58c2x5?autoplay=true'
 
-      expect(subsplashResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(subsplashResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an older embed of another kind than a media item', () => {
       const value = 'https://subsplash.com/+754a/embed/x/+r58c2x5?audio'
 
-      expect(subsplashResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(subsplashResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a file on the media CDN', () => {
       const value =
         'https://cdn.subsplash.com/audios/BNBD8V/2dc8100c-528c-4108-97b0-7959cd2e2da9/audio.mp3'
 
-      expect(subsplashResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(subsplashResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

@@ -45,8 +45,8 @@ const readItemHash = (parsed: URL): string | undefined => {
 
 // Flipsnack's flipbook player at `player.flipsnack.com`, the widget at `cdn.flipsnack.com` and the
 // Flash-era frame at `files.flipsnack.com` all mint onto widget v2, which plays every item.
-const flipsnackResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const itemHash = readItemHash(parsed)
+const flipsnackResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const itemHash = readItemHash(url)
 
   if (!itemHash) {
     return

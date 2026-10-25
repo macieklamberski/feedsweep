@@ -21,7 +21,7 @@ describe('oneTwoThreeFormBuilderResolveEmbed', () => {
         url: 'https://form.123formbuilder.com/5013627',
       }
 
-      expect(oneTwoThreeFormBuilderResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(oneTwoThreeFormBuilderResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should build the form from the form page with a trailing slash', () => {
@@ -33,7 +33,7 @@ describe('oneTwoThreeFormBuilderResolveEmbed', () => {
         url: 'https://form.123formbuilder.com/5013627',
       }
 
-      expect(oneTwoThreeFormBuilderResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(oneTwoThreeFormBuilderResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should rebuild the older iframe snippet onto the form page', () => {
@@ -45,7 +45,7 @@ describe('oneTwoThreeFormBuilderResolveEmbed', () => {
         url: 'https://form.123formbuilder.com/4733692',
       }
 
-      expect(oneTwoThreeFormBuilderResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(oneTwoThreeFormBuilderResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should rebuild the older iframe snippet that names the account', () => {
@@ -57,7 +57,7 @@ describe('oneTwoThreeFormBuilderResolveEmbed', () => {
         url: 'https://form.123formbuilder.com/783097',
       }
 
-      expect(oneTwoThreeFormBuilderResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(oneTwoThreeFormBuilderResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the query the form page is given', () => {
@@ -69,7 +69,7 @@ describe('oneTwoThreeFormBuilderResolveEmbed', () => {
         url: 'https://form.123formbuilder.com/5013627',
       }
 
-      expect(oneTwoThreeFormBuilderResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(oneTwoThreeFormBuilderResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -77,43 +77,43 @@ describe('oneTwoThreeFormBuilderResolveEmbed', () => {
     it('should ignore a route word in the id position', () => {
       const value = 'https://form.123formbuilder.com/notaform'
 
-      expect(oneTwoThreeFormBuilderResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(oneTwoThreeFormBuilderResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a form page below another segment', () => {
       const value = 'https://form.123formbuilder.com/x/5013627'
 
-      expect(oneTwoThreeFormBuilderResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(oneTwoThreeFormBuilderResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a route below the form page', () => {
       const value = 'https://form.123formbuilder.com/5013627/extra'
 
-      expect(oneTwoThreeFormBuilderResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(oneTwoThreeFormBuilderResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an older snippet page below another segment', () => {
       const value = 'https://www.123formbuilder.com/x/my-contact-form-4733692.html'
 
-      expect(oneTwoThreeFormBuilderResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(oneTwoThreeFormBuilderResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an older snippet page with a trailing segment', () => {
       const value = 'https://www.123formbuilder.com/my-contact-form-4733692.html/extra'
 
-      expect(oneTwoThreeFormBuilderResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(oneTwoThreeFormBuilderResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an older snippet page whose account part is not the account id', () => {
       const value = 'https://www.123formbuilder.com/my-contact-form-b6441661074-783097.html'
 
-      expect(oneTwoThreeFormBuilderResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(oneTwoThreeFormBuilderResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the loader script', () => {
       const value = 'https://form.123formbuilder.com/embed/5013627.js'
 
-      expect(oneTwoThreeFormBuilderResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(oneTwoThreeFormBuilderResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

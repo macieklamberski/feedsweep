@@ -212,9 +212,9 @@ const composeWatchEmbed = (videoId: string): EmbedResolverResult => {
 
 // A post has no name: its words go to `description`, and the frame titles itself
 // `fb:post Facebook Social Plugin`.
-export const facebookResolveEmbed: ResolveUrlEmbed = (url, _element, parsed) => {
-  if (legacyVideoPathRegex.test(parsed.pathname)) {
-    const videoId = getQueryParam(parsed.searchParams, 'video_id')
+export const facebookResolveEmbed: ResolveUrlEmbed = (url) => {
+  if (legacyVideoPathRegex.test(url.pathname)) {
+    const videoId = getQueryParam(url.searchParams, 'video_id')
 
     if (!videoId) {
       return
@@ -224,23 +224,23 @@ export const facebookResolveEmbed: ResolveUrlEmbed = (url, _element, parsed) => 
   }
 
   // `fb.watch/v/{code}` is a short link to another id, so the route is read on facebook.com only.
-  if (isHostOrSubdomainOf(parsed, 'facebook.com')) {
-    const flashVideoId = flashVideoPathRegex.exec(parsed.pathname)?.[1]
+  if (isHostOrSubdomainOf(url, 'facebook.com')) {
+    const flashVideoId = flashVideoPathRegex.exec(url.pathname)?.[1]
 
     if (flashVideoId) {
       return composeWatchEmbed(flashVideoId)
     }
   }
 
-  if (contentPathRegex.test(parsed.pathname) || isWatchPage(parsed)) {
-    return composePluginEmbed(readPlugin(parsed, 'post'), url, {})
+  if (contentPathRegex.test(url.pathname) || isWatchPage(url)) {
+    return composePluginEmbed(readPlugin(url, 'post'), url.href, {})
   }
 
-  if (!pluginPathRegex.test(parsed.pathname)) {
+  if (!pluginPathRegex.test(url.pathname)) {
     return
   }
 
-  const href = getQueryParam(parsed.searchParams, 'href')
+  const href = getQueryParam(url.searchParams, 'href')
   const target = parseUrlOnHosts(href, facebookHosts)
 
   if (!href || !target) {
@@ -249,9 +249,9 @@ export const facebookResolveEmbed: ResolveUrlEmbed = (url, _element, parsed) => 
 
   // The plugin is rebuilt around the href it names. The caption toggle, the size the dialog wrote,
   // the app id and a Graph API version in the path are the look.
-  const plugin = parsed.pathname.toLowerCase().endsWith('/video.php') ? 'video' : 'post'
+  const plugin = url.pathname.toLowerCase().endsWith('/video.php') ? 'video' : 'post'
 
-  return composePluginEmbed(plugin, href, {}, getQueryParam(parsed.searchParams, 't'))
+  return composePluginEmbed(plugin, href, {}, getQueryParam(url.searchParams, 't'))
 }
 
 // Facebook's plugin iframe, or a pasted post, video or watch page, which x-frame-options blanks.
@@ -264,10 +264,10 @@ export const facebookIframeEmbedResolver = createUrlEmbedResolver(
 // flashvars `video_id`. The share player names only a file and stays unresolved.
 const mvpPathRegex = /^\/swf\/mvp\.swf$/i
 
-const facebookFlashResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
+const facebookFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const videoId = flashVar(element, 'video_id')
 
-  if (!mvpPathRegex.test(parsed.pathname) || !videoId) {
+  if (!mvpPathRegex.test(url.pathname) || !videoId) {
     return
   }
 
@@ -317,7 +317,7 @@ export const facebookS9eEmbedResolver = createMarkupEmbedResolver(
       ? `https://www.facebook.com/watch/${composeQuery({ v: id })}`
       : `https://www.facebook.com/${page || s9ePlaceholderPage}/posts/${id}`
 
-    return facebookResolveEmbed(href, undefined, new URL(href))
+    return facebookResolveEmbed(new URL(href))
   },
 )
 

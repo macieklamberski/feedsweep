@@ -14,8 +14,8 @@ const wakePathRegex = /^\/wakes\/([^/]+)(?:\/[^/]+)?$/i
 
 // The collection frame Wakelet's embed dialog writes, embed.wakelet.com/wakes/{id}/list.
 // The layout and `border` are display, so every carrier is rebuilt onto the dialog's list.
-const wakeletResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const id = parsed.pathname.match(wakePathRegex)?.[1]
+const wakeletResolveEmbed: ResolveUrlEmbed = (url) => {
+  const id = url.pathname.match(wakePathRegex)?.[1]
 
   if (!id) {
     return

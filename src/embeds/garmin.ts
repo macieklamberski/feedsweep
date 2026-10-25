@@ -11,8 +11,8 @@ const activityEmbedRegex =
   /^\/(?:(?:modern|app)\/)?(?:activity\/embed|embed\/activity)\/([^/]+)\/?$/i
 
 // Garmin Connect's activity embed, an interactive map and stats panel for one recorded activity.
-export const garminResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const activityId = parsed.pathname.match(activityEmbedRegex)?.[1]
+export const garminResolveEmbed: ResolveUrlEmbed = (url) => {
+  const activityId = url.pathname.match(activityEmbedRegex)?.[1]
 
   if (!activityId) {
     return

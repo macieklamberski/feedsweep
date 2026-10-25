@@ -9,50 +9,44 @@ describe('extractBloggerToken', () => {
   it('should read the token from a player url', () => {
     const value = `https://www.blogger.com/video.g?token=${token}`
 
-    expect(extractBloggerToken(value)).toBe(token)
+    expect(extractBloggerToken(new URL(value))).toBe(token)
   })
 
   it('should read the token from the draft host', () => {
     const value = `https://draft.blogger.com/video.g?token=${token}`
 
-    expect(extractBloggerToken(value)).toBe(token)
+    expect(extractBloggerToken(new URL(value))).toBe(token)
   })
 
   it('should return undefined for a blogger url that is not the player', () => {
     const value = `https://www.blogger.com/share-post.g?token=${token}`
 
-    expect(extractBloggerToken(value)).toBeUndefined()
+    expect(extractBloggerToken(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a player url with no token', () => {
     const value = 'https://www.blogger.com/video.g'
 
-    expect(extractBloggerToken(value)).toBeUndefined()
+    expect(extractBloggerToken(new URL(value))).toBeUndefined()
   })
 
   it('should use a malformed token as written, even if the player answers an error', () => {
     const value = 'https://www.blogger.com/video.g?token=../../etc'
     const expected = '../../etc'
 
-    expect(extractBloggerToken(value)).toEqual(expected)
+    expect(extractBloggerToken(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for an empty token', () => {
     const value = 'https://www.blogger.com/video.g?token='
 
-    expect(extractBloggerToken(value)).toBeUndefined()
+    expect(extractBloggerToken(new URL(value))).toBeUndefined()
   })
 
   it('should read a token shorter than the ones Blogger writes today', () => {
     const value = 'https://www.blogger.com/video.g?token=AD6v5dz1'
 
-    expect(extractBloggerToken(value)).toBe('AD6v5dz1')
-  })
-
-  it('should return undefined for a url that cannot be parsed', () => {
-    const value = 'https://['
-
-    expect(extractBloggerToken(value)).toBeUndefined()
+    expect(extractBloggerToken(new URL(value))).toBe('AD6v5dz1')
   })
 })
 
@@ -68,7 +62,7 @@ describe('bloggerResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(bloggerResolveEmbed(value)).toEqual(expected)
+      expect(bloggerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the canonical player url from the draft host', () => {
@@ -80,7 +74,7 @@ describe('bloggerResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(bloggerResolveEmbed(value)).toEqual(expected)
+      expect(bloggerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep a token holding an ampersand as one query parameter', () => {
@@ -92,7 +86,7 @@ describe('bloggerResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(bloggerResolveEmbed(value)).toEqual(expected)
+      expect(bloggerResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -100,13 +94,7 @@ describe('bloggerResolveEmbed', () => {
     it('should return undefined for a blogger url that is not the player', () => {
       const value = 'https://www.blogger.com/profile/12345'
 
-      expect(bloggerResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for a url that cannot be parsed', () => {
-      const value = 'https://['
-
-      expect(bloggerResolveEmbed(value)).toBeUndefined()
+      expect(bloggerResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

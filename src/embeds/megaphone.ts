@@ -1,7 +1,7 @@
-import { composeQuery, getQueryParam, parseUrl } from 'trousse'
+import { composeQuery, getQueryParam } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { digitsRegex, isFileName, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, isFileName, pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'megaphone'
@@ -18,18 +18,16 @@ const embedKinds = {
 }
 
 export const extractMegaphoneEmbed = (
-  link: string,
+  url: URL,
 ): { param: string; kind: string; id: string; height: number } | undefined => {
-  const parsed = parseUrl(link, placeholderBaseUrl)
-
   // Megaphone serves the episode files from the same domain as the players.
   // Episode files carry the publisher's own ?e= and ?p=, so a claimed enclosure loses its audio.
-  if (!parsed || isFileName(parsed.pathname)) {
+  if (isFileName(url.pathname)) {
     return
   }
 
   for (const [param, { kind, height }] of Object.entries(embedKinds)) {
-    const id = getQueryParam(parsed.searchParams, param)
+    const id = getQueryParam(url.searchParams, param)
 
     if (!id) {
       continue
@@ -44,11 +42,11 @@ export const extractMegaphoneEmbed = (
   }
 
   // The legacy episode player names the episode in its path, `player.megaphone.fm/{id}`.
-  if (parsed.hostname !== 'player.megaphone.fm') {
+  if (url.hostname !== 'player.megaphone.fm') {
     return
   }
 
-  const legacyId = parsed.pathname.match(legacyPlayerPathRegex)?.groups?.id
+  const legacyId = url.pathname.match(legacyPlayerPathRegex)?.groups?.id
 
   if (!legacyId) {
     return
@@ -59,14 +57,14 @@ export const extractMegaphoneEmbed = (
 
 // No metadata and no thumbnail without an api key, so the height is the substance here, and
 // some iframes carry no height at all.
-export const megaphoneResolveEmbed: ResolveUrlEmbed = (url, _element, parsed) => {
+export const megaphoneResolveEmbed: ResolveUrlEmbed = (url) => {
   const embed = extractMegaphoneEmbed(url)
 
   if (!embed) {
     return
   }
 
-  const playback = pickQueryParams(parsed.search, ['start'])
+  const playback = pickQueryParams(url.search, ['start'])
   const query = composeQuery({ [embed.param]: embed.id, ...playback })
 
   return {

@@ -28,8 +28,8 @@ const composeEmbed = (id: string, src: string): EmbedResolverResult => {
 // map to offline, so it is kept. The embed reads `t` as the start position, and the rest of its
 // query, `audio`, `video`, `info`, `logoWatermark`, `shareable` and `embeddable`, only changes
 // the display or is ignored.
-export const subsplashResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const segments = getPathSegments(parsed)
+export const subsplashResolveEmbed: ResolveUrlEmbed = (url) => {
+  const segments = getPathSegments(url)
 
   if (segments.length === 6) {
     const [user, org, media, embed, d, id] = segments
@@ -43,7 +43,7 @@ export const subsplashResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) =
       return
     }
 
-    const query = pickUrlParams(parsed.href, ['t'])
+    const query = pickUrlParams(url.href, ['t'])
 
     return composeEmbed(id, `https://subsplash.com/u/${org}/media/embed/d/${id}${query}`)
   }

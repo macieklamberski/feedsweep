@@ -57,9 +57,9 @@ const readFlashId = (url: URL): string | undefined => {
   }
 }
 
-export const reverbnationResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const widget = readWidgetId(parsed)
-  const id = widget ?? readFlashId(parsed)
+export const reverbnationResolveEmbed: ResolveUrlEmbed = (url) => {
+  const widget = readWidgetId(url)
+  const id = widget ?? readFlashId(url)
 
   if (!id || !safeIdRegex.test(id)) {
     return
@@ -70,7 +70,7 @@ export const reverbnationResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed
   return {
     provider,
     id,
-    src: composeSource(id, widget ? filterUrlQuery(parsed, isWidgetParam) : ''),
+    src: composeSource(id, widget ? filterUrlQuery(url, isWidgetParam) : ''),
     height: 265,
   }
 }

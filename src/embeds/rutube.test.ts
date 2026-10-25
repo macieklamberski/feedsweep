@@ -16,7 +16,7 @@ describe('rutubeResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(rutubeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rutubeResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // The player still plays the numeric ids it minted before the uuid, so they are read like any
@@ -31,7 +31,7 @@ describe('rutubeResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(rutubeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rutubeResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use a hex-letter word in the id slot as written, even if the player answers an error', () => {
@@ -44,7 +44,7 @@ describe('rutubeResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(rutubeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rutubeResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use an uppercase hex id as written, even if the player answers an error', () => {
@@ -57,7 +57,7 @@ describe('rutubeResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(rutubeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rutubeResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the access key a private video carries in the player url only', () => {
@@ -70,7 +70,7 @@ describe('rutubeResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(rutubeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rutubeResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the start offset the publisher states', () => {
@@ -83,7 +83,7 @@ describe('rutubeResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(rutubeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rutubeResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the stop offset the publisher states', () => {
@@ -96,7 +96,7 @@ describe('rutubeResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(rutubeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rutubeResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the player skin and the tracking riding with it', () => {
@@ -110,7 +110,7 @@ describe('rutubeResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(rutubeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rutubeResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -118,49 +118,49 @@ describe('rutubeResolveEmbed', () => {
     it('should ignore an id behind a letter outside the hex alphabet', () => {
       const value = 'https://rutube.ru/play/embed/x73502f04b326cc20937a65e122a88cf8'
 
-      expect(rutubeResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(rutubeResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an id followed by a letter outside the hex alphabet', () => {
       const value = 'https://rutube.ru/play/embed/73502f04b326cc20937a65e122a88cf8x'
 
-      expect(rutubeResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(rutubeResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an id carrying a percent escape', () => {
       const value = 'https://rutube.ru/play/embed/73502f04b326cc20937a65e122a88cf8%3f'
 
-      expect(rutubeResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(rutubeResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should leave the Flash player alone', () => {
       const value = 'http://video.rutube.ru/2d0970f507fe8ecf63c5e570a2ddc74a'
 
-      expect(rutubeResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(rutubeResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the watch page, which frames nothing', () => {
       const value = 'https://rutube.ru/video/c91d5d8847c7c5391a090fff38c86f34/'
 
-      expect(rutubeResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(rutubeResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the player path under another directory', () => {
       const value = 'https://rutube.ru/api/play/embed/c91d5d8847c7c5391a090fff38c86f34/'
 
-      expect(rutubeResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(rutubeResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path that runs on past the id', () => {
       const value = 'https://rutube.ru/play/embed/c91d5d8847c7c5391a090fff38c86f34/options/'
 
-      expect(rutubeResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(rutubeResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the playlist route under another directory', () => {
       const value = 'https://rutube.ru/api/pl/?pl_video=20a54e4a6f61441d808db45f823a7809'
 
-      expect(rutubeResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(rutubeResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed playlist video id as written, even if the player answers an error', () => {
@@ -173,13 +173,13 @@ describe('rutubeResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(rutubeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rutubeResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should ignore a playlist route that names no video', () => {
       const value = 'https://rutube.ru/pl/?pl_id=1234&pl_type=user'
 
-      expect(rutubeResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(rutubeResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -194,7 +194,7 @@ describe('rutubeResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(rutubeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rutubeResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the player for the private embed route', () => {
@@ -208,7 +208,7 @@ describe('rutubeResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(rutubeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rutubeResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the access key on the private embed route in the player url only', () => {
@@ -221,7 +221,7 @@ describe('rutubeResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(rutubeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rutubeResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the player for the short embed route', () => {
@@ -234,7 +234,7 @@ describe('rutubeResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(rutubeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rutubeResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should take the video out of the playlist route and drop its own parameters', () => {
@@ -247,7 +247,7 @@ describe('rutubeResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(rutubeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(rutubeResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

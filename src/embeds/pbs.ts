@@ -122,16 +122,16 @@ const readFlashCarrier = (url: URL, element?: Element): EmbedResolverResult | un
 }
 
 // PBS's offsite player, which renders on its own but names no page and no poster.
-export const pbsResolveEmbed: ResolveUrlEmbed = (url, element, parsed) => {
-  if (isHostOf(parsed, flashHosts)) {
-    return readFlashCarrier(parsed, element)
+export const pbsResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  if (isHostOf(url, flashHosts)) {
+    return readFlashCarrier(url, element)
   }
 
-  const segments = getPathSegments(parsed)
+  const segments = getPathSegments(url)
   const route = segments.slice(0, -1).join('/')
 
   // The retired host served the viral route alone.
-  if (isHostOf(parsed, legacyPlayerHost) && !isAnyOf(route, 'viralplayer')) {
+  if (isHostOf(url, legacyPlayerHost) && !isAnyOf(route, 'viralplayer')) {
     return
   }
 

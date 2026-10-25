@@ -60,8 +60,9 @@ const handleStandIn = 'i'
 
 type Status = { handle: string; id: string }
 
-const readStatusUrl = (value: string | undefined): Status | undefined => {
-  const parsed = parseUrl(value ?? '', placeholderBaseUrl)
+const readStatusUrl = (value: string | URL | undefined): Status | undefined => {
+  // The url createUrlEmbedResolver hands its reader is already parsed.
+  const parsed = value instanceof URL ? value : parseUrl(value ?? '', placeholderBaseUrl)
 
   if (!parsed || !isTweetUrl(parsed)) {
     return
@@ -279,9 +280,9 @@ const playerPaths = ['/embed/Tweet.html', '/embed/index.html']
 
 // A post has no name: its words go to `description`, and the frame titles itself `Twitter Tweet`
 // or `X Post`.
-export const twitterResolveEmbed: ResolveUrlEmbed = (url, _element, parsed) => {
-  const framed = isAnyOf(parsed.pathname, playerPaths)
-    ? getQueryParam(parsed.searchParams, 'id')
+export const twitterResolveEmbed: ResolveUrlEmbed = (url) => {
+  const framed = isAnyOf(url.pathname, playerPaths)
+    ? getQueryParam(url.searchParams, 'id')
     : undefined
   const id = keepIfMatches(framed, digitsRegex)
 
@@ -304,9 +305,9 @@ export const twitterIframeEmbedResolver = createUrlEmbedResolver(
 
 // A forum's s9e MediaEmbed helper frame, naming the status id in its url fragment.
 export const twitterS9eEmbedResolver = createS9eEmbedResolver('twitter', (id) => {
-  const url = `https://platform.twitter.com/embed/Tweet.html${composeQuery({ id })}`
-
-  return twitterResolveEmbed(url, undefined, new URL(url))
+  return twitterResolveEmbed(
+    new URL(`https://platform.twitter.com/embed/Tweet.html${composeQuery({ id })}`),
+  )
 })
 
 // The player reports its rendered height in a JSON-RPC envelope, unprompted, once the frame is

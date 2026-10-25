@@ -31,13 +31,13 @@ const readEmbed = (
   return composeEmbed(integrationId, playlistId)
 }
 
-const glomexResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  if (!playerPathRegex.test(parsed.pathname)) {
+const glomexResolveEmbed: ResolveUrlEmbed = (url) => {
+  if (!playerPathRegex.test(url.pathname)) {
     return
   }
 
-  const integrationId = getQueryParam(parsed.searchParams, 'integrationId')
-  const playlistId = getQueryParam(parsed.searchParams, 'playlistId')
+  const integrationId = getQueryParam(url.searchParams, 'integrationId')
+  const playlistId = getQueryParam(url.searchParams, 'playlistId')
 
   return readEmbed(integrationId, playlistId)
 }

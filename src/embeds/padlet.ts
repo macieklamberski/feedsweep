@@ -12,11 +12,11 @@ const boardPathRegex = /^\/[^/]+\/[^/]*-([^/-]+)\/?$/
 // repeats that; the preview form sizes itself `height: 100%` and so states nothing usable.
 const boardHeight = 608
 
-const padletResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
+const padletResolveEmbed: ResolveUrlEmbed = (url) => {
   const boardId =
-    parsed.pathname.match(embedPathRegex)?.[1] ??
-    parsed.pathname.match(previewPathRegex)?.[1] ??
-    parsed.pathname.match(boardPathRegex)?.[1]
+    url.pathname.match(embedPathRegex)?.[1] ??
+    url.pathname.match(previewPathRegex)?.[1] ??
+    url.pathname.match(boardPathRegex)?.[1]
 
   if (!boardId) {
     return

@@ -21,7 +21,7 @@ describe('fliphtml5ResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
+      expect(fliphtml5ResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the secret WordPress stamps on the frame', () => {
@@ -35,7 +35,7 @@ describe('fliphtml5ResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
+      expect(fliphtml5ResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the page the reader is sent to', () => {
@@ -49,7 +49,7 @@ describe('fliphtml5ResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
+      expect(fliphtml5ResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a tracker from the query', () => {
@@ -63,7 +63,7 @@ describe('fliphtml5ResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
+      expect(fliphtml5ResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the https viewer from an http carrier', () => {
@@ -77,7 +77,7 @@ describe('fliphtml5ResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
+      expect(fliphtml5ResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the case and the hyphens of a custom book slug', () => {
@@ -91,7 +91,7 @@ describe('fliphtml5ResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
+      expect(fliphtml5ResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the case of an account', () => {
@@ -105,7 +105,7 @@ describe('fliphtml5ResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
+      expect(fliphtml5ResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the underscores of a custom book slug', () => {
@@ -119,7 +119,7 @@ describe('fliphtml5ResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
+      expect(fliphtml5ResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -127,19 +127,19 @@ describe('fliphtml5ResolveEmbed', () => {
     it('should ignore an account with no book, which the viewer 404s', () => {
       const value = 'https://online.fliphtml5.com/mzsro/'
 
-      expect(fliphtml5ResolveEmbed(value)).toBeUndefined()
+      expect(fliphtml5ResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a per-page asset under the book', () => {
       const value = 'https://online.fliphtml5.com/kgxw/wknu/files/large/2.jpg'
 
-      expect(fliphtml5ResolveEmbed(value)).toBeUndefined()
+      expect(fliphtml5ResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a file under the account, which the book segment never is', () => {
       const value = 'https://online.fliphtml5.com/mzsro/jvuq.pdf'
 
-      expect(fliphtml5ResolveEmbed(value)).toBeUndefined()
+      expect(fliphtml5ResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed account as written, even if the player answers an error', () => {
@@ -153,7 +153,7 @@ describe('fliphtml5ResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
+      expect(fliphtml5ResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use a malformed book as written, even if the player answers an error', () => {
@@ -167,13 +167,13 @@ describe('fliphtml5ResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(fliphtml5ResolveEmbed(value)).toEqual(expected)
+      expect(fliphtml5ResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should ignore the shelf on the apex host', () => {
       const value = 'https://fliphtml5.com/homepage/mzsro/'
 
-      expect(fliphtml5ResolveEmbed(value)).toBeUndefined()
+      expect(fliphtml5ResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

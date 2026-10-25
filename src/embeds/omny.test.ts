@@ -9,14 +9,14 @@ describe('extractOmnyClip', () => {
     const value = 'https://omny.fm/shows/the-show/an-episode-title/embed?style=cover'
     const expected = 'the-show/an-episode-title'
 
-    expect(extractOmnyClip(value)).toBe(expected)
+    expect(extractOmnyClip(new URL(value))).toBe(expected)
   })
 
   it('should read a playlist', () => {
     const value = 'https://omny.fm/shows/the-show/playlists/highlights/embed'
     const expected = 'the-show/playlists/highlights'
 
-    expect(extractOmnyClip(value)).toBe(expected)
+    expect(extractOmnyClip(new URL(value))).toBe(expected)
   })
 
   it('should read a clip whose slug carries digits', () => {
@@ -24,7 +24,7 @@ describe('extractOmnyClip', () => {
       'https://omny.fm/shows/today-fm/could-2023-see-the-end-of-the-russia-ukraine-war/embed'
     const expected = 'today-fm/could-2023-see-the-end-of-the-russia-ukraine-war'
 
-    expect(extractOmnyClip(value)).toBe(expected)
+    expect(extractOmnyClip(new URL(value))).toBe(expected)
   })
 
   // Omny's own slugs are lowercase, and the player serves the same clip under a capitalised one.
@@ -32,32 +32,32 @@ describe('extractOmnyClip', () => {
     const value = 'https://omny.fm/shows/101-3-kdwb-clips/6AM-Hour-Holiday-Awkward/embed'
     const expected = '101-3-kdwb-clips/6AM-Hour-Holiday-Awkward'
 
-    expect(extractOmnyClip(value)).toBe(expected)
+    expect(extractOmnyClip(new URL(value))).toBe(expected)
   })
 
   it('should return undefined for a show page that is not an embed', () => {
     const value = 'https://omny.fm/shows/the-show'
 
-    expect(extractOmnyClip(value)).toBeUndefined()
+    expect(extractOmnyClip(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a playlist page that is not an embed', () => {
     const value = 'https://omny.fm/shows/the-show/playlists/highlights'
 
-    expect(extractOmnyClip(value)).toBeUndefined()
+    expect(extractOmnyClip(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for the clip path under another segment', () => {
     const value = 'https://omny.fm/x/shows/the-show/an-episode/embed'
 
-    expect(extractOmnyClip(value)).toBeUndefined()
+    expect(extractOmnyClip(new URL(value))).toBeUndefined()
   })
 
   it('should use a malformed slug as written, even if the player answers an error', () => {
     const value = 'https://omny.fm/shows/the-show/an%2Fepisode/embed'
     const expected = 'the-show/an%2Fepisode'
 
-    expect(extractOmnyClip(value)).toEqual(expected)
+    expect(extractOmnyClip(new URL(value))).toEqual(expected)
   })
 
   // The player answers 404 for both where the hyphenated slug answers 200.
@@ -75,20 +75,14 @@ describe('extractOmnyClip', () => {
   it.each(malformedSlugUrls)(
     'should use the malformed slug in %s as written, even if the player answers an error',
     (value, expected) => {
-      expect(extractOmnyClip(value)).toEqual(expected)
+      expect(extractOmnyClip(new URL(value))).toEqual(expected)
     },
   )
 
   it('should return undefined when no clip is named', () => {
     const value = 'https://omny.fm/shows/embed'
 
-    expect(extractOmnyClip(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a url that cannot be parsed', () => {
-    const value = 'https://['
-
-    expect(extractOmnyClip(value)).toBeUndefined()
+    expect(extractOmnyClip(new URL(value))).toBeUndefined()
   })
 })
 
@@ -104,7 +98,7 @@ describe('omnyResolveEmbed', () => {
       height: 180,
     }
 
-    expect(omnyResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(omnyResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it("should compose the clip's poster from its path", () => {
@@ -119,7 +113,7 @@ describe('omnyResolveEmbed', () => {
       height: 180,
     }
 
-    expect(omnyResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(omnyResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should give the video rendering its own shape', () => {
@@ -132,7 +126,7 @@ describe('omnyResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(omnyResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(omnyResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read the video rendering in any case', () => {
@@ -145,7 +139,7 @@ describe('omnyResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(omnyResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(omnyResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should drop the square layout and the artwork style', () => {
@@ -158,7 +152,7 @@ describe('omnyResolveEmbed', () => {
       height: 180,
     }
 
-    expect(omnyResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(omnyResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should give a playlist the height of its own box', () => {
@@ -170,7 +164,7 @@ describe('omnyResolveEmbed', () => {
       height: 500,
     }
 
-    expect(omnyResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(omnyResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should size a clip whose slug is the playlists word', () => {
@@ -183,7 +177,7 @@ describe('omnyResolveEmbed', () => {
       height: 180,
     }
 
-    expect(omnyResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(omnyResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should keep a start offset', () => {
@@ -196,7 +190,7 @@ describe('omnyResolveEmbed', () => {
       height: 180,
     }
 
-    expect(omnyResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(omnyResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // Autoplay is the render hint's to offer on the click that loads the player, and tracking
@@ -212,13 +206,13 @@ describe('omnyResolveEmbed', () => {
       height: 180,
     }
 
-    expect(omnyResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(omnyResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a omny url naming no clip', () => {
     const value = 'https://omny.fm/about'
 
-    expect(omnyResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+    expect(omnyResolveEmbed(new URL(value))).toBeUndefined()
   })
 })
 

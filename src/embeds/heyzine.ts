@@ -62,16 +62,16 @@ const readPage = (parsed: URL): string => {
 }
 
 // Heyzine's flipbook viewer, which renders on its own and is its own page.
-export const heyzineResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  if (isHostOrSubdomainOf(parsed, customDomainHosts)) {
-    const [name = '', ...rest] = getPathSegments(parsed)
+export const heyzineResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  if (isHostOrSubdomainOf(url, customDomainHosts)) {
+    const [name = '', ...rest] = getPathSegments(url)
     const flipBook = readCustomFlipBook(name)
 
     if (!flipBook || rest.length) {
       return
     }
 
-    const src = `https://${parsed.hostname}/${flipBook.path}${readPage(parsed)}`
+    const src = `https://${url.hostname}/${flipBook.path}${readPage(url)}`
 
     return {
       provider,
@@ -83,18 +83,18 @@ export const heyzineResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
     }
   }
 
-  if (!isHostOf(parsed, heyzineHosts)) {
+  if (!isHostOf(url, heyzineHosts)) {
     return
   }
 
-  const [route, name = '', ...rest] = getPathSegments(parsed)
+  const [route, name = '', ...rest] = getPathSegments(url)
   const flipBook = readFlipBook(name)
 
   if (!isAnyOf(route, 'flip-book') || !flipBook || rest.length) {
     return
   }
 
-  const src = `https://heyzine.com/flip-book/${flipBook.path}${readPage(parsed)}`
+  const src = `https://heyzine.com/flip-book/${flipBook.path}${readPage(url)}`
 
   return {
     provider,

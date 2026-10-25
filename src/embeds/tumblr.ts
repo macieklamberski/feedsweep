@@ -20,7 +20,7 @@ const tumblrHosts = ['tumblr.com']
 // spellings address the same post, so the id keeps the bare one and `src` the current one.
 const blogKeyPrefixRegex = /^t:/i
 
-const readPostEmbed = (href: string | undefined): EmbedResolverResult | undefined => {
+const readPostEmbed = (href: string | URL | undefined): EmbedResolverResult | undefined => {
   const parsed = parseUrlOnHosts(href, tumblrEmbedHosts)
 
   if (!parsed) {

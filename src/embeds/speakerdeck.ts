@@ -71,7 +71,7 @@ export const speakerdeckLegacyScriptEmbedResolver = createMarkupEmbedResolver(
 
 // The player iframe the `data-id` script builds, saved into the feed by a CMS that ran the script
 // first, or the legacy `/embed/{id}` iframe.
-export const speakerdeckResolveEmbed: ResolveUrlEmbed = (url, element, parsed) => {
+export const speakerdeckResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const [route = '', deckId] = getPathSegments(url)
 
   // Speaker Deck serves files on its own host, so a file name is an enclosure.
@@ -79,7 +79,7 @@ export const speakerdeckResolveEmbed: ResolveUrlEmbed = (url, element, parsed) =
     return
   }
 
-  const slide = getQueryParam(parsed.searchParams, 'slide')
+  const slide = getQueryParam(url.searchParams, 'slide')
 
   return composeEmbed(deckId, { slide, title: attr(element, 'title') })
 }

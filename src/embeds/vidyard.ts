@@ -26,10 +26,10 @@ const composeEmbed = (uuid: string, thumbnail?: string): EmbedResolverResult => 
   }
 }
 
-const vidyardResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
+const vidyardResolveEmbed: ResolveUrlEmbed = (url) => {
   // Every carrier names the video with the same uuid, so one key serves them. The alphabet is what
   // refuses `{uuid}.jpg` and `{uuid}.js`, which share the player's root segment.
-  const uuid = keepIfMatches(parsed.pathname.match(playerPathRegex)?.[1], alphanumericRegex)
+  const uuid = keepIfMatches(url.pathname.match(playerPathRegex)?.[1], alphanumericRegex)
 
   if (!uuid) {
     return

@@ -49,8 +49,8 @@ const readClaimPath = (parsed: URL): string | undefined => {
   return claims.map(encodePathSegment).join('/')
 }
 
-const odyseeResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const claimPath = readClaimPath(parsed)
+const odyseeResolveEmbed: ResolveUrlEmbed = (url) => {
+  const claimPath = readClaimPath(url)
 
   if (!claimPath) {
     return

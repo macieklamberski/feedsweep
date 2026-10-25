@@ -17,7 +17,7 @@ describe('geogebraResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(geogebraResolveEmbed(value)).toEqual(expected)
+      expect(geogebraResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the material iframe with no options', () => {
@@ -30,7 +30,7 @@ describe('geogebraResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(geogebraResolveEmbed(value)).toEqual(expected)
+      expect(geogebraResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the layout size written among other options', () => {
@@ -44,7 +44,7 @@ describe('geogebraResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(geogebraResolveEmbed(value)).toEqual(expected)
+      expect(geogebraResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the last layout size the path writes', () => {
@@ -58,7 +58,7 @@ describe('geogebraResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(geogebraResolveEmbed(value)).toEqual(expected)
+      expect(geogebraResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the material iframe for the material page', () => {
@@ -71,7 +71,7 @@ describe('geogebraResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(geogebraResolveEmbed(value)).toEqual(expected)
+      expect(geogebraResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the material page route word in any case', () => {
@@ -84,7 +84,7 @@ describe('geogebraResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(geogebraResolveEmbed(value)).toEqual(expected)
+      expect(geogebraResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the material iframe for the Classic app', () => {
@@ -97,7 +97,7 @@ describe('geogebraResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(geogebraResolveEmbed(value)).toEqual(expected)
+      expect(geogebraResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the bare host', () => {
@@ -110,7 +110,7 @@ describe('geogebraResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(geogebraResolveEmbed(value)).toEqual(expected)
+      expect(geogebraResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the material iframe route words in another case and mint them in lowercase', () => {
@@ -123,7 +123,7 @@ describe('geogebraResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(geogebraResolveEmbed(value)).toEqual(expected)
+      expect(geogebraResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the Classic app route word in another case', () => {
@@ -136,7 +136,7 @@ describe('geogebraResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(geogebraResolveEmbed(value)).toEqual(expected)
+      expect(geogebraResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -144,67 +144,67 @@ describe('geogebraResolveEmbed', () => {
     it('should ignore the material iframe with no id', () => {
       const value = 'https://www.geogebra.org/material/iframe/id'
 
-      expect(geogebraResolveEmbed(value)).toBeUndefined()
+      expect(geogebraResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore another material route', () => {
       const value = 'https://www.geogebra.org/material/xyz/id/yqZMrWXI'
 
-      expect(geogebraResolveEmbed(value)).toBeUndefined()
+      expect(geogebraResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the material iframe with its options before the id', () => {
       const value = 'https://www.geogebra.org/material/iframe/width/500/id/yqZMrWXI'
 
-      expect(geogebraResolveEmbed(value)).toBeUndefined()
+      expect(geogebraResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the material route under a leading segment', () => {
       const value = 'https://www.geogebra.org/x/material/iframe/id/yqZMrWXI'
 
-      expect(geogebraResolveEmbed(value)).toBeUndefined()
+      expect(geogebraResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the material page with no id', () => {
       const value = 'https://www.geogebra.org/m'
 
-      expect(geogebraResolveEmbed(value)).toBeUndefined()
+      expect(geogebraResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a trailing segment after the material page', () => {
       const value = 'https://www.geogebra.org/m/NM8q9xuS/extra'
 
-      expect(geogebraResolveEmbed(value)).toBeUndefined()
+      expect(geogebraResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the Classic app with no material', () => {
       const value = 'https://www.geogebra.org/classic?embed'
 
-      expect(geogebraResolveEmbed(value)).toBeUndefined()
+      expect(geogebraResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a trailing segment after the Classic app material', () => {
       const value = 'https://www.geogebra.org/classic/gjencrn6/extra'
 
-      expect(geogebraResolveEmbed(value)).toBeUndefined()
+      expect(geogebraResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an app route that is not claimed', () => {
       const value = 'https://www.geogebra.org/calculator'
 
-      expect(geogebraResolveEmbed(value)).toBeUndefined()
+      expect(geogebraResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the retired tube host', () => {
       const value = 'https://tube.geogebra.org/material/iframe/id/381965/width/800/height/600'
 
-      expect(geogebraResolveEmbed(value)).toBeUndefined()
+      expect(geogebraResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a foreign host carrying the same path', () => {
       const value = 'https://evil.test/material/iframe/id/yqZMrWXI'
 
-      expect(geogebraResolveEmbed(value)).toBeUndefined()
+      expect(geogebraResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -219,7 +219,7 @@ describe('geogebraResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(geogebraResolveEmbed(value)).toEqual(expected)
+      expect(geogebraResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should leave the layout size out when the path names only a width', () => {
@@ -232,7 +232,7 @@ describe('geogebraResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(geogebraResolveEmbed(value)).toEqual(expected)
+      expect(geogebraResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should leave the layout size out when the path names only a height', () => {
@@ -245,7 +245,7 @@ describe('geogebraResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(geogebraResolveEmbed(value)).toEqual(expected)
+      expect(geogebraResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use the layout size as written', () => {
@@ -258,7 +258,7 @@ describe('geogebraResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(geogebraResolveEmbed(value)).toEqual(expected)
+      expect(geogebraResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a tracking query', () => {
@@ -271,7 +271,7 @@ describe('geogebraResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(geogebraResolveEmbed(value)).toEqual(expected)
+      expect(geogebraResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

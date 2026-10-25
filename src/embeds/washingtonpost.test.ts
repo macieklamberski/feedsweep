@@ -16,7 +16,7 @@ describe('washingtonpostResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(washingtonpostResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(washingtonpostResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should rebuild an inline player whose id is a uuid onto the embed route', () => {
@@ -29,7 +29,7 @@ describe('washingtonpostResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(washingtonpostResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(washingtonpostResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the embed route with a trailing slash', () => {
@@ -42,7 +42,7 @@ describe('washingtonpostResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(washingtonpostResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(washingtonpostResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass an id through as written', () => {
@@ -55,7 +55,7 @@ describe('washingtonpostResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(washingtonpostResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(washingtonpostResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the query', () => {
@@ -68,7 +68,7 @@ describe('washingtonpostResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(washingtonpostResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(washingtonpostResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the route in capitals and mint it in lowercase', () => {
@@ -81,7 +81,7 @@ describe('washingtonpostResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(washingtonpostResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(washingtonpostResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the inline player suffix in capitals', () => {
@@ -94,7 +94,7 @@ describe('washingtonpostResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(washingtonpostResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(washingtonpostResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -103,42 +103,42 @@ describe('washingtonpostResolveEmbed', () => {
       const value =
         'https://www.washingtonpost.com/x/video/c/embed/6c688908-1e4f-4130-b5ca-e371afc1c78b'
 
-      expect(washingtonpostResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(washingtonpostResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a segment after the video', () => {
       const value =
         'https://www.washingtonpost.com/video/c/embed/6c688908-1e4f-4130-b5ca-e371afc1c78b/extra'
 
-      expect(washingtonpostResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(washingtonpostResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for an inline player whose id is not a uuid', () => {
       const value =
         'http://www.washingtonpost.com/national/raw-video-storms-rip-through-east-coast/2012/06/30/gJQA0E1tEW_inline.html'
 
-      expect(washingtonpostResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(washingtonpostResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a segment after the inline player', () => {
       const value =
         'http://www.washingtonpost.com/opinions/dana-milbank-political-sketch-an-oasis-at-the-dnc/2012/09/05/609cbc68-f753-11e1-8253-3f495ae70650_inline.html/extra'
 
-      expect(washingtonpostResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(washingtonpostResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the video page, which refuses framing', () => {
       const value =
         'https://www.washingtonpost.com/video/politics/we-have-reached-a-deal-trump-says-shutdown-will-end/2019/01/25/6c688908-1e4f-4130-b5ca-e371afc1c78b_video.html'
 
-      expect(washingtonpostResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(washingtonpostResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the Flash campaign ad player', () => {
       const value =
         'http://www.washingtonpost.com/wp-srv/special/politics/track-presidential-campaign-ads-2012/video-embed/?flvURL=%2Fmedia%2Fcmag%2Fpresrestoreourfuture-saved.m4v&width=480&height=270'
 
-      expect(washingtonpostResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(washingtonpostResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

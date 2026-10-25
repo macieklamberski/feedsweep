@@ -1,5 +1,5 @@
-import { composeQuery, getAnyOf, getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import { composeQuery, getAnyOf, getPathSegments, isAnyOf } from 'trousse'
+import type { ResolveUrlEmbed } from '../types.js'
 import { attr, getElementDimensions } from '../utils/dom.js'
 import { pickQueryParams, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -33,8 +33,8 @@ const sheetHeight = 500
 const chartHeight = 371
 
 // A frame can name the tab it opens on in the fragment, as `#gid={id}`.
-const readTabFragment = (url: string): string => {
-  const hash = parseUrl(url)?.hash ?? ''
+const readTabFragment = (url: URL): string => {
+  const hash = url.hash
   const query = composeQuery(pickQueryParams(hash.slice(1), ['gid']))
 
   return query.replace('?', '#')
@@ -43,7 +43,7 @@ const readTabFragment = (url: string): string => {
 // `/spreadsheets/d/e/{token}` names a sheet published to the web and `/spreadsheets/d/{id}` names
 // it by its Drive file id. An account index, `/u/{n}/`, only picks the sign-in and serves the
 // same sheet.
-export const googlesheetsResolveEmbed: ResolveEmbed = (url, element) => {
+export const googlesheetsResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const pathSegments = getPathSegments(url)
 
   if (!isAnyOf(pathSegments[0], 'spreadsheets')) {

@@ -109,28 +109,28 @@ export const yandexMapsScriptEmbedResolver = createMarkupEmbedResolver(
 // of a short link, and a coordinate map's frame.
 export const yandexMapsIframeEmbedResolver = createUrlEmbedResolver(
   yandexMapsWidgetHosts,
-  (_url, element, parsed) => {
-    const code = parsed.pathname.match(shortLinkPathRegex)?.groups?.code
+  (url, element) => {
+    const code = url.pathname.match(shortLinkPathRegex)?.groups?.code
 
     if (code) {
       return {
         provider,
         id: `-/${code}`,
-        src: `https://${parsed.hostname}${widgetPath}-/${code}`,
-        url: `https://${parsed.hostname}/maps/-/${code}`,
+        src: `https://${url.hostname}${widgetPath}-/${code}`,
+        url: `https://${url.hostname}/maps/-/${code}`,
         height: mapHeight,
       }
     }
 
-    if (!isAnyOf(parsed.pathname, widgetPath)) {
+    if (!isAnyOf(url.pathname, widgetPath)) {
       return
     }
 
-    const position = pickQueryParams(parsed.search, positionParams)
+    const position = pickQueryParams(url.search, positionParams)
 
     return (
-      resolveConstructorMap(parsed.hostname, parsed.searchParams, position) ??
-      resolveCoordinateMap(parsed.hostname, parsed.searchParams, element)
+      resolveConstructorMap(url.hostname, url.searchParams, position) ??
+      resolveCoordinateMap(url.hostname, url.searchParams, element)
     )
   },
 )

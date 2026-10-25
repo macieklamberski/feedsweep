@@ -9,52 +9,46 @@ describe('extractPodbeanId', () => {
     const value = 'https://www.podbean.com/media/player/yx4hr-f3d1e1?from=pb6admin&download=1'
     const expected = 'yx4hr-f3d1e1'
 
-    expect(extractPodbeanId(value)).toBe(expected)
+    expect(extractPodbeanId(new URL(value))).toBe(expected)
   })
 
   it('should read the id from the v2 player query', () => {
     const value = 'https://www.podbean.com/player-v2/?i=wyvke-1aefb6c-pb&share=1&fonts=Arial'
     const expected = 'wyvke-1aefb6c-pb'
 
-    expect(extractPodbeanId(value)).toBe(expected)
+    expect(extractPodbeanId(new URL(value))).toBe(expected)
   })
 
   it('should return undefined for a podbean url naming no episode', () => {
     const value = 'https://www.podbean.com/pricing'
 
-    expect(extractPodbeanId(value)).toBeUndefined()
+    expect(extractPodbeanId(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for an id query off the v2 player route', () => {
     const value = 'https://www.podbean.com/site/about?i=yx4hr-f3d1e1'
 
-    expect(extractPodbeanId(value)).toBeUndefined()
+    expect(extractPodbeanId(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for the audio post player, whose episode id the server assigns', () => {
     const value =
       'http://www.podbean.com/media/player/audio/postId/5412166?url=http%3A%2F%2Fthetilehurstend.podbean.com%2Fe%2Fepisode-45%2F'
 
-    expect(extractPodbeanId(value)).toBeUndefined()
+    expect(extractPodbeanId(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for the legacy multi-episode player', () => {
     const value = 'https://www.podbean.com/media/player/multi?playlist=abc'
 
-    expect(extractPodbeanId(value)).toBeUndefined()
+    expect(extractPodbeanId(new URL(value))).toBeUndefined()
   })
 
   it('should decode a legacy path id before it moves into the query', () => {
     const value = 'https://www.podbean.com/media/player/yx4hr%2Ff3d1e1'
     const expected = 'yx4hr/f3d1e1'
 
-    expect(extractPodbeanId(value)).toBe(expected)
-  })
-
-  it('should return undefined for a url that cannot be parsed', () => {
-    const value = 'https://['
-
-    expect(extractPodbeanId(value)).toBeUndefined()
+    expect(extractPodbeanId(new URL(value))).toBe(expected)
   })
 })
 
@@ -69,7 +63,7 @@ describe('podbeanResolveEmbed', () => {
       height: 150,
     }
 
-    expect(podbeanResolveEmbed(value)).toEqual(expected)
+    expect(podbeanResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should keep a v2 id as written', () => {
@@ -81,7 +75,7 @@ describe('podbeanResolveEmbed', () => {
       height: 150,
     }
 
-    expect(podbeanResolveEmbed(value)).toEqual(expected)
+    expect(podbeanResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // The `size` query is the carrier's, which shallow handling does not read.
@@ -94,7 +88,7 @@ describe('podbeanResolveEmbed', () => {
       height: 150,
     }
 
-    expect(podbeanResolveEmbed(value)).toEqual(expected)
+    expect(podbeanResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should use a malformed id as written, even if the player answers an error', () => {
@@ -106,13 +100,13 @@ describe('podbeanResolveEmbed', () => {
       height: 150,
     }
 
-    expect(podbeanResolveEmbed(value)).toEqual(expected)
+    expect(podbeanResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should ignore a podbean url naming no episode', () => {
     const value = 'https://www.podbean.com/pricing'
 
-    expect(podbeanResolveEmbed(value)).toBeUndefined()
+    expect(podbeanResolveEmbed(new URL(value))).toBeUndefined()
   })
 })
 

@@ -71,11 +71,11 @@ const readNewsFlash = (element: Element | undefined): EmbedResolverResult | unde
 // BBC's news, World Service and programmes clip players, pasted in a portrait box that pads them,
 // and the retired Flash player. A news page needs its section slug, which the embed does not
 // carry, and a current programmes clip such as `p08s3bnj` has no page of its own.
-export const bbcResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
+export const bbcResolveEmbed: ResolveUrlEmbed = (url, element) => {
   // The retired Flash player names its clip in the `playlist` flashvar, as
   // `/iplayer/playlist/{pid}` or `/comedy/forge-assets/extra/playlist/{pid}.xml`. News and World
   // Service playlists carry no pid, and the news player names it in other flashvars.
-  if (flashFileRegex.test(parsed.pathname)) {
+  if (flashFileRegex.test(url.pathname)) {
     const playlist = parseUrlOnHosts(flashVar(element, 'playlist'), bbcHosts)
     const pid = playlist?.pathname.match(playlistPathRegex)?.[1]
 
@@ -86,7 +86,7 @@ export const bbcResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
     return readNewsFlash(element)
   }
 
-  const segments = getPathSegments(parsed)
+  const segments = getPathSegments(url)
   const [first, second, third, fourth, fifth] = segments
 
   // `/news/av/embed/{pid}/{article}` 301s to `/news/av-embeds/{article}/vpid/{pid}`, and the
@@ -120,7 +120,7 @@ export const bbcResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
     return {
       provider: 'bbc',
       id: pid,
-      src: `https://www.bbc.com${parsed.pathname}`,
+      src: `https://www.bbc.com${url.pathname}`,
       ratio: newsPlayerRatio,
     }
   }

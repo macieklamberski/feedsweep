@@ -1,5 +1,5 @@
 import { composeQuery, decodeSegment, getPathSegments, isAnyOf } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'channel9'
@@ -13,7 +13,7 @@ const embedUrl =
 // Channel 9 is retired and cannot mint a new section.
 const episodeSections = ['shows', 'blogs', 'series']
 
-const channel9ResolveEmbed: ResolveEmbed = (url) => {
+const channel9ResolveEmbed: ResolveUrlEmbed = (url) => {
   const segments = getPathSegments(url)
   const section = segments.at(0)
   const route = segments.at(-1)

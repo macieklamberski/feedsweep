@@ -25,8 +25,8 @@ const composeEmbed = (formKey: string): EmbedResolverResult => {
 }
 
 // The form page, `secure.lglforms.com/form_engine/s/{key}`.
-export const lglformsResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const formKey = parsed.pathname.match(formPathRegex)?.[1]
+export const lglformsResolveEmbed: ResolveUrlEmbed = (url) => {
+  const formKey = url.pathname.match(formPathRegex)?.[1]
 
   if (!formKey) {
     return

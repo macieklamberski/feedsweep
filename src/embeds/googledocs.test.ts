@@ -17,7 +17,7 @@ describe('googledocsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googledocsResolveEmbed(value)).toEqual(expected)
+      expect(googledocsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the embedded flag of a doc framed by its file id', () => {
@@ -31,7 +31,7 @@ describe('googledocsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googledocsResolveEmbed(value)).toEqual(expected)
+      expect(googledocsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the published-by header of a doc framed with no flag', () => {
@@ -45,7 +45,7 @@ describe('googledocsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googledocsResolveEmbed(value)).toEqual(expected)
+      expect(googledocsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the minimal toolbar flag, which draws the same doc', () => {
@@ -59,7 +59,7 @@ describe('googledocsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googledocsResolveEmbed(value)).toEqual(expected)
+      expect(googledocsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the deck parameters a doc carries', () => {
@@ -73,7 +73,7 @@ describe('googledocsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googledocsResolveEmbed(value)).toEqual(expected)
+      expect(googledocsResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -82,55 +82,55 @@ describe('googledocsResolveEmbed', () => {
       const value =
         'https://docs.google.com/document/d/1VEG0aH5kQ19Aq3I0honkir-8m9wTfZoWCyLPMOQIypQ/export?format=pdf'
 
-      expect(googledocsResolveEmbed(value)).toBeUndefined()
+      expect(googledocsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the legacy published doc', () => {
       const value =
         'https://docs.google.com/document/pub?id=13ZuzQMVth64Ak2_K6UITf6NvmtGETJZQObbaTsHwhAs&embedded=true'
 
-      expect(googledocsResolveEmbed(value)).toBeUndefined()
+      expect(googledocsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a published doc whose token the carrier wrote twice', () => {
       const value =
         'https://docs.google.com/document/d/e/2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN/2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN/pub'
 
-      expect(googledocsResolveEmbed(value)).toBeUndefined()
+      expect(googledocsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a publish route followed by another segment', () => {
       const value =
         'https://docs.google.com/document/d/e/2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN/pub/extra'
 
-      expect(googledocsResolveEmbed(value)).toBeUndefined()
+      expect(googledocsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a doc route with a foreign word before the id', () => {
       const value =
         'https://docs.google.com/document/x/e/2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN/pub'
 
-      expect(googledocsResolveEmbed(value)).toBeUndefined()
+      expect(googledocsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a doc route behind a foreign segment', () => {
       const value =
         'https://docs.google.com/x/document/d/e/2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN/pub'
 
-      expect(googledocsResolveEmbed(value)).toBeUndefined()
+      expect(googledocsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a doc route that names no id', () => {
       const value = 'https://docs.google.com/document/d/'
 
-      expect(googledocsResolveEmbed(value)).toBeUndefined()
+      expect(googledocsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a published deck on the same leaf', () => {
       const value =
         'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/pub'
 
-      expect(googledocsResolveEmbed(value)).toBeUndefined()
+      expect(googledocsResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -148,7 +148,7 @@ describe('googledocsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googledocsResolveEmbed(value)).toEqual(expected)
+      expect(googledocsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should frame a doc written on its edit page on its preview page', () => {
@@ -164,7 +164,7 @@ describe('googledocsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googledocsResolveEmbed(value)).toEqual(expected)
+      expect(googledocsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should frame a doc written with no route on its preview page', () => {
@@ -180,7 +180,7 @@ describe('googledocsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googledocsResolveEmbed(value)).toEqual(expected)
+      expect(googledocsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the embedded flag from a doc written with no route', () => {
@@ -196,7 +196,7 @@ describe('googledocsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googledocsResolveEmbed(value)).toEqual(expected)
+      expect(googledocsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the share tracker from a preview page', () => {
@@ -212,7 +212,7 @@ describe('googledocsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googledocsResolveEmbed(value)).toEqual(expected)
+      expect(googledocsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the share tracker from an edit page', () => {
@@ -228,7 +228,7 @@ describe('googledocsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googledocsResolveEmbed(value)).toEqual(expected)
+      expect(googledocsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the minimal toolbar flag from an edit page', () => {
@@ -244,7 +244,7 @@ describe('googledocsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googledocsResolveEmbed(value)).toEqual(expected)
+      expect(googledocsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the tab an edit page names', () => {
@@ -260,7 +260,7 @@ describe('googledocsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googledocsResolveEmbed(value)).toEqual(expected)
+      expect(googledocsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the parameters of an Office file shared by link', () => {
@@ -276,21 +276,21 @@ describe('googledocsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googledocsResolveEmbed(value)).toEqual(expected)
+      expect(googledocsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should ignore a published doc on its preview page', () => {
       const value =
         'https://docs.google.com/document/d/e/2PACX-1vQW3iYIW4L0w6xry6RUhynyWSb-VeEgSQl5q3mzR0335n7RA-EUvVJSiCQbISewyqE2CNP9mVAivM4G/preview'
 
-      expect(googledocsResolveEmbed(value)).toBeUndefined()
+      expect(googledocsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a published doc on its edit page', () => {
       const value =
         'https://docs.google.com/document/d/e/2PACX-1vQW3iYIW4L0w6xry6RUhynyWSb-VeEgSQl5q3mzR0335n7RA-EUvVJSiCQbISewyqE2CNP9mVAivM4G/edit'
 
-      expect(googledocsResolveEmbed(value)).toBeUndefined()
+      expect(googledocsResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -306,7 +306,7 @@ describe('googledocsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googledocsResolveEmbed(value)).toEqual(expected)
+      expect(googledocsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the Workspace prefix in front of a published doc', () => {
@@ -320,7 +320,7 @@ describe('googledocsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googledocsResolveEmbed(value)).toEqual(expected)
+      expect(googledocsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should frame a doc whose path doubles the slash before the route', () => {
@@ -334,7 +334,7 @@ describe('googledocsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googledocsResolveEmbed(value)).toEqual(expected)
+      expect(googledocsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop an empty query', () => {
@@ -348,7 +348,7 @@ describe('googledocsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googledocsResolveEmbed(value)).toEqual(expected)
+      expect(googledocsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the fragment', () => {
@@ -362,7 +362,7 @@ describe('googledocsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googledocsResolveEmbed(value)).toEqual(expected)
+      expect(googledocsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a pair with no name', () => {
@@ -376,7 +376,7 @@ describe('googledocsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googledocsResolveEmbed(value)).toEqual(expected)
+      expect(googledocsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use a malformed published id as written, even if the player answers an error', () => {
@@ -389,7 +389,7 @@ describe('googledocsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googledocsResolveEmbed(value)).toEqual(expected)
+      expect(googledocsResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

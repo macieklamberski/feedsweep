@@ -22,8 +22,8 @@ const composeEmbed = (path: string, page: string): EmbedResolverResult => {
 // Democracy Now!'s video player, `/embed/{kind}/{y}/{m}/{d}`, which plays a day's whole show or
 // its headlines, or one story when a slug follows the date. The server matches the route words in
 // their own case only.
-export const democracynowResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const [embed, kind, year, month, day, slug, ...rest] = getPathSegments(parsed)
+export const democracynowResolveEmbed: ResolveUrlEmbed = (url) => {
+  const [embed, kind, year, month, day, slug, ...rest] = getPathSegments(url)
 
   if (!isAnyOf(embed, 'embed') || !day || rest.length > 0) {
     return

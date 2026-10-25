@@ -42,7 +42,7 @@ describe('codepenResolveEmbed', () => {
         author: '@argyleink',
       }
 
-      expect(codepenResolveEmbed(value)).toEqual(expected)
+      expect(codepenResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // CodePen route words that still play the pen when they stand in the username position.
@@ -59,7 +59,7 @@ describe('codepenResolveEmbed', () => {
         height: 300,
       }
 
-      expect(codepenResolveEmbed(value)).toEqual(expected)
+      expect(codepenResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read a route word in the username position in any case', () => {
@@ -73,7 +73,7 @@ describe('codepenResolveEmbed', () => {
         height: 300,
       }
 
-      expect(codepenResolveEmbed(value)).toEqual(expected)
+      expect(codepenResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the hex slug CodePen mints for its own pens', () => {
@@ -87,7 +87,7 @@ describe('codepenResolveEmbed', () => {
         height: 300,
       }
 
-      expect(codepenResolveEmbed(value)).toEqual(expected)
+      expect(codepenResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the panes the publisher picked', () => {
@@ -102,7 +102,7 @@ describe('codepenResolveEmbed', () => {
         author: '@argyleink',
       }
 
-      expect(codepenResolveEmbed(value)).toEqual(expected)
+      expect(codepenResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // Three slug lengths are already in the wild, and the length is not what names a pen.
@@ -119,7 +119,7 @@ describe('codepenResolveEmbed', () => {
         author: '@argyleink',
       }
 
-      expect(codepenResolveEmbed(value)).toEqual(expected)
+      expect(codepenResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // The username selects the pen's page and its screenshot, and its length selects neither.
@@ -136,7 +136,7 @@ describe('codepenResolveEmbed', () => {
         author: '@argyleink-with-a-much-longer-handle',
       }
 
-      expect(codepenResolveEmbed(value)).toEqual(expected)
+      expect(codepenResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -156,13 +156,13 @@ describe('codepenResolveEmbed', () => {
         author: '@keyframers',
       }
 
-      expect(codepenResolveEmbed(value)).toEqual(expected)
+      expect(codepenResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should ignore a bare team profile, which names no pen', () => {
       const value = 'https://codepen.io/team/keyframers'
 
-      expect(codepenResolveEmbed(value)).toBeUndefined()
+      expect(codepenResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -170,7 +170,7 @@ describe('codepenResolveEmbed', () => {
     it('should ignore a pen page, which is a link rather than a player', () => {
       const value = 'https://codepen.io/argyleink/pen/XJpKqXm'
 
-      expect(codepenResolveEmbed(value)).toBeUndefined()
+      expect(codepenResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     // The path here is a valid embed path, so only the host check can reject it. A realistic
@@ -178,20 +178,20 @@ describe('codepenResolveEmbed', () => {
     it('should ignore a subdomain even when the path names a pen', () => {
       const value = 'https://blog.codepen.io/argyleink/embed/XJpKqXm'
 
-      expect(codepenResolveEmbed(value)).toBeUndefined()
+      expect(codepenResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a foreign host carrying the editor path', () => {
       const value = 'https://evil.test/editor/anon/embed/019dcdfc-1e41-77c8-afdf-810ebc6f2480'
 
-      expect(codepenResolveEmbed(value)).toBeUndefined()
+      expect(codepenResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     // www.codepen.io redirects every path to the site root, so the player never loads.
     it('should ignore the www host', () => {
       const value = 'https://www.codepen.io/argyleink/embed/XJpKqXm'
 
-      expect(codepenResolveEmbed(value)).toBeUndefined()
+      expect(codepenResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     // `cpe` is the 2.0 editor's own path and the prefill endpoint sits under it, so this has the
@@ -199,51 +199,51 @@ describe('codepenResolveEmbed', () => {
     it('should ignore a path segment CodePen owns in the username position', () => {
       const value = 'https://codepen.io/cpe/embed/prefill'
 
-      expect(codepenResolveEmbed(value)).toBeUndefined()
+      expect(codepenResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the collection segment in the username position', () => {
       const value = 'https://codepen.io/collection/embed/XJpKqXm'
 
-      expect(codepenResolveEmbed(value)).toBeUndefined()
+      expect(codepenResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the spark segment in the username position', () => {
       const value = 'https://codepen.io/spark/embed/XJpKqXm'
 
-      expect(codepenResolveEmbed(value)).toBeUndefined()
+      expect(codepenResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     // A separate product with its own id space and no screenshot endpoint. Zero in the corpus.
     it('should ignore a project embed', () => {
       const value = 'https://codepen.io/argyleink/project/embed/ABCDEF'
 
-      expect(codepenResolveEmbed(value)).toBeUndefined()
+      expect(codepenResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     // `cdpn.io` serves a pen's raw output without the player chrome, so it is not an embed.
     it('should ignore the asset host', () => {
       const value = 'https://cdpn.io/pen/debug/XJpKqXm/abc123'
 
-      expect(codepenResolveEmbed(value)).toBeUndefined()
+      expect(codepenResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a foreign host carrying the same path', () => {
       const value = 'https://evil.test/argyleink/embed/XJpKqXm'
 
-      expect(codepenResolveEmbed(value)).toBeUndefined()
+      expect(codepenResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a player url naming no pen', () => {
       const value = 'https://codepen.io/argyleink/embed'
 
-      expect(codepenResolveEmbed(value)).toBeUndefined()
+      expect(codepenResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a slug carrying a file name', () => {
       const value = 'https://codepen.io/argyleink/embed/XJpKqXm.mp4'
 
-      expect(codepenResolveEmbed(value)).toBeUndefined()
+      expect(codepenResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

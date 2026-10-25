@@ -18,8 +18,8 @@ const playerHeights = { episode: 120, show: 300, station: 200 }
 
 // An iHeart podcast player, of one episode or of a show, and the live station and artist radio
 // players, on www.iheart.com or beta.iheart.com.
-export const iheartResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const pathname = parsed.pathname
+export const iheartResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const pathname = url.pathname
   const episode = pathname.match(episodePathRegex)
 
   if (episode) {

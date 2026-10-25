@@ -17,7 +17,7 @@ describe('officeResolveEmbed', () => {
         title: 'Offering-Students-Flexibility-When-They-Are-Ill.docx',
       }
 
-      expect(officeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(officeResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the embed viewer for the share spelling', () => {
@@ -31,7 +31,7 @@ describe('officeResolveEmbed', () => {
         title: 'GrantWritingSICSFLAGS.pptx',
       }
 
-      expect(officeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(officeResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint https for an http carrier, which the viewer redirects there', () => {
@@ -45,7 +45,7 @@ describe('officeResolveEmbed', () => {
         title: 'Kuliah-APIO-1_PENGANTAR-1.pptx',
       }
 
-      expect(officeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(officeResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the aspect ratio of the deck', () => {
@@ -59,7 +59,7 @@ describe('officeResolveEmbed', () => {
         title: 'calldeck.pptx',
       }
 
-      expect(officeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(officeResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the share link origin and the newsletter tracking', () => {
@@ -73,7 +73,7 @@ describe('officeResolveEmbed', () => {
         title: 'SOP 50 10 8 Technical Updates effective 6.1.2025.docx',
       }
 
-      expect(officeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(officeResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // The viewer opens this 19-slide deck on its first slide with `wdStartOn=3` too.
@@ -88,7 +88,7 @@ describe('officeResolveEmbed', () => {
         title: 'Kuliah-APIO-1_PENGANTAR-1.pptx',
       }
 
-      expect(officeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(officeResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -96,34 +96,34 @@ describe('officeResolveEmbed', () => {
     it('should ignore a viewer naming no document', () => {
       const value = 'https://view.officeapps.live.com/op/embed.aspx'
 
-      expect(officeResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(officeResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a route on the host that is not the viewer', () => {
       const value =
         'https://view.officeapps.live.com/op/generate.aspx?src=https%3A%2F%2Fexample.com%2Fa.docx'
 
-      expect(officeResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(officeResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a viewer path with a segment before it', () => {
       const value =
         'https://view.officeapps.live.com/x/op/embed.aspx?src=https%3A%2F%2Fexample.com%2Fa.docx'
 
-      expect(officeResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(officeResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a viewer path with a segment after it', () => {
       const value =
         'https://view.officeapps.live.com/op/embed.aspx/extra?src=https%3A%2F%2Fexample.com%2Fa.docx'
 
-      expect(officeResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(officeResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a document url with no host', () => {
       const value = 'https://view.officeapps.live.com/op/embed.aspx?src=%2Ffiles%2Fa.docx'
 
-      expect(officeResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(officeResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -139,7 +139,7 @@ describe('officeResolveEmbed', () => {
         title: 'GrantWritingSICSFLAGS.pptx',
       }
 
-      expect(officeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(officeResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read a protocol-relative document url', () => {
@@ -153,7 +153,7 @@ describe('officeResolveEmbed', () => {
         title: 'GrantWritingSICSFLAGS.pptx',
       }
 
-      expect(officeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(officeResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should leave a download url untitled', () => {
@@ -166,7 +166,7 @@ describe('officeResolveEmbed', () => {
         ratio: '8/5',
       }
 
-      expect(officeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(officeResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should decode a file name the document url escaped', () => {
@@ -180,7 +180,7 @@ describe('officeResolveEmbed', () => {
         title: 'Q3 report.xlsx',
       }
 
-      expect(officeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(officeResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep a file name that is not valid escaping', () => {
@@ -194,7 +194,7 @@ describe('officeResolveEmbed', () => {
         title: '100%.xlsx',
       }
 
-      expect(officeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(officeResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

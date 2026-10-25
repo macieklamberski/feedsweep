@@ -68,8 +68,8 @@ const readProgramFromPlayer = (parsed: URL): Program | undefined => {
   }
 }
 
-const arteResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const program = readProgramFromPlayer(parsed)
+const arteResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const program = readProgramFromPlayer(url)
 
   if (!program) {
     return

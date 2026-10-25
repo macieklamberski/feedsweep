@@ -39,9 +39,9 @@ const findAnchor = (anchors: Array<Element>, pathRegex: RegExp): Element | undef
   })
 }
 
-const pixivResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const route = parsed.pathname.match(framePathRegex)?.[1]?.toLowerCase()
-  const workId = getQueryParam(parsed.searchParams, 'id')
+const pixivResolveEmbed: ResolveUrlEmbed = (url) => {
+  const route = url.pathname.match(framePathRegex)?.[1]?.toLowerCase()
+  const workId = getQueryParam(url.searchParams, 'id')
 
   if (!route || !workId) {
     return
@@ -51,7 +51,7 @@ const pixivResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
   const page = illustIdRegex.test(workId) ? `https://www.pixiv.net/artworks/${illustId}` : undefined
 
   // `type` picks the id space, and a novel's number reads the same as an illustration's.
-  if (route === 'oembed_iframe' && !isAnyOf(getQueryParam(parsed.searchParams, 'type'), 'illust')) {
+  if (route === 'oembed_iframe' && !isAnyOf(getQueryParam(url.searchParams, 'type'), 'illust')) {
     return
   }
 

@@ -13,7 +13,7 @@ const versionSuffixRegex = /@[^@/]*$/
 
 // Observable's notebook frame, observablehq.com/embed/@{user}/{notebook}[@{version}]?cells={names},
 // or embed/{16 hex}[@{version}] for a notebook addressed by its id.
-const observableResolveEmbed: ResolveUrlEmbed = (url, element, parsed) => {
+const observableResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const segments = getPathSegments(url)
 
   if (!isAnyOf(segments[0], 'embed')) {
@@ -22,7 +22,7 @@ const observableResolveEmbed: ResolveUrlEmbed = (url, element, parsed) => {
 
   // The query names which cells the frame renders, in `cells` or a repeated `cell`, and the frame
   // hands the rest to the notebook's own code, so all of it is kept.
-  const src = parsed.href
+  const src = url.href
 
   // `@{version}` pins one revision of a notebook rather than naming another one, and the document
   // endpoint takes the notebook alone, so the suffix stays out of the id.

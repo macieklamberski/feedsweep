@@ -16,7 +16,7 @@ describe('hearthisResolveEmbed', () => {
         height: 150,
       }
 
-      expect(hearthisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(hearthisResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the track player from the dark theme on the main host', () => {
@@ -28,7 +28,7 @@ describe('hearthisResolveEmbed', () => {
         height: 150,
       }
 
-      expect(hearthisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(hearthisResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the track player from a url with no theme segment', () => {
@@ -40,7 +40,7 @@ describe('hearthisResolveEmbed', () => {
         height: 150,
       }
 
-      expect(hearthisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(hearthisResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the autoplay the publisher switched on', () => {
@@ -52,7 +52,7 @@ describe('hearthisResolveEmbed', () => {
         height: 150,
       }
 
-      expect(hearthisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(hearthisResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the set player from the set and user pair', () => {
@@ -65,7 +65,7 @@ describe('hearthisResolveEmbed', () => {
         height: 350,
       }
 
-      expect(hearthisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(hearthisResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the set player from the bare set id the embed dialog writes', () => {
@@ -77,7 +77,7 @@ describe('hearthisResolveEmbed', () => {
         height: 350,
       }
 
-      expect(hearthisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(hearthisResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -86,43 +86,43 @@ describe('hearthisResolveEmbed', () => {
       const value =
         'https://hearthis.at/conrad.mildner/die-abspanner-8-godzilla-edge-of-tomorrow-xmen/'
 
-      expect(hearthisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(hearthisResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the track route below another segment', () => {
       const value = 'https://hearthis.at/conrad.mildner/embed/43067/'
 
-      expect(hearthisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(hearthisResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the embed route naming no track', () => {
       const value = 'https://hearthis.at/embed/'
 
-      expect(hearthisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(hearthisResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the set route naming no set', () => {
       const value = 'https://hearthis.at/set/'
 
-      expect(hearthisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(hearthisResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the player segments under a route word that is not set', () => {
       const value = 'https://hearthis.at/playlist/418439/embed/'
 
-      expect(hearthisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(hearthisResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a set route that is not the player', () => {
       const value = 'https://hearthis.at/set/418439-8790044/'
 
-      expect(hearthisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(hearthisResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a set player going on past the embed segment', () => {
       const value = 'https://hearthis.at/set/418439-8790044/embed/oAj31/'
 
-      expect(hearthisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(hearthisResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -136,7 +136,7 @@ describe('hearthisResolveEmbed', () => {
         height: 150,
       }
 
-      expect(hearthisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(hearthisResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the set route word in any case', () => {
@@ -148,7 +148,7 @@ describe('hearthisResolveEmbed', () => {
         height: 350,
       }
 
-      expect(hearthisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(hearthisResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass a track id through as written', () => {
@@ -160,7 +160,7 @@ describe('hearthisResolveEmbed', () => {
         height: 150,
       }
 
-      expect(hearthisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(hearthisResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

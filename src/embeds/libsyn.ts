@@ -1,10 +1,10 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { FieldCleaner, ResolveEmbed } from '../types.js'
+import { getPathSegments, isAnyOf } from 'trousse'
+import type { FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 
 const provider = 'libsyn'
 
-import { digitsRegex, isMediaFile, placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, isMediaFile } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const libsynHosts = ['libsyn.com']
@@ -29,16 +29,14 @@ type LibsynEmbed = {
   start?: string
 }
 
-export const extractLibsynEmbed = (link: string): LibsynEmbed | undefined => {
-  const parsed = parseUrl(link, placeholderBaseUrl)
-
+export const extractLibsynEmbed = (url: URL): LibsynEmbed | undefined => {
   // An audio file on the player path would otherwise trade its audio element for a placeholder.
   // Libsyn serves the episode audio from the same domain as the players.
-  if (!parsed || isMediaFile(parsed.pathname)) {
+  if (isMediaFile(url.pathname)) {
     return
   }
 
-  const segments = getPathSegments(parsed)
+  const segments = getPathSegments(url)
 
   if (!isAnyOf(segments[0], 'embed') || !isAnyOf(segments[1], embedKinds)) {
     return
@@ -58,7 +56,7 @@ export const extractLibsynEmbed = (link: string): LibsynEmbed | undefined => {
   }
 }
 
-export const libsynResolveEmbed: ResolveEmbed = (url, element) => {
+export const libsynResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const embed = extractLibsynEmbed(url)
 
   if (!embed) {

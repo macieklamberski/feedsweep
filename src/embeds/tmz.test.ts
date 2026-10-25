@@ -16,7 +16,7 @@ describe('tmzResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(tmzResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(tmzResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the player of an older slug', () => {
@@ -29,7 +29,7 @@ describe('tmzResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(tmzResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(tmzResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should fold the watch route onto the player', () => {
@@ -42,7 +42,7 @@ describe('tmzResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(tmzResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(tmzResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the query', () => {
@@ -55,7 +55,7 @@ describe('tmzResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(tmzResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(tmzResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should fold the case of the slug in the key only', () => {
@@ -68,7 +68,7 @@ describe('tmzResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(tmzResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(tmzResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -76,25 +76,25 @@ describe('tmzResolveEmbed', () => {
     it('should ignore a path with a leading segment', () => {
       const value = 'https://share.tmz.com/x/videos/0-aw46wcaj/'
 
-      expect(tmzResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(tmzResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path with a trailing segment', () => {
       const value = 'https://share.tmz.com/videos/0-aw46wcaj/extra/'
 
-      expect(tmzResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(tmzResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore another route word', () => {
       const value = 'https://share.tmz.com/clips/0-aw46wcaj/'
 
-      expect(tmzResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(tmzResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the player route with no slug', () => {
       const value = 'https://share.tmz.com/videos/'
 
-      expect(tmzResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(tmzResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

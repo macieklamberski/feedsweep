@@ -16,7 +16,7 @@ describe('deezerResolveEmbed', () => {
         height: 300,
       }
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should size a track shorter than a collection', () => {
@@ -29,7 +29,7 @@ describe('deezerResolveEmbed', () => {
         height: 150,
       }
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -37,13 +37,13 @@ describe('deezerResolveEmbed', () => {
     it('should ignore a deezer url naming no resource', () => {
       const value = 'https://www.deezer.com/fr/the-beatles'
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(deezerResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a short link whose target is only known to deezer', () => {
       const value = 'https://link.deezer.com/s/33aBcDeF'
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(deezerResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -58,7 +58,7 @@ describe('deezerResolveEmbed', () => {
         height: 300,
       }
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use a malformed id as written, even if the player answers an error', () => {
@@ -71,7 +71,7 @@ describe('deezerResolveEmbed', () => {
         height: 150,
       }
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep a decoded plugin id carrying a separator in one path segment', () => {
@@ -84,25 +84,25 @@ describe('deezerResolveEmbed', () => {
         height: 300,
       }
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should refuse an artist, which the widget serves as a blank page', () => {
       const value = 'https://widget.deezer.com/widget/dark/artist/27'
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(deezerResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should refuse a type naming an inherited method', () => {
       const value = 'https://widget.deezer.com/widget/dark/toString/3135556'
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(deezerResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should refuse a type naming the prototype itself', () => {
       const value = 'https://widget.deezer.com/widget/dark/__proto__/3135556'
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(deezerResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -117,7 +117,7 @@ describe('deezerResolveEmbed', () => {
         height: 300,
       }
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should take a podcast episode', () => {
@@ -130,7 +130,7 @@ describe('deezerResolveEmbed', () => {
         height: 300,
       }
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -146,7 +146,7 @@ describe('deezerResolveEmbed', () => {
         height: 300,
       }
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the share dialog theme over a plugin player layout', () => {
@@ -160,7 +160,7 @@ describe('deezerResolveEmbed', () => {
         height: 150,
       }
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the plural spelling of a track', () => {
@@ -173,7 +173,7 @@ describe('deezerResolveEmbed', () => {
         height: 150,
       }
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read a podcast as the show the widget serves', () => {
@@ -186,7 +186,7 @@ describe('deezerResolveEmbed', () => {
         height: 300,
       }
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the singular spelling of a track', () => {
@@ -199,7 +199,7 @@ describe('deezerResolveEmbed', () => {
         height: 150,
       }
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the singular spelling of an episode', () => {
@@ -212,7 +212,7 @@ describe('deezerResolveEmbed', () => {
         height: 300,
       }
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the plural spelling of an episode', () => {
@@ -225,7 +225,7 @@ describe('deezerResolveEmbed', () => {
         height: 300,
       }
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read a show under its own name', () => {
@@ -238,7 +238,7 @@ describe('deezerResolveEmbed', () => {
         height: 300,
       }
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should step over the locale the site puts in front of the route', () => {
@@ -251,13 +251,13 @@ describe('deezerResolveEmbed', () => {
         height: 300,
       }
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should refuse a plugin url naming a type the widget does not serve', () => {
       const value = 'https://www.deezer.com/plugins/player?type=artist&id=27&app_id=1'
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(deezerResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -273,7 +273,7 @@ describe('deezerResolveEmbed', () => {
         height: 150,
       }
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the first small widget', () => {
@@ -286,7 +286,7 @@ describe('deezerResolveEmbed', () => {
         height: 150,
       }
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the single player on its own path', () => {
@@ -299,25 +299,25 @@ describe('deezerResolveEmbed', () => {
         height: 150,
       }
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should refuse a swf naming no song', () => {
       const value = 'https://www.deezer.com/embedded/small-widget-v2.swf?colorBackground=0x009074'
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(deezerResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should refuse a swf whose name only ends like the player', () => {
       const value = 'https://www.deezer.com/embedded/x-small-widget.swf?idSong=293366'
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(deezerResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should refuse a file beside the player', () => {
       const value = 'https://www.deezer.com/embedded/small-widget.swf.xml?idSong=293366'
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(deezerResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -332,7 +332,7 @@ describe('deezerResolveEmbed', () => {
         height: 300,
       }
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the playlist named by pid', () => {
@@ -345,7 +345,7 @@ describe('deezerResolveEmbed', () => {
         height: 300,
       }
 
-      expect(deezerResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

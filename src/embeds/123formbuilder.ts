@@ -25,8 +25,8 @@ const composeEmbed = (formId: string): EmbedResolverResult => {
 
 // The form page, `form.123formbuilder.com/{id}`, and the older iframe snippet's
 // `my-contact-form-{id}.html`, which redirects onto the same host.
-export const oneTwoThreeFormBuilderResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const pathname = parsed.pathname
+export const oneTwoThreeFormBuilderResolveEmbed: ResolveUrlEmbed = (url) => {
+  const pathname = url.pathname
   const formId = pathname.match(formPathRegex)?.[1] ?? pathname.match(legacyFramePathRegex)?.[1]
 
   if (!formId) {

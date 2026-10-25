@@ -38,12 +38,12 @@ const composeShortLink = (url: URL, element?: Element): EmbedResolverResult | un
 // `/forms/d/e/{id}` names a form by its published id and `/forms/d/{id}` by its Drive file id,
 // which the server redirects to the published id. The account prefix `/u/{n}/` only picks the
 // sign-in and serves the same form.
-export const googleformsResolveEmbed: ResolveUrlEmbed = (url, element, parsed) => {
+export const googleformsResolveEmbed: ResolveUrlEmbed = (url, element) => {
   if (isHostOf(url, [shortLinkHost])) {
-    return composeShortLink(parsed, element)
+    return composeShortLink(url, element)
   }
 
-  const segments = getPathSegmentsWithoutWorkspace(parsed)
+  const segments = getPathSegmentsWithoutWorkspace(url)
   const formSegments = isAnyOf(segments[1], 'u') ? segments.slice(3) : segments.slice(1)
 
   if (!isAnyOf(segments[0], 'forms') || !isAnyOf(formSegments[0], 'd')) {
@@ -59,7 +59,7 @@ export const googleformsResolveEmbed: ResolveUrlEmbed = (url, element, parsed) =
   }
 
   const formPath = isPublished ? `e/${formId}` : formId
-  const prefill = filterUrlQuery(parsed, isPrefillParam).replace('?', '&')
+  const prefill = filterUrlQuery(url, isPrefillParam).replace('?', '&')
 
   return {
     provider,

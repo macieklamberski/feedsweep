@@ -1,5 +1,5 @@
 import { composeQuery, decodeSegment, getPathSegments, getQueryParam, parseUrl } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { isFileName, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -61,12 +61,11 @@ const readShow = (segments: Array<string>): Show | undefined => {
   return { key: `${user}/${slug}`, path: `${rawUser}/${rawSlug}` }
 }
 
-const readShowUrl = (link: string, flashFeed?: string): Show | undefined => {
-  const parsed = parseUrl(link)
+const readShowUrl = (url: URL, flashFeed?: string): Show | undefined => {
   // The feed parameter holds a path in the newer embeds and a whole url in the Flash
   // mixcloudLoader.swf one, which takes it in its query or in its flashvars.
-  const feed = getQueryParam(parsed?.searchParams, 'feed') ?? flashFeed
-  const source = feed ? parseUrl(feed, placeholderBaseUrl) : parsed
+  const feed = getQueryParam(url.searchParams, 'feed') ?? flashFeed
+  const source = feed ? parseUrl(feed, placeholderBaseUrl) : url
 
   // Mixcloud serves the show audio and the artwork from subdomains of mixcloud.com.
   // A file path has a show's two segments, so a claimed enclosure would lose its element.
@@ -77,8 +76,8 @@ const readShowUrl = (link: string, flashFeed?: string): Show | undefined => {
   return readShow(getPathSegments(source))
 }
 
-export const extractMixcloudShow = (link: string): string | undefined => {
-  return readShowUrl(link)?.key
+export const extractMixcloudShow = (url: URL): string | undefined => {
+  return readShowUrl(url)?.key
 }
 
 // Without the publisher's `mini`, `hide_cover`, `hide_artwork` and `light`, the widget is the cover
@@ -86,7 +85,7 @@ export const extractMixcloudShow = (link: string): string | undefined => {
 // widget.
 const playerHeight = 120
 
-export const mixcloudResolveEmbed: ResolveEmbed = (url, element) => {
+export const mixcloudResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const show = readShowUrl(url, flashVar(element, 'feed'))
 
   if (!show) {

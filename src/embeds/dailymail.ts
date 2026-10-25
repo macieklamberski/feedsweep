@@ -15,8 +15,8 @@ const playerRatio = '16/9'
 const chromeHeight = 234
 
 // MailOnline's video player, `/embed/video/{id}.html`.
-export const dailymailResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const id = parsed.pathname.match(playerPathRegex)?.[1]
+export const dailymailResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const id = url.pathname.match(playerPathRegex)?.[1]
 
   if (!id) {
     return
@@ -25,8 +25,8 @@ export const dailymailResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) =>
   return {
     provider,
     id,
-    src: `https://${parsed.hostname}/embed/video/${id}.html`,
-    url: `https://${parsed.hostname}/video/video-${id}.html`,
+    src: `https://${url.hostname}/embed/video/${id}.html`,
+    url: `https://${url.hostname}/video/video-${id}.html`,
     ratio: playerRatio,
     ratioHeightOffset: chromeHeight,
     title: attr(element, 'title'),

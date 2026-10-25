@@ -29,17 +29,17 @@ const composeEmbed = (orgKey: string, formNumber: string, query = ''): EmbedReso
 
 // The form page, `www.cognitoforms.com/f/{org}/{form}`, and the older
 // `services.cognitoforms.com/f/{org}?id={form}`, which serves the same form.
-export const cognitoformsResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const [route, orgKey, pathNumber, ...rest] = getPathSegments(parsed)
+export const cognitoformsResolveEmbed: ResolveUrlEmbed = (url) => {
+  const [route, orgKey, pathNumber, ...rest] = getPathSegments(url)
   // A query form number comes out decoded, and it goes into a path.
-  const formNumber = pathNumber ?? encodePathSegment(getQueryParam(parsed.searchParams, 'id') ?? '')
+  const formNumber = pathNumber ?? encodePathSegment(getQueryParam(url.searchParams, 'id') ?? '')
 
   if (!isAnyOf(route, 'f') || !orgKey || !formNumber || rest.length > 0) {
     return
   }
 
   // `entry` prefills the form.
-  return composeEmbed(orgKey, formNumber, pickUrlParams(parsed.href, ['entry']))
+  return composeEmbed(orgKey, formNumber, pickUrlParams(url.href, ['entry']))
 }
 
 // Cognito Forms' seamless embed, a script that renders the form into the page itself and that

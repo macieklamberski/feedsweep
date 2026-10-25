@@ -11,9 +11,9 @@ const canaluHosts = ['www.canal-u.tv']
 // Canal-U's video player, `/chaines/{channel}/embed/{id}` today and `/embed/{id}` before, which
 // redirects to the channel the id belongs to. The id is the video's node id, so it is the key on
 // both routes. The player reads `t` as the start position and nothing else from its query.
-export const canaluResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const segments = getPathSegments(parsed)
-  const query = pickUrlParams(parsed.href, ['t'])
+export const canaluResolveEmbed: ResolveUrlEmbed = (url) => {
+  const segments = getPathSegments(url)
+  const query = pickUrlParams(url.href, ['t'])
 
   if (segments.length === 4) {
     const [chaines, channel, embed, id] = segments

@@ -15,7 +15,7 @@ describe('dzenResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(dzenResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(dzenResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass an id with a dash and an underscore through as written', () => {
@@ -27,7 +27,7 @@ describe('dzenResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(dzenResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(dzenResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the player url with a trailing slash', () => {
@@ -39,7 +39,7 @@ describe('dzenResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(dzenResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(dzenResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the share dialog query and a tracker', () => {
@@ -52,7 +52,7 @@ describe('dzenResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(dzenResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(dzenResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the start position', () => {
@@ -64,7 +64,7 @@ describe('dzenResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(dzenResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(dzenResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the route in capitals and mint it in lowercase', () => {
@@ -76,7 +76,7 @@ describe('dzenResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(dzenResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(dzenResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -84,19 +84,19 @@ describe('dzenResolveEmbed', () => {
     it('should return undefined for the player route below another segment', () => {
       const value = 'https://dzen.ru/x/embed/oW0bt8mcOAAA'
 
-      expect(dzenResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(dzenResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a segment after the video', () => {
       const value = 'https://dzen.ru/embed/oW0bt8mcOAAA/extra'
 
-      expect(dzenResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(dzenResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the player route with no id', () => {
       const value = 'https://dzen.ru/embed/'
 
-      expect(dzenResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(dzenResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -104,13 +104,13 @@ describe('dzenResolveEmbed', () => {
     it('should return undefined for a news story page', () => {
       const value = 'https://dzen.ru/news/story/016e953d-d9ca-5a23-8062-e94c7d9f9e0e'
 
-      expect(dzenResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(dzenResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a video watch page, whose id is not the player id', () => {
       const value = 'https://dzen.ru/video/watch/6a47e3293d9f123299fe806a'
 
-      expect(dzenResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(dzenResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

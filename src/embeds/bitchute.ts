@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -7,7 +7,7 @@ const provider = 'bitchute'
 
 const bitchuteHosts = ['bitchute.com']
 
-const bitchuteResolveEmbed: ResolveEmbed = (url, element) => {
+const bitchuteResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const [route, id] = getPathSegments(url)
 
   // The route word tells a video from a channel or a profile.

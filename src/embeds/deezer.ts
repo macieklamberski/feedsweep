@@ -74,8 +74,8 @@ const readResource = (url: URL): Resource | undefined => {
   }
 }
 
-export const deezerResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const resource = readResource(parsed)
+export const deezerResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const resource = readResource(url)
 
   if (!resource || !deezerHeights.has(resource.type) || !resource.id) {
     return

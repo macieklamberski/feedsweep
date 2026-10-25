@@ -15,7 +15,7 @@ describe('videaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(videaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(videaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the current player for the retired Flash player', () => {
@@ -27,7 +27,7 @@ describe('videaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(videaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(videaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the apex for the www host', () => {
@@ -39,7 +39,7 @@ describe('videaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(videaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(videaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the start position and drop a tracker and the autoplay', () => {
@@ -52,7 +52,7 @@ describe('videaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(videaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(videaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the case of the id in the player and the key', () => {
@@ -64,7 +64,7 @@ describe('videaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(videaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(videaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the player route in another case and mint it in lowercase', () => {
@@ -76,7 +76,7 @@ describe('videaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(videaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(videaResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -84,33 +84,33 @@ describe('videaResolveEmbed', () => {
     it('should ignore the player with no video', () => {
       const value = 'https://videa.hu/player?start=120'
 
-      expect(videaResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(videaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path with a leading segment', () => {
       const value = 'https://videa.hu/x/player?v=RJiqVlMkla4Ckqf3'
 
-      expect(videaResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(videaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path with a trailing slash, which the server answers with 404', () => {
       const value = 'https://videa.hu/player/?v=RJiqVlMkla4Ckqf3'
 
-      expect(videaResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(videaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the watch page', () => {
       const value =
         'https://videa.hu/videok/vilaggazdasag/az-emberiseg-meg-fel-sem-RJiqVlMkla4Ckqf3'
 
-      expect(videaResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(videaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a video file', () => {
       const value =
         'https://video5.videa.hu/static/w480p/8.3805899.2579076.1.0.385.385?md5=9o58npU0Q'
 
-      expect(videaResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(videaResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

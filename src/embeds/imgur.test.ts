@@ -222,7 +222,7 @@ describe('imgurResolveEmbed', () => {
       thumbnail: 'https://i.imgur.com/pVa2rXLm.jpg',
     }
 
-    expect(imgurResolveEmbed(value)).toEqual(expected)
+    expect(imgurResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should resolve an album frame', () => {
@@ -235,7 +235,7 @@ describe('imgurResolveEmbed', () => {
       height: 500,
     }
 
-    expect(imgurResolveEmbed(value)).toEqual(expected)
+    expect(imgurResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should treat the gallery path as an album', () => {
@@ -248,7 +248,7 @@ describe('imgurResolveEmbed', () => {
       height: 500,
     }
 
-    expect(imgurResolveEmbed(value)).toEqual(expected)
+    expect(imgurResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // What the share button writes today. The slug is the post's title and addresses nothing on
@@ -263,7 +263,7 @@ describe('imgurResolveEmbed', () => {
       height: 500,
     }
 
-    expect(imgurResolveEmbed(value)).toEqual(expected)
+    expect(imgurResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // A tag is decoration in front of the same post one segment deeper, and the platform serves
@@ -278,7 +278,7 @@ describe('imgurResolveEmbed', () => {
       height: 500,
     }
 
-    expect(imgurResolveEmbed(value)).toEqual(expected)
+    expect(imgurResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read a post the topic alias of the tag route carries', () => {
@@ -291,7 +291,7 @@ describe('imgurResolveEmbed', () => {
       height: 500,
     }
 
-    expect(imgurResolveEmbed(value)).toEqual(expected)
+    expect(imgurResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // The accepted limit of reading the last word: a slug word can be id-shaped, and this one is
@@ -309,7 +309,7 @@ describe('imgurResolveEmbed', () => {
       height: 500,
     }
 
-    expect(imgurResolveEmbed(value)).toEqual(expected)
+    expect(imgurResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // The hyphen says where the id starts, and nothing tests its length, so a slug with no id
@@ -324,7 +324,7 @@ describe('imgurResolveEmbed', () => {
       height: 500,
     }
 
-    expect(imgurResolveEmbed(value)).toEqual(expected)
+    expect(imgurResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read a single word longer than an id whole', () => {
@@ -337,7 +337,7 @@ describe('imgurResolveEmbed', () => {
       height: 500,
     }
 
-    expect(imgurResolveEmbed(value)).toEqual(expected)
+    expect(imgurResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should resolve an album page url, which the prefix already names as one', () => {
@@ -350,7 +350,7 @@ describe('imgurResolveEmbed', () => {
       height: 500,
     }
 
-    expect(imgurResolveEmbed(value)).toEqual(expected)
+    expect(imgurResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // A publisher pastes the post page as often as the frame, and both name the same post.
@@ -364,7 +364,7 @@ describe('imgurResolveEmbed', () => {
       thumbnail: 'https://i.imgur.com/pVa2rXLm.jpg',
     }
 
-    expect(imgurResolveEmbed(value)).toEqual(expected)
+    expect(imgurResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // A word that reads like a site page is not one: `imgur.com/memes` is a post somebody uploaded.
@@ -379,7 +379,7 @@ describe('imgurResolveEmbed', () => {
       thumbnail: 'https://i.imgur.com/memesm.jpg',
     }
 
-    expect(imgurResolveEmbed(value)).toEqual(expected)
+    expect(imgurResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should use a malformed id as written, even if the player answers an error', () => {
@@ -392,18 +392,18 @@ describe('imgurResolveEmbed', () => {
       thumbnail: 'https://i.imgur.com/pVa2_rXLm.jpg',
     }
 
-    expect(imgurResolveEmbed(value)).toEqual(expected)
+    expect(imgurResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should ignore an imgur url that names no post', () => {
     const value = 'https://imgur.com/'
 
-    expect(imgurResolveEmbed(value)).toBeUndefined()
+    expect(imgurResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   describe('shapes that name no post', () => {
     it.each(sitePaths)('should ignore the site path %s', (value) => {
-      expect(imgurResolveEmbed(value)).toBeUndefined()
+      expect(imgurResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     const galleryListingUrls: Array<string> = [
@@ -416,7 +416,7 @@ describe('imgurResolveEmbed', () => {
     it.each(galleryListingUrls)(
       'should ignore %s, a gallery listing sitting where an album id would',
       (value) => {
-        expect(imgurResolveEmbed(value)).toBeUndefined()
+        expect(imgurResolveEmbed(new URL(value))).toBeUndefined()
       },
     )
   })
@@ -424,13 +424,13 @@ describe('imgurResolveEmbed', () => {
   it('should ignore a slugged gallery id carrying an encoded slash', () => {
     const value = 'https://imgur.com/gallery/cats-pVa2%2FrXL'
 
-    expect(imgurResolveEmbed(value)).toBeUndefined()
+    expect(imgurResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should ignore another host carrying the post path', () => {
     const value = 'https://imgur.com.evil.test/pVa2rXL/embed'
 
-    expect(imgurResolveEmbed(value)).toBeUndefined()
+    expect(imgurResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   describe('the hosts a post page answers on', () => {
@@ -444,7 +444,7 @@ describe('imgurResolveEmbed', () => {
         thumbnail: 'https://i.imgur.com/pVa2rXLm.jpg',
       }
 
-      expect(imgurResolveEmbed(value)).toEqual(expected)
+      expect(imgurResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the www spelling of the post page', () => {
@@ -457,7 +457,7 @@ describe('imgurResolveEmbed', () => {
         thumbnail: 'https://i.imgur.com/pVa2rXLm.jpg',
       }
 
-      expect(imgurResolveEmbed(value)).toEqual(expected)
+      expect(imgurResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     const fileUrls: Array<string> = [
@@ -470,7 +470,7 @@ describe('imgurResolveEmbed', () => {
     ]
 
     it.each(fileUrls)('should ignore %s, which names a file rather than a post', (value) => {
-      expect(imgurResolveEmbed(value)).toBeUndefined()
+      expect(imgurResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

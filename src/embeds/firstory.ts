@@ -13,8 +13,8 @@ const storyPathRegex = /^\/embed\/story\/([^/]+)\/?$/i
 const playerHeight = 182
 
 // A Firstory episode player.
-export const firstoryResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const pathname = parsed.pathname
+export const firstoryResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const pathname = url.pathname
   const id = pathname.match(storyPathRegex)?.[1]
 
   if (!id) {

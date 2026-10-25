@@ -194,8 +194,8 @@ const readItem = (url: URL): Item | undefined => {
 
 // ArcGIS Online's players for web maps, StoryMaps, Experience Builder apps, Instant Apps and
 // Dashboards. Each names one item, whose id the item api answers whatever its kind.
-export const arcgisResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const item = readItem(parsed)
+export const arcgisResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const item = readItem(url)
 
   if (!item) {
     return
@@ -236,6 +236,6 @@ export const arcgisWidgetEmbedResolver = createMarkupEmbedResolver(
       }
     }
 
-    return arcgisResolveEmbed(url.href, element, url)
+    return arcgisResolveEmbed(url, element)
   },
 )

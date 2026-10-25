@@ -44,61 +44,58 @@ export const composeLoaderViewerUrl = (url: string | undefined): string | undefi
 // DocumentCloud's viewer iframe, `embed.documentcloud.org/documents/{id}-{slug}/`, and the older
 // `www.documentcloud.org/documents/{id}-{slug}.html`, which redirects to it. The carrier `title`
 // is the document's own name with `" (Hosted by DocumentCloud)"` appended, so it is left unread.
-export const documentcloudEmbedResolver = createUrlEmbedResolver(
-  documentcloudHosts,
-  (url, _element, parsed) => {
-    const isLegacyHost = isHostOf(url, legacyHosts)
-    const [route, documentSegment, partSegment] = getPathSegments(url)
+export const documentcloudEmbedResolver = createUrlEmbedResolver(documentcloudHosts, (url) => {
+  const isLegacyHost = isHostOf(url, legacyHosts)
+  const [route, documentSegment, partSegment] = getPathSegments(url)
 
-    // A project id lands in the documents id space, so without this route check
-    // `projects/2345-jail-records` mints another document's page image.
-    if (!isAnyOf(route, 'documents')) {
+  // A project id lands in the documents id space, so without this route check
+  // `projects/2345-jail-records` mints another document's page image.
+  if (!isAnyOf(route, 'documents')) {
+    return
+  }
+
+  // A page or note embed, `documents/{id}/pages/{n}/` or `documents/{id}/annotations/{n}/`. The
+  // legacy host writes a note as `documents/{id}-{slug}/annotations/{n}.html`, a path the embed
+  // host answers with a 404.
+  if (partSegment) {
+    const partRegex = isLegacyHost ? legacyNotePathRegex : partPathRegex
+    const partMatch = url.pathname.match(partRegex)
+
+    if (!partMatch) {
       return
     }
 
-    // A page or note embed, `documents/{id}/pages/{n}/` or `documents/{id}/annotations/{n}/`. The
-    // legacy host writes a note as `documents/{id}-{slug}/annotations/{n}.html`, a path the embed
-    // host answers with a 404.
-    if (partSegment) {
-      const partRegex = isLegacyHost ? legacyNotePathRegex : partPathRegex
-      const partMatch = parsed.pathname.match(partRegex)
-
-      if (!partMatch) {
-        return
-      }
-
-      const [, id, part, number] = partMatch
-
-      return {
-        provider,
-        id: `${id}/${part}/${number}`,
-        src: `${embedBaseUrl}/${id}/${part}/${number}/`,
-      }
-    }
-
-    const match = documentSegment?.match(documentSegmentRegex)
-
-    if (!match) {
-      return
-    }
-
-    const [, id, slug, htmlSuffix] = match
-
-    // On www.documentcloud.org only the `.html` path redirects to the viewer. The bare segment is
-    // the site's own document page, and `.pdf` redirects to the file an enclosure links to.
-    if (isLegacyHost && !htmlSuffix) {
-      return
-    }
+    const [, id, part, number] = partMatch
 
     return {
       provider,
-      id,
-      src: composeViewerUrl(id, slug),
-      thumbnail: `https://s3.documentcloud.org/documents/${id}/pages/${slug}-p1-normal.gif`,
-      ratio: '17/22',
+      id: `${id}/${part}/${number}`,
+      src: `${embedBaseUrl}/${id}/${part}/${number}/`,
     }
-  },
-)
+  }
+
+  const match = documentSegment?.match(documentSegmentRegex)
+
+  if (!match) {
+    return
+  }
+
+  const [, id, slug, htmlSuffix] = match
+
+  // On www.documentcloud.org only the `.html` path redirects to the viewer. The bare segment is
+  // the site's own document page, and `.pdf` redirects to the file an enclosure links to.
+  if (isLegacyHost && !htmlSuffix) {
+    return
+  }
+
+  return {
+    provider,
+    id,
+    src: composeViewerUrl(id, slug),
+    thumbnail: `https://s3.documentcloud.org/documents/${id}/pages/${slug}-p1-normal.gif`,
+    ratio: '17/22',
+  }
+})
 
 // A page or note embed posts its rendered height unasked, as `{ width, height, href }`. The
 // document viewer posts nothing.

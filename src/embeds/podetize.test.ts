@@ -18,7 +18,7 @@ describe('podetizeResolveEmbed', () => {
       height: 200,
     }
 
-    expect(podetizeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(podetizeResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should leave the mode off when the url does not ask for it', () => {
@@ -30,19 +30,19 @@ describe('podetizeResolveEmbed', () => {
       height: 200,
     }
 
-    expect(podetizeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(podetizeResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a url naming no episode', () => {
     const value = 'https://player.podetize.com/?epmode=true'
 
-    expect(podetizeResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+    expect(podetizeResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for the loader script url', () => {
     const value = 'https://player.podetize.com/loadShowcasePlayer.js'
 
-    expect(podetizeResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+    expect(podetizeResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should use a malformed episode id as written, even if the player answers an error', () => {
@@ -54,7 +54,7 @@ describe('podetizeResolveEmbed', () => {
       height: 200,
     }
 
-    expect(podetizeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+    expect(podetizeResolveEmbed(new URL(value))).toEqual(expected)
   })
 })
 

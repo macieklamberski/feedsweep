@@ -16,7 +16,7 @@ describe('kickstarterResolveEmbed', () => {
         height: 420,
       }
 
-      expect(kickstarterResolveEmbed(value)).toEqual(expected)
+      expect(kickstarterResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should build the pitch video from the video widget url', () => {
@@ -30,7 +30,7 @@ describe('kickstarterResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(kickstarterResolveEmbed(value)).toEqual(expected)
+      expect(kickstarterResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the version the card embed code writes', () => {
@@ -44,7 +44,7 @@ describe('kickstarterResolveEmbed', () => {
         height: 420,
       }
 
-      expect(kickstarterResolveEmbed(value)).toEqual(expected)
+      expect(kickstarterResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the creator in the url as written', () => {
@@ -58,7 +58,7 @@ describe('kickstarterResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(kickstarterResolveEmbed(value)).toEqual(expected)
+      expect(kickstarterResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -66,39 +66,39 @@ describe('kickstarterResolveEmbed', () => {
     it('should ignore the project page itself', () => {
       const value = 'https://www.kickstarter.com/projects/78929588/cthulhu-dark'
 
-      expect(kickstarterResolveEmbed(value)).toBeUndefined()
+      expect(kickstarterResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the card script, which is not a frame', () => {
       const value = 'https://www.kickstarter.com/projects/78929588/cthulhu-dark/widget/card.js'
 
-      expect(kickstarterResolveEmbed(value)).toBeUndefined()
+      expect(kickstarterResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a video widget url cut off before its extension', () => {
       const value =
         'https://www.kickstarter.com/projects/dumbingofage/dumbing-of-age-twelfth-book-collection/widget/video.'
 
-      expect(kickstarterResolveEmbed(value)).toBeUndefined()
+      expect(kickstarterResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a widget under another route word', () => {
       const value = 'https://www.kickstarter.com/projects/78929588/cthulhu-dark/embed/video.html'
 
-      expect(kickstarterResolveEmbed(value)).toBeUndefined()
+      expect(kickstarterResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a widget path under another first route word', () => {
       const value = 'https://www.kickstarter.com/creators/78929588/cthulhu-dark/widget/video.html'
 
-      expect(kickstarterResolveEmbed(value)).toBeUndefined()
+      expect(kickstarterResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a segment after the widget', () => {
       const value =
         'https://www.kickstarter.com/projects/78929588/cthulhu-dark/widget/video.html/extra'
 
-      expect(kickstarterResolveEmbed(value)).toBeUndefined()
+      expect(kickstarterResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

@@ -10,8 +10,8 @@ const playerPathRegex = /^\/video\/embed\/([^/]+)\/?$/i
 
 // DVIDS' video player, `/video/embed/{id}`, the url its share dialog writes. The page
 // `/video/{id}` 301s to the video's slugged page.
-export const dvidsResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const id = parsed.pathname.match(playerPathRegex)?.[1]
+export const dvidsResolveEmbed: ResolveUrlEmbed = (url) => {
+  const id = url.pathname.match(playerPathRegex)?.[1]
 
   if (!id) {
     return

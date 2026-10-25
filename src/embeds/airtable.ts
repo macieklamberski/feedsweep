@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf, isHostOf, isPlainObject } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { readPixels } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -19,7 +19,7 @@ const viewHeight = 533
 
 // Airtable's shared view frame, `/embed/{shr}` from older snippets and `/embed/{app}/{shr}` from
 // the current one. The bare form redirects to the base, which cannot be derived from the share.
-export const airtableResolveEmbed: ResolveEmbed = (url) => {
+export const airtableResolveEmbed: ResolveUrlEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, airtableHosts, isHostOf)
 
   if (!parsed) {

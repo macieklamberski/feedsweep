@@ -15,7 +15,7 @@ describe('canaluResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(canaluResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(canaluResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the start position and drop a tracker', () => {
@@ -27,7 +27,7 @@ describe('canaluResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(canaluResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(canaluResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep a start position the publisher wrote with the size glued on', () => {
@@ -40,7 +40,7 @@ describe('canaluResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(canaluResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(canaluResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint no query when the carrier has none', () => {
@@ -52,7 +52,7 @@ describe('canaluResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(canaluResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(canaluResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the route words in any case and keep the channel as written', () => {
@@ -64,7 +64,7 @@ describe('canaluResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(canaluResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(canaluResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the route with no channel and key it by the same id', () => {
@@ -76,7 +76,7 @@ describe('canaluResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(canaluResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(canaluResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -84,37 +84,37 @@ describe('canaluResolveEmbed', () => {
     it('should ignore a path with a leading segment', () => {
       const value = 'https://www.canal-u.tv/x/chaines/ut2j/embed/170208'
 
-      expect(canaluResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(canaluResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path with a trailing segment', () => {
       const value = 'https://www.canal-u.tv/chaines/ut2j/embed/170208/extra'
 
-      expect(canaluResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(canaluResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an embed path under another first route word', () => {
       const value = 'https://www.canal-u.tv/x/ut2j/embed/170208'
 
-      expect(canaluResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(canaluResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a channel path that is not an embed', () => {
       const value = 'https://www.canal-u.tv/chaines/ut2j/x/170208'
 
-      expect(canaluResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(canaluResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a short path under another route word', () => {
       const value = 'https://www.canal-u.tv/x/117403'
 
-      expect(canaluResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(canaluResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a short path with a trailing segment', () => {
       const value = 'https://www.canal-u.tv/embed/117403/extra'
 
-      expect(canaluResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(canaluResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -123,20 +123,20 @@ describe('canaluResolveEmbed', () => {
       const value =
         'https://www.canal-u.tv/chaines/univ-bordeaux/externalisation-de-l-activite-dans-l-agriculture-de-l-opportunite-migratoire'
 
-      expect(canaluResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(canaluResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the legacy player, whose id is not the node id', () => {
       const value =
         'https://www.canal-u.tv/video/eduscol/embed.1/ouverture_du_pnf_numerique_14_15_octobre_2015.19758?width=100%&height=100%'
 
-      expect(canaluResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(canaluResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the audio file of a video', () => {
       const value = 'https://www.canal-u.tv/media/95844/ressource/podcast'
 
-      expect(canaluResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(canaluResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

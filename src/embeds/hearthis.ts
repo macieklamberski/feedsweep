@@ -11,8 +11,8 @@ const hearthisHosts = ['hearthis.at']
 const trackHeight = 150
 const setHeight = 350
 
-export const hearthisResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const [route, id, third, ...rest] = getPathSegments(parsed)
+export const hearthisResolveEmbed: ResolveUrlEmbed = (url) => {
+  const [route, id, third, ...rest] = getPathSegments(url)
 
   // `embed/{id}/{theme}/`, where the theme segment only colours the player.
   if (isAnyOf(route, 'embed') && id) {

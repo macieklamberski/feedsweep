@@ -11,9 +11,9 @@ const playerRatio = '16/9'
 // CNBC's player.cnbc.com clip iframe, pasted in a box taller than the 16:9 clip it fills.
 // It answers 200 for any guid, with a not-found page in the body for a fabricated one. The
 // Flash-era `plus.cnbc.com/rssvideosearch/…/id/{id}` ids are another space and get that page.
-export const cnbcResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const [route, account, player, extra] = getPathSegments(parsed)
-  const guid = getQueryParam(parsed.searchParams, 'byGuid')
+export const cnbcResolveEmbed: ResolveUrlEmbed = (url) => {
+  const [route, account, player, extra] = getPathSegments(url)
+  const guid = getQueryParam(url.searchParams, 'byGuid')
 
   if (!isAnyOf(route, 'p') || !player || extra) {
     return

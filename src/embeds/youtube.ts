@@ -8,7 +8,12 @@ import {
   isHostOrSubdomainOf,
   parseUrl,
 } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
+import type {
+  EmbedRenderHint,
+  EmbedResolverResult,
+  FieldCleaner,
+  ResolveUrlEmbed,
+} from '../types.js'
 import { attr } from '../utils/dom.js'
 import {
   parseUrlOnHosts,
@@ -98,11 +103,16 @@ const readPathId = (url: URL): string | undefined => {
 
 // The Flash player wrote `/v/{id}&hl=en_US&fs=1`, the query glued onto the id, and transforms
 // outside the resolver factory read urls here too.
-const parseYoutubeUrl = (link: string): URL | undefined => {
+const parseYoutubeUrl = (link: string | URL): URL | undefined => {
+  // The url createUrlEmbedResolver hands its reader is already repaired and parsed.
+  if (link instanceof URL) {
+    return link
+  }
+
   return parseUrl(repairCarrierUrl(link), placeholderBaseUrl)
 }
 
-export const extractVideoId = (link: string): string | undefined => {
+export const extractVideoId = (link: string | URL): string | undefined => {
   const url = parseYoutubeUrl(link)
 
   if (!url) {
@@ -154,7 +164,7 @@ const parseWatchOffset = (value: string): string | undefined => {
 
 // The player ignores `t`, so an offset moves over as `start` unless one is stated. Besides the
 // query, publishers write it in the fragment as `#t=220`.
-const readEmbedParams = (url: string): Record<string, string> => {
+const readEmbedParams = (url: string | URL): Record<string, string> => {
   const parsed = parseYoutubeUrl(url)
   const params = pickQueryParams(parsed?.search ?? '', youtubeEmbedParams)
 
@@ -277,12 +287,11 @@ const resolveCollectionEmbed = (
   return isAnyOf(listType, 'user_uploads') ? composeUploadsEmbed(list) : composeListEmbed(list)
 }
 
-const resolveTarget = (url: string): EmbedResolverResult | undefined => {
-  const parsed = parseYoutubeUrl(url)
-  const segments = parsed ? getPathSegments(parsed) : []
+const resolveTarget = (url: URL): EmbedResolverResult | undefined => {
+  const segments = getPathSegments(url)
 
-  if (isAnyOf(segments[0], 'embed') && parsed) {
-    const embed = resolveCollectionEmbed(parsed, segments)
+  if (isAnyOf(segments[0], 'embed')) {
+    const embed = resolveCollectionEmbed(url, segments)
 
     // A `/embed/{id}` path names a video and falls through; the rest of the embed paths name
     // their content here or name nothing resolvable.
@@ -294,7 +303,7 @@ const resolveTarget = (url: string): EmbedResolverResult | undefined => {
   // The playlist page refuses framing, so a frame of it shows nothing, and its `list` is the id
   // the playlist player takes.
   if (isAnyOf(segments[0], 'playlist')) {
-    const list = getQueryParam(parsed?.searchParams, 'list')
+    const list = getQueryParam(url.searchParams, 'list')
 
     if (!list) {
       return
@@ -323,7 +332,7 @@ const resolveTarget = (url: string): EmbedResolverResult | undefined => {
   return composeVideoEmbed(videoId, readEmbedParams(url))
 }
 
-export const youtubeResolveEmbed: ResolveEmbed = (url, element) => {
+export const youtubeResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const target = resolveTarget(url)
 
   return target && { ...target, title: attr(element, 'title') }
@@ -333,21 +342,19 @@ export const youtubeResolveEmbed: ResolveEmbed = (url, element) => {
 // `id` names. The generic iframe placeholder for it carries no provider and no poster.
 export const youtubeFc2EmbedResolver = createUrlEmbedResolver(
   ['static.fc2.com'],
-  (_url, element, parsed) => {
-    if (!isAnyOf(parsed.pathname, '/misc/blog/view/ext_youtube_player.html')) {
+  (url, element) => {
+    if (!isAnyOf(url.pathname, '/misc/blog/view/ext_youtube_player.html')) {
       return
     }
 
     // FC2's iframe snippet also carries the id as `data-id`, which the shell never reads.
-    const videoId = [getQueryParam(parsed.searchParams, 'id'), attr(element, 'data-id')].find(
-      Boolean,
-    )
+    const videoId = [getQueryParam(url.searchParams, 'id'), attr(element, 'data-id')].find(Boolean)
 
     if (!videoId) {
       return
     }
 
-    const title = getQueryParam(parsed.searchParams, 'title')
+    const title = getQueryParam(url.searchParams, 'title')
 
     return {
       ...composeVideoEmbed(videoId),

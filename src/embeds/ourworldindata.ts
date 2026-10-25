@@ -43,8 +43,8 @@ const displayParams = [
 const chartHeight = 600
 const explorerHeight = 696
 
-const ourworldindataResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const match = parsed.pathname.match(chartPathRegex)
+const ourworldindataResolveEmbed: ResolveUrlEmbed = (url) => {
+  const match = url.pathname.match(chartPathRegex)
 
   if (!match) {
     return
@@ -58,7 +58,7 @@ const ourworldindataResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => 
   }
 
   const isChart = isAnyOf(kind, 'grapher')
-  const query = filterUrlQuery(parsed, (name) => {
+  const query = filterUrlQuery(url, (name) => {
     return !isAnyOf(name, displayParams)
   })
   const src = `https://ourworldindata.org/${kind}/${slug}${query}`

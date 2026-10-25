@@ -1,5 +1,5 @@
 import { encodePathSegment, getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, setInnerHtml, text } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -69,7 +69,7 @@ const readRoute = (route: Array<string>): YandexMusicItem | undefined => {
   }
 }
 
-const readYandexMusicItem = (url: string): YandexMusicItem | undefined => {
+const readYandexMusicItem = (url: URL): YandexMusicItem | undefined => {
   const [route, ...rest] = getPathSegments(url)
 
   // The retired Flash player, `/embed/{track}/track.swf`.
@@ -184,7 +184,7 @@ const readFallback = (element: Element | undefined): Partial<EmbedResolverResult
   }
 }
 
-const yandexMusicResolveEmbed: ResolveEmbed = (url, element) => {
+const yandexMusicResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const item = readYandexMusicItem(url)
 
   if (!item) {

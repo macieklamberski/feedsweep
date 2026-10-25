@@ -1,5 +1,5 @@
 import { getPathSegments, toMap } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { digitsRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -37,7 +37,7 @@ const nbcnewsRoutes = toMap({
   },
 })
 
-const nbcnewsResolveEmbed: ResolveEmbed = (url) => {
+const nbcnewsResolveEmbed: ResolveUrlEmbed = (url) => {
   const segments = getPathSegments(url)
   const routePath = segments.slice(0, -1).join('/')
   const route = nbcnewsRoutes.get(routePath.toLowerCase())

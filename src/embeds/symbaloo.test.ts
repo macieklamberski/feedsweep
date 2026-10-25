@@ -16,7 +16,7 @@ describe('symbalooResolveEmbed', () => {
         height: 500,
       }
 
-      expect(symbalooResolveEmbed(value)).toEqual(expected)
+      expect(symbalooResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read a webmix shared by link without a key or a page', () => {
@@ -27,7 +27,7 @@ describe('symbalooResolveEmbed', () => {
         height: 500,
       }
 
-      expect(symbalooResolveEmbed(value)).toEqual(expected)
+      expect(symbalooResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the www host for a webmix on the edu webspace', () => {
@@ -40,7 +40,7 @@ describe('symbalooResolveEmbed', () => {
         height: 500,
       }
 
-      expect(symbalooResolveEmbed(value)).toEqual(expected)
+      expect(symbalooResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the www host for a webmix on the bare host', () => {
@@ -53,7 +53,7 @@ describe('symbalooResolveEmbed', () => {
         height: 500,
       }
 
-      expect(symbalooResolveEmbed(value)).toEqual(expected)
+      expect(symbalooResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the webmix whose slug is the shared route word', () => {
@@ -66,7 +66,7 @@ describe('symbalooResolveEmbed', () => {
         height: 500,
       }
 
-      expect(symbalooResolveEmbed(value)).toEqual(expected)
+      expect(symbalooResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the case of the slug in the key', () => {
@@ -79,7 +79,7 @@ describe('symbalooResolveEmbed', () => {
         height: 500,
       }
 
-      expect(symbalooResolveEmbed(value)).toEqual(expected)
+      expect(symbalooResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the embed route in uppercase and mint it in lowercase', () => {
@@ -92,7 +92,7 @@ describe('symbalooResolveEmbed', () => {
         height: 500,
       }
 
-      expect(symbalooResolveEmbed(value)).toEqual(expected)
+      expect(symbalooResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the shared route word in uppercase and mint it in lowercase', () => {
@@ -103,7 +103,7 @@ describe('symbalooResolveEmbed', () => {
         height: 500,
       }
 
-      expect(symbalooResolveEmbed(value)).toEqual(expected)
+      expect(symbalooResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -111,49 +111,49 @@ describe('symbalooResolveEmbed', () => {
     it('should ignore the embed route with no webmix', () => {
       const value = 'https://www.symbaloo.com/embed'
 
-      expect(symbalooResolveEmbed(value)).toBeUndefined()
+      expect(symbalooResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a webmix under another route word', () => {
       const value = 'https://www.symbaloo.com/x/tic-tacbasicos-edu'
 
-      expect(symbalooResolveEmbed(value)).toBeUndefined()
+      expect(symbalooResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the embed route under a leading segment', () => {
       const value = 'https://www.symbaloo.com/x/embed/tic-tacbasicos-edu'
 
-      expect(symbalooResolveEmbed(value)).toBeUndefined()
+      expect(symbalooResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a trailing segment after a published webmix', () => {
       const value = 'https://www.symbaloo.com/embed/tic-tacbasicos-edu/extra'
 
-      expect(symbalooResolveEmbed(value)).toBeUndefined()
+      expect(symbalooResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a trailing segment after a shared webmix', () => {
       const value = 'https://www.symbaloo.com/embed/shared/AAAAAtohsPUAA41_HDPALA==/extra'
 
-      expect(symbalooResolveEmbed(value)).toBeUndefined()
+      expect(symbalooResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the embed route on the blog subdomain', () => {
       const value = 'https://blog.symbaloo.com/embed/x'
 
-      expect(symbalooResolveEmbed(value)).toBeUndefined()
+      expect(symbalooResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an image on the file subdomain', () => {
       const value = 'https://cdn01.symbaloo.com/static/img/fb/fb_icon_symbaloo.png'
 
-      expect(symbalooResolveEmbed(value)).toBeUndefined()
+      expect(symbalooResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a foreign host carrying the same path', () => {
       const value = 'https://evil.test/embed/tic-tacbasicos-edu'
 
-      expect(symbalooResolveEmbed(value)).toBeUndefined()
+      expect(symbalooResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -168,7 +168,7 @@ describe('symbalooResolveEmbed', () => {
         height: 500,
       }
 
-      expect(symbalooResolveEmbed(value)).toEqual(expected)
+      expect(symbalooResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the background color and a tracking query', () => {
@@ -182,7 +182,7 @@ describe('symbalooResolveEmbed', () => {
         height: 500,
       }
 
-      expect(symbalooResolveEmbed(value)).toEqual(expected)
+      expect(symbalooResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

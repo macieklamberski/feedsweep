@@ -20,7 +20,7 @@ describe('jotformResolveEmbed', () => {
         height: 539,
       }
 
-      expect(jotformResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(jotformResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should build the form from the longer route the platform also serves', () => {
@@ -33,7 +33,7 @@ describe('jotformResolveEmbed', () => {
         height: 539,
       }
 
-      expect(jotformResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(jotformResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should carry the query over as published, campaign tags included', () => {
@@ -46,7 +46,7 @@ describe('jotformResolveEmbed', () => {
         height: 539,
       }
 
-      expect(jotformResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(jotformResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -54,37 +54,37 @@ describe('jotformResolveEmbed', () => {
     it('should ignore a form addressed by its vanity slug', () => {
       const value = 'https://form.jotform.com/anaccount/a-form-slug'
 
-      expect(jotformResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(jotformResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a route below the form', () => {
       const value = 'https://form.jotform.com/260493476454061/edit'
 
-      expect(jotformResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(jotformResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a route word in place of the form id', () => {
       const value = 'https://form.jotform.com/help'
 
-      expect(jotformResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(jotformResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a route word that ends in digits', () => {
       const value = 'https://form.jotform.com/help260493476454061'
 
-      expect(jotformResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(jotformResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a form id followed by a route word', () => {
       const value = 'https://form.jotform.com/260493476454061help'
 
-      expect(jotformResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(jotformResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the site root', () => {
       const value = 'https://form.jotform.com/'
 
-      expect(jotformResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(jotformResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

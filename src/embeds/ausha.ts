@@ -13,20 +13,20 @@ const playerHeight = 220
 // The v2 widget takes the same ids as the v3 player, so both are minted as the v3 player.
 const playerHosts = ['player.ausha.co', 'widget.ausha.co']
 
-export const aushaResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const segments = getPathSegments(parsed)
+export const aushaResolveEmbed: ResolveUrlEmbed = (url) => {
+  const segments = getPathSegments(url)
 
   // Both hosts serve their player from the root, spelled either bare or as `index.html`.
   if (
-    !playerHosts.includes(parsed.hostname) ||
+    !playerHosts.includes(url.hostname) ||
     (segments.length > 0 && !isAnyOf(segments[0], 'index.html'))
   ) {
     return
   }
 
   // An episode and its show are often named together, and the episode is the finer of the two.
-  const podcast = getQueryParam(parsed.searchParams, 'podcastId') ?? ''
-  const show = getQueryParam(parsed.searchParams, 'showId') ?? ''
+  const podcast = getQueryParam(url.searchParams, 'podcastId') ?? ''
+  const show = getQueryParam(url.searchParams, 'showId') ?? ''
   const named = [
     ['podcast', podcast],
     ['show', show],
@@ -39,7 +39,7 @@ export const aushaResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
   const [kind, id] = named
 
   // The spelling Ausha's share dialog writes, with the start position the frame names.
-  const start = getQueryParam(parsed.searchParams, 't')
+  const start = getQueryParam(url.searchParams, 't')
   const query = composeQuery(trimObject({ [`${kind}Id`]: id, v: '3', t: start }, Boolean))
 
   return {

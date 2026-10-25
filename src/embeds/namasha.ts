@@ -11,8 +11,8 @@ const namashaHosts = ['namasha.com']
 const embedPathRegex = /^\/embed\/([^/]+)\/?$/i
 
 // A Namasha video player. The embed page carries `t` into the player url.
-export const namashaResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const id = parsed.pathname.match(embedPathRegex)?.[1]
+export const namashaResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const id = url.pathname.match(embedPathRegex)?.[1]
 
   if (!id) {
     return
@@ -21,7 +21,7 @@ export const namashaResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
   return {
     provider,
     id,
-    src: `https://www.namasha.com/embed/${id}${pickUrlParams(parsed.href, ['t'])}`,
+    src: `https://www.namasha.com/embed/${id}${pickUrlParams(url.href, ['t'])}`,
     url: `https://www.namasha.com/v/${id}`,
     ratio: '16/9',
     title: attr(element, 'title'),

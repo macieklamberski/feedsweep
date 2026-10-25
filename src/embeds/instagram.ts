@@ -42,7 +42,7 @@ const postPathRegex = /^\/(?:([A-Za-z0-9_.]+)\/)?(p|reel|reels|tv)\/([^/]+)/i
 
 type Post = { kind: string; shortcode: string }
 
-const readPostUrl = (value: string | undefined): Post | undefined => {
+const readPostUrl = (value: string | URL | undefined): Post | undefined => {
   const parsed = parseUrlOnHosts(value, instagramHosts)
 
   if (!parsed) {
@@ -276,14 +276,14 @@ export const instagramSubstackEmbedResolver = createMarkupEmbedResolver(
 // Its query and hash (`cr`, `wp`, `rd`, `rp`) describe the embedding page, not the player.
 // A post has no name: its words go to `description`, and the frame titles itself `Instagram`
 // or nothing.
-export const instagramResolveEmbed: ResolveUrlEmbed = (url, _element, parsed) => {
+export const instagramResolveEmbed: ResolveUrlEmbed = (url) => {
   const post = readPostUrl(url)
 
   if (!post) {
     return
   }
 
-  return composeEmbed(post, parsed.pathname.toLowerCase().includes('/embed/captioned') === true)
+  return composeEmbed(post, url.pathname.toLowerCase().includes('/embed/captioned') === true)
 }
 
 export const instagramIframeEmbedResolver = createUrlEmbedResolver(
@@ -293,9 +293,9 @@ export const instagramIframeEmbedResolver = createUrlEmbedResolver(
 
 // A forum's s9e MediaEmbed helper frame, naming the post's shortcode in its url fragment.
 export const instagramS9eEmbedResolver = createS9eEmbedResolver('instagram', (shortcode) => {
-  const url = `https://www.instagram.com/p/${encodePathSegment(shortcode)}/`
-
-  return instagramResolveEmbed(url, undefined, new URL(url))
+  return instagramResolveEmbed(
+    new URL(`https://www.instagram.com/p/${encodePathSegment(shortcode)}/`),
+  )
 })
 
 // The player measures itself once mounted and reports it under a `MEASURE` type. `LOADING`

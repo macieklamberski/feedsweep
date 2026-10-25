@@ -117,19 +117,19 @@ describe('stravaResolveEmbed', () => {
     it('should ignore the athlete latest-rides widget', () => {
       const value = 'https://www.strava.com/athletes/6960345/latest-rides/100b02c4aa5c99ec4b7a1d1'
 
-      expect(stravaResolveEmbed(value)).toBeUndefined()
+      expect(stravaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the club latest-rides widget', () => {
       const value = 'https://www.strava.com/clubs/33153/latest-rides/05a215fe38ff1185efd6519fe41'
 
-      expect(stravaResolveEmbed(value)).toBeUndefined()
+      expect(stravaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an activity page that is not the embed route', () => {
       const value = 'https://www.strava.com/activities/2243948928'
 
-      expect(stravaResolveEmbed(value)).toBeUndefined()
+      expect(stravaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed activity id as written, even if the player answers an error', () => {
@@ -142,13 +142,13 @@ describe('stravaResolveEmbed', () => {
         ratio: '300/472',
       }
 
-      expect(stravaResolveEmbed(value)).toEqual(expected)
+      expect(stravaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should ignore the site root', () => {
       const value = 'https://www.strava.com/'
 
-      expect(stravaResolveEmbed(value)).toBeUndefined()
+      expect(stravaResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
   describe('edge cases', () => {
@@ -164,7 +164,7 @@ describe('stravaResolveEmbed', () => {
         ratio: '300/472',
       }
 
-      expect(stravaResolveEmbed(value)).toEqual(expected)
+      expect(stravaResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

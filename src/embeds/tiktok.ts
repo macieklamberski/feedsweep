@@ -28,7 +28,7 @@ const profileHeight = 478
 
 type Clip = { handle?: string; videoId?: string }
 
-const readWatchUrl = (url: string | undefined): Clip => {
+const readWatchUrl = (url: string | URL | undefined): Clip => {
   const parsed = parseUrlOnHosts(url, tiktokHosts)
 
   if (!parsed) {
@@ -157,8 +157,8 @@ export const tiktokBlockquoteEmbedResolver = createMarkupEmbedResolver(
 )
 
 // A post has no name: its words go to `description`, and the frame's title is not read.
-export const tiktokResolveEmbed: ResolveUrlEmbed = (src, _element, parsed) => {
-  const playerId = parsed.pathname.match(playerPathRegex)?.[1]
+export const tiktokResolveEmbed: ResolveUrlEmbed = (url) => {
+  const playerId = url.pathname.match(playerPathRegex)?.[1]
 
   if (playerId) {
     return {
@@ -169,7 +169,7 @@ export const tiktokResolveEmbed: ResolveUrlEmbed = (src, _element, parsed) => {
     }
   }
 
-  const { handle, videoId } = readWatchUrl(src)
+  const { handle, videoId } = readWatchUrl(url)
 
   if (!videoId) {
     return
@@ -179,7 +179,7 @@ export const tiktokResolveEmbed: ResolveUrlEmbed = (src, _element, parsed) => {
     provider: 'tiktok',
     id: handle ? `@${handle}/video/${videoId}` : videoId,
     src: `https://www.tiktok.com/embed/v2/${videoId}`,
-    url: src,
+    url: url.href,
     height: playerHeight,
   }
 }
@@ -189,9 +189,9 @@ export const tiktokIframeEmbedResolver = createUrlEmbedResolver(tiktokHosts, tik
 
 // A forum's s9e MediaEmbed helper frame, naming the clip id in its url fragment.
 export const tiktokS9eEmbedResolver = createS9eEmbedResolver('tiktok', (videoId) => {
-  const url = `https://www.tiktok.com/embed/v2/${encodePathSegment(videoId)}`
-
-  return tiktokResolveEmbed(url, undefined, new URL(url))
+  return tiktokResolveEmbed(
+    new URL(`https://www.tiktok.com/embed/v2/${encodePathSegment(videoId)}`),
+  )
 })
 
 // MetaSlider Pro's TikTok slide: a poster image that only the plugin's script swaps for the player.

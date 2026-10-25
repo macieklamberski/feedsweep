@@ -131,14 +131,14 @@ const readProfileView = (parsed: URL | undefined): RegExpMatchArray | null | und
   return parsed.hash.match(vizHomeHashRegex)
 }
 
-const tableauResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const view = parsed.pathname.match(viewPathRegex)
+const tableauResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const view = url.pathname.match(viewPathRegex)
 
   if (view) {
     return composeTableauEmbed(view[1], view[2], attr(element, 'title'))
   }
 
-  const profileView = readProfileView(parsed)
+  const profileView = readProfileView(url)
 
   if (!profileView) {
     return

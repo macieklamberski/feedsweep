@@ -47,16 +47,16 @@ const videoRoutes = toMap({
 
 // NPR's story player, `npr.org/player/embed/{storyId}/{mediaId}`, and its video player,
 // `npr.org/embedded-video?storyId={storyId}&mediaId={mediaId}`.
-export const nprResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const segments = getPathSegments(parsed)
+export const nprResolveEmbed: ResolveUrlEmbed = (url) => {
+  const segments = getPathSegments(url)
   const videoRoute = videoRoutes.get(segments.join('/').toLowerCase())
 
   if (videoRoute) {
     const [storyName, mediaName] = videoRoute
 
     return composeVideoEmbed(
-      getQueryParam(parsed.searchParams, storyName) ?? '',
-      getQueryParam(parsed.searchParams, mediaName) ?? '',
+      getQueryParam(url.searchParams, storyName) ?? '',
+      getQueryParam(url.searchParams, mediaName) ?? '',
     )
   }
 
@@ -70,15 +70,15 @@ export const nprResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
 }
 
 // The retired Flash player, `npr.org/v2/?i={storyId}&m={mediaId}&t={kind}`.
-export const nprFlashResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const segments = getPathSegments(parsed)
+export const nprFlashResolveEmbed: ResolveUrlEmbed = (url) => {
+  const segments = getPathSegments(url)
 
   if (segments.length !== 1 || !isAnyOf(segments[0], 'v2')) {
     return
   }
 
   // Some carriers join the query with `;`, so `m` would read `365995120;t=audio`.
-  const params = new URLSearchParams(parsed.search.replaceAll(';', '&'))
+  const params = new URLSearchParams(url.search.replaceAll(';', '&'))
 
   const storyId = getQueryParam(params, 'i') ?? ''
   const mediaId = getQueryParam(params, 'm') ?? ''

@@ -16,7 +16,7 @@ describe('abcotvResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(abcotvResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(abcotvResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop everything in the query but the pid', () => {
@@ -29,7 +29,7 @@ describe('abcotvResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(abcotvResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(abcotvResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint https for a carrier written on http', () => {
@@ -42,7 +42,7 @@ describe('abcotvResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(abcotvResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(abcotvResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint on the apex host for a carrier written on www', () => {
@@ -55,7 +55,7 @@ describe('abcotvResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(abcotvResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(abcotvResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the pid under an uppercase name and mint it in lowercase', () => {
@@ -68,7 +68,7 @@ describe('abcotvResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(abcotvResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(abcotvResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -76,25 +76,25 @@ describe('abcotvResolveEmbed', () => {
     it('should return undefined for a player url with no pid', () => {
       const value = 'https://abc7.com/video/embed/'
 
-      expect(abcotvResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(abcotvResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the route below another segment', () => {
       const value = 'https://abc7.com/archive/video/embed/?pid=5740386'
 
-      expect(abcotvResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(abcotvResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a segment after the route', () => {
       const value = 'https://abc7.com/video/embed/clip/?pid=5740386'
 
-      expect(abcotvResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(abcotvResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the clip page', () => {
       const value = 'https://abc7.com/videoClip/5740386/'
 
-      expect(abcotvResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(abcotvResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -109,7 +109,7 @@ describe('abcotvResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(abcotvResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(abcotvResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the route without the trailing slash', () => {
@@ -122,7 +122,7 @@ describe('abcotvResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(abcotvResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(abcotvResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass a pid that is not a number as written', () => {
@@ -135,7 +135,7 @@ describe('abcotvResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(abcotvResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(abcotvResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -151,7 +151,7 @@ describe('abcotvResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(abcotvResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(abcotvResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep abc11.com', () => {
@@ -164,7 +164,7 @@ describe('abcotvResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(abcotvResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(abcotvResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep abc13.com', () => {
@@ -177,7 +177,7 @@ describe('abcotvResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(abcotvResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(abcotvResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep abc30.com', () => {
@@ -190,7 +190,7 @@ describe('abcotvResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(abcotvResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(abcotvResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep abc7.com', () => {
@@ -203,7 +203,7 @@ describe('abcotvResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(abcotvResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(abcotvResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep abc7chicago.com', () => {
@@ -216,7 +216,7 @@ describe('abcotvResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(abcotvResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(abcotvResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep abc7news.com', () => {
@@ -229,7 +229,7 @@ describe('abcotvResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(abcotvResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(abcotvResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep abc7ny.com', () => {
@@ -242,7 +242,7 @@ describe('abcotvResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(abcotvResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(abcotvResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -250,7 +250,7 @@ describe('abcotvResolveEmbed', () => {
     it('should return undefined for the ABC News player', () => {
       const value = 'https://abcnews.go.com/video/embed?id=39415146'
 
-      expect(abcotvResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(abcotvResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

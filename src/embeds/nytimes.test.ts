@@ -16,7 +16,7 @@ describe('nytimesResolveEmbed', () => {
         ratioHeightOffset: 71,
       }
 
-      expect(nytimesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(nytimesResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should move a Brightcove-era player url onto the current player', () => {
@@ -30,7 +30,7 @@ describe('nytimesResolveEmbed', () => {
         ratioHeightOffset: 71,
       }
 
-      expect(nytimesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(nytimesResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should take the player from the static host', () => {
@@ -44,7 +44,7 @@ describe('nytimesResolveEmbed', () => {
         ratioHeightOffset: 71,
       }
 
-      expect(nytimesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(nytimesResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should take the player from the graphics host', () => {
@@ -58,7 +58,7 @@ describe('nytimesResolveEmbed', () => {
         ratioHeightOffset: 71,
       }
 
-      expect(nytimesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(nytimesResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -66,20 +66,20 @@ describe('nytimesResolveEmbed', () => {
     it('should return undefined for the video page itself', () => {
       const value = 'https://www.nytimes.com/video/arts/1247464583973/critics-picks-safe.html'
 
-      expect(nytimesResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(nytimesResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a video id on a path that is not the player', () => {
       const value =
         'https://www.nytimes.com/video/arts/1247464583973/critics-picks-safe.html?videoId=1247464583973'
 
-      expect(nytimesResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(nytimesResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a player naming no video', () => {
       const value = 'https://www.nytimes.com/video/players/offsite/index.html'
 
-      expect(nytimesResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(nytimesResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -94,7 +94,7 @@ describe('nytimesResolveEmbed', () => {
         ratioHeightOffset: 71,
       }
 
-      expect(nytimesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(nytimesResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

@@ -16,7 +16,7 @@ describe('reverbnationResolveEmbed', () => {
         height: 265,
       }
 
-      expect(reverbnationResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(reverbnationResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the tracking parameters from the widget query', () => {
@@ -29,7 +29,7 @@ describe('reverbnationResolveEmbed', () => {
         height: 265,
       }
 
-      expect(reverbnationResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(reverbnationResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the autoplay flag from the widget query', () => {
@@ -42,7 +42,7 @@ describe('reverbnationResolveEmbed', () => {
         height: 265,
       }
 
-      expect(reverbnationResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(reverbnationResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the song a widget plays', () => {
@@ -55,7 +55,7 @@ describe('reverbnationResolveEmbed', () => {
         height: 265,
       }
 
-      expect(reverbnationResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(reverbnationResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the whole list a widget includes', () => {
@@ -68,7 +68,7 @@ describe('reverbnationResolveEmbed', () => {
         height: 265,
       }
 
-      expect(reverbnationResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(reverbnationResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep a single song on the older widget', () => {
@@ -81,7 +81,7 @@ describe('reverbnationResolveEmbed', () => {
         height: 265,
       }
 
-      expect(reverbnationResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(reverbnationResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the colour, the branding and the promoter', () => {
@@ -94,7 +94,7 @@ describe('reverbnationResolveEmbed', () => {
         height: 265,
       }
 
-      expect(reverbnationResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(reverbnationResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should give an http frame the scheme it needs to load', () => {
@@ -107,7 +107,7 @@ describe('reverbnationResolveEmbed', () => {
         height: 265,
       }
 
-      expect(reverbnationResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(reverbnationResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -115,7 +115,7 @@ describe('reverbnationResolveEmbed', () => {
     it('should ignore a reverbnation url naming no widget', () => {
       const value = 'https://www.reverbnation.com/billyjonesbluez'
 
-      expect(reverbnationResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(reverbnationResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -123,13 +123,13 @@ describe('reverbnationResolveEmbed', () => {
     it('should refuse an id with no kind in front of the number', () => {
       const value = 'https://www.reverbnation.com/widget_code/html_widget/1018382'
 
-      expect(reverbnationResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(reverbnationResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should refuse a widget path naming nothing at all', () => {
       const value = 'https://www.reverbnation.com/widget_code/html_widget'
 
-      expect(reverbnationResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(reverbnationResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -143,7 +143,7 @@ describe('reverbnationResolveEmbed', () => {
         height: 265,
       }
 
-      expect(reverbnationResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(reverbnationResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should take an album', () => {
@@ -156,7 +156,7 @@ describe('reverbnationResolveEmbed', () => {
         height: 265,
       }
 
-      expect(reverbnationResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(reverbnationResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -171,7 +171,7 @@ describe('reverbnationResolveEmbed', () => {
         height: 265,
       }
 
-      expect(reverbnationResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(reverbnationResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the player playlist parameter', () => {
@@ -184,7 +184,7 @@ describe('reverbnationResolveEmbed', () => {
         height: 265,
       }
 
-      expect(reverbnationResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(reverbnationResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the tune widget parameter', () => {
@@ -196,7 +196,7 @@ describe('reverbnationResolveEmbed', () => {
         height: 265,
       }
 
-      expect(reverbnationResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(reverbnationResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the Flash colours, which the html widget does not take', () => {
@@ -209,34 +209,34 @@ describe('reverbnationResolveEmbed', () => {
         height: 265,
       }
 
-      expect(reverbnationResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(reverbnationResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should refuse an id parameter carrying a path after the number', () => {
       const value =
         'http://cache.reverbnation.com/widgets/swf/40/pro_widget.swf?id=artist_1354004%2F..%2F..%2Fadmin'
 
-      expect(reverbnationResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(reverbnationResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should refuse an id parameter carrying a path before the kind', () => {
       const value =
         'http://cache.reverbnation.com/widgets/swf/40/pro_widget.swf?id=admin%2Fartist_1354004'
 
-      expect(reverbnationResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(reverbnationResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should refuse a swf outside the widgets directory', () => {
       const value =
         'http://cache.reverbnation.com/assets/widgets/swf/40/pro_widget.swf?id=artist_1354004'
 
-      expect(reverbnationResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(reverbnationResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should refuse a swf naming nothing', () => {
       const value = 'http://cache.reverbnation.com/widgets/swf/15/widgetPlayer.swf'
 
-      expect(reverbnationResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(reverbnationResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -245,13 +245,13 @@ describe('reverbnationResolveEmbed', () => {
     it('should leave the tracking url alone', () => {
       const value = 'http://www.reverbnation.com/widgets/trk?id=artist_1018382'
 
-      expect(reverbnationResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(reverbnationResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should leave the widget chrome image alone', () => {
       const value = 'http://cache.reverbnation.com/widgets/content/13/footer.png'
 
-      expect(reverbnationResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(reverbnationResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

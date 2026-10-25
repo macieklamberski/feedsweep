@@ -1,5 +1,5 @@
 import { decodeSegment, encodePathSegment, getPathSegments, isAnyOf } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'br'
@@ -9,7 +9,7 @@ const brHost = 'br.de'
 // The slug BR writes in front of the token is decorative: the token alone names the media.
 const mediaTokenRegex = /av:[^/]+$/
 
-const brResolveEmbed: ResolveEmbed = (url) => {
+const brResolveEmbed: ResolveUrlEmbed = (url) => {
   const [section, route, slot] = getPathSegments(url)
   const token = decodeSegment(slot)?.match(mediaTokenRegex)?.[0]
 

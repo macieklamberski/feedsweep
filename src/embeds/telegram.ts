@@ -1,5 +1,5 @@
 import { encodePathSegment, getPathSegments, isAnyOf, isPlainObject } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import {
@@ -66,7 +66,7 @@ export const telegramScriptEmbedResolver = createMarkupEmbedResolver(
 )
 
 // The post iframe that script builds, saved into the feed by a CMS that ran it first.
-const telegramResolveEmbed: ResolveEmbed = (url) => {
+const telegramResolveEmbed: ResolveUrlEmbed = (url) => {
   return readPost(getPathSegments(url).join('/'))
 }
 
@@ -80,7 +80,7 @@ export const telegramIframeEmbedResolver = createUrlEmbedResolver(
 
 // A forum's s9e MediaEmbed helper frame, naming the post as `{channel}/{id}` in its url fragment.
 export const telegramS9eEmbedResolver = createS9eEmbedResolver('telegram', (fragment) => {
-  return telegramResolveEmbed(`https://t.me/${fragment}`)
+  return telegramResolveEmbed(new URL(`https://t.me/${fragment}`))
 })
 
 // The player reports a `resize` event with its height, `null` for a post it could not load,

@@ -425,13 +425,7 @@ describe('flourishResolveEmbed', () => {
   it('should ignore a foreign host carrying the path', () => {
     const value = 'https://evil.test/visualisation/29132382/embed'
 
-    expect(flourishResolveEmbed(value)).toBeUndefined()
-  })
-
-  it('should ignore a string that is not a url', () => {
-    const value = 'visualisation/29132382/embed'
-
-    expect(flourishResolveEmbed(value)).toBeUndefined()
+    expect(flourishResolveEmbed(new URL(value))).toBeUndefined()
   })
 })
 

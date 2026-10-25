@@ -49,8 +49,8 @@ const composeEmbed = (
 }
 
 // Buzzsprout's player iframe, whose title names the episode.
-export const buzzsproutResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const match = parsed.pathname.match(episodePagePathRegex)
+export const buzzsproutResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const match = url.pathname.match(episodePagePathRegex)
 
   if (!match) {
     return

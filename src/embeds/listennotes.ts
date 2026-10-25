@@ -55,8 +55,8 @@ const composeSlugged = (slugged: Slugged): EmbedResolverResult | undefined => {
   }
 }
 
-export const listennotesResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const segments = getPathSegments(parsed)
+export const listennotesResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const segments = getPathSegments(url)
 
   if (localeRegex.test(segments[0] ?? '')) {
     segments.shift()
@@ -64,7 +64,7 @@ export const listennotesResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) 
 
   const [route = '', first = '', second, third] = segments
   const title = attr(element, 'title')
-  const episodeQuery = composeQuery(pickQueryParams(parsed.search, episodeParams))
+  const episodeQuery = composeQuery(pickQueryParams(url.search, episodeParams))
 
   if (!second) {
     return

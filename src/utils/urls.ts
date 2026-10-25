@@ -205,7 +205,7 @@ export const isUrlShaped = (value: string): boolean => {
 // A host whose subdomains serve files or other sites takes `isHostOf`, which matches the listed
 // hosts alone.
 export const parseUrlOnHosts = (
-  url: string | null | undefined,
+  url: string | URL | null | undefined,
   hosts: string | ReadonlyArray<string>,
   isOnHost: (url: URL, hosts: string | ReadonlyArray<string>) => boolean = isHostOrSubdomainOf,
 ): URL | undefined => {
@@ -213,7 +213,11 @@ export const parseUrlOnHosts = (
     return
   }
 
-  const parsed = parseUrl(trimUrlValues(foldEscapedAmpersands(url)), placeholderBaseUrl)
+  // A url already parsed, such as the one createUrlEmbedResolver hands a reader, is only checked.
+  const parsed =
+    url instanceof URL
+      ? url
+      : parseUrl(trimUrlValues(foldEscapedAmpersands(url)), placeholderBaseUrl)
 
   if (parsed && isOnHost(parsed, hosts)) {
     return parsed
@@ -283,7 +287,7 @@ export const dropUrlParams = (url: string, names: ReadonlyArray<string>): string
   return parsed.href
 }
 
-export const pickUrlParams = (url: string, names: ReadonlyArray<string>): string => {
+export const pickUrlParams = (url: string | URL, names: ReadonlyArray<string>): string => {
   return composeQuery(pickQueryParams(parseUrl(url)?.search ?? '', names))
 }
 

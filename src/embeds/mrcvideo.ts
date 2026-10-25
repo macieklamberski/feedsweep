@@ -1,5 +1,5 @@
 import { encodePathSegment, getPathSegments, getQueryParam, isAnyOf, isHostOf } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -24,7 +24,7 @@ const composeEmbed = (id: string): EmbedResolverResult => {
 }
 
 // The route word answers in any case.
-const readEmbedId = (url: string | undefined): string | undefined => {
+const readEmbedId = (url: string | URL | undefined): string | undefined => {
   const parsed = parseUrlOnHosts(url, mrcvideoHosts, isHostOf)
 
   if (!parsed) {
@@ -52,7 +52,7 @@ const readCallbackId = (element: Element | undefined): string | undefined => {
   return getQueryParam(parsed?.searchParams, 'nodeid')
 }
 
-const mrcvideoResolveEmbed: ResolveEmbed = (url) => {
+const mrcvideoResolveEmbed: ResolveUrlEmbed = (url) => {
   const id = readEmbedId(url)
 
   if (!id) {
@@ -65,7 +65,7 @@ const mrcvideoResolveEmbed: ResolveEmbed = (url) => {
 // MRC Video's embed iframe, `/embed/{id}`, on the current host and the former MRCTV ones.
 export const mrcvideoEmbedResolver = createUrlEmbedResolver(mrcvideoHosts, mrcvideoResolveEmbed)
 
-const mrcvideoFlashResolveEmbed: ResolveEmbed = (url, element) => {
+const mrcvideoFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, mrcvideoHosts, isHostOf)
 
   if (!parsed) {

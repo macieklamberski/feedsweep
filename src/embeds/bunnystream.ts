@@ -17,15 +17,15 @@ const playerPathRegex = /^\/(?:embed|play)\/([^/]+)\/([^/]+)$/i
 // The start position, and the token pair a library with embed authentication needs.
 const playbackParams = ['t', 'token', 'expires']
 
-export const bunnystreamResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const match = parsed.pathname.match(playerPathRegex)
+export const bunnystreamResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const match = url.pathname.match(playerPathRegex)
 
   if (!match) {
     return
   }
 
   const [, libraryId, videoId] = match
-  const picked = pickQueryParams(parsed.search, playbackParams)
+  const picked = pickQueryParams(url.search, playbackParams)
   // The player autoplays unless the library turns it off, so a frame loaded without a click
   // would play unasked.
   const query = composeQuery({ autoplay: 'false', ...picked })

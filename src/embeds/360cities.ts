@@ -24,8 +24,8 @@ const composeEmbed = (slug: string): EmbedResolverResult => {
 // The retired Flash viewer `360cities.net/javascripts/krpano/krpano.swf`, which renders nothing
 // and names the panorama in flashvars as `pano=…/krpano/external_embed/{slug}.xml`, and the
 // frame `360cities.net/embed_iframe/{slug}`.
-export const threeSixtyCitiesResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  if (flashPlayerPathRegex.test(parsed.pathname)) {
+export const threeSixtyCitiesResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  if (flashPlayerPathRegex.test(url.pathname)) {
     const pano = parseUrlOnHosts(flashVar(element, 'pano'), threeSixtyCitiesHosts)
     const slug = pano?.pathname.match(flashPanoPathRegex)?.[1]
 
@@ -36,7 +36,7 @@ export const threeSixtyCitiesResolveEmbed: ResolveUrlEmbed = (_url, element, par
     return composeEmbed(slug)
   }
 
-  const slug = parsed.pathname.match(framePathRegex)?.[1]
+  const slug = url.pathname.match(framePathRegex)?.[1]
 
   if (!slug) {
     return

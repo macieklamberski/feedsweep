@@ -1,5 +1,5 @@
 import { composeQuery, encodePathSegment, getPathSegments, getQueryParam, toMap } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -14,7 +14,7 @@ const idParams = toMap({
 // The Bundestag media library's player, `webtv.bundestag.de/pservices/player/embed/nokey?c={id}`,
 // and its loader script `player/macros/bttv/hls/player.js?content={id}`, which builds the same
 // player with config `bt-od` and policy `69`, the values every frame writes as `e` and `ep`.
-export const bundestagResolveEmbed: ResolveEmbed = (url) => {
+export const bundestagResolveEmbed: ResolveUrlEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, bundestagHosts)
 
   if (!parsed) {
@@ -53,6 +53,12 @@ export const bundestagIframeEmbedResolver = createUrlEmbedResolver(
 export const bundestagScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="webtv.bundestag.de/player/" i]',
   (element) => {
-    return bundestagResolveEmbed(attr(element, 'src') ?? '')
+    const url = parseUrlOnHosts(attr(element, 'src'), bundestagHosts)
+
+    if (!url) {
+      return
+    }
+
+    return bundestagResolveEmbed(url)
   },
 )

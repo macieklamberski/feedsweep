@@ -17,7 +17,7 @@ describe('audiomackResolveEmbed', () => {
         author: 'larrynorman',
       }
 
-      expect(audiomackResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(audiomackResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should size an album taller than a song', () => {
@@ -31,7 +31,7 @@ describe('audiomackResolveEmbed', () => {
         author: 'chuuwee',
       }
 
-      expect(audiomackResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(audiomackResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -39,13 +39,13 @@ describe('audiomackResolveEmbed', () => {
     it('should ignore a route word that is not the player', () => {
       const value = 'https://audiomack.com/widget/larrynorman/song/burn-2'
 
-      expect(audiomackResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(audiomackResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an audiomack url naming no player', () => {
       const value = 'https://audiomack.com/search?q=burn'
 
-      expect(audiomackResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(audiomackResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -53,25 +53,25 @@ describe('audiomackResolveEmbed', () => {
     it('should refuse a kind the player does not have', () => {
       const value = 'https://audiomack.com/embed/larrynorman/mixtape/burn-2'
 
-      expect(audiomackResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(audiomackResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should refuse a kind naming an inherited method', () => {
       const value = 'https://audiomack.com/embed/larrynorman/toString/burn-2'
 
-      expect(audiomackResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(audiomackResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should refuse a kind naming the prototype itself', () => {
       const value = 'https://audiomack.com/embed/larrynorman/__proto__/burn-2'
 
-      expect(audiomackResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(audiomackResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should refuse an embed path with no slug', () => {
       const value = 'https://audiomack.com/embed/larrynorman/song'
 
-      expect(audiomackResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(audiomackResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed slug as written, even if the player answers an error', () => {
@@ -85,7 +85,7 @@ describe('audiomackResolveEmbed', () => {
         author: 'larrynorman',
       }
 
-      expect(audiomackResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(audiomackResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use a malformed artist as written, even if the player answers an error', () => {
@@ -99,7 +99,7 @@ describe('audiomackResolveEmbed', () => {
         author: 'larry%2Fnorman',
       }
 
-      expect(audiomackResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(audiomackResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the kind in any case and write it as the feed wrote it', () => {
@@ -113,7 +113,7 @@ describe('audiomackResolveEmbed', () => {
         author: 'larrynorman',
       }
 
-      expect(audiomackResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(audiomackResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -129,7 +129,7 @@ describe('audiomackResolveEmbed', () => {
         author: 'larrynorman',
       }
 
-      expect(audiomackResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(audiomackResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the private-link key in the player and link no page beside it', () => {
@@ -142,7 +142,7 @@ describe('audiomackResolveEmbed', () => {
         author: 'mlgmusiz',
       }
 
-      expect(audiomackResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(audiomackResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the background setting with the rest', () => {
@@ -157,7 +157,7 @@ describe('audiomackResolveEmbed', () => {
         author: 'mlgmusiz',
       }
 
-      expect(audiomackResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(audiomackResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // Which order the path is in is decided by whether the second segment is a kind, so a handle
@@ -173,7 +173,7 @@ describe('audiomackResolveEmbed', () => {
         author: 'toString',
       }
 
-      expect(audiomackResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(audiomackResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should take a playlist at the album height', () => {
@@ -187,7 +187,7 @@ describe('audiomackResolveEmbed', () => {
         author: 'team-bigga-rankin',
       }
 
-      expect(audiomackResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(audiomackResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -203,7 +203,7 @@ describe('audiomackResolveEmbed', () => {
         author: 'knightstalker',
       }
 
-      expect(audiomackResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(audiomackResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read embed3 as a song', () => {
@@ -217,7 +217,7 @@ describe('audiomackResolveEmbed', () => {
         author: 'hhs1987',
       }
 
-      expect(audiomackResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(audiomackResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read embed3-album as an album', () => {
@@ -231,7 +231,7 @@ describe('audiomackResolveEmbed', () => {
         author: 'chuuwee',
       }
 
-      expect(audiomackResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(audiomackResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read embed4-large as a song', () => {
@@ -245,7 +245,7 @@ describe('audiomackResolveEmbed', () => {
         author: 'costill8nine',
       }
 
-      expect(audiomackResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(audiomackResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read embed4-album as an album', () => {
@@ -260,7 +260,7 @@ describe('audiomackResolveEmbed', () => {
         author: 'creative-soul-music-group-1',
       }
 
-      expect(audiomackResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(audiomackResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the retired colour parameters, which the current player ignores', () => {
@@ -274,7 +274,7 @@ describe('audiomackResolveEmbed', () => {
         author: 'jhoss',
       }
 
-      expect(audiomackResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(audiomackResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

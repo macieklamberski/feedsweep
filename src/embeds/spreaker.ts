@@ -1,15 +1,8 @@
-import {
-  composeQuery,
-  encodePathSegment,
-  getPathSegments,
-  getQueryParam,
-  isAnyOf,
-  parseUrl,
-} from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { composeQuery, encodePathSegment, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'spreaker'
@@ -23,18 +16,16 @@ const embedKinds = { episode_id: 'episode', show_id: 'show' } as const
 const playerHeight = 200
 
 export const extractSpreakerEmbed = (
-  link: string,
+  url: URL,
 ): { kind: string; param: string; id: string } | undefined => {
-  const parsed = parseUrl(link, placeholderBaseUrl)
-
   // The route is `player` on the widget host and `embed/player/{variant}` on the site host,
   // read as a whole segment so a longer name starting with it is not the player route.
-  if (!parsed || !getPathSegments(parsed).some((segment) => isAnyOf(segment, 'player'))) {
+  if (!getPathSegments(url).some((segment) => isAnyOf(segment, 'player'))) {
     return
   }
 
   for (const [param, kind] of Object.entries(embedKinds)) {
-    const id = getQueryParam(parsed.searchParams, param)
+    const id = getQueryParam(url.searchParams, param)
 
     if (!id) {
       continue
@@ -52,7 +43,7 @@ export const extractSpreakerEmbed = (
 // Spreaker's player iframe ships no height attribute, so a reader reserves nothing for it.
 // Spreaker's oEmbed answers the show url minted here. It refuses an episode url without the slug,
 // which the carrier lacks, so an episode is read from `api.spreaker.com/v2/episodes/{id}`.
-export const spreakerResolveEmbed: ResolveEmbed = (url, element) => {
+export const spreakerResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const embed = extractSpreakerEmbed(url)
 
   if (!embed) {
@@ -91,7 +82,7 @@ export const spreakerAnchorEmbedResolver = createMarkupEmbedResolver(
     // own href can name the show while the resource names an episode.
     const resource = attr(element, 'data-resource')
     const result = resource
-      ? spreakerResolveEmbed(`https://widget.spreaker.com/player?${resource}`)
+      ? spreakerResolveEmbed(new URL(`https://widget.spreaker.com/player?${resource}`))
       : undefined
 
     if (!result) {

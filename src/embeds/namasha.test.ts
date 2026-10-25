@@ -16,7 +16,7 @@ describe('namashaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(namashaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(namashaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the www host for the apex', () => {
@@ -29,7 +29,7 @@ describe('namashaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(namashaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(namashaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the route word in any case and keep the id as written', () => {
@@ -42,7 +42,7 @@ describe('namashaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(namashaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(namashaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the start position and drop the autoplay and a tracker', () => {
@@ -55,7 +55,7 @@ describe('namashaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(namashaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(namashaResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -63,25 +63,25 @@ describe('namashaResolveEmbed', () => {
     it('should ignore the watch page', () => {
       const value = 'https://www.namasha.com/v/TR5Otj9Q'
 
-      expect(namashaResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(namashaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path with a leading segment', () => {
       const value = 'https://www.namasha.com/x/embed/TR5Otj9Q'
 
-      expect(namashaResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(namashaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path with a trailing segment', () => {
       const value = 'https://www.namasha.com/embed/TR5Otj9Q/extra'
 
-      expect(namashaResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(namashaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a video file', () => {
       const value = 'https://s15.namasha.com/videos/7246593438.mp4'
 
-      expect(namashaResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(namashaResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

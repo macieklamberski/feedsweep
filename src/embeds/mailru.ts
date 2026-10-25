@@ -1,5 +1,5 @@
 import { encodePathSegment, getQueryParam, isHostOrSubdomainOf, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
@@ -64,7 +64,7 @@ const composeSubject = (subject: string): EmbedResolverResult | undefined => {
   }
 }
 
-const resolveTarget = (url: string, element?: Element): EmbedResolverResult | undefined => {
+const resolveTarget = (url: string | URL, element?: Element): EmbedResolverResult | undefined => {
   const parsed = parseUrlOnHosts(url, mailruHosts)
 
   if (!parsed) {
@@ -117,7 +117,7 @@ const readPreviewVideoId = (thumbnail: string | undefined): string | undefined =
   return parseUrl(previewUrl ?? '', placeholderBaseUrl)?.pathname.match(previewVideoIdRegex)?.[1]
 }
 
-export const mailruResolveEmbed: ResolveEmbed = (url, element) => {
+export const mailruResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const target = resolveTarget(url, element)
 
   return target && { ...target, title: attr(element, 'title') }
@@ -144,7 +144,8 @@ export const mailruWidgetEmbedResolver = createMarkupEmbedResolver(
 
     // A republished card sits beside the my.mail.ru iframe of the same video, which already plays.
     for (const frame of frames) {
-      const framedId = mailruResolveEmbed(attr(frame, 'src') ?? '')?.id
+      const frameUrl = parseUrlOnHosts(attr(frame, 'src'), mailruHosts)
+      const framedId = frameUrl && mailruResolveEmbed(frameUrl)?.id
 
       if (framedId && videoIds.includes(framedId)) {
         return

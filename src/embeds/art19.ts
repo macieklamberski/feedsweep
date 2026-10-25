@@ -12,8 +12,8 @@ const playerPathRegex = /^\/shows\/([^/]+)(?:\/episodes\/([^/]+))?\/embed\/?$/i
 
 // An ART19 player, of one episode or of a whole show. The show is its slug or its uuid, and the
 // episode player answers 404 without the show.
-export const art19ResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
-  const match = parsed.pathname.match(playerPathRegex)
+export const art19ResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const match = url.pathname.match(playerPathRegex)
 
   if (!match) {
     return

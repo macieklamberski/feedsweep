@@ -31,8 +31,8 @@ const composePosterUrl = (id: string): string | undefined => {
   return `https://cdn.thinglink.me/api/image/${id}/1024/10/scaletowidth`
 }
 
-export const thinglinkResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const id = readSceneId(parsed)
+export const thinglinkResolveEmbed: ResolveUrlEmbed = (url) => {
+  const id = readSceneId(url)
 
   if (!id) {
     return

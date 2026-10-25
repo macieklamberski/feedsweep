@@ -32,14 +32,14 @@ const readRatio = (element: Element | undefined): string => {
   return element?.classList.contains('zpvideo') ? '16/9' : '4/3'
 }
 
-export const zohoworkdriveResolveEmbed: ResolveUrlEmbed = (url, element, parsed) => {
-  const domain = zohoworkdriveDomains.get(parsed.hostname)
+export const zohoworkdriveResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const domain = zohoworkdriveDomains.get(url.hostname)
 
   if (!domain) {
     return
   }
 
-  const fileId = parsed.pathname.match(embedPathRegex)?.[1]
+  const fileId = url.pathname.match(embedPathRegex)?.[1]
 
   if (fileId) {
     const page = `https://workdrive.${domain}/embed/${fileId}`
@@ -54,7 +54,7 @@ export const zohoworkdriveResolveEmbed: ResolveUrlEmbed = (url, element, parsed)
     }
   }
 
-  const linkId = parsed.pathname.match(externalPathRegex)?.[1]
+  const linkId = url.pathname.match(externalPathRegex)?.[1]
 
   if (!linkId) {
     return

@@ -1,5 +1,5 @@
 import { encodePathSegment, getPathSegments, isAnyOf, isHostOf } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -21,7 +21,7 @@ const composeEmbed = (postId: string): EmbedResolverResult => {
 }
 
 // The frame a publisher pastes once the snippet has already run.
-export const tenorResolveEmbed: ResolveEmbed = (url) => {
+export const tenorResolveEmbed: ResolveUrlEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, tenorHosts, isHostOf)
 
   if (!parsed) {

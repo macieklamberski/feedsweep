@@ -9,12 +9,12 @@ const megatvHosts = ['megatv.com']
 // Mega switched to it at post 151920 in October 2020, and earlier articles carry eight-digit ids.
 const prefixedPostIdRegex = /^2020(\d{6,})$/
 
-const megatvResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  if (!isAnyOf(getPathSegments(parsed).join('/'), 'embed')) {
+const megatvResolveEmbed: ResolveUrlEmbed = (url) => {
+  if (!isAnyOf(getPathSegments(url).join('/'), 'embed')) {
     return
   }
 
-  const id = getQueryParam(parsed.searchParams, 'p')
+  const id = getQueryParam(url.searchParams, 'p')
 
   if (!id) {
     return

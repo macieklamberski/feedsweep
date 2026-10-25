@@ -9,98 +9,92 @@ describe('extractGeniallyViewId', () => {
   it('should read the id from the modern host', () => {
     const value = `https://view.genially.com/${viewId}`
 
-    expect(extractGeniallyViewId(value)).toBe(viewId)
+    expect(extractGeniallyViewId(new URL(value))).toBe(viewId)
   })
 
   it('should read the id from the legacy host', () => {
     const value = `https://view.genial.ly/${viewId}`
 
-    expect(extractGeniallyViewId(value)).toBe(viewId)
+    expect(extractGeniallyViewId(new URL(value))).toBe(viewId)
   })
 
   // WordPress embeds it with the fragment its own embed handler adds.
   it('should read the id from a url carrying a secret fragment', () => {
     const value = `https://view.genial.ly/${viewId}#?secret=5n2fsT8hDN`
 
-    expect(extractGeniallyViewId(value)).toBe(viewId)
+    expect(extractGeniallyViewId(new URL(value))).toBe(viewId)
   })
 
   it('should read the id from a /view/ path', () => {
     const value = `https://genially.com/view/${viewId}`
 
-    expect(extractGeniallyViewId(value)).toBe(viewId)
+    expect(extractGeniallyViewId(new URL(value))).toBe(viewId)
   })
 
   it('should read the id from the retired View/Index route', () => {
     const value = 'https://www.genial.ly/View/Index/59cc0e1689ef4914f441596a'
 
-    expect(extractGeniallyViewId(value)).toBe('59cc0e1689ef4914f441596a')
+    expect(extractGeniallyViewId(new URL(value))).toBe('59cc0e1689ef4914f441596a')
   })
 
   it('should read the id from a View/Index route spelled in mixed case', () => {
     const value = 'https://www.genial.ly/View/index/59cc0e1689ef4914f441596a'
 
-    expect(extractGeniallyViewId(value)).toBe('59cc0e1689ef4914f441596a')
+    expect(extractGeniallyViewId(new URL(value))).toBe('59cc0e1689ef4914f441596a')
   })
 
   it('should read the id from a /view/ path in capitals', () => {
     const value = `https://genially.com/VIEW/${viewId}`
 
-    expect(extractGeniallyViewId(value)).toBe(viewId)
+    expect(extractGeniallyViewId(new URL(value))).toBe(viewId)
   })
 
   it('should return undefined for a View route with another second word', () => {
     const value = 'https://www.genial.ly/View/Embed/59cc0e1689ef4914f441596a'
 
-    expect(extractGeniallyViewId(value)).toBeUndefined()
+    expect(extractGeniallyViewId(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for an Index route under another first word', () => {
     const value = 'https://www.genial.ly/Vista/Index/59cc0e1689ef4914f441596a'
 
-    expect(extractGeniallyViewId(value)).toBeUndefined()
+    expect(extractGeniallyViewId(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a genially url naming no view', () => {
     const value = 'https://genially.com/pricing'
 
-    expect(extractGeniallyViewId(value)).toBeUndefined()
+    expect(extractGeniallyViewId(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for an id that is not the documented shape', () => {
     const value = 'https://view.genially.com/not-a-view-id'
 
-    expect(extractGeniallyViewId(value)).toBeUndefined()
+    expect(extractGeniallyViewId(new URL(value))).toBeUndefined()
   })
 
   it('should use a hex id of another length on the view host as written', () => {
     const value = `https://view.genially.com/${viewId}0`
 
-    expect(extractGeniallyViewId(value)).toBe(`${viewId}0`)
+    expect(extractGeniallyViewId(new URL(value))).toBe(`${viewId}0`)
   })
 
   it('should use a hex id of another length on the retired route as written', () => {
     const value = 'https://www.genial.ly/View/Index/60294f8b2ec856159ae0ba'
 
-    expect(extractGeniallyViewId(value)).toBe('60294f8b2ec856159ae0ba')
+    expect(extractGeniallyViewId(new URL(value))).toBe('60294f8b2ec856159ae0ba')
   })
 
   it('should return undefined for a site page on the main host whose name is hex', () => {
     const value = 'https://genially.com/de'
 
-    expect(extractGeniallyViewId(value)).toBeUndefined()
+    expect(extractGeniallyViewId(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a view id carrying an encoded slash', () => {
     const value = 'https://view.genially.com/60294f8b2ec8%2f59ae0baa5'
 
-    expect(extractGeniallyViewId(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a url that cannot be parsed', () => {
-    const value = 'https://['
-
-    expect(extractGeniallyViewId(value)).toBeUndefined()
+    expect(extractGeniallyViewId(new URL(value))).toBeUndefined()
   })
 })
 
@@ -115,7 +109,7 @@ describe('geniallyResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(geniallyResolveEmbed(value)).toEqual(expected)
+    expect(geniallyResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should leave a modern url on its own host', () => {
@@ -127,13 +121,13 @@ describe('geniallyResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(geniallyResolveEmbed(value)).toEqual(expected)
+    expect(geniallyResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a genially url naming no view', () => {
     const value = 'https://genially.com/pricing'
 
-    expect(geniallyResolveEmbed(value)).toBeUndefined()
+    expect(geniallyResolveEmbed(new URL(value))).toBeUndefined()
   })
 })
 

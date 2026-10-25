@@ -8,7 +8,7 @@ import {
   isHostOf,
   trimObject,
 } from 'trousse'
-import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
+import type { EmbedResolverResult, FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
 import { alphanumericRegex, isFileName, parseUrlOnHosts, uuidRegex } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -72,7 +72,7 @@ const readUser = (value: string | undefined): string | undefined => {
   return name
 }
 
-const parseTarget = (value: string | undefined): CodepenTarget | undefined => {
+const parseTarget = (value: string | URL | undefined): CodepenTarget | undefined => {
   const parsed = parseUrlOnHosts(value, codepenHosts, isHostOf)
 
   if (!parsed) {
@@ -247,7 +247,7 @@ export const codepenWidgetEmbedResolver = createMarkupEmbedResolver(
   readWidget,
 )
 
-export const codepenResolveEmbed: ResolveEmbed = (url, element) => {
+export const codepenResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const target = parseTarget(url)
 
   if (target?.kind !== 'embed') {

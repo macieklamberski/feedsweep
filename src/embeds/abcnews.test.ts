@@ -16,7 +16,7 @@ describe('abcnewsResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(abcnewsResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(abcnewsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should claim the player on the current host', () => {
@@ -29,7 +29,7 @@ describe('abcnewsResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(abcnewsResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(abcnewsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop everything in the query but the id', () => {
@@ -42,7 +42,7 @@ describe('abcnewsResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(abcnewsResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(abcnewsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the id under an uppercase name and mint it in lowercase', () => {
@@ -55,7 +55,7 @@ describe('abcnewsResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(abcnewsResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(abcnewsResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -63,19 +63,19 @@ describe('abcnewsResolveEmbed', () => {
     it('should return undefined for a player url with no id', () => {
       const value = 'https://abcnews.go.com/video/embed'
 
-      expect(abcnewsResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(abcnewsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the route below another segment', () => {
       const value = 'https://abcnews.go.com/archive/video/embed?id=39415146'
 
-      expect(abcnewsResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(abcnewsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a segment after the route', () => {
       const value = 'https://abcnews.go.com/video/embed/clip?id=39415146'
 
-      expect(abcnewsResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(abcnewsResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -90,7 +90,7 @@ describe('abcnewsResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(abcnewsResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(abcnewsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the route with a trailing slash', () => {
@@ -103,7 +103,7 @@ describe('abcnewsResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(abcnewsResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(abcnewsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass an id that is not a number as written', () => {
@@ -116,7 +116,7 @@ describe('abcnewsResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(abcnewsResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
+      expect(abcnewsResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -125,19 +125,19 @@ describe('abcnewsResolveEmbed', () => {
     it('should return undefined for the Flash player', () => {
       const value = 'http://abcnews.go.com/assets/player/walt2.6/flash/SFP_Walt_2_65.swf'
 
-      expect(abcnewsResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(abcnewsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the ABC network player', () => {
       const value = 'https://abc.go.com/embed?id=VDKA0_dc1yn7tn'
 
-      expect(abcnewsResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(abcnewsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a poster on the image host', () => {
       const value = 'https://s.abcnews.com/images/Health/160527_wn_besser_16x9_992.jpg'
 
-      expect(abcnewsResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
+      expect(abcnewsResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

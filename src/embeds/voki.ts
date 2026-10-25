@@ -31,13 +31,13 @@ const composeEmbed = (sc: string, chsm: string): EmbedResolverResult => {
   }
 }
 
-const vokiFlashResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  if (!flashPlayerPathRegex.test(parsed.pathname)) {
+const vokiFlashResolveEmbed: ResolveUrlEmbed = (url) => {
+  if (!flashPlayerPathRegex.test(url.pathname)) {
     return
   }
 
   // The scene url ends in `getvoki/chsm={chsm}&sc={sc}`, its `&` kept as `%26` inside `doc`.
-  const [route, scene] = getQueryParam(parsed.searchParams, 'doc')?.split('/').slice(-2) ?? []
+  const [route, scene] = getQueryParam(url.searchParams, 'doc')?.split('/').slice(-2) ?? []
   const params = new URLSearchParams(scene)
   const sc = getQueryParam(params, 'sc')
   const chsm = getQueryParam(params, 'chsm')
@@ -54,13 +54,13 @@ const vokiFlashResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
 // the scene in its `doc` url.
 export const vokiFlashEmbedResolver = createUrlEmbedResolver(flashHosts, vokiFlashResolveEmbed)
 
-const vokiResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  if (!pickupPathRegex.test(parsed.pathname)) {
+const vokiResolveEmbed: ResolveUrlEmbed = (url) => {
+  if (!pickupPathRegex.test(url.pathname)) {
     return
   }
 
-  const sc = getQueryParam(parsed.searchParams, 'scid')
-  const chsm = getQueryParam(parsed.searchParams, 'chsm')
+  const sc = getQueryParam(url.searchParams, 'scid')
+  const chsm = getQueryParam(url.searchParams, 'chsm')
 
   if (!sc || !chsm) {
     return

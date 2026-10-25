@@ -36,7 +36,7 @@ describe('stackblitzResolveEmbed', () => {
         height: 500,
       }
 
-      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+      expect(stackblitzResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the open file and drop the pane', () => {
@@ -50,7 +50,7 @@ describe('stackblitzResolveEmbed', () => {
         height: 500,
       }
 
-      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+      expect(stackblitzResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the tracking parameters and the pane from the project query', () => {
@@ -64,7 +64,7 @@ describe('stackblitzResolveEmbed', () => {
         height: 500,
       }
 
-      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+      expect(stackblitzResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep every file the embed opens', () => {
@@ -78,7 +78,7 @@ describe('stackblitzResolveEmbed', () => {
         height: 500,
       }
 
-      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+      expect(stackblitzResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep an option spelled in another case, as the instance reads it', () => {
@@ -91,7 +91,7 @@ describe('stackblitzResolveEmbed', () => {
         height: 500,
       }
 
-      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+      expect(stackblitzResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the path the preview opens on', () => {
@@ -104,7 +104,7 @@ describe('stackblitzResolveEmbed', () => {
         height: 500,
       }
 
-      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+      expect(stackblitzResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the click-to-load flag the placeholder already stands in for', () => {
@@ -117,7 +117,7 @@ describe('stackblitzResolveEmbed', () => {
         height: 500,
       }
 
-      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+      expect(stackblitzResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the long spelling of the click-to-load flag', () => {
@@ -130,7 +130,7 @@ describe('stackblitzResolveEmbed', () => {
         height: 500,
       }
 
-      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+      expect(stackblitzResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read a slug ending in the hash a generated project carries', () => {
@@ -143,7 +143,7 @@ describe('stackblitzResolveEmbed', () => {
         height: 500,
       }
 
-      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+      expect(stackblitzResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read a slug longer than eighty characters', () => {
@@ -157,7 +157,7 @@ describe('stackblitzResolveEmbed', () => {
         height: 500,
       }
 
-      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+      expect(stackblitzResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read a project on the www host', () => {
@@ -170,7 +170,7 @@ describe('stackblitzResolveEmbed', () => {
         height: 500,
       }
 
-      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+      expect(stackblitzResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the npm script the project starts', () => {
@@ -183,7 +183,7 @@ describe('stackblitzResolveEmbed', () => {
         height: 500,
       }
 
-      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+      expect(stackblitzResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // The layout, the theme and the settings the project runs with.
@@ -212,29 +212,29 @@ describe('stackblitzResolveEmbed', () => {
         height: 500,
       }
 
-      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+      expect(stackblitzResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
   describe('sad paths', () => {
     it('should ignore the host root, which names no project', () => {
-      expect(stackblitzResolveEmbed('https://stackblitz.com/')).toBeUndefined()
+      expect(stackblitzResolveEmbed(new URL('https://stackblitz.com/'))).toBeUndefined()
     })
 
     it('should ignore an author page', () => {
-      expect(stackblitzResolveEmbed('https://stackblitz.com/@trungvose')).toBeUndefined()
+      expect(stackblitzResolveEmbed(new URL('https://stackblitz.com/@trungvose'))).toBeUndefined()
     })
 
     it('should ignore a foreign host carrying the same path', () => {
       const value = 'https://evil.test/edit/angular-ivy-snow'
 
-      expect(stackblitzResolveEmbed(value)).toBeUndefined()
+      expect(stackblitzResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the documentation subdomain carrying the same path', () => {
       const value = 'https://developer.stackblitz.com/edit/angular-ivy-snow'
 
-      expect(stackblitzResolveEmbed(value)).toBeUndefined()
+      expect(stackblitzResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed slug as written, even if the player answers an error', () => {
@@ -247,7 +247,7 @@ describe('stackblitzResolveEmbed', () => {
         height: 500,
       }
 
-      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+      expect(stackblitzResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use a malformed capitalised slug as written, even if the player answers an error', () => {
@@ -260,13 +260,13 @@ describe('stackblitzResolveEmbed', () => {
         height: 500,
       }
 
-      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+      expect(stackblitzResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
   describe('edge cases', () => {
     it('should ignore the edit route with no slug behind it', () => {
-      expect(stackblitzResolveEmbed('https://stackblitz.com/edit')).toBeUndefined()
+      expect(stackblitzResolveEmbed(new URL('https://stackblitz.com/edit'))).toBeUndefined()
     })
   })
 
@@ -281,7 +281,7 @@ describe('stackblitzResolveEmbed', () => {
         height: 500,
       }
 
-      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+      expect(stackblitzResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the publisher layout across the repair', () => {
@@ -294,11 +294,11 @@ describe('stackblitzResolveEmbed', () => {
         height: 500,
       }
 
-      expect(stackblitzResolveEmbed(value)).toEqual(expected)
+      expect(stackblitzResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should ignore the bare run route, which redirects to the home page', () => {
-      expect(stackblitzResolveEmbed('https://stackblitz.com/run?embed=1')).toBeUndefined()
+      expect(stackblitzResolveEmbed(new URL('https://stackblitz.com/run?embed=1'))).toBeUndefined()
     })
   })
 
@@ -306,13 +306,13 @@ describe('stackblitzResolveEmbed', () => {
     it('should refuse a repository embed, which the oEmbed endpoint cannot look up', () => {
       const value = 'https://stackblitz.com/github/okikio/astro-form-data/main?embed=1'
 
-      expect(stackblitzResolveEmbed(value)).toBeUndefined()
+      expect(stackblitzResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should refuse the fork-on-load repository route', () => {
       const value = 'https://stackblitz.com/fork/github/vuejs/core?embed=1'
 
-      expect(stackblitzResolveEmbed(value)).toBeUndefined()
+      expect(stackblitzResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     // The enclosure probe reads this same url shape, so a media file on the host would otherwise
@@ -325,7 +325,7 @@ describe('stackblitzResolveEmbed', () => {
     ]
 
     it.each(fileNameUrls)('should refuse the file name %s', (value) => {
-      expect(stackblitzResolveEmbed(value)).toBeUndefined()
+      expect(stackblitzResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

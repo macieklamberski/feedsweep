@@ -9,8 +9,8 @@ const ardmediathekHosts = ['ardmediathek.de']
 // The legacy `/{channel}/embed/{id}` route 404s.
 const embedPathRegex = /^\/(?:\w+\/)?embed\/([^/]+)\/?$/i
 
-const ardmediathekResolveEmbed: ResolveUrlEmbed = (url, _element, parsed) => {
-  const id = parsed.pathname.match(embedPathRegex)?.[1]
+const ardmediathekResolveEmbed: ResolveUrlEmbed = (url) => {
+  const id = url.pathname.match(embedPathRegex)?.[1]
 
   if (!id) {
     return

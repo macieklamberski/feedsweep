@@ -9,13 +9,13 @@ describe('extractFiresideToken', () => {
     const value = 'https://fireside.fm/player/v2/DiNRb69N+Dagp3z15'
     const expected = { version: 'v2', token: 'DiNRb69N+Dagp3z15' }
 
-    expect(extractFiresideToken(value)).toEqual(expected)
+    expect(extractFiresideToken(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a token whose plus arrived percent-encoded', () => {
     const value = 'https://fireside.fm/player/v2/o5sVQfzy%2BKzqauAdJ'
 
-    expect(extractFiresideToken(value)).toBeUndefined()
+    expect(extractFiresideToken(new URL(value))).toBeUndefined()
   })
 
   // The player host omits the `player` segment, and it is what the platform's embed code writes.
@@ -23,14 +23,14 @@ describe('extractFiresideToken', () => {
     const value = 'https://player.fireside.fm/v3/N8LaNbQY+MI2PkJ2g'
     const expected = { version: 'v3', token: 'N8LaNbQY+MI2PkJ2g' }
 
-    expect(extractFiresideToken(value)).toEqual(expected)
+    expect(extractFiresideToken(new URL(value))).toEqual(expected)
   })
 
   it('should read the third player version on the feed-side host', () => {
     const value = 'https://fireside.fm/player/v3/N8LaNbQY+MI2PkJ2g'
     const expected = { version: 'v3', token: 'N8LaNbQY+MI2PkJ2g' }
 
-    expect(extractFiresideToken(value)).toEqual(expected)
+    expect(extractFiresideToken(new URL(value))).toEqual(expected)
   })
 
   // Both halves are base64url, so three of five tokens read off live shows carry `-` or `_`.
@@ -38,21 +38,21 @@ describe('extractFiresideToken', () => {
     const value = 'https://player.fireside.fm/v3/I-2by1pi+kf-gXAOz'
     const expected = { version: 'v3', token: 'I-2by1pi+kf-gXAOz' }
 
-    expect(extractFiresideToken(value)).toEqual(expected)
+    expect(extractFiresideToken(new URL(value))).toEqual(expected)
   })
 
   it('should read a token ending in an underscore', () => {
     const value = 'https://player.fireside.fm/v3/nj9oaFbU+BY9LAva_'
     const expected = { version: 'v3', token: 'nj9oaFbU+BY9LAva_' }
 
-    expect(extractFiresideToken(value)).toEqual(expected)
+    expect(extractFiresideToken(new URL(value))).toEqual(expected)
   })
 
   it('should read a player version past the ones Fireside has shipped', () => {
     const value = 'https://player.fireside.fm/v4/N8LaNbQY+MI2PkJ2g'
     const expected = { version: 'v4', token: 'N8LaNbQY+MI2PkJ2g' }
 
-    expect(extractFiresideToken(value)).toEqual(expected)
+    expect(extractFiresideToken(new URL(value))).toEqual(expected)
   })
 
   // The retired share route names the token and no version, so it takes the current player.
@@ -60,75 +60,69 @@ describe('extractFiresideToken', () => {
     const value = 'https://fireside.fm/s/aHx_iT3N+3W9-AW7P/iframe'
     const expected = { version: 'v3', token: 'aHx_iT3N+3W9-AW7P' }
 
-    expect(extractFiresideToken(value)).toEqual(expected)
+    expect(extractFiresideToken(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a share route naming no token', () => {
     const value = 'https://fireside.fm/s'
 
-    expect(extractFiresideToken(value)).toBeUndefined()
+    expect(extractFiresideToken(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a first segment that is not a version', () => {
     const value = 'https://player.fireside.fm/embed/DiNRb69N+Dagp3z15'
 
-    expect(extractFiresideToken(value)).toBeUndefined()
+    expect(extractFiresideToken(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a fireside url that is not a player', () => {
     const value = 'https://fireside.fm/podcasts'
 
-    expect(extractFiresideToken(value)).toBeUndefined()
+    expect(extractFiresideToken(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a version segment with a leading prefix', () => {
     const value = 'https://player.fireside.fm/xv3/N8LaNbQY+MI2PkJ2g'
 
-    expect(extractFiresideToken(value)).toBeUndefined()
+    expect(extractFiresideToken(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a version segment with a trailing suffix', () => {
     const value = 'https://player.fireside.fm/v3x/N8LaNbQY+MI2PkJ2g'
 
-    expect(extractFiresideToken(value)).toBeUndefined()
+    expect(extractFiresideToken(new URL(value))).toBeUndefined()
   })
 
   it('should use a malformed token opening with an encoded slash as written, even if the player answers an error', () => {
     const value = 'https://player.fireside.fm/v3/x%2FN8LaNbQY+MI2PkJ2g'
     const expected = { version: 'v3', token: 'x%2FN8LaNbQY+MI2PkJ2g' }
 
-    expect(extractFiresideToken(value)).toEqual(expected)
+    expect(extractFiresideToken(new URL(value))).toEqual(expected)
   })
 
   it('should use a malformed token closing with an encoded slash as written, even if the player answers an error', () => {
     const value = 'https://player.fireside.fm/v3/N8LaNbQY+MI2PkJ2g%2Fx'
     const expected = { version: 'v3', token: 'N8LaNbQY+MI2PkJ2g%2Fx' }
 
-    expect(extractFiresideToken(value)).toEqual(expected)
+    expect(extractFiresideToken(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a token of the wrong shape', () => {
     const value = 'https://fireside.fm/player/v2/onlyoneside'
 
-    expect(extractFiresideToken(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a url that cannot be parsed', () => {
-    const value = 'https://['
-
-    expect(extractFiresideToken(value)).toBeUndefined()
+    expect(extractFiresideToken(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a player url naming a version and no token', () => {
     const value = 'https://fireside.fm/player/v3'
 
-    expect(extractFiresideToken(value)).toBeUndefined()
+    expect(extractFiresideToken(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a token holding a malformed percent escape', () => {
     const value = 'https://fireside.fm/player/v3/%'
 
-    expect(extractFiresideToken(value)).toBeUndefined()
+    expect(extractFiresideToken(new URL(value))).toBeUndefined()
   })
 })
 
@@ -143,7 +137,7 @@ describe('firesideResolveEmbed', () => {
       height: 200,
     }
 
-    expect(firesideResolveEmbed(value)).toEqual(expected)
+    expect(firesideResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should rebuild a v2 player onto v3', () => {
@@ -155,7 +149,7 @@ describe('firesideResolveEmbed', () => {
       height: 200,
     }
 
-    expect(firesideResolveEmbed(value)).toEqual(expected)
+    expect(firesideResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // The route 302s to a page that 404s, while the same token plays on the versioned player.
@@ -168,13 +162,13 @@ describe('firesideResolveEmbed', () => {
       height: 200,
     }
 
-    expect(firesideResolveEmbed(value)).toEqual(expected)
+    expect(firesideResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a fireside url naming no episode', () => {
     const value = 'https://fireside.fm/pricing'
 
-    expect(firesideResolveEmbed(value)).toBeUndefined()
+    expect(firesideResolveEmbed(new URL(value))).toBeUndefined()
   })
 })
 

@@ -41,8 +41,8 @@ const composeEmbed = (formId: string, carrier: URL): EmbedResolverResult => {
 }
 
 // The form frame, which the platform serves at the bare id and at `/form/{id}` alike.
-export const jotformResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
-  const segments = getPathSegments(parsed)
+export const jotformResolveEmbed: ResolveUrlEmbed = (url) => {
+  const segments = getPathSegments(url)
   const route = isAnyOf(segments[0], 'form') ? segments.slice(1) : segments
   const formId = route[0]
 
@@ -50,7 +50,7 @@ export const jotformResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => 
     return
   }
 
-  return composeEmbed(formId, parsed)
+  return composeEmbed(formId, url)
 }
 
 // Jotform's inline form, written in place by a script the pipeline drops, so an item whose whole

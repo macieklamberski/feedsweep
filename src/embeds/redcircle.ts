@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf, toMap } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -52,7 +52,7 @@ const readSubject = (
   return { kind, show, episode }
 }
 
-export const redcircleResolveEmbed: ResolveEmbed = (url) => {
+export const redcircleResolveEmbed: ResolveUrlEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, redcircleHosts)
   const subject = parsed ? readSubject(getPathSegments(parsed)) : undefined
 
@@ -85,7 +85,13 @@ export const redcircleResolveEmbed: ResolveEmbed = (url) => {
 export const redcircleScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="podcache.net/embedded-" i]',
   (element) => {
-    return redcircleResolveEmbed(attr(element, 'src') ?? '')
+    const url = parseUrlOnHosts(attr(element, 'src'), redcircleHosts)
+
+    if (!url) {
+      return
+    }
+
+    return redcircleResolveEmbed(url)
   },
 )
 

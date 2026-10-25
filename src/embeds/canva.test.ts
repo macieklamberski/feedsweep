@@ -16,7 +16,7 @@ describe('canvaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(canvaResolveEmbed(value)).toEqual(expected)
+      expect(canvaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read a design id carrying a dash', () => {
@@ -29,7 +29,7 @@ describe('canvaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(canvaResolveEmbed(value)).toEqual(expected)
+      expect(canvaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read a share token carrying a dash', () => {
@@ -42,7 +42,7 @@ describe('canvaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(canvaResolveEmbed(value)).toEqual(expected)
+      expect(canvaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the watch route of a video design', () => {
@@ -55,7 +55,7 @@ describe('canvaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(canvaResolveEmbed(value)).toEqual(expected)
+      expect(canvaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the older snippet that names no share token', () => {
@@ -68,7 +68,7 @@ describe('canvaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(canvaResolveEmbed(value)).toEqual(expected)
+      expect(canvaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the meta flag the oEmbed snippet writes', () => {
@@ -82,7 +82,7 @@ describe('canvaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(canvaResolveEmbed(value)).toEqual(expected)
+      expect(canvaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should frame the design page and drop its tracking query', () => {
@@ -96,7 +96,7 @@ describe('canvaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(canvaResolveEmbed(value)).toEqual(expected)
+      expect(canvaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the bare canva.com host', () => {
@@ -109,7 +109,7 @@ describe('canvaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(canvaResolveEmbed(value)).toEqual(expected)
+      expect(canvaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read an uppercase view route and mint it as written', () => {
@@ -122,7 +122,7 @@ describe('canvaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(canvaResolveEmbed(value)).toEqual(expected)
+      expect(canvaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read an uppercase design route', () => {
@@ -135,7 +135,7 @@ describe('canvaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(canvaResolveEmbed(value)).toEqual(expected)
+      expect(canvaResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -144,20 +144,20 @@ describe('canvaResolveEmbed', () => {
       const value =
         'https://document-export.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view?embed'
 
-      expect(canvaResolveEmbed(value)).toBeUndefined()
+      expect(canvaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a design url with no view route', () => {
       const value = 'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/edit'
 
-      expect(canvaResolveEmbed(value)).toBeUndefined()
+      expect(canvaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path with more segments than a design and its token', () => {
       const value =
         'https://www.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/extra/view?embed'
 
-      expect(canvaResolveEmbed(value)).toBeUndefined()
+      expect(canvaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed share token as written, even if the player answers an error', () => {
@@ -170,25 +170,25 @@ describe('canvaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(canvaResolveEmbed(value)).toEqual(expected)
+      expect(canvaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should ignore a design route below another path', () => {
       const value = 'https://www.canva.com/templates/design/DAHLowacSd4/view?embed'
 
-      expect(canvaResolveEmbed(value)).toBeUndefined()
+      expect(canvaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a page below the view route', () => {
       const value = 'https://www.canva.com/design/DAHLowacSd4/view/comments'
 
-      expect(canvaResolveEmbed(value)).toBeUndefined()
+      expect(canvaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a marketing page', () => {
       const value = 'https://www.canva.com/templates/EAFabc/view'
 
-      expect(canvaResolveEmbed(value)).toBeUndefined()
+      expect(canvaResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })
