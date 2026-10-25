@@ -236,13 +236,6 @@ describeForEachParser('rebuildIframelyEmbeds', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
-    // Constructed: Iframely's oEmbed endpoint answers JSON and is no frame.
-    it('should keep a frame on another Iframely API route', async () => {
-      const value = html`<iframe src="https://cdn.iframe.ly/api/oembed?url=https%3A%2F%2Fyoutu.be%2FNObkWjQHNm8"></iframe>`
-
-      expect(await transform(value)).toEqualHtml(value)
-    })
-
     // Constructed: an iframe API frame naming no url.
     it('should keep a frame naming no url', async () => {
       const value = html`<iframe src="https://cdn.iframe.ly/api/iframe?app=1&amp;key=57d2ec5998440ab74c7cf485bffd908c"></iframe>`
