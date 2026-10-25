@@ -591,7 +591,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams/17367418@N03',
-        src: 'https://www.flickr.com/photos/17367418@N03/player?width=400&height=300',
+        src: 'https://embedr.flickr.com/photostreams/17367418@N03?width=400&height=300',
         url: 'https://www.flickr.com/photos/17367418@N03/',
         width: 400,
         height: 300,
