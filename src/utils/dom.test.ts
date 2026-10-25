@@ -1473,6 +1473,10 @@ describe('parseFlashVars', () => {
     expect(parseFlashVars('title=Two%20words').get('title')).toBe('Two words')
   })
 
+  it('should fold a twice-escaped ampersand between the pairs', () => {
+    expect(parseFlashVars('bg=0xF8F8F8&amp;amp;id=17216').get('id')).toBe('17216')
+  })
+
   it('should return no pairs for a missing query', () => {
     expect([...parseFlashVars(undefined)]).toEqual([])
   })

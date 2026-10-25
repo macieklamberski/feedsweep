@@ -60,6 +60,12 @@ describe('parseUrlOnHosts', () => {
     expect(parseUrlOnHosts(value, hosts)?.pathname).toBe('/watch/123')
   })
 
+  it('should fold a twice-escaped ampersand before the next parameter', () => {
+    const value = 'https://platform.example/watch?v=123&amp;amp;key=abc'
+
+    expect(parseUrlOnHosts(value, hosts)?.searchParams.get('key')).toBe('abc')
+  })
+
   it('should return undefined for a url on another host', () => {
     expect(parseUrlOnHosts('https://elsewhere.example/watch/123', hosts)).toBeUndefined()
   })

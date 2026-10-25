@@ -209,7 +209,11 @@ export const parseUrlOnHosts = (
   hosts: string | ReadonlyArray<string>,
   isOnHost: (url: URL, hosts: string | ReadonlyArray<string>) => boolean = isHostOrSubdomainOf,
 ): URL | undefined => {
-  const parsed = url ? parseUrl(trimUrlValues(url), placeholderBaseUrl) : undefined
+  if (!url) {
+    return
+  }
+
+  const parsed = parseUrl(trimUrlValues(foldEscapedAmpersands(url)), placeholderBaseUrl)
 
   if (parsed && isOnHost(parsed, hosts)) {
     return parsed

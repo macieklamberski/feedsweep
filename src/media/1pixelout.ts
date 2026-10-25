@@ -1,12 +1,7 @@
 import { getQueryParam, parseUrl } from 'trousse'
 import type { MediaResolver, MediaResolverResult } from '../types.js'
 import { flashVars, parseFlashVars } from '../utils/dom.js'
-import {
-  flashFileRegex,
-  foldEscapedAmpersands,
-  parseUrlOnHosts,
-  placeholderBaseUrl,
-} from '../utils/urls.js'
+import { flashFileRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { readRepairedCarrierUrl } from '../utils/widgets.js'
 
 // Weebly's own copy has a resolver of its own, later in the list.
@@ -68,8 +63,7 @@ export const onePixelOutFlashMediaResolver: MediaResolver = {
       return
     }
 
-    // A feed that escapes the markup twice leaves `&amp;` between the flashvars.
-    const config = parseFlashVars(foldEscapedAmpersands(flashVars(element) ?? ''))
+    const config = parseFlashVars(flashVars(element))
     const soundFile =
       getQueryParam(config, 'soundFile') ?? getQueryParam(player.searchParams, 'soundFile')
 
