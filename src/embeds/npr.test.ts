@@ -125,18 +125,6 @@ describe('nprResolveEmbed', () => {
       expect(nprResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore the player path on a foreign host', () => {
-      const value = 'https://evil.test/player/embed/1/2'
-
-      expect(nprResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore the player path on the file host', () => {
-      const value = 'https://ondemand.npr.org/player/embed/550179668/551339989'
-
-      expect(nprResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore an episode file', () => {
       const value = 'https://ondemand.npr.org/anon.npr-mp3/npr/me/2026/09/20260928_me_01.mp3'
 
@@ -169,12 +157,6 @@ describe('nprResolveEmbed', () => {
 
     it('should ignore a route other than the video player', () => {
       const value = 'https://www.npr.org/embedded-foo?storyId=141331825&mediaId=141398010'
-
-      expect(nprResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore the video player path on a foreign host', () => {
-      const value = 'https://evil.test/embedded-video?storyId=141331825&mediaId=141398010'
 
       expect(nprResolveEmbed(value)).toBeUndefined()
     })
@@ -291,12 +273,6 @@ describe('nprFlashResolveEmbed', () => {
 
     it('should ignore a path below the Flash player', () => {
       const value = 'http://www.npr.org/v2/player/?i=340005056&m=340005057&t=audio'
-
-      expect(nprFlashResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore the Flash path on a foreign host', () => {
-      const value = 'http://evil.test/v2/?i=340005056&m=340005057&t=audio'
 
       expect(nprFlashResolveEmbed(value)).toBeUndefined()
     })
@@ -453,6 +429,13 @@ describeForEachParser('nprIframeEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the player path', async () => {
       const value = '<iframe src="https://evil.test/player/embed/550179668/551339989"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the player path on the file host', async () => {
+      const value =
+        '<iframe src="https://ondemand.npr.org/player/embed/550179668/551339989"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

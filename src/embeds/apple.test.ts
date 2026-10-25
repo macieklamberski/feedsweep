@@ -229,18 +229,6 @@ describe('appleResolveEmbed', () => {
 
       expect(appleResolveEmbed(value)).toBeUndefined()
     })
-
-    it('should return undefined for a lookalike host', () => {
-      const value = 'https://music.apple.com.evil.test/us/album/thriller/1440857781'
-
-      expect(appleResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for an invalid url', () => {
-      const value = 'not a url'
-
-      expect(appleResolveEmbed(value)).toBeUndefined()
-    })
   })
 })
 

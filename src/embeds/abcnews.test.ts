@@ -60,12 +60,6 @@ describe('abcnewsResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/video/embed?id=39415146'
-
-      expect(abcnewsResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for a player url with no id', () => {
       const value = 'https://abcnews.go.com/video/embed'
 

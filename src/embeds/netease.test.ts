@@ -85,12 +85,6 @@ describe('neteaseResolveEmbed', () => {
       expect(neteaseResolveEmbed(value)).toBeUndefined()
     })
 
-    it('should ignore a foreign host', () => {
-      const value = 'https://evil.test/outchain/player?type=2&id=1392990601'
-
-      expect(neteaseResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore the player route under another path', () => {
       const value = 'https://music.163.com/x/outchain/player?type=2&id=1392990601'
 

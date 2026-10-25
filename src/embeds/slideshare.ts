@@ -33,7 +33,7 @@ const composeEmbed = (deck: string, fields?: Partial<EmbedResolverResult>): Embe
 }
 
 export const slideshareResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, slideshareHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return

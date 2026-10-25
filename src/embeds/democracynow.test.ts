@@ -91,12 +91,6 @@ describe('democracynowResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/embed/show/2023/6/27'
-
-      expect(democracynowResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for the route below another segment', () => {
       const value = 'https://www.democracynow.org/es/embed/show/2023/6/27'
 

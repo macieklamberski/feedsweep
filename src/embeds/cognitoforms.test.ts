@@ -102,12 +102,6 @@ describe('cognitoformsResolveEmbed', () => {
 
       expect(cognitoformsResolveEmbed(value)).toBeUndefined()
     })
-
-    it('should ignore the form path on another subdomain', () => {
-      const value = 'https://files.cognitoforms.com/f/yExCAh1c_E2nq69zMpV9RA/48'
-
-      expect(cognitoformsResolveEmbed(value)).toBeUndefined()
-    })
   })
 })
 
@@ -272,6 +266,13 @@ describeForEachParser('cognitoformsIframeEmbedResolver', (parseHtml) => {
     }
 
     expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should ignore the form path on another subdomain', async () => {
+    const value =
+      '<iframe src="https://files.cognitoforms.com/f/yExCAh1c_E2nq69zMpV9RA/48"></iframe>'
+
+    expect(await extract(value)).toBeUndefined()
   })
 })
 

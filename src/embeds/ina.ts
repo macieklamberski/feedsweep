@@ -1,7 +1,7 @@
-import { composeQuery, decodeSegment, getPathSegments, isAnyOf } from 'trousse'
+import { composeQuery, decodeSegment, getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ina'
@@ -37,7 +37,7 @@ const composeEmbed = (id: string, playerId: string, key: string): EmbedResolverR
 
 // INA's player urls, whose iframe routes redirect into autoplay and whose Flash route is dead.
 export const inaResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, inaHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
   const segments = parsed ? getPathSegments(parsed) : []
   const [route, kind, id, playerId, key] = segments
 

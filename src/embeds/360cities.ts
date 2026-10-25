@@ -1,6 +1,7 @@
+import { parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = '360cities'
@@ -25,7 +26,7 @@ const composeEmbed = (slug: string): EmbedResolverResult => {
 // and names the panorama in flashvars as `pano=…/krpano/external_embed/{slug}.xml`, and the
 // frame `360cities.net/embed_iframe/{slug}`.
 export const threeSixtyCitiesResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrlOnHosts(url, threeSixtyCitiesHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return

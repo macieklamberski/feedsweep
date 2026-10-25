@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { flashVar } from '../utils/dom.js'
-import { digitsRegex, flashFileRegex, parseUrlOnHosts } from '../utils/urls.js'
+import { digitsRegex, flashFileRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `bbc.co.uk` 301s every player route onto `bbc.com`.
@@ -72,7 +72,7 @@ const readNewsFlash = (element: Element | undefined): EmbedResolverResult | unde
 // and the retired Flash player. A news page needs its section slug, which the embed does not
 // carry, and a current programmes clip such as `p08s3bnj` has no page of its own.
 export const bbcResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrlOnHosts(url, bbcHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return

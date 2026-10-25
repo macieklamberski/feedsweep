@@ -1,6 +1,6 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'patronite'
@@ -13,7 +13,7 @@ const widgetHeight = 306
 // Patronite's support widget, framed from `/widget/{slug}/{id}/{size}/{colors}`. The widget
 // renders by the numeric id alone, and the slug names the creator page.
 export const patroniteResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, patroniteHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return

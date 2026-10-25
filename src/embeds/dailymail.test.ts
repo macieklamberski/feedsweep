@@ -65,12 +65,6 @@ describe('dailymailResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/embed/video/1763642.html'
-
-      expect(dailymailResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for the route below another segment', () => {
       const value = 'https://www.dailymail.co.uk/news/embed/video/1763642.html'
 

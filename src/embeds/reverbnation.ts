@@ -1,6 +1,6 @@
-import { getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { filterUrlQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { filterUrlQuery, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'reverbnation'
@@ -58,7 +58,7 @@ const readFlashId = (url: URL): string | undefined => {
 }
 
 export const reverbnationResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, reverbnationHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return

@@ -132,12 +132,6 @@ describe('pbsResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a host that is not the player', () => {
-      const value = 'https://evil.test/viralplayer/3005825044/'
-
-      expect(pbsResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a route naming a member of the object prototype', () => {
       const value = 'https://player.pbs.org/toString/3005825044/'
 

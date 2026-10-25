@@ -1,7 +1,7 @@
-import { toMap } from 'trousse'
+import { parseUrl, toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const guardianHosts = ['embed.theguardian.com']
@@ -51,7 +51,7 @@ const readDate = (path: string): string | undefined => {
 const playerRatio = '16/9'
 
 export const guardianResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, guardianHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
   const path = parsed?.pathname.match(playerPathRegex)?.[1]
 
   if (!path) {
@@ -79,7 +79,7 @@ const endpointPathRegex = /^(?<path>\/.+)\/json$/i
 export const guardianFlashEmbedResolver = createUrlEmbedResolver(
   guardianFlashHosts,
   (url, element) => {
-    if (!flashPlayerPathRegex.test(parseUrlOnHosts(url, guardianFlashHosts)?.pathname ?? '')) {
+    if (!flashPlayerPathRegex.test(parseUrl(url, placeholderBaseUrl)?.pathname ?? '')) {
       return
     }
 

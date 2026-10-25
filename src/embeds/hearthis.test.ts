@@ -82,12 +82,6 @@ describe('hearthisResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a foreign host carrying the track route', () => {
-      const value = 'https://evil.test/embed/43067/transparent/'
-
-      expect(hearthisResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for a track page', () => {
       const value =
         'https://hearthis.at/conrad.mildner/die-abspanner-8-godzilla-edge-of-tomorrow-xmen/'

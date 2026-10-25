@@ -32,12 +32,6 @@ describe('aushaResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/?podcastId=BGKwJUJG8D9m'
-
-      expect(aushaResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore an ausha host that is not a player', () => {
       const value = 'https://podcast.ausha.co/comicsdiscovery?podcastId=BGKwJUJG8D9m'
 

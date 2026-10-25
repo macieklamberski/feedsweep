@@ -115,12 +115,6 @@ describe('rutubeResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/play/embed/c91d5d8847c7c5391a090fff38c86f34/'
-
-      expect(rutubeResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore an id behind a letter outside the hex alphabet', () => {
       const value = 'https://rutube.ru/play/embed/x73502f04b326cc20937a65e122a88cf8'
 

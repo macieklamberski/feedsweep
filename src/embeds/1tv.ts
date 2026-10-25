@@ -1,6 +1,6 @@
-import { getPathSegments, isAnyOf, toMap } from 'trousse'
+import { getPathSegments, isAnyOf, parseUrl, toMap } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const channelOneHosts = ['1tv.ru']
@@ -19,7 +19,7 @@ const legacyRouteTypes = toMap({
 // number names a different item in each, so the key keeps both halves. The player reads `t` as
 // the start position.
 export const channelOneResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, channelOneHosts)
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
   if (!parsed) {
     return

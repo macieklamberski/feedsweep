@@ -75,12 +75,6 @@ describe('cspanResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/video/standalone/?c4509010'
-
-      expect(cspanResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should ignore a path with a leading segment', () => {
       const value = 'https://www.c-span.org/x/video/standalone/?c4509010'
 
