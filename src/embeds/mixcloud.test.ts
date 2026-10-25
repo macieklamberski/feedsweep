@@ -329,7 +329,7 @@ describeForEachParser('mixcloudEmbedResolver', (parseHtml) => {
     const expected: EmbedResolverResult = {
       provider: 'mixcloud',
       id: 'Flashflooder/a-state-of-trap-episode-34',
-      src: 'https://www.mixcloud.com/widget/iframe/?feed=%2FFlashflooder%2Fa-state-of-trap-episode-34%2F',
+      src: 'https://www.mixcloud.com/widget/iframe/?feed=/Flashflooder/a-state-of-trap-episode-34/',
       url: 'https://www.mixcloud.com/Flashflooder/a-state-of-trap-episode-34/',
       height: 120,
       author: 'Flashflooder',
