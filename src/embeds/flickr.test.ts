@@ -1435,16 +1435,18 @@ describeForEachParser('flickr through the pipeline', (parseHtml) => {
     })
   }
 
+  // Constructed carrier: no feed lists a Flickr video as an enclosure. The item is the real 360p
+  // video the media resolver's own test pins, so the case plays.
   it('should leave a flickr video enclosure playable', async () => {
     const enclosures = [
       {
-        url: 'https://www.flickr.com/photos/macarignan/7531203512/play/360p/3f1b9c7a2e/',
+        url: 'https://www.flickr.com/photos/naturewoman/14392168940/play/360p/61d915cc45/',
         type: 'video/mp4',
       },
     ]
 
     const expected = html`
-      <video data-enclosure="" controls src="https://www.flickr.com/photos/macarignan/7531203512/play/360p/3f1b9c7a2e/"></video>
+      <video data-enclosure="" controls src="https://www.flickr.com/photos/naturewoman/14392168940/play/360p/61d915cc45/"></video>
       <p>Body</p>
     `
 
