@@ -1,7 +1,15 @@
 import type { Nullish } from 'trousse'
 import { composeQuery, encodePathSegment, getPathSegments, getQueryParam, parseUrl } from 'trousse'
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { attr, find, flashVars, keepIfMatches, paramValue, parseFlashVars, text } from '../utils/dom.js'
+import {
+  attr,
+  find,
+  flashVars,
+  keepIfMatches,
+  paramValue,
+  parseFlashVars,
+  text,
+} from '../utils/dom.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 

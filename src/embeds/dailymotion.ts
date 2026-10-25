@@ -17,7 +17,12 @@ import { attr, find } from '../utils/dom.js'
 
 const provider = 'dailymotion'
 
-import { parseUrlOnHosts, pickQueryParams, placeholderBaseUrl, repairCarrierUrl } from '../utils/urls.js'
+import {
+  parseUrlOnHosts,
+  pickQueryParams,
+  placeholderBaseUrl,
+  repairCarrierUrl,
+} from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 // Listed one by one: `dailymotion.de` is third-party, and a tld pattern would trust it.
