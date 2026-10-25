@@ -81,6 +81,12 @@ describe('composeEmbedUrl', () => {
     expect(composeEmbedUrl(value)).toBeUndefined()
   })
 
+  it('should return undefined for a permalink with no host', () => {
+    const value = 'javascript:/Soiree-debat-Softway-Medical_a4183.html'
+
+    expect(composeEmbedUrl(value)).toBeUndefined()
+  })
+
   it('should return undefined when there is no permalink', () => {
     expect(composeEmbedUrl(undefined)).toBeUndefined()
   })

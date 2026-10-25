@@ -1,6 +1,6 @@
-import { isHttpUrl, parseUrl } from 'trousse'
+import { parseUrl } from 'trousse'
 import { attr } from '../utils/dom.js'
-import { pickUrlParams } from '../utils/urls.js'
+import { pickUrlParams, readOrigin } from '../utils/urls.js'
 import { createMarkupEmbedResolver, readCarrierUrl } from '../utils/widgets.js'
 
 const provider = 'umap'
@@ -22,8 +22,7 @@ export const umapEmbedResolver = createMarkupEmbedResolver('iframe[src*="/map/"]
   const link = readCarrierUrl(element)
   const url = parseUrl(link)
 
-  // A javascript: url parses with a matching pathname, and its origin is the string null.
-  if (!url || !isHttpUrl(url)) {
+  if (!url || !readOrigin(url)) {
     return
   }
 

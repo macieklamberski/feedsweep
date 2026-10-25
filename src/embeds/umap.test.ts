@@ -191,8 +191,8 @@ describeForEachParser('umapEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a scheme other than http', async () => {
-      const value = '<iframe src="ftp://umap.openstreetmap.fr/fr/map/maison_203723"></iframe>'
+    it('should ignore a map path on a url with no host', async () => {
+      const value = '<iframe src="javascript:/fr/map/maison_203723"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -201,6 +201,21 @@ describeForEachParser('umapEmbedResolver', (parseHtml) => {
       const value = '<iframe src="//umap.openstreetmap.fr/fr/map/maison_203723"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should mint the https map for a scheme other than http', async () => {
+      const value = '<iframe src="ftp://umap.openstreetmap.fr/fr/map/maison_203723"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'umap',
+        id: 'umap.openstreetmap.fr/203723',
+        src: 'https://umap.openstreetmap.fr/fr/map/maison_203723',
+        url: 'https://umap.openstreetmap.fr/fr/map/maison_203723',
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })
