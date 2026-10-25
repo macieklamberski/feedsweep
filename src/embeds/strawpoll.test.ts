@@ -49,6 +49,19 @@ describe('strawpollResolveEmbed', () => {
 
       expect(strawpollResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the embed route in uppercase and mint it in lowercase', () => {
+      const value = 'https://strawpoll.com/EMBED/e7ZJaM1BPg3'
+      const expected: EmbedResolverResult = {
+        provider: 'strawpoll',
+        id: 'e7ZJaM1BPg3',
+        src: 'https://strawpoll.com/embed/e7ZJaM1BPg3',
+        url: 'https://strawpoll.com/e7ZJaM1BPg3',
+        thumbnail: 'https://cdn.strawpoll.com/images/polls/previews/e7ZJaM1BPg3-c.png',
+      }
+
+      expect(strawpollResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -66,12 +79,6 @@ describe('strawpollResolveEmbed', () => {
 
     it('should ignore a trailing segment after the poll', () => {
       const value = 'https://strawpoll.com/embed/e7ZJaM1BPg3/results'
-
-      expect(strawpollResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore the embed route in uppercase', () => {
-      const value = 'https://strawpoll.com/EMBED/e7ZJaM1BPg3'
 
       expect(strawpollResolveEmbed(value)).toBeUndefined()
     })

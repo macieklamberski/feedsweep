@@ -1,4 +1,4 @@
-import { encodePathSegment, getSubdomain } from 'trousse'
+import { encodePathSegment, getSubdomain, isAnyOf, startsWithAnyOf } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { flashVar } from '../../utils/dom.js'
 import { parseUrlOnHosts } from '../../utils/urls.js'
@@ -34,13 +34,13 @@ export const linkifyPodomaticPlaylists: DomTransform = () => (document) => {
   for (const element of document.querySelectorAll(playerSelector)) {
     const player = parseUrlOnHosts(readCarrierUrl(element), podomaticHost)
 
-    if (!player?.pathname.startsWith(playerPath)) {
+    if (!player || !startsWithAnyOf(player.pathname, [playerPath])) {
       continue
     }
 
     const file = flashVar(element, 'file')
 
-    if (parseUrlOnHosts(file, podomaticHost)?.pathname !== playlistPath) {
+    if (!isAnyOf(parseUrlOnHosts(file, podomaticHost)?.pathname, playlistPath)) {
       continue
     }
 

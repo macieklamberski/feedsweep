@@ -99,6 +99,19 @@ describe('mediacccResolveEmbed', () => {
 
       expect(mediacccResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the route words in another case and mint them in lowercase', () => {
+      const value = 'https://media.ccc.de/V/why2025-23-tic-80-byte-jam/OEMBED'
+      const expected: EmbedResolverResult = {
+        provider: 'mediaccc',
+        id: 'why2025-23-tic-80-byte-jam',
+        src: 'https://media.ccc.de/v/why2025-23-tic-80-byte-jam/oembed',
+        url: 'https://media.ccc.de/v/why2025-23-tic-80-byte-jam',
+        ratio: '16/9',
+      }
+
+      expect(mediacccResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -116,12 +129,6 @@ describe('mediacccResolveEmbed', () => {
 
     it('should ignore a path with a trailing segment', () => {
       const value = 'https://media.ccc.de/v/why2025-23-tic-80-byte-jam/oembed/extra'
-
-      expect(mediacccResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore the route words in another case, which the server answers with 404', () => {
-      const value = 'https://media.ccc.de/V/why2025-23-tic-80-byte-jam/OEMBED'
 
       expect(mediacccResolveEmbed(value)).toBeUndefined()
     })

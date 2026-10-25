@@ -9,8 +9,8 @@ const provider = 'mediaccc'
 // `app.media.ccc.de` serves the same player on the same paths.
 const mediacccHosts = ['media.ccc.de']
 
-// The server matches the route words and the slug in their case only.
-const playerPathRegex = /^\/v\/([^/]+)\/oembed\/?$/
+// The server matches the slug in its case only.
+const playerPathRegex = /^\/v\/([^/]+)\/oembed\/?$/i
 
 // The player seeks to the `#t=` it reads from the hash. A WordPress auto-embed writes
 // `#?secret=` there.

@@ -1,4 +1,4 @@
-import { encodePathSegment, getPathSegments } from 'trousse'
+import { encodePathSegment, getPathSegments, isAnyOf, startsWithAnyOf } from 'trousse'
 import type { MediaResolver } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -19,7 +19,7 @@ export const podomaticFlashMediaResolver: MediaResolver = {
   extract: (element) => {
     const player = parseUrlOnHosts(readCarrierUrl(element), podomaticHost)
 
-    if (!player?.pathname.startsWith(playerPath)) {
+    if (!player || !startsWithAnyOf(player.pathname, [playerPath])) {
       return
     }
 
@@ -31,7 +31,7 @@ export const podomaticFlashMediaResolver: MediaResolver = {
 
     const [entry, route, timestamp] = getPathSegments(location)
 
-    if (entry !== 'entry' || route !== 'embed_params' || !timestamp) {
+    if (!isAnyOf(entry, 'entry') || !isAnyOf(route, 'embed_params') || !timestamp) {
       return
     }
 

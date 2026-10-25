@@ -1,4 +1,4 @@
-import { composeQuery, encodePathSegment, trimObject } from 'trousse'
+import { composeQuery, encodePathSegment, startsWithAnyOf, trimObject } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -20,7 +20,7 @@ type WidgetConfig = {
 const readSignedQuery = (url: URL): string => {
   const pairs = url.search.slice(1).split('&')
   const isSignaturePair = (pair: string) => {
-    return pair.startsWith('sig=')
+    return startsWithAnyOf(pair, ['sig='])
   }
   const signedPairs = pairs.slice(0, pairs.findIndex(isSignaturePair) + 1)
 

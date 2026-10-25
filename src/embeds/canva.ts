@@ -8,7 +8,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const canvaHosts = ['canva.com', 'www.canva.com']
 
 // /design/{designId}/{shareToken}/{view|watch}, where older snippets leave the token out.
-const designPathRegex = /^\/design\/([^/]+(?:\/[^/]+)?)\/(view|watch)\/?$/
+const designPathRegex = /^\/design\/([^/]+(?:\/[^/]+)?)\/(view|watch)\/?$/i
 
 const designRatio = '16/9'
 

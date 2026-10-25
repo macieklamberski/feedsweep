@@ -8,7 +8,7 @@ const provider = 'ourworldindata'
 const ourworldindataHosts = ['ourworldindata.org']
 
 // The site serves the route words in lowercase only, and answers 404 to `/GRAPHER/{slug}`.
-const chartPathRegex = /^\/(grapher|explorers)\/([^/]+)$/
+const chartPathRegex = /^\/(grapher|explorers)\/([^/]+)$/i
 
 // See: https://github.com/owid/owid-grapher/blob/master/packages/@ourworldindata/explorer/src/ExplorerConstants.ts.
 // An explorer and a multi-dimensional chart pick their view with params of their own, so only the
@@ -58,7 +58,7 @@ const ourworldindataResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const isChart = kind === 'grapher'
+  const isChart = isAnyOf(kind, 'grapher')
   const query = filterUrlQuery(parsed, (name) => {
     return !isAnyOf(name, displayParams)
   })

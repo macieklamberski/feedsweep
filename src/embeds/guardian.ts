@@ -71,8 +71,8 @@ export const guardianResolveEmbed: ResolveEmbed = (url) => {
 export const guardianEmbedResolver = createUrlEmbedResolver(guardianHosts, guardianResolveEmbed)
 
 const guardianFlashHosts = ['guardian.co.uk', 'theguardian.com']
-const flashPlayerPathRegex = /^\/video\/embed\/?$/
-const endpointPathRegex = /^(?<path>\/.+)\/json$/
+const flashPlayerPathRegex = /^\/video\/embed\/?$/i
+const endpointPathRegex = /^(?<path>\/.+)\/json$/i
 
 // The retired Flash player, `guardian.co.uk/video/embed`, names the video in its `endpoint`
 // flashvar, `{page}/json`, and the page's path plays on today's player.

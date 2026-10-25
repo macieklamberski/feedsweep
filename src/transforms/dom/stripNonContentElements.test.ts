@@ -16,7 +16,7 @@ const specimens: Record<string, string | [string, string]> = {
     '<div data-component-name="SubscribeWidget"><input type="email"><button>Subscribe</button></div>',
   '.subscription-widget-wrap-editor':
     '<div class="subscription-widget-wrap-editor"><div class="subscription-widget"><h2>Keep reading with a 7-day free trial</h2></div></div>',
-  'iframe[src*=".substack.com/"][src$="/embed"]':
+  'iframe[src*=".substack.com/" i][src$="/embed" i]':
     '<iframe src="https://other.substack.com/embed" width="480" height="320"></iframe>',
   '.wp-block-jetpack-subscriptions':
     '<div class="wp-block-jetpack-subscriptions"><form><input type="email"></form></div>',
@@ -24,17 +24,17 @@ const specimens: Record<string, string | [string, string]> = {
     '<div class="kg-card kg-signup-card" data-lexical-signup-form><h2>Subscribe</h2></div>',
   '.mc4wp-form': '<form class="mc4wp-form" method="post"><input type="email" name="EMAIL"></form>',
   '.formkit-form': '<form class="formkit-form" data-sv-form="123456"><input type="email"></form>',
-  'iframe[src*="embeds.beehiiv.com"]':
+  'iframe[src*="embeds.beehiiv.com" i]':
     '<iframe src="https://embeds.beehiiv.com/72773897-9d0c" height="320"></iframe>',
   '.jetpack_subscription_widget':
     '<div class="jetpack_subscription_widget"><form><input type="email"></form></div>',
-  'form[action*="buttondown.email"]':
+  'form[action*="buttondown.email" i]':
     '<form action="https://buttondown.email/api/emails/embed-subscribe/foo" method="post"><input name="email"></form>',
   '.sqs-block-newsletter':
     '<div class="sqs-block newsletter-block sqs-block-newsletter"><form><input type="email"></form></div>',
   '.wpforms-container': '<div class="wpforms-container"><form></form></div>',
   '[class*="tve-leads"]': '<div class="tve-leads-conversion-object"></div>',
-  'form[action*=".list-manage"]:not(:has(img, picture, video, iframe))':
+  'form[action*=".list-manage" i]:not(:has(img, picture, video, iframe))':
     '<form action="https://example.us8.list-manage.com/subscribe/post?u=6812a77ff87af5e2479fffcec&amp;id=2fe16a669" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank"><div id="mc_embed_signup_scroll"><h2>Subscribe to my mailing list</h2><div class="mc-field-group"><label for="mce-EMAIL">Email Address</label><input type="email" name="EMAIL" class="required email" id="mce-EMAIL"></div><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div></form>',
   'form[class*="fivestar"]':
     '<form class="fivestar-widget" action="/taxonomy/term/116/feed" method="post" id="fivestar-custom-widget" accept-charset="UTF-8"><div class="clearfix fivestar-combo-text fivestar-combo-stars fivestar-form-item fivestar-default"><div class="form-item form-type-select form-item-vote"><select id="edit-vote--2" name="vote" class="form-select"><option value="-">Select rating</option><option value="20">Give it 1/5</option><option value="40">Give it 2/5</option><option value="60">Give it 3/5</option><option value="80">Give it 4/5</option><option value="100">Give it 5/5</option></select><div class="description"><div class="fivestar-summary fivestar-summary-average-count"><span class="average-rating">Average: <span>4.9</span></span> <span class="total-votes">(<span>8</span> votes)</span></div></div></div><input class="fivestar-submit form-submit" type="submit" id="edit-fivestar-submit" name="op" value="Rate"></div></form>',
@@ -44,9 +44,9 @@ const specimens: Record<string, string | [string, string]> = {
     '<form id="searchwp-form-1" role="search" method="get" class="searchwp-form" action="https://example.com/" aria-label="Search"><input type="hidden" name="swp_form[form_id]" value="1"><div class="searchwp-form-input-container swp-items-stretch"><input type="search" class="swp-input--search swp-input" name="swps" aria-label="Search"></div><input type="submit" class="search-submit swp-button" value="archive search"></form>',
   'form:has(input[name="s"]:not([type="submit"]))':
     '<form class="e-search-form" action="https://example.com/blog" method="get"><label class="e-search-label" for="search-f088e24"><span class="elementor-screen-only">Search</span></label><div class="e-search-input-wrapper"><input id="search-f088e24" placeholder="Search" class="e-search-input" type="search" name="s" value=""></div><button class="e-search-submit" type="submit">Search</button></form>',
-  'iframe[src*="google.com/recaptcha/"]':
+  'iframe[src*="google.com/recaptcha/" i]':
     '<iframe src="https://www.google.com/recaptcha/api/fallback?hl=en&amp;k=6LddubAUAAAAAOZ0V8l7NcrIkv58vlZKl6k6b2c_" frameborder="0" scrolling="no" style="width: 302px; height:422px; border-style: none;"></iframe>',
-  'iframe[src*="recaptcha.net/"]':
+  'iframe[src*="recaptcha.net/" i]':
     '<iframe src="https://api-secure.recaptcha.net/noscript?k=6LeMVQQAAAAAAE8eiOuwZPcQUIg_1ooYyN7m3Ibx" height="300" width="500" frameborder="0"></iframe>',
   'noscript textarea[name="g-recaptcha-response"]': [
     '<noscript><div style="width: 250px; height: 80px; position: absolute; border-style: none; bottom: 21px; left: 25px; margin: 0px; padding: 0px; right: 25px;"><textarea id="g-recaptcha-response" name="g-recaptcha-response" class="recaptcha_challenge_field" style="width: 250px; height: 80px; border: 1px solid #c1c1c1; margin: 0px; padding: 0px; resize: none;" value=""></textarea></div></noscript>',
@@ -72,17 +72,17 @@ const specimens: Record<string, string | [string, string]> = {
     '<amp-sticky-ad layout="nodisplay"><amp-ad width="320" height="50" type="doubleclick" data-slot="/4119129/sticky"></amp-ad></amp-sticky-ad>',
   'amp-sticky-ad-top-padding':
     '<amp-sticky-ad-top-padding class="amp-sticky-ad-top-padding"></amp-sticky-ad-top-padding>',
-  '[src*="amazon"][src*="/e/cm"]':
+  '[src*="amazon" i][src*="/e/cm" i]':
     '<iframe src="https://rcm.amazon.com/e/cm?t=tag-20&o=1&p=8&l=as1&asins=B00451B7WU&f=ifr" style="width:120px;height:240px;" scrolling="no" frameborder="0"></iframe>',
-  '[src*="amazon"][src*="/widgets/q"]':
+  '[src*="amazon" i][src*="/widgets/q" i]':
     '<iframe src="//ws-na.amazon-adsystem.com/widgets/q?ServiceVersion=20070822&OneJS=1&Operation=GetAdHtml&asins=B00451B7WU" width="120" height="240"></iframe>',
-  'object[data*="amazon"][data*="/widgets/q"]':
+  'object[data*="amazon" i][data*="/widgets/q" i]':
     '<object data="//ws-na.amazon-adsystem.com/widgets/q?ServiceVersion=20070822&asins=B00451B7WU" width="120" height="240"></object>',
-  'iframe[src*="ad.duga.jp/"]':
+  'iframe[src*="ad.duga.jp/" i]':
     '<iframe src="https://ad.duga.jp/dynamic/1002/34/?mode=1" width="440" height="195" scrolling="no"><a href="https://example.com/1002-01">DUGA</a></iframe>',
-  'iframe[src*="shopsensewidget.shopstyle.com"]':
+  'iframe[src*="shopsensewidget.shopstyle.com" i]':
     '<iframe src="//shopsensewidget.shopstyle.com/#/?options=%7B%22widgetId%22%3A%225bad8374%22%2C%22pid%22%3A%22uid0000-00000000-00%22%7D" width="460" height="402"></iframe>',
-  'script[src*="shopsensewidget.shopstyle.com"]': [
+  'script[src*="shopsensewidget.shopstyle.com" i]': [
     '<div class="shopsense-widget" data-options="%7B%22widgetId%22%3A%225dac5d8d%22%7D"><script id="shopsensewidget-script" src="//shopsensewidget.shopstyle.com/widget-script.js?cb=1571575698116"></script></div>',
     '<div class="shopsense-widget" data-options="%7B%22widgetId%22%3A%225dac5d8d%22%7D"></div>',
   ],
@@ -92,26 +92,26 @@ const specimens: Record<string, string | [string, string]> = {
     '<amp-analytics type="googleanalytics" data-credentials="include"><script type="application/json">{"vars":{"account":"UA-12345-6"}}</script></amp-analytics>',
   '.captioned-button-wrap':
     '<div class="captioned-button-wrap"><p class="button-wrapper"><a class="button primary" href="https://example.com/p/post?action=share"><span>Share</span></a></p></div>',
-  '[data-component-name="ButtonCreateButton"]:has(> a[href*="/subscribe"])':
+  '[data-component-name="ButtonCreateButton"]:has(> a[href*="/subscribe" i])':
     '<p class="button-wrapper" data-component-name="ButtonCreateButton"><a class="button primary" href="https://example.com/subscribe?"><span>Subscribe now</span></a></p>',
-  '[data-component-name="ButtonCreateButton"]:has(> a[href*="/comments"])':
+  '[data-component-name="ButtonCreateButton"]:has(> a[href*="/comments" i])':
     '<p class="button-wrapper" data-component-name="ButtonCreateButton"><a class="button primary" href="https://example.com/p/post/comments"><span>Leave a comment</span></a></p>',
-  '[data-component-name="ButtonCreateButton"]:has(> a[href*="action=share"])':
+  '[data-component-name="ButtonCreateButton"]:has(> a[href*="action=share" i])':
     '<p class="button-wrapper" data-component-name="ButtonCreateButton"><a class="button primary" href="https://example.com/p/post?action=share"><span>Share</span></a></p>',
   '[class*="social-share"]': '<div class="social-share"><a href="/x">X</a></div>',
-  'iframe[src*="eventbrite."][src*="/tickets-external"]':
+  'iframe[src*="eventbrite." i][src*="/tickets-external" i]':
     '<iframe width="100%" height="214" src="//eventbrite.es/tickets-external?eid=13461809635&amp;ref=etckt"></iframe>',
-  'iframe[src*="eventbrite."][src*="/countdown-widget"]':
+  'iframe[src*="eventbrite." i][src*="/countdown-widget" i]':
     '<iframe allowtransparency="true" frameborder="0" height="383" marginheight="0" marginwidth="0" scrolling="no" src="https://www.eventbrite.ca/countdown-widget?eid=24687510007" width="195"></iframe>',
-  'form[action*="paypal.com/cgi-bin/webscr"]':
+  'form[action*="paypal.com/cgi-bin/webscr" i]':
     '<form action="https://www.paypal.com/cgi-bin/webscr" method="post"><input type="hidden" name="cmd" value="_donations"><input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" name="submit" alt="Donate"></form>',
-  'img[src*="paypal.com/"][src*="/i/btn/"]:not(a img)':
+  'img[src*="paypal.com/" i][src*="/i/btn/" i]:not(a img)':
     '<img src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" alt="Donate with PayPal">',
   'form.edd_download_purchase_form':
     '<form id="edd_purchase_4374" class="edd_download_purchase_form edd_purchase_4374" method="post"><div class="edd_purchase_submit_wrapper"><button class="edd-add-to-cart button red edd-submit" data-action="edd_add_to_cart" data-download-id="4374" data-variable-price="no" data-price-mode="single" data-price="15.00"><span class="edd-add-to-cart-label">$15.00&nbsp;&ndash;&nbsp;Purchase</span></button><a href="https://example.com/checkout/" class="edd_go_to_checkout button red edd-submit" style="display:none;">Checkout</a><span class="edd-cart-ajax-alert" aria-live="assertive"><span class="edd-cart-added-alert" style="display: none;">Added to cart</span></span></div><input type="hidden" name="download_id" value="4374"><input type="hidden" name="edd_action" class="edd_action_input" value="add_to_cart"></form>',
   'p:has(> a.redcircle-link)':
     '<p style="font-size: 10px; color: gray;">Powered by <a class="redcircle-link" href="https://example.com/?utm_source=rc_embedded_player">RedCircle</a></p>',
-  'iframe[src*="zeno.fm/player/"] + a:is([href$="//zeno.fm/"], [href$="//www.zeno.fm/"], [href$="//www.zeno.fm"], [href$="//www.zenomedia.com/"])':
+  'iframe[src*="zeno.fm/player/" i] + a:is([href$="//zeno.fm/" i], [href$="//www.zeno.fm/" i], [href$="//www.zeno.fm" i], [href$="//www.zenomedia.com/" i])':
     [
       '<iframe src="https://zeno.fm/player/halshack" width="575" height="250" frameborder="0" scrolling="no"></iframe><a href="https://zeno.fm/" target="_blank" style="display: block; font-size: 0.9em; line-height: 10px;">A Zeno.FM Station</a>',
       '<iframe src="https://zeno.fm/player/halshack" width="575" height="250" frameborder="0" scrolling="no"></iframe>',
@@ -122,15 +122,15 @@ const specimens: Record<string, string | [string, string]> = {
   '.feedflare': '<div class="feedflare"><a href="/ff">Share</a></div>',
   '.addtoany_share_save_container':
     '<div class="addtoany_share_save_container"><a class="a2a_button_facebook" href="#">Share</a></div>',
-  'iframe[src*="platform.twitter.com/widgets/"]':
+  'iframe[src*="platform.twitter.com/widgets/" i]':
     '<iframe id="twitter-widget-0" scrolling="no" frameborder="0" allowtransparency="true" src="https://platform.twitter.com/widgets/tweet_button.1397165098.html#_=1400000000000&amp;count=horizontal&amp;id=twitter-widget-0&amp;lang=en&amp;original_referer=https%3A%2F%2Fexample.com%2Fpost&amp;size=m&amp;text=A%20post&amp;url=https%3A%2F%2Fexample.com%2Fpost" class="twitter-share-button twitter-share-button-rendered twitter-tweet-button" style="position: static; visibility: visible; width: 107px; height: 20px;" title="Twitter Tweet Button"></iframe>',
-  'iframe:is([src*="facebook.com/plugins/like.php"], [src*="facebook.com/v"][src*="/plugins/like.php"])':
+  'iframe:is([src*="facebook.com/plugins/like.php" i], [src*="facebook.com/v" i][src*="/plugins/like.php" i])':
     '<iframe src="http://www.facebook.com/plugins/like.php?href=https://example.com/post/&amp;layout=standard&amp;show_faces=1&amp;width=450&amp;action=like" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:450px; height:25px"></iframe>',
-  'iframe:is([src*="facebook.com/plugins/page.php"], [src*="facebook.com/v"][src*="/plugins/page.php"])':
+  'iframe:is([src*="facebook.com/plugins/page.php" i], [src*="facebook.com/v" i][src*="/plugins/page.php" i])':
     '<iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Facme&amp;tabs=timeline&amp;width=340&amp;height=500&amp;small_header=false&amp;adapt_container_width=true&amp;hide_cover=false&amp;show_facepile=true" width="340" height="500" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>',
-  'iframe:is([src*="facebook.com/plugins/likebox.php"], [src*="facebook.com/v"][src*="/plugins/likebox.php"])':
+  'iframe:is([src*="facebook.com/plugins/likebox.php" i], [src*="facebook.com/v" i][src*="/plugins/likebox.php" i])':
     '<iframe src="//www.facebook.com/plugins/likebox.php?href=https%3A%2F%2Fwww.facebook.com%2Facme&amp;width=292&amp;height=258&amp;show_faces=true&amp;header=false&amp;stream=false&amp;show_border=false" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:292px; height:258px" allowtransparency="true"></iframe>',
-  'iframe:is([src*="facebook.com/plugins/share_button.php"], [src*="facebook.com/v"][src*="/plugins/share_button.php"])':
+  'iframe:is([src*="facebook.com/plugins/share_button.php" i], [src*="facebook.com/v" i][src*="/plugins/share_button.php" i])':
     '<iframe src="https://www.facebook.com/plugins/share_button.php?href=https%3A%2F%2Fexample.com%2Fpost&amp;layout=button_count&amp;size=small&amp;width=90&amp;height=20" width="90" height="20" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>',
   '.a2a_kit': '<span class="a2a_kit a2a_kit_size_32 addtoany_list"></span>',
   '[class*="addthis_"]': '<div class="addthis_toolbox addthis_default_style"></div>',
@@ -167,27 +167,27 @@ const specimens: Record<string, string | [string, string]> = {
     '<div class="ya-share2" data-services="vkontakte,odnoklassniki,twitter,telegram" data-image="https://example.com/logo.png" data-title=""></div>',
   'div.zemanta-pixie':
     '<div style="margin-top: 10px; height: 15px;" class="zemanta-pixie"><a class="zemanta-pixie-a" href="https://example.com/zemified/da212ae4/" title="Reblog this post"><img class="zemanta-pixie-img" src="https://example.com/reblog_e.png?x-id=da212ae4" alt="Reblog this post"></a></div>',
-  'a[href*="digg.com/submit"]':
+  'a[href*="digg.com/submit" i]':
     '<a href="https://digg.com/submit?url=https%3A%2F%2Fexample.com%2Fa&title=A+post"><img src="https://digg.com/img/badges/100x20-digg-button.png" alt="Digg"></a>',
-  'img[src*="digg.com/img/badges"]':
+  'img[src*="digg.com/img/badges" i]':
     '<img src="https://digg.com/img/badges/100x20-digg-button.png" alt="Digg this">',
-  'iframe[src*="plusone.google.com"]':
+  'iframe[src*="plusone.google.com" i]':
     '<iframe allowtransparency="true" frameborder="0" scrolling="no" src="https://plusone.google.com/_/+1/fastbutton?bsv&size=medium&hl=en-US&url=https%3A%2F%2Fexample.com%2Fa"></iframe>',
-  'iframe[src*="tunein.com/embed/follow/"]':
+  'iframe[src*="tunein.com/embed/follow/" i]':
     '<iframe src="https://tunein.com/embed/follow/p950157/?wmode=opaque"></iframe>',
-  'iframe[src*="youtube.com/subscribe_embed"]':
+  'iframe[src*="youtube.com/subscribe_embed" i]':
     '<iframe data-gapiattached="true" frameborder="0" id="I2_1468640673809" marginheight="0" marginwidth="0" name="I2_1468640673809" scrolling="no" src="https://www.youtube.com/subscribe_embed?usegapi=1&amp;channelid=UCZUsI_y_Lyxni9pqSOBb_xw&amp;layout=default&amp;count=default&amp;origin=https%3A%2F%2Fexample.com&amp;gsrc=3p"></iframe>',
-  'iframe[src*="youtube.com/subscribe_widget"]':
+  'iframe[src*="youtube.com/subscribe_widget" i]':
     '<iframe id="fr" src="https://www.youtube.com/subscribe_widget?p=_YVgU7I2NTwgDISHtjk_vA" style="overflow: hidden; height: 105px; border: 0; width: 100%;" scrolling="no" frameborder="0"></iframe>',
-  'img[src*="w.sharethis.com/"]':
+  'img[src*="w.sharethis.com/" i]':
     '<img src="https://w.sharethis.com/images/facebook_32.png" alt="Share on Facebook">',
   'a.hatena-bookmark-button':
     '<a href="https://example.com/entry/https://example.com/a" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" title="Add to Hatena Bookmark"><img src="https://example.com/entry-button/button-only@2x.png" alt="Add to Hatena Bookmark" width="20" height="20"></a>',
   'iframe.hatena-bookmark-button-frame':
     '<iframe src="https://example.com/bc/bcbutton?url=https%3A%2F%2Fexample.com%2Fa" class="hatena-bookmark-button-frame" width="150" height="28" frameborder="0" scrolling="no"></iframe>',
-  'img:is([src*="flagcounter.com/count"], [src*="flagcounter.com/mini/"], [src*="flagcounter.com/map/"])':
+  'img:is([src*="flagcounter.com/count" i], [src*="flagcounter.com/mini/" i], [src*="flagcounter.com/map/" i])':
     '<img src="http://s01.flagcounter.com/mini/ezoj/bg_FFFFFF/txt_000000/border_CCCCCC/flags_1.jfif">',
-  'a[href*="flagcounter.com/"]:has(img:is([src*="flagcounter.com/count"], [src*="flagcounter.com/mini/"], [src*="flagcounter.com/map/"]))':
+  'a[href*="flagcounter.com/" i]:has(img:is([src*="flagcounter.com/count" i], [src*="flagcounter.com/mini/" i], [src*="flagcounter.com/map/" i]))':
     '<a href="https://info.flagcounter.com/9q1P"><img src="https://s11.flagcounter.com/count2/9q1P/bg_FFFFFF/txt_000000/border_CCCCCC/columns_2/maxflags_10/viewers_0/labels_0/pageviews_0/flags_0/percent_0/" alt="Flag Counter" border="0"></a>',
   '.yarpp-related':
     '<div class="yarpp yarpp-related yarpp-template-list"><h3>Related</h3><ol><li><a href="/a">A</a></li></ol></div>',
@@ -204,7 +204,7 @@ const specimens: Record<string, string | [string, string]> = {
     '<a class="read-more-link" href="/post">Read more</a>',
   'a[class*="continue-reading"]': '<a class="continue-reading" href="/post">Continue reading</a>',
   '.fb-comments': '<div class="fb-comments" data-href="https://example.com/p"></div>',
-  'iframe[src*="jetpack.wordpress.com/jetpack-comment/"]':
+  'iframe[src*="jetpack.wordpress.com/jetpack-comment/" i]':
     '<iframe title="Comment Form" src="https://jetpack.wordpress.com/jetpack-comment/?blogid=163164229&amp;postid=6215&amp;comment_registration=0&amp;require_name_email=1&amp;stc_enabled=0&amp;stb_enabled=1&amp;show_avatars=0&amp;avatar_default=identicon&amp;greeting=Bir+Cevap+Yaz%C4%B1n#parent=https%3A%2F%2Fexample.com%2Fpost%2F" name="jetpack_remote_comment" style="width:100%; height: 430px; border:0;" class="jetpack_remote_comment" id="jetpack_remote_comment" sandbox="allow-same-origin allow-top-navigation allow-scripts allow-forms allow-popups"></iframe>',
   '.printfriendly': '<a class="printfriendly" href="#">Print</a>',
   '.pf-button': '<button class="pf-button">Print</button>',
@@ -242,11 +242,11 @@ const specimens: Record<string, string | [string, string]> = {
     '<div id="goodreadsGiveawayWidget182419"><div class="goodreadsGiveawayWidget"><h2><a href="https://example.com/">Goodreads</a> Book Giveaway</h2><div style="float: left;"><a href="https://example.com/book/show/29745568"><img alt="Benjamin McTish and The Hidden Caverns of Bristonbel by June M. Pace" src="https://example.com/books/1459384569l/29745568.jpg" width="100"></a></div><div class="giveaway_details">Giveaway ends May 13, 2016.<br>See the <a href="https://example.com/giveaway/show/182419">giveaway details</a> at Goodreads.</div><a class="goodreadsGiveawayWidgetEnterLink" href="https://example.com/giveaway/enter_choose_address/182419">Enter Giveaway</a></div></div>',
   '.goodreadsGiveawayWidget':
     '<div class="goodreadsGiveawayWidget" style="max-width: 350px; margin: 10px auto; padding: 10px 15px;"><h2><a href="https://example.com/">Goodreads</a> Book Giveaway</h2><div style="float: left;"><a href="https://example.com/book/show/36704145"><img src="https://example.com/books/1517005563l/36704145.jpg" alt="A Kiss, a Dance and a Diamond by Helen Lacey" width="100"></a></div><div class="giveaway_details"><p>Giveaway ends April 30, 2018.</p></div><p><a class="goodreadsGiveawayWidgetEnterLink" href="https://example.com/giveaway/enter_choose_address/268862">Enter Giveaway</a></p></div>',
-  'a.goodreadsGiveawayWidgetEnterLink[href*="goodreads.com/giveaway/"]': [
+  'a.goodreadsGiveawayWidgetEnterLink[href*="goodreads.com/giveaway/" i]': [
     '<h2 style="font-size: 20px; font-weight: normal; line-height: 20px; margin: 0 0 10px; padding: 0; text-align: center;"><a class="goodreadsGiveawayWidgetEnterLink" href="https://www.goodreads.com/giveaway/show/249139">Enter Giveaway</a></h2>',
     '<h2 style="font-size: 20px; font-weight: normal; line-height: 20px; margin: 0 0 10px; padding: 0; text-align: center;"></h2>',
   ],
-  'iframe[src*="stay22.com/embed"]':
+  'iframe[src*="stay22.com/embed" i]':
     '<iframe id="stay22-widget" src="https://www.stay22.com/embed/699754889b53f8015d33a6ae" width="100%" height="428" frameborder="0"></iframe>',
   ':is(p, div)[data-gyg-href]:not(:has(*:not(a)))':
     '<div data-gyg-href="https://example.com/default/activities.frame" data-gyg-locale-code="en-US" data-gyg-widget="activities" data-gyg-number-of-items="3" data-gyg-partner-id="66RVO1V" data-gyg-tour-ids="76035,75950,400712">Powered by <a href="https://example.com/sarajevo-l2281/" target="_blank" rel="noopener sponsored">GetYourGuide</a></div>',
@@ -255,7 +255,7 @@ const specimens: Record<string, string | [string, string]> = {
     '<drupal-render-placeholder callback="comment.lazy_builders:renderLinks" arguments="0=node:1"></drupal-render-placeholder>',
   '.mcnPreviewText': '<span class="mcnPreviewText" style="display:none">Preview text</span>',
   '.tmblr-alt-text-helper': '<span class="tmblr-alt-text-helper">ALT</span>',
-  'img[src*="steamcommunity.com"][src*="placeholder"]':
+  'img[src*="steamcommunity.com" i][src*="placeholder" i]':
     '<img src="https://cdn.steamcommunity.com/news/placeholder_video.gif">',
   'script[consent-original-src-_]':
     '<script type="text/plain" consent-original-src-_="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>',
