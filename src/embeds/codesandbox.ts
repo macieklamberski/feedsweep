@@ -38,6 +38,8 @@ type CodesandboxTarget = {
   // Where a reader goes when they click through. `/p/…` carriers already name their own page, so
   // only the `/embed/` and `/s/` forms are rewritten onto the `/s/{slug}` route CodeSandbox
   // declares canonical in its own `og:url`.
+  // CodeSandbox's oEmbed answers a `/p/` url with the full JSON body under a 403 status, so an
+  // enricher reads the body before the status (probed 2026-10-25).
   pagePath: string
   // The player. CodeSandbox's own `/embed/` redirects a DevBox-era sandbox to `/p/sandbox/`, a
   // DevBox included, so a `/p/` carrier keeps its route.
