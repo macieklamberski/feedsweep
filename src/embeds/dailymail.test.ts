@@ -17,7 +17,7 @@ describe('dailymailResolveEmbed', () => {
         ratioHeightOffset: 234,
       }
 
-      expect(dailymailResolveEmbed(value)).toEqual(expected)
+      expect(dailymailResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the edition host as written', () => {
@@ -31,7 +31,7 @@ describe('dailymailResolveEmbed', () => {
         ratioHeightOffset: 234,
       }
 
-      expect(dailymailResolveEmbed(value)).toEqual(expected)
+      expect(dailymailResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop a query the player does not read', () => {
@@ -46,7 +46,7 @@ describe('dailymailResolveEmbed', () => {
         ratioHeightOffset: 234,
       }
 
-      expect(dailymailResolveEmbed(value)).toEqual(expected)
+      expect(dailymailResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should read the route in capitals and mint it in lowercase', () => {
@@ -60,7 +60,7 @@ describe('dailymailResolveEmbed', () => {
         ratioHeightOffset: 234,
       }
 
-      expect(dailymailResolveEmbed(value)).toEqual(expected)
+      expect(dailymailResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -68,19 +68,19 @@ describe('dailymailResolveEmbed', () => {
     it('should return undefined for the route below another segment', () => {
       const value = 'https://www.dailymail.co.uk/news/embed/video/1763642.html'
 
-      expect(dailymailResolveEmbed(value)).toBeUndefined()
+      expect(dailymailResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a segment after the id', () => {
       const value = 'https://www.dailymail.co.uk/embed/video/1763642.html/related'
 
-      expect(dailymailResolveEmbed(value)).toBeUndefined()
+      expect(dailymailResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the id without its extension, which the player answers 404', () => {
       const value = 'https://www.dailymail.co.uk/embed/video/1763642'
 
-      expect(dailymailResolveEmbed(value)).toBeUndefined()
+      expect(dailymailResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 
@@ -96,7 +96,7 @@ describe('dailymailResolveEmbed', () => {
         ratioHeightOffset: 234,
       }
 
-      expect(dailymailResolveEmbed(value)).toEqual(expected)
+      expect(dailymailResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -105,14 +105,14 @@ describe('dailymailResolveEmbed', () => {
       const value =
         'https://videos.dailymail.co.uk/video/mol/2019/04/03/1763642/1024x576_MP4_1763642.mp4'
 
-      expect(dailymailResolveEmbed(value)).toBeUndefined()
+      expect(dailymailResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the video page', () => {
       const value =
         'https://www.dailymail.co.uk/video/tvshowbiz/video-1763642/Video-look-Joaquin-Phoenix-playing-supervillain-Joker.html'
 
-      expect(dailymailResolveEmbed(value)).toBeUndefined()
+      expect(dailymailResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 })

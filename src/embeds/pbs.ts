@@ -6,17 +6,11 @@ import {
   isAnyOf,
   isHostOf,
   type Nullish,
-  parseUrl,
   toMap,
 } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { flashVars, parseFlashVars } from '../utils/dom.js'
-import {
-  absoluteUrlRegex,
-  pickQueryParams,
-  pickUrlParams,
-  placeholderBaseUrl,
-} from '../utils/urls.js'
+import { absoluteUrlRegex, pickQueryParams, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'pbs'
@@ -128,13 +122,7 @@ const readFlashCarrier = (url: URL, element?: Element): EmbedResolverResult | un
 }
 
 // PBS's offsite player, which renders on its own but names no page and no poster.
-export const pbsResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
+export const pbsResolveEmbed: ResolveUrlEmbed = (url, element, parsed) => {
   if (isHostOf(parsed, flashHosts)) {
     return readFlashCarrier(parsed, element)
   }

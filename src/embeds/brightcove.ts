@@ -1,6 +1,6 @@
 import type { Nullish } from 'trousse'
-import { composeQuery, encodePathSegment, getPathSegments, getQueryParam, parseUrl } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { composeQuery, encodePathSegment, getPathSegments, getQueryParam } from 'trousse'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import {
   attr,
   find,
@@ -10,7 +10,6 @@ import {
   parseFlashVars,
   text,
 } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'brightcove'
@@ -163,10 +162,8 @@ const federatedPathRegex = /\/services\/viewer\/federated_/i
 
 // The account sits in the url as `publisherID` and the video id in `flashVars`. The federated
 // player id in the path is not a modern player id.
-const brightcoveFlashResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed || !federatedPathRegex.test(parsed.pathname)) {
+const brightcoveFlashResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
+  if (!federatedPathRegex.test(parsed.pathname)) {
     return
   }
 
@@ -227,10 +224,8 @@ export const brightcoveExperienceEmbedResolver = createMarkupEmbedResolver(
 const playerPathRegex = /^([^_]+)_(.+)$/
 
 // The players.brightcove.net player page as an ordinary iframe.
-export const brightcoveResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed?.hostname.startsWith('players.')) {
+export const brightcoveResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
+  if (!parsed.hostname.startsWith('players.')) {
     return
   }
 

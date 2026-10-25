@@ -1,12 +1,7 @@
-import { encodePathSegment, getQueryParam, isHostOrSubdomainOf, parseUrl } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { encodePathSegment, getQueryParam, isHostOrSubdomainOf } from 'trousse'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
-import {
-  absoluteUrlRegex,
-  parseUrlOnHosts,
-  pickUrlParams,
-  placeholderBaseUrl,
-} from '../utils/urls.js'
+import { absoluteUrlRegex, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'cloudflarestream'
@@ -44,13 +39,7 @@ const readVideoId = (parsed: URL): string | undefined => {
   }
 }
 
-export const cloudflarestreamResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
+export const cloudflarestreamResolveEmbed: ResolveUrlEmbed = (url, _element, parsed) => {
   const videoId = readVideoId(parsed)
 
   if (!videoId) {

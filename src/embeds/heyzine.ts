@@ -1,7 +1,6 @@
-import { getPathSegments, isAnyOf, isHostOf, isHostOrSubdomainOf, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import { getPathSegments, isAnyOf, isHostOf, isHostOrSubdomainOf } from 'trousse'
+import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 type FlipBook = {
@@ -63,10 +62,8 @@ const readPage = (parsed: URL): string => {
 }
 
 // Heyzine's flipbook viewer, which renders on its own and is its own page.
-export const heyzineResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (parsed && isHostOrSubdomainOf(parsed, customDomainHosts)) {
+export const heyzineResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
+  if (isHostOrSubdomainOf(parsed, customDomainHosts)) {
     const [name = '', ...rest] = getPathSegments(parsed)
     const flipBook = readCustomFlipBook(name)
 
@@ -86,7 +83,7 @@ export const heyzineResolveEmbed: ResolveEmbed = (url, element) => {
     }
   }
 
-  if (!parsed || !isHostOf(parsed, heyzineHosts)) {
+  if (!isHostOf(parsed, heyzineHosts)) {
     return
   }
 

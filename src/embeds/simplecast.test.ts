@@ -93,7 +93,7 @@ describe('simplecastResolveEmbed', () => {
       height: 200,
     }
 
-    expect(simplecastResolveEmbed(value)).toEqual(expected)
+    expect(simplecastResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should mint the player host from the share host, which names the same uuid', () => {
@@ -105,7 +105,7 @@ describe('simplecastResolveEmbed', () => {
       height: 200,
     }
 
-    expect(simplecastResolveEmbed(value)).toEqual(expected)
+    expect(simplecastResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   // The legacy id is a separate id space: the server maps `fc9a4d22` to a uuid we cannot
@@ -119,7 +119,7 @@ describe('simplecastResolveEmbed', () => {
       height: 200,
     }
 
-    expect(simplecastResolveEmbed(value)).toEqual(expected)
+    expect(simplecastResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should keep a legacy numeric url', () => {
@@ -131,7 +131,7 @@ describe('simplecastResolveEmbed', () => {
       height: 200,
     }
 
-    expect(simplecastResolveEmbed(value)).toEqual(expected)
+    expect(simplecastResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should drop the display style from a legacy numeric url', () => {
@@ -143,7 +143,7 @@ describe('simplecastResolveEmbed', () => {
       height: 200,
     }
 
-    expect(simplecastResolveEmbed(value)).toEqual(expected)
+    expect(simplecastResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should drop the display color from a legacy embed url', () => {
@@ -155,13 +155,13 @@ describe('simplecastResolveEmbed', () => {
       height: 200,
     }
 
-    expect(simplecastResolveEmbed(value)).toEqual(expected)
+    expect(simplecastResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a simplecast url naming no episode', () => {
     const value = 'https://simplecast.com/pricing'
 
-    expect(simplecastResolveEmbed(value)).toBeUndefined()
+    expect(simplecastResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
   })
 })
 

@@ -1,6 +1,5 @@
-import { parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
-import { pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
+import type { ResolveUrlEmbed } from '../types.js'
+import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ardmediathek'
@@ -10,9 +9,8 @@ const ardmediathekHosts = ['ardmediathek.de']
 // The legacy `/{channel}/embed/{id}` route 404s.
 const embedPathRegex = /^\/(?:\w+\/)?embed\/([^/]+)\/?$/i
 
-const ardmediathekResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const id = parsed?.pathname.match(embedPathRegex)?.[1]
+const ardmediathekResolveEmbed: ResolveUrlEmbed = (url, _element, parsed) => {
+  const id = parsed.pathname.match(embedPathRegex)?.[1]
 
   if (!id) {
     return

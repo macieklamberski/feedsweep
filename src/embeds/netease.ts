@@ -1,6 +1,5 @@
-import { composeQuery, getQueryParam, parseUrl, toMap } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, getQueryParam, toMap } from 'trousse'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'netease'
@@ -42,13 +41,7 @@ const composeResult = (type: string, id: string): EmbedResolverResult | undefine
 
 // NetEase Cloud Music's outchain player, and the Flash widget it replaced, which names the song
 // as `sid` and renders nothing today.
-export const neteaseResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
+export const neteaseResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
   const query = parsed.searchParams
 
   if (playerPathRegex.test(parsed.pathname)) {

@@ -18,7 +18,7 @@ describe('patroniteResolveEmbed', () => {
         height: 306,
       }
 
-      expect(patroniteResolveEmbed(value)).toEqual(expected)
+      expect(patroniteResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the theme and description the publisher chose', () => {
@@ -32,7 +32,7 @@ describe('patroniteResolveEmbed', () => {
         height: 306,
       }
 
-      expect(patroniteResolveEmbed(value)).toEqual(expected)
+      expect(patroniteResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -40,13 +40,13 @@ describe('patroniteResolveEmbed', () => {
     it('should ignore a category listing, which is not a widget', () => {
       const value = 'https://patronite.pl/kategoria/34/podcast'
 
-      expect(patroniteResolveEmbed(value)).toBeUndefined()
+      expect(patroniteResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a widget url naming no id', () => {
       const value = 'https://patronite.pl/widget/strajk'
 
-      expect(patroniteResolveEmbed(value)).toBeUndefined()
+      expect(patroniteResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 })

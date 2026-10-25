@@ -1,6 +1,5 @@
-import { composeQuery, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, getQueryParam, isAnyOf } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'voki'
@@ -32,10 +31,8 @@ const composeEmbed = (sc: string, chsm: string): EmbedResolverResult => {
   }
 }
 
-const vokiFlashResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
+const vokiFlashResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
+  if (!flashPlayerPathRegex.test(parsed.pathname)) {
     return
   }
 
@@ -57,10 +54,8 @@ const vokiFlashResolveEmbed: ResolveEmbed = (url) => {
 // the scene in its `doc` url.
 export const vokiFlashEmbedResolver = createUrlEmbedResolver(flashHosts, vokiFlashResolveEmbed)
 
-const vokiResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed || !pickupPathRegex.test(parsed.pathname)) {
+const vokiResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
+  if (!pickupPathRegex.test(parsed.pathname)) {
     return
   }
 

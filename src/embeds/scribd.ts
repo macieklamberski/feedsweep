@@ -5,11 +5,10 @@ import {
   getPathSegments,
   getQueryParam,
   isAnyOf,
-  parseUrl,
 } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVar, flashVars } from '../utils/dom.js'
-import { pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The embed routes are the site's own. `scribdassets.com` served the Flash player and serves the
@@ -60,13 +59,7 @@ const readDocumentId = (parsed: URL): string | undefined => {
 // The modern player, `scribd.com/embeds/{id}/content`. `/doc/{id}` is the pre-2018 spelling of
 // the same document and its embed lived at `/embeds/{id}` with no `/content` suffix. Both
 // address the id space this composes from.
-export const scribdResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
+export const scribdResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
   const document = readDocumentId(parsed)
 
   if (!document) {
@@ -79,10 +72,8 @@ export const scribdResolveEmbed: ResolveEmbed = (url, element) => {
 // Scribd's player iframe, /embeds/{id}/content.
 export const scribdIframeEmbedResolver = createUrlEmbedResolver(scribdHosts, scribdResolveEmbed)
 
-export const scribdFlashResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
+export const scribdFlashResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
+  if (!flashPlayerPathRegex.test(parsed.pathname)) {
     return
   }
 

@@ -1,7 +1,5 @@
-import { parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'art19'
@@ -14,9 +12,8 @@ const playerPathRegex = /^\/shows\/([^/]+)(?:\/episodes\/([^/]+))?\/embed\/?$/i
 
 // An ART19 player, of one episode or of a whole show. The show is its slug or its uuid, and the
 // episode player answers 404 without the show.
-export const art19ResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const match = parsed?.pathname.match(playerPathRegex)
+export const art19ResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
+  const match = parsed.pathname.match(playerPathRegex)
 
   if (!match) {
     return

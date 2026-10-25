@@ -1,6 +1,5 @@
-import { composeQuery, encodePathSegment, parseUrl, startsWithAnyOf, trimObject } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, encodePathSegment, startsWithAnyOf, trimObject } from 'trousse'
+import type { ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The asset id Getty calls `items`, and the opaque embed token it calls `et`.
@@ -27,11 +26,10 @@ const readSignedQuery = (url: URL): string => {
   return signedPairs.length > 0 ? `?${signedPairs.join('&')}` : ''
 }
 
-const gettyImagesResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const itemId = parsed?.pathname.match(embedPathRegex)?.[1]
+const gettyImagesResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
+  const itemId = parsed.pathname.match(embedPathRegex)?.[1]
 
-  if (!parsed || !itemId) {
+  if (!itemId) {
     return
   }
 

@@ -1,13 +1,5 @@
-import {
-  composeQuery,
-  encodePathSegment,
-  getPathSegments,
-  getQueryParam,
-  isAnyOf,
-  parseUrl,
-} from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, encodePathSegment, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'traileraddict'
@@ -35,13 +27,7 @@ const composeEmbed = (id: string): EmbedResolverResult => {
 // Trailer Addict's player, `/iframe.php?id={id}`, the `embedUrl` its watch pages name. The Flash
 // player, `/emd/{id}` or `/emb/{id}`, and the short `v.traileraddict.com/{id}` took the same id,
 // so both are rebuilt onto the current one.
-export const traileraddictResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
+export const traileraddictResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
   if (parsed.hostname === shortHost) {
     const [id, ...rest] = getPathSegments(parsed)
 

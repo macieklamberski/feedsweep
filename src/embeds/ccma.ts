@@ -1,5 +1,5 @@
-import { encodePathSegment, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { encodePathSegment } from 'trousse'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -66,13 +66,7 @@ const readFlashVideoId = (element: Element | undefined, name: string): string | 
 // The player frame in its 3Cat and CCMA spellings, the CCMA audio frame, and CCMA's two Flash
 // players, both dead: the EVP generation carrying `videoid` in its flashvars, and the older SVP2
 // carrying `VIDEO_ID`.
-export const ccmaResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url)
-
-  if (!parsed) {
-    return
-  }
-
+export const ccmaResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
   const framedVideoId = parsed.pathname.match(embedPathRegex)?.[1]
 
   if (framedVideoId) {

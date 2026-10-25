@@ -1,7 +1,6 @@
-import { composeQuery, encodePathSegment, getQueryParam, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import { composeQuery, encodePathSegment, getQueryParam } from 'trousse'
+import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const amebaHosts = ['static.blog-video.jp']
@@ -13,8 +12,8 @@ const imagePagePathRegex = /^\/p\/embed\/([^/]+\/image-[^/]+)\.html$/i
 // Ameba's movie player, `static.blog-video.jp/?v={id}`, for a video uploaded into a blog post.
 // The id is the whole key the platform's own endpoint takes. Its thumbnails are pathed by the
 // blog's own user id, which the carrier does not name, so no poster is minted.
-export const amebaResolveEmbed: ResolveEmbed = (url) => {
-  const videoId = getQueryParam(parseUrl(url, placeholderBaseUrl)?.searchParams, 'v')
+export const amebaResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
+  const videoId = getQueryParam(parsed.searchParams, 'v')
 
   if (!videoId) {
     return
@@ -44,48 +43,54 @@ const readReblogCardId = (
 // Ameba's reblog card, `ameblo.jp/s/embed/reblog-card/{amebaId}/entry-{entryId}.html`, the iframe
 // a blogger gets when reblogging another Ameba post. Only the blog and the entry together name
 // the reblogged post, so the id carries the pair and composes the post's own page from it.
-export const amebaReblogCardEmbedResolver = createUrlEmbedResolver(amebloHosts, (url, element) => {
-  const match = reblogCardPathRegex.exec(parseUrl(url, placeholderBaseUrl)?.pathname ?? '')
+export const amebaReblogCardEmbedResolver = createUrlEmbedResolver(
+  amebloHosts,
+  (_url, element, parsed) => {
+    const match = reblogCardPathRegex.exec(parsed.pathname)
 
-  if (!match) {
-    return
-  }
+    if (!match) {
+      return
+    }
 
-  const blogId = attr(element, 'data-ameba-id')
-  const entryId = attr(element, 'data-entry-id')
-  // A stated pair comes out of its attributes decoded, and both halves go into a path.
-  const id =
-    readReblogCardId(encodePathSegment(blogId ?? ''), encodePathSegment(entryId ?? '')) ??
-    readReblogCardId(match[1], match[2])
+    const blogId = attr(element, 'data-ameba-id')
+    const entryId = attr(element, 'data-entry-id')
+    // A stated pair comes out of its attributes decoded, and both halves go into a path.
+    const id =
+      readReblogCardId(encodePathSegment(blogId ?? ''), encodePathSegment(entryId ?? '')) ??
+      readReblogCardId(match[1], match[2])
 
-  if (!id) {
-    return
-  }
+    if (!id) {
+      return
+    }
 
-  return {
-    provider: 'ameba',
-    id,
-    src: `https://${amebloHosts[0]}/s/embed/reblog-card/${id}.html`,
-    url: `https://${amebloHosts[0]}/${id}.html`,
-    height: 234,
-  }
-})
+    return {
+      provider: 'ameba',
+      id,
+      src: `https://${amebloHosts[0]}/s/embed/reblog-card/${id}.html`,
+      url: `https://${amebloHosts[0]}/${id}.html`,
+      height: 234,
+    }
+  },
+)
 
 // Ameba's in-article image page, `ameblo.jp/p/embed/{amebaId}/image-{entryId}-{imageId}.html`,
 // the iframe for one image inside a post. The image file's url carries an upload date, an hour and
 // three hashed path segments the carrier does not name, so no thumbnail is minted.
-export const amebaImagePageEmbedResolver = createUrlEmbedResolver(amebloHosts, (url) => {
-  const match = imagePagePathRegex.exec(parseUrl(url, placeholderBaseUrl)?.pathname ?? '')
+export const amebaImagePageEmbedResolver = createUrlEmbedResolver(
+  amebloHosts,
+  (_url, _element, parsed) => {
+    const match = imagePagePathRegex.exec(parsed.pathname)
 
-  if (!match) {
-    return
-  }
+    if (!match) {
+      return
+    }
 
-  return {
-    provider: 'ameba',
-    id: match[1],
-    src: `https://${amebloHosts[0]}/p/embed/${match[1]}.html`,
-    url: `https://${amebloHosts[0]}/${match[1]}.html`,
-    ratio: '360/416',
-  }
-})
+    return {
+      provider: 'ameba',
+      id: match[1],
+      src: `https://${amebloHosts[0]}/p/embed/${match[1]}.html`,
+      url: `https://${amebloHosts[0]}/${match[1]}.html`,
+      ratio: '360/416',
+    }
+  },
+)

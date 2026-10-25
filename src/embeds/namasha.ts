@@ -1,7 +1,6 @@
-import { parseUrl } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
+import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'namasha'
@@ -12,11 +11,10 @@ const namashaHosts = ['namasha.com']
 const embedPathRegex = /^\/embed\/([^/]+)\/?$/i
 
 // A Namasha video player. The embed page carries `t` into the player url.
-export const namashaResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const id = parsed?.pathname.match(embedPathRegex)?.[1]
+export const namashaResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
+  const id = parsed.pathname.match(embedPathRegex)?.[1]
 
-  if (!parsed || !id) {
+  if (!id) {
     return
   }
 

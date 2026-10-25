@@ -15,7 +15,7 @@ describe('pinecastResolveEmbed', () => {
         height: 60,
       }
 
-      expect(pinecastResolveEmbed(value)).toEqual(expected)
+      expect(pinecastResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop the theme the publisher picked', () => {
@@ -27,7 +27,7 @@ describe('pinecastResolveEmbed', () => {
         height: 60,
       }
 
-      expect(pinecastResolveEmbed(value)).toEqual(expected)
+      expect(pinecastResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop a tracker on the query', () => {
@@ -40,7 +40,7 @@ describe('pinecastResolveEmbed', () => {
         height: 60,
       }
 
-      expect(pinecastResolveEmbed(value)).toEqual(expected)
+      expect(pinecastResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop a trailing slash', () => {
@@ -52,7 +52,7 @@ describe('pinecastResolveEmbed', () => {
         height: 60,
       }
 
-      expect(pinecastResolveEmbed(value)).toEqual(expected)
+      expect(pinecastResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should pass the id on as written', () => {
@@ -64,7 +64,7 @@ describe('pinecastResolveEmbed', () => {
         height: 60,
       }
 
-      expect(pinecastResolveEmbed(value)).toEqual(expected)
+      expect(pinecastResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -72,32 +72,32 @@ describe('pinecastResolveEmbed', () => {
     it('should ignore the player route behind another segment', () => {
       const value = 'https://pinecast.com/x/player/fd8fd547-b572-4ff7-ae71-b8c944b7a471'
 
-      expect(pinecastResolveEmbed(value)).toBeUndefined()
+      expect(pinecastResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the player route followed by another segment', () => {
       const value = 'https://pinecast.com/player/fd8fd547-b572-4ff7-ae71-b8c944b7a471/extra'
 
-      expect(pinecastResolveEmbed(value)).toBeUndefined()
+      expect(pinecastResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the player route with no id', () => {
       const value = 'https://pinecast.com/player/'
 
-      expect(pinecastResolveEmbed(value)).toBeUndefined()
+      expect(pinecastResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the episode audio file', () => {
       const value =
         'https://pinecast.com/listen/463fa99c-b84c-464e-95fe-d679dd91c938.mp3?source=rss&ext=asset.mp3'
 
-      expect(pinecastResolveEmbed(value)).toBeUndefined()
+      expect(pinecastResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the podcast playlist player', () => {
       const value = 'https://pinecast.com/embed/player_playlist/testcast'
 
-      expect(pinecastResolveEmbed(value)).toBeUndefined()
+      expect(pinecastResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 })

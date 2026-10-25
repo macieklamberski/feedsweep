@@ -1,7 +1,5 @@
-import { parseUrl } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'pinecast'
@@ -15,8 +13,8 @@ const playerPathRegex = /^\/player\/([^/]+)\/?$/i
 const playerHeight = 60
 
 // A Pinecast episode player.
-export const pinecastResolveEmbed: ResolveEmbed = (url, element) => {
-  const pathname = parseUrl(url, placeholderBaseUrl)?.pathname ?? ''
+export const pinecastResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
+  const pathname = parsed.pathname
   const id = pathname.match(playerPathRegex)?.[1]
 
   if (!id) {

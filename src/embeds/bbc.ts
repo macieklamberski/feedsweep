@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { getPathSegments, isAnyOf } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { flashVar } from '../utils/dom.js'
-import { digitsRegex, flashFileRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, flashFileRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `bbc.co.uk` 301s every player route onto `bbc.com`.
@@ -71,13 +71,7 @@ const readNewsFlash = (element: Element | undefined): EmbedResolverResult | unde
 // BBC's news, World Service and programmes clip players, pasted in a portrait box that pads them,
 // and the retired Flash player. A news page needs its section slug, which the embed does not
 // carry, and a current programmes clip such as `p08s3bnj` has no page of its own.
-export const bbcResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
+export const bbcResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
   // The retired Flash player names its clip in the `playlist` flashvar, as
   // `/iplayer/playlist/{pid}` or `/comedy/forge-assets/extra/playlist/{pid}.xml`. News and World
   // Service playlists carry no pid, and the news player names it in other flashvars.

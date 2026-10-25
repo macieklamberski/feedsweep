@@ -1,5 +1,5 @@
-import { getPathSegments, isAnyOf, isHostOf, parseUrl, startsWithAnyOf } from 'trousse'
-import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
+import { getPathSegments, isAnyOf, isHostOf, startsWithAnyOf } from 'trousse'
+import type { EmbedResolverResult, FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { filterUrlQuery } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -38,13 +38,7 @@ const composeShortLink = (url: URL, element?: Element): EmbedResolverResult | un
 // `/forms/d/e/{id}` names a form by its published id and `/forms/d/{id}` by its Drive file id,
 // which the server redirects to the published id. The account prefix `/u/{n}/` only picks the
 // sign-in and serves the same form.
-export const googleformsResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url)
-
-  if (!parsed) {
-    return
-  }
-
+export const googleformsResolveEmbed: ResolveUrlEmbed = (url, element, parsed) => {
   if (isHostOf(url, [shortLinkHost])) {
     return composeShortLink(parsed, element)
   }

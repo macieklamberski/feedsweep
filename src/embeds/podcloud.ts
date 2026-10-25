@@ -1,8 +1,7 @@
-import { encodePathSegment, getPathSegments, isAnyOf, parseUrl, startsWithAnyOf } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { encodePathSegment, getPathSegments, isAnyOf, startsWithAnyOf } from 'trousse'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readIframeResizeHeight } from '../utils/hints.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'podcloud'
@@ -63,10 +62,8 @@ const composeEmbed = (
 // player reads every segment after `player` as an option. `guid:` and `playlist:` pick what
 // plays and are kept, and the rest, such as `fixed-size` or `list:opened`, are display options
 // and are dropped. The `title` its embed dialog writes is the show's or the episode's name.
-export const podcloudResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed || parsed.hostname !== podcloudHost) {
+export const podcloudResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
+  if (parsed.hostname !== podcloudHost) {
     return
   }
 

@@ -1,7 +1,6 @@
-import { parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'lglforms'
@@ -26,8 +25,8 @@ const composeEmbed = (formKey: string): EmbedResolverResult => {
 }
 
 // The form page, `secure.lglforms.com/form_engine/s/{key}`.
-export const lglformsResolveEmbed: ResolveEmbed = (url) => {
-  const formKey = parseUrl(url, placeholderBaseUrl)?.pathname.match(formPathRegex)?.[1]
+export const lglformsResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
+  const formKey = parsed.pathname.match(formPathRegex)?.[1]
 
   if (!formKey) {
     return

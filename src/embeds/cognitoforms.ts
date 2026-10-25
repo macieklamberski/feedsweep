@@ -1,7 +1,7 @@
-import { encodePathSegment, getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { encodePathSegment, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, find, text } from '../utils/dom.js'
-import { parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'cognitoforms'
@@ -29,13 +29,7 @@ const composeEmbed = (orgKey: string, formNumber: string, query = ''): EmbedReso
 
 // The form page, `www.cognitoforms.com/f/{org}/{form}`, and the older
 // `services.cognitoforms.com/f/{org}?id={form}`, which serves the same form.
-export const cognitoformsResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
+export const cognitoformsResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
   const [route, orgKey, pathNumber, ...rest] = getPathSegments(parsed)
   // A query form number comes out decoded, and it goes into a path.
   const formNumber = pathNumber ?? encodePathSegment(getQueryParam(parsed.searchParams, 'id') ?? '')

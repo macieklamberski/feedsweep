@@ -193,7 +193,7 @@ describe('megaphoneResolveEmbed', () => {
       height: 200,
     }
 
-    expect(megaphoneResolveEmbed(value)).toEqual(expected)
+    expect(megaphoneResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   // A playlist squeezed into the episode height is the visible failure this separation avoids.
@@ -206,7 +206,7 @@ describe('megaphoneResolveEmbed', () => {
       height: 482,
     }
 
-    expect(megaphoneResolveEmbed(value)).toEqual(expected)
+    expect(megaphoneResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should keep the start position and drop a tracker', () => {
@@ -218,7 +218,7 @@ describe('megaphoneResolveEmbed', () => {
       height: 200,
     }
 
-    expect(megaphoneResolveEmbed(value)).toEqual(expected)
+    expect(megaphoneResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should keep a start position of zero as written', () => {
@@ -230,7 +230,7 @@ describe('megaphoneResolveEmbed', () => {
       height: 200,
     }
 
-    expect(megaphoneResolveEmbed(value)).toEqual(expected)
+    expect(megaphoneResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should use a malformed episode id as written, even if the player answers an error', () => {
@@ -242,7 +242,7 @@ describe('megaphoneResolveEmbed', () => {
       height: 200,
     }
 
-    expect(megaphoneResolveEmbed(value)).toEqual(expected)
+    expect(megaphoneResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should use a malformed playlist id as written, even if the player answers an error', () => {
@@ -254,13 +254,13 @@ describe('megaphoneResolveEmbed', () => {
       height: 482,
     }
 
-    expect(megaphoneResolveEmbed(value)).toEqual(expected)
+    expect(megaphoneResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a megaphone url naming no episode', () => {
     const value = 'https://playlist.megaphone.fm/?x=ABC123'
 
-    expect(megaphoneResolveEmbed(value)).toBeUndefined()
+    expect(megaphoneResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
   })
 })
 

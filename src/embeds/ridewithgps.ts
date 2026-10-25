@@ -5,11 +5,10 @@ import {
   getPathSegments,
   getQueryParam,
   isAnyOf,
-  parseUrl,
   toMap,
 } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
+import { pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 type EmbedShape = {
@@ -137,10 +136,8 @@ const readPathEmbed = (parsed: URL): EmbedResolverResult | undefined => {
   return composeEmbed(kind, shape, id, src)
 }
 
-const ridewithgpsResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  return parsed && (readQueryEmbed(parsed) ?? readPathEmbed(parsed))
+const ridewithgpsResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
+  return readQueryEmbed(parsed) ?? readPathEmbed(parsed)
 }
 
 // The Ride with GPS route map iframe, in both its query and its path spelling.

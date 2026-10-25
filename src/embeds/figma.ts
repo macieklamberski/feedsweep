@@ -1,12 +1,6 @@
-import { composeQuery, getPathSegments, getQueryParam, isAnyOf, isHostOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import {
-  alphanumericRegex,
-  lettersRegex,
-  parseUrlOnHosts,
-  pickQueryParams,
-  placeholderBaseUrl,
-} from '../utils/urls.js'
+import { composeQuery, getPathSegments, getQueryParam, isAnyOf, isHostOf } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
+import { alphanumericRegex, lettersRegex, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const figmaHost = 'figma.com'
@@ -58,13 +52,7 @@ const readFileEmbed = (url: URL): EmbedResolverResult | undefined => {
   }
 }
 
-const resolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
+const resolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
   const segments = getPathSegments(parsed)
 
   if (segments.length === 1 && isAnyOf(segments[0], 'embed')) {

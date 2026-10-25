@@ -1,6 +1,4 @@
-import { parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import type { ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'garmin'
@@ -13,9 +11,8 @@ const activityEmbedRegex =
   /^\/(?:(?:modern|app)\/)?(?:activity\/embed|embed\/activity)\/([^/]+)\/?$/i
 
 // Garmin Connect's activity embed, an interactive map and stats panel for one recorded activity.
-export const garminResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const activityId = parsed?.pathname.match(activityEmbedRegex)?.[1]
+export const garminResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
+  const activityId = parsed.pathname.match(activityEmbedRegex)?.[1]
 
   if (!activityId) {
     return

@@ -1,7 +1,7 @@
-import { composeQuery, parseUrl } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { composeQuery } from 'trousse'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'bunnystream'
@@ -17,11 +17,10 @@ const playerPathRegex = /^\/(?:embed|play)\/([^/]+)\/([^/]+)$/i
 // The start position, and the token pair a library with embed authentication needs.
 const playbackParams = ['t', 'token', 'expires']
 
-export const bunnystreamResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const match = parsed?.pathname.match(playerPathRegex)
+export const bunnystreamResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
+  const match = parsed.pathname.match(playerPathRegex)
 
-  if (!parsed || !match) {
+  if (!match) {
     return
   }
 

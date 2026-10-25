@@ -17,7 +17,7 @@ describe('preziResolveEmbed', () => {
         ratio: '550/400',
       }
 
-      expect(preziResolveEmbed(value)).toEqual(expected)
+      expect(preziResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should read the current embed route the same way', () => {
@@ -30,7 +30,7 @@ describe('preziResolveEmbed', () => {
         ratio: '550/400',
       }
 
-      expect(preziResolveEmbed(value)).toEqual(expected)
+      expect(preziResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should mint the login-gated embed route onto the current one', () => {
@@ -43,7 +43,7 @@ describe('preziResolveEmbed', () => {
         ratio: '550/400',
       }
 
-      expect(preziResolveEmbed(value)).toEqual(expected)
+      expect(preziResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop the landing tracker and keep a classic id carrying an underscore', () => {
@@ -57,7 +57,7 @@ describe('preziResolveEmbed', () => {
         ratio: '550/400',
       }
 
-      expect(preziResolveEmbed(value)).toEqual(expected)
+      expect(preziResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the view route of a share token as written', () => {
@@ -70,7 +70,7 @@ describe('preziResolveEmbed', () => {
         ratio: '550/400',
       }
 
-      expect(preziResolveEmbed(value)).toEqual(expected)
+      expect(preziResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should link a share token on the login-gated embed route to its view page', () => {
@@ -83,7 +83,7 @@ describe('preziResolveEmbed', () => {
         ratio: '550/400',
       }
 
-      expect(preziResolveEmbed(value)).toEqual(expected)
+      expect(preziResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the Prezi Video frame and link its view page', () => {
@@ -96,7 +96,7 @@ describe('preziResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(preziResolveEmbed(value)).toEqual(expected)
+      expect(preziResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -104,25 +104,25 @@ describe('preziResolveEmbed', () => {
     it('should ignore a route word other than embed under the video route', () => {
       const value = 'https://prezi.com/v/watch/q88cqSPKvGcJH9t97Nmm/'
 
-      expect(preziResolveEmbed(value)).toBeUndefined()
+      expect(preziResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the video embed route with no id', () => {
       const value = 'https://prezi.com/v/embed/'
 
-      expect(preziResolveEmbed(value)).toBeUndefined()
+      expect(preziResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the view page that is not the embed', () => {
       const value = 'https://prezi.com/view/AmsY8GrnVuyJbYDH8QXI/'
 
-      expect(preziResolveEmbed(value)).toBeUndefined()
+      expect(preziResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore an embed word after a token under a route other than view', () => {
       const value = 'https://prezi.com/x/AmsY8GrnVuyJbYDH8QXI/embed'
 
-      expect(preziResolveEmbed(value)).toBeUndefined()
+      expect(preziResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed presentation id as written, even if the player answers an error', () => {
@@ -135,25 +135,25 @@ describe('preziResolveEmbed', () => {
         ratio: '550/400',
       }
 
-      expect(preziResolveEmbed(value)).toEqual(expected)
+      expect(preziResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should ignore an embed word under a route other than the presentation one', () => {
       const value = 'https://prezi.com/x/embed/07fqanglwhcw/'
 
-      expect(preziResolveEmbed(value)).toBeUndefined()
+      expect(preziResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the presentation page itself', () => {
       const value = 'https://prezi.com/p/testonly0001/'
 
-      expect(preziResolveEmbed(value)).toBeUndefined()
+      expect(preziResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the Flash loader with nothing naming a presentation', () => {
       const value = 'http://prezi.com/bin/preziloader.swf'
 
-      expect(preziResolveEmbed(value)).toBeUndefined()
+      expect(preziResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 })

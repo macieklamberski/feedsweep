@@ -1,6 +1,6 @@
-import { getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
+import { getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
+import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'radioradicale'
@@ -45,13 +45,7 @@ const readFlashId = (parsed: URL): string | undefined => {
 // Radio Radicale's archive player, `/scheda/{id}/iframe`, which 301s to the same path with the
 // recording's slug inserted. The page `/scheda/{id}` does the same. The server folds the case of
 // the route words. The Flash player took the same id, so it is rebuilt onto the current one.
-export const radioradicaleResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
+export const radioradicaleResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
   const flashId = readFlashId(parsed)
 
   if (flashId) {

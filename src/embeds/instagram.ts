@@ -4,13 +4,17 @@ import {
   includesAnyOf,
   isAnyOf,
   isPlainObject,
-  parseUrl,
   toMap,
 } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
+import type {
+  EmbedRenderHint,
+  EmbedResolverResult,
+  FieldCleaner,
+  ResolveUrlEmbed,
+} from '../types.js'
 import { attr, find, jsonAttr, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import {
   atUsername,
   bareHandleRegex,
@@ -272,16 +276,14 @@ export const instagramSubstackEmbedResolver = createMarkupEmbedResolver(
 // Its query and hash (`cr`, `wp`, `rd`, `rp`) describe the embedding page, not the player.
 // A post has no name: its words go to `description`, and the frame titles itself `Instagram`
 // or nothing.
-export const instagramResolveEmbed: ResolveEmbed = (url) => {
+export const instagramResolveEmbed: ResolveUrlEmbed = (url, _element, parsed) => {
   const post = readPostUrl(url)
 
   if (!post) {
     return
   }
 
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  return composeEmbed(post, parsed?.pathname.toLowerCase().includes('/embed/captioned') === true)
+  return composeEmbed(post, parsed.pathname.toLowerCase().includes('/embed/captioned') === true)
 }
 
 export const instagramIframeEmbedResolver = createUrlEmbedResolver(
@@ -291,7 +293,9 @@ export const instagramIframeEmbedResolver = createUrlEmbedResolver(
 
 // A forum's s9e MediaEmbed helper frame, naming the post's shortcode in its url fragment.
 export const instagramS9eEmbedResolver = createS9eEmbedResolver('instagram', (shortcode) => {
-  return instagramResolveEmbed(`https://www.instagram.com/p/${encodePathSegment(shortcode)}/`)
+  const url = `https://www.instagram.com/p/${encodePathSegment(shortcode)}/`
+
+  return instagramResolveEmbed(url, undefined, new URL(url))
 })
 
 // The player measures itself once mounted and reports it under a `MEASURE` type. `LOADING`

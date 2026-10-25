@@ -1,6 +1,6 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
-import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
+import { getPathSegments, isAnyOf } from 'trousse'
+import type { ResolveUrlEmbed } from '../types.js'
+import { digitsRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const thinglinkHost = 'thinglink.com'
@@ -31,9 +31,8 @@ const composePosterUrl = (id: string): string | undefined => {
   return `https://cdn.thinglink.me/api/image/${id}/1024/10/scaletowidth`
 }
 
-export const thinglinkResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const id = parsed && readSceneId(parsed)
+export const thinglinkResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
+  const id = readSceneId(parsed)
 
   if (!id) {
     return

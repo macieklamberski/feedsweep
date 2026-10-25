@@ -16,7 +16,7 @@ describe('traileraddictResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(traileraddictResolveEmbed(value)).toEqual(expected)
+      expect(traileraddictResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should rebuild the other Flash route onto the current player', () => {
@@ -29,7 +29,7 @@ describe('traileraddictResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(traileraddictResolveEmbed(value)).toEqual(expected)
+      expect(traileraddictResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should claim the current player', () => {
@@ -42,7 +42,7 @@ describe('traileraddictResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(traileraddictResolveEmbed(value)).toEqual(expected)
+      expect(traileraddictResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should rebuild the short host onto the current player', () => {
@@ -55,7 +55,7 @@ describe('traileraddictResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(traileraddictResolveEmbed(value)).toEqual(expected)
+      expect(traileraddictResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop everything in the query but the id', () => {
@@ -68,7 +68,7 @@ describe('traileraddictResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(traileraddictResolveEmbed(value)).toEqual(expected)
+      expect(traileraddictResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -76,49 +76,49 @@ describe('traileraddictResolveEmbed', () => {
     it('should return undefined for a route word the Flash player did not serve', () => {
       const value = 'https://www.traileraddict.com/emx/13259'
 
-      expect(traileraddictResolveEmbed(value)).toBeUndefined()
+      expect(traileraddictResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a Flash route with no id', () => {
       const value = 'https://www.traileraddict.com/emd/'
 
-      expect(traileraddictResolveEmbed(value)).toBeUndefined()
+      expect(traileraddictResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a segment after the Flash id', () => {
       const value = 'https://www.traileraddict.com/emd/13259/extra'
 
-      expect(traileraddictResolveEmbed(value)).toBeUndefined()
+      expect(traileraddictResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the current player with no id', () => {
       const value = 'https://traileraddict.com/iframe.php'
 
-      expect(traileraddictResolveEmbed(value)).toBeUndefined()
+      expect(traileraddictResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the short host with no id', () => {
       const value = 'https://v.traileraddict.com/'
 
-      expect(traileraddictResolveEmbed(value)).toBeUndefined()
+      expect(traileraddictResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a segment after the short host id', () => {
       const value = 'https://v.traileraddict.com/119230/extra'
 
-      expect(traileraddictResolveEmbed(value)).toBeUndefined()
+      expect(traileraddictResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for an id alone on the apex host', () => {
       const value = 'https://traileraddict.com/119230'
 
-      expect(traileraddictResolveEmbed(value)).toBeUndefined()
+      expect(traileraddictResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the watch page', () => {
       const value = 'https://traileraddict.com/watch/13259/untitled/trailer'
 
-      expect(traileraddictResolveEmbed(value)).toBeUndefined()
+      expect(traileraddictResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 
@@ -133,7 +133,7 @@ describe('traileraddictResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(traileraddictResolveEmbed(value)).toEqual(expected)
+      expect(traileraddictResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should read the Flash route in any case, as the server redirects it', () => {
@@ -146,7 +146,7 @@ describe('traileraddictResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(traileraddictResolveEmbed(value)).toEqual(expected)
+      expect(traileraddictResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should pass an id that is not a number as written', () => {
@@ -159,7 +159,7 @@ describe('traileraddictResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(traileraddictResolveEmbed(value)).toEqual(expected)
+      expect(traileraddictResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should pass a short host id that is not a number as written', () => {
@@ -172,7 +172,7 @@ describe('traileraddictResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(traileraddictResolveEmbed(value)).toEqual(expected)
+      expect(traileraddictResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 })

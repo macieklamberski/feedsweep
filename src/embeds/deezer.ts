@@ -1,14 +1,6 @@
-import {
-  encodePathSegment,
-  getPathSegments,
-  getQueryParam,
-  isAnyOf,
-  parseUrl,
-  toMap,
-} from 'trousse'
-import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
+import { encodePathSegment, getPathSegments, getQueryParam, isAnyOf, toMap } from 'trousse'
+import type { EmbedRenderHint, FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'deezer'
@@ -82,9 +74,8 @@ const readResource = (url: URL): Resource | undefined => {
   }
 }
 
-export const deezerResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const resource = parsed && readResource(parsed)
+export const deezerResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
+  const resource = readResource(parsed)
 
   if (!resource || !deezerHeights.has(resource.type) || !resource.id) {
     return

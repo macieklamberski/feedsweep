@@ -4,13 +4,12 @@ import {
   getQueryParam,
   isPlainObject,
   isPresent,
-  parseUrl,
   toMap,
   trimObject,
 } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { readPixels } from '../utils/hints.js'
-import { pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { pickQueryParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'vk'
@@ -53,13 +52,7 @@ const widgetFrameKey = 'feeds'
 
 // VK's player, `video_ext.php?oid={ownerId}&id={videoId}`, the clip player beside it, and a
 // video's page.
-export const vkResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
+export const vkResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
   const page = parsed.pathname.match(videoPageRegex)?.groups
   const player = players.get(page ? '/video_ext.php' : parsed.pathname.toLowerCase())
   const ownerId = page?.owner ?? getQueryParam(parsed.searchParams, 'oid') ?? ''

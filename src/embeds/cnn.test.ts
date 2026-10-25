@@ -217,7 +217,7 @@ describe('cnnFlashResolveEmbed', () => {
         date: '2011-05-31',
       }
 
-      expect(cnnFlashResolveEmbed(value)).toEqual(expected)
+      expect(cnnFlashResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should read the video out of the swf query', () => {
@@ -232,7 +232,7 @@ describe('cnnFlashResolveEmbed', () => {
         date: '2011-02-27',
       }
 
-      expect(cnnFlashResolveEmbed(value)).toEqual(expected)
+      expect(cnnFlashResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -241,27 +241,27 @@ describe('cnnFlashResolveEmbed', () => {
       const value =
         'http://i.cdn.turner.com/v5cache/TBS/cvp/teamcoco_drupal_embed.swf?context=teamcoco_embed_offsite&videoId=19701'
 
-      expect(cnnFlashResolveEmbed(value)).toBeUndefined()
+      expect(cnnFlashResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a swf naming no video', () => {
       const value = 'http://i.cdn.turner.com/cnn/.element/apps/cvp/3.0/swf/cnn_416x234_embed.swf'
 
-      expect(cnnFlashResolveEmbed(value)).toBeUndefined()
+      expect(cnnFlashResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the player path under another segment', () => {
       const value =
         'http://i.cdn.turner.com/x/cnn/.element/apps/cvp/3.0/swf/cnn_416x234_embed.swf?context=embed&videoId=politics/2011/02/27/rs.book.google.power.cnn'
 
-      expect(cnnFlashResolveEmbed(value)).toBeUndefined()
+      expect(cnnFlashResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a path below the player swf', () => {
       const value =
         'http://i.cdn.turner.com/cnn/.element/apps/cvp/3.0/swf/cnn_416x234_embed.swf/extra?context=embed&videoId=politics/2011/02/27/rs.book.google.power.cnn'
 
-      expect(cnnFlashResolveEmbed(value)).toBeUndefined()
+      expect(cnnFlashResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 })

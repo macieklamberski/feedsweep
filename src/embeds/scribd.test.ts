@@ -6,7 +6,6 @@ import {
   scribdFlashEmbedResolver,
   scribdFlashResolveEmbed,
   scribdIframeEmbedResolver,
-  scribdResolveEmbed,
 } from './scribd.js'
 
 describeForEachParser('scribdIframeEmbedResolver', (parseHtml) => {
@@ -346,31 +345,13 @@ describeForEachParser('scribdFlashEmbedResolver', (parseHtml) => {
   })
 })
 
-describeForEachParser('scribdResolveEmbed', (parseHtml) => {
-  const carrier = (): Element => {
-    return parseHtml('<iframe></iframe>').querySelector('iframe') as Element
-  }
-
-  it('should ignore a url that cannot be parsed', () => {
-    const value = 'https://['
-
-    expect(scribdResolveEmbed(value, carrier())).toBeUndefined()
-  })
-})
-
 describe('scribdFlashResolveEmbed', () => {
   // The document id is present so the path is the only thing that can reject this: without it
   // the guard below would never be what returns undefined.
   it('should ignore a scribd url that is not the flash player', () => {
     const value = 'https://www.scribd.com/embeds/526446879/content?document_id=526446879'
 
-    expect(scribdFlashResolveEmbed(value)).toBeUndefined()
-  })
-
-  it('should ignore a url that cannot be parsed', () => {
-    const value = 'https://['
-
-    expect(scribdFlashResolveEmbed(value)).toBeUndefined()
+    expect(scribdFlashResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
   })
 })
 

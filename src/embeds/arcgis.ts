@@ -10,9 +10,9 @@ import {
   parseUrl,
   trimObject,
 } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { filterUrlQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { filterUrlQuery } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 type Item = {
@@ -194,9 +194,8 @@ const readItem = (url: URL): Item | undefined => {
 
 // ArcGIS Online's players for web maps, StoryMaps, Experience Builder apps, Instant Apps and
 // Dashboards. Each names one item, whose id the item api answers whatever its kind.
-export const arcgisResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const item = parsed ? readItem(parsed) : undefined
+export const arcgisResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
+  const item = readItem(parsed)
 
   if (!item) {
     return
@@ -237,6 +236,6 @@ export const arcgisWidgetEmbedResolver = createMarkupEmbedResolver(
       }
     }
 
-    return arcgisResolveEmbed(url.href, element)
+    return arcgisResolveEmbed(url.href, element, url)
   },
 )

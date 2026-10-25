@@ -16,7 +16,7 @@ describe('heyzineResolveEmbed', () => {
         ratio: '490/600',
       }
 
-      expect(heyzineResolveEmbed(value)).toEqual(expected)
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should read the spelling without the extension', () => {
@@ -29,7 +29,7 @@ describe('heyzineResolveEmbed', () => {
         ratio: '490/600',
       }
 
-      expect(heyzineResolveEmbed(value)).toEqual(expected)
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should carry the page the fragment opens on', () => {
@@ -42,7 +42,7 @@ describe('heyzineResolveEmbed', () => {
         ratio: '490/600',
       }
 
-      expect(heyzineResolveEmbed(value)).toEqual(expected)
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the case of an uppercase id in the key and the url', () => {
@@ -55,7 +55,7 @@ describe('heyzineResolveEmbed', () => {
         ratio: '490/600',
       }
 
-      expect(heyzineResolveEmbed(value)).toEqual(expected)
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the case of a custom slug in the key and the url', () => {
@@ -68,7 +68,7 @@ describe('heyzineResolveEmbed', () => {
         ratio: '490/600',
       }
 
-      expect(heyzineResolveEmbed(value)).toEqual(expected)
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should mint the apex host for the viewer on the www host', () => {
@@ -81,7 +81,7 @@ describe('heyzineResolveEmbed', () => {
         ratio: '490/600',
       }
 
-      expect(heyzineResolveEmbed(value)).toEqual(expected)
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should mint the apex host for the viewer on the cdn host', () => {
@@ -94,7 +94,7 @@ describe('heyzineResolveEmbed', () => {
         ratio: '490/600',
       }
 
-      expect(heyzineResolveEmbed(value)).toEqual(expected)
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -102,74 +102,74 @@ describe('heyzineResolveEmbed', () => {
     it('should ignore a route that is not a flipbook', () => {
       const value = 'https://heyzine.com/pricing/4db16f598c.html'
 
-      expect(heyzineResolveEmbed(value)).toBeUndefined()
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore an id outside the hexadecimal the viewer writes', () => {
       const value = 'https://heyzine.com/flip-book/zzzzzzzzzz.html'
 
-      expect(heyzineResolveEmbed(value)).toBeUndefined()
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore an id carrying a query separator', () => {
       const value = 'https://heyzine.com/flip-book/4db16f59=c.html'
 
-      expect(heyzineResolveEmbed(value)).toBeUndefined()
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore an id longer than the ten characters the viewer writes', () => {
       const value = 'https://heyzine.com/flip-book/4db16f598c5.html'
 
-      expect(heyzineResolveEmbed(value)).toBeUndefined()
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore an id shorter than the ten characters the viewer writes', () => {
       const value = 'https://heyzine.com/flip-book/4db16f598.html'
 
-      expect(heyzineResolveEmbed(value)).toBeUndefined()
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a name that only ends in a hexadecimal id', () => {
       const value = 'https://heyzine.com/flip-book/x4db16f598c.html'
 
-      expect(heyzineResolveEmbed(value)).toBeUndefined()
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the file host, where the flipbook PDF itself lives', () => {
       const value = 'https://cdnm.heyzine.com/files/uploaded/4db16f598c5a1f41c91c75d099f41ea4.pdf'
 
-      expect(heyzineResolveEmbed(value)).toBeUndefined()
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the PDF route that shares the flipbook segment', () => {
       const value =
         'https://cdn.heyzine.com/flip-book/pdf/4db16f598c5a1f41c91c75d099f41ea4b2c3d4e5.pdf'
 
-      expect(heyzineResolveEmbed(value)).toBeUndefined()
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a custom slug with the extension, which not every slug is served with', () => {
       const value = 'https://heyzine.com/flip-book/ThroughThePrism.html'
 
-      expect(heyzineResolveEmbed(value)).toBeUndefined()
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the flipbook route on a foreign host', () => {
       const value = 'https://evil.test/flip-book/695b82b89c.html'
 
-      expect(heyzineResolveEmbed(value)).toBeUndefined()
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the flipbook route on a file host', () => {
       const value = 'https://cdnm.heyzine.com/flip-book/695b82b89c.html'
 
-      expect(heyzineResolveEmbed(value)).toBeUndefined()
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a deeper path under the flipbook', () => {
       const value = 'https://heyzine.com/flip-book/4db16f598c/page/2'
 
-      expect(heyzineResolveEmbed(value)).toBeUndefined()
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 
@@ -184,7 +184,7 @@ describe('heyzineResolveEmbed', () => {
         ratio: '490/600',
       }
 
-      expect(heyzineResolveEmbed(value)).toEqual(expected)
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should build a longer bare hexadecimal name as a slug, as written', () => {
@@ -197,7 +197,7 @@ describe('heyzineResolveEmbed', () => {
         ratio: '490/600',
       }
 
-      expect(heyzineResolveEmbed(value)).toEqual(expected)
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should use a malformed slug as written, even if the player answers an error', () => {
@@ -210,7 +210,7 @@ describe('heyzineResolveEmbed', () => {
         ratio: '490/600',
       }
 
-      expect(heyzineResolveEmbed(value)).toEqual(expected)
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop a fragment that names no page', () => {
@@ -223,7 +223,7 @@ describe('heyzineResolveEmbed', () => {
         ratio: '490/600',
       }
 
-      expect(heyzineResolveEmbed(value)).toEqual(expected)
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should use a malformed page as written, even if the player answers an error', () => {
@@ -236,7 +236,7 @@ describe('heyzineResolveEmbed', () => {
         ratio: '490/600',
       }
 
-      expect(heyzineResolveEmbed(value)).toEqual(expected)
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop a tracking query', () => {
@@ -249,7 +249,7 @@ describe('heyzineResolveEmbed', () => {
         ratio: '490/600',
       }
 
-      expect(heyzineResolveEmbed(value)).toEqual(expected)
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -264,7 +264,7 @@ describe('heyzineResolveEmbed', () => {
         ratio: '490/600',
       }
 
-      expect(heyzineResolveEmbed(value)).toEqual(expected)
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should read a custom slug on an aflip.in account', () => {
@@ -277,7 +277,7 @@ describe('heyzineResolveEmbed', () => {
         ratio: '490/600',
       }
 
-      expect(heyzineResolveEmbed(value)).toEqual(expected)
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the extension a custom slug was written with and drop it from the key', () => {
@@ -290,7 +290,7 @@ describe('heyzineResolveEmbed', () => {
         ratio: '490/600',
       }
 
-      expect(heyzineResolveEmbed(value)).toEqual(expected)
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the custom domain host for a book the apex does not serve', () => {
@@ -303,7 +303,7 @@ describe('heyzineResolveEmbed', () => {
         ratio: '490/600',
       }
 
-      expect(heyzineResolveEmbed(value)).toEqual(expected)
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should read a custom slug on an hflip.co account', () => {
@@ -316,7 +316,7 @@ describe('heyzineResolveEmbed', () => {
         ratio: '490/600',
       }
 
-      expect(heyzineResolveEmbed(value)).toEqual(expected)
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should carry the page the fragment opens on', () => {
@@ -329,7 +329,7 @@ describe('heyzineResolveEmbed', () => {
         ratio: '490/600',
       }
 
-      expect(heyzineResolveEmbed(value)).toEqual(expected)
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop the secret fragment a WordPress embed frame appends', () => {
@@ -342,7 +342,7 @@ describe('heyzineResolveEmbed', () => {
         ratio: '490/600',
       }
 
-      expect(heyzineResolveEmbed(value)).toEqual(expected)
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop a tracking query', () => {
@@ -356,7 +356,7 @@ describe('heyzineResolveEmbed', () => {
         ratio: '490/600',
       }
 
-      expect(heyzineResolveEmbed(value)).toEqual(expected)
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should mint https for an http carrier', () => {
@@ -369,19 +369,19 @@ describe('heyzineResolveEmbed', () => {
         ratio: '490/600',
       }
 
-      expect(heyzineResolveEmbed(value)).toEqual(expected)
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should ignore the account root, which holds no book', () => {
       const value = 'https://biggertable.aflip.in/'
 
-      expect(heyzineResolveEmbed(value)).toBeUndefined()
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a deeper path under a book', () => {
       const value = 'https://paigeweber.aflip.in/sisept25.html/extra'
 
-      expect(heyzineResolveEmbed(value)).toBeUndefined()
+      expect(heyzineResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 })

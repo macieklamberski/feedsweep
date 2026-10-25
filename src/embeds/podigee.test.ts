@@ -103,6 +103,12 @@ describeForEachParser('podigeeScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore a configuration that does not parse', async () => {
+      const value = script('https://[theshow.podigee.io/42-an-episode/embed')
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore an unnumbered page that does not name the player', async () => {
       const value = script('https://theshow.podigee.io/about-the-show')
 
@@ -151,7 +157,7 @@ describe('podigeeResolveEmbed', () => {
       height: 145,
     }
 
-    expect(podigeeResolveEmbed(value)).toEqual(expected)
+    expect(podigeeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should read a show whose subdomain carries digits', () => {
@@ -164,7 +170,7 @@ describe('podigeeResolveEmbed', () => {
       height: 145,
     }
 
-    expect(podigeeResolveEmbed(value)).toEqual(expected)
+    expect(podigeeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should read a show whose subdomain carries hyphens', () => {
@@ -178,14 +184,14 @@ describe('podigeeResolveEmbed', () => {
       height: 145,
     }
 
-    expect(podigeeResolveEmbed(value)).toEqual(expected)
+    expect(podigeeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   // The company site sits on the show domain under www, and its paths can open with a number.
   it('should return undefined for the www host', () => {
     const value = 'https://www.podigee.io/2024-pricing-update'
 
-    expect(podigeeResolveEmbed(value)).toBeUndefined()
+    expect(podigeeResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
   })
 
   it('should read a trailer numbered behind a letter', () => {
@@ -198,13 +204,13 @@ describe('podigeeResolveEmbed', () => {
       height: 145,
     }
 
-    expect(podigeeResolveEmbed(value)).toEqual(expected)
+    expect(podigeeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for an unnumbered episode with a number inside its slug', () => {
     const value = 'https://cloudonaut.podigee.io/season-2-trailer'
 
-    expect(podigeeResolveEmbed(value)).toBeUndefined()
+    expect(podigeeResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
   })
 
   it('should mint the embed code url over a player url carrying other parameters', () => {
@@ -218,7 +224,7 @@ describe('podigeeResolveEmbed', () => {
       height: 145,
     }
 
-    expect(podigeeResolveEmbed(value)).toEqual(expected)
+    expect(podigeeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   // A `/embed` suffix names the player outright, so the episode needs no number.
@@ -232,7 +238,7 @@ describe('podigeeResolveEmbed', () => {
       height: 145,
     }
 
-    expect(podigeeResolveEmbed(value)).toEqual(expected)
+    expect(podigeeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   // With anything after `embed` the show serves its website page rather than the player, and the
@@ -240,7 +246,7 @@ describe('podigeeResolveEmbed', () => {
   it('should return undefined when embed is not the last segment', () => {
     const value = 'https://cloudonaut.podigee.io/an-episode/embed/extra'
 
-    expect(podigeeResolveEmbed(value)).toBeUndefined()
+    expect(podigeeResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
   })
 
   // A numbered episode still resolves: the trailing junk is dropped with the rebuilt src.
@@ -254,7 +260,7 @@ describe('podigeeResolveEmbed', () => {
       height: 145,
     }
 
-    expect(podigeeResolveEmbed(value)).toEqual(expected)
+    expect(podigeeResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   describe('hosts that are not a show', () => {
@@ -268,7 +274,7 @@ describe('podigeeResolveEmbed', () => {
     ]
 
     it.each(cdnAndCompanyUrls)('should return undefined for %s', (value) => {
-      expect(podigeeResolveEmbed(value)).toBeUndefined()
+      expect(podigeeResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 
@@ -283,7 +289,7 @@ describe('podigeeResolveEmbed', () => {
     ]
 
     it.each(nonEpisodeUrls)('should return undefined for %s', (value) => {
-      expect(podigeeResolveEmbed(value)).toBeUndefined()
+      expect(podigeeResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 })

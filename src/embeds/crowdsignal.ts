@@ -1,7 +1,7 @@
-import { encodePathSegment, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { encodePathSegment } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'crowdsignal'
@@ -29,8 +29,8 @@ const composeEmbed = (pollId: string): EmbedResolverResult => {
 }
 
 // The poll frame, `poll.fm/{id}/embed`, and the poll page, which the snippet's <noscript> names.
-export const crowdsignalResolveEmbed: ResolveEmbed = (url, element) => {
-  const pollId = parseUrl(url, placeholderBaseUrl)?.pathname.match(pollPathRegex)?.[1]
+export const crowdsignalResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
+  const pollId = parsed.pathname.match(pollPathRegex)?.[1]
 
   if (!pollId) {
     return
@@ -52,7 +52,7 @@ const readFallbackPollId = (fallback: Element): string | undefined => {
   const frame = parseUrlOnHosts(url, 'poll.fm')
 
   if (frame) {
-    return crowdsignalResolveEmbed(frame.href)?.id
+    return crowdsignalResolveEmbed(frame.href, undefined, frame)?.id
   }
 
   return parseUrlOnHosts(url, 'polldaddy.com')?.pathname.match(retiredPollPathRegex)?.[1]
@@ -94,10 +94,8 @@ export const crowdsignalScriptEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-const crowdsignalFlashResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
+const crowdsignalFlashResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
+  if (!flashPlayerPathRegex.test(parsed.pathname)) {
     return
   }
 

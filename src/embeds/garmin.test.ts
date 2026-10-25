@@ -15,7 +15,7 @@ describe('garminResolveEmbed', () => {
         height: 548,
       }
 
-      expect(garminResolveEmbed(value)).toEqual(expected)
+      expect(garminResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should read the older spelling, port and all', () => {
@@ -28,7 +28,7 @@ describe('garminResolveEmbed', () => {
         height: 548,
       }
 
-      expect(garminResolveEmbed(value)).toEqual(expected)
+      expect(garminResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should read the app spelling the chain passes through', () => {
@@ -41,7 +41,7 @@ describe('garminResolveEmbed', () => {
         height: 548,
       }
 
-      expect(garminResolveEmbed(value)).toEqual(expected)
+      expect(garminResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should read the current spelling with its trailing slash', () => {
@@ -54,7 +54,7 @@ describe('garminResolveEmbed', () => {
         height: 548,
       }
 
-      expect(garminResolveEmbed(value)).toEqual(expected)
+      expect(garminResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -62,31 +62,31 @@ describe('garminResolveEmbed', () => {
     it('should ignore the activity page, which is not the embed', () => {
       const value = 'https://connect.garmin.com/modern/activity/1393315994'
 
-      expect(garminResolveEmbed(value)).toBeUndefined()
+      expect(garminResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the app spelling of that page as well', () => {
       const value = 'https://connect.garmin.com/app/activity/1393315994'
 
-      expect(garminResolveEmbed(value)).toBeUndefined()
+      expect(garminResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a course, which names its own id space', () => {
       const value = 'https://connect.garmin.com/course/1393315994'
 
-      expect(garminResolveEmbed(value)).toBeUndefined()
+      expect(garminResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the embed route nested under another section', () => {
       const value = 'https://connect.garmin.com/course/embed/activity/1393315994'
 
-      expect(garminResolveEmbed(value)).toBeUndefined()
+      expect(garminResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a segment after the activity id', () => {
       const value = 'https://connect.garmin.com/modern/activity/embed/1393315994/extra'
 
-      expect(garminResolveEmbed(value)).toBeUndefined()
+      expect(garminResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 
@@ -101,7 +101,7 @@ describe('garminResolveEmbed', () => {
         height: 548,
       }
 
-      expect(garminResolveEmbed(value)).toEqual(expected)
+      expect(garminResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 })

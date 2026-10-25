@@ -1,6 +1,6 @@
-import { parseUrl, toMap } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
+import { toMap } from 'trousse'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
+import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'zohoworkdrive'
@@ -32,11 +32,10 @@ const readRatio = (element: Element | undefined): string => {
   return element?.classList.contains('zpvideo') ? '16/9' : '4/3'
 }
 
-export const zohoworkdriveResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const domain = parsed ? zohoworkdriveDomains.get(parsed.hostname) : undefined
+export const zohoworkdriveResolveEmbed: ResolveUrlEmbed = (url, element, parsed) => {
+  const domain = zohoworkdriveDomains.get(parsed.hostname)
 
-  if (!parsed || !domain) {
+  if (!domain) {
     return
   }
 

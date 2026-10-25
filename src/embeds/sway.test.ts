@@ -16,7 +16,7 @@ describe('swayResolveEmbed', () => {
         height: 500,
       }
 
-      expect(swayResolveEmbed(value)).toEqual(expected)
+      expect(swayResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should mint the current host for the embed url on sway.com', () => {
@@ -29,7 +29,7 @@ describe('swayResolveEmbed', () => {
         height: 500,
       }
 
-      expect(swayResolveEmbed(value)).toEqual(expected)
+      expect(swayResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should mint the current host for the embed url on sway.office.com', () => {
@@ -42,7 +42,7 @@ describe('swayResolveEmbed', () => {
         height: 500,
       }
 
-      expect(swayResolveEmbed(value)).toEqual(expected)
+      expect(swayResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should read the route words in any case', () => {
@@ -55,7 +55,7 @@ describe('swayResolveEmbed', () => {
         height: 500,
       }
 
-      expect(swayResolveEmbed(value)).toEqual(expected)
+      expect(swayResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -63,25 +63,25 @@ describe('swayResolveEmbed', () => {
     it('should ignore the route without the embed segment', () => {
       const value = 'https://sway.cloud.microsoft/s/s7OAd7CG19agnTuf'
 
-      expect(swayResolveEmbed(value)).toBeUndefined()
+      expect(swayResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore an embed segment under another route word', () => {
       const value = 'https://sway.cloud.microsoft/x/s7OAd7CG19agnTuf/embed'
 
-      expect(swayResolveEmbed(value)).toBeUndefined()
+      expect(swayResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the embed route under a leading segment', () => {
       const value = 'https://sway.cloud.microsoft/x/s/s7OAd7CG19agnTuf/embed'
 
-      expect(swayResolveEmbed(value)).toBeUndefined()
+      expect(swayResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a trailing segment after the embed route', () => {
       const value = 'https://sway.cloud.microsoft/s/s7OAd7CG19agnTuf/embed/extra'
 
-      expect(swayResolveEmbed(value)).toBeUndefined()
+      expect(swayResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 
@@ -96,7 +96,7 @@ describe('swayResolveEmbed', () => {
         height: 500,
       }
 
-      expect(swayResolveEmbed(value)).toEqual(expected)
+      expect(swayResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop a tracking query', () => {
@@ -109,7 +109,7 @@ describe('swayResolveEmbed', () => {
         height: 500,
       }
 
-      expect(swayResolveEmbed(value)).toEqual(expected)
+      expect(swayResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 })

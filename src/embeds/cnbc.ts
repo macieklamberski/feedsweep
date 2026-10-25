@@ -1,6 +1,5 @@
-import { composeQuery, getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import type { ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const cnbcHosts = ['player.cnbc.com']
@@ -12,10 +11,9 @@ const playerRatio = '16/9'
 // CNBC's player.cnbc.com clip iframe, pasted in a box taller than the 16:9 clip it fills.
 // It answers 200 for any guid, with a not-found page in the body for a fabricated one. The
 // Flash-era `plus.cnbc.com/rssvideosearch/…/id/{id}` ids are another space and get that page.
-export const cnbcResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const [route, account, player, extra] = parsed ? getPathSegments(parsed) : []
-  const guid = getQueryParam(parsed?.searchParams, 'byGuid')
+export const cnbcResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
+  const [route, account, player, extra] = getPathSegments(parsed)
+  const guid = getQueryParam(parsed.searchParams, 'byGuid')
 
   if (!isAnyOf(route, 'p') || !player || extra) {
     return

@@ -9,7 +9,7 @@ import {
   parseUrl,
   trimObject,
 } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, find, flashVar, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
@@ -212,13 +212,7 @@ const composeWatchEmbed = (videoId: string): EmbedResolverResult => {
 
 // A post has no name: its words go to `description`, and the frame titles itself
 // `fb:post Facebook Social Plugin`.
-export const facebookResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url)
-
-  if (!parsed) {
-    return
-  }
-
+export const facebookResolveEmbed: ResolveUrlEmbed = (url, _element, parsed) => {
   if (legacyVideoPathRegex.test(parsed.pathname)) {
     const videoId = getQueryParam(parsed.searchParams, 'video_id')
 
@@ -270,11 +264,10 @@ export const facebookIframeEmbedResolver = createUrlEmbedResolver(
 // flashvars `video_id`. The share player names only a file and stays unresolved.
 const mvpPathRegex = /^\/swf\/mvp\.swf$/i
 
-const facebookFlashResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url)
+const facebookFlashResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
   const videoId = flashVar(element, 'video_id')
 
-  if (!parsed || !mvpPathRegex.test(parsed.pathname) || !videoId) {
+  if (!mvpPathRegex.test(parsed.pathname) || !videoId) {
     return
   }
 
@@ -324,7 +317,7 @@ export const facebookS9eEmbedResolver = createMarkupEmbedResolver(
       ? `https://www.facebook.com/watch/${composeQuery({ v: id })}`
       : `https://www.facebook.com/${page || s9ePlaceholderPage}/posts/${id}`
 
-    return facebookResolveEmbed(href)
+    return facebookResolveEmbed(href, undefined, new URL(href))
   },
 )
 

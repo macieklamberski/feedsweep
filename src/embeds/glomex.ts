@@ -1,7 +1,6 @@
-import { composeQuery, getQueryParam, parseUrl, trimObject } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { composeQuery, getQueryParam, trimObject } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const glomexHosts = ['player.glomex.com']
@@ -32,10 +31,8 @@ const readEmbed = (
   return composeEmbed(integrationId, playlistId)
 }
 
-const glomexResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed || !playerPathRegex.test(parsed.pathname)) {
+const glomexResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
+  if (!playerPathRegex.test(parsed.pathname)) {
     return
   }
 

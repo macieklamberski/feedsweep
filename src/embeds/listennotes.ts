@@ -1,7 +1,7 @@
-import { composeQuery, getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { composeQuery, getPathSegments, isAnyOf } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'listennotes'
@@ -55,9 +55,8 @@ const composeSlugged = (slugged: Slugged): EmbedResolverResult | undefined => {
   }
 }
 
-export const listennotesResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const segments = parsed ? getPathSegments(parsed) : []
+export const listennotesResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
+  const segments = getPathSegments(parsed)
 
   if (localeRegex.test(segments[0] ?? '')) {
     segments.shift()
@@ -65,7 +64,7 @@ export const listennotesResolveEmbed: ResolveEmbed = (url, element) => {
 
   const [route = '', first = '', second, third] = segments
   const title = attr(element, 'title')
-  const episodeQuery = composeQuery(pickQueryParams(parsed?.search ?? '', episodeParams))
+  const episodeQuery = composeQuery(pickQueryParams(parsed.search, episodeParams))
 
   if (!second) {
     return

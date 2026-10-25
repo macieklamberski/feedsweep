@@ -1,6 +1,6 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
+import { getPathSegments, isAnyOf } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
+import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'subsplash'
@@ -28,13 +28,7 @@ const composeEmbed = (id: string, src: string): EmbedResolverResult => {
 // map to offline, so it is kept. The embed reads `t` as the start position, and the rest of its
 // query, `audio`, `video`, `info`, `logoWatermark`, `shareable` and `embeddable`, only changes
 // the display or is ignored.
-export const subsplashResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
+export const subsplashResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
   const segments = getPathSegments(parsed)
 
   if (segments.length === 6) {

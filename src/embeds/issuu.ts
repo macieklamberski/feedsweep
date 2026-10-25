@@ -5,10 +5,9 @@ import {
   getPathSegments,
   getQueryParam,
   isAnyOf,
-  parseUrl,
   trimObject,
 } from 'trousse'
-import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
+import type { EmbedResolverResult, FieldCleaner, ResolveUrlEmbed } from '../types.js'
 
 const provider = 'issuu'
 
@@ -127,13 +126,7 @@ const readFlashDocument = (parsed: URL, element?: Element): EmbedResolverResult 
 
 // The reader iframe, at `e.issuu.com/embed.html` or the document page pasted from the address bar,
 // and the retired Flash reader.
-const issuuResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url)
-
-  if (!parsed) {
-    return
-  }
-
+const issuuResolveEmbed: ResolveUrlEmbed = (url, element, parsed) => {
   const route = getPathSegments(parsed)[0] ?? ''
 
   if (isAnyOf(route, flashRoute)) {

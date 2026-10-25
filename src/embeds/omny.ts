@@ -1,7 +1,7 @@
-import { composeQuery, getPathSegments, isAnyOf, parseUrl, trimObject } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { composeQuery, getPathSegments, isAnyOf, trimObject } from 'trousse'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'omny'
@@ -39,17 +39,14 @@ export const extractOmnyClip = (link: string): string | undefined => {
 // rendering, so only `Video` is written.
 const omnyEmbedParams = ['media', 't']
 
-export const omnyResolveEmbed: ResolveEmbed = (url, element) => {
+export const omnyResolveEmbed: ResolveUrlEmbed = (url, element, parsed) => {
   const clip = extractOmnyClip(url)
 
   if (!clip) {
     return
   }
 
-  const { media, t } = pickQueryParams(
-    parseUrl(url, placeholderBaseUrl)?.search ?? '',
-    omnyEmbedParams,
-  )
+  const { media, t } = pickQueryParams(parsed.search, omnyEmbedParams)
   // The player reads the value in any case.
   const isVideo = media?.toLowerCase() === 'video'
   const isPlaylist = clip.toLowerCase().includes('/playlists/')

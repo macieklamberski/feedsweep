@@ -1,10 +1,12 @@
+import { parseUrl } from 'trousse'
 import { vimeoResolveEmbed } from '../../embeds/vimeo.js'
 import { youtubeResolveEmbed } from '../../embeds/youtube.js'
-import type { DomTransform } from '../../types.js'
+import type { DomTransform, ResolveUrlEmbed } from '../../types.js'
+import { placeholderBaseUrl } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
 
 // A hand-built embed url drops the ?h= hash an unlisted Vimeo needs.
-const resolveEmbedSource = [youtubeResolveEmbed, vimeoResolveEmbed]
+const resolveEmbedSource: Array<ResolveUrlEmbed> = [youtubeResolveEmbed, vimeoResolveEmbed]
 
 // Lazy Load for Videos ships a facade anchor with the watch url and builds the iframe on click.
 export const rebuildLazyLoadForVideos: DomTransform = () => (document) => {
@@ -24,8 +26,14 @@ export const rebuildLazyLoadForVideos: DomTransform = () => (document) => {
         continue
       }
 
+      const parsed = parseUrl(url, placeholderBaseUrl)
+
+      if (!parsed) {
+        continue
+      }
+
       for (const resolveEmbed of resolveEmbedSource) {
-        source = resolveEmbed(url)?.src
+        source = resolveEmbed(url, undefined, parsed)?.src
 
         if (source) {
           break

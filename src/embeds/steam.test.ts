@@ -16,7 +16,7 @@ describe('steamResolveEmbed', () => {
         height: 190,
       }
 
-      expect(steamResolveEmbed(value)).toEqual(expected)
+      expect(steamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the purchase option and the text the widget prints', () => {
@@ -33,7 +33,7 @@ describe('steamResolveEmbed', () => {
           'Top-down, 2.5D action that combines elements of old-school shooters like Star-Control and action-RPGs like Diablo with an evolving weapons system, 32-player dedicated servers, coop, and PVP.',
       }
 
-      expect(steamResolveEmbed(value)).toEqual(expected)
+      expect(steamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop a tracking parameter beside the text', () => {
@@ -50,7 +50,7 @@ describe('steamResolveEmbed', () => {
           'Top-down, 2.5D action that combines elements of old-school shooters like Star-Control and action-RPGs like Diablo with an evolving weapons system, 32-player dedicated servers, coop, and PVP.',
       }
 
-      expect(steamResolveEmbed(value)).toEqual(expected)
+      expect(steamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop the label language', () => {
@@ -67,7 +67,7 @@ describe('steamResolveEmbed', () => {
           'Top-down, 2.5D action that combines elements of old-school shooters like Star-Control and action-RPGs like Diablo with an evolving weapons system, 32-player dedicated servers, coop, and PVP.',
       }
 
-      expect(steamResolveEmbed(value)).toEqual(expected)
+      expect(steamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -75,25 +75,25 @@ describe('steamResolveEmbed', () => {
     it('should ignore the store page itself', () => {
       const value = 'https://store.steampowered.com/app/355060/'
 
-      expect(steamResolveEmbed(value)).toBeUndefined()
+      expect(steamResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a package page, whose id is not an app id', () => {
       const value = 'https://store.steampowered.com/sub/62345/'
 
-      expect(steamResolveEmbed(value)).toBeUndefined()
+      expect(steamResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for an app id that is not digits', () => {
       const value = 'https://store.steampowered.com/widget/news'
 
-      expect(steamResolveEmbed(value)).toBeUndefined()
+      expect(steamResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a purchase option that is not digits', () => {
       const value = 'https://store.steampowered.com/widget/355060/abc'
 
-      expect(steamResolveEmbed(value)).toBeUndefined()
+      expect(steamResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 
@@ -109,7 +109,7 @@ describe('steamResolveEmbed', () => {
         height: 190,
       }
 
-      expect(steamResolveEmbed(value)).toEqual(expected)
+      expect(steamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 })

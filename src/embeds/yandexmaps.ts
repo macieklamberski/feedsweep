@@ -1,4 +1,4 @@
-import { composeQuery, getQueryParam, isAnyOf, parseUrl } from 'trousse'
+import { composeQuery, getQueryParam, isAnyOf } from 'trousse'
 import type { EmbedResolverResult } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
@@ -109,13 +109,7 @@ export const yandexMapsScriptEmbedResolver = createMarkupEmbedResolver(
 // of a short link, and a coordinate map's frame.
 export const yandexMapsIframeEmbedResolver = createUrlEmbedResolver(
   yandexMapsWidgetHosts,
-  (url, element) => {
-    const parsed = parseUrl(url)
-
-    if (!parsed) {
-      return
-    }
-
+  (_url, element, parsed) => {
     const code = parsed.pathname.match(shortLinkPathRegex)?.groups?.code
 
     if (code) {

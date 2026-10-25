@@ -17,7 +17,7 @@ describe('googleformsResolveEmbed', () => {
         height: 600,
       }
 
-      expect(googleformsResolveEmbed(value)).toEqual(expected)
+      expect(googleformsResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep a form named by its Drive file id on that id', () => {
@@ -31,7 +31,7 @@ describe('googleformsResolveEmbed', () => {
         height: 600,
       }
 
-      expect(googleformsResolveEmbed(value)).toEqual(expected)
+      expect(googleformsResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should add the embedded view to a share link and drop its trackers', () => {
@@ -45,7 +45,7 @@ describe('googleformsResolveEmbed', () => {
         height: 600,
       }
 
-      expect(googleformsResolveEmbed(value)).toEqual(expected)
+      expect(googleformsResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the prefilled answers and drop the prefill flag', () => {
@@ -59,7 +59,7 @@ describe('googleformsResolveEmbed', () => {
         height: 600,
       }
 
-      expect(googleformsResolveEmbed(value)).toEqual(expected)
+      expect(googleformsResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should frame a short link as written', () => {
@@ -72,7 +72,7 @@ describe('googleformsResolveEmbed', () => {
         height: 600,
       }
 
-      expect(googleformsResolveEmbed(value)).toEqual(expected)
+      expect(googleformsResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -81,53 +81,53 @@ describe('googleformsResolveEmbed', () => {
       const value =
         'https://docs.google.com/forms/d/e/1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg/notaroute'
 
-      expect(googleformsResolveEmbed(value)).toBeUndefined()
+      expect(googleformsResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path past the form route', () => {
       const value =
         'https://docs.google.com/forms/d/e/1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg/viewform/extra'
 
-      expect(googleformsResolveEmbed(value)).toBeUndefined()
+      expect(googleformsResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a deck on the same host', () => {
       const value =
         'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/embed'
 
-      expect(googleformsResolveEmbed(value)).toBeUndefined()
+      expect(googleformsResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a forms path under another first segment', () => {
       const value =
         'https://docs.google.com/x/forms/d/e/1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg/viewform'
 
-      expect(googleformsResolveEmbed(value)).toBeUndefined()
+      expect(googleformsResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore another file kind on the form route', () => {
       const value =
         'https://docs.google.com/notaform/d/e/1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg/viewform'
 
-      expect(googleformsResolveEmbed(value)).toBeUndefined()
+      expect(googleformsResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a forms path that names no form', () => {
       const value = 'https://docs.google.com/forms/x/e/1FAIpQLSc2TjIaI6kPtQDHE7/viewform'
 
-      expect(googleformsResolveEmbed(value)).toBeUndefined()
+      expect(googleformsResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a short link with a second segment', () => {
       const value = 'https://forms.gle/3mfiVWiFzt6E1hhx6/extra'
 
-      expect(googleformsResolveEmbed(value)).toBeUndefined()
+      expect(googleformsResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the short link host on its own', () => {
       const value = 'https://forms.gle/'
 
-      expect(googleformsResolveEmbed(value)).toBeUndefined()
+      expect(googleformsResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 
@@ -143,7 +143,7 @@ describe('googleformsResolveEmbed', () => {
         height: 600,
       }
 
-      expect(googleformsResolveEmbed(value)).toEqual(expected)
+      expect(googleformsResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop the Workspace prefix', () => {
@@ -157,7 +157,7 @@ describe('googleformsResolveEmbed', () => {
         height: 600,
       }
 
-      expect(googleformsResolveEmbed(value)).toEqual(expected)
+      expect(googleformsResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 })

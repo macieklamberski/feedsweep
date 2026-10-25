@@ -6,7 +6,7 @@ import {
   type Nullish,
   parseUrl,
 } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedResolverResult, ResolveEmbed, ResolveUrlEmbed } from '../types.js'
 import { attr, find, text } from '../utils/dom.js'
 import { isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -311,10 +311,8 @@ export const slideshareIframeEmbedResolver = createUrlEmbedResolver(
 // Flash died in 2020 and these embeds have rendered nothing since, but the markup is still in
 // old posts and their feeds. The numeric id in the wrapper is the same id the modern embed
 // route accepts, so the dead player can be replaced by one that works.
-const slideshareFlashResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
+const slideshareFlashResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
+  if (!flashPlayerPathRegex.test(parsed.pathname)) {
     return
   }
 

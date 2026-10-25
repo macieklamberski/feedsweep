@@ -1,8 +1,13 @@
-import { composeQuery, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolver, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { composeQuery } from 'trousse'
+import type {
+  EmbedRenderHint,
+  EmbedResolver,
+  EmbedResolverResult,
+  ResolveUrlEmbed,
+} from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { parseUrlOnHosts, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'buzzsprout'
@@ -44,13 +49,7 @@ const composeEmbed = (
 }
 
 // Buzzsprout's player iframe, whose title names the episode.
-export const buzzsproutResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
+export const buzzsproutResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
   const match = parsed.pathname.match(episodePagePathRegex)
 
   if (!match) {

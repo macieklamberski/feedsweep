@@ -1,6 +1,5 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { getPathSegments, isAnyOf } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const imdbHosts = ['imdb.com']
@@ -18,13 +17,7 @@ const composeEmbed = (id: string): EmbedResolverResult => {
 // IMDb's trailer player, `/video/embed/{vi}/` today, and the older `/videoembed/{vi}` and
 // `/video/{source}/{vi}/imdb/embed`, which both redirect onto it. The server ignores the source
 // word, written as `imdb`, `wab` or `user`.
-export const imdbResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
+export const imdbResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
   const segments = getPathSegments(parsed)
 
   if (segments.length === 2) {

@@ -15,7 +15,7 @@ describe('aushaResolveEmbed', () => {
         height: 220,
       }
 
-      expect(aushaResolveEmbed(value)).toEqual(expected)
+      expect(aushaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should mint the bare root for the player spelled as index.html', () => {
@@ -27,7 +27,7 @@ describe('aushaResolveEmbed', () => {
         height: 220,
       }
 
-      expect(aushaResolveEmbed(value)).toEqual(expected)
+      expect(aushaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -35,25 +35,19 @@ describe('aushaResolveEmbed', () => {
     it('should ignore an ausha host that is not a player', () => {
       const value = 'https://podcast.ausha.co/comicsdiscovery?podcastId=BGKwJUJG8D9m'
 
-      expect(aushaResolveEmbed(value)).toBeUndefined()
+      expect(aushaResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore an ausha host that is not a player at the root', () => {
       const value = 'https://www.ausha.co/?podcastId=BGKwJUJG8D9m'
 
-      expect(aushaResolveEmbed(value)).toBeUndefined()
+      expect(aushaResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a player url naming nothing', () => {
       const value = 'https://player.ausha.co/?color=%23001B2D&v=3'
 
-      expect(aushaResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a url that cannot be parsed', () => {
-      const value = 'https://['
-
-      expect(aushaResolveEmbed(value)).toBeUndefined()
+      expect(aushaResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 
@@ -67,7 +61,7 @@ describe('aushaResolveEmbed', () => {
         height: 220,
       }
 
-      expect(aushaResolveEmbed(value)).toEqual(expected)
+      expect(aushaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should read an id longer than the twelve characters minted today', () => {
@@ -79,13 +73,13 @@ describe('aushaResolveEmbed', () => {
         height: 220,
       }
 
-      expect(aushaResolveEmbed(value)).toEqual(expected)
+      expect(aushaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should refuse a path on the player host that is not the player', () => {
       const value = 'https://player.ausha.co/ausha-player.js?podcastId=BGKwJUJG8D9m'
 
-      expect(aushaResolveEmbed(value)).toBeUndefined()
+      expect(aushaResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 
@@ -100,7 +94,7 @@ describe('aushaResolveEmbed', () => {
         height: 220,
       }
 
-      expect(aushaResolveEmbed(value)).toEqual(expected)
+      expect(aushaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should fall back to the show where no episode is named', () => {
@@ -112,7 +106,7 @@ describe('aushaResolveEmbed', () => {
         height: 220,
       }
 
-      expect(aushaResolveEmbed(value)).toEqual(expected)
+      expect(aushaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -129,7 +123,7 @@ describe('aushaResolveEmbed', () => {
         height: 220,
       }
 
-      expect(aushaResolveEmbed(value)).toEqual(expected)
+      expect(aushaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -144,7 +138,7 @@ describe('aushaResolveEmbed', () => {
         height: 220,
       }
 
-      expect(aushaResolveEmbed(value)).toEqual(expected)
+      expect(aushaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should mint the v3 player for a widget naming only its show', () => {
@@ -157,7 +151,7 @@ describe('aushaResolveEmbed', () => {
         height: 220,
       }
 
-      expect(aushaResolveEmbed(value)).toEqual(expected)
+      expect(aushaResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 })

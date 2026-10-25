@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import { getPathSegments, isAnyOf } from 'trousse'
+import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'anyflip'
@@ -16,13 +16,7 @@ const viewerPaths = ['', 'index.html', 'mobile/index.html']
 
 // AnyFlip's flipbook viewer, `online.anyflip.com/{user}/{book}/index.html`, with the `#p=` start
 // page the embed dialog writes.
-export const anyflipResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
+export const anyflipResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
   const segments = getPathSegments(parsed)
   const bucket = parsed.hostname === bucketHost ? segments.shift() : parsed.hostname
   const [user, book, ...rest] = segments

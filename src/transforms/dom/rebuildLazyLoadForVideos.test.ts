@@ -114,6 +114,17 @@ describeForEachParser('rebuildLazyLoadForVideos', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should leave the facade untouched when its url does not parse', async () => {
+    const value = html`
+      <a
+        href="https://[vimeo.com/76979871"
+        class="preview-lazyload preview-vimeo"
+      ></a>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should produce a youtube placeholder end to end', async () => {
     const value = html`
       <div class="container-lazyload preview-lazyload container-youtube">

@@ -1,5 +1,5 @@
 import { composeQuery, getQueryParam, parseUrl } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { digitsRegex, isFileName, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -59,14 +59,14 @@ export const extractMegaphoneEmbed = (
 
 // No metadata and no thumbnail without an api key, so the height is the substance here, and
 // some iframes carry no height at all.
-export const megaphoneResolveEmbed: ResolveEmbed = (url) => {
+export const megaphoneResolveEmbed: ResolveUrlEmbed = (url, _element, parsed) => {
   const embed = extractMegaphoneEmbed(url)
 
   if (!embed) {
     return
   }
 
-  const playback = pickQueryParams(parseUrl(url, placeholderBaseUrl)?.search ?? '', ['start'])
+  const playback = pickQueryParams(parsed.search, ['start'])
   const query = composeQuery({ [embed.param]: embed.id, ...playback })
 
   return {

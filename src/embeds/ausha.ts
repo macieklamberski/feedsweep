@@ -1,14 +1,6 @@
-import {
-  composeQuery,
-  getPathSegments,
-  getQueryParam,
-  isAnyOf,
-  parseUrl,
-  trimObject,
-} from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { composeQuery, getPathSegments, getQueryParam, isAnyOf, trimObject } from 'trousse'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ausha'
@@ -21,13 +13,7 @@ const playerHeight = 220
 // The v2 widget takes the same ids as the v3 player, so both are minted as the v3 player.
 const playerHosts = ['player.ausha.co', 'widget.ausha.co']
 
-export const aushaResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
+export const aushaResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
   const segments = getPathSegments(parsed)
 
   // Both hosts serve their player from the root, spelled either bare or as `index.html`.

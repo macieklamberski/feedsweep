@@ -1,5 +1,5 @@
-import { composeQuery, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { composeQuery, getQueryParam, isAnyOf } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -39,13 +39,7 @@ const findAnchor = (anchors: Array<Element>, pathRegex: RegExp): Element | undef
   })
 }
 
-const pixivResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url)
-
-  if (!parsed) {
-    return
-  }
-
+const pixivResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
   const route = parsed.pathname.match(framePathRegex)?.[1]?.toLowerCase()
   const workId = getQueryParam(parsed.searchParams, 'id')
 

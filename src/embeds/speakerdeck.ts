@@ -1,14 +1,7 @@
-import {
-  composeQuery,
-  encodePathSegment,
-  getPathSegments,
-  getQueryParam,
-  isAnyOf,
-  parseUrl,
-} from 'trousse'
-import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
+import { composeQuery, encodePathSegment, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import type { EmbedResolverResult, FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'speakerdeck'
@@ -78,7 +71,7 @@ export const speakerdeckLegacyScriptEmbedResolver = createMarkupEmbedResolver(
 
 // The player iframe the `data-id` script builds, saved into the feed by a CMS that ran the script
 // first, or the legacy `/embed/{id}` iframe.
-export const speakerdeckResolveEmbed: ResolveEmbed = (url, element) => {
+export const speakerdeckResolveEmbed: ResolveUrlEmbed = (url, element, parsed) => {
   const [route = '', deckId] = getPathSegments(url)
 
   // Speaker Deck serves files on its own host, so a file name is an enclosure.
@@ -86,7 +79,7 @@ export const speakerdeckResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const slide = getQueryParam(parseUrl(url, placeholderBaseUrl)?.searchParams, 'slide')
+  const slide = getQueryParam(parsed.searchParams, 'slide')
 
   return composeEmbed(deckId, { slide, title: attr(element, 'title') })
 }

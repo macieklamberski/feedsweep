@@ -16,7 +16,7 @@ describe('ispotResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(ispotResolveEmbed(value)).toEqual(expected)
+      expect(ispotResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop the query', () => {
@@ -29,7 +29,7 @@ describe('ispotResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(ispotResolveEmbed(value)).toEqual(expected)
+      expect(ispotResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the case of the id', () => {
@@ -42,7 +42,7 @@ describe('ispotResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(ispotResolveEmbed(value)).toEqual(expected)
+      expect(ispotResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop the trailing slash the player answers 404 to', () => {
@@ -55,7 +55,7 @@ describe('ispotResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(ispotResolveEmbed(value)).toEqual(expected)
+      expect(ispotResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -63,25 +63,25 @@ describe('ispotResolveEmbed', () => {
     it('should ignore a path with a leading segment', () => {
       const value = 'https://www.ispot.tv/x/share/IoLU'
 
-      expect(ispotResolveEmbed(value)).toBeUndefined()
+      expect(ispotResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path with a trailing segment', () => {
       const value = 'https://www.ispot.tv/share/IoLU/extra'
 
-      expect(ispotResolveEmbed(value)).toBeUndefined()
+      expect(ispotResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the ad page', () => {
       const value = 'https://www.ispot.tv/ad/IoLU'
 
-      expect(ispotResolveEmbed(value)).toBeUndefined()
+      expect(ispotResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the player route with no id', () => {
       const value = 'https://www.ispot.tv/share/'
 
-      expect(ispotResolveEmbed(value)).toBeUndefined()
+      expect(ispotResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 })

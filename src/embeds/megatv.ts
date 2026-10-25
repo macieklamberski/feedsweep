@@ -1,6 +1,5 @@
-import { composeQuery, getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import type { ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const megatvHosts = ['megatv.com']
@@ -10,10 +9,8 @@ const megatvHosts = ['megatv.com']
 // Mega switched to it at post 151920 in October 2020, and earlier articles carry eight-digit ids.
 const prefixedPostIdRegex = /^2020(\d{6,})$/
 
-const megatvResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed || !isAnyOf(getPathSegments(parsed).join('/'), 'embed')) {
+const megatvResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
+  if (!isAnyOf(getPathSegments(parsed).join('/'), 'embed')) {
     return
   }
 

@@ -1,5 +1,5 @@
 import { composeQuery, encodePathSegment, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedResolverResult, ResolveEmbed, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -92,10 +92,8 @@ export const cnnIframeEmbedResolver = createUrlEmbedResolver(cnnHosts, cnnResolv
 // `flashVars` on none, but the player read both so both are read here.
 const flashPlayerPathRegex = /^\/cnn\/\.element\/apps\/cvp\/.*\.swf$/i
 
-export const cnnFlashResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
+export const cnnFlashResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
+  if (!flashPlayerPathRegex.test(parsed.pathname)) {
     return
   }
 

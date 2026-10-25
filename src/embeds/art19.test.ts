@@ -17,7 +17,7 @@ describe('art19ResolveEmbed', () => {
         height: 200,
       }
 
-      expect(art19ResolveEmbed(value)).toEqual(expected)
+      expect(art19ResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should mint the show player', () => {
@@ -30,7 +30,7 @@ describe('art19ResolveEmbed', () => {
         height: 505,
       }
 
-      expect(art19ResolveEmbed(value)).toEqual(expected)
+      expect(art19ResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should mint the apex for the www host and drop the micro layout', () => {
@@ -44,7 +44,7 @@ describe('art19ResolveEmbed', () => {
         height: 200,
       }
 
-      expect(art19ResolveEmbed(value)).toEqual(expected)
+      expect(art19ResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop the theme and the trailing slash', () => {
@@ -58,7 +58,7 @@ describe('art19ResolveEmbed', () => {
         height: 200,
       }
 
-      expect(art19ResolveEmbed(value)).toEqual(expected)
+      expect(art19ResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the case of the episode in the key', () => {
@@ -72,7 +72,7 @@ describe('art19ResolveEmbed', () => {
         height: 200,
       }
 
-      expect(art19ResolveEmbed(value)).toEqual(expected)
+      expect(art19ResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should read the route words in another case and mint them in lowercase', () => {
@@ -86,7 +86,7 @@ describe('art19ResolveEmbed', () => {
         height: 200,
       }
 
-      expect(art19ResolveEmbed(value)).toEqual(expected)
+      expect(art19ResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -95,32 +95,32 @@ describe('art19ResolveEmbed', () => {
       const value =
         'https://art19.com/shows/broadcast-dialogue/episodes/949de556-7d25-406a-8a27-9823364183bd'
 
-      expect(art19ResolveEmbed(value)).toBeUndefined()
+      expect(art19ResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path with a leading segment', () => {
       const value = 'https://art19.com/x/shows/broadcast-dialogue/embed'
 
-      expect(art19ResolveEmbed(value)).toBeUndefined()
+      expect(art19ResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path with a trailing segment', () => {
       const value = 'https://art19.com/shows/broadcast-dialogue/embed/extra'
 
-      expect(art19ResolveEmbed(value)).toBeUndefined()
+      expect(art19ResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore an episode path under another route word', () => {
       const value =
         'https://art19.com/shows/broadcast-dialogue/x/949de556-7d25-406a-8a27-9823364183bd/embed'
 
-      expect(art19ResolveEmbed(value)).toBeUndefined()
+      expect(art19ResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore an episode audio file', () => {
       const value = 'https://rss.art19.com/episodes/949de556-7d25-406a-8a27-9823364183bd.mp3'
 
-      expect(art19ResolveEmbed(value)).toBeUndefined()
+      expect(art19ResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 })

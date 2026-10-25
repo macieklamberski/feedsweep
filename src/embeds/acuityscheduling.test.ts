@@ -19,7 +19,7 @@ describe('acuityschedulingResolveEmbed', () => {
         url: 'https://app.acuityscheduling.com/schedule.php?owner=14276092',
       }
 
-      expect(acuityschedulingResolveEmbed(value)).toEqual(expected)
+      expect(acuityschedulingResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the appointment type and put it in the key', () => {
@@ -32,7 +32,7 @@ describe('acuityschedulingResolveEmbed', () => {
         url: 'https://app.acuityscheduling.com/schedule.php?owner=19828685&appointmentType=28566466',
       }
 
-      expect(acuityschedulingResolveEmbed(value)).toEqual(expected)
+      expect(acuityschedulingResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the owner once where the embed code repeats it', () => {
@@ -45,7 +45,7 @@ describe('acuityschedulingResolveEmbed', () => {
         url: 'https://app.acuityscheduling.com/schedule.php?owner=12572531&appointmentType=1914136',
       }
 
-      expect(acuityschedulingResolveEmbed(value)).toEqual(expected)
+      expect(acuityschedulingResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep a category of appointment types as written', () => {
@@ -58,7 +58,7 @@ describe('acuityschedulingResolveEmbed', () => {
         url: 'https://app.acuityscheduling.com/schedule.php?owner=13689466&appointmentType=category:Campfire%20Mini%20Sessions',
       }
 
-      expect(acuityschedulingResolveEmbed(value)).toEqual(expected)
+      expect(acuityschedulingResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the calendar', () => {
@@ -70,7 +70,7 @@ describe('acuityschedulingResolveEmbed', () => {
         url: 'https://app.acuityscheduling.com/schedule.php?owner=12493437&calendarID=651411',
       }
 
-      expect(acuityschedulingResolveEmbed(value)).toEqual(expected)
+      expect(acuityschedulingResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the location', () => {
@@ -82,7 +82,7 @@ describe('acuityschedulingResolveEmbed', () => {
         url: 'https://app.acuityscheduling.com/schedule.php?owner=12493437&location=Studio',
       }
 
-      expect(acuityschedulingResolveEmbed(value)).toEqual(expected)
+      expect(acuityschedulingResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop the referral source and tracking', () => {
@@ -95,7 +95,7 @@ describe('acuityschedulingResolveEmbed', () => {
         url: 'https://app.acuityscheduling.com/schedule.php?owner=13184170&appointmentType=54171635',
       }
 
-      expect(acuityschedulingResolveEmbed(value)).toEqual(expected)
+      expect(acuityschedulingResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -103,19 +103,19 @@ describe('acuityschedulingResolveEmbed', () => {
     it('should ignore a scheduler with no owner', () => {
       const value = 'https://app.acuityscheduling.com/schedule.php?appointmentType=28566466'
 
-      expect(acuityschedulingResolveEmbed(value)).toBeUndefined()
+      expect(acuityschedulingResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore another route on the host', () => {
       const value = 'https://app.acuityscheduling.com/catalog.php?owner=14276092'
 
-      expect(acuityschedulingResolveEmbed(value)).toBeUndefined()
+      expect(acuityschedulingResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the button script, which opens the scheduler in an overlay', () => {
       const value = 'https://embed.acuityscheduling.com/embed/button/19367985.js'
 
-      expect(acuityschedulingResolveEmbed(value)).toBeUndefined()
+      expect(acuityschedulingResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 })

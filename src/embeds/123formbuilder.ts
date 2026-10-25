@@ -1,8 +1,8 @@
-import { getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { getQueryParam, isAnyOf } from 'trousse'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { iframeResizerHeightRequest, readIframeResizerHeight } from '../utils/hints.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = '123formbuilder'
@@ -25,8 +25,8 @@ const composeEmbed = (formId: string): EmbedResolverResult => {
 
 // The form page, `form.123formbuilder.com/{id}`, and the older iframe snippet's
 // `my-contact-form-{id}.html`, which redirects onto the same host.
-export const oneTwoThreeFormBuilderResolveEmbed: ResolveEmbed = (url) => {
-  const pathname = parseUrl(url, placeholderBaseUrl)?.pathname ?? ''
+export const oneTwoThreeFormBuilderResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
+  const pathname = parsed.pathname
   const formId = pathname.match(formPathRegex)?.[1] ?? pathname.match(legacyFramePathRegex)?.[1]
 
   if (!formId) {

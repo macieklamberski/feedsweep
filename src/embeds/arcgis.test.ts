@@ -12,7 +12,7 @@ describe('arcgisResolveEmbed', () => {
   describe('happy paths', () => {
     it('should keep a classic snippet on the classic player with its box', () => {
       const value =
-        '//sonomaopenspace.maps.arcgis.com/apps/Embed/index.html?webmap=62bf87f7b2f64f15b48491d39242f4d7&extent=-123.0692,38.5233,-122.9947,38.5929&zoom=true&scale=true&disable_scroll=true&theme=light'
+        'https://sonomaopenspace.maps.arcgis.com/apps/Embed/index.html?webmap=62bf87f7b2f64f15b48491d39242f4d7&extent=-123.0692,38.5233,-122.9947,38.5929&zoom=true&scale=true&disable_scroll=true&theme=light'
       const expected: EmbedResolverResult = {
         provider: 'arcgis',
         id: '62bf87f7b2f64f15b48491d39242f4d7',
@@ -21,7 +21,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the centre and level of a classic snippet', () => {
@@ -35,7 +35,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the classic embed viewer with its box', () => {
@@ -49,7 +49,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should rebuild an organization embed viewer onto the public host with its box', () => {
@@ -63,7 +63,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep a world box on the embed viewer as written', () => {
@@ -77,7 +77,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the start position of the Map Viewer embed and drop its display settings', () => {
@@ -91,7 +91,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the zoom level of a Map Viewer link', () => {
@@ -105,7 +105,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should rebuild the retired OnePane template onto the classic embed viewer with its box', () => {
@@ -119,7 +119,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep a story on its own player', () => {
@@ -132,7 +132,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the item a story collection opens on', () => {
@@ -146,7 +146,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should read the StoryMaps route word in any case', () => {
@@ -159,7 +159,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep an Experience Builder app on its own player', () => {
@@ -172,7 +172,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the template of an Instant App, which picks the app', () => {
@@ -186,7 +186,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should rebuild an organization Instant App onto the public host', () => {
@@ -200,7 +200,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep a dashboard on its own player', () => {
@@ -213,7 +213,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should read the dashboard from the Dashboards app shell fragment', () => {
@@ -227,7 +227,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should rebuild the retired Operations Dashboard onto Dashboards', () => {
@@ -241,7 +241,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should read a lowercase classic embed path and mint the path Esri serves', () => {
@@ -255,7 +255,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -264,121 +264,121 @@ describe('arcgisResolveEmbed', () => {
       const value =
         'https://evil.test/apps/Embed/index.html?webmap=62bf87f7b2f64f15b48491d39242f4d7'
 
-      expect(arcgisResolveEmbed(value)).toBeUndefined()
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a foreign host carrying the story path', () => {
       const value = 'https://evil.test/stories/ec8a4b675cac476380df910304a47547'
 
-      expect(arcgisResolveEmbed(value)).toBeUndefined()
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a foreign host carrying the experience path', () => {
       const value = 'https://evil.test/experience/ebec3698f7a94be5a43e9370f2f5015a'
 
-      expect(arcgisResolveEmbed(value)).toBeUndefined()
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the developer SDK host, which serves scripts', () => {
       const value = 'https://js.arcgis.com/apps/dashboards/bda7594740fd40299423467b48e9ecf6'
 
-      expect(arcgisResolveEmbed(value)).toBeUndefined()
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a story route on the portal host', () => {
       const value = 'https://www.arcgis.com/stories/ec8a4b675cac476380df910304a47547'
 
-      expect(arcgisResolveEmbed(value)).toBeUndefined()
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a story route on the Experience Builder host', () => {
       const value = 'https://experience.arcgis.com/stories/ec8a4b675cac476380df910304a47547'
 
-      expect(arcgisResolveEmbed(value)).toBeUndefined()
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a route word StoryMaps does not serve', () => {
       const value = 'https://storymaps.arcgis.com/briefings2/ec8a4b675cac476380df910304a47547'
 
-      expect(arcgisResolveEmbed(value)).toBeUndefined()
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a story page past the item', () => {
       const value = 'https://storymaps.arcgis.com/stories/ec8a4b675cac476380df910304a47547/edit'
 
-      expect(arcgisResolveEmbed(value)).toBeUndefined()
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the StoryMaps route list with no item', () => {
       const value = 'https://storymaps.arcgis.com/stories'
 
-      expect(arcgisResolveEmbed(value)).toBeUndefined()
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a web map route that names no web map', () => {
       const value =
         'https://www.arcgis.com/apps/Embed/index.html?appid=62bf87f7b2f64f15b48491d39242f4d7'
 
-      expect(arcgisResolveEmbed(value)).toBeUndefined()
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore an Instant App route that names no app', () => {
       const value =
         'https://www.arcgis.com/apps/instant/basic/index.html?webmap=62bf87f7b2f64f15b48491d39242f4d7'
 
-      expect(arcgisResolveEmbed(value)).toBeUndefined()
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore an Instant App path under another prefix', () => {
       const value =
         'https://www.arcgis.com/x/apps/instant/basic/index.html?appid=6b81ccb18d40497d879207d291dcc966'
 
-      expect(arcgisResolveEmbed(value)).toBeUndefined()
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore an Instant App path with a trailing segment', () => {
       const value =
         'https://www.arcgis.com/apps/instant/basic/index.html/extra?appid=6b81ccb18d40497d879207d291dcc966'
 
-      expect(arcgisResolveEmbed(value)).toBeUndefined()
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a dashboard path under another prefix', () => {
       const value = 'https://www.arcgis.com/x/apps/dashboards/bda7594740fd40299423467b48e9ecf6'
 
-      expect(arcgisResolveEmbed(value)).toBeUndefined()
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a dashboard path with a trailing segment', () => {
       const value = 'https://www.arcgis.com/apps/dashboards/bda7594740fd40299423467b48e9ecf6/extra'
 
-      expect(arcgisResolveEmbed(value)).toBeUndefined()
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the Dashboards app shell with no dashboard in the fragment', () => {
       const value = 'https://www.arcgis.com/apps/dashboards/index.html'
 
-      expect(arcgisResolveEmbed(value)).toBeUndefined()
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the Operations Dashboard with no dashboard in the fragment', () => {
       const value = 'https://www.arcgis.com/apps/opsdashboard/index.html'
 
-      expect(arcgisResolveEmbed(value)).toBeUndefined()
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore an Operations Dashboard fragment that does not start the route', () => {
       const value =
         'https://www.arcgis.com/apps/opsdashboard/index.html#home#/bda7594740fd40299423467b48e9ecf6'
 
-      expect(arcgisResolveEmbed(value)).toBeUndefined()
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore an item file, which is not a player', () => {
       const value =
         'https://www.arcgis.com/sharing/rest/content/items/62bf87f7b2f64f15b48491d39242f4d7/data'
 
-      expect(arcgisResolveEmbed(value)).toBeUndefined()
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 
@@ -393,7 +393,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should use an item id as written, even if the player answers an error', () => {
@@ -406,7 +406,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep an ampersand in the web map id inside the webmap parameter', () => {
@@ -419,7 +419,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep a hash in the OnePane box inside the extent parameter', () => {
@@ -433,7 +433,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep a hash in the app id inside the appid parameter', () => {
@@ -446,7 +446,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep a hash in the web map id inside the Map Viewer webmap parameter', () => {
@@ -459,7 +459,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should read the dashboard from an Operations Dashboard fragment with a query', () => {
@@ -473,7 +473,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep a fragment dashboard holding a fragment sign inside one path segment', () => {
@@ -487,7 +487,7 @@ describe('arcgisResolveEmbed', () => {
         height: 500,
       }
 
-      expect(arcgisResolveEmbed(value)).toEqual(expected)
+      expect(arcgisResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 })

@@ -22,7 +22,7 @@ describe('cloudflarestreamResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
+      expect(cloudflarestreamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the loop and drop the muting and preload', () => {
@@ -37,7 +37,7 @@ describe('cloudflarestreamResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
+      expect(cloudflarestreamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should take a poster stating its frame time as the thumbnail', () => {
@@ -52,7 +52,7 @@ describe('cloudflarestreamResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
+      expect(cloudflarestreamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should compose the thumbnail on the account host when no poster is stated', () => {
@@ -67,7 +67,7 @@ describe('cloudflarestreamResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
+      expect(cloudflarestreamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the start position', () => {
@@ -82,7 +82,7 @@ describe('cloudflarestreamResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
+      expect(cloudflarestreamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should take the thumbnail off the bare host for the shared player', () => {
@@ -96,7 +96,7 @@ describe('cloudflarestreamResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
+      expect(cloudflarestreamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should read the iframe route on the bare shared host', () => {
@@ -110,7 +110,7 @@ describe('cloudflarestreamResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
+      expect(cloudflarestreamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -118,14 +118,14 @@ describe('cloudflarestreamResolveEmbed', () => {
     it('should ignore a foreign host carrying the player path', () => {
       const value = 'https://evil.test/35d8788a685e8cd8db81e6f3e2269e2a/iframe'
 
-      expect(cloudflarestreamResolveEmbed(value)).toBeUndefined()
+      expect(cloudflarestreamResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a lookalike host', () => {
       const value =
         'https://customer-2haawx7cuvbfttcn.cloudflarestream.com.evil.test/35d8788a685e8cd8db81e6f3e2269e2a/iframe'
 
-      expect(cloudflarestreamResolveEmbed(value)).toBeUndefined()
+      expect(cloudflarestreamResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed video id as written, even if the player answers an error', () => {
@@ -140,27 +140,27 @@ describe('cloudflarestreamResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
+      expect(cloudflarestreamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should ignore the account host without the iframe route', () => {
       const value =
         'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35d8788a685e8cd8db81e6f3e2269e2a'
 
-      expect(cloudflarestreamResolveEmbed(value)).toBeUndefined()
+      expect(cloudflarestreamResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the shared host outside its iframe subdomain', () => {
       const value = 'https://videodelivery.net/5653cfd537db1edbed98c5c0119f390c'
 
-      expect(cloudflarestreamResolveEmbed(value)).toBeUndefined()
+      expect(cloudflarestreamResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the thumbnail route', () => {
       const value =
         'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35d8788a685e8cd8db81e6f3e2269e2a/thumbnails/thumbnail.jpg'
 
-      expect(cloudflarestreamResolveEmbed(value)).toBeUndefined()
+      expect(cloudflarestreamResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should use a signed token on the account host as written', () => {
@@ -175,7 +175,7 @@ describe('cloudflarestreamResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
+      expect(cloudflarestreamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should use a signed token on the shared player host as written', () => {
@@ -190,33 +190,33 @@ describe('cloudflarestreamResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
+      expect(cloudflarestreamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should ignore the shared path on another delivery subdomain', () => {
       const value = 'https://embed.videodelivery.net/5653cfd537db1edbed98c5c0119f390c'
 
-      expect(cloudflarestreamResolveEmbed(value)).toBeUndefined()
+      expect(cloudflarestreamResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the iframe route under a prefix', () => {
       const value =
         'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/embed/35d8788a685e8cd8db81e6f3e2269e2a/iframe'
 
-      expect(cloudflarestreamResolveEmbed(value)).toBeUndefined()
+      expect(cloudflarestreamResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the iframe route followed by another segment', () => {
       const value =
         'https://customer-2haawx7cuvbfttcn.cloudflarestream.com/35d8788a685e8cd8db81e6f3e2269e2a/iframe/embed'
 
-      expect(cloudflarestreamResolveEmbed(value)).toBeUndefined()
+      expect(cloudflarestreamResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the shared player path under a prefix', () => {
       const value = 'https://iframe.videodelivery.net/embed/5653cfd537db1edbed98c5c0119f390c'
 
-      expect(cloudflarestreamResolveEmbed(value)).toBeUndefined()
+      expect(cloudflarestreamResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 
@@ -233,7 +233,7 @@ describe('cloudflarestreamResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
+      expect(cloudflarestreamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should compose the thumbnail when the poster parameter is empty', () => {
@@ -248,7 +248,7 @@ describe('cloudflarestreamResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
+      expect(cloudflarestreamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should compose the thumbnail when the poster is relative', () => {
@@ -263,7 +263,7 @@ describe('cloudflarestreamResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cloudflarestreamResolveEmbed(value)).toEqual(expected)
+      expect(cloudflarestreamResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 })

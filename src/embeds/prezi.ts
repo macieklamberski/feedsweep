@@ -1,7 +1,6 @@
-import { encodePathSegment, getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { encodePathSegment, getPathSegments, isAnyOf } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const preziHosts = ['prezi.com']
@@ -60,13 +59,7 @@ const readFrameId = ([route, second, third]: Array<string>): string | undefined 
 // The Flash loader `prezi.com/bin/preziloader.swf`, which renders nothing, the frames
 // `prezi.com/embed/{id}/`, `prezi.com/p/{id}/embed`, `prezi.com/view/{id}/embed` and Prezi Video's
 // `prezi.com/v/embed/{id}/`, and `prezi.com/p/embed/{id}/`, which asks for a login.
-export const preziResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
+export const preziResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
   if (loaderPathRegex.test(parsed.pathname)) {
     const flashId = flashVar(element, 'prezi_id')
     const declaredId = flashId ? flashId : attr(element, 'id')?.match(elementIdRegex)?.[1]

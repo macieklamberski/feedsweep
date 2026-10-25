@@ -1,7 +1,7 @@
-import { getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { getQueryParam, isAnyOf } from 'trousse'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { readPixels } from '../utils/hints.js'
-import { pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
+import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'acuityscheduling'
@@ -18,11 +18,10 @@ const sizingMessageRegex = /^sizing:(\d+)$/
 
 // The scheduler, `schedule.php?owner={id}`, as the embed code writes it. It redirects to a
 // `/schedule/{hash}` path that only the server can derive from the owner.
-export const acuityschedulingResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const owner = getQueryParam(parsed?.searchParams, 'owner')
+export const acuityschedulingResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
+  const owner = getQueryParam(parsed.searchParams, 'owner')
 
-  if (!parsed || !isAnyOf(parsed.pathname, '/schedule.php') || !owner) {
+  if (!isAnyOf(parsed.pathname, '/schedule.php') || !owner) {
     return
   }
 

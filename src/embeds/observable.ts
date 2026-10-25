@@ -1,5 +1,5 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { getPathSegments, isAnyOf } from 'trousse'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 import { readIframeResizeHeight } from '../utils/hints.js'
 import { hexRegex } from '../utils/urls.js'
@@ -13,11 +13,10 @@ const versionSuffixRegex = /@[^@/]*$/
 
 // Observable's notebook frame, observablehq.com/embed/@{user}/{notebook}[@{version}]?cells={names},
 // or embed/{16 hex}[@{version}] for a notebook addressed by its id.
-const observableResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url)
+const observableResolveEmbed: ResolveUrlEmbed = (url, element, parsed) => {
   const segments = getPathSegments(url)
 
-  if (!parsed || !isAnyOf(segments[0], 'embed')) {
+  if (!isAnyOf(segments[0], 'embed')) {
     return
   }
 

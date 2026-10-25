@@ -7,7 +7,7 @@ import {
   type Nullish,
   parseUrl,
 } from 'trousse'
-import type { FieldCleaner, ResolveEmbed } from '../types.js'
+import type { FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
 
 const provider = 'bandcamp'
@@ -99,11 +99,10 @@ const parseFallback = (element: Nullish<Element>): Element | undefined => {
   )
 }
 
-const bandcampResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
+const bandcampResolveEmbed: ResolveUrlEmbed = (url, element, parsed) => {
   const release = extractBandcampRelease(url)
 
-  if (!parsed || !release) {
+  if (!release) {
     return
   }
 

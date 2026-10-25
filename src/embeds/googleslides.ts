@@ -1,5 +1,5 @@
-import { composeQuery, encodePathSegment, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { composeQuery, encodePathSegment, getQueryParam, isAnyOf } from 'trousse'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { pickQueryParams, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 import { getPathSegmentsWithoutWorkspace } from './googledrive.js'
@@ -26,11 +26,10 @@ const readDeckFragment = (parsed: URL): string => {
 
 // `/presentation/d/e/{id}` names a deck published to the web and `/presentation/d/{id}` names it
 // by its Drive file id. The legacy `/presentation/embed?id={id}` 301s onto the second.
-export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url)
+export const googleslidesResolveEmbed: ResolveUrlEmbed = (url, _element, parsed) => {
   const segments = getPathSegmentsWithoutWorkspace(url)
 
-  if (!parsed || !isAnyOf(segments[0], 'presentation')) {
+  if (!isAnyOf(segments[0], 'presentation')) {
     return
   }
 

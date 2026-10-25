@@ -1,7 +1,7 @@
-import { encodePathSegment, getQueryParam, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { encodePathSegment, getQueryParam } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'fc2'
@@ -26,21 +26,18 @@ const composeEmbed = (contentId: string): EmbedResolverResult => {
   }
 }
 
-const fc2IframeResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const contentId = parsed?.pathname.match(embedPlayerRegex)?.[1]
+const fc2IframeResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
+  const contentId = parsed.pathname.match(embedPlayerRegex)?.[1]
 
-  if (!parsed || !contentId) {
+  if (!contentId) {
     return
   }
 
   return composeEmbed(contentId)
 }
 
-const fc2FlashResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed || !flashPlayerRegex.test(parsed.pathname)) {
+const fc2FlashResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
+  if (!flashPlayerRegex.test(parsed.pathname)) {
     return
   }
 

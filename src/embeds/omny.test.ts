@@ -104,7 +104,7 @@ describe('omnyResolveEmbed', () => {
       height: 180,
     }
 
-    expect(omnyResolveEmbed(value)).toEqual(expected)
+    expect(omnyResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it("should compose the clip's poster from its path", () => {
@@ -119,7 +119,7 @@ describe('omnyResolveEmbed', () => {
       height: 180,
     }
 
-    expect(omnyResolveEmbed(value)).toEqual(expected)
+    expect(omnyResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should give the video rendering its own shape', () => {
@@ -132,7 +132,7 @@ describe('omnyResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(omnyResolveEmbed(value)).toEqual(expected)
+    expect(omnyResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should read the video rendering in any case', () => {
@@ -145,7 +145,7 @@ describe('omnyResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(omnyResolveEmbed(value)).toEqual(expected)
+    expect(omnyResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should drop the square layout and the artwork style', () => {
@@ -158,7 +158,7 @@ describe('omnyResolveEmbed', () => {
       height: 180,
     }
 
-    expect(omnyResolveEmbed(value)).toEqual(expected)
+    expect(omnyResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should give a playlist the height of its own box', () => {
@@ -170,7 +170,7 @@ describe('omnyResolveEmbed', () => {
       height: 500,
     }
 
-    expect(omnyResolveEmbed(value)).toEqual(expected)
+    expect(omnyResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should size a clip whose slug is the playlists word', () => {
@@ -183,7 +183,7 @@ describe('omnyResolveEmbed', () => {
       height: 180,
     }
 
-    expect(omnyResolveEmbed(value)).toEqual(expected)
+    expect(omnyResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should keep a start offset', () => {
@@ -196,7 +196,7 @@ describe('omnyResolveEmbed', () => {
       height: 180,
     }
 
-    expect(omnyResolveEmbed(value)).toEqual(expected)
+    expect(omnyResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   // Autoplay is the render hint's to offer on the click that loads the player, and tracking
@@ -212,13 +212,13 @@ describe('omnyResolveEmbed', () => {
       height: 180,
     }
 
-    expect(omnyResolveEmbed(value)).toEqual(expected)
+    expect(omnyResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a omny url naming no clip', () => {
     const value = 'https://omny.fm/about'
 
-    expect(omnyResolveEmbed(value)).toBeUndefined()
+    expect(omnyResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
   })
 })
 

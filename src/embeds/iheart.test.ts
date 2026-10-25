@@ -16,7 +16,7 @@ describe('iheartResolveEmbed', () => {
         height: 120,
       }
 
-      expect(iheartResolveEmbed(value)).toEqual(expected)
+      expect(iheartResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should take the ids out of the slugged segments', () => {
@@ -30,7 +30,7 @@ describe('iheartResolveEmbed', () => {
         height: 120,
       }
 
-      expect(iheartResolveEmbed(value)).toEqual(expected)
+      expect(iheartResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop the attribution the publisher wrote', () => {
@@ -44,7 +44,7 @@ describe('iheartResolveEmbed', () => {
         height: 120,
       }
 
-      expect(iheartResolveEmbed(value)).toEqual(expected)
+      expect(iheartResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should move the beta host onto www', () => {
@@ -58,7 +58,7 @@ describe('iheartResolveEmbed', () => {
         height: 120,
       }
 
-      expect(iheartResolveEmbed(value)).toEqual(expected)
+      expect(iheartResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should read the route words in any case', () => {
@@ -71,7 +71,7 @@ describe('iheartResolveEmbed', () => {
         height: 120,
       }
 
-      expect(iheartResolveEmbed(value)).toEqual(expected)
+      expect(iheartResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should mint the show player at its own height', () => {
@@ -85,7 +85,7 @@ describe('iheartResolveEmbed', () => {
         height: 300,
       }
 
-      expect(iheartResolveEmbed(value)).toEqual(expected)
+      expect(iheartResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should mint the live station player', () => {
@@ -98,7 +98,7 @@ describe('iheartResolveEmbed', () => {
         height: 200,
       }
 
-      expect(iheartResolveEmbed(value)).toEqual(expected)
+      expect(iheartResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should mint the artist radio player', () => {
@@ -111,7 +111,7 @@ describe('iheartResolveEmbed', () => {
         height: 200,
       }
 
-      expect(iheartResolveEmbed(value)).toEqual(expected)
+      expect(iheartResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -119,61 +119,61 @@ describe('iheartResolveEmbed', () => {
     it('should ignore the episode route behind another segment', () => {
       const value = 'https://www.iheart.com/x/podcast/84297824/episode/87767164/?embed=true'
 
-      expect(iheartResolveEmbed(value)).toBeUndefined()
+      expect(iheartResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the episode route followed by another segment', () => {
       const value = 'https://www.iheart.com/podcast/84297824/episode/87767164/extra'
 
-      expect(iheartResolveEmbed(value)).toBeUndefined()
+      expect(iheartResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the show route behind another segment', () => {
       const value = 'https://www.iheart.com/x/podcast/84297824/?embed=true'
 
-      expect(iheartResolveEmbed(value)).toBeUndefined()
+      expect(iheartResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the show route followed by another segment', () => {
       const value = 'https://www.iheart.com/podcast/84297824/extra'
 
-      expect(iheartResolveEmbed(value)).toBeUndefined()
+      expect(iheartResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a podcast category page', () => {
       const value = 'https://www.iheart.com/podcast/category/news-and-politics-106/'
 
-      expect(iheartResolveEmbed(value)).toBeUndefined()
+      expect(iheartResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a segment with no id after the slug', () => {
       const value = 'https://www.iheart.com/podcast/the-woj-pod/?embed=true'
 
-      expect(iheartResolveEmbed(value)).toBeUndefined()
+      expect(iheartResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a station route followed by another segment', () => {
       const value = 'https://www.iheart.com/live/kfi-am-640-177/extra/?embed=true'
 
-      expect(iheartResolveEmbed(value)).toBeUndefined()
+      expect(iheartResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a station route behind another segment', () => {
       const value = 'https://www.iheart.com/x/live/kfi-am-640-177/?embed=true'
 
-      expect(iheartResolveEmbed(value)).toBeUndefined()
+      expect(iheartResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore an unknown route word naming an id', () => {
       const value = 'https://www.iheart.com/zzroute/kfi-am-640-177/?embed=true'
 
-      expect(iheartResolveEmbed(value)).toBeUndefined()
+      expect(iheartResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the retired widget route', () => {
       const value = 'https://www.iheart.com/widget/?showId=25229902&episodeId=27347420'
 
-      expect(iheartResolveEmbed(value)).toBeUndefined()
+      expect(iheartResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 
@@ -188,7 +188,7 @@ describe('iheartResolveEmbed', () => {
         height: 200,
       }
 
-      expect(iheartResolveEmbed(value)).toEqual(expected)
+      expect(iheartResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 })

@@ -1,6 +1,6 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
-import { pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { getPathSegments, isAnyOf } from 'trousse'
+import type { ResolveUrlEmbed } from '../types.js'
+import { pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const cspanHosts = ['c-span.org']
@@ -10,13 +10,7 @@ const idEndRegex = /[/&]/
 // C-SPAN's standalone player, `/video/standalone/?{id}/{slug}`, where the id is `c{n}` for a
 // clip or `{program}-{n}` for a program and leads the query with no name. The player plays the
 // id without its slug and reads `start` as the position.
-export const cspanResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
+export const cspanResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
   const [video, standalone, ...rest] = getPathSegments(parsed)
 
   if (!isAnyOf(video, 'video') || !isAnyOf(standalone, 'standalone') || rest.length > 0) {

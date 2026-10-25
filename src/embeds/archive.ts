@@ -7,7 +7,13 @@ import {
   isHostOrSubdomainOf,
   parseUrl,
 } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
+import type {
+  EmbedRenderHint,
+  EmbedResolverResult,
+  FieldCleaner,
+  ResolveEmbed,
+  ResolveUrlEmbed,
+} from '../types.js'
 import { attr, flashVar, flashVars } from '../utils/dom.js'
 import {
   audioFileRegex,
@@ -222,13 +228,7 @@ const readItemPlayer = (element: Element | undefined): EmbedResolverResult | und
   return { ...composeEmbedResult(identifier, '', file), height: audioPlayerHeight }
 }
 
-const archiveFlashResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
+const archiveFlashResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
   if (xspfPlayerPathRegex.test(parsed.pathname)) {
     return readXspfPlayer(parsed)
   }

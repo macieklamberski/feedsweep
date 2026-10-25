@@ -17,7 +17,7 @@ describe('listennotesResolveEmbed', () => {
         height: 600,
       }
 
-      expect(listennotesResolveEmbed(value)).toEqual(expected)
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should mint the episode player from the episode embed url', () => {
@@ -31,7 +31,7 @@ describe('listennotesResolveEmbed', () => {
         height: 180,
       }
 
-      expect(listennotesResolveEmbed(value)).toEqual(expected)
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the episode player on the hex id route', () => {
@@ -44,7 +44,7 @@ describe('listennotesResolveEmbed', () => {
         height: 180,
       }
 
-      expect(listennotesResolveEmbed(value)).toEqual(expected)
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should mint the clip player from the clip embed url', () => {
@@ -58,7 +58,7 @@ describe('listennotesResolveEmbed', () => {
         height: 300,
       }
 
-      expect(listennotesResolveEmbed(value)).toEqual(expected)
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should move a clip on the older route onto the current one', () => {
@@ -72,7 +72,7 @@ describe('listennotesResolveEmbed', () => {
         height: 300,
       }
 
-      expect(listennotesResolveEmbed(value)).toEqual(expected)
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should mint the playlist player listing podcasts without its sort order', () => {
@@ -86,7 +86,7 @@ describe('listennotesResolveEmbed', () => {
         height: 600,
       }
 
-      expect(listennotesResolveEmbed(value)).toEqual(expected)
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should mint the playlist player listing episodes', () => {
@@ -100,7 +100,7 @@ describe('listennotesResolveEmbed', () => {
         height: 600,
       }
 
-      expect(listennotesResolveEmbed(value)).toEqual(expected)
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should read a route word in another case and mint it in lowercase', () => {
@@ -114,7 +114,7 @@ describe('listennotesResolveEmbed', () => {
         height: 180,
       }
 
-      expect(listennotesResolveEmbed(value)).toEqual(expected)
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -122,64 +122,64 @@ describe('listennotesResolveEmbed', () => {
     it('should return undefined for a podcast page', () => {
       const value = 'https://www.listennotes.com/podcasts/switched-on-pop-vulture-YAyMJOkLo-7/'
 
-      expect(listennotesResolveEmbed(value)).toBeUndefined()
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for an episode page', () => {
       const value =
         'https://www.listennotes.com/podcasts/nokia-chronicles/david-wood-symbian-psion-XGD3Cq8pn9j/'
 
-      expect(listennotesResolveEmbed(value)).toBeUndefined()
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a playlist page', () => {
       const value = 'https://www.listennotes.com/playlists/altacities-ulimv5yN7ZW/podcasts/'
 
-      expect(listennotesResolveEmbed(value)).toBeUndefined()
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the playlist route stopping short of the embed segment', () => {
       const value = 'https://www.listennotes.com/listen/altacities-ulimv5yN7ZW/podcasts/'
 
-      expect(listennotesResolveEmbed(value)).toBeUndefined()
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the hex route naming no episode', () => {
       const value = 'https://www.listennotes.com/embedded/e/'
 
-      expect(listennotesResolveEmbed(value)).toBeUndefined()
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a hex id under another route word', () => {
       const value = 'https://www.listennotes.com/embedded/x/698f97a6d5eb47e0a2ebbfa52b008065/'
 
-      expect(listennotesResolveEmbed(value)).toBeUndefined()
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the hex id under another first route word', () => {
       const value = 'https://www.listennotes.com/shared/e/698f97a6d5eb47e0a2ebbfa52b008065/'
 
-      expect(listennotesResolveEmbed(value)).toBeUndefined()
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the player segments under a route word that is not a player', () => {
       const value =
         'https://www.listennotes.com/channels/switched-on-pop-vulture-YAyMJOkLo-7/embed/'
 
-      expect(listennotesResolveEmbed(value)).toBeUndefined()
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a segment with no short id after a hyphen', () => {
       const value = 'https://www.listennotes.com/podcasts/songexploder/embed/'
 
-      expect(listennotesResolveEmbed(value)).toBeUndefined()
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a leading segment that is not a locale', () => {
       const value =
         'https://www.listennotes.com/abc/podcasts/nokia-chronicles/david-wood-symbian-psion-XGD3Cq8pn9j/embed/'
 
-      expect(listennotesResolveEmbed(value)).toBeUndefined()
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 
@@ -195,7 +195,7 @@ describe('listennotesResolveEmbed', () => {
         height: 180,
       }
 
-      expect(listennotesResolveEmbed(value)).toEqual(expected)
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop a locale with a script subtag opening the hex route', () => {
@@ -209,7 +209,7 @@ describe('listennotesResolveEmbed', () => {
         height: 180,
       }
 
-      expect(listennotesResolveEmbed(value)).toEqual(expected)
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should read a short id holding a hyphen of its own', () => {
@@ -222,7 +222,7 @@ describe('listennotesResolveEmbed', () => {
         height: 600,
       }
 
-      expect(listennotesResolveEmbed(value)).toEqual(expected)
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop the tracking parameter a publisher appended', () => {
@@ -236,7 +236,7 @@ describe('listennotesResolveEmbed', () => {
         height: 180,
       }
 
-      expect(listennotesResolveEmbed(value)).toEqual(expected)
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the start time on the episode player', () => {
@@ -250,7 +250,7 @@ describe('listennotesResolveEmbed', () => {
         height: 180,
       }
 
-      expect(listennotesResolveEmbed(value)).toEqual(expected)
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the start time on the hex episode route', () => {
@@ -263,7 +263,7 @@ describe('listennotesResolveEmbed', () => {
         height: 180,
       }
 
-      expect(listennotesResolveEmbed(value)).toEqual(expected)
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop the start time from the clip player, which ignores it', () => {
@@ -277,7 +277,7 @@ describe('listennotesResolveEmbed', () => {
         height: 300,
       }
 
-      expect(listennotesResolveEmbed(value)).toEqual(expected)
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop the secret hash a WordPress oEmbed iframe carries', () => {
@@ -291,7 +291,7 @@ describe('listennotesResolveEmbed', () => {
         height: 180,
       }
 
-      expect(listennotesResolveEmbed(value)).toEqual(expected)
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should pass a short id the platform never issued through as written', () => {
@@ -304,7 +304,7 @@ describe('listennotesResolveEmbed', () => {
         height: 180,
       }
 
-      expect(listennotesResolveEmbed(value)).toEqual(expected)
+      expect(listennotesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 })

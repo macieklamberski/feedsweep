@@ -333,10 +333,8 @@ export const youtubeResolveEmbed: ResolveEmbed = (url, element) => {
 // `id` names. The generic iframe placeholder for it carries no provider and no poster.
 export const youtubeFc2EmbedResolver = createUrlEmbedResolver(
   ['static.fc2.com'],
-  (url, element) => {
-    const parsed = parseUrl(url)
-
-    if (!parsed || !isAnyOf(parsed.pathname, '/misc/blog/view/ext_youtube_player.html')) {
+  (_url, element, parsed) => {
+    if (!isAnyOf(parsed.pathname, '/misc/blog/view/ext_youtube_player.html')) {
       return
     }
 

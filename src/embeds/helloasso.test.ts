@@ -16,7 +16,7 @@ describe('helloassoResolveEmbed', () => {
         url: 'https://www.helloasso.com/associations/cine-club-du-quartier/formulaires/1',
       }
 
-      expect(helloassoResolveEmbed(value)).toEqual(expected)
+      expect(helloassoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should mint the full form', () => {
@@ -29,7 +29,7 @@ describe('helloassoResolveEmbed', () => {
         url: 'https://www.helloasso.com/associations/cine-club-du-quartier/evenements/nuit-du-court-metrage',
       }
 
-      expect(helloassoResolveEmbed(value)).toEqual(expected)
+      expect(helloassoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should mint the full form in place of the card', () => {
@@ -42,7 +42,7 @@ describe('helloassoResolveEmbed', () => {
         url: 'https://www.helloasso.com/associations/cine-club-du-quartier/collectes/nouveau-projecteur',
       }
 
-      expect(helloassoResolveEmbed(value)).toEqual(expected)
+      expect(helloassoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should mint the full form in place of any other variant', () => {
@@ -55,7 +55,7 @@ describe('helloassoResolveEmbed', () => {
         url: 'https://www.helloasso.com/associations/cine-club-du-quartier/collectes/nouveau-projecteur',
       }
 
-      expect(helloassoResolveEmbed(value)).toEqual(expected)
+      expect(helloassoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -63,26 +63,26 @@ describe('helloassoResolveEmbed', () => {
     it('should ignore the form page, which is a link and not a widget', () => {
       const value = 'https://www.helloasso.com/associations/cine-club-du-quartier/formulaires/1'
 
-      expect(helloassoResolveEmbed(value)).toBeUndefined()
+      expect(helloassoResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a form page whose last segment is not a widget kind', () => {
       const value = 'https://www.helloasso.com/associations/cine-club-du-quartier/formulaires/1/en'
 
-      expect(helloassoResolveEmbed(value)).toBeUndefined()
+      expect(helloassoResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a widget path with a trailing segment', () => {
       const value =
         'https://www.helloasso.com/associations/cine-club-du-quartier/formulaires/1/widget/x'
 
-      expect(helloassoResolveEmbed(value)).toBeUndefined()
+      expect(helloassoResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a widget-shaped path outside the associations route', () => {
       const value = 'https://www.helloasso.com/blog/cine-club-du-quartier/formulaires/1/widget'
 
-      expect(helloassoResolveEmbed(value)).toBeUndefined()
+      expect(helloassoResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 })

@@ -1,5 +1,5 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { getPathSegments, isAnyOf } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -41,13 +41,7 @@ const composeEmbed = (formId: string, carrier: URL): EmbedResolverResult => {
 }
 
 // The form frame, which the platform serves at the bare id and at `/form/{id}` alike.
-export const jotformResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url)
-
-  if (!parsed) {
-    return
-  }
-
+export const jotformResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
   const segments = getPathSegments(parsed)
   const route = isAnyOf(segments[0], 'form') ? segments.slice(1) : segments
   const formId = route[0]

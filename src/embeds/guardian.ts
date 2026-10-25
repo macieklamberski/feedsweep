@@ -1,7 +1,7 @@
-import { parseUrl, toMap } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import { toMap } from 'trousse'
+import type { ResolveUrlEmbed } from '../types.js'
 import { flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const guardianHosts = ['embed.theguardian.com']
@@ -50,9 +50,8 @@ const readDate = (path: string): string | undefined => {
 // and 506 tall and is the whole page, so the height is 16:9 of the width with nothing around it.
 const playerRatio = '16/9'
 
-export const guardianResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const path = parsed?.pathname.match(playerPathRegex)?.[1]
+export const guardianResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
+  const path = parsed.pathname.match(playerPathRegex)?.[1]
 
   if (!path) {
     return
@@ -78,8 +77,8 @@ const endpointPathRegex = /^(?<path>\/.+)\/json$/i
 // flashvar, `{page}/json`, and the page's path plays on today's player.
 export const guardianFlashEmbedResolver = createUrlEmbedResolver(
   guardianFlashHosts,
-  (url, element) => {
-    if (!flashPlayerPathRegex.test(parseUrl(url, placeholderBaseUrl)?.pathname ?? '')) {
+  (_url, element, parsed) => {
+    if (!flashPlayerPathRegex.test(parsed.pathname)) {
       return
     }
 
@@ -90,6 +89,8 @@ export const guardianFlashEmbedResolver = createUrlEmbedResolver(
       return
     }
 
-    return guardianResolveEmbed(`https://embed.theguardian.com/embed/video${path}`)
+    const videoUrl = `https://embed.theguardian.com/embed/video${path}`
+
+    return guardianResolveEmbed(videoUrl, undefined, new URL(videoUrl))
   },
 )

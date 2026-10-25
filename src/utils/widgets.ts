@@ -2,6 +2,7 @@ import {
   isAnyOf,
   isHostOrSubdomainOf,
   type MaybePromise,
+  parseUrl,
   startsWithAnyOf,
   trimObject,
 } from 'trousse'
@@ -13,7 +14,7 @@ import type {
   MediaResolver,
   MediaResolverResult,
   ParseDateFn,
-  ResolveEmbed,
+  ResolveUrlEmbed,
   TransformContext,
   WidgetResolver,
   WidgetResolverResult,
@@ -257,7 +258,7 @@ const unfilledTemplateRegex = /[/=]\$\d+(?=[/?&#]|$)/
 // An iframe's `title` is the one field a publisher's snippet states that the url does not carry.
 export const createUrlEmbedResolver = (
   hosts: Array<string>,
-  extract: ResolveEmbed,
+  extract: ResolveUrlEmbed,
   options: ResolverOptions = {},
 ): EmbedResolver => {
   return {
@@ -265,8 +266,9 @@ export const createUrlEmbedResolver = (
     selector: embedCarrierSelector,
     extract: (element) => {
       const src = readCarrierUrl(element)
+      const carrier = parseUrl(src)
 
-      if (!isHostOrSubdomainOf(src, hosts)) {
+      if (!carrier || !isHostOrSubdomainOf(carrier, hosts)) {
         return
       }
 
@@ -277,8 +279,12 @@ export const createUrlEmbedResolver = (
       }
 
       // Only a resolver reads the glued-query and whitespace repairs. Every frame, claimed or not,
-      // reads the ampersands readCarrierUrl folded.
-      return decideSize(element, extract(repairCarrierUrl(src), element), options.readCarrierSize)
+      // reads the ampersands readCarrierUrl folded. The repairs rewrite only after the host, so
+      // the repaired url parses whenever the carrier did.
+      const url = repairCarrierUrl(src)
+      const parsed = parseUrl(url) ?? carrier
+
+      return decideSize(element, extract(url, element, parsed), options.readCarrierSize)
     },
   }
 }

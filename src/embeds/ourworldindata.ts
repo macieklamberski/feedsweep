@@ -1,5 +1,5 @@
-import { isAnyOf, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import { isAnyOf } from 'trousse'
+import type { ResolveUrlEmbed } from '../types.js'
 import { filterUrlQuery, isFileName } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -43,11 +43,10 @@ const displayParams = [
 const chartHeight = 600
 const explorerHeight = 696
 
-const ourworldindataResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url)
-  const match = parsed?.pathname.match(chartPathRegex)
+const ourworldindataResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
+  const match = parsed.pathname.match(chartPathRegex)
 
-  if (!parsed || !match) {
+  if (!match) {
     return
   }
 

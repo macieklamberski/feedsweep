@@ -180,7 +180,7 @@ describe('vimeoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(vimeoResolveEmbed(value)).toEqual(expected)
+    expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   // The player answers 401 for an unlisted video with no hash, so it has to survive whichever
@@ -195,7 +195,7 @@ describe('vimeoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(vimeoResolveEmbed(value)).toEqual(expected)
+    expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should use a malformed query hash as written, even if the player answers an error', () => {
@@ -208,7 +208,7 @@ describe('vimeoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(vimeoResolveEmbed(value)).toEqual(expected)
+    expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should use a query hash holding the whitespace a feed left in it as written', () => {
@@ -222,7 +222,7 @@ describe('vimeoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(vimeoResolveEmbed(value)).toEqual(expected)
+    expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should use a malformed clip_id as written, even if the player answers an error', () => {
@@ -235,7 +235,7 @@ describe('vimeoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(vimeoResolveEmbed(value)).toEqual(expected)
+    expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   // The share link states it as a path segment, which the player refuses: it takes the hash
@@ -250,7 +250,7 @@ describe('vimeoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(vimeoResolveEmbed(value)).toEqual(expected)
+    expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should use a path hash of another length as written', () => {
@@ -263,7 +263,7 @@ describe('vimeoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(vimeoResolveEmbed(value)).toEqual(expected)
+    expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should use an uppercase path hash as written, even if the player answers an error', () => {
@@ -276,7 +276,7 @@ describe('vimeoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(vimeoResolveEmbed(value)).toEqual(expected)
+    expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should not read a path segment carrying a percent escape as the hash', () => {
@@ -289,7 +289,7 @@ describe('vimeoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(vimeoResolveEmbed(value)).toEqual(expected)
+    expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should read a ten-digit video id after the player route as the video', () => {
@@ -302,7 +302,7 @@ describe('vimeoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(vimeoResolveEmbed(value)).toEqual(expected)
+    expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   // A review link states the hash the same way, two segments further down.
@@ -316,7 +316,7 @@ describe('vimeoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(vimeoResolveEmbed(value)).toEqual(expected)
+    expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should move the start offset a page url carries into the fragment', () => {
@@ -329,7 +329,7 @@ describe('vimeoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(vimeoResolveEmbed(value)).toEqual(expected)
+    expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should move the start offset the query carries into the fragment', () => {
@@ -342,7 +342,7 @@ describe('vimeoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(vimeoResolveEmbed(value)).toEqual(expected)
+    expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should keep the start offset the fragment carries as written', () => {
@@ -355,7 +355,7 @@ describe('vimeoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(vimeoResolveEmbed(value)).toEqual(expected)
+    expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should read the fragment start offset ahead of the query one', () => {
@@ -368,7 +368,7 @@ describe('vimeoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(vimeoResolveEmbed(value)).toEqual(expected)
+    expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should drop an empty start offset', () => {
@@ -381,7 +381,7 @@ describe('vimeoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(vimeoResolveEmbed(value)).toEqual(expected)
+    expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should keep the loop and drop the look', () => {
@@ -394,7 +394,7 @@ describe('vimeoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(vimeoResolveEmbed(value)).toEqual(expected)
+    expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should drop tracking parameters', () => {
@@ -407,13 +407,13 @@ describe('vimeoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(vimeoResolveEmbed(value)).toEqual(expected)
+    expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a url naming no video', () => {
     const value = 'https://vimeo.com/user/profile'
 
-    expect(vimeoResolveEmbed(value)).toBeUndefined()
+    expect(vimeoResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
   })
 
   // A showcase is a playlist in its own id space, so it resolves as itself rather than as the
@@ -429,7 +429,7 @@ describe('vimeoResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(vimeoResolveEmbed(value)).toEqual(expected)
+      expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     // The album player 301s onto the showcase one, so the id travels in the spelling Vimeo
@@ -444,7 +444,7 @@ describe('vimeoResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(vimeoResolveEmbed(value)).toEqual(expected)
+      expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should build the player from a bare showcase page url', () => {
@@ -457,7 +457,7 @@ describe('vimeoResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(vimeoResolveEmbed(value)).toEqual(expected)
+      expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     // The deeper path still names a real video, and a video beats the collection around it.
@@ -471,19 +471,19 @@ describe('vimeoResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(vimeoResolveEmbed(value)).toEqual(expected)
+      expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should refuse a showcase path whose id is not numeric', () => {
       const value = 'https://vimeo.com/showcase/highlights/embed'
 
-      expect(vimeoResolveEmbed(value)).toBeUndefined()
+      expect(vimeoResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should still leave an on-demand store front unresolved', () => {
       const value = 'https://vimeo.com/ondemand/20704'
 
-      expect(vimeoResolveEmbed(value)).toBeUndefined()
+      expect(vimeoResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 
@@ -500,7 +500,7 @@ describe('vimeoResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(vimeoResolveEmbed(value)).toEqual(expected)
+      expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     // The event page refuses framing, so a frame of it shows nothing.
@@ -514,7 +514,7 @@ describe('vimeoResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(vimeoResolveEmbed(value)).toEqual(expected)
+      expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should carry the hash of an unlisted event embed', () => {
@@ -527,7 +527,7 @@ describe('vimeoResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(vimeoResolveEmbed(value)).toEqual(expected)
+      expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should carry an event hash of another length as written', () => {
@@ -540,7 +540,7 @@ describe('vimeoResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(vimeoResolveEmbed(value)).toEqual(expected)
+      expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should use an uppercase event hash as written, even if the player answers an error', () => {
@@ -553,7 +553,7 @@ describe('vimeoResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(vimeoResolveEmbed(value)).toEqual(expected)
+      expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should build the player from an unlisted event page url', () => {
@@ -566,7 +566,7 @@ describe('vimeoResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(vimeoResolveEmbed(value)).toEqual(expected)
+      expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop the interaction panel from an event embed', () => {
@@ -579,7 +579,7 @@ describe('vimeoResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(vimeoResolveEmbed(value)).toEqual(expected)
+      expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop the interaction panel from an unlisted event embed', () => {
@@ -592,7 +592,7 @@ describe('vimeoResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(vimeoResolveEmbed(value)).toEqual(expected)
+      expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should drop the query an event embed carries', () => {
@@ -605,31 +605,31 @@ describe('vimeoResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(vimeoResolveEmbed(value)).toEqual(expected)
+      expect(vimeoResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should refuse the chat embed of an event', () => {
       const value = 'https://vimeo.com/event/22567/chat'
 
-      expect(vimeoResolveEmbed(value)).toBeUndefined()
+      expect(vimeoResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should refuse a route word after the event embed that is not a layout', () => {
       const value = 'https://vimeo.com/event/6084402/embed/schedule'
 
-      expect(vimeoResolveEmbed(value)).toBeUndefined()
+      expect(vimeoResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should refuse a second segment after the interaction panel', () => {
       const value = 'https://vimeo.com/event/6084402/embed/interaction/extra'
 
-      expect(vimeoResolveEmbed(value)).toBeUndefined()
+      expect(vimeoResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should refuse an event path whose id is not numeric', () => {
       const value = 'https://vimeo.com/event/launch/embed'
 
-      expect(vimeoResolveEmbed(value)).toBeUndefined()
+      expect(vimeoResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 
@@ -638,7 +638,7 @@ describe('vimeoResolveEmbed', () => {
   it('should not mint a player from a channel listing', () => {
     const value = 'https://vimeo.com/channels/927'
 
-    expect(vimeoResolveEmbed(value)).toBeUndefined()
+    expect(vimeoResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
   })
 })
 

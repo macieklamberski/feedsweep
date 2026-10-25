@@ -1,7 +1,12 @@
-import { getPathSegments, getQueryParam, isAnyOf, isPlainObject, parseUrl, toMap } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
+import { getPathSegments, getQueryParam, isAnyOf, isPlainObject, toMap } from 'trousse'
+import type {
+  EmbedRenderHint,
+  EmbedResolverResult,
+  FieldCleaner,
+  ResolveUrlEmbed,
+} from '../types.js'
 import { attr, jsonAttr } from '../utils/dom.js'
-import { parseUrlOnHosts, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The player is fluid-width and fixed-height: a compact bar for a single item, a taller box for
@@ -84,13 +89,7 @@ const readPathPair = (url: URL | undefined): [string, string] | undefined => {
 }
 
 // Spotify's player iframe, in the modern path form and the pre-2017 embed.spotify.com/?uri= form.
-export const spotifyResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
+export const spotifyResolveEmbed: ResolveUrlEmbed = (url, element, parsed) => {
   // The `uri` parameter also carries an open.spotify.com url, in every spelling the carrier's own
   // path has: the `intl-{lang}` prefix, an `/embed/` prefix and the `user/{handle}/playlist/{id}`
   // ownership form.

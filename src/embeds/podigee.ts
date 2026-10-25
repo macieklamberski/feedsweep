@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf, isPlainObject, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest, readPixels } from '../utils/hints.js'
 import { placeholderBaseUrl, repairCarrierUrl } from '../utils/urls.js'
@@ -50,18 +50,20 @@ export const podigeeScriptEmbedResolver = createMarkupEmbedResolver(
     const configuration = repairCarrierUrl(attr(element, 'data-configuration') ?? '')
     const parsed = parseUrl(configuration, placeholderBaseUrl)
 
-    if (parsed && showHostRegex.test(parsed.hostname) && isAnyOf(parsed.pathname, '/embed')) {
+    if (!parsed) {
+      return
+    }
+
+    if (showHostRegex.test(parsed.hostname) && isAnyOf(parsed.pathname, '/embed')) {
       return composeEmbed(parsed)
     }
 
-    return podigeeResolveEmbed(configuration)
+    return podigeeResolveEmbed(configuration, element, parsed)
   },
 )
 
-export const podigeeResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed || !showHostRegex.test(parsed.hostname)) {
+export const podigeeResolveEmbed: ResolveUrlEmbed = (_url, _element, parsed) => {
+  if (!showHostRegex.test(parsed.hostname)) {
     return
   }
 

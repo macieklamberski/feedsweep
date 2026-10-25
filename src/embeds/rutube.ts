@@ -1,7 +1,7 @@
-import { encodePathSegment, getQueryParam, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { encodePathSegment, getQueryParam } from 'trousse'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
-import { hexRegex, pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
+import { hexRegex, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'rutube'
@@ -34,13 +34,7 @@ const composeEmbed = (videoId: string, parsed: URL): EmbedResolverResult => {
   }
 }
 
-export const rutubeResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
+export const rutubeResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
   // An id is a uuid with the dashes stripped, and the player still plays the all-digit ids the same
   // routes carried before.
   const videoId = playlistPathRegex.test(parsed.pathname)

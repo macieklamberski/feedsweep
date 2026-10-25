@@ -17,7 +17,7 @@ describe('googleslidesResolveEmbed', () => {
         ratio: '480/299',
       }
 
-      expect(googleslidesResolveEmbed(value)).toEqual(expected)
+      expect(googleslidesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should frame a published deck on /embed when the carrier names /pubembed', () => {
@@ -31,7 +31,7 @@ describe('googleslidesResolveEmbed', () => {
         ratio: '480/299',
       }
 
-      expect(googleslidesResolveEmbed(value)).toEqual(expected)
+      expect(googleslidesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should frame a published deck on /embed when the carrier names its /pub page', () => {
@@ -45,7 +45,7 @@ describe('googleslidesResolveEmbed', () => {
         ratio: '480/299',
       }
 
-      expect(googleslidesResolveEmbed(value)).toEqual(expected)
+      expect(googleslidesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the fragment of a deck frame', () => {
@@ -59,7 +59,7 @@ describe('googleslidesResolveEmbed', () => {
         ratio: '480/299',
       }
 
-      expect(googleslidesResolveEmbed(value)).toEqual(expected)
+      expect(googleslidesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep only the slide a shared fragment opens on', () => {
@@ -73,7 +73,7 @@ describe('googleslidesResolveEmbed', () => {
         ratio: '480/299',
       }
 
-      expect(googleslidesResolveEmbed(value)).toEqual(expected)
+      expect(googleslidesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should resolve a deck framed by its file id', () => {
@@ -87,7 +87,7 @@ describe('googleslidesResolveEmbed', () => {
         ratio: '480/299',
       }
 
-      expect(googleslidesResolveEmbed(value)).toEqual(expected)
+      expect(googleslidesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should frame a deck on /embed and drop the share tracker when the carrier names its /edit page', () => {
@@ -101,7 +101,7 @@ describe('googleslidesResolveEmbed', () => {
         ratio: '480/299',
       }
 
-      expect(googleslidesResolveEmbed(value)).toEqual(expected)
+      expect(googleslidesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should frame a deck on /embed when the carrier names its /preview page', () => {
@@ -115,7 +115,7 @@ describe('googleslidesResolveEmbed', () => {
         ratio: '480/299',
       }
 
-      expect(googleslidesResolveEmbed(value)).toEqual(expected)
+      expect(googleslidesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should frame a deck on /embed when the carrier names no route after the id', () => {
@@ -129,7 +129,7 @@ describe('googleslidesResolveEmbed', () => {
         ratio: '480/299',
       }
 
-      expect(googleslidesResolveEmbed(value)).toEqual(expected)
+      expect(googleslidesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should keep the start slide of a deck frame', () => {
@@ -143,7 +143,7 @@ describe('googleslidesResolveEmbed', () => {
         ratio: '480/299',
       }
 
-      expect(googleslidesResolveEmbed(value)).toEqual(expected)
+      expect(googleslidesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should rebuild the legacy frame that names the file id in its query onto the current player', () => {
@@ -157,7 +157,7 @@ describe('googleslidesResolveEmbed', () => {
         ratio: '480/299',
       }
 
-      expect(googleslidesResolveEmbed(value)).toEqual(expected)
+      expect(googleslidesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -166,46 +166,46 @@ describe('googleslidesResolveEmbed', () => {
       const value =
         'https://docs.google.com/presentation/d/1k5NXExE8IvVgEIAwhxzwNw93Kt6f8Yqp1K7TuSigXiE/export/pdf'
 
-      expect(googleslidesResolveEmbed(value)).toBeUndefined()
+      expect(googleslidesResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a published deck on a route that is not a page', () => {
       const value =
         'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/export'
 
-      expect(googleslidesResolveEmbed(value)).toBeUndefined()
+      expect(googleslidesResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a deck route with a foreign word before the id', () => {
       const value =
         'https://docs.google.com/presentation/x/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/embed'
 
-      expect(googleslidesResolveEmbed(value)).toBeUndefined()
+      expect(googleslidesResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a form on the same host', () => {
       const value = 'https://docs.google.com/forms/d/e/1FAIpQLSfQq3/viewform?embedded=true'
 
-      expect(googleslidesResolveEmbed(value)).toBeUndefined()
+      expect(googleslidesResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a document on the same host', () => {
       const value = 'https://docs.google.com/document/d/e/2PACX-1vT/pub?embedded=true'
 
-      expect(googleslidesResolveEmbed(value)).toBeUndefined()
+      expect(googleslidesResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore a sheet on the same host', () => {
       const value = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT/pubhtml'
 
-      expect(googleslidesResolveEmbed(value)).toBeUndefined()
+      expect(googleslidesResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
 
     it('should ignore the pdf viewer on the same host', () => {
       const value =
         'https://docs.google.com/viewer?url=https%3A%2F%2Fexample.com%2Fa.pdf&embedded=true'
 
-      expect(googleslidesResolveEmbed(value)).toBeUndefined()
+      expect(googleslidesResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 
@@ -220,7 +220,7 @@ describe('googleslidesResolveEmbed', () => {
         ratio: '480/299',
       }
 
-      expect(googleslidesResolveEmbed(value)).toEqual(expected)
+      expect(googleslidesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should use a malformed legacy file id as written, even if the player answers an error', () => {
@@ -233,7 +233,7 @@ describe('googleslidesResolveEmbed', () => {
         ratio: '480/299',
       }
 
-      expect(googleslidesResolveEmbed(value)).toEqual(expected)
+      expect(googleslidesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should use a malformed legacy file id carrying an encoded slash as written, even if the player answers an error', () => {
@@ -247,7 +247,7 @@ describe('googleslidesResolveEmbed', () => {
         ratio: '480/299',
       }
 
-      expect(googleslidesResolveEmbed(value)).toEqual(expected)
+      expect(googleslidesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
@@ -263,7 +263,7 @@ describe('googleslidesResolveEmbed', () => {
         ratio: '480/299',
       }
 
-      expect(googleslidesResolveEmbed(value)).toEqual(expected)
+      expect(googleslidesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should frame a deck behind a Workspace prefix on /embed when the carrier names /preview', () => {
@@ -277,14 +277,14 @@ describe('googleslidesResolveEmbed', () => {
         ratio: '480/299',
       }
 
-      expect(googleslidesResolveEmbed(value)).toEqual(expected)
+      expect(googleslidesResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
 
     it('should ignore a deck behind a prefix that is not a Workspace domain', () => {
       const value =
         'https://docs.google.com/x/redhat.com/presentation/d/e/2PACX-1vQEcK-_l5PvQtIMVBRj1_2TU3M52F44esHEVSVfDvYVcvfsDFk9JsY6mvGgPgPp5nfCDw2RwMg8s231/embed'
 
-      expect(googleslidesResolveEmbed(value)).toBeUndefined()
+      expect(googleslidesResolveEmbed(value, undefined, new URL(value))).toBeUndefined()
     })
   })
 })

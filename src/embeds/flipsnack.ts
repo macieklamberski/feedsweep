@@ -1,5 +1,5 @@
-import { composeQuery, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import { composeQuery, getQueryParam, isAnyOf } from 'trousse'
+import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -45,13 +45,7 @@ const readItemHash = (parsed: URL): string | undefined => {
 
 // Flipsnack's flipbook player at `player.flipsnack.com`, the widget at `cdn.flipsnack.com` and the
 // Flash-era frame at `files.flipsnack.com` all mint onto widget v2, which plays every item.
-const flipsnackResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url)
-
-  if (!parsed) {
-    return
-  }
-
+const flipsnackResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
   const itemHash = readItemHash(parsed)
 
   if (!itemHash) {

@@ -1,8 +1,8 @@
-import { encodePathSegment, getQueryParam, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { encodePathSegment, getQueryParam } from 'trousse'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 import { readIframeResizeHeight } from '../utils/hints.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'infogram'
@@ -82,11 +82,10 @@ export const infogramScriptEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-const infogramResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const chartId = keepIfMatches(parsed?.pathname.slice(1), chartIdRegex)
+const infogramResolveEmbed: ResolveUrlEmbed = (_url, element, parsed) => {
+  const chartId = keepIfMatches(parsed.pathname.slice(1), chartIdRegex)
 
-  if (!parsed || !chartId) {
+  if (!chartId) {
     return
   }
 
