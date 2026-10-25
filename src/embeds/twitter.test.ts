@@ -1618,6 +1618,27 @@ describeForEachParser('twitter shapes asserted on the pipeline', (parseHtml) => 
       expect(await placeholder(value)).toEqual(expected)
     })
   })
+
+  describe('Variant #11: tweet text beside the byline with no paragraph of its own', () => {
+    it('should read the text before the line break as the description', async () => {
+      const value = html`
+        <blockquote class="twitter-tweet">
+          I'd love to see some serious environmental writer do a post on what good things might come from global warming. Surely there must be some.<br />
+          — Megan McArdle (@asymmetricinfo) <a href="https://twitter.com/asymmetricinfo/status/336850961828024323">May 21, 2013</a></blockquote>
+      `
+      const expected: Record<string, string> = {
+        provider: 'twitter',
+        id: '336850961828024323',
+        src: 'https://platform.twitter.com/embed/Tweet.html?id=336850961828024323',
+        url: 'https://x.com/asymmetricinfo/status/336850961828024323',
+        description:
+          "I'd love to see some serious environmental writer do a post on what good things might come from global warming. Surely there must be some.",
+        author: '@asymmetricinfo',
+      }
+
+      expect(await placeholder(value)).toEqual(expected)
+    })
+  })
 })
 
 describe('readTwitterHeight', () => {

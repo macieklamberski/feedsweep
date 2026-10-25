@@ -116,6 +116,20 @@ const readAuthor = (status: Status): string | undefined => {
   return atUsername(status.handle)
 }
 
+// A blockquote with no paragraph of its own keeps the tweet text in the byline's paragraph,
+// ahead of the line break before the byline.
+const readLeadText = (byline: Element | null | undefined): string | undefined => {
+  const parts: Array<string> = []
+
+  for (const node of Array.from(byline?.childNodes ?? [])) {
+    if (node.nodeName === 'BR') {
+      return parts.join('').trim() || undefined
+    }
+
+    parts.push(node.textContent ?? '')
+  }
+}
+
 // The tweet text: every paragraph but the one holding the dated anchor, which is the byline once
 // the pipeline has wrapped it. A long tweet spans several paragraphs.
 const readContent = (element: Element, status: Status, anchor: Element | undefined) => {
@@ -127,7 +141,7 @@ const readContent = (element: Element, status: Status, anchor: Element | undefin
     .join('\n')
 
   return {
-    description: body || undefined,
+    description: body || readLeadText(byline),
     author: readAuthor(status),
   }
 }
