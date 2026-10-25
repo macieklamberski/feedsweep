@@ -111,6 +111,14 @@ describeForEachParser('padletEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    // Constructed: the lab's board page carries nothing after the board id.
+    it('should ignore a path below a board page', async () => {
+      const value =
+        '<iframe src="https://padlet.com/gwusa/for-our-parks-for-our-future-9gm8z3x03iuwt1zp/extra"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a board page slug with no id after a hyphen', async () => {
       const value = '<iframe src="https://padlet.com/gwusa/parks"></iframe>'
 

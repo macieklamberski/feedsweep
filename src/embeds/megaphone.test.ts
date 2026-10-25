@@ -174,6 +174,13 @@ describe('extractMegaphoneEmbed on the legacy episode player', () => {
 
     expect(extractMegaphoneEmbed(value)).toBeUndefined()
   })
+
+  // Constructed: no lab carrier writes anything but letters before the episode digits.
+  it('should ignore an episode prefix holding an escaped path separator', () => {
+    const value = 'https://player.megaphone.fm/VMP%2F9785445903'
+
+    expect(extractMegaphoneEmbed(value)).toBeUndefined()
+  })
 })
 
 describe('megaphoneResolveEmbed', () => {

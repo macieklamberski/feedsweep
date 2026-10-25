@@ -372,6 +372,30 @@ describeForEachParser('bbcIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    // Constructed: the lab's news players name their article at the root of the news section.
+    it('should ignore a news player naming an article page under another segment', async () => {
+      const value = html`
+        <embed
+          src="http://news.bbc.co.uk/player/emp/external/player.swf"
+          flashvars="externalIdentifier=p00h8wqt&embedPageUrl=http://www.bbc.co.uk/x/news/technology-13614478"
+        ></embed>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    // Constructed: the lab's news players name their article page with nothing after it.
+    it('should ignore a news player naming a path below an article page', async () => {
+      const value = html`
+        <embed
+          src="http://news.bbc.co.uk/player/emp/external/player.swf"
+          flashvars="externalIdentifier=p00h8wqt&embedPageUrl=http://www.bbc.co.uk/news/technology-13614478/extra"
+        ></embed>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a news player naming its clip with no article page', async () => {
       const value = html`
         <embed
