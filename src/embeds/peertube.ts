@@ -55,9 +55,8 @@ const parseVideo = (link: string): PeertubeVideo | undefined => {
   return { origin: url.origin, id }
 }
 
-// Where playback starts and stops, whether it loops, and the subtitle language the publisher
-// chose. The rest of the query sets the player's chrome, which is the reader's to choose.
-const peertubeEmbedParams = ['start', 'stop', 'loop', 'subtitle']
+// Where playback starts and stops, and whether it loops. The rest is the reader's to choose.
+const peertubeEmbedParams = ['start', 'stop', 'loop']
 
 // A PeerTube video, framed as the bare player or as the watch page. A framed watch page loads the
 // instance's whole page, header and comments around the player, so the src is rebuilt either way.
