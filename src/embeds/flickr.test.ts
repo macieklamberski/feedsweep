@@ -555,7 +555,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams/17367418@N03 ',
-        src: 'https://embedr.flickr.com/photostreams/17367418@N03%20?width=400&height=300',
+        src: 'https://www.flickr.com/photos/17367418@N03%20/player?width=400&height=300',
         url: 'https://www.flickr.com/photos/17367418@N03%20/',
         width: 400,
         height: 300,
@@ -698,6 +698,22 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
         url: 'https://www.flickr.com/photos/strictly.kev/15753890338/',
         author: 'strictly.kev',
         ratio: '4/3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a group NSID with a three-digit suffix as written', async () => {
+      const value = html`
+        <iframe src="https://www.flickr.com/groups/1753363@N230/pool/show/"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'groups/1753363@N230',
+        src: 'https://embedr.flickr.com/groups/1753363@N230?width=400&height=300',
+        url: 'https://www.flickr.com/groups/1753363@N230/',
+        width: 400,
+        height: 300,
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1340,34 +1356,18 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep a group id opening with an encoded traversal inside one path segment', async () => {
+    it('should return undefined for a group id opening with an encoded traversal', async () => {
       const value =
         '<iframe src="https://www.flickr.com/slideShow/index.gne?group_id=..%2F797770@N21"></iframe>'
-      const expected: EmbedResolverResult = {
-        provider: 'flickr',
-        id: 'groups/../797770@N21',
-        src: 'https://embedr.flickr.com/groups/..%2F797770@N21?width=400&height=300',
-        url: 'https://www.flickr.com/groups/..%2F797770@N21/',
-        width: 400,
-        height: 300,
-      }
 
-      expect(await extract(value)).toEqual(expected)
+      expect(await extract(value)).toBeUndefined()
     })
 
-    it('should keep a group id closing with an encoded traversal inside one path segment', async () => {
+    it('should return undefined for a group id closing with an encoded traversal', async () => {
       const value =
         '<iframe src="https://www.flickr.com/slideShow/index.gne?group_id=797770@N21%2F.."></iframe>'
-      const expected: EmbedResolverResult = {
-        provider: 'flickr',
-        id: 'groups/797770@N21/..',
-        src: 'https://embedr.flickr.com/groups/797770@N21%2F..?width=400&height=300',
-        url: 'https://www.flickr.com/groups/797770@N21%2F../',
-        width: 400,
-        height: 300,
-      }
 
-      expect(await extract(value)).toEqual(expected)
+      expect(await extract(value)).toBeUndefined()
     })
 
     it('should return undefined for a carrier on another host', async () => {

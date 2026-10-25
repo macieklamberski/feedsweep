@@ -10,7 +10,12 @@ import {
 } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
 import { attr, jsonAttr, text } from '../utils/dom.js'
-import { isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  isFileName,
+  parseUrlOnHosts,
+  placeholderBaseUrl,
+  wordOrHyphenRegex,
+} from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'soundcloud'
@@ -97,9 +102,9 @@ const sitePathSegments = [
 // A page url names its kind by shape: one segment is the user, `sets` marks a playlist, and a
 // second segment is otherwise the track.
 const readPageKind = (segments: Array<string>): string | undefined => {
-  // A permalink admits letters, digits, dashes and underscores and no dot at all, so a last
-  // segment naming a file of any kind is a file.
-  if (isFileName(segments[segments.length - 1] ?? '')) {
+  // A permalink admits letters, digits, dashes and underscores and no dot at all, so a segment
+  // outside that names a file or another page of the site.
+  if (!segments.every((segment) => wordOrHyphenRegex.test(segment))) {
     return
   }
 

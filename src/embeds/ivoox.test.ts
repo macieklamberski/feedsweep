@@ -163,11 +163,28 @@ describe('extractIvooxSubject', () => {
     expect(extractIvooxSubject(value)).toEqual(expected)
   })
 
-  it('should use a malformed podcast id as written, even if the player answers an error', () => {
+  it('should return undefined for a podcast id that is not digits', () => {
     const value = 'https://www.ivoox.com/player_es_podcast_x1267769_1.html'
+
+    expect(extractIvooxSubject(value)).toBeUndefined()
+  })
+
+  it('should read a podcast id of unusual length as written', () => {
+    const value = 'https://www.ivoox.com/player_es_podcast_123456789012_1.html'
     const expected: IvooxSubject = {
       kind: 'show',
-      id: 'x1267769',
+      id: '123456789012',
+      page: '1',
+    }
+
+    expect(extractIvooxSubject(value)).toEqual(expected)
+  })
+
+  it('should read the legacy player in the case its own snippet wrote', () => {
+    const value = 'http://www.ivoox.com/playeriVoox_em_7041_1.html'
+    const expected: IvooxSubject = {
+      kind: 'episode',
+      id: '7041',
       page: '1',
     }
 

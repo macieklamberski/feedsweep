@@ -15,7 +15,9 @@ export type MastodonStatus = {
 
 // A full handle, /@user@origin/{id}, 302s to a page served x-frame-options: DENY.
 // Six or more digits keep brunch.co.kr/@{user}/{n} posts out of the Discourse cite path.
-const statusPathRegex = /^\/@([\w.-]+)\/(\d{6,})(?:\/embed)?\/?$/i
+const statusPathRegex = /^\/@(?<user>[\w.-]+)\/(?<id>\d{6,})(?:\/embed)?\/?$/i
+// The ActivityPub spelling of the same status, which plays the same embed.
+const usersStatusPathRegex = /^\/users\/(?<user>[\w.-]+)\/statuses\/(?<id>\d{6,})(?:\/embed)?\/?$/i
 
 // Any host filing posts under an author and a number takes this shape, brunch.co.kr among them.
 export const parseMastodonStatus = (link: string): MastodonStatus | undefined => {
@@ -26,13 +28,13 @@ export const parseMastodonStatus = (link: string): MastodonStatus | undefined =>
     return
   }
 
-  const match = statusPathRegex.exec(parsed.pathname)
+  const match = statusPathRegex.exec(parsed.pathname) ?? usersStatusPathRegex.exec(parsed.pathname)
 
-  if (!match) {
+  if (!match?.groups) {
     return
   }
 
-  return { origin: parsed.origin, host: parsed.host, user: match[1], id: match[2] }
+  return { origin: parsed.origin, host: parsed.host, user: match.groups.user, id: match.groups.id }
 }
 
 const composeEmbedResult = (status: MastodonStatus): EmbedResolverResult => {

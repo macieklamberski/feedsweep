@@ -32,6 +32,7 @@ export const absoluteUrlRegex = /^[a-z][a-z0-9+.-]*:/i
 export const digitsRegex = /^\d+$/
 export const alphanumericRegex = /^[A-Za-z0-9]+$/
 export const hexRegex = /^[0-9a-f]+$/i
+export const wordOrHyphenRegex = /^[\w-]+$/
 export const lettersRegex = /^[a-z]+$/i
 export const hyphenatedLettersRegex = /^[a-z]+-[a-z]+$/i
 

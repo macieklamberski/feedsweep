@@ -682,6 +682,19 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    // A permalink is letters, digits, underscores and dashes, so a dotted segment names a file
+    // the site serves, whatever its extension.
+    it('should not read a dotted segment as a permalink', async () => {
+      const value = '<iframe src="https://soundcloud.com/robots.txt"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'soundcloud',
+        src: 'https://soundcloud.com/robots.txt',
+        height: 166,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // The shortener answers a redirect, so the code is not a permalink: reading it as one names
     // `soundcloud.com/{code}`, which does not exist. The widget resolves the short url itself.
     it('should hand a share short link to the widget rather than rebuild it as a page', async () => {

@@ -9,7 +9,7 @@ import {
 import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'spreaker'
@@ -36,9 +36,16 @@ export const extractSpreakerEmbed = (
   for (const [param, kind] of Object.entries(embedKinds)) {
     const id = getQueryParam(parsed.searchParams, param)
 
-    if (id) {
-      return { kind, param, id }
+    if (!id) {
+      continue
     }
+
+    // An episode id outside the class refuses the carrier, never falling through to the show.
+    if (!digitsRegex.test(id)) {
+      return
+    }
+
+    return { kind, param, id }
   }
 }
 
