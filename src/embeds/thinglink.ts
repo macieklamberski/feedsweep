@@ -43,7 +43,8 @@ export const thinglinkResolveEmbed: ResolveEmbed = (url) => {
     provider: 'thinglink',
     id,
     src: `https://www.thinglink.com/card/${id}`,
-    url: `https://www.thinglink.com/card/${id}`,
+    // ThingLink's oEmbed answers the `scene` page and refuses the `card` viewer.
+    url: `https://www.thinglink.com/scene/${id}`,
     thumbnail: composePosterUrl(id),
     ratio: '3/2',
   }

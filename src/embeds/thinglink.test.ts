@@ -32,7 +32,7 @@ describe('thinglinkResolveEmbed', () => {
         provider: 'thinglink',
         id: '853609259307368449',
         src: 'https://www.thinglink.com/card/853609259307368449',
-        url: 'https://www.thinglink.com/card/853609259307368449',
+        url: 'https://www.thinglink.com/scene/853609259307368449',
         thumbnail: 'https://cdn.thinglink.me/api/image/853609259307368449/1024/10/scaletowidth',
         ratio: '3/2',
       }
@@ -46,7 +46,7 @@ describe('thinglinkResolveEmbed', () => {
         provider: 'thinglink',
         id: '1681632338456346625',
         src: 'https://www.thinglink.com/card/1681632338456346625',
-        url: 'https://www.thinglink.com/card/1681632338456346625',
+        url: 'https://www.thinglink.com/scene/1681632338456346625',
         ratio: '3/2',
       }
 
@@ -93,7 +93,7 @@ describe('thinglinkResolveEmbed', () => {
         provider: 'thinglink',
         id: '8536092593073684%2Fother',
         src: 'https://www.thinglink.com/card/8536092593073684%2Fother',
-        url: 'https://www.thinglink.com/card/8536092593073684%2Fother',
+        url: 'https://www.thinglink.com/scene/8536092593073684%2Fother',
         ratio: '3/2',
       }
 
@@ -120,7 +120,7 @@ describe('thinglinkResolveEmbed', () => {
         provider: 'thinglink',
         id: '794327401873014786',
         src: 'https://www.thinglink.com/card/794327401873014786',
-        url: 'https://www.thinglink.com/card/794327401873014786',
+        url: 'https://www.thinglink.com/scene/794327401873014786',
         thumbnail: 'https://cdn.thinglink.me/api/image/794327401873014786/1024/10/scaletowidth',
         ratio: '3/2',
       }
@@ -134,7 +134,7 @@ describe('thinglinkResolveEmbed', () => {
         provider: 'thinglink',
         id: '1349876451188408322',
         src: 'https://www.thinglink.com/card/1349876451188408322',
-        url: 'https://www.thinglink.com/card/1349876451188408322',
+        url: 'https://www.thinglink.com/scene/1349876451188408322',
         ratio: '3/2',
       }
 
@@ -149,7 +149,7 @@ describe('thinglinkResolveEmbed', () => {
         provider: 'thinglink',
         id: '794327401873014786',
         src: 'https://www.thinglink.com/card/794327401873014786',
-        url: 'https://www.thinglink.com/card/794327401873014786',
+        url: 'https://www.thinglink.com/scene/794327401873014786',
         thumbnail: 'https://cdn.thinglink.me/api/image/794327401873014786/1024/10/scaletowidth',
         ratio: '3/2',
       }
@@ -163,7 +163,7 @@ describe('thinglinkResolveEmbed', () => {
         provider: 'thinglink',
         id: '853609259307368449',
         src: 'https://www.thinglink.com/card/853609259307368449',
-        url: 'https://www.thinglink.com/card/853609259307368449',
+        url: 'https://www.thinglink.com/scene/853609259307368449',
         thumbnail: 'https://cdn.thinglink.me/api/image/853609259307368449/1024/10/scaletowidth',
         ratio: '3/2',
       }
@@ -177,7 +177,7 @@ describe('thinglinkResolveEmbed', () => {
         provider: 'thinglink',
         id: '1681632338456346625',
         src: 'https://www.thinglink.com/card/1681632338456346625',
-        url: 'https://www.thinglink.com/card/1681632338456346625',
+        url: 'https://www.thinglink.com/scene/1681632338456346625',
         ratio: '3/2',
       }
 
@@ -192,7 +192,7 @@ describe('thinglinkResolveEmbed', () => {
         provider: 'thinglink',
         id: '496982514175311874',
         src: 'https://www.thinglink.com/card/496982514175311874',
-        url: 'https://www.thinglink.com/card/496982514175311874',
+        url: 'https://www.thinglink.com/scene/496982514175311874',
         thumbnail: 'https://cdn.thinglink.me/api/image/496982514175311874/1024/10/scaletowidth',
         ratio: '3/2',
       }
@@ -206,7 +206,7 @@ describe('thinglinkResolveEmbed', () => {
         provider: 'thinglink',
         id: '1199999999999999999',
         src: 'https://www.thinglink.com/card/1199999999999999999',
-        url: 'https://www.thinglink.com/card/1199999999999999999',
+        url: 'https://www.thinglink.com/scene/1199999999999999999',
         thumbnail: 'https://cdn.thinglink.me/api/image/1199999999999999999/1024/10/scaletowidth',
         ratio: '3/2',
       }
@@ -220,7 +220,7 @@ describe('thinglinkResolveEmbed', () => {
         provider: 'thinglink',
         id: '1200000000000000000',
         src: 'https://www.thinglink.com/card/1200000000000000000',
-        url: 'https://www.thinglink.com/card/1200000000000000000',
+        url: 'https://www.thinglink.com/scene/1200000000000000000',
         ratio: '3/2',
       }
 
@@ -233,7 +233,7 @@ describe('thinglinkResolveEmbed', () => {
         provider: 'thinglink',
         id: '1681632338456346625',
         src: 'https://www.thinglink.com/card/1681632338456346625',
-        url: 'https://www.thinglink.com/card/1681632338456346625',
+        url: 'https://www.thinglink.com/scene/1681632338456346625',
         ratio: '3/2',
       }
 
@@ -261,7 +261,7 @@ describeForEachParser('thinglinkEmbedResolver', (parseHtml) => {
         provider: 'thinglink',
         id: '853609259307368449',
         src: 'https://www.thinglink.com/card/853609259307368449',
-        url: 'https://www.thinglink.com/card/853609259307368449',
+        url: 'https://www.thinglink.com/scene/853609259307368449',
         thumbnail: 'https://cdn.thinglink.me/api/image/853609259307368449/1024/10/scaletowidth',
         ratio: '3/2',
       }
@@ -286,7 +286,7 @@ describeForEachParser('thinglinkEmbedResolver', (parseHtml) => {
         provider: 'thinglink',
         id: '1681632338456346625',
         src: 'https://www.thinglink.com/card/1681632338456346625',
-        url: 'https://www.thinglink.com/card/1681632338456346625',
+        url: 'https://www.thinglink.com/scene/1681632338456346625',
         ratio: '3/2',
       }
 
@@ -301,7 +301,7 @@ describeForEachParser('thinglinkEmbedResolver', (parseHtml) => {
         provider: 'thinglink',
         id: '1318748169202302978',
         src: 'https://www.thinglink.com/card/1318748169202302978',
-        url: 'https://www.thinglink.com/card/1318748169202302978',
+        url: 'https://www.thinglink.com/scene/1318748169202302978',
         ratio: '3/2',
       }
 
@@ -344,7 +344,7 @@ describeForEachParser('thinglink shapes the pipeline repairs first', (parseHtml)
       provider: 'thinglink',
       id: '853609259307368449',
       src: 'https://www.thinglink.com/card/853609259307368449',
-      url: 'https://www.thinglink.com/card/853609259307368449',
+      url: 'https://www.thinglink.com/scene/853609259307368449',
       thumbnail: 'https://cdn.thinglink.me/api/image/853609259307368449/1024/10/scaletowidth',
       ratio: '3/2',
     }

@@ -16,7 +16,7 @@ describe('buzzsproutResolveEmbed', () => {
       provider: 'buzzsprout',
       id: '1735722/8166676',
       src: 'https://www.buzzsprout.com/1735722/8166676?iframe=true',
-      url: 'https://www.buzzsprout.com/1735722/8166676',
+      url: 'https://www.buzzsprout.com/1735722/episodes/8166676',
       height: 200,
     }
 
@@ -56,7 +56,7 @@ describeForEachParser('buzzsproutScriptEmbedResolver', (parseHtml) => {
         provider: 'buzzsprout',
         id: '231452/19565923',
         src: 'https://www.buzzsprout.com/231452/19565923?iframe=true',
-        url: 'https://www.buzzsprout.com/231452/19565923',
+        url: 'https://www.buzzsprout.com/231452/episodes/19565923',
         height: 200,
       }
 
@@ -74,7 +74,7 @@ describeForEachParser('buzzsproutScriptEmbedResolver', (parseHtml) => {
         provider: 'buzzsprout',
         id: '42610/19141080',
         src: 'https://www.buzzsprout.com/42610/19141080?iframe=true',
-        url: 'https://www.buzzsprout.com/42610/19141080',
+        url: 'https://www.buzzsprout.com/42610/episodes/19141080',
         height: 200,
       }
 
@@ -174,7 +174,7 @@ describeForEachParser('buzzsproutIframeEmbedResolver', (parseHtml) => {
       provider: 'buzzsprout',
       id: '1735722/8166676',
       src: 'https://www.buzzsprout.com/1735722/8166676?iframe=true',
-      url: 'https://www.buzzsprout.com/1735722/8166676',
+      url: 'https://www.buzzsprout.com/1735722/episodes/8166676',
       height: 200,
     }
 
@@ -193,7 +193,7 @@ describeForEachParser('buzzsproutIframeEmbedResolver', (parseHtml) => {
       provider: 'buzzsprout',
       id: '1735722/8166676',
       src: 'https://www.buzzsprout.com/1735722/8166676?iframe=true',
-      url: 'https://www.buzzsprout.com/1735722/8166676',
+      url: 'https://www.buzzsprout.com/1735722/episodes/8166676',
       height: 200,
       title: 'How Producers Keep Live Events on Track',
     }

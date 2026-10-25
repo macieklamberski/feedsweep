@@ -31,12 +31,14 @@ const composeEmbed = (
   params?: Record<string, string>,
 ): EmbedResolverResult => {
   const path = episodeId ? `${podcastId}/${episodeId}` : podcastId
+  // The episode page and its oEmbed live under `episodes/`, and the short path only redirects.
+  const pagePath = episodeId ? `${podcastId}/episodes/${episodeId}` : podcastId
 
   return {
     provider,
     id: path,
     src: `https://www.buzzsprout.com/${path}${composeQuery({ iframe: 'true', ...params })}`,
-    url: `https://www.buzzsprout.com/${path}`,
+    url: `https://www.buzzsprout.com/${pagePath}`,
     height: episodeId ? episodeHeight : showHeight,
   }
 }

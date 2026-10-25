@@ -50,7 +50,8 @@ export const extractSpreakerEmbed = (
 }
 
 // Spreaker's player iframe ships no height attribute, so a reader reserves nothing for it.
-// Spreaker's oEmbed returns the title, the author and a thumbnail for the id tagged here.
+// Spreaker's oEmbed answers the show url minted here. It refuses an episode url without the slug,
+// which the carrier lacks, so an episode is read from `api.spreaker.com/v2/episodes/{id}`.
 export const spreakerResolveEmbed: ResolveEmbed = (url, element) => {
   const embed = extractSpreakerEmbed(url)
 
