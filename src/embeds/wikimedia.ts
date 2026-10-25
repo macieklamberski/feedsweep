@@ -37,12 +37,18 @@ export const composeFilePathUrl = (
   return origin && `${origin}/wiki/Special:FilePath/${fileName}${query}`
 }
 
-// The url Commons' "Embed this file" dialog writes. Without `embedplayer` the same address answers
-// with the file's description page. `File:` is the namespace name every wiki answers to.
-const composePlayerUrl = (url: string, fileName: string): string => {
+// The file's description page on the wiki that framed it. `File:` is the namespace name every
+// wiki answers to.
+const composeFilePageUrl = (url: string, fileName: string): string => {
   const host = parseUrl(url, placeholderBaseUrl)?.host ?? ''
 
-  return `https://${host}/wiki/File:${fileName}?embedplayer=yes`
+  return `https://${host}/wiki/File:${fileName}`
+}
+
+// The url Commons' "Embed this file" dialog writes. Without `embedplayer` the same address answers
+// with the file's description page.
+const composePlayerUrl = (url: string, fileName: string): string => {
+  return `${composeFilePageUrl(url, fileName)}?embedplayer=yes`
 }
 
 // MediaWiki's TimedMediaHandler frames its own player for a freely licensed file, and that player
@@ -66,6 +72,7 @@ export const wikimediaEmbedResolver: EmbedResolver = createMarkupEmbedResolver(
       provider: 'wikimedia',
       id: fileName,
       src: composePlayerUrl(source, fileName),
+      url: composeFilePageUrl(source, fileName),
       ratio: '16/9',
     }
 
