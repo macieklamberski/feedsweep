@@ -176,8 +176,8 @@ describe('extractMegaphoneEmbed on the legacy episode player', () => {
   })
 
   // Constructed: no lab carrier writes anything but letters before the episode digits.
-  it('should ignore an episode prefix holding an escaped path separator', () => {
-    const value = 'https://player.megaphone.fm/VMP%2F9785445903'
+  it('should ignore a percent sign inside the episode prefix', () => {
+    const value = 'https://player.megaphone.fm/VMP%9785445903'
 
     expect(extractMegaphoneEmbed(value)).toBeUndefined()
   })
