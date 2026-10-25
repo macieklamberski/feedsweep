@@ -69,7 +69,7 @@ export const extractBlubrryEmbed = (link: string): BlubrryPlayer | undefined => 
       ? filterUrlQuery(parsed, (name) => isAnyOf(name, playlistPositionParams))
       : ''
 
-    return { kind: 'show', id: encodePathSegment(keyword), route, position }
+    return { kind: 'show', id: keyword, route, position }
   }
 
   // A `podcast_id` beside a media url can name another episode: one feed writes the same id
@@ -89,7 +89,8 @@ export const extractBlubrryEmbed = (link: string): BlubrryPlayer | undefined => 
   return { kind: 'episode', id: encodePathSegment(podcastId) }
 }
 
-// Blubrry's player iframe, by episode id, media url or show, with no oEmbed to size it.
+// Blubrry's player iframe, by episode id, media url or show. The player answers an undocumented
+// oEmbed at `?target=oembed&oembed=json` whose height the measurement does not follow.
 export const blubrryResolveEmbed: ResolveEmbed = (url, element) => {
   const player = extractBlubrryEmbed(url)
 
