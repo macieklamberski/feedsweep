@@ -33,7 +33,7 @@ export const channelOneResolveEmbed: ResolveUrlEmbed = (url) => {
     return
   }
 
-  const query = pickUrlParams(url.href, ['t'])
+  const query = pickUrlParams(url, ['t'])
 
   return {
     provider: '1tv',

@@ -39,7 +39,7 @@ export const cognitoformsResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 
   // `entry` prefills the form.
-  return composeEmbed(orgKey, formNumber, pickUrlParams(url.href, ['entry']))
+  return composeEmbed(orgKey, formNumber, pickUrlParams(url, ['entry']))
 }
 
 // Cognito Forms' seamless embed, a script that renders the form into the page itself and that

@@ -58,7 +58,7 @@ export const radioradicaleResolveEmbed: ResolveUrlEmbed = (url) => {
     return
   }
 
-  return composeEmbed(id, pickUrlParams(url.href, playbackParams))
+  return composeEmbed(id, pickUrlParams(url, playbackParams))
 }
 
 export const radioradicaleEmbedResolver = createUrlEmbedResolver(

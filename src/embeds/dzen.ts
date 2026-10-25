@@ -19,7 +19,7 @@ export const dzenResolveEmbed: ResolveUrlEmbed = (url) => {
   return {
     provider,
     id,
-    src: `https://dzen.ru/embed/${id}${pickUrlParams(url.href, ['t'])}`,
+    src: `https://dzen.ru/embed/${id}${pickUrlParams(url, ['t'])}`,
     ratio: '16/9',
   }
 }

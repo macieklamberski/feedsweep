@@ -43,7 +43,7 @@ export const subsplashResolveEmbed: ResolveUrlEmbed = (url) => {
       return
     }
 
-    const query = pickUrlParams(url.href, ['t'])
+    const query = pickUrlParams(url, ['t'])
 
     return composeEmbed(id, `https://subsplash.com/u/${org}/media/embed/d/${id}${query}`)
   }

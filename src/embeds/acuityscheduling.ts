@@ -26,7 +26,7 @@ export const acuityschedulingResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 
   // The embed code repeats `owner`, and the first one is kept.
-  const query = pickUrlParams(url.href, schedulerParams)
+  const query = pickUrlParams(url, schedulerParams)
   const appointmentType = getQueryParam(url.searchParams, 'appointmentType')
 
   return {

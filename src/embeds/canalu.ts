@@ -13,7 +13,7 @@ const canaluHosts = ['www.canal-u.tv']
 // both routes. The player reads `t` as the start position and nothing else from its query.
 export const canaluResolveEmbed: ResolveUrlEmbed = (url) => {
   const segments = getPathSegments(url)
-  const query = pickUrlParams(url.href, ['t'])
+  const query = pickUrlParams(url, ['t'])
 
   if (segments.length === 4) {
     const [chaines, channel, embed, id] = segments
