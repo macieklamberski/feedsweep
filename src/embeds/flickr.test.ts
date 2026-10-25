@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import { flickrEmbedResolver, flickrResolveEmbed } from './flickr.js'
@@ -1472,5 +1473,35 @@ describeForEachParser('flickrEmbedResolver carrier title', (parseHtml) => {
     }
 
     expect(await extract(value)).toEqual(expected)
+  })
+})
+
+// www.flickr.com serves a photo's video file on its play route, so an enclosure there reaches the
+// resolver.
+describeForEachParser('flickr through the pipeline', (parseHtml) => {
+  const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
+  }
+
+  // Constructed carrier: no feed lists a Flickr video as an enclosure. The item is the real 360p
+  // video the media resolver's own test pins, so the case plays.
+  it('should leave a flickr video enclosure playable', async () => {
+    const enclosures = [
+      {
+        url: 'https://www.flickr.com/photos/naturewoman/14392168940/play/360p/61d915cc45/',
+        type: 'video/mp4',
+      },
+    ]
+
+    const expected = html`
+      <video data-enclosure="" controls src="https://www.flickr.com/photos/naturewoman/14392168940/play/360p/61d915cc45/"></video>
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
