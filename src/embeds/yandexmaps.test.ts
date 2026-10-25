@@ -364,6 +364,171 @@ describeForEachParser('yandexMapsIframeEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should keep the English host of a constructor frame', async () => {
+      const value = html`
+        <iframe
+          src="https://yandex.com/map-widget/v1/?um=constructor%3A56f6b30938b701761416476fec0fe35e1bbe8a78cf22463ba3977ec6c75398f4&amp;source=constructor"
+          width="500"
+          height="400"
+          frameborder="0"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'yandexmaps',
+        id: 'constructor:56f6b30938b701761416476fec0fe35e1bbe8a78cf22463ba3977ec6c75398f4',
+        src: 'https://yandex.com/map-widget/v1/?um=constructor:56f6b30938b701761416476fec0fe35e1bbe8a78cf22463ba3977ec6c75398f4&source=constructor',
+        thumbnail:
+          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor:56f6b30938b701761416476fec0fe35e1bbe8a78cf22463ba3977ec6c75398f4&width=650&height=400',
+        height: 400,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep where a constructor frame opens', async () => {
+      const value = html`
+        <iframe
+          src="https://yandex.by/map-widget/v1/?from=mapframe&amp;ll=27.562149%2C53.939212&amp;mode=usermaps&amp;source=mapframe&amp;um=constructor%3A0242b1593be31838cd4117b8071e0f6d04082335598e31436a84d2e2a02ddd17&amp;utm_source=mapframe&amp;z=16"
+          width="560"
+          height="400"
+          frameborder="1"
+          allowfullscreen="true"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'yandexmaps',
+        id: 'constructor:0242b1593be31838cd4117b8071e0f6d04082335598e31436a84d2e2a02ddd17',
+        src: 'https://yandex.by/map-widget/v1/?um=constructor:0242b1593be31838cd4117b8071e0f6d04082335598e31436a84d2e2a02ddd17&source=constructor&ll=27.562149,53.939212&z=16',
+        thumbnail:
+          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor:0242b1593be31838cd4117b8071e0f6d04082335598e31436a84d2e2a02ddd17&width=650&height=400',
+        height: 400,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop the language a constructor frame names', async () => {
+      const value = html`
+        <iframe
+          src="https://yandex.ru/map-widget/v1/?lang=ru_RU&amp;scroll=true&amp;um=constructor%3Acdaf1d35825766e91a2eecbac1476a02c410ff570830efd17ecaffeb5effbfb9"
+          frameborder="0"
+          allowfullscreen="true"
+          width="100%"
+          height="400px"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'yandexmaps',
+        id: 'constructor:cdaf1d35825766e91a2eecbac1476a02c410ff570830efd17ecaffeb5effbfb9',
+        src: 'https://yandex.ru/map-widget/v1/?um=constructor:cdaf1d35825766e91a2eecbac1476a02c410ff570830efd17ecaffeb5effbfb9&source=constructor',
+        thumbnail:
+          'https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor:cdaf1d35825766e91a2eecbac1476a02c410ff570830efd17ecaffeb5effbfb9&width=650&height=400',
+        height: 400,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should claim a short link frame', async () => {
+      const value = html`
+        <iframe
+          allowfullscreen="true"
+          frameborder="1"
+          height="400"
+          loading="lazy"
+          src="https://yandex.ru/map-widget/v1/-/CCUnYRDQkD"
+          width="600"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'yandexmaps',
+        id: '-/CCUnYRDQkD',
+        src: 'https://yandex.ru/map-widget/v1/-/CCUnYRDQkD',
+        url: 'https://yandex.ru/maps/-/CCUnYRDQkD',
+        height: 400,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the Belarusian host of a short link frame', async () => {
+      const value = html`
+        <iframe
+          src="https://yandex.by/map-widget/v1/-/CCUmMWx~KA"
+          width="560"
+          height="400"
+          frameborder="1"
+          allowfullscreen="allowfullscreen"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'yandexmaps',
+        id: '-/CCUmMWx~KA',
+        src: 'https://yandex.by/map-widget/v1/-/CCUmMWx~KA',
+        url: 'https://yandex.by/maps/-/CCUmMWx~KA',
+        height: 400,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should claim a coordinate map frame and keep where it opens and its host', async () => {
+      const value = html`
+        <iframe
+          src="https://yandex.com/map-widget/v1/?ll=37.612000%2C55.752000&#038;z=13&#038;l=map"
+          style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;"
+          loading="lazy"
+          allowfullscreen
+          title="Yandex map of central Moscow"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'yandexmaps',
+        src: 'https://yandex.com/map-widget/v1/?ll=37.612000,55.752000&z=13&l=map',
+        height: 400,
+        title: 'Yandex map of central Moscow',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should claim a frame placed by coordinates on the Russian host', async () => {
+      const value =
+        '<iframe src="https://yandex.ru/map-widget/v1/?ll=37.612000%2C55.752000&z=13&l=map"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'yandexmaps',
+        src: 'https://yandex.ru/map-widget/v1/?ll=37.612000,55.752000&z=13&l=map',
+        height: 400,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the coordinate parameter names in any case', async () => {
+      const value =
+        '<iframe src="https://yandex.com/map-widget/v1/?LL=37.612000%2C55.752000&Z=13"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'yandexmaps',
+        src: 'https://yandex.com/map-widget/v1/?ll=37.612000,55.752000&z=13',
+        height: 400,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // Constructed: every lab layer value is letters.
+    it('should keep a percent sign in the layer value', async () => {
+      const value =
+        '<iframe src="https://yandex.com/map-widget/v1/?ll=37.612000%2C55.752000&z=13&l=map%2595"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'yandexmaps',
+        src: 'https://yandex.com/map-widget/v1/?ll=37.612000,55.752000&z=13&l=map%2595',
+        height: 400,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -374,15 +539,33 @@ describeForEachParser('yandexMapsIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a short link frame', async () => {
-      const value = '<iframe src="https://yandex.ru/map-widget/v1/-/CHA0YA-W"></iframe>'
+    it('should ignore a short link frame naming no code', async () => {
+      const value = '<iframe src="https://yandex.ru/map-widget/v1/-/"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a frame placed by coordinates', async () => {
+    it('should ignore a segment after the short link code', async () => {
+      const value = '<iframe src="https://yandex.ru/map-widget/v1/-/CHA0YA-W/extra"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the short link path under another route', async () => {
+      const value = '<iframe src="https://yandex.ru/x/map-widget/v1/-/CHA0YA-W"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a coordinate frame naming no centre', async () => {
+      const value = '<iframe src="https://yandex.com/map-widget/v1/?z=13&l=map"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a coordinate frame naming an organisation', async () => {
       const value =
-        '<iframe src="https://yandex.ru/map-widget/v1/?ll=37.612000%2C55.752000&z=13&l=map"></iframe>'
+        '<iframe src="https://yandex.com/map-widget/v1/?ll=30.326905%2C59.940084&mode=search&oid=1184371713&ol=biz&z=16"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

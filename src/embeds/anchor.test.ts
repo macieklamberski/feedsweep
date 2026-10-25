@@ -198,8 +198,45 @@ describe('anchorResolveEmbed', () => {
     expect(anchorResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should return undefined for an episode page rather than its player', () => {
+  it('should rebuild an episode page onto its player', () => {
     const value = 'https://anchor.fm/myshow/episodes/my-title-e123'
+    const expected: EmbedResolverResult = {
+      provider: 'anchor',
+      id: 'myshow/my-title-e123',
+      src: 'https://creators.spotify.com/pod/profile/myshow/embed/episodes/my-title-e123',
+      height: 100,
+    }
+
+    expect(anchorResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should rebuild the episode page a publisher framed', () => {
+    const value =
+      'https://anchor.fm/somethingsomethingpodcast/episodes/Something-Something-about-Justin-DiPego-e1j88pn'
+    const expected: EmbedResolverResult = {
+      provider: 'anchor',
+      id: 'somethingsomethingpodcast/Something-Something-about-Justin-DiPego-e1j88pn',
+      src: 'https://creators.spotify.com/pod/profile/somethingsomethingpodcast/embed/episodes/Something-Something-about-Justin-DiPego-e1j88pn',
+      height: 100,
+    }
+
+    expect(anchorResolveEmbed(value)).toEqual(expected)
+  })
+
+  it('should ignore the episode page path on a Spotify host', () => {
+    const value = 'https://creators.spotify.com/myshow/episodes/my-title-e123'
+
+    expect(anchorResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should ignore an episode page path under another segment', () => {
+    const value = 'https://anchor.fm/x/myshow/episodes/my-title-e123'
+
+    expect(anchorResolveEmbed(value)).toBeUndefined()
+  })
+
+  it('should ignore a segment after the episode page slug', () => {
+    const value = 'https://anchor.fm/myshow/episodes/my-title-e123/extra'
 
     expect(anchorResolveEmbed(value)).toBeUndefined()
   })
