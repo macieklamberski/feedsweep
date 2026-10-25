@@ -25,6 +25,20 @@ describeForEachParser('podigeeScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    // Constructed: no lab configuration carries whitespace, the trim is the shared carrier repair.
+    it('should trim the whitespace a configuration carries on its episode segment', async () => {
+      const value = script('https://theshow.podigee.io/42-an-episode%20/embed?context=external')
+      const expected: EmbedResolverResult = {
+        provider: 'podigee',
+        id: 'theshow/42-an-episode',
+        src: 'https://theshow.podigee.io/42-an-episode/embed?context=external',
+        url: 'https://theshow.podigee.io/42-an-episode',
+        height: 145,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should drop the token the embed code carries', async () => {
       const value = script(
         'https://redfield.podigee.io/183-r-183-mit-michaela-schneider-ceo-von-allgaeu-concerts/embed?context=external&amp;token=j0d6cKXw8sAaSGMikUmG5A',
