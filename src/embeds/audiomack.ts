@@ -47,15 +47,15 @@ const readTrack = (url: URL): Track | undefined => {
   // The current player spells the kind either side of the artist: `embed/song/{artist}/{slug}`
   // 301s to `embed/{artist}/song/{slug}`.
   return audiomackHeights.has(second.toLowerCase())
-    ? { artist: third, kind: second.toLowerCase(), slug: fourth, search: url.search }
-    : { artist: second, kind: third.toLowerCase(), slug: fourth, search: url.search }
+    ? { artist: third, kind: second, slug: fourth, search: url.search }
+    : { artist: second, kind: third, slug: fourth, search: url.search }
 }
 
 export const audiomackResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
   const track = parsed && readTrack(parsed)
 
-  if (!track || !audiomackHeights.has(track.kind)) {
+  if (!track || !audiomackHeights.has(track.kind.toLowerCase())) {
     return
   }
 
@@ -70,7 +70,7 @@ export const audiomackResolveEmbed: ResolveEmbed = (url, element) => {
     src: `https://audiomack.com/embed/${path}${composeQuery(params)}`,
     // The key is an access token, so a private track's page is not linked where it could leak.
     url: params.key ? undefined : `https://audiomack.com/${path}`,
-    height: audiomackHeights.get(kind),
+    height: audiomackHeights.get(kind.toLowerCase()),
     title: attr(element, 'title'),
     author: artist,
   }

@@ -84,6 +84,7 @@ describe('extractTransistorEmbed', () => {
     const expected = {
       kind: 'latest',
       id: 'megamaker',
+      mode: 'latest',
     } as const
 
     expect(extractTransistorEmbed(value)).toEqual(expected)
@@ -94,6 +95,7 @@ describe('extractTransistorEmbed', () => {
     const expected = {
       kind: 'playlist',
       id: 'megamaker',
+      mode: 'playlist',
     } as const
 
     expect(extractTransistorEmbed(value)).toEqual(expected)
@@ -105,6 +107,7 @@ describe('extractTransistorEmbed', () => {
     const expected = {
       kind: 'latest',
       id: 'build-your-saas',
+      mode: 'latest',
     } as const
 
     expect(extractTransistorEmbed(value)).toEqual(expected)
@@ -115,6 +118,7 @@ describe('extractTransistorEmbed', () => {
     const expected = {
       kind: 'playlist',
       id: '100-segundos-para-la-media-noche',
+      mode: 'playlist',
     } as const
 
     expect(extractTransistorEmbed(value)).toEqual(expected)
@@ -125,6 +129,7 @@ describe('extractTransistorEmbed', () => {
     const expected = {
       kind: 'latest',
       id: 'talk2bewell',
+      mode: 'latest',
     } as const
 
     expect(extractTransistorEmbed(value)).toEqual(expected)
@@ -135,6 +140,7 @@ describe('extractTransistorEmbed', () => {
     const expected = {
       kind: 'playlist',
       id: 'z',
+      mode: 'playlist',
     } as const
 
     expect(extractTransistorEmbed(value)).toEqual(expected)
@@ -162,11 +168,23 @@ describe('extractTransistorEmbed', () => {
     expect(extractTransistorEmbed(value)).toEqual(expected)
   })
 
+  it('should read a show mode in any case and keep it as the feed wrote it', () => {
+    const value = 'https://share.transistor.fm/e/megamaker/Latest'
+    const expected = {
+      kind: 'latest',
+      id: 'megamaker',
+      mode: 'Latest',
+    } as const
+
+    expect(extractTransistorEmbed(value)).toEqual(expected)
+  })
+
   it('should use a malformed show slug as written, even if the player answers an error', () => {
     const value = 'https://share.transistor.fm/e/build-your-saas%2Fx/latest'
     const expected = {
       kind: 'latest',
       id: 'build-your-saas%2Fx',
+      mode: 'latest',
     } as const
 
     expect(extractTransistorEmbed(value)).toEqual(expected)
@@ -243,6 +261,19 @@ describe('transistorResolveEmbed', () => {
       provider: 'transistor',
       id: 'latest/megamaker',
       src: 'https://share.transistor.fm/e/megamaker/latest',
+      height: 180,
+    }
+
+    expect(transistorResolveEmbed(value)).toEqual(expected)
+  })
+
+  // Transistor answers `/Latest` with 404, so the player shows broken as the feed wrote it.
+  it('should write a show mode as the feed wrote it', () => {
+    const value = 'https://share.transistor.fm/e/megamaker/Latest'
+    const expected: EmbedResolverResult = {
+      provider: 'transistor',
+      id: 'latest/megamaker',
+      src: 'https://share.transistor.fm/e/megamaker/Latest',
       height: 180,
     }
 
