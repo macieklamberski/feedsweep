@@ -75,7 +75,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `unwrapRebelmouseEmbedFrames` | Point a RebelMouse embed frame (`/res/scraper/embed/`, `/res/community/twitter_embed/`) at the player or tweet it wraps |
 | `surfaceNoscriptEmbeds` | Hoist a video `<iframe>` out of a `<noscript>` lazy-load fallback (e.g. WP Rocket, a3 Lazy Load); ignores non-video noscript iframes like Google Tag Manager |
 | `rebuildEmbedPlusEmbeds` | Rebuild a real `<iframe>` from an "Embed Plus for YouTube" facade (`.epyt-facade[data-facadesrc]`) |
-| `rebuildIframelyEmbeds` | Rebuild an Iframely anchor facade (an empty `a[data-iframely-url]`) into the destination's frame or a plain link |
+| `rebuildIframelyEmbeds` | Rebuild an Iframely anchor facade (an empty `a[data-iframely-url]`) into the destination's frame or a plain link, and point an Iframely frame at the player of the url it proxies |
 | `rebuildWordpressEmbeds` | Rebuild a WordPress embed block that holds only its source url into the platform's frame, when a resolver claims the url |
 | `rebuildLiteVideoEmbeds` | Rebuild a real `<iframe>` from a `lite-youtube` / `lite-vimeo` web component's `videoid`, carrying over `start` and `videotitle` |
 | `rebuildLyteEmbeds` | Rebuild a real `<iframe>` from a WP YouTube Lyte facade (`WYL_`/`lyte_` id) or the thumbnail it writes into feeds |

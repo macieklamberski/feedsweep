@@ -71,6 +71,7 @@ export const defaultLazyIframeAttributes = [
   'data-orig', // Lazy-video facades (iframe id="_ytid_*") parking the embed URL with empty src.
   'data-original-src', // Generic lazy loaders.
   'data-opt-src', // Image/embed optimizers.
+  'data-iframely-url', // Iframely lazy iframe API frame.
 
   // Invision Community forums defer embeds two ways: an iframe with no src at all, or one whose
   // src points at the forum's own blank interface page. FixLazyIframes treats that page as a

@@ -1026,9 +1026,9 @@ describeForEachParser('Substack', (parseHtml) => {
     expect(result).toEqualHtml(expected)
   })
 
-  it('should fall back the TikTok embed pair to a generic placeholder and its static link', async () => {
-    // The generic iframe fallback owns the iframely player (no tiktok resolver claims it),
-    // the hidden cookie-check iframe is stripped, and the static thumbnail link survives.
+  it('should turn the TikTok embed pair into the TikTok placeholder and its static link', async () => {
+    // The Iframely frame names the video in its `url` query value, the hidden cookie-check iframe
+    // is stripped, and the static thumbnail link survives.
     const tiktokAttrs = jsonAttrValue({
       url: 'https://www.tiktok.com/@caseyhandle/video/7123456789012345678',
       thumbnail_url:
@@ -1074,7 +1074,11 @@ describeForEachParser('Substack', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-src="https://cdn.iframe.ly/api/iframe?media=1&app=1&url=https%3A%2F%2Fwww.tiktok.com%2F%40caseyhandle%2Fvideo%2F7123456789012345678&key=abc123"
+        data-embed-height="738"
+        data-embed-url="https://www.tiktok.com/@caseyhandle/video/7123456789012345678"
+        data-embed-id="@caseyhandle/video/7123456789012345678"
+        data-embed-provider="tiktok"
+        data-embed-src="https://www.tiktok.com/embed/v2/7123456789012345678"
       ></div>
       <a href="https://www.tiktok.com/@caseyhandle/video/7123456789012345678" target="_blank">
         <img

@@ -171,6 +171,86 @@ describeForEachParser('rebuildIframelyEmbeds', (parseHtml) => {
     })
   })
 
+  describe('the iframe API frame', () => {
+    it('should point a frame on cdn.iframe.ly at the YouTube video it names', async () => {
+      const value = html`
+        <iframe
+          allow="autoplay *; encrypted-media *"
+          allowfullscreen=""
+          scrolling="no"
+          src="https://cdn.iframe.ly/api/iframe?url=https%3A%2F%2Fyoutu.be%2FNObkWjQHNm8%3Fsi%3DucUQoghAP7K-_bgE&amp;v=1&amp;app=1&amp;key=57d2ec5998440ab74c7cf485bffd908c"
+        ></iframe>
+      `
+      const expected = '<iframe src="https://youtu.be/NObkWjQHNm8?si=ucUQoghAP7K-_bgE"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should point a frame on iframely.net at the TikTok video it names', async () => {
+      const value = html`
+        <iframe
+          class="tiktok-iframe"
+          src="https://iframely.net/api/iframe?media=1&amp;app=1&amp;url=https%3A%2F%2Fwww.tiktok.com%2F%40tamoorewrites%2Fvideo%2F7641692647203130646&amp;key=e27c740634285c9ddc20db64f73358dd"
+          frameborder="0"
+          allowfullscreen=""
+          scrolling="no"
+          loading="lazy"
+        ></iframe>
+      `
+      const expected =
+        '<iframe src="https://www.tiktok.com/@tamoorewrites/video/7641692647203130646"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should point a protocol-relative frame at the unencoded url it names', async () => {
+      const value = html`
+        <iframe
+          src="//cdn.iframe.ly/api/iframe?app=1&amp;api_key=082915126879d5135eb7bb&amp;url=https://x.com/rion_eos/status/2043687804111380544"
+          frameborder="0"
+          allowfullscreen=""
+        ></iframe>
+      `
+      const expected = '<iframe src="https://x.com/rion_eos/status/2043687804111380544"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep the frame when no resolver claims the url it names', async () => {
+      const value = html`
+        <iframe
+          src="https://cdn.iframe.ly/api/iframe?_layout=standard&amp;_playlist=false&amp;_theme=light&amp;app=1&amp;url=https%3A%2F%2Fdaily.bandcamp.com%2Ffeatures%2Fbeatnik-youth-interview&amp;key=e27c740634285c9ddc20db64f73358dd"
+          frameborder="0"
+          scrolling="no"
+          allowfullscreen="true"
+        ></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    // Constructed: the iframe API path on a host Iframely does not serve it from.
+    it('should keep a frame on another host carrying the iframe API path', async () => {
+      const value = html`<iframe src="https://evil.test/api/iframe?url=https%3A%2F%2Fyoutu.be%2FNObkWjQHNm8"></iframe>`
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    // Constructed: Iframely's oEmbed endpoint answers JSON and is no frame.
+    it('should keep a frame on another Iframely API route', async () => {
+      const value = html`<iframe src="https://cdn.iframe.ly/api/oembed?url=https%3A%2F%2Fyoutu.be%2FNObkWjQHNm8"></iframe>`
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    // Constructed: an iframe API frame naming no url.
+    it('should keep a frame naming no url', async () => {
+      const value = html`<iframe src="https://cdn.iframe.ly/api/iframe?app=1&amp;key=57d2ec5998440ab74c7cf485bffd908c"></iframe>`
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
   describe('sad paths', () => {
     it('should leave an anchor that already carries its own text alone', async () => {
       const value = html`
@@ -218,6 +298,14 @@ describeForEachParser('rebuildIframelyEmbeds', (parseHtml) => {
           </div>
         </div>
       `
+      const once = await transform(value)
+      const twice = await transform(once)
+
+      expect(twice).toEqualHtml(once)
+    })
+
+    it('should be idempotent on an iframe API frame', async () => {
+      const value = html`<iframe src="https://cdn.iframe.ly/api/iframe?url=https%3A%2F%2Fyoutu.be%2FNObkWjQHNm8%3Fsi%3DucUQoghAP7K-_bgE&amp;v=1&amp;app=1&amp;key=57d2ec5998440ab74c7cf485bffd908c"></iframe>`
       const once = await transform(value)
       const twice = await transform(once)
 
@@ -352,6 +440,67 @@ describeForEachParser('rebuildIframelyEmbeds through the pipeline', (parseHtml) 
         data-embed-src="https://www.youtube.com/embed/wN_PqWOCCb4"
       ></div>
     `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should bring an iframe API frame back as the player of the url it names', async () => {
+    const value = html`
+      <iframe
+        allow="autoplay *; encrypted-media *"
+        allowfullscreen=""
+        scrolling="no"
+        src="https://cdn.iframe.ly/api/iframe?url=https%3A%2F%2Fyoutu.be%2FNObkWjQHNm8%3Fsi%3DucUQoghAP7K-_bgE&amp;v=1&amp;app=1&amp;key=57d2ec5998440ab74c7cf485bffd908c"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://i.ytimg.com/vi/NObkWjQHNm8/hqdefault.jpg"
+        data-embed-url="https://www.youtube.com/watch?v=NObkWjQHNm8"
+        data-embed-id="NObkWjQHNm8"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/NObkWjQHNm8"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should bring a lazy iframe API frame back as the player of the url it names', async () => {
+    const value = html`
+      <iframe
+        data-img
+        data-iframely-url="https://cdn.iframe.ly/api/iframe?url=https%3A%2F%2Fyoutu.be%2FvkG0KkjPzfs&amp;key=a91f6c63822d2172297a7435cae7a9eb"
+        style="border: 0; top: 0; left: 0; width: 100%; height: 100%; position: absolute;"
+        allowfullscreen
+        scrolling="no"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://i.ytimg.com/vi/vkG0KkjPzfs/hqdefault.jpg"
+        data-embed-url="https://www.youtube.com/watch?v=vkG0KkjPzfs"
+        data-embed-id="vkG0KkjPzfs"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/vkG0KkjPzfs"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should load a lazy iframe API frame no resolver claims through its own url', async () => {
+    const value = html`
+      <iframe
+        data-iframely-url="https://cdn.iframe.ly/api/iframe?url=https%3A%2F%2Fmassivesci.com%2Fvideos%2Fastronomy-einstein-eddington-eclipse-relativity%2F&amp;key=a91f6c63822d2172297a7435cae7a9eb&amp;app=1"
+        style="border: 0; top: 0; left: 0; width: 100%; height: 100%; position: absolute;"
+        allowfullscreen
+        allow="encrypted-media *"
+      ></iframe>
+    `
+    const expected = html`<div data-embed-src="https://cdn.iframe.ly/api/iframe?url=https%3A%2F%2Fmassivesci.com%2Fvideos%2Fastronomy-einstein-eddington-eclipse-relativity%2F&amp;key=a91f6c63822d2172297a7435cae7a9eb&amp;app=1"></div>`
 
     expect(await convert(value)).toEqualHtml(expected)
   })

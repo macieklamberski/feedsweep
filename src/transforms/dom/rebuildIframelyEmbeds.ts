@@ -1,3 +1,4 @@
+import { getQueryParam } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr, hasText } from '../../utils/dom.js'
 import { isUrlShaped, parseUrlOnHosts } from '../../utils/urls.js'
@@ -10,13 +11,28 @@ import {
 
 const facadeSelector = 'a[data-iframely-url][href]'
 const wrapperSelector = '.iframely-embed'
-const oembedFrameSelector = '[data-oembed-url] iframe'
 const iframelyFrameHosts = ['if-cdn.com']
+const iframelyApiHosts = ['cdn.iframe.ly', 'iframely.net']
 
 // Iframely's anchor facade: an empty <a> holding the destination inside a responsive wrapper that
 // only embed.js fills, so the pipeline deletes the anchor as empty and the destination with it.
 export const rebuildIframelyEmbeds: DomTransform = (context) => {
   const resolvers = context.widgetResolvers.filter(isEmbedOrMediaResolver)
+
+  // The source url a frame Iframely renders proxies: the `url` query value of its iframe API, or
+  // the url CKEditor's oEmbed wrapper names around a short-id frame.
+  const readSourceUrl = (frame: Element): string | undefined => {
+    const src = attr(frame, 'src')
+    const apiUrl = parseUrlOnHosts(src, iframelyApiHosts)
+
+    if (apiUrl?.pathname === '/api/iframe') {
+      return getQueryParam(apiUrl.searchParams, 'url')
+    }
+
+    if (parseUrlOnHosts(src, iframelyFrameHosts)) {
+      return attr(frame.closest('[data-oembed-url]'), 'data-oembed-url')
+    }
+  }
 
   return async (document) => {
     for (const anchor of document.querySelectorAll(facadeSelector)) {
@@ -38,14 +54,14 @@ export const rebuildIframelyEmbeds: DomTransform = (context) => {
       target.replaceWith(createLink(document, href))
     }
 
-    // CKEditor's oEmbed wrapper around a frame Iframely rendered: the wrapper names the source url
-    // the frame proxies, so a resolver that claims it mints the platform's own player instead.
-    for (const frame of document.querySelectorAll(oembedFrameSelector)) {
-      if (!parseUrlOnHosts(attr(frame, 'src'), iframelyFrameHosts)) {
+    // A resolver that claims the source url mints the platform's own player instead of the proxy.
+    for (const frame of document.querySelectorAll('iframe')) {
+      const url = readSourceUrl(frame)
+
+      if (!url) {
         continue
       }
 
-      const url = attr(frame.closest('[data-oembed-url]'), 'data-oembed-url') ?? ''
       const probe = createIframe(document, url)
 
       if (await isResolvedIframe(probe, resolvers)) {
