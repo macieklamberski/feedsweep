@@ -1013,6 +1013,16 @@ describeForEachParser('highlightCode', (parseHtml) => {
       expect(await transform(value, { ...baseContext, highlightFn })).toEqualHtml(value)
     })
 
+    it('should drop a doctype a custom highlightFn writes', async () => {
+      const highlightFn: HighlightFn = (text) => text
+      const value =
+        '<pre><code class="language-html">&lt;!DOCTYPE html&gt;\n&lt;p&gt;Hi&lt;/p&gt;</code></pre><p>After.</p>'
+      const expected =
+        '<pre data-pre-language="html" data-pre-label="HTML"><code class="language-html hljs">\n<p>Hi</p></code></pre><p>After.</p>'
+
+      expect(await transform(value, { ...baseContext, highlightFn })).toEqualHtml(expected)
+    })
+
     it('should support an async highlightFn', async () => {
       const highlightFn: HighlightFn = async (text) => `<i>${text}</i>`
       const value = '<pre><code class="language-js">const x = 1</code></pre>'

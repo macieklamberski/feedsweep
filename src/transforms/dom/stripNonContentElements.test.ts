@@ -790,7 +790,7 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
 
     it('should keep a reCAPTCHA response box outside a noscript', async () => {
       const value = html`
-        <textarea name="g-recaptcha-response" class="g-recaptcha-response" aria-hidden="true"></textarea>
+        <textarea name="g-recaptcha-response" class="g-recaptcha-response" id="g-recaptcha-response" style="margin: 10px 25px; padding: 0px; border: 1px solid #c1c1c1; width: 250px; height: 40px; display: none;"></textarea>
       `
 
       expect(await transform(value)).toEqualHtml(value)
