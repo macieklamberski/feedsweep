@@ -1,4 +1,11 @@
-import { composeQuery, encodePathSegment, getQueryParam, parseUrl, trimObject } from 'trousse'
+import {
+  composeQuery,
+  encodePathSegment,
+  getQueryParam,
+  isAnyOf,
+  parseUrl,
+  trimObject,
+} from 'trousse'
 import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
 import { attr, flashVars } from '../utils/dom.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
@@ -12,13 +19,13 @@ const libraryPathRegex = /^\/library\/?$/i
 // draws its shelves 185 pixels a row at its default thumbnail size. It reads `rows` with
 // `parseInt`, and a count below one fills the frame, which at that height is one row.
 const resolveLibrary = (url: URL): EmbedResolverResult | undefined => {
-  const accountId = url.searchParams.get('id')
+  const accountId = getQueryParam(url.searchParams, 'id')
 
-  if (url.searchParams.get('type') !== 'account' || !accountId) {
+  if (!isAnyOf(getQueryParam(url.searchParams, 'type'), 'account') || !accountId) {
     return
   }
 
-  const rows = url.searchParams.get('rows') ?? undefined
+  const rows = getQueryParam(url.searchParams, 'rows')
   const rowCount = Number.parseInt(rows ?? '', 10)
   const query = composeQuery(trimObject({ type: 'account', id: accountId, rows }, Boolean))
 

@@ -196,6 +196,32 @@ describe('calameoResolveEmbed', () => {
 
       expect(calameoResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the library query names in any case', () => {
+      const value = 'https://v.calameo.com/library/?TYPE=account&ID=5807295&ROWS=2'
+      const expected: EmbedResolverResult = {
+        provider: 'calameo',
+        id: 'library/account/5807295',
+        src: 'https://v.calameo.com/library/?type=account&id=5807295&rows=2',
+        url: 'https://www.calameo.com/accounts/5807295',
+        height: 370,
+      }
+
+      expect(calameoResolveEmbed(value)).toEqual(expected)
+    })
+
+    it('should read the library type in any case and write it as the widget takes it', () => {
+      const value = 'https://v.calameo.com/library/?type=Account&id=5807295'
+      const expected: EmbedResolverResult = {
+        provider: 'calameo',
+        id: 'library/account/5807295',
+        src: 'https://v.calameo.com/library/?type=account&id=5807295',
+        url: 'https://www.calameo.com/accounts/5807295',
+        height: 185,
+      }
+
+      expect(calameoResolveEmbed(value)).toEqual(expected)
+    })
   })
 })
 
