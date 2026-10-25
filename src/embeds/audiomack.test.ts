@@ -107,6 +107,20 @@ describe('audiomackResolveEmbed', () => {
 
       expect(audiomackResolveEmbed(value)).toEqual(expected)
     })
+
+    it('should read the kind in any case and write it as the feed wrote it', () => {
+      const value = 'https://audiomack.com/embed/larrynorman/Song/burn-2'
+      const expected: EmbedResolverResult = {
+        provider: 'audiomack',
+        id: 'larrynorman/Song/burn-2',
+        src: 'https://audiomack.com/embed/larrynorman/Song/burn-2',
+        url: 'https://audiomack.com/larrynorman/Song/burn-2',
+        height: 252,
+        author: 'larrynorman',
+      }
+
+      expect(audiomackResolveEmbed(value)).toEqual(expected)
+    })
   })
 
   describe('Variant #1: the two orders the current player accepts', () => {
