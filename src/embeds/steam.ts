@@ -14,7 +14,7 @@ const widgetParams = ['t']
 export const steamResolveEmbed: ResolveEmbed = (url) => {
   const [route, appId, subId] = getPathSegments(url)
 
-  if (!isAnyOf(route, 'widget') || !appId || !digitsRegex.test(appId)) {
+  if (!isAnyOf(route, 'widget') || !digitsRegex.test(appId)) {
     return
   }
 
