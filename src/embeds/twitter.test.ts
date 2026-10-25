@@ -654,6 +654,53 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
     })
   })
 
+  // A feed that cut into the status link's query leaves the id glued to what followed it.
+  describe('a status link cut inside its query', () => {
+    it('should read the id up to its last digit when the query lost its question mark', async () => {
+      const value = html`
+        <blockquote class="twitter-tweet">
+          <p lang="en" dir="ltr">Tweet text here.</p>
+          <p>
+            &mdash; Display Name (@user)
+            <a href="https://twitter.com/user/status/${statusId}_src=twsrc%5Etfw">December 23, 2019</a>
+          </p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: statusId,
+        src: playerUrl,
+        url: statusUrl,
+        description: 'Tweet text here.',
+        author: '@user',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the id up to its last digit when letters follow it', async () => {
+      const value = html`
+        <blockquote class="twitter-tweet">
+          <p lang="en" dir="ltr">Tweet text here.</p>
+          <p>
+            &mdash; Display Name (@user)
+            <a href="https://twitter.com/user/status/${statusId}abc">May 12, 2020</a>
+          </p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: statusId,
+        src: playerUrl,
+        url: statusUrl,
+        description: 'Tweet text here.',
+        author: '@user',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
   // The proxy front-ends put the same tweet under their own host, so the same post can arrive
   // twice over in one corpus. Each resolves to the id and the x.com url the direct form gives, so
   // one tweet stays one placeholder and one enrichment key whichever host carried it.
@@ -1353,6 +1400,18 @@ describeForEachParser('twitterIframeEmbedResolver', (parseHtml) => {
 
     it.each(playerUrls)('should mint the player from %s', async (url) => {
       const value = html`<iframe src="${url}"></iframe>`
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: statusId,
+        src: playerUrl,
+        url: `https://x.com/i/status/${statusId}`,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the id up to its last digit on an internal path', async () => {
+      const value = html`<iframe src="https://x.com/i/web/status/${statusId}abc"></iframe>`
       const expected: EmbedResolverResult = {
         provider: 'twitter',
         id: statusId,

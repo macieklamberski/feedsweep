@@ -211,14 +211,14 @@ describe('vimeoResolveEmbed', () => {
     expect(vimeoResolveEmbed(value)).toEqual(expected)
   })
 
-  it('should cut a query hash at the whitespace a feed left in it', () => {
+  it('should use a query hash holding the whitespace a feed left in it as written', () => {
     const value =
       'https://player.vimeo.com/video/664725670?h=04acf91ce2 portrait=0&amp;color=98895e'
     const expected: EmbedResolverResult = {
       provider: 'vimeo',
-      id: '664725670:04acf91ce2',
-      src: 'https://player.vimeo.com/video/664725670?h=04acf91ce2',
-      url: 'https://vimeo.com/664725670/04acf91ce2',
+      id: '664725670:04acf91ce2 portrait=0',
+      src: 'https://player.vimeo.com/video/664725670?h=04acf91ce2%20portrait=0',
+      url: 'https://vimeo.com/664725670/04acf91ce2%20portrait=0',
       ratio: '16/9',
     }
 
@@ -652,6 +652,41 @@ describeForEachParser('vimeoEmbedResolver', (parseHtml) => {
       id: '76979871',
       src: 'https://player.vimeo.com/video/76979871',
       url: 'https://vimeo.com/76979871',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should read the hash up to the whitespace a feed left in place of an ampersand', async () => {
+    const value = html`
+      <iframe
+        src="https://player.vimeo.com/video/664725670?h=04acf91ce2 portrait=0&#38;color=98895e"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'vimeo',
+      id: '664725670:04acf91ce2',
+      src: 'https://player.vimeo.com/video/664725670?h=04acf91ce2',
+      url: 'https://vimeo.com/664725670/04acf91ce2',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should drop the slash a feed glued onto the clip id', async () => {
+    const value = html`
+      <object
+        type="application/x-shockwave-flash"
+        data="http://vimeo.com/moogaloop.swf?clip_id=4775093/"
+      ></object>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'vimeo',
+      id: '4775093',
+      src: 'https://player.vimeo.com/video/4775093',
+      url: 'https://vimeo.com/4775093',
       ratio: '16/9',
     }
 

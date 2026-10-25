@@ -22,8 +22,6 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const provider = 'vimeo'
 const playerRatio = '16/9'
 
-const whitespaceRegex = /\s/
-
 const vimeoHosts = ['vimeo.com']
 
 // The hosts that serve a video page or a player. Other subdomains serve files and assets, and the
@@ -216,12 +214,11 @@ const readReference = (link: string): VimeoReference | undefined => {
     }
   }
 
-  // A feed that lost the `&` before the next parameter leaves it after a space. A hash is hex and
-  // never holds one, so the cut repairs what the feed did.
-  const queryHash = getQueryParam(url.searchParams, 'h')?.split(whitespaceRegex)[0]
+  const queryHash = getQueryParam(url.searchParams, 'h')
 
   return {
     id,
+    // biome-ignore lint/nursery/useNullishCoalescing: An empty hash reads as absent.
     hash: queryHash || undefined,
   }
 }

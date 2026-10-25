@@ -393,9 +393,10 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
   })
 
   describe('the legacy slideshow iframe', () => {
-    it('should trim the path slash a feed left on the set id', async () => {
-      const value =
-        '<iframe src="http://www.flickr.com/slideShow/index.gne?user_id=24006738@N07&amp;set_id=72157627734131040/"></iframe>'
+    it('should drop the slash a feed glued onto the set id', async () => {
+      const value = html`
+        <iframe src="http://www.flickr.com/slideShow/index.gne?group_id=&amp;user_id=24006738@N07&amp;set_id=72157627734131040/&amp;text="></iframe>
+      `
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photosets/72157627734131040',
@@ -607,6 +608,22 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
     it('should map a framed album page without the show segment', async () => {
       const value = html`
         <iframe src="http://www.flickr.com/photos/53116286@N07/sets/72157627116531602/"></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photosets/72157627116531602',
+        src: 'https://embedr.flickr.com/photosets/72157627116531602?width=400&height=300',
+        url: 'https://www.flickr.com/photos/53116286@N07/sets/72157627116531602',
+        width: 400,
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the set id as its digit run when the path runs on past it', async () => {
+      const value = html`
+        <iframe src="http://www.flickr.com/photos/53116286@N07/sets/72157627116531602x/"></iframe>
       `
       const expected: EmbedResolverResult = {
         provider: 'flickr',

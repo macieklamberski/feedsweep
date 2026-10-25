@@ -246,6 +246,8 @@ export const setDimensions = (
   }
 }
 
+const unfilledTemplateRegex = /[/=]\$\d+(?=[/?&#]|$)/
+
 // An iframe's `title` is the one field a publisher's snippet states that the url does not carry.
 export const createUrlEmbedResolver = (
   hosts: Array<string>,
@@ -259,6 +261,12 @@ export const createUrlEmbedResolver = (
       const src = readCarrierUrl(element)
 
       if (!isHostOrSubdomainOf(src, hosts)) {
+        return
+      }
+
+      // A script that never filled its template, `embed/$1`, names no item, and its frame stays
+      // as written.
+      if (unfilledTemplateRegex.test(src)) {
         return
       }
 
