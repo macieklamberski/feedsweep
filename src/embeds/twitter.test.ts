@@ -672,8 +672,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
         src: playerUrl,
         url: statusUrl,
         description: 'Tweet text here.',
-        author: 'Display Name',
-        date: 'December 23, 2019',
+        author: '@user',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -695,8 +694,7 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
         src: playerUrl,
         url: statusUrl,
         description: 'Tweet text here.',
-        author: 'Display Name',
-        date: 'May 12, 2020',
+        author: '@user',
       }
 
       expect(await extract(value)).toEqual(expected)

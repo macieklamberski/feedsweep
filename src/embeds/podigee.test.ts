@@ -180,6 +180,7 @@ describe('podigeeResolveEmbed', () => {
       provider: 'podigee',
       id: 'redfield/t97-trailer-das-ist-der-redfield-podcast',
       src: 'https://redfield.podigee.io/t97-trailer-das-ist-der-redfield-podcast/embed?context=external',
+      url: 'https://redfield.podigee.io/t97-trailer-das-ist-der-redfield-podcast',
       height: 145,
     }
 
