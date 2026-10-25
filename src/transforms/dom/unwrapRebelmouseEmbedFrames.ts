@@ -1,4 +1,4 @@
-import { isHostOrSubdomainOf, isHttpUrl, parseUrl } from 'trousse'
+import { getQueryParam, isAnyOf, isHostOrSubdomainOf, isHttpUrl, parseUrl } from 'trousse'
 import { jwplayerHosts } from '../../embeds/jwplayer.js'
 import { composeTwitterStatusUrl } from '../../embeds/twitter.js'
 import type { DomTransform } from '../../types.js'
@@ -11,7 +11,7 @@ const tweetPath = '/res/community/twitter_embed/'
 // The wrapper writes `jwplayer_video_url` into a script, so only a JW script is let through.
 // It writes `video_url` into an iframe, so any http url is framed as written.
 const readPlayerUrl = (query: URLSearchParams): string | undefined => {
-  const scriptUrl = query.get('jwplayer_video_url')
+  const scriptUrl = getQueryParam(query, 'jwplayer_video_url')
 
   if (scriptUrl) {
     if (!isHttpUrl(scriptUrl) || !isHostOrSubdomainOf(scriptUrl, jwplayerHosts)) {
@@ -21,7 +21,7 @@ const readPlayerUrl = (query: URLSearchParams): string | undefined => {
     return scriptUrl
   }
 
-  const frameUrl = query.get('video_url')
+  const frameUrl = getQueryParam(query, 'video_url')
 
   if (!frameUrl || !isHttpUrl(frameUrl)) {
     return
@@ -31,8 +31,8 @@ const readPlayerUrl = (query: URLSearchParams): string | undefined => {
 }
 
 const readTweetUrl = (query: URLSearchParams): string | undefined => {
-  const id = query.get('id')
-  const handle = query.get('screen_name')
+  const id = getQueryParam(query, 'id')
+  const handle = getQueryParam(query, 'screen_name')
 
   if (!id || !handle || !digitsRegex.test(id)) {
     return
@@ -44,11 +44,15 @@ const readTweetUrl = (query: URLSearchParams): string | undefined => {
 const readInnerUrl = (src: string | undefined): string | undefined => {
   const wrapper = parseUrl(src ?? '', placeholderBaseUrl)
 
-  if (wrapper?.pathname === playerPath) {
+  if (!wrapper) {
+    return
+  }
+
+  if (isAnyOf(wrapper.pathname, playerPath)) {
     return readPlayerUrl(wrapper.searchParams)
   }
 
-  if (wrapper?.pathname === tweetPath) {
+  if (isAnyOf(wrapper.pathname, tweetPath)) {
     return readTweetUrl(wrapper.searchParams)
   }
 }
@@ -58,7 +62,7 @@ const readInnerUrl = (src: string | undefined): string | undefined => {
 // `video_url`, and `/res/community/twitter_embed/` takes a tweet's fields and answers 404.
 export const unwrapRebelmouseEmbedFrames: DomTransform = () => {
   return (document) => {
-    for (const iframe of document.querySelectorAll('iframe[src*="/res/"]')) {
+    for (const iframe of document.querySelectorAll('iframe[src*="/res/" i]')) {
       const url = readInnerUrl(attr(iframe, 'src'))
 
       if (!url) {

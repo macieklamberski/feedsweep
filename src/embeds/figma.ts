@@ -37,14 +37,14 @@ const readFileEmbed = (url: URL): EmbedResolverResult | undefined => {
 
   // Figma keeps opening kinds beside the `file`, `proto`, `board` and `deck` the feeds carry, and
   // every one takes the same route shape. A file key is base62, so a hyphenated slug is not one.
-  if (!lettersRegex.test(kind) || kind === catalogueKind || !alphanumericRegex.test(key)) {
+  if (!lettersRegex.test(kind) || isAnyOf(kind, catalogueKind) || !alphanumericRegex.test(key)) {
     return
   }
 
   const params = pickQueryParams(url.search, contentParams)
   const path = `${kind}/${key}/${name}`
   // Figma renamed the `file` route to `design`, and both name one file, so they share one key.
-  const idKind = kind === 'file' ? 'design' : kind
+  const idKind = isAnyOf(kind, 'file') ? 'design' : kind
 
   return {
     provider: 'figma',
