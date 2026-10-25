@@ -113,7 +113,7 @@ describe('audiomackResolveEmbed', () => {
         author: 'larrynorman',
       }
 
-      expect(audiomackResolveEmbed(value)).toEqual(expected)
+      expect(audiomackResolveEmbed(value, undefined, new URL(value))).toEqual(expected)
     })
   })
 
