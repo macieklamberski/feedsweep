@@ -99,7 +99,7 @@ describeForEachParser('substackOwnPostCiteResolver', (parseHtml) => {
 
   // The shape a reader-mode fetch of the post page returns: no data-attrs, fields as markup.
   describe('rendered shape', () => {
-    it('should extract every field from a rendered card', async () => {
+    it('should extract every field but the numeric-profile author from a rendered card', async () => {
       const value = html`
         <div data-component-name="DigestPostEmbed" class="digestPostEmbed-flwiST">
           <a href="https://thereader.example.com/p/model-drop" rel="noopener" target="_blank">
@@ -128,7 +128,6 @@ describeForEachParser('substackOwnPostCiteResolver', (parseHtml) => {
         provider: 'substack',
         url: 'https://thereader.example.com/p/model-drop',
         title: 'Model Drop',
-        author: 'Author name',
         thumbnail: 'https://cdn.example.com/cover.jpeg',
       }
 
@@ -152,24 +151,6 @@ describeForEachParser('substackOwnPostCiteResolver', (parseHtml) => {
         url: 'https://thereader.example.com/p/model-drop',
         title: 'Model Drop',
         thumbnail: 'https://cdn.example.com/cover.jpeg',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should ignore a byline that is not a profile link', async () => {
-      const value = html`
-        <div data-component-name="DigestPostEmbed">
-          <a href="https://thereader.example.com/p/model-drop">
-            <h4>Model Drop</h4>
-            <a href="https://thereader.example.com/about">Author name</a>
-          </a>
-        </div>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'substack',
-        url: 'https://thereader.example.com/p/model-drop',
-        title: 'Model Drop',
       }
 
       expect(await extract(value)).toEqual(expected)

@@ -63,11 +63,10 @@ export const substackOwnPostCiteResolver: CiteResolver = {
     if (!attrs) {
       return buildCite({
         provider,
-        // The card's own anchor comes first. The byline anchor below it points at the
-        // author's Substack profile, on custom domains too.
+        // The card's own anchor comes first. The byline anchor below it links the author's
+        // numeric Substack profile, which names no handle, so the card states no author.
         url: attr(find(element, 'a[href]'), 'href'),
         title: text(element, 'h4'),
-        author: text(element, 'a[href*="substack.com/profile/" i]'),
         thumbnail: attr(find(element, 'img'), 'src'),
       })
     }

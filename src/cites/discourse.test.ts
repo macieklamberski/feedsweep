@@ -195,7 +195,7 @@ describeForEachParser('discourseCiteResolver', (parseHtml) => {
         url: 'https://github.com/owner/repo/issues/284',
         title: 'Issue title',
         description: 'The visible half of the configuration preview.',
-        author: 'Author name',
+        author: 'author',
         publisher: 'github.com/owner/repo',
         date: '2024-12-06',
         icon: 'https://avatars.example.com/u/1',
@@ -339,6 +339,38 @@ describeForEachParser('discourseCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should drop a GitHub author whose link is off github.com', async () => {
+      const value = html`
+        <aside class="onebox githubissue" data-onebox-src="https://github.com/owner/repo/issues/284">
+          <header class="source">
+            <a href="https://github.com/owner/repo/issues/284" target="_blank" rel="noopener">github.com/owner/repo</a>
+          </header>
+          <article class="onebox-body">
+            <div class="github-row">
+              <div class="github-info-container">
+                <h4>
+                  <a href="https://github.com/owner/repo/issues/284" target="_blank" rel="noopener">Issue title</a>
+                </h4>
+                <div class="github-info">
+                  <div class="user">
+                    <a href="https://evil.test/author" target="_blank" rel="noopener">Author name</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </aside>
+      `
+      const expected: CiteResolverResult = {
+        provider: 'discourse',
+        url: 'https://github.com/owner/repo/issues/284',
+        title: 'Issue title',
+        publisher: 'github.com/owner/repo',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('file oneboxes (omitted)', () => {
@@ -434,7 +466,7 @@ describeForEachParser('discourseCiteResolver', (parseHtml) => {
   })
 
   describe('Stack Exchange oneboxes', () => {
-    it('should extract the author, date and avatar from a Stack Exchange onebox', async () => {
+    it('should extract the date and avatar from a Stack Exchange onebox and drop its numeric-profile author', async () => {
       const value = html`
         <aside class="onebox stackexchange">
           <header class="source">
@@ -460,7 +492,6 @@ describeForEachParser('discourseCiteResolver', (parseHtml) => {
         provider: 'discourse',
         url: 'https://stackoverflow.com/questions/1',
         title: 'Question title',
-        author: 'Author name',
         publisher: 'stackoverflow.com',
         date: '12:42AM - 07 Sep 08',
         thumbnail: 'https://www.gravatar.com/avatar/abc?s=128',
@@ -502,6 +533,29 @@ describeForEachParser('discourseCiteResolver', (parseHtml) => {
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+
+    // Constructed: Hacker News writes the username as the anchor text too, and the rule reads the
+    // byline from its link.
+    it('should read the author from the id of the profile link, not the anchor text', async () => {
+      const value = html`
+        <aside class="onebox hackernews" data-onebox-src="https://news.ycombinator.com/item?id=28680387">
+          <header class="source">
+            <a href="https://news.ycombinator.com/item?id=28680387" target="_blank" rel="noopener">news.ycombinator.com</a>
+          </header>
+          <article class="onebox-body">
+            <h3>
+              <a href="https://news.ycombinator.com/item?id=28680387" target="_blank" rel="noopener">Story title</a>
+            </h3>
+            <p>
+              <a href="https://news.ycombinator.com/user?id=poster" class="author" target="_blank" rel="noopener">Poster Display</a> —
+              <a href="https://news.ycombinator.com/item?id=28680387" class="timestamp" target="_blank" rel="noopener">8:09 AM - 28 Sep 2021</a>
+            </p>
+          </article>
+        </aside>
+      `
+
+      expect((await extract(value))?.author).toBe('poster')
     })
 
     it('should read the self-post text over the stats line', async () => {

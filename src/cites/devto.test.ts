@@ -183,8 +183,8 @@ describeForEachParser('devtoPostCiteResolver', (parseHtml) => {
         provider: 'devto',
         url: 'https://example.com/org/post',
         title: 'Page title',
-        author: 'Author name',
-        publisher: 'Org name',
+        author: 'author',
+        publisher: 'org',
         icon: 'https://example.com/org.png',
       }
 
@@ -211,7 +211,52 @@ describeForEachParser('devtoPostCiteResolver', (parseHtml) => {
         provider: 'devto',
         url: 'https://example.com/post',
         title: 'Page title',
-        author: 'Author name',
+        author: 'author',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the author handle off an absolute byline href', async () => {
+      const value = html`
+        <div class="ltag__link--embedded">
+          <div class="crayons-story ">
+            <a href="https://example.com/post" class="crayons-story__hidden-navigation-link">Page title</a>
+            <div class="crayons-story__body">
+              <div>
+                <a href="https://example.com/author" class="crayons-story__secondary fw-medium">Author name</a>
+              </div>
+              <h2 class="crayons-story__title">
+                <a href="https://example.com/post">Page title</a>
+              </h2>
+            </div>
+          </div>
+        </div>
+      `
+
+      expect((await extract(value))?.author).toBe('author')
+    })
+
+    it('should state no author when the byline anchor has no href', async () => {
+      const value = html`
+        <div class="ltag__link--embedded">
+          <div class="crayons-story ">
+            <a href="https://example.com/post" class="crayons-story__hidden-navigation-link">Page title</a>
+            <div class="crayons-story__body">
+              <div>
+                <a class="crayons-story__secondary fw-medium">Author name</a>
+              </div>
+              <h2 class="crayons-story__title">
+                <a href="https://example.com/post">Page title</a>
+              </h2>
+            </div>
+          </div>
+        </div>
+      `
+      const expected: CiteResolverResult = {
+        provider: 'devto',
+        url: 'https://example.com/post',
+        title: 'Page title',
       }
 
       expect(await extract(value)).toEqual(expected)

@@ -298,7 +298,8 @@ const soundcloudResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const [artist, track] = anchors.toSorted((a, b) => pageDepth(a) - pageDepth(b))
 
   if (anchors.length === 2 && pageDepth(artist) < pageDepth(track)) {
-    result.author = text(artist)
+    // The snippet writes the artist's display name in the anchor's `title`.
+    result.author = attr(artist, 'title')
     result.title = text(track) ?? result.title
     result.url = attr(track, 'href')
     sibling?.remove()

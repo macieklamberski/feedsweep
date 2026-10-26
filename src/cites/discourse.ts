@@ -1,9 +1,9 @@
-import { isHostOrSubdomainOf, parseUrl } from 'trousse'
+import { getPathSegments, getQueryParam, isHostOrSubdomainOf, parseUrl } from 'trousse'
 import { parseMastodonStatus } from '../embeds/mastodon.js'
 import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, isElement, text } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 
 const provider = 'discourse'
 
@@ -33,6 +33,19 @@ const githubDescription = (paragraph: Element): string | undefined => {
   }
 
   return result.trim() || undefined
+}
+
+// The GitHub engines link the author to `github.com/{login}`.
+const readGithubLogin = (anchor: Element | undefined): string | undefined => {
+  const profile = parseUrlOnHosts(attr(anchor, 'href'), 'github.com')
+
+  if (!profile) {
+    return
+  }
+
+  const [login] = getPathSegments(profile)
+
+  return login
 }
 
 // Engines whose cards are not link previews, or whose body is content a cite would drop. TikTok,
@@ -104,17 +117,22 @@ export const discourseCiteResolver: CiteResolver = {
       description = text(find(body, 'p', (paragraph) => !find(paragraph, 'a.author')))
     }
 
-    const githubAuthor =
-      text(element, '.github-info .user a') ?? text(element, '.github-info span a')
+    const githubAuthorAnchor =
+      find(element, '.github-info .user a') ?? find(element, '.github-info span a')
+    const githubAuthor = readGithubLogin(githubAuthorAnchor)
 
     // The Stack Exchange onebox writes "asked by <author> on <date>" as two anchors in its
-    // `.date` div.
+    // `.date` div. The author anchor links a numeric profile with no handle, so only the date is read.
     const dateAnchors = Array.from(body?.querySelectorAll('.date a') ?? [])
 
     // The submitter and the item's time, from the stats paragraph the description skips. No
     // other engine's body carries either anchor, and the timestamp is the site's own
-    // formatting ("8:09 AM - 28 Sep 2021").
-    const hackernewsAuthor = text(find(body, 'a.author'))
+    // formatting ("8:09 AM - 28 Sep 2021"). The submitter's link names the username in `id`.
+    const hackernewsProfile = parseUrlOnHosts(
+      attr(find(body, 'a.author'), 'href'),
+      'news.ycombinator.com',
+    )
+    const hackernewsAuthor = getQueryParam(hackernewsProfile?.searchParams, 'id')
     const hackernewsDate = text(find(body, 'a.timestamp'))
 
     return buildCite({
@@ -122,7 +140,7 @@ export const discourseCiteResolver: CiteResolver = {
       url,
       title: githubAuthor ? stripCommentPrefix(title, githubAuthor) : title,
       description,
-      author: githubAuthor ?? text(dateAnchors[0]) ?? hackernewsAuthor,
+      author: githubAuthor ?? hackernewsAuthor,
       publisher,
       date:
         date ??
