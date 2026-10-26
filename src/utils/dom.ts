@@ -1,10 +1,4 @@
-import {
-  coerceNumber,
-  getQueryParam,
-  isNonEmptyString,
-  type Nullish,
-  startsWithAnyOf,
-} from 'trousse'
+import { coerceNumber, getQueryParam, type Nullish, startsWithAnyOf } from 'trousse'
 import * as styles from './styles.js'
 import { foldEscapedAmpersands, isUrlShaped } from './urls.js'
 
@@ -232,8 +226,9 @@ export const isComment = (node: Nullish<Node>): node is Comment => {
   return node?.nodeType === Node.COMMENT_NODE
 }
 
+// The same trim as `text`, so a node holding only a byte-order mark is empty to both.
 export const hasText = (node: Nullish<Node>): boolean => {
-  return isNonEmptyString(node?.textContent)
+  return Boolean(node?.textContent?.trim())
 }
 
 export const isWhitespaceText = (node: Node): boolean => {

@@ -12,6 +12,7 @@ import {
   getStylePairRatio,
   getWrapperRatio,
   hasAncestorWithTagName,
+  hasText,
   hasZeroOpacity,
   isElementHidden,
   isEmptyElement,
@@ -1268,6 +1269,33 @@ describeForEachParser('text', (parseHtml) => {
 
   it('should return undefined for a nullish element', () => {
     expect(text(undefined)).toBeUndefined()
+  })
+})
+
+describeForEachParser('hasText', (parseHtml) => {
+  it('should be true for an element with text', () => {
+    const document = parseHtml('<p> spaced </p>')
+    const element = queryElement(document, 'p')
+
+    expect(hasText(element)).toBe(true)
+  })
+
+  it('should be false for blank text', () => {
+    const document = parseHtml('<p>   </p>')
+    const element = queryElement(document, 'p')
+
+    expect(hasText(element)).toBe(false)
+  })
+
+  it('should be false for a lone byte-order mark', () => {
+    const document = parseHtml('<p>\uFEFF</p>')
+    const element = queryElement(document, 'p')
+
+    expect(hasText(element)).toBe(false)
+  })
+
+  it('should be false for a nullish node', () => {
+    expect(hasText(undefined)).toBe(false)
   })
 })
 
