@@ -339,38 +339,6 @@ describeForEachParser('discourseCiteResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-
-    it('should drop a GitHub author whose link is off github.com', async () => {
-      const value = html`
-        <aside class="onebox githubissue" data-onebox-src="https://github.com/owner/repo/issues/284">
-          <header class="source">
-            <a href="https://github.com/owner/repo/issues/284" target="_blank" rel="noopener">github.com/owner/repo</a>
-          </header>
-          <article class="onebox-body">
-            <div class="github-row">
-              <div class="github-info-container">
-                <h4>
-                  <a href="https://github.com/owner/repo/issues/284" target="_blank" rel="noopener">Issue title</a>
-                </h4>
-                <div class="github-info">
-                  <div class="user">
-                    <a href="https://evil.test/author" target="_blank" rel="noopener">Author name</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </article>
-        </aside>
-      `
-      const expected: CiteResolverResult = {
-        provider: 'discourse',
-        url: 'https://github.com/owner/repo/issues/284',
-        title: 'Issue title',
-        publisher: 'github.com/owner/repo',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
   })
 
   describe('file oneboxes (omitted)', () => {

@@ -1,5 +1,7 @@
-import { isString, type PartialNullish } from 'trousse'
+import { getPathSegments, isString, type Nullish, type PartialNullish, parseUrl } from 'trousse'
 import type { CiteResolverResult } from '../types.js'
+import { attr } from './dom.js'
+import { placeholderBaseUrl } from './urls.js'
 
 // What a resolver scrapes: the result fields as the markup or the JSON blob carries them,
 // untrimmed and nullish wherever the field is absent.
@@ -12,6 +14,20 @@ export const trim = (value: unknown): string | undefined => {
   }
 
   return value.trim() || undefined
+}
+
+// A byline links the author or the publisher at `/{handle}`, relative on a self-hosted card and
+// absolute on a cross-posted one.
+export const readLinkHandle = (anchor: Nullish<Element>): string | undefined => {
+  const page = parseUrl(attr(anchor, 'href'), placeholderBaseUrl)
+
+  if (!page) {
+    return
+  }
+
+  const [handle] = getPathSegments(page)
+
+  return handle
 }
 
 export const buildCite = (result: RawCiteResult): CiteResolverResult | undefined => {

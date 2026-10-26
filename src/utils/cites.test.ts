@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test'
+import { describeForEachParser, queryElement } from '../tests.js'
 import type { CiteResolverResult } from '../types.js'
-import { buildCite } from './cites.js'
+import { buildCite, readLinkHandle } from './cites.js'
 
 describe('buildCite', () => {
   describe('happy paths', () => {
@@ -106,5 +107,29 @@ describe('buildCite', () => {
         buildCite({ provider: 'stub', url: 'https://example.com', title: ' ' }),
       ).toBeUndefined()
     })
+  })
+})
+
+describeForEachParser('readLinkHandle', (parseHtml) => {
+  it('should read the handle off a relative byline link', () => {
+    const document = parseHtml('<a href="/author">Author name</a>')
+
+    expect(readLinkHandle(queryElement(document, 'a'))).toBe('author')
+  })
+
+  it('should read the handle off an absolute byline link', () => {
+    const document = parseHtml('<a href="https://example.com/author?tab=posts">Author name</a>')
+
+    expect(readLinkHandle(queryElement(document, 'a'))).toBe('author')
+  })
+
+  it('should return undefined for a link with no href', () => {
+    const document = parseHtml('<a>Author name</a>')
+
+    expect(readLinkHandle(queryElement(document, 'a'))).toBeUndefined()
+  })
+
+  it('should return undefined for a nullish element', () => {
+    expect(readLinkHandle(undefined)).toBeUndefined()
   })
 })

@@ -1,8 +1,6 @@
-import { getPathSegments, parseUrl } from 'trousse'
 import type { CiteResolver } from '../types.js'
-import { buildCite } from '../utils/cites.js'
+import { buildCite, readLinkHandle } from '../utils/cites.js'
 import { attr, find, keepIfMatches, text, textNode } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
 
 const provider = 'devto'
 
@@ -10,19 +8,6 @@ const provider = 'devto'
 // article's save year ("Jul 25"), and the save year itself is unrecoverable later, so only
 // dates spelling a year ("Aug 21, 2025", "Nov 6 '22") are worth passing through.
 const yearRegex = /\b(19|20)\d{2}\b|'\d{2}\b/
-
-// Forem links a byline to `/{handle}`, the author's or the organization's, relative to the site.
-const readHandle = (anchor: Element | undefined): string | undefined => {
-  const page = parseUrl(attr(anchor, 'href'), placeholderBaseUrl)
-
-  if (!page) {
-    return
-  }
-
-  const [handle] = getPathSegments(page)
-
-  return handle
-}
 
 // Forem's embed card for an external link, compiled into the stored body as bare divs.
 // The feed sanitizer's allowlist keeps div, class and id intact.
@@ -67,8 +52,8 @@ export const devtoPostCiteResolver: CiteResolver = {
         text(element, '.crayons-story__contentpreview'),
       // The author anchor always precedes the organization's, so the first match is never the org.
       // Forem always renders the author anchor and wraps the organization's in a "for <org>" span.
-      author: readHandle(find(element, 'a.crayons-story__secondary')),
-      publisher: readHandle(find(element, 'span > a.crayons-story__secondary')),
+      author: readLinkHandle(find(element, 'a.crayons-story__secondary')),
+      publisher: readLinkHandle(find(element, 'span > a.crayons-story__secondary')),
       date: keepIfMatches(text(element, 'time'), yearRegex),
       icon: attr(find(element, '.crayons-story__author-pic img'), 'src'),
     })
