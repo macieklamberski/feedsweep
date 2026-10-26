@@ -8,6 +8,7 @@ import {
   imageExtensions,
   isAnyOf,
   isHostOrSubdomainOf,
+  type Nullish,
   normalizeUrl,
   parseUrl,
   trimUrlValues,
@@ -212,7 +213,7 @@ const parseCarrierUrl = (url: string): URL | undefined => {
 // as written, with `isHostOf` where a platform's subdomains serve other sites, and the glued-query
 // and whitespace repairs run after it, so a frame no resolver claims keeps `readCarrierUrl`'s url.
 export const parseUrlOnHosts = (
-  url: string | URL | null | undefined,
+  url: Nullish<string | URL>,
   hosts: string | ReadonlyArray<string>,
   isOnHost: (url: URL, hosts: string | ReadonlyArray<string>) => boolean = isHostOrSubdomainOf,
 ): URL | undefined => {
