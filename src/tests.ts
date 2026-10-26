@@ -53,13 +53,20 @@ type AnyResolver<Result> = {
   extract: (element: Element) => MaybePromise<Result | undefined>
 }
 
-// Runs a resolver's extract on the element its selector claims in a fixture, then the field
-// cleaners the pipeline runs on every result, so a fixture asserts what a placeholder carries.
-// The url createUrlEmbedResolver hands a reader for a carrier src on the resolver's hosts.
+// The url createUrlEmbedResolver hands a reader for a carrier src on the resolver's hosts. A
+// fixture off those hosts is a mistake in the test, so it fails here and not inside the reader.
 export const carrierUrl = (value: string, hosts: string | ReadonlyArray<string>): URL => {
-  return parseUrlOnHosts(value, hosts) as URL
+  const url = parseUrlOnHosts(value, hosts)
+
+  if (!url) {
+    throw new Error(`Not a carrier url on ${hosts}: ${value}`)
+  }
+
+  return url
 }
 
+// Runs a resolver's extract on the element its selector claims in a fixture, then the field
+// cleaners the pipeline runs on every result, so a fixture asserts what a placeholder carries.
 export const resolverExtractor = <Result>(parseHtml: ParseHtml, resolver: AnyResolver<Result>) => {
   return async (value: string): Promise<Result | undefined> => {
     const element = parseHtml(value).querySelector(resolver.selector)

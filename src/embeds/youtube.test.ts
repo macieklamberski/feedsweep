@@ -74,22 +74,8 @@ describe('extractVideoId', () => {
     expect(extractVideoId(carrierUrl(value, youtubeHosts))).toBe('dQw4w9WgXcQ')
   })
 
-  it('should return undefined for invalid url', () => {
-    const value = 'not-a-url'
-
-    expect(extractVideoId(carrierUrl(value, youtubeHosts))).toBeUndefined()
-  })
-
-  it('should return undefined for empty string', () => {
-    const value = ''
-
-    expect(extractVideoId(carrierUrl(value, youtubeHosts))).toBeUndefined()
-  })
-
-  it('should return undefined for a url that cannot be parsed', () => {
-    const value = 'https://['
-
-    expect(extractVideoId(carrierUrl(value, youtubeHosts))).toBeUndefined()
+  it('should return undefined with no url', () => {
+    expect(extractVideoId(undefined)).toBeUndefined()
   })
 
   it('should reject video id with unsafe characters', () => {

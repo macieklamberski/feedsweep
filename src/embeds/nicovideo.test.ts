@@ -60,12 +60,6 @@ describe('extractNicovideoId', () => {
     expect(extractNicovideoId(carrierUrl(value, nicovideoHosts))).toBe(expected)
   })
 
-  it('should return undefined for a url that cannot be parsed', () => {
-    const value = 'https://['
-
-    expect(extractNicovideoId(carrierUrl(value, nicovideoHosts))).toBeUndefined()
-  })
-
   it('should return undefined for a nicovideo url naming no video', () => {
     const value = 'https://ext.nicovideo.jp/thumb_watch/'
 
