@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { isHostOf } from 'trousse'
 import { transformContent } from '../index.js'
 import { baseContext, describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type {
@@ -1918,6 +1919,48 @@ describeForEachParser('createUrlEmbedResolver', (parseHtml) => {
     }
 
     expect(extract(value)).toEqual(expected)
+  })
+
+  it('should read a carrier on a subdomain of its hosts', () => {
+    const value = '<iframe src="https://cdn.x.test/embed/abc"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'example',
+      id: 'abc',
+      src: 'https://cdn.x.test/embed/abc',
+    }
+
+    expect(extract(value)).toEqual(expected)
+  })
+
+  describe('with exact hosts', () => {
+    const exactResolver = createUrlEmbedResolver(
+      ['x.test'],
+      (url) => {
+        return { provider: 'example', id: 'abc', src: url.href }
+      },
+      { isOnHost: isHostOf },
+    )
+
+    const extractExact = (value: string) => {
+      return exactResolver.extract(parseHtml(value).body.firstElementChild as Element)
+    }
+
+    it('should read a carrier on one of its hosts', () => {
+      const value = '<iframe src="https://x.test/embed/abc"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'example',
+        id: 'abc',
+        src: 'https://x.test/embed/abc',
+      }
+
+      expect(extractExact(value)).toEqual(expected)
+    })
+
+    it('should ignore a carrier on a subdomain of its hosts', () => {
+      const value = '<iframe src="https://cdn.x.test/embed/abc"></iframe>'
+
+      expect(extractExact(value)).toBeUndefined()
+    })
   })
 })
 
