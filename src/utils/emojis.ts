@@ -1,4 +1,5 @@
-import { toMap } from 'trousse'
+import { t, toMap } from 'trousse'
+import locales from '../locales.json' with { type: 'json' }
 import type { EmojiResolverResult } from '../types.js'
 import { attr } from './dom.js'
 import { unwrapProxiedImage } from './images.js'
@@ -79,12 +80,16 @@ export const mergeEmojiNames = (tables: Array<EmojiNameTable>): Record<string, E
     for (const [name, glyph] of Object.entries(table.names)) {
       // Lookups lower-case the name, so a key with a capital letter would never match.
       if (name !== name.toLowerCase()) {
-        throw new Error(`Emoji name "${name}" on ${table.name} must be lower case`)
+        throw new Error(t(locales.errors.emojiNameNotLowerCase, { name, table: table.name }))
       }
 
       if (Object.hasOwn(merged, name) && merged[name] !== glyph) {
         throw new Error(
-          `Emoji name "${name}" is ${merged[name]} and ${glyph} on different platforms`,
+          t(locales.errors.emojiNameConflict, {
+            name,
+            firstGlyph: String(merged[name]),
+            secondGlyph: String(glyph),
+          }),
         )
       }
 
