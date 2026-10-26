@@ -1,5 +1,5 @@
 import type { CiteResolver } from '../types.js'
-import { buildCite, readLinkHandle } from '../utils/cites.js'
+import { buildCite } from '../utils/cites.js'
 import { attr, find, keepIfMatches, text, textNode } from '../utils/dom.js'
 
 const provider = 'devto'
@@ -52,8 +52,8 @@ export const devtoPostCiteResolver: CiteResolver = {
         text(element, '.crayons-story__contentpreview'),
       // The author anchor always precedes the organization's, so the first match is never the org.
       // Forem always renders the author anchor and wraps the organization's in a "for <org>" span.
-      author: readLinkHandle(find(element, 'a.crayons-story__secondary')),
-      publisher: readLinkHandle(find(element, 'span > a.crayons-story__secondary')),
+      author: text(element, 'a.crayons-story__secondary'),
+      publisher: text(element, 'span > a.crayons-story__secondary'),
       date: keepIfMatches(text(element, 'time'), yearRegex),
       icon: attr(find(element, '.crayons-story__author-pic img'), 'src'),
     })
