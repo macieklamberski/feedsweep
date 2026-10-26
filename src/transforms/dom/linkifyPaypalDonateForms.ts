@@ -2,6 +2,7 @@ import { composeQuery, getPathSegments, isHostOf, parseUrl } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../../utils/urls.js'
+import { createLinkedImage } from '../../utils/widgets.js'
 
 // Listed exactly: a www.sandbox.paypal.com form is a test button that takes no real payment.
 const paypalHosts = ['paypal.com', 'www.paypal.com']
@@ -56,19 +57,8 @@ export const linkifyPaypalDonateForms: DomTransform = () => (document) => {
     }
 
     const url = `https://www.paypal.com/donate/${composeQuery({ hosted_button_id: buttonId })}`
+    const link = createLinkedImage(document, { href: url, src: imageSrc, alt: attr(image, 'alt') })
 
-    const button = document.createElement('img')
-    button.setAttribute('src', imageSrc)
-
-    const alt = attr(image, 'alt')
-
-    if (alt) {
-      button.setAttribute('alt', alt)
-    }
-
-    const link = document.createElement('a')
-    link.setAttribute('href', url)
-    link.append(button)
     image?.replaceWith(link)
 
     for (const input of form.querySelectorAll('input')) {

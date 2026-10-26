@@ -8,6 +8,10 @@ const provider = 'speakerdeck'
 
 const speakerdeckHosts = ['speakerdeck.com']
 
+const sizes = {
+  player: { ratio: '16/9' },
+}
+
 // The legacy `/embed/{id}` iframe redirects to `/player/{id}`.
 const deckRouteWords = ['player', 'embed']
 
@@ -29,7 +33,7 @@ const composeEmbed = (
     provider,
     id: slide ? `${deckId}/${slide}` : deckId,
     src: `https://speakerdeck.com/player/${deckId}${query}`,
-    ratio: '16/9',
+    ...sizes.player,
     title,
   }
 }

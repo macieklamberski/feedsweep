@@ -7,7 +7,9 @@ import { getPathSegmentsWithoutWorkspace } from './googledrive.js'
 
 const provider = 'googleforms'
 
-const formHeight = 600
+const sizes = {
+  player: { height: 600 },
+}
 
 const shortLinkHost = 'forms.gle'
 
@@ -30,7 +32,7 @@ const composeShortLink = (url: URL, element?: Element): EmbedResolverResult | un
     id: code,
     src: `https://forms.gle/${code}`,
     url: `https://forms.gle/${code}`,
-    height: formHeight,
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }
@@ -66,7 +68,7 @@ export const googleformsResolveEmbed: ResolveUrlEmbed = (url, element) => {
     id: formId,
     src: `https://docs.google.com/forms/d/${formPath}/viewform?embedded=true${prefill}`,
     url: `https://docs.google.com/forms/d/${formPath}/viewform`,
-    height: formHeight,
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }

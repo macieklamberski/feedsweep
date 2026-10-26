@@ -10,15 +10,13 @@ const provider = 'fliphtml5'
 // the same two-segment shape.
 const fliphtml5Hosts = ['online.fliphtml5.com']
 
+const sizes = {
+  player: { ratio: '4/3' },
+}
+
 // FlipHTML5's flipbook viewer, `online.fliphtml5.com/{account}/{book}/`, opening at the `#p=` page.
 export const fliphtml5ResolveEmbed: ResolveUrlEmbed = (url, element) => {
-  const parsed = parseUrlOnHosts(url, fliphtml5Hosts)
-
-  if (!parsed) {
-    return
-  }
-
-  const segments = getPathSegments(parsed)
+  const segments = getPathSegments(url)
   const [account, book] = segments
 
   // The viewer host serves files under an account, so a file name is an enclosure.
@@ -27,7 +25,7 @@ export const fliphtml5ResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 
   const viewerUrl = `https://online.fliphtml5.com/${account}/${book}/`
-  const { p: page } = pickQueryParams(parsed.hash.slice(1), ['p'])
+  const { p: page } = pickQueryParams(url.hash.slice(1), ['p'])
 
   return {
     provider,
@@ -36,7 +34,7 @@ export const fliphtml5ResolveEmbed: ResolveUrlEmbed = (url, element) => {
     url: viewerUrl,
     // The cover the viewer's own `og:image` names, 404 on a book that does not exist.
     thumbnail: `${viewerUrl}files/shot.jpg`,
-    ratio: '4/3',
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }

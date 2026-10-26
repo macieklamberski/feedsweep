@@ -261,34 +261,6 @@ describeForEachParser('convertCiteCards', (parseHtml) => {
     })
   })
 
-  describe('edge cases', () => {
-    it('should leave content unchanged when no resolver matches', async () => {
-      const value = '<p>Regular content</p>'
-
-      expect(await transform(value, [cardResolver])).toEqualHtml(value)
-    })
-
-    it('should skip elements when the resolver returns undefined', async () => {
-      const value = '<div class="card"></div>'
-
-      expect(await transform(value, [cardResolver])).toEqualHtml(value)
-    })
-
-    it.todo('should surface errors when a resolver extract throws', () => {
-      // An extract that throws currently rejects the whole transform run. Whether the error should
-      // propagate or the element should be skipped is an open design question, so the contract is
-      // not pinned yet.
-    })
-
-    it('should be idempotent', async () => {
-      const value = '<div class="card" data-url="https://example.com" data-title="Title"></div>'
-      const once = await transform(value, [cardResolver])
-      const twice = await transform(once, [cardResolver])
-
-      expect(twice).toEqualHtml(once)
-    })
-  })
-
   describe('parseDateFn', () => {
     const value = html`
       <div
@@ -351,6 +323,34 @@ describeForEachParser('convertCiteCards', (parseHtml) => {
 
       expect(await transform(noDate, [cardResolver], context)).toEqualHtml(expected)
       expect(calls).toEqual([])
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should leave content unchanged when no resolver matches', async () => {
+      const value = '<p>Regular content</p>'
+
+      expect(await transform(value, [cardResolver])).toEqualHtml(value)
+    })
+
+    it('should skip elements when the resolver returns undefined', async () => {
+      const value = '<div class="card"></div>'
+
+      expect(await transform(value, [cardResolver])).toEqualHtml(value)
+    })
+
+    it.todo('should surface errors when a resolver extract throws', () => {
+      // An extract that throws currently rejects the whole transform run. Whether the error should
+      // propagate or the element should be skipped is an open design question, so the contract is
+      // not pinned yet.
+    })
+
+    it('should be idempotent', async () => {
+      const value = '<div class="card" data-url="https://example.com" data-title="Title"></div>'
+      const once = await transform(value, [cardResolver])
+      const twice = await transform(once, [cardResolver])
+
+      expect(twice).toEqualHtml(once)
     })
   })
 })

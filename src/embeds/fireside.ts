@@ -2,6 +2,8 @@ import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'fireside'
+
 // `{show}+{episode}`: the `+` tells a token from a single word in the same slot.
 const tokenRegex = /^[^+]+\+[^+]+$/
 
@@ -12,8 +14,10 @@ const currentPlayerVersion = 'v3'
 
 const firesideHosts = ['fireside.fm']
 
-// Fireside's player is one fixed size: every iframe states `height="200"`.
-const playerHeight = 200
+const sizes = {
+  // Fireside's player is one fixed size: every iframe states `height="200"`.
+  player: { height: 200 },
+}
 
 type FiresidePlayer = { version: string; token: string }
 
@@ -45,13 +49,13 @@ export const firesideResolveEmbed: ResolveUrlEmbed = (url) => {
 
   // The embed carries no metadata, no thumbnail and no canonical episode url.
   return {
-    provider: 'fireside',
+    provider,
     id: player.token,
     // Feeds write `fireside.fm/player/{version}/{token}`, which 301s to the same path on
     // `player.fireside.fm`. A token from any version plays on the current player, where a real
     // token answers 200 and a fabricated one 404.
     src: `https://player.fireside.fm/${currentPlayerVersion}/${player.token}`,
-    height: playerHeight,
+    ...sizes.player,
   }
 }
 

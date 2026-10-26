@@ -24,9 +24,11 @@ const jotformHosts = [
 
 const loaderPathRegex = /^\/jsform\/([^/]+)$/i
 
-// The loader's starting box, which the iframe snippet also states. A card form starts at 640, and
-// nothing in the markup tells a card form from a classic one.
-const formHeight = 539
+const sizes = {
+  // The loader's starting box, which the iframe snippet also states. A card form starts at 640,
+  // and nothing in the markup tells a card form from a classic one.
+  player: { height: 539 },
+}
 
 // Any name can be a prefill, which the form reads off its own query, so the query goes to the
 // frame as the carrier sends it.
@@ -36,7 +38,7 @@ const composeEmbed = (formId: string, carrier: URL): EmbedResolverResult => {
     id: formId,
     src: `https://form.jotform.com/${formId}${carrier.search}`,
     url: `https://form.jotform.com/${formId}`,
-    height: formHeight,
+    ...sizes.player,
   }
 }
 

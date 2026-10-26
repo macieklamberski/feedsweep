@@ -6,7 +6,10 @@ import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'mailru'
-const playerRatio = '16/9'
+
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 // `my.mail.ru` serves the player, `api.video.mail.ru` was the host of the older embed and no
 // longer resolves, and `img.mail.ru` and the `imgsmail.ru` asset hosts served the Flash player.
@@ -34,7 +37,7 @@ const composeNumeric = (videoId: string): EmbedResolverResult => {
     provider,
     id: videoId,
     src: `https://my.mail.ru/video/embed/${videoId}`,
-    ratio: playerRatio,
+    ...sizes.player,
   }
 }
 
@@ -59,7 +62,7 @@ const composeSubject = (subject: string): EmbedResolverResult | undefined => {
     id: `${type}/${user}/${album}/${counter}`,
     src: `https://my.mail.ru/${owner}/video/embed/${albumSegment}/${counterSegment}`,
     url: `https://my.mail.ru/${owner}/video/${albumSegment}/${counterSegment}.html`,
-    ratio: playerRatio,
+    ...sizes.player,
     author: user,
   }
 }
@@ -120,11 +123,18 @@ const readPreviewVideoId = (thumbnail: string | undefined): string | undefined =
 export const mailruResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const target = resolveTarget(url, element)
 
-  return target && { ...target, title: attr(element, 'title') }
+  if (!target) {
+    return
+  }
+
+  return {
+    ...target,
+    title: attr(element, 'title'),
+  }
 }
 
 // A Mail.ru video: the my.mail.ru iframe, the dead api.video.mail.ru embed or the Flash player.
-export const mailruEmbedResolver = createUrlEmbedResolver(mailruHosts, mailruResolveEmbed)
+export const mailruIframeEmbedResolver = createUrlEmbedResolver(mailruHosts, mailruResolveEmbed)
 
 // A my.mail.ru journal post's video: a span only Mail.ru's own page script turned into its player,
 // naming the video as `/{type}/{user}/{album}/{counter}`.

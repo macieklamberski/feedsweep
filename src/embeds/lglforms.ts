@@ -10,9 +10,11 @@ const lglformsHosts = ['secure.lglforms.com']
 const formPathRegex = /^\/form_engine\/s\/([^/]+)$/i
 const loaderPathRegex = /^\/form_engine\/s\/([^/]+)\.js$/i
 
-// A form's height follows its fields, and the frame posts one only to the page its `origin`
-// query names, which is the reader's own address, so a long form scrolls inside the frame.
-const formHeight = 600
+const sizes = {
+  // A form's height follows its fields, and the frame posts one only to the page its `origin`
+  // query names, which is the reader's own address, so a long form scrolls inside the frame.
+  player: { height: 600 },
+}
 
 const composeEmbed = (formKey: string): EmbedResolverResult => {
   return {
@@ -20,7 +22,7 @@ const composeEmbed = (formKey: string): EmbedResolverResult => {
     id: formKey,
     src: `https://secure.lglforms.com/form_engine/s/${formKey}`,
     url: `https://secure.lglforms.com/form_engine/s/${formKey}`,
-    height: formHeight,
+    ...sizes.player,
   }
 }
 

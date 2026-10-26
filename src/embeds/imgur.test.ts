@@ -427,12 +427,6 @@ describe('imgurResolveEmbed', () => {
     expect(imgurResolveEmbed(new URL(value))).toBeUndefined()
   })
 
-  it('should ignore another host carrying the post path', () => {
-    const value = 'https://imgur.com.evil.test/pVa2rXL/embed'
-
-    expect(imgurResolveEmbed(new URL(value))).toBeUndefined()
-  })
-
   describe('the hosts a post page answers on', () => {
     it('should read the mobile spelling of the post page', () => {
       const value = 'https://m.imgur.com/pVa2rXL'
@@ -461,9 +455,7 @@ describe('imgurResolveEmbed', () => {
     })
 
     const fileUrls: Array<string> = [
-      'https://i.imgur.com/pVa2rXL',
       'https://i.imgur.com/pVa2rXL.mp4',
-      'https://s.imgur.com/min/embed.js',
       'https://i.stack.imgur.com/pVa2rXL.png',
       'https://imgur.com/pVa2rXL.jpg',
       'https://imgur.com/pVa2rXL.gifv',
@@ -501,6 +493,21 @@ describeForEachParser('imgurIframeEmbedResolver', (parseHtml) => {
 
   it('should ignore an iframe on another host', async () => {
     const value = '<iframe src="https://evil.test/pVa2rXL/embed"></iframe>'
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
+  const fileHostUrls: Array<string> = [
+    'https://i.imgur.com/pVa2rXL',
+    'https://s.imgur.com/min/embed.js',
+  ]
+
+  it.each(fileHostUrls)('should ignore %s, on a host that serves files', async (value) => {
+    expect(await extract(html`<iframe src="${value}"></iframe>`)).toBeUndefined()
+  })
+
+  it('should ignore another host carrying the post path', async () => {
+    const value = html`<iframe src="https://imgur.com.evil.test/pVa2rXL/embed"></iframe>`
 
     expect(await extract(value)).toBeUndefined()
   })

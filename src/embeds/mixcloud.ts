@@ -6,6 +6,13 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'mixcloud'
 
+// Without the publisher's `mini`, `hide_cover`, `hide_artwork` and `light`, the widget is the cover
+// player, which fills whatever box it gets. 120 is the height Mixcloud's oEmbed states for its
+// widget.
+const sizes = {
+  player: { height: 120 },
+}
+
 const mixcloudHosts = ['mixcloud.com']
 
 // An account's sections sit where a show slug does, and the widget answers {user}/uploads with the
@@ -80,11 +87,6 @@ export const extractMixcloudShow = (url: URL): string | undefined => {
   return readShowUrl(url)?.key
 }
 
-// Without the publisher's `mini`, `hide_cover`, `hide_artwork` and `light`, the widget is the cover
-// player, which fills whatever box it gets. 120 is the height Mixcloud's oEmbed states for its
-// widget.
-const playerHeight = 120
-
 export const mixcloudResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const show = readShowUrl(url, flashVar(element, 'feed'))
 
@@ -103,7 +105,7 @@ export const mixcloudResolveEmbed: ResolveUrlEmbed = (url, element) => {
     // The www url 301s to player-widget.mixcloud.com, a host one redirect away from changing.
     src: `https://www.mixcloud.com/widget/iframe/${query}`,
     url: `https://www.mixcloud.com/${show.path}/`,
-    height: playerHeight,
+    ...sizes.player,
     author,
     title,
   }

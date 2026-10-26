@@ -5,6 +5,10 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'indavideo'
 
+const sizes = {
+  player: { ratio: '16/9' },
+}
+
 const indavideoHosts = ['indavideo.hu']
 
 const playerPathRegex = /^\/player\/video\/([^/]+)\/?$/i
@@ -47,7 +51,7 @@ export const indavideoResolveEmbed: ResolveUrlEmbed = (url, element) => {
     id,
     src: `https://indavideo.hu/player/video/${id}/`,
     url: `https://indavideo.hu/video/${id}`,
-    ratio: '16/9',
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }

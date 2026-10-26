@@ -4,6 +4,10 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'sway'
 
+const sizes = {
+  presentation: { height: 500 },
+}
+
 const swayHosts = ['sway.cloud.microsoft', 'sway.com', 'sway.office.com']
 
 // Microsoft Sway's embed iframe, `/s/{id}/embed`, on any of its three hosts. The ids are one space
@@ -21,7 +25,7 @@ export const swayResolveEmbed: ResolveUrlEmbed = (url) => {
     id,
     src: `https://sway.cloud.microsoft/s/${id}/embed`,
     url: `https://sway.cloud.microsoft/${id}`,
-    height: 500,
+    ...sizes.presentation,
   }
 }
 

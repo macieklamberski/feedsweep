@@ -10,7 +10,9 @@ const pinecastHosts = ['pinecast.com']
 const playerPathRegex = /^\/player\/([^/]+)\/?$/i
 
 // The player without a theme draws the minimal bar, which stays this tall at any width.
-const playerHeight = 60
+const sizes = {
+  player: { height: 60 },
+}
 
 // A Pinecast episode player.
 export const pinecastResolveEmbed: ResolveUrlEmbed = (url, element) => {
@@ -25,7 +27,7 @@ export const pinecastResolveEmbed: ResolveUrlEmbed = (url, element) => {
     provider,
     id,
     src: `https://pinecast.com/player/${id}`,
-    height: playerHeight,
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }

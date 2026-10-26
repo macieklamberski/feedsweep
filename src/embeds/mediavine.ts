@@ -3,7 +3,11 @@ import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver } from '../utils/widgets.js'
 
-const playerRatio = '16/9'
+const provider = 'mediavine'
+
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 // Without /iframe the route answers 200 but is served x-frame-options: SAMEORIGIN.
 // A fabricated id answers 404 on the /iframe route.
@@ -23,10 +27,10 @@ export const mediavineWidgetEmbedResolver = createMarkupEmbedResolver(
 
     // Mediavine has no public watch page.
     return {
-      provider: 'mediavine',
+      provider,
       id: videoId,
       src: composeEmbedUrl(videoId),
-      ratio: playerRatio,
+      ...sizes.player,
       title: attr(element, 'title'),
     }
   },
@@ -52,11 +56,11 @@ export const mediavineScriptEmbedResolver = createMarkupEmbedResolver(
     }
 
     return {
-      provider: 'mediavine',
+      provider,
       id: videoId,
       // The script path id is decoded, like the div's attribute, so the player url encodes it once.
       src: composeEmbedUrl(decodeSegment(videoId) ?? videoId),
-      ratio: playerRatio,
+      ...sizes.player,
     }
   },
 )

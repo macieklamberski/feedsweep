@@ -123,6 +123,9 @@ type ResolverOptions = {
   // carrier the publisher sized for the player that loads, never on a retired tool's or dead
   // route's.
   readCarrierSize?: boolean
+  // A url resolver matches its hosts and their subdomains. Pass `isHostOf` where a subdomain of
+  // the platform serves files or machinery instead of the player.
+  isOnHost?: (url: URL, hosts: string | ReadonlyArray<string>) => boolean
 }
 
 // A resolver whose selector names the platform's own markup.
@@ -259,7 +262,7 @@ export const createUrlEmbedResolver = (
     selector: embedCarrierSelector,
     extract: (element) => {
       const src = readCarrierUrl(element)
-      const url = parseUrlOnHosts(src, hosts)
+      const url = parseUrlOnHosts(src, hosts, options.isOnHost)
 
       // A script that never filled its template, `embed/$1`, names no item, and its frame stays
       // as written.

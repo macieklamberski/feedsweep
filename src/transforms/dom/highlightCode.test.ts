@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'bun:test'
-import { parseHTML } from 'linkedom'
 import { parseHtml } from '../../parsers/linkedom.js'
 import { baseContext, describeForEachParser, html, queryElement } from '../../tests.js'
 import type { HighlightFn, TransformContext } from '../../types.js'
@@ -8,7 +7,7 @@ import { detectLanguage, highlightCode } from './highlightCode.js'
 
 describe('detectLanguage', () => {
   const createElement = (value: string): { pre: Element; code: Element | null } => {
-    const { document } = parseHTML(`<!doctype html><html><body>${value}</body></html>`)
+    const document = parseHtml(value)
     const pre = queryElement(document, 'pre')
     const code = pre.querySelector('code')
 
@@ -818,12 +817,9 @@ describeForEachParser('highlightCode', (parseHtml) => {
   })
 
   it('should highlight Shiki code blocks using data-language on pre', async () => {
-    const value = [
-      '<pre class="astro-code" data-language="scss">',
-      '<code><span class="line"><span>header</span><span> {</span></span>\n',
-      '<span class="line"><span>  ul</span><span> {</span></span></code>',
-      '</pre>',
-    ].join('')
+    // The newline inside `<code>` is code, and `html` would join the lines without it.
+    const value = `<pre class="astro-code" data-language="scss"><code><span class="line"><span>header</span><span> {</span></span>
+<span class="line"><span>  ul</span><span> {</span></span></code></pre>`
     const expected =
       '<pre class="astro-code" data-language="scss" data-pre-language="scss" data-pre-label="SCSS"><code class="hljs"><span class="hljs-selector-tag">header</span> {\n  <span class="hljs-selector-tag">ul</span> {</code></pre>'
 
@@ -831,10 +827,10 @@ describeForEachParser('highlightCode', (parseHtml) => {
   })
 
   it('should highlight multiple code blocks', async () => {
-    const value = [
-      '<pre><code class="language-js">const a = 1</code></pre>',
-      '<pre><code class="language-python">x = 1</code></pre>',
-    ].join('')
+    const value = html`
+      <pre><code class="language-js">const a = 1</code></pre>
+      <pre><code class="language-python">x = 1</code></pre>
+    `
     const expected =
       '<pre data-pre-language="js" data-pre-label="JavaScript"><code class="language-js hljs"><span class="hljs-keyword">const</span> a = <span class="hljs-number">1</span></code></pre><pre data-pre-language="python" data-pre-label="Python"><code class="language-python hljs">x = <span class="hljs-number">1</span></code></pre>'
 

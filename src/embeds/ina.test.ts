@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
-import { inaEmbedResolver, inaRenderHint, inaResolveEmbed, inaScriptEmbedResolver } from './ina.js'
+import {
+  inaIframeEmbedResolver,
+  inaRenderHint,
+  inaResolveEmbed,
+  inaScriptEmbedResolver,
+} from './ina.js'
 
 describe('inaResolveEmbed', () => {
   describe('happy paths', () => {
@@ -156,8 +161,8 @@ describe('inaResolveEmbed', () => {
   })
 })
 
-describeForEachParser('inaEmbedResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, inaEmbedResolver)
+describeForEachParser('inaIframeEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, inaIframeEmbedResolver)
 
   describe('happy paths', () => {
     it('should state the platform size over the box the carrier declares', async () => {

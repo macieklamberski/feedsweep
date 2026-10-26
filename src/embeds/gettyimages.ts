@@ -2,6 +2,12 @@ import { composeQuery, encodePathSegment, startsWithAnyOf, trimObject } from 'tr
 import type { ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'gettyimages'
+
+const sizes = {
+  player: { ratio: '3/2' },
+}
+
 // The asset id Getty calls `items`, and the opaque embed token it calls `et`.
 const embedPathRegex = /^\/embed\/([^/]+)\/?$/i
 
@@ -34,13 +40,13 @@ const gettyImagesResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 
   return {
-    provider: 'gettyimages',
+    provider,
     // `embed.gettyimages.com/oembed?url=http://gty.im/{items}` answers title, caption,
     // photographer, collection and a thumbnail with no key, and 404s on an invented id.
     id: itemId,
     src: `https://embed.gettyimages.com/embed/${itemId}${readSignedQuery(url)}`,
     url: `https://www.gettyimages.com/detail/${itemId}`,
-    ratio: '3/2',
+    ...sizes.player,
   }
 }
 

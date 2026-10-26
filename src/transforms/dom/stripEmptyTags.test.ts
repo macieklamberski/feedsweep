@@ -381,18 +381,6 @@ describeForEachParser('stripEmptyTags', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
-  it('should be idempotent', async () => {
-    const value = html`
-      <div></div>
-      <p>Keep</p>
-      <div></div>
-    `
-    const once = await transform(value)
-    const twice = await transform(once)
-
-    expect(twice).toEqualHtml(once)
-  })
-
   describe('anchor targets', () => {
     it('should preserve an empty named anchor', async () => {
       const value = '<a name="section"></a>'
@@ -447,5 +435,17 @@ describeForEachParser('stripEmptyTags', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+  })
+
+  it('should be idempotent', async () => {
+    const value = html`
+      <div></div>
+      <p>Keep</p>
+      <div></div>
+    `
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
   })
 })

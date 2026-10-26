@@ -4,6 +4,10 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'dzen'
 
+const sizes = {
+  player: { ratio: '16/9' },
+}
+
 const dzenHosts = ['dzen.ru']
 
 const embedPathRegex = /^\/embed\/([^/]+)\/?$/i
@@ -20,7 +24,7 @@ export const dzenResolveEmbed: ResolveUrlEmbed = (url) => {
     provider,
     id,
     src: `https://dzen.ru/embed/${id}${pickUrlParams(url, ['t'])}`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

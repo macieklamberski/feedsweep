@@ -4,11 +4,17 @@ import { attr, keepIfMatches } from '../utils/dom.js'
 import { hexRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'genially'
+
 // The view id is a dashless 24-character hex id. On the main site the length tells it from a page
 // such as `genially.com/de`, whose name is hex too.
 const safeViewIdRegex = /^[0-9a-f]{24}$/i
 
 const geniallyHosts = ['genially.com', 'genial.ly']
+
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 export const extractGeniallyViewId = (link: URL): string | undefined => {
   const segments = getPathSegments(link)
@@ -42,12 +48,12 @@ export const geniallyResolveEmbed: ResolveUrlEmbed = (url, element) => {
   // No thumbnail offline: the page's `og:image` on `thumbnails.genially.com` is keyed by ids that
   // appear nowhere in the embed url.
   return {
-    provider: 'genially',
+    provider,
     id: viewId,
     // `view.genial.ly/{id}` answers 301 to `view.genially.com/{id}`, where a real id answers 200
     // and an invented one 302s away.
     src: `https://view.genially.com/${viewId}`,
-    ratio: '16/9',
+    ...sizes.player,
     title,
   }
 }

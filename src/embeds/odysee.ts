@@ -2,6 +2,12 @@ import { decodeSegment, encodePathSegment, isAnyOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'odysee'
+
+const sizes = {
+  video: { ratio: '16/9' },
+}
+
 // lbry.tv and open.lbry.com redirect every url to odysee.com with the path kept.
 const odyseeHosts = ['odysee.com', 'lbry.tv', 'open.lbry.com']
 
@@ -64,11 +70,11 @@ const odyseeResolveEmbed: ResolveUrlEmbed = (url) => {
   // odysee.com/$/oembed?url=https://odysee.com/{claim path} answers the title, author and thumbnail
   // without a key.
   return {
-    provider: 'odysee',
+    provider,
     id: claimPath,
     src: `https://odysee.com/$/embed/${claimPath}`,
     url: `https://odysee.com/${claimPath}`,
-    ratio: '16/9',
+    ...sizes.video,
     author,
   }
 }

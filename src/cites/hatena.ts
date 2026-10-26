@@ -4,6 +4,7 @@ import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 
+const provider = 'hatena'
 const cardHost = 'hatenablog-parts.com'
 
 // The iframe's class is not dependable: embed-card is the common spelling, and the rest ship
@@ -47,7 +48,7 @@ export const hatenaCiteResolver: CiteResolver = {
     }
 
     const result = buildCite({
-      provider: 'hatena',
+      provider,
       // The citation's href comes first: it is the plain target, so it needs no decoding.
       url: citationHref ?? getQueryParam(cardUrl?.searchParams, 'url'),
       title: attr(element, 'title'),

@@ -6,6 +6,14 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'listennotes'
 
+// The embed dialog writes each player at a fixed height, and none of them grows with its width.
+const sizes = {
+  episode: { height: 180 },
+  podcast: { height: 600 },
+  clip: { height: 300 },
+  playlist: { height: 600 },
+}
+
 const listennotesHosts = ['listennotes.com']
 
 const listennotesOrigin = 'https://www.listennotes.com'
@@ -14,12 +22,6 @@ const clipRouteWords = ['clips', 'podcast-clips']
 
 // The episode player starts at `t`, in seconds. The clip player ignores it for its own start.
 const episodeParams = ['t']
-
-// The embed dialog writes each player at a fixed height, and none of them grows with its width.
-const episodeHeight = 180
-const podcastHeight = 600
-const clipHeight = 300
-const playlistHeight = 600
 
 // A locale such as `fr` or `zh-hant` can open the path, ahead of the route word. Two letters tell
 // it from a route word such as `podcasts` or `podcast-clips`, which opens the path in its place.
@@ -33,7 +35,7 @@ type Slugged = {
   slug: string
   playerPath: string
   pagePath: string
-  height: number
+  size: { height: number }
   title: string | undefined
   query?: string
 }
@@ -50,7 +52,7 @@ const composeSlugged = (slugged: Slugged): EmbedResolverResult | undefined => {
     id: `${slugged.kind}/${shortId}`,
     src: `${listennotesOrigin}/${slugged.playerPath}/embed/${slugged.query ?? ''}`,
     url: `${listennotesOrigin}/${slugged.pagePath}/`,
-    height: slugged.height,
+    ...slugged.size,
     title: slugged.title,
   }
 }
@@ -77,7 +79,7 @@ export const listennotesResolveEmbed: ResolveUrlEmbed = (url, element) => {
       id: `episode/${second}`,
       src: `${listennotesOrigin}/embedded/e/${second}/${episodeQuery}`,
       url: `${listennotesOrigin}/e/${second}/`,
-      height: episodeHeight,
+      ...sizes.episode,
       title,
     }
   }
@@ -90,7 +92,7 @@ export const listennotesResolveEmbed: ResolveUrlEmbed = (url, element) => {
       slug: first,
       playerPath: path,
       pagePath: path,
-      height: podcastHeight,
+      size: sizes.podcast,
       title,
     })
   }
@@ -103,7 +105,7 @@ export const listennotesResolveEmbed: ResolveUrlEmbed = (url, element) => {
       slug: second,
       playerPath: path,
       pagePath: path,
-      height: episodeHeight,
+      size: sizes.episode,
       title,
       query: episodeQuery,
     })
@@ -118,7 +120,7 @@ export const listennotesResolveEmbed: ResolveUrlEmbed = (url, element) => {
       slug: first,
       playerPath: path,
       pagePath: path,
-      height: clipHeight,
+      size: sizes.clip,
       title,
     })
   }
@@ -131,7 +133,7 @@ export const listennotesResolveEmbed: ResolveUrlEmbed = (url, element) => {
       slug: first,
       playerPath: `listen/${first}/${second}`,
       pagePath: `playlists/${first}/${second}`,
-      height: playlistHeight,
+      size: sizes.playlist,
       title,
     })
   }

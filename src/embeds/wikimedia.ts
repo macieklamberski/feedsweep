@@ -10,6 +10,12 @@ import {
 } from '../utils/urls.js'
 import { createMarkupEmbedResolver, readRepairedCarrierUrl } from '../utils/widgets.js'
 
+const provider = 'wikimedia'
+
+const sizes = {
+  video: { ratio: '16/9' },
+}
+
 const extensionRegex = /\.[^.]+$/
 const underscoreRegex = /_/g
 
@@ -77,11 +83,11 @@ export const wikimediaEmbedResolver: EmbedResolver = createMarkupEmbedResolver(
     }
 
     const result: EmbedResolverResult = {
-      provider: 'wikimedia',
+      provider,
       id: fileName,
       src,
       url: composeFilePageUrl(source, fileName),
-      ratio: '16/9',
+      ...sizes.video,
     }
 
     const thumbnail = composeFilePathUrl(source, fileName, posterWidth)

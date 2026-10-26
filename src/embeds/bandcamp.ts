@@ -8,11 +8,10 @@ import {
 } from 'trousse'
 import type { FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
-
-const provider = 'bandcamp'
-
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'bandcamp'
 
 // A release is either an album or a single track.
 const releaseRegex = /^(album|track)=([^/]+)$/i
@@ -20,10 +19,13 @@ const releaseRegex = /^(album|track)=([^/]+)$/i
 const signedTrackRegex = /^tracks=([^/,]+)$/i
 // The track number an album player opens on: `album=2182110545/t=38/` plays track 38.
 const startTrackRegex = /^t=[^/]+$/i
-// The large player with small artwork and no tracklist, spelled as the embed dialog writes it. It
-// lays out as a strip 120 tall that fits its controls to any width.
+// The large player with small artwork and no tracklist, spelled as the embed dialog writes it.
 const playerLayout = 'size=large/tracklist=false/artwork=small/'
-const playerHeight = 120
+const sizes = {
+  // The large player lays out as a strip 120 tall that fits its controls to any width.
+  player: { height: 120 },
+  video: { ratio: '16/9' },
+}
 const releaseKinds = ['album', 'track']
 
 // The audio player spells its options as path segments (`EmbeddedPlayer/album=123/size=large/`)
@@ -127,8 +129,7 @@ const bandcampResolveEmbed: ResolveUrlEmbed = (url, element) => {
       ? `https://bandcamp.com/VideoEmbed${composeQuery({ [kind]: id })}`
       : `https://bandcamp.com/EmbeddedPlayer/${head}${playerLayout}${tail}${start}`,
     url: pageUrl,
-    height: isVideo ? undefined : playerHeight,
-    ratio: isVideo ? '16/9' : undefined,
+    ...(isVideo ? sizes.video : sizes.player),
     title,
   }
 }

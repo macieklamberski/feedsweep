@@ -5,6 +5,8 @@ import { buildCite } from '../utils/cites.js'
 import { attr, find, isElement, text } from '../utils/dom.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 
+const provider = 'discourse'
+
 // When the linked article has a date, the generic onebox appends it to the source anchor's
 // text ("Whonix – 13 Jan 23") behind this spaced en dash.
 const publisherDateSeparator = ' – '
@@ -116,7 +118,7 @@ export const discourseCiteResolver: CiteResolver = {
     const hackernewsDate = text(find(body, 'a.timestamp'))
 
     return buildCite({
-      provider: 'discourse',
+      provider,
       url,
       title: githubAuthor ? stripCommentPrefix(title, githubAuthor) : title,
       description,

@@ -1,7 +1,6 @@
 import { composeQuery, encodePathSegment, getQueryParam, isHostOf } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, isEmptyElement } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'puzzleme'
@@ -14,8 +13,10 @@ const puzzlemeHosts = ['amuselabs.com', 'puzzleme.amuselabs.com', 'www.amuselabs
 // id and set name, and one it does not know answers 404.
 const playerPathRegex = /^\/pmm\/([^/]+)$/i
 
-// The loader sizes its frame to 700 pixels, and the player lays the puzzle out to fit it.
-const playerHeight = 700
+const sizes = {
+  // The loader sizes its frame to 700 pixels, and the player lays the puzzle out to fit it.
+  player: { height: 700 },
+}
 
 // The player finds a puzzle by its id within the publisher's set.
 const composePuzzlemeEmbed = (kind: string, id: string, set: string): EmbedResolverResult => {
@@ -27,20 +28,14 @@ const composePuzzlemeEmbed = (kind: string, id: string, set: string): EmbedResol
     // `embed=1` turns the page into the embedded player, without the site's own chrome.
     src: `${page}&embed=1`,
     url: page,
-    height: playerHeight,
+    ...sizes.player,
   }
 }
 
 const puzzlemeResolveEmbed: ResolveUrlEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, puzzlemeHosts, isHostOf)
-
-  if (!parsed) {
-    return
-  }
-
-  const kind = parsed.pathname.match(playerPathRegex)?.[1]
-  const id = getQueryParam(parsed.searchParams, 'id')
-  const set = getQueryParam(parsed.searchParams, 'set')
+  const kind = url.pathname.match(playerPathRegex)?.[1]
+  const id = getQueryParam(url.searchParams, 'id')
+  const set = getQueryParam(url.searchParams, 'set')
 
   if (!kind || !id || !set) {
     return
@@ -49,7 +44,11 @@ const puzzlemeResolveEmbed: ResolveUrlEmbed = (url) => {
   return composePuzzlemeEmbed(kind, id, set)
 }
 
-export const puzzlemeEmbedResolver = createUrlEmbedResolver(puzzlemeHosts, puzzlemeResolveEmbed)
+export const puzzlemeIframeEmbedResolver = createUrlEmbedResolver(
+  puzzlemeHosts,
+  puzzlemeResolveEmbed,
+  { isOnHost: isHostOf },
+)
 
 // The mount `puzzleme-embed.js` fills with a player frame, which renders nothing without it.
 export const puzzlemeWidgetEmbedResolver = createMarkupEmbedResolver(

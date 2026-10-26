@@ -26,19 +26,13 @@ const composeEmbed = (form: URL, hash: string): EmbedResolverResult => {
 
 // The form page, `{ssl|pro}.form-mailer.jp/fms/{hash}`.
 export const formmailerResolveEmbed: ResolveUrlEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, formmailerHosts)
-
-  if (!parsed) {
-    return
-  }
-
-  const [route, hash, ...rest] = getPathSegments(parsed)
+  const [route, hash, ...rest] = getPathSegments(url)
 
   if (!isAnyOf(route, 'fms') || !hash || rest.length > 0) {
     return
   }
 
-  return composeEmbed(parsed, hash)
+  return composeEmbed(url, hash)
 }
 
 // The inline embed, an empty div that `formfiles/js/embed.js` fills with the form's frame. The

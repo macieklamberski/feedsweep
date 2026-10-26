@@ -4,6 +4,12 @@ import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'bundestag'
+
+const sizes = {
+  player: { ratio: '16/9' },
+}
+
 const bundestagHosts = ['webtv.bundestag.de']
 
 const idParams = toMap({
@@ -15,19 +21,13 @@ const idParams = toMap({
 // and its loader script `player/macros/bttv/hls/player.js?content={id}`, which builds the same
 // player with config `bt-od` and policy `69`, the values every frame writes as `e` and `ep`.
 export const bundestagResolveEmbed: ResolveUrlEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, bundestagHosts)
-
-  if (!parsed) {
-    return
-  }
-
-  const name = idParams.get(getPathSegments(parsed).join('/').toLowerCase())
+  const name = idParams.get(getPathSegments(url).join('/').toLowerCase())
 
   if (!name) {
     return
   }
 
-  const id = getQueryParam(parsed.searchParams, name)
+  const id = getQueryParam(url.searchParams, name)
 
   if (!id) {
     return
@@ -36,12 +36,12 @@ export const bundestagResolveEmbed: ResolveUrlEmbed = (url) => {
   const query = composeQuery({ e: 'bt-od', ep: '69', a: '144277506', c: id })
 
   return {
-    provider: 'bundestag',
+    provider,
     id,
     src: `https://webtv.bundestag.de/pservices/player/embed/nokey${query}`,
     // The query id comes out decoded, and it goes into the page path.
     url: `https://dbtg.tv/cvid/${encodePathSegment(id)}`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

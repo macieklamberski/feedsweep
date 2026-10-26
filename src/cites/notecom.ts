@@ -3,6 +3,8 @@ import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
 
+const provider = 'notecom'
+
 // note.com's external-article card, stripped of every class and style by its RSS sanitizer.
 // The sanitizer leaves <a><strong>title</strong><em>description</em><em>host</em></a>, and page
 // HTML carries the classful external-article-widget-* tree with a CSS background-image thumbnail.
@@ -18,7 +20,7 @@ export const notecomCiteResolver: CiteResolver = {
     const descriptionEm = ems.length > 1 ? ems[0] : undefined
 
     return buildCite({
-      provider: 'notecom',
+      provider,
       url: attr(find(element, 'a'), 'href'),
       title: text(element, '.external-article-widget-title') ?? text(element, 'a > strong'),
       description: text(element, '.external-article-widget-description') ?? text(descriptionEm),

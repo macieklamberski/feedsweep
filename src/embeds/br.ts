@@ -6,6 +6,10 @@ const provider = 'br'
 
 const brHost = 'br.de'
 
+const sizes = {
+  player: { ratio: '16/9' },
+}
+
 // The slug BR writes in front of the token is decorative: the token alone names the media.
 const mediaTokenRegex = /av:[^/]+$/
 
@@ -24,7 +28,7 @@ const brResolveEmbed: ResolveUrlEmbed = (url) => {
     id: token,
     // The token is read decoded, and it goes back into the path.
     src: `https://www.br.de/mediathek/embed/${encodePathSegment(token)}`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

@@ -138,20 +138,8 @@ describe('symbalooResolveEmbed', () => {
       expect(symbalooResolveEmbed(new URL(value))).toBeUndefined()
     })
 
-    it('should ignore the embed route on the blog subdomain', () => {
-      const value = 'https://blog.symbaloo.com/embed/x'
-
-      expect(symbalooResolveEmbed(new URL(value))).toBeUndefined()
-    })
-
     it('should ignore an image on the file subdomain', () => {
       const value = 'https://cdn01.symbaloo.com/static/img/fb/fb_icon_symbaloo.png'
-
-      expect(symbalooResolveEmbed(new URL(value))).toBeUndefined()
-    })
-
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/embed/tic-tacbasicos-edu'
 
       expect(symbalooResolveEmbed(new URL(value))).toBeUndefined()
     })
@@ -245,6 +233,18 @@ describeForEachParser('symbalooEmbedResolver', (parseHtml) => {
 
     it('should ignore the embed route on a foreign host', async () => {
       const value = '<iframe src="https://evil.test/embed/tic-tacbasicos-edu"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the embed route on the blog subdomain', async () => {
+      const value = html`<iframe src="https://blog.symbaloo.com/embed/x"></iframe>`
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a foreign host carrying the same path', async () => {
+      const value = html`<iframe src="https://evil.test/embed/tic-tacbasicos-edu"></iframe>`
 
       expect(await extract(value)).toBeUndefined()
     })

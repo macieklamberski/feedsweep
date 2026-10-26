@@ -14,7 +14,11 @@ const stationPathRegex = /^\/(?<kind>live|artist)\/(?:[^/]*-)?(?<id>\d+)\/?$/i
 
 // The episode player fills its frame and switches to a compact bar, drawn whole at 120 tall. The
 // show and station players keep the 300 and 200 their embed code writes.
-const playerHeights = { episode: 120, show: 300, station: 200 }
+const sizes = {
+  episode: { height: 120 },
+  show: { height: 300 },
+  station: { height: 200 },
+}
 
 // An iHeart podcast player, of one episode or of a show, and the live station and artist radio
 // players, on www.iheart.com or beta.iheart.com.
@@ -30,7 +34,7 @@ export const iheartResolveEmbed: ResolveUrlEmbed = (url, element) => {
       id: `${episode[1]}/${episode[2]}`,
       src: `${page}?embed=true`,
       url: page,
-      height: playerHeights.episode,
+      ...sizes.episode,
       title: attr(element, 'title'),
     }
   }
@@ -45,7 +49,7 @@ export const iheartResolveEmbed: ResolveUrlEmbed = (url, element) => {
       id: `${station.kind}/${station.id}`,
       src: `${page}?embed=true`,
       url: page,
-      height: playerHeights.station,
+      ...sizes.station,
       title: attr(element, 'title'),
     }
   }
@@ -63,7 +67,7 @@ export const iheartResolveEmbed: ResolveUrlEmbed = (url, element) => {
     id: show[1],
     src: `${page}?embed=true`,
     url: page,
-    height: playerHeights.show,
+    ...sizes.show,
     title: attr(element, 'title'),
   }
 }

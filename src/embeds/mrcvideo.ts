@@ -6,6 +6,10 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'mrcvideo'
 
+const sizes = {
+  player: { ratio: '16/9' },
+}
+
 // Exact: `cdn.mrcvideo.org` serves the video files. `mrctv.org` and `www.mrctv.org` 301 onto
 // `mrcvideo.org/embed/{same id}`.
 const mrcvideoHosts = ['mrcvideo.org', 'mrctv.org', 'www.mrctv.org']
@@ -19,19 +23,17 @@ const composeEmbed = (id: string): EmbedResolverResult => {
     provider,
     id,
     src: `https://mrcvideo.org/embed/${encodePathSegment(id)}`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 
 // The route word answers in any case.
 const readEmbedId = (url: URL | undefined): string | undefined => {
-  const parsed = parseUrlOnHosts(url, mrcvideoHosts, isHostOf)
-
-  if (!parsed) {
+  if (!url) {
     return
   }
 
-  const [route, id, ...rest] = getPathSegments(parsed)
+  const [route, id, ...rest] = getPathSegments(url)
 
   if (!isAnyOf(route, 'embed') || rest.length > 0) {
     return
@@ -63,16 +65,14 @@ const mrcvideoResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 // MRC Video's embed iframe, `/embed/{id}`, on the current host and the former MRCTV ones.
-export const mrcvideoEmbedResolver = createUrlEmbedResolver(mrcvideoHosts, mrcvideoResolveEmbed)
+export const mrcvideoIframeEmbedResolver = createUrlEmbedResolver(
+  mrcvideoHosts,
+  mrcvideoResolveEmbed,
+  { isOnHost: isHostOf },
+)
 
 const mrcvideoFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
-  const parsed = parseUrlOnHosts(url, mrcvideoHosts, isHostOf)
-
-  if (!parsed) {
-    return
-  }
-
-  const [directory, file, ...rest] = getPathSegments(parsed)
+  const [directory, file, ...rest] = getPathSegments(url)
 
   if (!isAnyOf(directory, 'jwplayer') || !isAnyOf(file, 'player.swf') || rest.length > 0) {
     return
@@ -92,6 +92,7 @@ const mrcvideoFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
 export const mrcvideoFlashEmbedResolver = createUrlEmbedResolver(
   mrcvideoHosts,
   mrcvideoFlashResolveEmbed,
+  { isOnHost: isHostOf },
 )
 
 // The player calls `play()` when its query holds `autoplay`, whatever the value.

@@ -15,8 +15,8 @@ import { readPixels } from '../utils/hints.js'
 import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
+  createS9eEmbedResolver,
   createUrlEmbedResolver,
-  readS9eFragment,
 } from '../utils/widgets.js'
 
 const provider = 'facebook'
@@ -302,24 +302,20 @@ const s9ePlaceholderPage = 'Bob'
 const s9eWatchKindRegex = /[rv]/i
 
 // A forum's s9e MediaEmbed helper frame, naming a post or a video in its url fragment.
-export const facebookS9eEmbedResolver = createMarkupEmbedResolver(
-  'iframe[data-s9e-mediaembed="facebook"]',
-  (element) => {
-    const fragment = readS9eFragment(element) ?? ''
-    const match = s9eFragmentRegexes.map((regex) => regex.exec(fragment)).find(Boolean)
+export const facebookS9eEmbedResolver = createS9eEmbedResolver('facebook', (fragment) => {
+  const match = s9eFragmentRegexes.map((regex) => regex.exec(fragment)).find(Boolean)
 
-    if (!match) {
-      return
-    }
+  if (!match) {
+    return
+  }
 
-    const [, page, kind, id] = match
-    const href = s9eWatchKindRegex.test(kind)
-      ? `https://www.facebook.com/watch/${composeQuery({ v: id })}`
-      : `https://www.facebook.com/${page || s9ePlaceholderPage}/posts/${id}`
+  const [, page, kind, id] = match
+  const href = s9eWatchKindRegex.test(kind)
+    ? `https://www.facebook.com/watch/${composeQuery({ v: id })}`
+    : `https://www.facebook.com/${page || s9ePlaceholderPage}/posts/${id}`
 
-    return facebookResolveEmbed(new URL(href))
-  },
-)
+  return facebookResolveEmbed(new URL(href))
+})
 
 // The embed dialog's fallback blockquote, kept by the publisher without its widget div.
 export const facebookBlockquoteEmbedResolver = createMarkupEmbedResolver(

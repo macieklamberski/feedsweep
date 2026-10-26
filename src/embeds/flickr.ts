@@ -7,6 +7,15 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'flickr'
 
+const sizes = {
+  // The player fills its frame, and photos come in every shape.
+  photo: { ratio: '4/3' },
+  // The size Flickr's own dialog wrote for years. The slideshow renders at whatever box the query
+  // names, so there is no rendered height to measure against.
+  slideshow: { width: 400, height: 300 },
+  video: { ratio: '16/9' },
+}
+
 const flickrHosts = ['flickr.com']
 const embedrHost = 'embedr.flickr.com'
 
@@ -101,13 +110,9 @@ const composePhotoThumbnail = (photoId: string, secret: string): string => {
   return `https://live.staticflickr.com/0/${photoId}_${secret}_b.jpg`
 }
 
-// The size Flickr's own dialog wrote for years. The slideshow renders at whatever box the query
-// names, so there is no rendered height to measure against.
-const dialogSize = { width: 400, height: 300 }
-
 // embedr draws its box at the size the query names, whatever the frame, so the video player is
 // asked for 16:9.
-const videoSize = { width: 640, height: 360 }
+const videoQuery = '?width=640&height=360'
 
 // What a page path names, whether it arrived in the flashvars or as the framed page itself.
 // A value read out of a path is decoded, so each is held in one form and only the urls encode it.
@@ -238,8 +243,7 @@ const composePhotoEmbed = (src: string, photo: FlickrPhoto): EmbedResolverResult
       : composeShortPhotoUrl(photoId),
     thumbnail: secret ? composePhotoThumbnail(photoId, secret) : undefined,
     author: readOwnerAlias(owner),
-    // The player fills its frame, and photos come in every shape.
-    ratio: '4/3',
+    ...sizes.photo,
   }
 }
 
@@ -340,20 +344,25 @@ const resolveTarget = (url: URL, element: Nullish<Element>): EmbedResolverResult
 
   // The size always travels in the src: with no query every image renders at NaN.
   if (flashVideoPathRegex.test(url.pathname)) {
-    const { width, height } = videoSize
-
-    return { ...result, src: `${result.src}?width=${width}&height=${height}`, ratio: '16/9' }
+    return { ...result, src: `${result.src}${videoQuery}`, ...sizes.video }
   }
 
-  const { width, height } = dialogSize
+  const { width, height } = sizes.slideshow
 
-  return { ...result, src: `${result.src}?width=${width}&height=${height}`, width, height }
+  return { ...result, src: `${result.src}?width=${width}&height=${height}`, ...sizes.slideshow }
 }
 
 export const flickrResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const target = resolveTarget(url, element)
 
-  return target && { ...target, title: target.title ?? attr(element, 'title') }
+  if (!target) {
+    return
+  }
+
+  return {
+    ...target,
+    title: target.title ?? attr(element, 'title'),
+  }
 }
 
 // Flickr's slideshow swf, its video swf, the legacy iframe, a framed album or stream page, and

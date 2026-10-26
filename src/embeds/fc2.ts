@@ -7,6 +7,11 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const provider = 'fc2'
 const videoHosts = ['video.fc2.com']
 
+const sizes = {
+  // The loader draws the player 9/16 of its width tall.
+  player: { ratio: '16/9' },
+}
+
 // The content page is `/content/{id}/`, behind a two-character language on most snippets. The
 // adult site's `/a/content/` is refused, since the embed player cannot play it.
 const contentPageRegex = /^\/(?:[A-Za-z0-9_]{2}\/)?content\/([^/]+)\/?$/i
@@ -21,8 +26,7 @@ const composeEmbed = (contentId: string): EmbedResolverResult => {
     id: contentId,
     src: `https://video.fc2.com/embed/player/${contentId}/`,
     url: `https://video.fc2.com/content/${contentId}/`,
-    // The loader draws the player 9/16 of its width tall.
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

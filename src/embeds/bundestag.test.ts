@@ -66,12 +66,6 @@ describe('bundestagResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/pservices/player/embed/nokey?e=bt-od&ep=69&c=7657467'
-
-      expect(bundestagResolveEmbed(new URL(value))).toBeUndefined()
-    })
-
     it('should ignore a path with a leading segment', () => {
       const value = 'https://webtv.bundestag.de/x/pservices/player/embed/nokey?c=7657467'
 

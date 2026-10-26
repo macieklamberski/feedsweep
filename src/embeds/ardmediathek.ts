@@ -4,6 +4,10 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ardmediathek'
 
+const sizes = {
+  player: { ratio: '16/9' },
+}
+
 const ardmediathekHosts = ['ardmediathek.de']
 
 // The legacy `/{channel}/embed/{id}` route 404s.
@@ -23,7 +27,7 @@ const ardmediathekResolveEmbed: ResolveUrlEmbed = (url) => {
     id,
     src: `https://www.ardmediathek.de/embed/${id}${pickUrlParams(url, ['startTime'])}`,
     url: `https://www.ardmediathek.de/video/${id}`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

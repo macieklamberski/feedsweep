@@ -2,6 +2,8 @@ import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 
+const provider = 'pzlinkcard'
+
 // Pz-LinkCard's WordPress link card: the whole card sits inside one anchor to the target.
 export const pzlinkcardCiteResolver: CiteResolver = {
   kind: 'cite',
@@ -14,7 +16,7 @@ export const pzlinkcardCiteResolver: CiteResolver = {
     const favicon = find(element, '.lkc-favicon img') ?? find(element, '.lkc-favicon')
 
     return buildCite({
-      provider: 'pzlinkcard',
+      provider,
       // A card with no wrapping anchor prints the target in .lkc-url.
       url: attr(element, 'href') ?? text(element, '.lkc-url'),
       title: text(element, '.lkc-title-text') ?? text(element, '.lkc-title'),

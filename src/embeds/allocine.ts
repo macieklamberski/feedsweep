@@ -4,6 +4,10 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'allocine'
 
+const sizes = {
+  player: { ratio: '16/9' },
+}
+
 const allocineHosts = ['allocine.fr']
 
 // The server answers every route in lowercase only, so `src` mints the route words that way.
@@ -38,7 +42,7 @@ export const allocineResolveEmbed: ResolveUrlEmbed = (url) => {
     provider,
     id: cmedia,
     src: `https://player.allocine.fr/${encodePathSegment(cmedia)}.html`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

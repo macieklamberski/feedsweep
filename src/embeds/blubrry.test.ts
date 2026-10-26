@@ -4,7 +4,7 @@ import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { CleanUrlFn, EmbedResolverResult } from '../types.js'
 import {
   type BlubrryPlayer,
-  blubrryEmbedResolver,
+  blubrryIframeEmbedResolver,
   blubrryPowerpressEmbedResolver,
   blubrryResolveEmbed,
   extractBlubrryEmbed,
@@ -258,8 +258,8 @@ describe('blubrryResolveEmbed', () => {
   })
 })
 
-describeForEachParser('blubrryEmbedResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, blubrryEmbedResolver)
+describeForEachParser('blubrryIframeEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, blubrryIframeEmbedResolver)
 
   describe('happy paths', () => {
     it('should claim a player iframe and state the measured height', async () => {
@@ -482,8 +482,8 @@ describeForEachParser('blubrry through the pipeline', (parseHtml) => {
   })
 })
 
-describeForEachParser('blubrryEmbedResolver carrier title', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, blubrryEmbedResolver)
+describeForEachParser('blubrryIframeEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, blubrryIframeEmbedResolver)
 
   it('should drop the label the player writes in place of the name', async () => {
     const value = html`

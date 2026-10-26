@@ -3,7 +3,13 @@ import type { ResolveUrlEmbed } from '../types.js'
 import { pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'cspan'
+
 const cspanHosts = ['c-span.org']
+
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 const idEndRegex = /[/&]/
 
@@ -28,11 +34,11 @@ export const cspanResolveEmbed: ResolveUrlEmbed = (url) => {
   const query = params.size ? `&${params}` : ''
 
   return {
-    provider: 'cspan',
+    provider,
     id,
     src: `https://www.c-span.org/video/standalone/?${id}${query}`,
     url: `https://www.c-span.org/video/?${id}`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

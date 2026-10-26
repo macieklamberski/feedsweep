@@ -6,6 +6,10 @@ import { getPathSegmentsWithoutWorkspace } from './googledrive.js'
 
 const provider = 'googleslides'
 
+const sizes = {
+  player: { ratio: '480/299' },
+}
+
 // The page routes a deck frame names. `/export` serves the deck as a file, which stays an
 // enclosure.
 const deckRoutes = ['edit', 'embed', 'preview', 'pub', 'pubembed']
@@ -13,8 +17,6 @@ const deckRoutes = ['edit', 'embed', 'preview', 'pub', 'pubembed']
 // `slide` is the start position. `loop` and `delayms` only shape auto-advance, which `start`
 // turns on, and starting playback is the reader's call.
 const deckParams = ['slide']
-
-const deckRatio = '480/299'
 
 // A share link can write its slide in the fragment, beside flags for the toolbar and where the
 // file was opened from. Only the slide the deck opens on is kept.
@@ -48,7 +50,7 @@ export const googleslidesResolveEmbed: ResolveUrlEmbed = (url) => {
       id: fileId,
       src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${readDeckFragment(url)}`,
       url: `https://docs.google.com/presentation/d/${deckPath}/pub`,
-      ratio: deckRatio,
+      ...sizes.player,
     }
   }
 
@@ -77,7 +79,7 @@ export const googleslidesResolveEmbed: ResolveUrlEmbed = (url) => {
     id: deckId,
     src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${readDeckFragment(url)}`,
     url: `https://docs.google.com/presentation/d/${deckPath}/pub`,
-    ratio: deckRatio,
+    ...sizes.player,
   }
 }
 

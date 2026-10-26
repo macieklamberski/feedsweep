@@ -273,31 +273,6 @@ describeForEachParser('stripDuplicateTitleHeading', (parseHtml) => {
       expect(await transform(value, context)).toEqualHtml(value)
     })
 
-    it('should be idempotent', async () => {
-      const value = html`
-        <h1>Breaking News Today</h1>
-        <p>Body.</p>
-      `
-      const context: TransformContext = { ...baseContext, articleTitle: 'Breaking News Today' }
-      const once = await transform(value, context)
-      const twice = await transform(once, context)
-
-      expect(twice).toEqualHtml(once)
-    })
-
-    it('should be idempotent when a later heading repeats the title', async () => {
-      const value = html`
-        <h1>The Title</h1>
-        <p>Body.</p>
-        <h1>The Title</h1>
-      `
-      const context: TransformContext = { ...baseContext, articleTitle: 'The Title' }
-      const once = await transform(value, context)
-      const twice = await transform(once, context)
-
-      expect(twice).toEqualHtml(once)
-    })
-
     it('should skip removal when the heading contains an img', async () => {
       const value = html`
         <h1>Logo<img src="logo.png">
@@ -383,6 +358,31 @@ describeForEachParser('stripDuplicateTitleHeading', (parseHtml) => {
       `
 
       expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should be idempotent', async () => {
+      const value = html`
+        <h1>Breaking News Today</h1>
+        <p>Body.</p>
+      `
+      const context: TransformContext = { ...baseContext, articleTitle: 'Breaking News Today' }
+      const once = await transform(value, context)
+      const twice = await transform(once, context)
+
+      expect(twice).toEqualHtml(once)
+    })
+
+    it('should be idempotent when a later heading repeats the title', async () => {
+      const value = html`
+        <h1>The Title</h1>
+        <p>Body.</p>
+        <h1>The Title</h1>
+      `
+      const context: TransformContext = { ...baseContext, articleTitle: 'The Title' }
+      const once = await transform(value, context)
+      const twice = await transform(once, context)
+
+      expect(twice).toEqualHtml(once)
     })
   })
 })

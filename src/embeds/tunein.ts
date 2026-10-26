@@ -4,6 +4,10 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'tunein'
 
+const sizes = {
+  player: { height: 100 },
+}
+
 // A guide id opens with its kind letter: `s` for a station, `p` for a program, `t` for a topic.
 const guideIdRegex = /^([a-z])/
 
@@ -30,7 +34,7 @@ export const tuneinResolveEmbed: ResolveUrlEmbed = (url) => {
     src: `https://tunein.com/embed/player/${guideId}/`,
     url: hasPage ? `https://tunein.com/radio/${guideId}/` : undefined,
     thumbnail: hasPage ? `https://cdn-radiotime-logos.tunein.com/${guideId}d.png` : undefined,
-    height: 100,
+    ...sizes.player,
   }
 }
 

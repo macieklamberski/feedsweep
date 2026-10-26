@@ -105,18 +105,6 @@ describe('streamableResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/e/qun2ij'
-
-      expect(streamableResolveEmbed(new URL(value))).toBeUndefined()
-    })
-
-    it('should ignore a file host of the platform', () => {
-      const value = 'https://cdn-cf-east.streamable.com/qun2ij'
-
-      expect(streamableResolveEmbed(new URL(value))).toBeUndefined()
-    })
-
     it('should ignore a route nested under another segment', () => {
       const value = 'https://streamable.com/x/e/qun2ij'
 
@@ -303,6 +291,12 @@ describeForEachParser('streamableIframeEmbedResolver', (parseHtml) => {
           height="315"
         ></iframe>
       `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a file host of the platform', async () => {
+      const value = html`<iframe src="https://cdn-cf-east.streamable.com/qun2ij"></iframe>`
 
       expect(await extract(value)).toBeUndefined()
     })

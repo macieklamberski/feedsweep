@@ -1,9 +1,8 @@
 import type { FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
+import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ivoox'
-
-import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `playerivoox_ee_`, `_ep_` and `_em_` are three generations of the legacy episode player, and
 // all of them name the episode by the same numeric id.
@@ -20,8 +19,10 @@ const showPlayerRegex = /\/player_es_podcast_(\d+)(?:_[^_/]+)?_(\d+)\.html$/i
 const ivooxHosts = ['ivoox.com']
 
 // The heights iVoox's embed dialog states for the current episode and show players.
-const episodeHeight = 200
-const showHeight = 400
+const sizes = {
+  episode: { height: 200 },
+  show: { height: 400 },
+}
 
 export type IvooxSubject = {
   kind: 'episode' | 'show'
@@ -66,7 +67,7 @@ export const ivooxResolveEmbed: ResolveUrlEmbed = (url, element) => {
       provider,
       id: `podcast/${subject.id}`,
       src: `https://www.ivoox.com/player_es_podcast_${subject.id}_zp_${subject.page}.html`,
-      height: showHeight,
+      ...sizes.show,
       title: attr(element, 'title'),
     }
   }
@@ -76,7 +77,7 @@ export const ivooxResolveEmbed: ResolveUrlEmbed = (url, element) => {
     provider,
     id: subject.id,
     src: `https://www.ivoox.com/player_ej_${subject.id}_6_${subject.page}.html`,
-    height: episodeHeight,
+    ...sizes.episode,
     title: attr(element, 'title'),
   }
 }

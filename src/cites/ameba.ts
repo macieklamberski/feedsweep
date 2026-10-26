@@ -2,13 +2,15 @@ import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 
+const provider = 'ameba'
+
 // Ameba's ogpCard: an anchor of inline-styled spans frozen from the link's Open Graph data.
 export const amebaCiteResolver: CiteResolver = {
   kind: 'cite',
   selector: '.ogpCard_wrap',
   extract: (element) => {
     return buildCite({
-      provider: 'ameba',
+      provider,
       url: attr(find(element, 'a.ogpCard_link'), 'href'),
       title: text(element, '.ogpCard_title'),
       description: text(element, '.ogpCard_description'),

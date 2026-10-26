@@ -16,8 +16,10 @@ const yandexMusicHosts = [
 
 // The heights the share dialog writes: the track card, and the album or playlist card with its
 // scrolling track list. Both players fill whatever width they get.
-const trackHeight = 244
-const listHeight = 556
+const sizes = {
+  track: { height: 244 },
+  list: { height: 556 },
+}
 
 type YandexMusicItem =
   | { kind: 'track'; track: string; album?: string }
@@ -111,7 +113,7 @@ const composeYandexMusicEmbed = (item: YandexMusicItem): EmbedResolverResult => 
       id: `album/${item.album}`,
       src: `https://music.yandex.ru/iframe/album/${album}`,
       url: `https://music.yandex.ru/album/${album}`,
-      height: listHeight,
+      ...sizes.list,
     }
   }
 
@@ -124,7 +126,7 @@ const composeYandexMusicEmbed = (item: YandexMusicItem): EmbedResolverResult => 
       id: `playlist/${item.owner}/${item.playlist}`,
       src: `https://music.yandex.ru/iframe/playlist/${owner}/${playlist}`,
       url: `https://music.yandex.ru/users/${owner}/playlists/${playlist}`,
-      height: listHeight,
+      ...sizes.list,
     }
   }
 
@@ -139,7 +141,7 @@ const composeYandexMusicEmbed = (item: YandexMusicItem): EmbedResolverResult => 
     id: `track/${item.track}`,
     src: `https://music.yandex.ru/iframe/${path}`,
     url: `https://music.yandex.ru/${path}`,
-    height: trackHeight,
+    ...sizes.track,
   }
 }
 

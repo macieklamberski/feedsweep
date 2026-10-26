@@ -6,6 +6,10 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'sketchfab'
 
+const sizes = {
+  model: { ratio: '4/3' },
+}
+
 // A model uid is 32 hex characters, and it also ends the slugged page url
 // (`/3d-models/{slug}-{uid}`), which is how a pasted page link is read. The shape tells a uid from
 // the listing words that share the bare page route, such as `/models/popular`.
@@ -51,7 +55,7 @@ const sketchfabResolveEmbed: ResolveUrlEmbed = (url, element) => {
     // The slug is not derivable from the uid, and the site redirects the unslugged `/models/{uid}`
     // to the `/3d-models/{slug}-{uid}` page.
     url: `https://sketchfab.com/models/${uid}`,
-    ratio: '4/3',
+    ...sizes.model,
     title: attr(element, 'title'),
   }
 }

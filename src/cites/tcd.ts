@@ -2,6 +2,8 @@ import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 
+const provider = 'tcd'
+
 // TCD's WordPress theme family renders a pasted link as a card, the thumbnail in its own anchor.
 // The card's footer ships empty. Half the sites close the thumbnail anchor before its div, and
 // the parser then lands cardlink_content, title included, as the card's sibling.
@@ -10,7 +12,7 @@ export const tcdCiteResolver: CiteResolver = {
   selector: '.cardlink',
   extract: (element) => {
     return buildCite({
-      provider: 'tcd',
+      provider,
       url: attr(find(element, '.cardlink_title a'), 'href'),
       title: text(element, '.cardlink_title'),
       description: text(element, '.cardlink_excerpt'),

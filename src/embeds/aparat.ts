@@ -3,6 +3,13 @@ import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'aparat'
+
+const sizes = {
+  // Most iframes that state a size are 16:9, and the script carrier states no size at all.
+  player: { ratio: '16/9' },
+}
+
 const aparatHosts = ['aparat.com']
 const scriptPathRegex = /^\/embed\/([^/]+)$/i
 const framePathRegex = /^\/video\/video\/embed\/videohash\/([^/]+)(?:\/vt\/frame)?\/?$/i
@@ -11,12 +18,11 @@ const framePathRegex = /^\/video\/video\/embed\/videohash\/([^/]+)(?:\/vt\/frame
 // and a poster, with no key. The poster's asset url is signed with a `secret=` parameter.
 const composeEmbed = (videoHash: string): EmbedResolverResult => {
   return {
-    provider: 'aparat',
+    provider,
     id: videoHash,
     src: `https://www.aparat.com/video/video/embed/videohash/${videoHash}/vt/frame`,
     url: `https://www.aparat.com/v/${videoHash}`,
-    // Most iframes that state a size are 16:9, and the script carrier states no size at all.
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

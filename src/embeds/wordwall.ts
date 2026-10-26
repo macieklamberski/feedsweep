@@ -4,6 +4,12 @@ import { keepIfMatches } from '../utils/dom.js'
 import { hexRegex, hyphenatedLettersRegex, lettersRegex, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'wordwall'
+
+const sizes = {
+  player: { ratio: '500/380' },
+}
+
 // `screens.cdn.wordwall.net` serves the activity images, so only the page hosts are claimed.
 const wordwallHosts = ['wordwall.net', 'www.wordwall.net']
 
@@ -57,10 +63,10 @@ const wordwallResolveEmbed: ResolveUrlEmbed = (url) => {
   // a hash that appears nowhere in the embed url.
   // No separate page either: that page states the embed url itself as its `og:url`.
   return {
-    provider: 'wordwall',
+    provider,
     id: activityId,
     src: `https://wordwall.net/embed/${activityId}${pickUrlParams(url, playParams)}`,
-    ratio: '500/380',
+    ...sizes.player,
   }
 }
 

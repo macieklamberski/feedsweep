@@ -19,9 +19,11 @@ const typeRoutes = toMap({
 const playerPathRegex = /^\/outchain\/player\/?$/i
 const flashPlayerPathRegex = /^\/style\/swf\/widget\.swf$/i
 
-// Without `height` the player loads its list layout and fills its box. 250 shows the header, about
-// three tracks and the footer, so a playlist shows that it holds more than one.
-const playerHeight = 250
+const sizes = {
+  // Without `height` the player loads its list layout and fills its box. 250 shows the header,
+  // about three tracks and the footer, so a playlist shows that it holds more than one.
+  player: { height: 250 },
+}
 
 const composeResult = (type: string, id: string): EmbedResolverResult | undefined => {
   const route = typeRoutes.get(type)
@@ -35,7 +37,7 @@ const composeResult = (type: string, id: string): EmbedResolverResult | undefine
     id: `${route}/${id}`,
     src: `https://music.163.com/outchain/player${composeQuery({ type, id })}`,
     url: `https://music.163.com/${route}${composeQuery({ id })}`,
-    height: playerHeight,
+    ...sizes.player,
   }
 }
 

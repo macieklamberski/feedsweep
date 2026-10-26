@@ -169,12 +169,6 @@ describe('fliphtml5ResolveEmbed', () => {
 
       expect(fliphtml5ResolveEmbed(new URL(value))).toEqual(expected)
     })
-
-    it('should ignore the shelf on the apex host', () => {
-      const value = 'https://fliphtml5.com/homepage/mzsro/'
-
-      expect(fliphtml5ResolveEmbed(new URL(value))).toBeUndefined()
-    })
   })
 })
 
@@ -206,6 +200,12 @@ describeForEachParser('fliphtml5IframeEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore the account and book path on a foreign host', async () => {
       const value = '<iframe src="https://evil.test/mzsro/jvuq/"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the shelf on the apex host', async () => {
+      const value = '<iframe src="https://fliphtml5.com/homepage/mzsro/"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

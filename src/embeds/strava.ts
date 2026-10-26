@@ -6,11 +6,16 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'strava'
 
-// The page each player kind embeds, and the player's ratio at its narrowest width, where the
-// fixed chrome makes it tallest.
+// The player's ratio at its narrowest width, where the fixed chrome makes it tallest.
+const sizes = {
+  activity: { ratio: '300/472' },
+  route: { ratio: '300/531' },
+}
+
+// The page each player kind embeds, and its size.
 const embedKinds = toMap({
-  activity: { page: 'activities', ratio: '300/472' },
-  route: { page: 'routes', ratio: '300/531' },
+  activity: { page: 'activities', size: sizes.activity },
+  route: { page: 'routes', size: sizes.route },
 })
 
 // The routes of the retired apex embed, `{route}/{id}/embed/{token}`, and the kind each names.
@@ -39,7 +44,7 @@ const composeEmbed = (
     id: `${kind}/${id}`,
     src: `https://strava-embeds.com/${kind}/${id}${query}`,
     ...(!query && { url: `https://www.strava.com/${embedKind.page}/${id}` }),
-    ratio: embedKind.ratio,
+    ...embedKind.size,
   }
 }
 

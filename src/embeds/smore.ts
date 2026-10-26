@@ -7,8 +7,11 @@ const provider = 'smore'
 
 const legacyHost = 'www.smore.com'
 
-// The newsletter page posts no height to its parent, so a long newsletter scrolls inside the frame.
-const newsletterHeight = 600
+const sizes = {
+  // The newsletter page posts no height to its parent, so a long newsletter scrolls inside the
+  // frame.
+  player: { height: 600 },
+}
 
 // A newsletter is `www.smore.com/{key}-{slug}` on the legacy host and `/n/{key}-{slug}` on
 // `app.smore.com` and `secure.smore.com`. The slug is cosmetic and the key is case-sensitive.
@@ -39,7 +42,7 @@ export const smoreEmbedResolver = createUrlEmbedResolver(
       id: key,
       src: `https://app.smore.com/n/${key}?embedded`,
       url: `https://app.smore.com/n/${key}`,
-      height: newsletterHeight,
+      ...sizes.player,
       title: attr(element, 'title'),
     }
   },

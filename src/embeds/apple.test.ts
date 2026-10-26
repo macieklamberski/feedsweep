@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, jsonAttrValue, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { appleEmbedResolver, appleResolveEmbed, appleToolsEmbedResolver } from './apple.js'
+import { appleIframeEmbedResolver, appleResolveEmbed, appleToolsEmbedResolver } from './apple.js'
 
 describe('appleResolveEmbed', () => {
   describe('happy paths', () => {
@@ -232,8 +232,8 @@ describe('appleResolveEmbed', () => {
   })
 })
 
-describeForEachParser('appleEmbedResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, appleEmbedResolver)
+describeForEachParser('appleIframeEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, appleIframeEmbedResolver)
 
   it('should resolve an apple music iframe', async () => {
     const value = html`
@@ -255,6 +255,12 @@ describeForEachParser('appleEmbedResolver', (parseHtml) => {
 
   it('should ignore a non-apple iframe', async () => {
     const value = '<iframe src="https://example.com/us/album/thriller/1440857781"></iframe>'
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
+  it('should ignore an apple iframe on a route that is no player', async () => {
+    const value = '<iframe src="https://music.apple.com/us/browse"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
   })
@@ -479,8 +485,8 @@ describeForEachParser('appleEmbedResolver', (parseHtml) => {
   })
 })
 
-describeForEachParser('appleEmbedResolver carrier title', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, appleEmbedResolver)
+describeForEachParser('appleIframeEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, appleIframeEmbedResolver)
 
   it('should drop the label the share dialog writes in place of the name', async () => {
     const value = html`

@@ -2,6 +2,8 @@ import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text, textNode } from '../utils/dom.js'
 
+const provider = 'nodebb'
+
 // NodeBB's link-preview plugin card: a Bootstrap card stored in the post HTML.
 // Core bundles the plugin since 4.7.0 but leaves it off, so only forums that turned it on emit it.
 export const nodebbCiteResolver: CiteResolver = {
@@ -10,7 +12,7 @@ export const nodebbCiteResolver: CiteResolver = {
   selector: '.card.link-preview',
   extract: (element) => {
     return buildCite({
-      provider: 'nodebb',
+      provider,
       // The image, title and footer anchors all carry the same target url.
       url: attr(find(element, '.card-title a'), 'href') ?? attr(find(element, 'a'), 'href'),
       title: text(element, '.card-title'),

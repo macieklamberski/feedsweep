@@ -272,6 +272,12 @@ describeForEachParser('markTimestamps', (parseHtml) => {
     expect(result).toEqualHtml(expected)
   })
 
+  it('should stay linear on a long whitespace run after a colon', async () => {
+    const value = `<p>:${' '.repeat(80000)}</p>`
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should be idempotent', async () => {
     const value = '<p>01:21 - Intro</p>'
     const once = await transform(value)
@@ -286,12 +292,6 @@ describeForEachParser('markTimestamps', (parseHtml) => {
     const twice = await transform(once)
 
     expect(twice).toEqualHtml(once)
-  })
-
-  it('should stay linear on a long whitespace run after a colon', async () => {
-    const value = `<p>:${' '.repeat(80000)}</p>`
-
-    expect(await transform(value)).toEqualHtml(value)
   })
 })
 

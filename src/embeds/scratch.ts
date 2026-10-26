@@ -1,6 +1,5 @@
 import { isHostOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'scratch'
@@ -15,18 +14,13 @@ const scratchHosts = [
 const projectEmbedRegex = /^\/projects\/(?:([^/]+)\/embed|embed\/([^/]+))\/?$/i
 
 // The box the share snippet writes.
-const snippetWidth = 485
-const snippetHeight = 402
+const sizes = {
+  player: { width: 485, height: 402 },
+}
 
 // Scratch's project player.
 export const scratchResolveEmbed: ResolveUrlEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, scratchHosts, isHostOf)
-
-  if (!parsed) {
-    return
-  }
-
-  const match = parsed.pathname.match(projectEmbedRegex)
+  const match = url.pathname.match(projectEmbedRegex)
   const projectId = match?.[1] ?? match?.[2]
 
   if (!projectId) {
@@ -39,9 +33,10 @@ export const scratchResolveEmbed: ResolveUrlEmbed = (url) => {
     src: `https://scratch.mit.edu/projects/${projectId}/embed`,
     url: `https://scratch.mit.edu/projects/${projectId}/`,
     thumbnail: `https://cdn2.scratch.mit.edu/get_image/project/${projectId}_480x360.png`,
-    width: snippetWidth,
-    height: snippetHeight,
+    ...sizes.player,
   }
 }
 
-export const scratchEmbedResolver = createUrlEmbedResolver(scratchHosts, scratchResolveEmbed)
+export const scratchEmbedResolver = createUrlEmbedResolver(scratchHosts, scratchResolveEmbed, {
+  isOnHost: isHostOf,
+})

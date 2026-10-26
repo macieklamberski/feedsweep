@@ -340,22 +340,18 @@ describeForEachParser('rebuildEmbedlyEmbeds', (parseHtml) => {
   })
 
   it('should be idempotent', async () => {
-    const value = [
-      '<iframe src="https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fexample.com%2Fembed&image=https%3A%2F%2Fexample.com%2Fp.jpg"></iframe>',
-      html`
-        <div
-          data-type="embedly"
-          src="https://example.com/thing"
-          data="${jsonAttrValue({ type: 'video', url: 'https://example.com/widget' })}"
-        ></div>
-      `,
-      html`
-        <div
-          data-type="embedly"
-          src='https://example.com/thing'
-        ></div>
-      `,
-    ].join('')
+    const value = html`
+      <iframe src="https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fexample.com%2Fembed&image=https%3A%2F%2Fexample.com%2Fp.jpg"></iframe>
+      <div
+        data-type="embedly"
+        src="https://example.com/thing"
+        data="${jsonAttrValue({ type: 'video', url: 'https://example.com/widget' })}"
+      ></div>
+      <div
+        data-type="embedly"
+        src='https://example.com/thing'
+      ></div>
+    `
     const once = await transform(value)
     const twice = await applyDomTransforms(parseHtml(once), [rebuildEmbedlyEmbeds(baseContext)])
 

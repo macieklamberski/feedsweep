@@ -10,7 +10,7 @@ const sharePathRegex = /^\/+(?:s|scl\/fi)\//i
 // element pointed at one plays nothing. `dl=1` wins over `raw=1` and has to go.
 export const fixDropboxMediaUrls: DomTransform = () => (document) => {
   for (const element of document.querySelectorAll('audio[src], video[src], source[src]')) {
-    const url = parseUrlOnHosts(element.getAttribute('src') ?? undefined, dropboxHosts)
+    const url = parseUrlOnHosts(element.getAttribute('src'), dropboxHosts)
 
     if (!url || !sharePathRegex.test(url.pathname)) {
       continue

@@ -13,9 +13,11 @@ const readerHosts = ['read.bookcreator.com']
 // segment from this list is never a user.
 const readerRoutes = ['_next', 'api', 'l', 'lib', 'library', 'portfolio', 'storage']
 
-// The box Book Creator's oEmbed writes for a portrait book, which the reader shows as a two-page
-// spread. A square book gets 675 by 675. The reader fits the book inside the box.
-const readerRatio = '900/675'
+const sizes = {
+  // The box Book Creator's oEmbed writes for a portrait book, which the reader shows as a two-page
+  // spread. A square book gets 675 by 675. The reader fits the book inside the box.
+  player: { ratio: '900/675' },
+}
 
 // Book Creator's reader frame, read.bookcreator.com/{userId}/{bookId}, as its oEmbed writes it.
 // The ids are case-sensitive, and a book id under another user answers 404.
@@ -37,7 +39,7 @@ const bookcreatorResolveEmbed: ResolveUrlEmbed = (url, element) => {
     src: `https://read.bookcreator.com/${id}${query}`,
     url: `https://read.bookcreator.com/${id}`,
     thumbnail: `https://assets.api.bookcreator.com/${userId}/books/${bookId}/cover/share`,
-    ratio: readerRatio,
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }

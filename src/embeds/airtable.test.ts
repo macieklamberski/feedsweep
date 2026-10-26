@@ -73,18 +73,6 @@ describe('airtableResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/embed/appmHSMnV4Q1S4cWh/shrMnUTYyzmsdX8JT'
-
-      expect(airtableResolveEmbed(new URL(value))).toBeUndefined()
-    })
-
-    it('should ignore the static subdomain, which serves files', () => {
-      const value = 'https://static.airtable.com/embed/shrIBFxXbBGxNv8at'
-
-      expect(airtableResolveEmbed(new URL(value))).toBeUndefined()
-    })
-
     it('should ignore a route word that is not the embed route', () => {
       expect(
         airtableResolveEmbed(new URL('https://airtable.com/frame/shrIBFxXbBGxNv8at')),
@@ -270,6 +258,18 @@ describeForEachParser('airtableEmbedResolver', (parseHtml) => {
           style="background: transparent; border: 1px solid #ccc;"
         ></iframe>
       `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a foreign host carrying the same path', async () => {
+      const value = html`<iframe src="https://evil.test/embed/appmHSMnV4Q1S4cWh/shrMnUTYyzmsdX8JT"></iframe>`
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the static subdomain, which serves files', async () => {
+      const value = html`<iframe src="https://static.airtable.com/embed/shrIBFxXbBGxNv8at"></iframe>`
 
       expect(await extract(value)).toBeUndefined()
     })

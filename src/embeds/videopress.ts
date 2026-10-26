@@ -11,6 +11,10 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'videopress'
 
+const sizes = {
+  player: { ratio: '16/9' },
+}
+
 // Not wordpress.com itself: every blog frames its posts on that domain, and those are cards.
 // `video.wordpress.com` is the documented player host, the one its oEmbed writes, and the Flash
 // player lived on `s0.videopress.com`, `v0.wordpress.com` and `v.wordpress.com`.
@@ -31,7 +35,7 @@ const composeEmbed = (guid: string, query = ''): EmbedResolverResult => {
     id: guid,
     src: `https://video.wordpress.com/embed/${guid}${query}`,
     url: `https://videopress.com/v/${guid}`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

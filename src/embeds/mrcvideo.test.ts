@@ -2,10 +2,10 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { mrcvideoEmbedResolver, mrcvideoFlashEmbedResolver } from './mrcvideo.js'
+import { mrcvideoFlashEmbedResolver, mrcvideoIframeEmbedResolver } from './mrcvideo.js'
 
-describeForEachParser('mrcvideoEmbedResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, mrcvideoEmbedResolver)
+describeForEachParser('mrcvideoIframeEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, mrcvideoIframeEmbedResolver)
 
   describe('happy paths', () => {
     it('should resolve the former MRCTV player onto the current host', async () => {

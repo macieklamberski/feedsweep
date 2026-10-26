@@ -17,8 +17,10 @@ const pageParams = ['pg']
 // The viewer highlights the terms of a search the publisher ran on the page it opens.
 const highlightParams = ['dq', 'q', 'vq']
 
-// The viewer fills whatever box it gets, and Google's embed code writes it at 500 by 500.
-const snippetSize = { width: 500, height: 500 }
+const sizes = {
+  // The viewer fills whatever box it gets, and Google's embed code writes it at 500 by 500.
+  player: { width: 500, height: 500 },
+}
 
 // The viewer frames a volume at `/books?id={id}&output=embed`. The Ngram chart on
 // `/ngrams/interactive_chart` and the store redirect on `/ebooks?id={id}` are separate resources
@@ -49,7 +51,7 @@ export const googlebooksEmbedResolver = createMarkupEmbedResolver(
       src: `${viewerOrigin}/books${composeQuery({ ...volume, ...highlights, output: 'embed' })}`,
       url: `${viewerOrigin}/books${composeQuery(volume)}`,
       thumbnail: `${viewerOrigin}/books/content${composeQuery(cover)}`,
-      ...snippetSize,
+      ...sizes.player,
     }
   },
 )

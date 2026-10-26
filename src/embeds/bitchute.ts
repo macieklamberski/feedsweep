@@ -5,6 +5,10 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'bitchute'
 
+const sizes = {
+  video: { ratio: '16/9' },
+}
+
 const bitchuteHosts = ['bitchute.com']
 
 const bitchuteResolveEmbed: ResolveUrlEmbed = (url, element) => {
@@ -28,7 +32,7 @@ const bitchuteResolveEmbed: ResolveUrlEmbed = (url, element) => {
     id,
     src: `https://www.bitchute.com/embed/${id}/`,
     url: `https://www.bitchute.com/video/${id}/`,
-    ratio: '16/9',
+    ...sizes.video,
     title,
   }
 }

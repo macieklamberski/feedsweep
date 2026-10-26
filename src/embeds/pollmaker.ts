@@ -14,9 +14,11 @@ const pollmakerHosts = ['poll-maker.com', 'www.poll-maker.com']
 const pollPathRegex = /^\/(?:frame|poll|results)(\d[^/]*)$/i
 const snippetIdRegex = /^qp_main(?<number>\d+)$/
 
-// A poll's height follows its options, not its width. The frame posts its height only when the
-// parent url rides in its hash, which no reader sets.
-const pollHeight = 372
+const sizes = {
+  // A poll's height follows its options, not its width. The frame posts its height only when the
+  // parent url rides in its hash, which no reader sets.
+  player: { height: 372 },
+}
 
 const composeEmbed = (
   pollId: string,
@@ -28,7 +30,7 @@ const composeEmbed = (
     id: pollId,
     src: `https://poll-maker.com/frame${pollId}`,
     url: `https://poll-maker.com/poll${pollId}`,
-    height: pollHeight,
+    ...sizes.player,
     title,
     description,
   }

@@ -3,6 +3,8 @@ import type { CiteKind, CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 
+const provider = 'microformats'
+
 const citeKindByResponseProperty: ReadonlyMap<string, CiteKind> = toMap({
   'bookmark-of': 'bookmark',
   'repost-of': 'repost',
@@ -66,7 +68,7 @@ export const microformatsCiteResolver: CiteResolver = {
       .find((named) => named !== undefined)
 
     return buildCite({
-      provider: 'microformats',
+      provider,
       url: attr(find(element, '[class~="u-url" i]', notInAuthor), 'href'),
       title: text(find(element, '[class~="p-name" i]', notInAuthor)),
       description: text(description),

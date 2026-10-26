@@ -3,8 +3,14 @@ import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVars, parseFlashVars } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-const viewerRatio = '300/194'
-const libraryRowHeight = 185
+const provider = 'calameo'
+
+const sizes = {
+  viewer: { ratio: '300/194' },
+  // One shelf of the library widget. Its frame is this tall for every row it shows.
+  library: { height: 185 },
+}
+
 const libraryPathRegex = /^\/library\/?$/i
 
 // The account library widget, `v.calameo.com/library/?type=account&id={account}&rows={rows}`,
@@ -22,11 +28,11 @@ const resolveLibrary = (url: URL): EmbedResolverResult | undefined => {
   const query = composeQuery(trimObject({ type: 'account', id: accountId, rows }, Boolean))
 
   return {
-    provider: 'calameo',
+    provider,
     id: `library/account/${accountId}`,
     src: `https://v.calameo.com/library/${query}`,
     url: `https://www.calameo.com/accounts/${encodePathSegment(accountId)}`,
-    height: libraryRowHeight * (rowCount > 0 ? rowCount : 1),
+    height: sizes.library.height * (rowCount > 0 ? rowCount : 1),
   }
 }
 
@@ -66,21 +72,21 @@ export const calameoResolveEmbed: ResolveUrlEmbed = (url, element) => {
   // The book page answers 404 without the token, and the token stays in the player url alone.
   if (authId) {
     return {
-      provider: 'calameo',
+      provider,
       id: code,
       src,
-      ratio: viewerRatio,
+      ...sizes.viewer,
       title: attr(element, 'title'),
     }
   }
 
   return {
-    provider: 'calameo',
+    provider,
     id: code,
     src,
     // The code comes out of a query decoded, and it goes into a path.
     url: `https://www.calameo.com/books/${encodePathSegment(code)}`,
-    ratio: viewerRatio,
+    ...sizes.viewer,
     title: attr(element, 'title'),
   }
 }

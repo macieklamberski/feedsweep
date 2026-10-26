@@ -6,7 +6,6 @@ import {
   flashExtensions,
   getQueryParam,
   imageExtensions,
-  isAnyOf,
   isHostOrSubdomainOf,
   type Nullish,
   normalizeUrl,
@@ -37,6 +36,7 @@ export const alphanumericRegex = /^[A-Za-z0-9]+$/
 export const hexRegex = /^[0-9a-f]+$/i
 export const wordOrHyphenRegex = /^[\w-]+$/
 export const lettersRegex = /^[a-z]+$/i
+export const twoLettersRegex = /^[a-z]{2}$/i
 export const hyphenatedLettersRegex = /^[a-z]+-[a-z]+$/i
 
 // A browser trims C0 controls and spaces from both ends, so \x01javascript: runs. Inside the
@@ -285,20 +285,6 @@ export const filterUrlQuery = (url: URL, isKept: (name: string) => boolean): str
 // The query string an embed resolver carries over when it rebuilds a src from the video id:
 // only the parameters that change what plays. Returns it ready to append, so a src with
 // nothing worth keeping stays bare.
-// The url with the named query parameters removed and every other pair as written. A url that
-// names none of them comes back as it was.
-export const dropUrlParams = (url: string, names: ReadonlyArray<string>): string => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed || !names.some((name) => getQueryParam(parsed.searchParams, name) !== undefined)) {
-    return url
-  }
-
-  parsed.search = filterUrlQuery(parsed, (name) => !isAnyOf(name, names))
-
-  return parsed.href
-}
-
 export const pickUrlParams = (url: URL, names: ReadonlyArray<string>): string => {
   return composeQuery(pickQueryParams(url.search, names))
 }

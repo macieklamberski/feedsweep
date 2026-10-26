@@ -4,6 +4,8 @@ import { attr, find, text } from '../utils/dom.js'
 import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'slideshare'
+
 const slideshareHosts = ['slideshare.net', 'slidesharecdn.com']
 
 // The Flash wrapper spells its id `__ss_{id}` on the div and `__sse{id}` on the object inside and
@@ -13,14 +15,16 @@ const wrapperIdRegex = /^__ss[e_]?(\d+)$/i
 // Two players, the presentation one and the document one, sharing a query.
 const flashPlayerPathRegex = /\/swf\/(?:ssplayer\d?|doc_player)\.swf$/i
 
-const deckRatio = '595/485'
+const sizes = {
+  player: { ratio: '595/485' },
+}
 
 const composeEmbed = (deck: string, fields?: Partial<EmbedResolverResult>): EmbedResolverResult => {
   return {
-    provider: 'slideshare',
+    provider,
     id: deck,
     src: `https://www.slideshare.net/slideshow/embed_code/${deck}`,
-    ratio: deckRatio,
+    ...sizes.player,
     ...fields,
   }
 }
@@ -46,10 +50,10 @@ export const slideshareResolveEmbed: ResolveUrlEmbed = (url) => {
 
   return isKeyed
     ? {
-        provider: 'slideshare',
+        provider,
         id: deck,
         src: `https://www.slideshare.net/slideshow/embed_code/key/${deck}`,
-        ratio: deckRatio,
+        ...sizes.player,
       }
     : composeEmbed(deck)
 }

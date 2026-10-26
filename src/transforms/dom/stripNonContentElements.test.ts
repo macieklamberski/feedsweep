@@ -603,23 +603,6 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(value)
     })
-
-    it('should be idempotent', async () => {
-      const value = html`
-        <picture>
-          <img src="x.jpg">
-        </picture>
-        <div class="image-link-expand">
-          <button>
-            <svg></svg>
-          </button>
-        </div>
-      `
-      const once = await transform(value)
-      const twice = await transform(once)
-
-      expect(twice).toEqualHtml(once)
-    })
   })
 
   describe('scoped selectors', () => {
@@ -940,6 +923,23 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(value)
     })
+  })
+
+  it('should be idempotent', async () => {
+    const value = html`
+      <picture>
+        <img src="x.jpg">
+      </picture>
+      <div class="image-link-expand">
+        <button>
+          <svg></svg>
+        </button>
+      </div>
+    `
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
   })
 })
 

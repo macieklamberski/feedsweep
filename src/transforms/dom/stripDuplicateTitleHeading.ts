@@ -9,7 +9,11 @@ import {
 
 const mediaSelector = 'img, picture, video, audio, iframe, svg'
 
-const normalize = (value: string): string => value.trim().toLowerCase().replace(/\s+/g, ' ')
+const whitespaceRunRegex = /\s+/g
+
+const normalize = (value: string): string => {
+  return value.trim().toLowerCase().replace(whitespaceRunRegex, ' ')
+}
 
 const markupRegex = /[&<]/
 

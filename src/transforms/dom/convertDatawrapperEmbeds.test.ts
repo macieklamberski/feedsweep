@@ -290,17 +290,6 @@ describeForEachParser('convertDatawrapperEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should be idempotent', async () => {
-    const value = html`
-      <iframe src="https://datawrapper.dwcdn.net/bdqZJ/2/" title="Egg prices"></iframe>
-      <script>window.addEventListener("message",function(a){a.data["datawrapper-height"]})</script>
-    `
-    const once = await transform(value)
-    const twice = await applyDomTransforms(parseHtml(once), [convertDatawrapperEmbeds(baseContext)])
-
-    expect(twice).toEqualHtml(once)
-  })
-
   it('should survive into the output end to end', async () => {
     const value = html`
       <iframe
@@ -320,5 +309,16 @@ describeForEachParser('convertDatawrapperEmbeds', (parseHtml) => {
     })
 
     expect(result).toEqualHtml(expected)
+  })
+
+  it('should be idempotent', async () => {
+    const value = html`
+      <iframe src="https://datawrapper.dwcdn.net/bdqZJ/2/" title="Egg prices"></iframe>
+      <script>window.addEventListener("message",function(a){a.data["datawrapper-height"]})</script>
+    `
+    const once = await transform(value)
+    const twice = await applyDomTransforms(parseHtml(once), [convertDatawrapperEmbeds(baseContext)])
+
+    expect(twice).toEqualHtml(once)
   })
 })

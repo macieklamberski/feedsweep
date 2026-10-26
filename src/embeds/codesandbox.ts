@@ -14,6 +14,12 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'codesandbox'
 
+// A height, not a ratio: the editor fills any box, and an unsized frame renders 150 tall.
+// The share dialog writes 500.
+const sizes = {
+  player: { height: 500 },
+}
+
 // Listed exactly, not by subdomain: sse.codesandbox.io and blog.codesandbox.io name no sandbox.
 const codesandboxHosts = ['codesandbox.io', 'www.codesandbox.io']
 
@@ -25,10 +31,6 @@ const reservedSlugSegments = new Set(['github', 'github.com', 'fork', 'new'])
 
 const projectKinds = ['sandbox', 'devbox']
 const playerRoutes = ['embed', 's']
-
-// A height, not a ratio: the editor fills any box, and an unsized frame renders 150 tall.
-// The share dialog writes 500.
-const defaultSandboxHeight = 500
 
 type CodesandboxTarget = {
   // The path segment the publisher wrote, hash and slug together. Kept whole because the page url
@@ -116,14 +118,14 @@ export const codesandboxResolveEmbed: ResolveUrlEmbed = (url, element) => {
     id: target.id,
     src: target.src,
     url: `https://codesandbox.io/${target.pagePath}`,
-    height: defaultSandboxHeight,
+    ...sizes.player,
     title,
   }
 }
 
 // CodeSandbox's editor iframe, under /embed/, /s/ or the DevBox-era /p/ routes.
 export const codesandboxIframeEmbedResolver = createUrlEmbedResolver(
-  ['codesandbox.io'],
+  codesandboxHosts,
   codesandboxResolveEmbed,
 )
 

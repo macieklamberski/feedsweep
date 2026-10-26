@@ -3,6 +3,12 @@ import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { digitsRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'learningapps'
+
+const sizes = {
+  player: { height: 500 },
+}
+
 const learningappsHosts = ['learningapps.org']
 
 const exerciseRoutes = ['watch', 'show']
@@ -33,10 +39,10 @@ export const learningappsResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 
   const result: EmbedResolverResult = {
-    provider: 'learningapps',
+    provider,
     id: appId,
     src: `https://learningapps.org/watch${composeQuery({ app: appId })}`,
-    height: 500,
+    ...sizes.player,
   }
 
   if (!isNumericAppId) {

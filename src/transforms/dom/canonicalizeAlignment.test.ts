@@ -320,14 +320,6 @@ describeForEachParser('canonicalizeAlignment', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
-    it('should be idempotent', async () => {
-      const value = '<center><img class="aligncenter" src="a.jpg"></center>'
-      const once = await transform(value)
-      const twice = await transform(once)
-
-      expect(twice).toEqualHtml(once)
-    })
-
     it('should not restamp when applied multiple times to the same document', async () => {
       const value = '<div class="aligncenter"><img src="a.jpg"></div>'
       const expected = '<div class="aligncenter"><img src="a.jpg" data-align="center"></div>'
@@ -340,9 +332,20 @@ describeForEachParser('canonicalizeAlignment', (parseHtml) => {
 
       expect(result).toEqualHtml(expected)
     })
-  })
 
-  describe('pipeline ordering', () => {
+    it('should be idempotent', async () => {
+      const value = '<center><img class="aligncenter" src="a.jpg"></center>'
+      const once = await transform(value)
+      const twice = await transform(once)
+
+      expect(twice).toEqualHtml(once)
+    })
+  })
+})
+
+describeForEachParser(
+  'canonicalizeAlignment before the transforms that dissolve its wrapper',
+  (parseHtml) => {
     it('should survive flattenPictureElements dissolving the picture', async () => {
       const value = '<picture class="aligncenter"><img src="a.jpg"></picture>'
       const expected = '<img src="a.jpg" data-align="center">'
@@ -368,5 +371,5 @@ describeForEachParser('canonicalizeAlignment', (parseHtml) => {
 
       expect(result).toEqualHtml(expected)
     })
-  })
-})
+  },
+)

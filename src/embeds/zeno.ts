@@ -5,6 +5,10 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'zeno'
 
+const sizes = {
+  player: { height: 250 },
+}
+
 const zenoHosts = ['zeno.fm']
 
 // Zeno.FM's station widget, `zeno.fm/player/{slug}`. The widget reads the slug from the second
@@ -21,7 +25,7 @@ export const zenoResolveEmbed: ResolveUrlEmbed = (url, element) => {
     id: slug,
     src: `https://zeno.fm/player/${slug}`,
     url: `https://zeno.fm/radio/${slug}/`,
-    height: 250,
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }

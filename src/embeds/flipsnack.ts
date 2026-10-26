@@ -16,7 +16,9 @@ const itemHashPaths = [
   '/iframe/embed.html', // Flash era, renders a blank page
 ]
 
-const widgetHeight = 480
+const sizes = {
+  widget: { height: 480 },
+}
 
 // The player's `hash` is the base64 of `{accountId}+{itemHash}`.
 const decodePlayerHash = (hash: string): string | undefined => {
@@ -56,7 +58,7 @@ const flipsnackResolveEmbed: ResolveUrlEmbed = (url, element) => {
     provider,
     id: itemHash,
     src: `https://cdn.flipsnack.com/widget/v2/widget.html${composeQuery({ hash: itemHash })}`,
-    height: widgetHeight,
+    ...sizes.widget,
     title: attr(element, 'title'),
   }
 }

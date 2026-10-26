@@ -65,7 +65,9 @@ const dashboardShellPaths = ['/apps/dashboards/index.html', '/apps/opsdashboard/
 const dashboardFragmentRegex = /^#\/([^/?]+)/
 
 // The box Map Viewer's and StoryMaps' iframe snippets write.
-const snippetHeight = 500
+const sizes = {
+  player: { height: 500 },
+}
 
 const composeItem = (id: string, src: string): Item => {
   return { id, src, url: src }
@@ -206,7 +208,7 @@ export const arcgisResolveEmbed: ResolveUrlEmbed = (url, element) => {
     id: item.id,
     src: item.src,
     url: item.url,
-    height: snippetHeight,
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }

@@ -4,6 +4,10 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'abcnews'
 
+const sizes = {
+  player: { ratio: '16/9' },
+}
+
 // `abcnews.go.com` is the host the embed snippet wrote for years, and it 301s onto `abcnews.com`
 // with the path and query kept.
 const abcnewsHosts = ['abcnews.com', 'abcnews.go.com']
@@ -29,7 +33,7 @@ export const abcnewsResolveEmbed: ResolveUrlEmbed = (url) => {
     id,
     src: `https://abcnews.com/video/embed${composeQuery({ id })}`,
     url: `https://abcnews.com/video/${encodePathSegment(id)}`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

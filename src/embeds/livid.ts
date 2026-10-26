@@ -1,11 +1,14 @@
 import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
-import { attr } from '../utils/dom.js'
+import { attr, find } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'livid'
-const playerRatio = '16/9'
+
+const sizes = {
+  video: { ratio: '16/9' },
+}
 
 const lividHosts = ['livid.com']
 
@@ -37,7 +40,7 @@ export const lividResolveEmbed: ResolveUrlEmbed = (url, element) => {
       provider,
       id: `${account}/${number}`,
       src: `https://livid.com/oe/${account}/video/${number}`,
-      ratio: playerRatio,
+      ...sizes.video,
       title,
     }
   }
@@ -53,7 +56,7 @@ export const lividResolveEmbed: ResolveUrlEmbed = (url, element) => {
     id: videoId,
     src: `https://livid.com/embed/${videoId}`,
     url: `https://livid.com/watch/${videoId}`,
-    ratio: playerRatio,
+    ...sizes.video,
     title,
   }
 }
@@ -81,7 +84,7 @@ export const lividMetasliderEmbedResolver = createMarkupEmbedResolver(
 
     return {
       ...result,
-      thumbnail: attr(element.querySelector('img.msDefaultImage'), 'src'),
+      thumbnail: attr(find(element, 'img.msDefaultImage'), 'src'),
     }
   },
 )

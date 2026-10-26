@@ -4,6 +4,12 @@ import { attr } from '../utils/dom.js'
 import { hyphenatedLettersRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'ganjingworld'
+
+const sizes = {
+  player: { ratio: '16/9' },
+}
+
 // `ganjing.com` 301s onto `www.ganjingworld.com/embed/{same id}`, so both hosts name one embed.
 const ganjingworldHosts = ['ganjingworld.com', 'ganjing.com']
 
@@ -37,11 +43,11 @@ const ganjingworldResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
   // The locale is dropped: both locale routes answer 301 to the bare route for the same id.
   return {
-    provider: 'ganjingworld',
+    provider,
     id: videoId,
     src: `https://www.ganjingworld.com/embed/${videoId}`,
     url: `https://www.ganjingworld.com/video/${videoId}`,
-    ratio: '16/9',
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }

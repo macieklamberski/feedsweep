@@ -2,6 +2,8 @@ import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 
+const provider = 'blogcard'
+
 // Where the url sits varies with the theme: some make the card itself the anchor, others link
 // only the title, others wrap the whole card body in one anchor. Most cards also carry a Hatena
 // bookmark button, .blog-card-hatebu, whose href is the target behind b.hatena.ne.jp/entry/.
@@ -20,7 +22,7 @@ export const blogCardCiteResolver: CiteResolver = {
   selector: '.blog-card',
   extract: (element) => {
     return buildCite({
-      provider: 'blogcard',
+      provider,
       url: cardUrl(element),
       // blog-card-title is the only field class every card carries.
       title: text(element, '.blog-card-title') ?? attr(element, 'title'),

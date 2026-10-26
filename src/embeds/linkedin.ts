@@ -2,12 +2,16 @@ import { decodeSegment, encodePathSegment, getPathSegments, isAnyOf } from 'trou
 import type { ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'linkedin'
+
 const linkedinHosts = ['linkedin.com']
 
-// The post fills the frame's width and grows with its text and images, and neither scrolls inside
-// the frame nor reports its height. 800 fits the header, the text and most images, and cuts the
-// reactions under a long post.
-const postHeight = 800
+const sizes = {
+  // The post fills the frame's width and grows with its text and images, and neither scrolls
+  // inside the frame nor reports its height. 800 fits the header, the text and most images, and
+  // cuts the reactions under a long post.
+  post: { height: 800 },
+}
 
 // A post has no name, and the frame titles itself `Embedded post` in the reader's language.
 const linkedinResolveEmbed: ResolveUrlEmbed = (url) => {
@@ -28,12 +32,12 @@ const linkedinResolveEmbed: ResolveUrlEmbed = (url) => {
 
   // No title: carriers state the boilerplate "Embedded post" in eight languages.
   return {
-    provider: 'linkedin',
+    provider,
     id: postUrn,
     src: `https://www.linkedin.com/embed/feed/update/${urnSegment}`,
     // The activity urn is assigned server-side, so a share urn cannot be rewritten to it.
     url: `https://www.linkedin.com/feed/update/${urnSegment}`,
-    height: postHeight,
+    ...sizes.post,
   }
 }
 

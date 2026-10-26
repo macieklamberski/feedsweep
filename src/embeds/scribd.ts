@@ -11,6 +11,12 @@ import { attr, flashVar, flashVars } from '../utils/dom.js'
 import { pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'scribd'
+
+const sizes = {
+  document: { height: 600 },
+}
+
 // The embed routes are the site's own. `scribdassets.com` served the Flash player and serves the
 // document images beside it, `img/document/{id}/…` among them, so only the Flash resolver takes
 // it: read as an embed those images mint a player over a picture the feed attached.
@@ -33,13 +39,13 @@ const composeEmbed = (document: string, search = ''): EmbedResolverResult => {
   const segment = encodePathSegment(document)
 
   return {
-    provider: 'scribd',
+    provider,
     id: document,
     src: `https://www.scribd.com/embeds/${segment}/content${composeQuery(params)}`,
     // A public document's page opens without the key. A private one answers 410 with or without
     // it, and nothing offline tells the two apart.
     url: `https://www.scribd.com/document/${segment}`,
-    height: 600,
+    ...sizes.document,
   }
 }
 

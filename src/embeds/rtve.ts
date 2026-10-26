@@ -24,8 +24,10 @@ const nielsenAssetRegex = /(?:^|,)assetID::([^,]+)/i
 const nielsenTitleRegex = /(?:^|,)title::(.+)$/i
 const audioConfigRegex = /\/rtve_config_audio_embed\.xml$/i
 
-// The player fills whatever box it gets, and the Flash video carriers state 425 by 239, 16:9.
-const playerRatio = '16/9'
+const sizes = {
+  // The player fills whatever box it gets, and the Flash video carriers state 425 by 239, 16:9.
+  player: { ratio: '16/9' },
+}
 
 // Audio and video are two id spaces with one grammar, and rtve.es/api/{videos|audios}/{id}.json
 // needs the kind. The page and the poster share the kind's letter: img.rtve.es/v/{id}/ and
@@ -39,7 +41,7 @@ const composeEmbed = (kind: Kind, id: string): EmbedResolverResult => {
     src: `https://www.rtve.es/drmn/embed/${kind}/${id}/`,
     url: `https://www.rtve.es/${letter}/${id}/`,
     thumbnail: `https://img.rtve.es/${letter}/${id}/`,
-    ratio: playerRatio,
+    ...sizes.player,
   }
 }
 

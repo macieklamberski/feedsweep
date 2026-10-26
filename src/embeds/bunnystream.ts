@@ -17,6 +17,10 @@ const playerPathRegex = /^\/(?:embed|play)\/([^/]+)\/([^/]+)$/i
 // The start position, and the token pair a library with embed authentication needs.
 const playbackParams = ['t', 'token', 'expires']
 
+const sizes = {
+  player: { ratio: '16/9' },
+}
+
 export const bunnystreamResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const match = url.pathname.match(playerPathRegex)
 
@@ -35,11 +39,13 @@ export const bunnystreamResolveEmbed: ResolveUrlEmbed = (url, element) => {
     id: `${libraryId}/${videoId}`,
     src: `https://player.mediadelivery.net/embed/${libraryId}/${videoId}${query}`,
     url: picked.token ? undefined : `https://player.mediadelivery.net/play/${libraryId}/${videoId}`,
-    ratio: '16/9',
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }
 
+// Bunny Stream's player iframe or its full-window `/play` page, which renders on its own but
+// autoplays unless the library turns it off.
 export const bunnystreamEmbedResolver = createUrlEmbedResolver(
   bunnystreamHosts,
   bunnystreamResolveEmbed,

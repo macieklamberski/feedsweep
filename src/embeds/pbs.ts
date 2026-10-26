@@ -64,7 +64,9 @@ const flashPortalRoutes = toMap({
 const playbackParams = ['start', 'end', 'chapter']
 
 // The viral player shows a top bar above its 16:9 video, and the partner players show none.
-const playerRatio = '16/9'
+const sizes = {
+  player: { ratio: '16/9' },
+}
 const viralTopBarHeight = 40
 
 // The route qualifies the id, since a numeric id also fits the slug alphabet and an id alone
@@ -85,7 +87,7 @@ const composeEmbed = (
     provider,
     id: `${idSpace}/${videoId}`,
     src: `https://${playerHost}/${route}/${videoId}/${query}`,
-    ratio: playerRatio,
+    ...sizes.player,
     ratioHeightOffset: route === 'viralplayer' ? viralTopBarHeight : undefined,
   }
 }

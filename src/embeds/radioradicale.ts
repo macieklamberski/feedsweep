@@ -7,6 +7,10 @@ const provider = 'radioradicale'
 
 const radioradicaleHosts = ['radioradicale.it']
 
+const sizes = {
+  player: { ratio: '16/9' },
+}
+
 // The player's own script reads these from its query: the first and last playlist item, the
 // speech, and the start and end second. It also reads `a` and `m`, autoplay and branding.
 const playbackParams = ['f', 'i', 'p', 's', 't']
@@ -17,7 +21,7 @@ const composeEmbed = (id: string, query = ''): EmbedResolverResult => {
     id,
     src: `https://www.radioradicale.it/scheda/${id}/iframe${query}`,
     url: `https://www.radioradicale.it/scheda/${id}`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

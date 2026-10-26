@@ -4,6 +4,12 @@ import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'corriere'
+
+const sizes = {
+  player: { ratio: '16/9' },
+}
+
 // The regional `video.corrieredelmezzogiorno.corriere.it` keeps its own videos, which
 // `video.corriere.it` answers with a 404, so the frame host is not widened to `corriere.it`.
 const corriereFrameHosts = ['video.corriere.it']
@@ -13,11 +19,11 @@ const rssFileRegex = /^video_(.+)\.rss$/i
 
 const composeEmbed = (id: string): EmbedResolverResult => {
   return {
-    provider: 'corriere',
+    provider,
     id,
     src: `https://video.corriere.it/video-embed/${id}`,
     url: `https://video.corriere.it/x/${id}`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

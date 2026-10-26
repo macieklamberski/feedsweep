@@ -13,9 +13,11 @@ const seamlessPathRegex = /^\/f\/seamless\.js$/i
 // The loader's `Cognito.load` refuses any kind but `"forms"`, and mounts the form named by `id`.
 const loadCallRegex = /Cognito\.load\(\s*"forms"\s*,\s*\{\s*id\s*:\s*"([^"]+)"/
 
-// A form's height follows its fields, and the frame reports one only over a channel the
-// parent opens in answer to its `cog-handshake`, so a long form scrolls inside the frame.
-const formHeight = 600
+const sizes = {
+  // A form's height follows its fields, and the frame reports one only over a channel the
+  // parent opens in answer to its `cog-handshake`, so a long form scrolls inside the frame.
+  form: { height: 600 },
+}
 
 const composeEmbed = (orgKey: string, formNumber: string, query = ''): EmbedResolverResult => {
   return {
@@ -23,7 +25,7 @@ const composeEmbed = (orgKey: string, formNumber: string, query = ''): EmbedReso
     id: `${orgKey}/${formNumber}`,
     src: `https://www.cognitoforms.com/f/${orgKey}/${formNumber}${query}`,
     url: `https://www.cognitoforms.com/f/${orgKey}/${formNumber}`,
-    height: formHeight,
+    ...sizes.form,
   }
 }
 

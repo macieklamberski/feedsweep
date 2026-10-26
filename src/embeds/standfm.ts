@@ -3,6 +3,8 @@ import type { ResolveUrlEmbed } from '../types.js'
 import { hexRegex, lettersRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'standfm'
+
 const standfmHosts = ['stand.fm']
 
 // stand.fm's own snippet sizes the iframe with a `<style>` beside it, which is stripped before the
@@ -20,7 +22,7 @@ export const standfmResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 
   return {
-    provider: 'standfm',
+    provider,
     id: `${kind}/${id}`,
     src: `https://stand.fm/embed/${kind}/${id}`,
     url: `https://stand.fm/${kind}/${id}`,

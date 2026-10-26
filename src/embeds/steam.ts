@@ -3,8 +3,12 @@ import type { ResolveUrlEmbed } from '../types.js'
 import { digitsRegex, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-// The store's purchase box is a fixed bar.
-const widgetHeight = 190
+const provider = 'steam'
+
+const sizes = {
+  // The store's purchase box is a fixed bar.
+  player: { height: 190 },
+}
 
 // `t` is the text the widget prints under the game's name.
 const widgetParams = ['t']
@@ -27,12 +31,12 @@ export const steamResolveEmbed: ResolveUrlEmbed = (url) => {
   const description = getQueryParam(url.searchParams, 't')?.trim() || undefined
 
   return {
-    provider: 'steam',
+    provider,
     id: appId,
     src: `https://store.steampowered.com/widget/${widget}/${pickUrlParams(url, widgetParams)}`,
     url: `https://store.steampowered.com/app/${appId}/`,
     thumbnail: `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/header.jpg`,
-    height: widgetHeight,
+    ...sizes.player,
     description,
   }
 }

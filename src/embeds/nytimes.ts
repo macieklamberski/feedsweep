@@ -1,10 +1,9 @@
+import { composeQuery, getQueryParam, isAnyOf } from 'trousse'
 import type { FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
+import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'nytimes'
-
-import { composeQuery, getQueryParam, isAnyOf } from 'trousse'
-import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `static01.nyt.com` is the static host, which 301s the player onto `www.nytimes.com`.
 const nytimesHosts = ['nytimes.com', 'static01.nyt.com']
@@ -15,8 +14,11 @@ const nytimesHosts = ['nytimes.com', 'static01.nyt.com']
 const playerPath = '/video/players/offsite/index.html'
 const legacyPlayerPath = '/bcvideo/1.0/iframe/embed.html'
 
-// A footer of share links sits under the 16:9 video. NYT's own snippet sizes the player 480 by 321.
-const playerRatio = '16/9'
+const sizes = {
+  // A footer of share links sits under the 16:9 video. NYT's own snippet sizes the player 480
+  // by 321.
+  player: { ratio: '16/9' },
+}
 const footerHeight = 71
 
 // The video page is `/video/{section}/{id}/{slug}.html`, and neither the section nor the slug is
@@ -37,7 +39,7 @@ export const nytimesResolveEmbed: ResolveUrlEmbed = (url, element) => {
     provider,
     id,
     src: `https://www.nytimes.com${playerPath}${composeQuery({ videoId: id })}`,
-    ratio: playerRatio,
+    ...sizes.player,
     ratioHeightOffset: footerHeight,
     title: attr(element, 'title'),
   }

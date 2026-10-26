@@ -3,6 +3,14 @@ import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'ameba'
+
+const sizes = {
+  video: { ratio: '16/9' },
+  reblogCard: { height: 234 },
+  image: { ratio: '360/416' },
+}
+
 const amebaHosts = ['static.blog-video.jp']
 const amebloHosts = ['ameblo.jp']
 
@@ -20,10 +28,10 @@ export const amebaResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 
   return {
-    provider: 'ameba',
+    provider,
     id: videoId,
     src: `https://${amebaHosts[0]}/${composeQuery({ v: videoId })}`,
-    ratio: '16/9',
+    ...sizes.video,
   }
 }
 
@@ -62,11 +70,11 @@ export const amebaReblogCardEmbedResolver = createUrlEmbedResolver(amebloHosts, 
   }
 
   return {
-    provider: 'ameba',
+    provider,
     id,
     src: `https://${amebloHosts[0]}/s/embed/reblog-card/${id}.html`,
     url: `https://${amebloHosts[0]}/${id}.html`,
-    height: 234,
+    ...sizes.reblogCard,
   }
 })
 
@@ -81,10 +89,10 @@ export const amebaImagePageEmbedResolver = createUrlEmbedResolver(amebloHosts, (
   }
 
   return {
-    provider: 'ameba',
+    provider,
     id: match[1],
     src: `https://${amebloHosts[0]}/p/embed/${match[1]}.html`,
     url: `https://${amebloHosts[0]}/${match[1]}.html`,
-    ratio: '360/416',
+    ...sizes.image,
   }
 })

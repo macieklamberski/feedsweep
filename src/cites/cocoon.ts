@@ -2,6 +2,8 @@ import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 
+const provider = 'cocoon'
+
 // Cocoon's blogcard: an anchor wrapping a card of divs the theme's stylesheet lays out.
 export const cocoonCiteResolver: CiteResolver = {
   kind: 'cite',
@@ -9,7 +11,7 @@ export const cocoonCiteResolver: CiteResolver = {
   selector: '.blogcard-wrap',
   extract: (element) => {
     return buildCite({
-      provider: 'cocoon',
+      provider,
       url: attr(element, 'href'),
       // The anchor's title attribute repeats the card title.
       title: text(element, '.blogcard-title') ?? attr(element, 'title'),

@@ -34,12 +34,6 @@ describe('tenorResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore the embed path on the host that serves the files', () => {
-      const value = 'https://media.tenor.com/embed/16892698'
-
-      expect(tenorResolveEmbed(new URL(value))).toBeUndefined()
-    })
-
     it('should ignore the view page, which is not a frame', () => {
       const value = 'https://tenor.com/view/madam-cj-walker-gif-16892698'
 
@@ -190,6 +184,12 @@ describeForEachParser('tenorIframeEmbedResolver', (parseHtml) => {
       const value = html`
         <iframe src="https://evil.test/embed/16892698"></iframe>
       `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the embed path on the host that serves the files', async () => {
+      const value = html`<iframe src="https://media.tenor.com/embed/16892698"></iframe>`
 
       expect(await extract(value)).toBeUndefined()
     })

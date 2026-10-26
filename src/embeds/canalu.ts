@@ -8,6 +8,10 @@ const provider = 'canalu'
 // The apex has no DNS, and `vod.canal-u.tv` serves the video files.
 const canaluHosts = ['www.canal-u.tv']
 
+const sizes = {
+  player: { ratio: '16/9' },
+}
+
 // Canal-U's video player, `/chaines/{channel}/embed/{id}` today and `/embed/{id}` before, which
 // redirects to the channel the id belongs to. The id is the video's node id, so it is the key on
 // both routes. The player reads `t` as the start position and nothing else from its query.
@@ -26,7 +30,7 @@ export const canaluResolveEmbed: ResolveUrlEmbed = (url) => {
       provider,
       id,
       src: `https://www.canal-u.tv/chaines/${channel}/embed/${id}${query}`,
-      ratio: '16/9',
+      ...sizes.player,
     }
   }
 
@@ -41,7 +45,7 @@ export const canaluResolveEmbed: ResolveUrlEmbed = (url) => {
       provider,
       id,
       src: `https://www.canal-u.tv/embed/${id}${query}`,
-      ratio: '16/9',
+      ...sizes.player,
     }
   }
 }

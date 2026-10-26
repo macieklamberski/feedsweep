@@ -2,15 +2,19 @@ import type { ResolveUrlEmbed } from '../types.js'
 import { isFileName } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'padlet'
+
 const padletHosts = ['padlet.com']
 const embedPathRegex = /^\/embed\/([^/]+)\/?$/i
 const previewPathRegex = /^\/padlets\/([^/]+)\/embeds\/preview_embed\/?$/i
 // The board page, `/{user}/{slug}-{id}`, refuses framing. Its id follows the slug's last hyphen.
 const boardPathRegex = /^\/[^/]+\/[^/]*-([^/-]+)\/?$/
 
-// The share code sizes the board `height: 608px` at full width, and nearly every carrier
-// repeats that; the preview form sizes itself `height: 100%` and so states nothing usable.
-const boardHeight = 608
+const sizes = {
+  // The share code sizes the board `height: 608px` at full width, and nearly every carrier
+  // repeats that; the preview form sizes itself `height: 100%` and so states nothing usable.
+  board: { height: 608 },
+}
 
 const padletResolveEmbed: ResolveUrlEmbed = (url) => {
   const boardId =
@@ -32,11 +36,11 @@ const padletResolveEmbed: ResolveUrlEmbed = (url) => {
   // the embed route 404s it. The board page is padlet.com/{user}/{slug}-{id}, and neither half is
   // in the embed url.
   return {
-    provider: 'padlet',
+    provider,
     id: boardId,
     src: `https://padlet.com/embed/${boardId}`,
     thumbnail: `https://padlet.net/social-previews/board/${boardId}/opengraph.jpg`,
-    height: boardHeight,
+    ...sizes.board,
   }
 }
 

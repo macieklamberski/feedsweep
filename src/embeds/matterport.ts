@@ -10,6 +10,10 @@ const matterportHosts = ['my.matterport.com']
 
 const showPathRegex = /^\/show\/?$/i
 
+const sizes = {
+  player: { ratio: '4/3' },
+}
+
 // The start pose a shared location link writes, the keys the showcase reads to place the camera.
 const navigationParams = ['start', 'sm', 'sp', 'sq', 'sr', 'ss', 'sf', 'sz']
 
@@ -33,7 +37,7 @@ const matterportResolveEmbed: ResolveUrlEmbed = (url, element) => {
     src: `https://my.matterport.com/show/${query}`,
     url: `https://my.matterport.com/show/${composeQuery({ m: id })}`,
     thumbnail: `https://my.matterport.com/api/v2/player/models/${encodePathSegment(id)}/thumb/`,
-    ratio: '4/3',
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }

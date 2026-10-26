@@ -6,8 +6,10 @@ const provider = 'patronite'
 
 const patroniteHosts = ['patronite.pl']
 
-// The widget card stays this tall at any width from 300 up.
-const widgetHeight = 306
+const sizes = {
+  // The widget card stays this tall at any width from 300 up.
+  widget: { height: 306 },
+}
 
 // Patronite's support widget, framed from `/widget/{slug}/{id}/{size}/{colors}`. The widget
 // renders by the numeric id alone, and the slug names the creator page.
@@ -23,7 +25,7 @@ export const patroniteResolveEmbed: ResolveUrlEmbed = (url) => {
     id,
     src: url.href,
     url: `https://patronite.pl/${slug}`,
-    height: widgetHeight,
+    ...sizes.widget,
   }
 }
 

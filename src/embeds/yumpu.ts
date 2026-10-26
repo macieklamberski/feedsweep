@@ -6,6 +6,10 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'yumpu'
 
+const sizes = {
+  document: { ratio: '4/3' },
+}
+
 // `players.yumpu.com` serves the resizer script and `assets.yumpu.com` the site assets, so only
 // the bare host and its `www.` spelling name a document.
 const yumpuHosts = ['yumpu.com', 'www.yumpu.com']
@@ -51,13 +55,7 @@ const readHash = (segments: Array<string>): string | undefined => {
 }
 
 const yumpuResolveEmbed: ResolveUrlEmbed = (url, element) => {
-  const parsed = parseUrlOnHosts(url, yumpuHosts, isHostOf)
-
-  if (!parsed) {
-    return
-  }
-
-  const segments = getPathSegments(parsed)
+  const segments = getPathSegments(url)
   const isLocaleless = isAnyOf(segments[0], 'embed')
   const hash = readHash(isLocaleless ? segments : segments.slice(1))
 
@@ -74,11 +72,13 @@ const yumpuResolveEmbed: ResolveUrlEmbed = (url, element) => {
     provider,
     id: hash,
     src: `https://www.yumpu.com/en/embed/view/${hash}`,
-    ratio: '4/3',
+    ...sizes.document,
     ...readCompanion(element),
   }
 }
 
 // YUMPU's flipbook iframe, which names a document by an opaque embed hash. The document page sits
 // in a numeric id space that only the embed page's own canonical link joins to that hash.
-export const yumpuEmbedResolver = createUrlEmbedResolver(yumpuHosts, yumpuResolveEmbed)
+export const yumpuEmbedResolver = createUrlEmbedResolver(yumpuHosts, yumpuResolveEmbed, {
+  isOnHost: isHostOf,
+})

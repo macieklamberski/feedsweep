@@ -3,6 +3,12 @@ import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { alphanumericRegex, lettersRegex, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'figma'
+
+const sizes = {
+  player: { ratio: '16/9' },
+}
+
 const figmaHost = 'figma.com'
 const figmaEmbedHost = 'embed.figma.com'
 
@@ -41,14 +47,14 @@ const readFileEmbed = (url: URL): EmbedResolverResult | undefined => {
   const idKind = isAnyOf(kind, 'file') ? 'design' : kind
 
   return {
-    provider: 'figma',
+    provider,
     // The id carries the kind because `proto` and `board` are different views of one file, and the
     // oEmbed url it rebuilds is `figma.com/{kind}/{key}`.
     id: `${idKind}/${key}`,
     // `embed-host` is what makes the route serve a player at all, not a reader's preference.
     src: `https://${figmaEmbedHost}/${path}${composeQuery({ ...params, 'embed-host': 'share' })}`,
     url: `https://www.${figmaHost}/${path}${composeQuery(params)}`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

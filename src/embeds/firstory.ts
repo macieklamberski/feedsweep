@@ -9,8 +9,10 @@ const firstoryHosts = ['open.firstory.fm', 'open.firstory.me']
 
 const storyPathRegex = /^\/embed\/story\/([^/]+)\/?$/i
 
-// The episode bar stays this tall at any width.
-const playerHeight = 182
+const sizes = {
+  // The episode bar stays this tall at any width.
+  player: { height: 182 },
+}
 
 // A Firstory episode player.
 export const firstoryResolveEmbed: ResolveUrlEmbed = (url, element) => {
@@ -26,7 +28,7 @@ export const firstoryResolveEmbed: ResolveUrlEmbed = (url, element) => {
     id,
     src: `https://open.firstory.fm/embed/story/${id}`,
     url: `https://open.firstory.fm/story/${id}`,
-    height: playerHeight,
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }

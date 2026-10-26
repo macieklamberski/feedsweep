@@ -12,8 +12,10 @@ const spreakerHosts = ['spreaker.com']
 // An episode player, or a show player that plays the latest episode.
 const embedKinds = { episode_id: 'episode', show_id: 'show' } as const
 
-// The height Spreaker documents in its own embed snippet, `height="200px"`.
-const playerHeight = 200
+const sizes = {
+  // The height Spreaker documents in its own embed snippet, `height="200px"`.
+  player: { height: 200 },
+}
 
 export const extractSpreakerEmbed = (
   url: URL,
@@ -60,7 +62,7 @@ export const spreakerResolveEmbed: ResolveUrlEmbed = (url, element) => {
     src: `https://widget.spreaker.com/player${composeQuery({ [embed.param]: embed.id })}`,
     // The query id comes out decoded, and it goes into the page path.
     url: `https://www.spreaker.com/${embed.kind}/${encodePathSegment(embed.id)}`,
-    height: playerHeight,
+    ...sizes.player,
     title,
   }
 }

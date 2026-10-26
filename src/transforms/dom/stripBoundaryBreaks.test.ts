@@ -212,14 +212,6 @@ describeForEachParser('stripBoundaryBreaks', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should be idempotent', async () => {
-      const value = '<div><br>Text<br></div>'
-      const once = await transform(value)
-      const twice = await transform(once)
-
-      expect(twice).toEqualHtml(once)
-    })
-
     it('should leave paragraph with only boundary whitespace alone', async () => {
       const value = '<p> <em>Hi</em> </p>'
 
@@ -339,6 +331,14 @@ describeForEachParser('stripBoundaryBreaks', (parseHtml) => {
       const value = '<p>Line one<br><img data-emoji="x"></p>'
 
       expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should be idempotent', async () => {
+      const value = '<div><br>Text<br></div>'
+      const once = await transform(value)
+      const twice = await transform(once)
+
+      expect(twice).toEqualHtml(once)
     })
   })
 })

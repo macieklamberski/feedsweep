@@ -9,7 +9,9 @@ const provider = 'acast'
 const acastHosts = ['embed.acast.com', 'player.acast.com']
 
 // Acast's share code writes `height="190px"` and its pages state `twitter:player:height` 190.
-const playerHeight = 190
+const sizes = {
+  player: { height: 190 },
+}
 
 // The spellings all redirect to `embed.acast.com/{show}/{episode}`: the current embed code
 // `embed.acast.com/$/{show}/{episode}`, the same path without the `$`, and the older
@@ -42,7 +44,7 @@ const acastResolveEmbed: ResolveUrlEmbed = (url, element) => {
     provider,
     id: path,
     src: `https://embed.acast.com/${path}`,
-    height: playerHeight,
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }

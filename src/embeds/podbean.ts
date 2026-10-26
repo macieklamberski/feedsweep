@@ -7,16 +7,18 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'podbean'
 
+// The v2 player renders 150 behind both url forms, and the legacy markup states 122 for a player
+// Podbean retired.
+const sizes = {
+  player: { height: 150 },
+}
+
 const podbeanHosts = ['podbean.com']
 
 // Route words that sit where the legacy player's episode id does. `audio/postId/{post}` 301s to
 // the v2 player under a server-assigned episode id the url does not hold, and
 // `multi?playlist={list}` is another player.
 const legacyRouteWords = ['audio', 'multi']
-
-// The v2 player renders 150 behind both url forms, and the legacy markup states 122 for a player
-// Podbean retired.
-const defaultPlayerHeight = 150
 
 export const extractPodbeanId = (url: URL): string | undefined => {
   // Podbean serves the episode audio from the same domain as the players.
@@ -61,7 +63,7 @@ export const podbeanResolveEmbed: ResolveUrlEmbed = (url, element) => {
     provider,
     id,
     src: `https://www.podbean.com/player-v2/${composeQuery({ i: id })}`,
-    height: defaultPlayerHeight,
+    ...sizes.player,
     title,
   }
 }

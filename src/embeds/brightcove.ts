@@ -1,5 +1,10 @@
-import type { Nullish } from 'trousse'
-import { composeQuery, encodePathSegment, getPathSegments, getQueryParam } from 'trousse'
+import {
+  composeQuery,
+  encodePathSegment,
+  getPathSegments,
+  getQueryParam,
+  type Nullish,
+} from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import {
   attr,
@@ -13,7 +18,10 @@ import {
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'brightcove'
-const playerRatio = '16/9'
+
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 // The minimum length is the only check on the id: `AQ~~` decodes to the number 1.
 // A real Brightcove id runs to ten digits and more.
@@ -114,7 +122,7 @@ export const brightcoveVideoJsEmbedResolver = createMarkupEmbedResolver(
         attr(element, 'data-player'),
         attr(element, 'data-embed'),
       ),
-      ratio: playerRatio,
+      ...sizes.player,
     }
   },
 )
@@ -149,7 +157,7 @@ export const brightcoveSkyEmbedResolver = createMarkupEmbedResolver(
       id: `${account}/${videoId}`,
       src: composePlayerUrl(account, videoId, attr(element, 'data-player-id')),
       thumbnail: attr(poster, 'src'),
-      ratio: playerRatio,
+      ...sizes.player,
       title:
         attr(element, 'data-caption') ??
         attr(element, 'data-title') ??
@@ -188,7 +196,7 @@ const brightcoveFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
     provider,
     id: `${account}/${videoId}`,
     src: composePlayerUrl(account, videoId),
-    ratio: playerRatio,
+    ...sizes.player,
   }
 }
 
@@ -215,7 +223,7 @@ export const brightcoveExperienceEmbedResolver = createMarkupEmbedResolver(
       provider,
       id: `${account}/${videoId}`,
       src: composePlayerUrl(account, videoId),
-      ratio: playerRatio,
+      ...sizes.player,
     }
   },
 )
@@ -246,7 +254,7 @@ export const brightcoveResolveEmbed: ResolveUrlEmbed = (url, element) => {
     provider,
     id: `${account}/${videoId}`,
     src: `https://players.brightcove.net/${account}/${player}/index.html${composeQuery({ videoId })}`,
-    ratio: playerRatio,
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }

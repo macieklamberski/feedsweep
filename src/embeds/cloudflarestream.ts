@@ -5,7 +5,10 @@ import { absoluteUrlRegex, parseUrlOnHosts, pickUrlParams } from '../utils/urls.
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'cloudflarestream'
-const playerRatio = '16/9'
+
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 const cloudflarestreamHosts = [
   'cloudflarestream.com', // Every publisher's own `customer-{accountCode}` subdomain
@@ -58,7 +61,7 @@ export const cloudflarestreamResolveEmbed: ResolveUrlEmbed = (url) => {
     id: videoId,
     src: `https://${url.hostname}${playerPath}${pickUrlParams(url, playbackParams)}`,
     thumbnail: poster ?? composeThumbnail(videoId, thumbnailHost),
-    ratio: playerRatio,
+    ...sizes.player,
   }
 }
 
@@ -91,7 +94,7 @@ export const cloudflarestreamScriptEmbedResolver = createMarkupEmbedResolver(
       id: videoId,
       src: `https://${deliveryPlayerHost}/${segment}`,
       thumbnail: composeThumbnail(segment, deliveryThumbnailHost),
-      ratio: playerRatio,
+      ...sizes.player,
     }
   },
 )

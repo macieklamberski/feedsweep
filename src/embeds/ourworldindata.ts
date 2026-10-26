@@ -40,9 +40,13 @@ const displayParams = [
 
 // The embed dialog's snippet frames the page 600 pixels tall, and 696 for an explorer, whose
 // controls take the extra height. The chart fills whatever box it gets.
-const chartHeight = 600
-const explorerHeight = 696
+const sizes = {
+  chart: { height: 600 },
+  explorer: { height: 696 },
+}
 
+// Our World in Data's chart and explorer iframes, `/grapher/{slug}` and `/explorers/{slug}`, the
+// site's own page framed with its display query.
 const ourworldindataResolveEmbed: ResolveUrlEmbed = (url) => {
   const match = url.pathname.match(chartPathRegex)
 
@@ -71,7 +75,7 @@ const ourworldindataResolveEmbed: ResolveUrlEmbed = (url) => {
     url: src,
     // An explorer's image shows its default view whatever the query names.
     thumbnail: isChart ? `https://ourworldindata.org/grapher/${slug}.png${query}` : undefined,
-    height: isChart ? chartHeight : explorerHeight,
+    ...(isChart ? sizes.chart : sizes.explorer),
   }
 }
 

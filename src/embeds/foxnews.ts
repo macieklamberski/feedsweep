@@ -11,6 +11,9 @@ import { attr } from '../utils/dom.js'
 import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
+const foxnewsProvider = 'foxnews'
+const foxbusinessProvider = 'foxbusiness'
+
 type FoxBrand = {
   provider: string
   playerHost: string
@@ -18,13 +21,13 @@ type FoxBrand = {
 }
 
 const foxnewsBrand: FoxBrand = {
-  provider: 'foxnews',
+  provider: foxnewsProvider,
   playerHost: 'video.foxnews.com',
   pageHost: 'www.foxnews.com',
 }
 
 const foxbusinessBrand: FoxBrand = {
-  provider: 'foxbusiness',
+  provider: foxbusinessProvider,
   playerHost: 'video.foxbusiness.com',
   pageHost: 'www.foxbusiness.com',
 }
@@ -35,10 +38,12 @@ const foxBrands = [foxnewsBrand, foxbusinessBrand]
 
 const playerHosts = foxBrands.map((brand) => brand.playerHost)
 
-// The player fills whatever frames it (`html, body { width: 100%; height: 100% }` on the embed
-// page), and Fox's own numbers for it are 16:9 throughout: 640 by 360 in the page's `og:video`
-// and in the iframe publishers paste, 466 by 263 in the script snippet.
-const playerRatio = '16/9'
+const sizes = {
+  // The player fills whatever frames it (`html, body { width: 100%; height: 100% }` on the embed
+  // page), and Fox's own numbers for it are 16:9 throughout: 640 by 360 in the page's `og:video`
+  // and in the iframe publishers paste, 466 by 263 in the script snippet.
+  player: { ratio: '16/9' },
+}
 
 // `video-embed.html` is what Fox names as the player in the video page's `twitter:player` and
 // `embedUrl`. Both players answer 404 for an unknown id.
@@ -49,7 +54,7 @@ const composeEmbed = (brand: FoxBrand, id: string): EmbedResolverResult => {
     src: `https://${brand.playerHost}/v/video-embed.html${composeQuery({ video_id: id })}`,
     // The id comes out of the query decoded, and it goes into a path.
     url: `https://${brand.pageHost}/video/${encodePathSegment(id)}`,
-    ratio: playerRatio,
+    ...sizes.player,
   }
 }
 

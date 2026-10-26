@@ -9,6 +9,8 @@ import {
   createUrlEmbedResolver,
 } from '../utils/widgets.js'
 
+const provider = 'tiktok'
+
 const tiktokHosts = ['tiktok.com']
 
 // Every player url TikTok has issued frames the clip by its numeric id: `/embed/{id}` and
@@ -20,11 +22,13 @@ const playerPathRegex = /^\/(?:embed(?:\/v2)?|player\/v1)\/(\d+)\/?$/i
 // sometimes keep only the `/video/{id}` half, so the handle is optional.
 const watchPathRegex = /^(?:\/@([^/]+))?\/video\/(\d+)\/?$/i
 
-// Not a 9/16 ratio: the frame stays 738 tall at any width, and the ratio asks 1778 at 1000.
-// The clip is letterboxed inside a frame whose header, caption, sound row and action rail set
-// the height. TikTok's own oEmbed answers 739 for the same clip.
-const playerHeight = 738
-const profileHeight = 478
+const sizes = {
+  // Not a 9/16 ratio: the frame stays 738 tall at any width, and the ratio asks 1778 at 1000.
+  // The clip is letterboxed inside a frame whose header, caption, sound row and action rail set
+  // the height. TikTok's own oEmbed answers 739 for the same clip.
+  video: { height: 738 },
+  profile: { height: 478 },
+}
 
 type Clip = { handle?: string; videoId?: string }
 
@@ -94,7 +98,7 @@ const resolveClip = (element: Element): EmbedResolverResult | undefined => {
   const watchPath = handle ? `@${handle}/video/${segment}` : undefined
 
   return {
-    provider: 'tiktok',
+    provider,
     // TikTok's oEmbed endpoint takes the watch url, which needs the handle beside the video id.
     id: watchPath ?? videoId,
     src: `https://www.tiktok.com/embed/v2/${segment}`,
@@ -102,7 +106,7 @@ const resolveClip = (element: Element): EmbedResolverResult | undefined => {
     url: cited.videoId ? cite : watchPath && `https://www.tiktok.com/${watchPath}`,
     description: text(caption),
     author: author ? atUsername(author) : undefined,
-    height: playerHeight,
+    ...sizes.video,
   }
 }
 
@@ -138,11 +142,11 @@ const resolveAccount = (element: Element): EmbedResolverResult | undefined => {
   const isCitedProfile = Boolean(cite && parseUrlOnHosts(cite, tiktokHosts))
 
   return {
-    provider: 'tiktok',
+    provider,
     id: atUsername(handle),
     src: `https://www.tiktok.com/embed/@${segment}`,
     url: isCitedProfile ? cite : `https://www.tiktok.com/@${segment}`,
-    height: profileHeight,
+    ...sizes.profile,
     description: textNode(element),
     author: atUsername(handle),
   }
@@ -160,10 +164,10 @@ export const tiktokResolveEmbed: ResolveUrlEmbed = (url) => {
 
   if (playerId) {
     return {
-      provider: 'tiktok',
+      provider,
       id: playerId,
       src: `https://www.tiktok.com/embed/v2/${playerId}`,
-      height: playerHeight,
+      ...sizes.video,
     }
   }
 
@@ -174,11 +178,11 @@ export const tiktokResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 
   return {
-    provider: 'tiktok',
+    provider,
     id: handle ? `@${handle}/video/${videoId}` : videoId,
     src: `https://www.tiktok.com/embed/v2/${videoId}`,
     url: url.href,
-    height: playerHeight,
+    ...sizes.video,
   }
 }
 
@@ -209,12 +213,12 @@ export const tiktokMetasliderEmbedResolver = createMarkupEmbedResolver(
     const watchPath = handle ? `@${handle}/video/${segment}` : undefined
 
     return {
-      provider: 'tiktok',
+      provider,
       id: watchPath ?? videoId,
       src: `https://www.tiktok.com/embed/v2/${segment}`,
       url: watchPath ? `https://www.tiktok.com/${watchPath}` : undefined,
-      thumbnail: attr(element.querySelector('img.msDefaultImage'), 'src'),
-      height: playerHeight,
+      thumbnail: attr(find(element, 'img.msDefaultImage'), 'src'),
+      ...sizes.video,
     }
   },
 )

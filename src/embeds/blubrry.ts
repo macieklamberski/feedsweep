@@ -8,9 +8,6 @@ import {
 } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-
-const provider = 'blubrry'
-
 import { filterUrlQuery } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
@@ -18,24 +15,26 @@ import {
   readRepairedCarrierUrl,
 } from '../utils/widgets.js'
 
+const provider = 'blubrry'
+
 const blubrryHosts = ['blubrry.com']
 
-// The player is 164 tall, one less than the 165 publishers write.
-// A fixed height on a fluid width, and still 164 inside a 100-tall frame.
-const playerHeight = 164
-// The playlist lists ten episodes under the player.
-const playlistHeight = 568
+const sizes = {
+  // The player is 164 tall, one less than the 165 publishers write.
+  // A fixed height on a fluid width, and still 164 inside a 100-tall frame.
+  player: { height: 164 },
+  // The playlist lists ten episodes under the player.
+  playlist: { height: 568 },
+  // The frame draws MediaElement's 40-pixel audio bar at any width, over the 30 or 24 PowerPress
+  // writes on the carrier.
+  powerpressAudio: { height: 40 },
+  // The video fills the frame's width at 57% of it, and shrinks to 16:9 when the frame is shorter.
+  powerpressVideo: { ratio: '16/9' },
+}
 
 // The players PowerPress writes into an embed url for a video file, per
 // `powerpressplayer_embedable` in its powerpress-player.php. Every other value is an audio player.
 const powerpressVideoPlayers = new Set(['html5video', 'mediaelement-video'])
-
-// The frame draws MediaElement's 40-pixel audio bar at any width, over the 30 or 24 PowerPress
-// writes on the carrier.
-const powerpressAudioHeight = 40
-
-// The video fills the frame's width at 57% of it, and shrinks to 16:9 when the frame is shorter.
-const powerpressVideoRatio = '16/9'
 
 // A show's player follows its newest episode, and its playlist lists the show's episodes.
 const showRoutes = ['latest', 'playlist']
@@ -99,7 +98,7 @@ export const blubrryResolveEmbed: ResolveUrlEmbed = (url, element) => {
       provider,
       id: `${id}/${route}`,
       src: `https://player.blubrry.com/${id}/${route}/${position}`,
-      height: isAnyOf(route, 'playlist') ? playlistHeight : playerHeight,
+      ...(isAnyOf(route, 'playlist') ? sizes.playlist : sizes.player),
       title: attr(element, 'title'),
     }
   }
@@ -113,12 +112,12 @@ export const blubrryResolveEmbed: ResolveUrlEmbed = (url, element) => {
       kind === 'episode'
         ? `https://player.blubrry.com/id/${id}/`
         : `https://player.blubrry.com/${composeQuery({ media_url: id })}`,
-    height: playerHeight,
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }
 
-export const blubrryEmbedResolver = createUrlEmbedResolver(blubrryHosts, blubrryResolveEmbed)
+export const blubrryIframeEmbedResolver = createUrlEmbedResolver(blubrryHosts, blubrryResolveEmbed)
 
 // PowerPress, Blubrry's WordPress plugin, frames an episode from the publisher's own site as
 // `{site}/?powerpress_embed={postId}-{feed}`. The post id belongs to that site and maps onto no
@@ -146,8 +145,7 @@ export const blubrryPowerpressEmbedResolver = createMarkupEmbedResolver(
       // A post id is unique only within its site, so the site travels in the id.
       id: [url.host, ...getPathSegments(url), episode].join('/'),
       src: link,
-      height: isVideo ? undefined : powerpressAudioHeight,
-      ratio: isVideo ? powerpressVideoRatio : undefined,
+      ...(isVideo ? sizes.powerpressVideo : sizes.powerpressAudio),
       title: attr(element, 'title'),
     }
   },

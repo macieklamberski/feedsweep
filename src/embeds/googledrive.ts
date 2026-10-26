@@ -16,9 +16,12 @@ const provider = 'googledrive'
 // A link-shared file from before 2021 answers only with its resource key.
 const accessParams = ['resourcekey']
 
-// The audio preview draws a card 206 tall at every width, and the virus-scan dialog it shows
-// for a file over 100 MB is 252 tall.
-const audioPlayerHeight = 252
+const sizes = {
+  // The audio preview draws a card 206 tall at every width, and the virus-scan dialog it shows
+  // for a file over 100 MB is 252 tall.
+  audio: { height: 252 },
+  file: { ratio: '4/3' },
+}
 
 // `/open?id={id}` redirects a file to its page and a folder to its listing, so only an audio
 // type says the id is a file.
@@ -73,8 +76,7 @@ export const googledriveResolveEmbed: ResolveUrlEmbed = (url, element) => {
       provider,
       id: fileId,
       src: `${src}${accessQuery}`,
-      height: isAudio ? audioPlayerHeight : undefined,
-      ratio: isAudio ? undefined : '4/3',
+      ...(isAudio ? sizes.audio : sizes.file),
     }
   }
 
@@ -85,7 +87,7 @@ export const googledriveResolveEmbed: ResolveUrlEmbed = (url, element) => {
       id: fileId,
       src,
       url: `https://drive.google.com/file/d/${fileId}/view`,
-      height: audioPlayerHeight,
+      ...sizes.audio,
     }
   }
 
@@ -95,7 +97,7 @@ export const googledriveResolveEmbed: ResolveUrlEmbed = (url, element) => {
     src,
     url: `https://drive.google.com/file/d/${fileId}/view`,
     thumbnail: composeDriveThumbnail(fileId),
-    ratio: '4/3',
+    ...sizes.file,
   }
 }
 

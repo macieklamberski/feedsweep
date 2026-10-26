@@ -15,7 +15,6 @@ describe('extractMegaphoneEmbed', () => {
       param: 'e',
       kind: 'episode',
       id: 'AUDD4761726018',
-      height: 200,
     }
 
     expect(extractMegaphoneEmbed(new URL(value))).toEqual(expected)
@@ -27,7 +26,6 @@ describe('extractMegaphoneEmbed', () => {
       param: 'p',
       kind: 'playlist',
       id: 'NSM7546490835',
-      height: 482,
     }
 
     expect(extractMegaphoneEmbed(new URL(value))).toEqual(expected)
@@ -86,7 +84,7 @@ describe('extractMegaphoneEmbed', () => {
     'should read an episode id with a long publisher prefix (%s)',
     (id) => {
       const value = `https://playlist.megaphone.fm/?e=${id}`
-      const expected = { param: 'e', kind: 'episode', id, height: 200 }
+      const expected = { param: 'e', kind: 'episode', id }
 
       expect(extractMegaphoneEmbed(new URL(value))).toEqual(expected)
     },
@@ -100,7 +98,6 @@ describe('extractMegaphoneEmbed', () => {
       param: 'e',
       kind: 'episode',
       id: 'GLT46534611423',
-      height: 200,
     }
 
     expect(extractMegaphoneEmbed(new URL(value))).toEqual(expected)
@@ -113,7 +110,6 @@ describe('extractMegaphoneEmbed', () => {
       param: 'p',
       kind: 'playlist',
       id: 'sciencevs',
-      height: 482,
     }
 
     expect(extractMegaphoneEmbed(new URL(value))).toEqual(expected)
@@ -127,7 +123,6 @@ describe('extractMegaphoneEmbed on the legacy episode player', () => {
       param: 'e',
       kind: 'episode',
       id: 'VMP9785445903',
-      height: 200,
     }
 
     expect(extractMegaphoneEmbed(new URL(value))).toEqual(expected)
@@ -139,7 +134,6 @@ describe('extractMegaphoneEmbed on the legacy episode player', () => {
       param: 'e',
       kind: 'episode',
       id: 'ATL3525134210',
-      height: 200,
     }
 
     expect(extractMegaphoneEmbed(new URL(value))).toEqual(expected)

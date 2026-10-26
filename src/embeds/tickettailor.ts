@@ -1,6 +1,6 @@
 import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
-import { attr } from '../utils/dom.js'
+import { attr, find } from '../utils/dom.js'
 import { iframeResizerHeightRequest, readIframeResizerHeight } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver } from '../utils/widgets.js'
@@ -90,7 +90,7 @@ export const tickettailorScriptEmbedResolver = createMarkupEmbedResolver(
     // The snippet's fallback links to the same page, for a reader with no script.
     const siblings = [...(element.parentElement?.children ?? [])]
     const fallback = siblings.find((sibling) => sibling.classList.contains('tt-widget-fallback'))
-    const fallbackLink = attr(fallback?.querySelector('a[href]'), 'href')
+    const fallbackLink = attr(find(fallback, 'a[href]'), 'href')
 
     if (fallback && parseUrlOnHosts(fallbackLink, tickettailorHosts)?.pathname === page.pathname) {
       fallback.remove()
