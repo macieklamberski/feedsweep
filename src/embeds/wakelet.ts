@@ -3,7 +3,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'wakelet'
 
-const wakeletHosts = ['embed.wakelet.com']
+const hosts = ['embed.wakelet.com']
 
 const sizes = {
   // The height Wakelet's embed dialog writes, with resizing off. The collection scrolls inside it.
@@ -32,4 +32,4 @@ const wakeletResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const wakeletEmbedResolver = createUrlEmbedResolver(wakeletHosts, wakeletResolveEmbed)
+export const wakeletEmbedResolver = createUrlEmbedResolver(hosts, wakeletResolveEmbed)

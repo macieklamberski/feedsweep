@@ -18,7 +18,7 @@ const safeUidRegex = /^[0-9a-f]{32}$/i
 // 26-character uid in letters of both cases.
 const sluggedUidRegex = /(?<uid>[0-9a-f]{32}|[0-9a-z]{26})$/i
 
-const sketchfabHosts = ['sketchfab.com']
+const hosts = ['sketchfab.com']
 
 const readModelUid = (parsed: URL): string | undefined => {
   const [route, second, third] = getPathSegments(parsed)
@@ -61,7 +61,7 @@ const sketchfabResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // Sketchfab's viewer iframe, /models/{uid}/embed, its retired spellings and a pasted page link.
-export const sketchfabEmbedResolver = createUrlEmbedResolver(sketchfabHosts, sketchfabResolveEmbed)
+export const sketchfabEmbedResolver = createUrlEmbedResolver(hosts, sketchfabResolveEmbed)
 
 export const sketchfabFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'A 3D model' },

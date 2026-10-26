@@ -6,7 +6,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'matterport'
 
-const matterportHosts = ['my.matterport.com']
+const hosts = ['my.matterport.com']
 
 const showPathRegex = /^\/show\/?$/i
 
@@ -42,10 +42,7 @@ const matterportResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const matterportEmbedResolver = createUrlEmbedResolver(
-  matterportHosts,
-  matterportResolveEmbed,
-)
+export const matterportEmbedResolver = createUrlEmbedResolver(hosts, matterportResolveEmbed)
 
 // Without `play=1` the showcase waits on its own play button, a second click after the reader's.
 export const matterportRenderHint: EmbedRenderHint = {

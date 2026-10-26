@@ -4,7 +4,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'linkedin'
 
-const linkedinHosts = ['linkedin.com']
+const hosts = ['linkedin.com']
 
 const sizes = {
   // The post fills the frame's width and grows with its text and images, and neither scrolls
@@ -42,4 +42,4 @@ const linkedinResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 // LinkedIn's post iframe, linkedin.com/embed/feed/update/{urn}, the platform's only embed form.
-export const linkedinEmbedResolver = createUrlEmbedResolver(linkedinHosts, linkedinResolveEmbed)
+export const linkedinEmbedResolver = createUrlEmbedResolver(hosts, linkedinResolveEmbed)

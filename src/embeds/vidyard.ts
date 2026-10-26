@@ -10,7 +10,7 @@ const sizes = {
   player: { ratio: '16/9' },
 }
 
-const vidyardHosts = ['play.vidyard.com']
+const hosts = ['play.vidyard.com']
 
 // The player sits at the root as `{uuid}.html`, or with no extension where `embed/v4.js` writes
 // the iframe, so the single segment is what tells it from `embed/v4.js`.
@@ -43,7 +43,7 @@ const vidyardResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 // Vidyard's player iframe, which arrives protocol-relative and with a trailing `?`.
-export const vidyardIframeEmbedResolver = createUrlEmbedResolver(vidyardHosts, vidyardResolveEmbed)
+export const vidyardIframeEmbedResolver = createUrlEmbedResolver(hosts, vidyardResolveEmbed)
 
 // Vidyard's v4 embed: an `<img>` that `play.vidyard.com/embed/v4.js` swaps for the player. The
 // script does not survive a feed, so the still frame is left behind with no player. No title:
@@ -68,7 +68,7 @@ export const vidyardScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="play.vidyard.com/" i]',
   (element) => {
     // The selector matches a substring any host can carry, so the host is checked here.
-    const parsed = parseUrlOnHosts(attr(element, 'src'), vidyardHosts)
+    const parsed = parseUrlOnHosts(attr(element, 'src'), hosts)
     const uuid = parsed?.pathname.match(scriptPathRegex)?.[1]
 
     if (!uuid) {

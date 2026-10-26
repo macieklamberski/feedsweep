@@ -10,7 +10,7 @@ const sizes = {
   player: { ratio: '16/9' },
 }
 
-const cloudflarestreamHosts = [
+const hosts = [
   'cloudflarestream.com', // Every publisher's own `customer-{accountCode}` subdomain
   'videodelivery.net',
 ]
@@ -37,7 +37,7 @@ const readVideoId = (parsed: URL): string | undefined => {
     return parsed.pathname.match(deliveryPathRegex)?.[1]
   }
 
-  if (isHostOrSubdomainOf(parsed, cloudflarestreamHosts)) {
+  if (isHostOrSubdomainOf(parsed, hosts)) {
     return parsed.pathname.match(playerPathRegex)?.[1]
   }
 }
@@ -67,7 +67,7 @@ export const cloudflarestreamResolveEmbed: ResolveUrlEmbed = (url) => {
 
 // The Cloudflare Stream iframe, naming the video in its path.
 export const cloudflarestreamIframeEmbedResolver = createUrlEmbedResolver(
-  cloudflarestreamHosts,
+  hosts,
   cloudflarestreamResolveEmbed,
 )
 
@@ -77,7 +77,7 @@ export const cloudflarestreamScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="videodelivery.net/embed/" i], script[src*="cloudflarestream.com/embed/" i]',
   (element) => {
     // The selector matches a substring any host can carry, so the host is checked here.
-    const parsed = parseUrlOnHosts(attr(element, 'src'), cloudflarestreamHosts)
+    const parsed = parseUrlOnHosts(attr(element, 'src'), hosts)
     const videoId = getQueryParam(parsed?.searchParams, 'video')
 
     if (!videoId) {

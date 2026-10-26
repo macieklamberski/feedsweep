@@ -4,7 +4,7 @@ import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { readCarrierUrl } from '../utils/widgets.js'
 
-const flashMp3PlayerHosts = ['flash-mp3-player.net']
+const hosts = ['flash-mp3-player.net']
 
 // The Flash MP3 Player widget, an `<object>` or `<embed>` whose `.swf` on flash-mp3-player.net
 // answers 404, so it renders nothing.
@@ -13,7 +13,7 @@ export const flashMp3PlayerMediaResolver: MediaResolver = {
   selector:
     'embed[src*="flash-mp3-player.net/medias/" i], object[data*="flash-mp3-player.net/medias/" i]',
   extract: (element) => {
-    const parsed = parseUrlOnHosts(readCarrierUrl(element), flashMp3PlayerHosts)
+    const parsed = parseUrlOnHosts(readCarrierUrl(element), hosts)
 
     if (!parsed) {
       return

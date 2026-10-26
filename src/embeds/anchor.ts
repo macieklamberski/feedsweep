@@ -8,7 +8,7 @@ const provider = 'anchor'
 // One service, three host generations, all still live in feeds: `anchor.fm` became
 // `podcasters.spotify.com` became `creators.spotify.com`. The Spotify resolver matches the
 // spotify.com hosts but rejects these paths, so they fall through to here.
-const anchorHosts = ['anchor.fm', 'podcasters.spotify.com', 'creators.spotify.com']
+const hosts = ['anchor.fm', 'podcasters.spotify.com', 'creators.spotify.com']
 
 const sizes = {
   // Spotify's snippet writes 102, but the card is 100 and the two extra pixels render as white.
@@ -100,7 +100,7 @@ export const anchorResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
 // Anchor's episode and show player iframes, on the anchor.fm host and the two Spotify hosts it
 // became, and an anchor.fm episode page, rebuilt onto its player.
-export const anchorEmbedResolver = createUrlEmbedResolver(anchorHosts, anchorResolveEmbed)
+export const anchorEmbedResolver = createUrlEmbedResolver(hosts, anchorResolveEmbed)
 
 export const anchorFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'myFrame' },

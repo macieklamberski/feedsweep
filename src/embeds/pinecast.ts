@@ -4,7 +4,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'pinecast'
 
-const pinecastHosts = ['pinecast.com']
+const hosts = ['pinecast.com']
 
 // The host also serves the episode audio, under `/listen/{uuid}.mp3`.
 const playerPathRegex = /^\/player\/([^/]+)\/?$/i
@@ -32,7 +32,7 @@ export const pinecastResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const pinecastEmbedResolver = createUrlEmbedResolver(pinecastHosts, pinecastResolveEmbed)
+export const pinecastEmbedResolver = createUrlEmbedResolver(hosts, pinecastResolveEmbed)
 
 // The player posts no ready message. A `seekTo` message starts the audio from that position.
 export const pinecastRenderHint: EmbedRenderHint = {

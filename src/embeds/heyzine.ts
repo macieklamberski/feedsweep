@@ -11,7 +11,7 @@ type FlipBook = {
 const provider = 'heyzine'
 
 // Listed exactly, not by subdomain: cdnm.heyzine.com serves the uploaded PDFs.
-const heyzineHosts = ['heyzine.com', 'www.heyzine.com', 'cdn.heyzine.com']
+const hosts = ['heyzine.com', 'www.heyzine.com', 'cdn.heyzine.com']
 // Paid custom domains serve an account's flipbooks at the root, `{account}.aflip.in/{name}`. A
 // book can live on its custom domain alone, so the mint keeps the host.
 const customDomainHosts = ['aflip.in', 'hflip.co']
@@ -87,7 +87,7 @@ export const heyzineResolveEmbed: ResolveUrlEmbed = (url, element) => {
     }
   }
 
-  if (!isHostOf(url, heyzineHosts)) {
+  if (!isHostOf(url, hosts)) {
     return
   }
 
@@ -111,6 +111,6 @@ export const heyzineResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 export const heyzineEmbedResolver = createUrlEmbedResolver(
-  [...heyzineHosts, ...customDomainHosts],
+  [...hosts, ...customDomainHosts],
   heyzineResolveEmbed,
 )

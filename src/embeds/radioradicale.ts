@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'radioradicale'
 
-const radioradicaleHosts = ['radioradicale.it']
+const hosts = ['radioradicale.it']
 
 const sizes = {
   player: { ratio: '16/9' },
@@ -28,10 +28,7 @@ const composeEmbed = (id: string, query = ''): EmbedResolverResult => {
 // The Flowplayer configuration, `/scheda/embedcfg/{id}/{clip}`, that the Flash object names in its
 // `config` query. The clip picks a stretch of the recording whose seconds only that config holds.
 const readFlashId = (parsed: URL): string | undefined => {
-  const config = parseUrlOnHosts(
-    getQueryParam(parsed.searchParams, 'config') ?? '',
-    radioradicaleHosts,
-  )
+  const config = parseUrlOnHosts(getQueryParam(parsed.searchParams, 'config'), hosts)
 
   if (!config) {
     return
@@ -65,7 +62,4 @@ export const radioradicaleResolveEmbed: ResolveUrlEmbed = (url) => {
   return composeEmbed(id, pickUrlParams(url, playbackParams))
 }
 
-export const radioradicaleEmbedResolver = createUrlEmbedResolver(
-  radioradicaleHosts,
-  radioradicaleResolveEmbed,
-)
+export const radioradicaleEmbedResolver = createUrlEmbedResolver(hosts, radioradicaleResolveEmbed)

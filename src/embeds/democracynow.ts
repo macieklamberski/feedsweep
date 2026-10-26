@@ -10,7 +10,7 @@ const sizes = {
   player: { ratio: '16/9' },
 }
 
-const democracynowHosts = ['democracynow.org']
+const hosts = ['democracynow.org']
 
 // The path after `/embed/` names the item, and each kind has its own page.
 const composeEmbed = (path: string, page: string): EmbedResolverResult => {
@@ -57,7 +57,7 @@ export const democracynowResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 export const democracynowIframeEmbedResolver = createUrlEmbedResolver(
-  democracynowHosts,
+  hosts,
   democracynowResolveEmbed,
 )
 
@@ -66,7 +66,7 @@ export const democracynowIframeEmbedResolver = createUrlEmbedResolver(
 export const democracynowScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="democracynow.org/embed_show_v2" i]',
   (element) => {
-    const parsed = parseUrlOnHosts(attr(element, 'src'), democracynowHosts)
+    const parsed = parseUrlOnHosts(attr(element, 'src'), hosts)
 
     if (!parsed) {
       return

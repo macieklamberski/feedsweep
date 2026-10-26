@@ -10,7 +10,7 @@ const sizes = {
   video: { ratio: '16/9' },
 }
 
-const lividHosts = ['livid.com']
+const hosts = ['livid.com']
 
 // `watch` is the video page and `embed` the player, both served in any case, and both take the
 // video id next.
@@ -62,7 +62,7 @@ export const lividResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // A Livid player iframe, or a frame of a video page.
-export const lividIframeEmbedResolver = createUrlEmbedResolver(lividHosts, lividResolveEmbed)
+export const lividIframeEmbedResolver = createUrlEmbedResolver(hosts, lividResolveEmbed)
 
 // MetaSlider's lazy Livid slide parks the player iframe as markup in `data-embed`, beside a poster
 // image, and only the plugin's script swaps them.
@@ -70,7 +70,7 @@ export const lividMetasliderEmbedResolver = createMarkupEmbedResolver(
   'li.ms-livid div.ms-livid-lazy-wrap[data-embed]',
   (element) => {
     const src = attr(element, 'data-embed')?.match(iframeSrcRegex)?.[1]
-    const url = parseUrlOnHosts(src, lividHosts)
+    const url = parseUrlOnHosts(src, hosts)
 
     if (!url) {
       return

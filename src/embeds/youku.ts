@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'youku'
 
-const youkuHosts = ['player.youku.com', 'static.youku.com']
+const hosts = ['player.youku.com', 'static.youku.com']
 
 // The modern player, `/embed/{vid}`, and the two Flash forms that carried the same id:
 // `/player.php/sid/{vid}/v.swf` on the player host and `/v{version}/v/swf/{q}player.swf` on the
@@ -60,7 +60,7 @@ const youkuResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 // A Youku player iframe, or a Flash player embed whose swf now redirects to the homepage.
-export const youkuEmbedResolver = createUrlEmbedResolver(youkuHosts, youkuResolveEmbed)
+export const youkuEmbedResolver = createUrlEmbedResolver(hosts, youkuResolveEmbed)
 
 export const youkuRenderHint: EmbedRenderHint = {
   provider,

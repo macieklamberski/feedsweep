@@ -6,7 +6,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const provider = 'airtable'
 
 // Exact: `static.airtable.com` serves the embed script and images.
-const airtableHosts = ['airtable.com']
+const hosts = ['airtable.com']
 
 // A shared view is `shr…` and its base `app…`. An interface page `pag…` and a table `tbl…`
 // share the same path depth, and the server matches both prefixes case-sensitively.
@@ -49,7 +49,7 @@ export const airtableResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const airtableEmbedResolver = createUrlEmbedResolver(airtableHosts, airtableResolveEmbed, {
+export const airtableEmbedResolver = createUrlEmbedResolver(hosts, airtableResolveEmbed, {
   isOnHost: isHostOf,
 })
 

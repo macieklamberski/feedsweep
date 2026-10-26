@@ -6,7 +6,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'arte'
 
-const arteHosts = ['arte.tv']
+const hosts = ['arte.tv']
 
 const sizes = {
   // The player fills whatever box it gets, and ARTE's own snippet sizes it `100%` both ways.
@@ -81,7 +81,7 @@ const arteResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // ARTE's player iframe, current or a retired player that names the program in a config url.
-export const arteEmbedResolver = createUrlEmbedResolver(arteHosts, arteResolveEmbed)
+export const arteEmbedResolver = createUrlEmbedResolver(hosts, arteResolveEmbed)
 
 // The share snippet's own parameters, muted off so the click that loads it hears the sound.
 export const arteRenderHint: EmbedRenderHint = {

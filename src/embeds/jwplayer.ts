@@ -8,7 +8,7 @@ const provider = 'jwplayer'
 
 const fileExtensionRegex = /\.[a-z]+$/i
 
-export const jwplayerHosts = ['jwplayer.com', 'jwplatform.com']
+export const hosts = ['jwplayer.com', 'jwplatform.com']
 const libraryHosts = ['jwplatform.com', 'jwpsrv.com']
 
 const sizes = {
@@ -74,16 +74,13 @@ export const jwplayerResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // A JW Player iframe, players/{mediaId}-{playerId}.html, some with an empty player id that 404s.
-export const jwplayerIframeEmbedResolver = createUrlEmbedResolver(
-  jwplayerHosts,
-  jwplayerResolveEmbed,
-)
+export const jwplayerIframeEmbedResolver = createUrlEmbedResolver(hosts, jwplayerResolveEmbed)
 
 // JW Player's script embed: the same players/{mediaId}-{playerId} url beside an empty botr_ div.
 export const jwplayerScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="jwplayer.com/players/" i], script[src*="jwplatform.com/players/" i]',
   (element) => {
-    const url = parseUrlOnHosts(attr(element, 'src'), jwplayerHosts)
+    const url = parseUrlOnHosts(attr(element, 'src'), hosts)
 
     if (!url) {
       return

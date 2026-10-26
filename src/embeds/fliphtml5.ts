@@ -8,7 +8,7 @@ const provider = 'fliphtml5'
 
 // The viewer lives on this host alone. The apex serves the author's shelf at `homepage/{account}`,
 // the same two-segment shape.
-const fliphtml5Hosts = ['online.fliphtml5.com']
+const hosts = ['online.fliphtml5.com']
 
 const sizes = {
   player: { ratio: '4/3' },
@@ -39,17 +39,14 @@ export const fliphtml5ResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const fliphtml5IframeEmbedResolver = createUrlEmbedResolver(
-  fliphtml5Hosts,
-  fliphtml5ResolveEmbed,
-)
+export const fliphtml5IframeEmbedResolver = createUrlEmbedResolver(hosts, fliphtml5ResolveEmbed)
 
 // The LightBox snippet: a cover `<img>` that its script turns into a link, opening the book named
 // in `data-href`. Without the script, only the cover renders.
 export const fliphtml5LightBoxEmbedResolver = createMarkupEmbedResolver(
   'img[data-rel="fh5-light-box-demo"][data-href]',
   (element) => {
-    const url = parseUrlOnHosts(attr(element, 'data-href'), fliphtml5Hosts)
+    const url = parseUrlOnHosts(attr(element, 'data-href'), hosts)
 
     if (!url) {
       return

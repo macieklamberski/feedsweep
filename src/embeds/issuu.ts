@@ -14,7 +14,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'issuu'
 
-const issuuHosts = ['issuu.com']
+const hosts = ['issuu.com']
 
 // `issuu.com/{publisher}/docs/{document}/s/{story}` names a story, not a page, in the page's
 // position.
@@ -94,7 +94,7 @@ export const issuuWidgetEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     return (
       composeConfigEmbed(attr(element, 'data-configid')) ??
-      readDocumentUrl(parseUrlOnHosts(attr(element, 'data-url'), issuuHosts))
+      readDocumentUrl(parseUrlOnHosts(attr(element, 'data-url'), hosts))
     )
   },
 )
@@ -162,7 +162,7 @@ const issuuResolveEmbed: ResolveUrlEmbed = (url, element) => {
   return { ...embed, title }
 }
 
-export const issuuIframeEmbedResolver = createUrlEmbedResolver(issuuHosts, issuuResolveEmbed)
+export const issuuIframeEmbedResolver = createUrlEmbedResolver(hosts, issuuResolveEmbed)
 
 export const issuuFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'issuu.com' },

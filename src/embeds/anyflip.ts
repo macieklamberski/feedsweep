@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { pickQueryParams } from '../utils/urls.js'
@@ -10,9 +10,9 @@ const sizes = {
   player: { ratio: '550/350' },
 }
 
-const viewerHost = 'online.anyflip.com'
+const hosts = ['online.anyflip.com']
 // The viewer's S3 bucket, which also serves it path-style with the bucket as the first segment.
-const bucketHost = 's3.amazonaws.com'
+const bucketHosts = ['s3.amazonaws.com']
 
 // The routes under `{user}/{book}` that open the viewer. `index.html` is a script that sends the
 // browser on to `mobile/index.html`.
@@ -22,10 +22,10 @@ const viewerPaths = ['', 'index.html', 'mobile/index.html']
 // page the embed dialog writes.
 export const anyflipResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const segments = getPathSegments(url)
-  const bucket = url.hostname === bucketHost ? segments.shift() : url.hostname
+  const bucket = isHostOf(url, bucketHosts) ? segments.shift() : url.hostname
   const [user, book, ...rest] = segments
 
-  if (!isAnyOf(bucket, viewerHost) || !book || !isAnyOf(rest.join('/'), viewerPaths)) {
+  if (!isAnyOf(bucket, hosts) || !book || !isAnyOf(rest.join('/'), viewerPaths)) {
     return
   }
 
@@ -45,6 +45,6 @@ export const anyflipResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 export const anyflipEmbedResolver = createUrlEmbedResolver(
-  [viewerHost, bucketHost],
+  [...hosts, ...bucketHosts],
   anyflipResolveEmbed,
 )

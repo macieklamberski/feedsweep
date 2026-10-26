@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'helloasso'
 
-const helloassoHosts = ['helloasso.com']
+const hosts = ['helloasso.com']
 
 // A donation, membership, ticketing or shop form, framed from
 // `/associations/{org}/{type}/{slug}/{kind}`, where the kind is `widget` or a `widget-` variant
@@ -31,7 +31,7 @@ export const helloassoResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 // HelloAsso's form widget iframe.
-export const helloassoEmbedResolver = createUrlEmbedResolver(helloassoHosts, helloassoResolveEmbed)
+export const helloassoEmbedResolver = createUrlEmbedResolver(hosts, helloassoResolveEmbed)
 
 // The form posts its rendered height unasked as `{ height }`, again on each step it grows to.
 export const helloassoRenderHint: EmbedRenderHint = {

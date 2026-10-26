@@ -10,7 +10,7 @@ const sizes = {
   player: { ratio: '16/9' },
 }
 
-const inaHosts = ['ina.fr']
+const hosts = ['ina.fr']
 
 // Each is followed by an archive id, a player id and a key.
 const playerPaths = [
@@ -51,13 +51,13 @@ export const inaResolveEmbed: ResolveUrlEmbed = (url) => {
   return composeEmbed(id, playerId, key)
 }
 
-export const inaIframeEmbedResolver = createUrlEmbedResolver(inaHosts, inaResolveEmbed)
+export const inaIframeEmbedResolver = createUrlEmbedResolver(hosts, inaResolveEmbed)
 
 // INA's retired script loader, a carrier the iframe fallback cannot read.
 export const inaScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="ina.fr/player/embed/" i]',
   (element) => {
-    const match = parseUrlOnHosts(attr(element, 'src'), inaHosts)?.pathname.match(scriptPathRegex)
+    const match = parseUrlOnHosts(attr(element, 'src'), hosts)?.pathname.match(scriptPathRegex)
 
     if (!match) {
       return

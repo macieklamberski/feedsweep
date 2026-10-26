@@ -30,7 +30,7 @@ const sizes = {
 
 // Listed one by one: `dailymotion.de` is third-party, and a tld pattern would trust it.
 // Each apex redirects to a language landing page, dropping the video.
-export const dailymotionHosts = [
+export const hosts = [
   'dailymotion.com',
   'dailymotion.co.uk',
   'dailymotion.es',
@@ -178,7 +178,7 @@ export const composeEmbedUrl = (
 // The player url for a caller holding a url nothing has checked: a page builder stores whatever
 // the publisher pasted, so the host is checked here the way the factory checks it for a carrier.
 export const readDailymotionEmbedSrc = (link: string): string | undefined => {
-  const url = parseUrlOnHosts(link, dailymotionHosts)
+  const url = parseUrlOnHosts(link, hosts)
   const videoId = url && extractDailymotionId(url)
 
   return videoId ? composeEmbedUrl('video', videoId) : undefined
@@ -238,10 +238,7 @@ export const dailymotionResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // Dailymotion's player iframe for a video or a playlist, on its country hosts and dai.ly too.
-export const dailymotionIframeEmbedResolver = createUrlEmbedResolver(
-  dailymotionHosts,
-  dailymotionResolveEmbed,
-)
+export const dailymotionIframeEmbedResolver = createUrlEmbedResolver(hosts, dailymotionResolveEmbed)
 
 // The Library Script under `/libs/player/` takes no item from its tag.
 const playerScriptPathRegex = /^\/player\/[^/]+\.js$/i
@@ -257,7 +254,7 @@ const readSnippetFields = (
     return attr(find(element.parentElement, `meta[itemprop="${name}"]`), 'content')
   }
 
-  const embedUrl = parseUrlOnHosts(readMeta('embedUrl'), dailymotionHosts)
+  const embedUrl = parseUrlOnHosts(readMeta('embedUrl'), hosts)
 
   if (!embedUrl || dailymotionResolveEmbed(embedUrl)?.id !== result.id) {
     return
@@ -278,7 +275,7 @@ const readSnippetFields = (
 export const dailymotionScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="dailymotion.com/" i][data-video], script[src*="dailymotion.com/" i][data-playlist]',
   (element) => {
-    const loader = parseUrlOnHosts(attr(element, 'src'), dailymotionHosts)
+    const loader = parseUrlOnHosts(attr(element, 'src'), hosts)
 
     if (!loader || !playerScriptPathRegex.test(loader.pathname)) {
       return

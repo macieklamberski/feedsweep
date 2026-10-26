@@ -9,12 +9,12 @@ const sizes = {
   player: { ratio: '16/9' },
 }
 
-const figmaHost = 'figma.com'
-const figmaEmbedHost = 'embed.figma.com'
+const hosts = ['figma.com']
+const embedHosts = ['embed.figma.com']
 
 // Other figma subdomains serve pages the wrapper never frames: `help.figma.com/hc/articles/{id}`
 // has three segments and would mint a 404.
-const figmaFileHosts = ['figma.com', 'www.figma.com']
+const fileHosts = ['figma.com', 'www.figma.com']
 
 // `node-id` names the frame the embed opens on, `page-id` the page that holds it,
 // `starting-point-node-id` the node that starts a prototype's flow, and `version-id` the version.
@@ -52,8 +52,8 @@ const readFileEmbed = (url: URL): EmbedResolverResult | undefined => {
     // oEmbed url it rebuilds is `figma.com/{kind}/{key}`.
     id: `${idKind}/${key}`,
     // `embed-host` is what makes the route serve a player at all, not a reader's preference.
-    src: `https://${figmaEmbedHost}/${path}${composeQuery({ ...params, 'embed-host': 'share' })}`,
-    url: `https://www.${figmaHost}/${path}${composeQuery(params)}`,
+    src: `https://embed.figma.com/${path}${composeQuery({ ...params, 'embed-host': 'share' })}`,
+    url: `https://www.figma.com/${path}${composeQuery(params)}`,
     ...sizes.player,
   }
 }
@@ -63,11 +63,7 @@ const resolveEmbed: ResolveUrlEmbed = (url) => {
 
   if (segments.length === 1 && isAnyOf(segments[0], 'embed')) {
     // The wrapper frames whatever its `url` names, so a value off figma is refused and never minted.
-    const wrapped = parseUrlOnHosts(
-      getQueryParam(url.searchParams, 'url'),
-      figmaFileHosts,
-      isHostOf,
-    )
+    const wrapped = parseUrlOnHosts(getQueryParam(url.searchParams, 'url'), fileHosts, isHostOf)
 
     if (!wrapped) {
       return
@@ -76,7 +72,7 @@ const resolveEmbed: ResolveUrlEmbed = (url) => {
     return readFileEmbed(wrapped)
   }
 
-  if (!isHostOf(url, figmaEmbedHost)) {
+  if (!isHostOf(url, embedHosts)) {
     return
   }
 
@@ -86,4 +82,4 @@ const resolveEmbed: ResolveUrlEmbed = (url) => {
 // Figma's two embed codes: the older `figma.com/embed?embed_host=share&url={encoded figma url}`,
 // which leaves the file inside a percent-encoded query nothing downstream reads, and the current
 // `embed.figma.com/{kind}/{key}/{name}`.
-export const figmaEmbedResolver = createUrlEmbedResolver([figmaHost], resolveEmbed)
+export const figmaEmbedResolver = createUrlEmbedResolver(hosts, resolveEmbed)

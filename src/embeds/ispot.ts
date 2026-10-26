@@ -8,7 +8,7 @@ const sizes = {
   commercial: { ratio: '16/9' },
 }
 
-const ispotHosts = ['www.ispot.tv']
+const hosts = ['www.ispot.tv']
 
 // iSpot.tv's TV commercial player, `www.ispot.tv/share/{id}`. The id is case-sensitive: another
 // casing names another spot or none. The `/ad/{id}` page answers 404 without its slug, so no page
@@ -29,4 +29,4 @@ export const ispotResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const ispotEmbedResolver = createUrlEmbedResolver(ispotHosts, ispotResolveEmbed)
+export const ispotEmbedResolver = createUrlEmbedResolver(hosts, ispotResolveEmbed)

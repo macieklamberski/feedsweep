@@ -11,10 +11,10 @@ import {
 
 const provider = 'tumblr'
 
-const tumblrEmbedHosts = ['embed.tumblr.com']
+const hosts = ['embed.tumblr.com']
 // A post page is `{blog}.tumblr.com/post/{id}/{slug}` on the old form and
 // `tumblr.com/{blog}/{id}/{slug}` on the current one.
-const tumblrHosts = ['tumblr.com']
+const postHosts = ['tumblr.com']
 
 // The blog key is written bare on the older route and prefixed `t:` on the current one. Both
 // spellings address the same post, so the id keeps the bare one and `src` the current one.
@@ -42,21 +42,21 @@ const readPostEmbed = (parsed: URL | undefined): EmbedResolverResult | undefined
 }
 
 // Tumblr's post frame written as a real iframe, which a handful of feeds carry in place of the div.
-export const tumblrIframeEmbedResolver = createUrlEmbedResolver(tumblrEmbedHosts, readPostEmbed)
+export const tumblrIframeEmbedResolver = createUrlEmbedResolver(hosts, readPostEmbed)
 
 // Tumblr's own post embed: an inert div holding the complete frame url, beside a loader script
 // the pipeline drops, so the post renders as nothing but the anchor under it.
 export const tumblrPostEmbedResolver = createMarkupEmbedResolver(
   'div.tumblr-post[data-href]',
   (element) => {
-    const result = readPostEmbed(parseUrlOnHosts(attr(element, 'data-href'), tumblrEmbedHosts))
+    const result = readPostEmbed(parseUrlOnHosts(attr(element, 'data-href'), hosts))
 
     if (!result) {
       return
     }
 
     // The anchor under the div is the post page. Its text is that url again, never a title.
-    const postUrl = parseUrlOnHosts(attr(find(element, 'a'), 'href'), tumblrHosts)
+    const postUrl = parseUrlOnHosts(attr(find(element, 'a'), 'href'), postHosts)
 
     return { ...result, url: postUrl?.href }
   },

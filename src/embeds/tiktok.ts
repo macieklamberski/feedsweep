@@ -11,7 +11,7 @@ import {
 
 const provider = 'tiktok'
 
-const tiktokHosts = ['tiktok.com']
+const hosts = ['tiktok.com']
 
 // Every player url TikTok has issued frames the clip by its numeric id: `/embed/{id}` and
 // `/embed/v2/{id}` from the oEmbed loader's eras, `/player/v1/{id}` from the current player.
@@ -48,18 +48,18 @@ const profilePathRegex = /^\/@([^/]+)\/?$/
 const secUidRegex = /^MS4wLjABAAAA/
 
 const readProfileHandle = (anchor: Element | undefined): string | undefined => {
-  return parseUrlOnHosts(attr(anchor, 'href'), tiktokHosts)?.pathname.match(profilePathRegex)?.[1]
+  return parseUrlOnHosts(attr(anchor, 'href'), hosts)?.pathname.match(profilePathRegex)?.[1]
 }
 
 const resolveClip = (element: Element): EmbedResolverResult | undefined => {
   const declared = attr(element, 'data-video-id')
   const cite = attr(element, 'cite')
-  const cited = readWatchUrl(parseUrlOnHosts(cite, tiktokHosts))
+  const cited = readWatchUrl(parseUrlOnHosts(cite, hosts))
 
   let linked: Clip = {}
 
   for (const anchor of element.querySelectorAll('a[href]')) {
-    const clip = readWatchUrl(parseUrlOnHosts(attr(anchor, 'href'), tiktokHosts))
+    const clip = readWatchUrl(parseUrlOnHosts(attr(anchor, 'href'), hosts))
 
     if (clip.videoId) {
       linked = clip
@@ -139,7 +139,7 @@ const resolveAccount = (element: Element): EmbedResolverResult | undefined => {
   const { handle, segment } = account
 
   const cite = attr(element, 'cite')
-  const isCitedProfile = Boolean(cite && parseUrlOnHosts(cite, tiktokHosts))
+  const isCitedProfile = Boolean(cite && parseUrlOnHosts(cite, hosts))
 
   return {
     provider,
@@ -187,7 +187,7 @@ export const tiktokResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 // A pasted TikTok player iframe, or a frame of the watch page, which refuses framing.
-export const tiktokIframeEmbedResolver = createUrlEmbedResolver(tiktokHosts, tiktokResolveEmbed)
+export const tiktokIframeEmbedResolver = createUrlEmbedResolver(hosts, tiktokResolveEmbed)
 
 // A forum's s9e MediaEmbed helper frame, naming the clip id in its url fragment.
 export const tiktokS9eEmbedResolver = createS9eEmbedResolver('tiktok', (videoId) => {
@@ -209,7 +209,7 @@ export const tiktokMetasliderEmbedResolver = createMarkupEmbedResolver(
     // The id comes out of its attribute decoded, and it goes into a path.
     const segment = encodePathSegment(videoId)
 
-    const { handle } = readWatchUrl(parseUrlOnHosts(attr(element, 'data-cite'), tiktokHosts))
+    const { handle } = readWatchUrl(parseUrlOnHosts(attr(element, 'data-cite'), hosts))
     const watchPath = handle ? `@${handle}/video/${segment}` : undefined
 
     return {

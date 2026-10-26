@@ -7,7 +7,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'spreaker'
 
-const spreakerHosts = ['spreaker.com']
+const hosts = ['spreaker.com']
 
 // An episode player, or a show player that plays the latest episode.
 const embedKinds = { episode_id: 'episode', show_id: 'show' } as const
@@ -67,10 +67,7 @@ export const spreakerResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const spreakerIframeEmbedResolver = createUrlEmbedResolver(
-  spreakerHosts,
-  spreakerResolveEmbed,
-)
+export const spreakerIframeEmbedResolver = createUrlEmbedResolver(hosts, spreakerResolveEmbed)
 
 // Spreaker's anchor snippet, which only a widgets.js loader swaps for the player at runtime.
 // Feeds carrying the loader mostly hold no player iframe anywhere, so a reader sees the anchor's

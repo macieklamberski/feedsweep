@@ -4,7 +4,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'piktochart'
 
-const piktochartHosts = [
+const hosts = [
   'create.piktochart.com',
   'magic.piktochart.com', // The retired host, which 301s `/embed/{uid}` onto `create.`
 ]
@@ -43,7 +43,4 @@ const piktochartResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // Piktochart's infographic iframe, `/embed/{uid}` on the current host or the retired one.
-export const piktochartIframeEmbedResolver = createUrlEmbedResolver(
-  piktochartHosts,
-  piktochartResolveEmbed,
-)
+export const piktochartIframeEmbedResolver = createUrlEmbedResolver(hosts, piktochartResolveEmbed)

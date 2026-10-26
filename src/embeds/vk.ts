@@ -18,7 +18,7 @@ const sizes = {
   player: { ratio: '16/9' },
 }
 
-const vkHosts = ['vk.com', 'vk.ru', 'vkontakte.ru', 'vkvideo.ru']
+const hosts = ['vk.com', 'vk.ru', 'vkontakte.ru', 'vkvideo.ru']
 
 // The page a player opens is spelled with the endpoint's own word, on the host vk.com redirects
 // videos to. A clip page on vk.com redirects to an unsupported-browser page instead.
@@ -83,7 +83,7 @@ export const vkResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const vkIframeEmbedResolver = createUrlEmbedResolver(vkHosts, vkResolveEmbed)
+export const vkIframeEmbedResolver = createUrlEmbedResolver(hosts, vkResolveEmbed)
 
 // `hash` unlocks the post, and the widget answers "Error" without it. The playlist widget
 // ignores it, and its page answers the same shell for any playlist, so it gets no page url.

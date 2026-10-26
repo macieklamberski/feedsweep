@@ -4,7 +4,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'imdb'
 
-const imdbHosts = ['imdb.com']
+const hosts = ['imdb.com']
 
 const sizes = {
   player: { ratio: '16/9' },
@@ -57,4 +57,4 @@ export const imdbResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const imdbEmbedResolver = createUrlEmbedResolver(imdbHosts, imdbResolveEmbed)
+export const imdbEmbedResolver = createUrlEmbedResolver(hosts, imdbResolveEmbed)

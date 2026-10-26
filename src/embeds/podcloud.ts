@@ -7,7 +7,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const provider = 'podcloud'
 
 // A show's own site is a subdomain, and it answers 404 to the player's path.
-const podcloudHost = 'podcloud.fr'
+const hosts = ['podcloud.fr']
 
 // The two player options that pick what plays: `guid:{item}` loads that item in place of the
 // page's, and `playlist:{user}-{id}` loads a playlist in place of both. The rest only change
@@ -63,7 +63,7 @@ const composeEmbed = (
 // plays and are kept, and the rest, such as `fixed-size` or `list:opened`, are display options
 // and are dropped. The `title` its embed dialog writes is the show's or the episode's name.
 export const podcloudResolveEmbed: ResolveUrlEmbed = (url, element) => {
-  if (url.hostname !== podcloudHost) {
+  if (!isAnyOf(url.hostname, hosts)) {
     return
   }
 
@@ -85,10 +85,7 @@ export const podcloudResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const podcloudIframeEmbedResolver = createUrlEmbedResolver(
-  [podcloudHost],
-  podcloudResolveEmbed,
-)
+export const podcloudIframeEmbedResolver = createUrlEmbedResolver(hosts, podcloudResolveEmbed)
 
 // The div podCloud's older platform.js turns into the player, naming the show and the episode.
 export const podcloudWidgetEmbedResolver = createMarkupEmbedResolver(

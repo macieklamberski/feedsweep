@@ -19,7 +19,7 @@ const provider = 'imgur'
 // Exact hosts on purpose: `i.imgur.com` is the CDN and names no post, and a `video/mp4` enclosure
 // there carries no extension, so the host is all that keeps it a playable file.
 // `s.imgur.com` is the embed script, and `i.stack.imgur.com` is not Imgur's content at all.
-const imgurPageHosts = ['imgur.com', 'www.imgur.com', 'm.imgur.com']
+const hosts = ['imgur.com', 'www.imgur.com', 'm.imgur.com']
 
 // The routes that name an album: the prefix the platform's own script writes, and the gallery
 // path both the older share links and the current slugged ones take.
@@ -183,7 +183,7 @@ export const imgurResolveEmbed: ResolveUrlEmbed = (url) => {
   return post ? composeEmbed(post) : undefined
 }
 
-export const imgurIframeEmbedResolver = createUrlEmbedResolver(imgurPageHosts, imgurResolveEmbed, {
+export const imgurIframeEmbedResolver = createUrlEmbedResolver(hosts, imgurResolveEmbed, {
   isOnHost: isHostOf,
 })
 

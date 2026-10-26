@@ -16,8 +16,8 @@ const sizes = {
   video: { ratio: '16/9' },
 }
 
-const flickrHosts = ['flickr.com']
-const embedrHost = 'embedr.flickr.com'
+const hosts = ['flickr.com']
+const embedrHosts = ['embedr.flickr.com']
 
 // Both swf urls name only the player. Their `?v=` cache-buster names no item.
 const flashPlayerPathRegex = /^\/apps\/slideshow\//i
@@ -221,7 +221,7 @@ const readPhotoPlayer = (parsed: URL): { src: string; photo: FlickrPhoto } | und
     return { src: composePagePhotoPlayer(photo), photo }
   }
 
-  const embedr = isHostOf(parsed, embedrHost) && parsed.pathname.match(embedrPhotoPathRegex)
+  const embedr = isHostOf(parsed, embedrHosts) && parsed.pathname.match(embedrPhotoPathRegex)
 
   if (embedr) {
     return { src: composePhotoPlayer(embedr[1]), photo: { photoId: embedr[1] } }
@@ -368,7 +368,7 @@ export const flickrResolveEmbed: ResolveUrlEmbed = (url, element) => {
 // Flickr's slideshow swf, its video swf, the legacy iframe, a framed album or stream page, and
 // the two players for a single photo. Only `/player/` and `embedr.flickr.com` are served without
 // `x-frame-options: SAMEORIGIN`, so the rest name a frame that renders empty.
-export const flickrEmbedResolver = createUrlEmbedResolver(flickrHosts, flickrResolveEmbed)
+export const flickrEmbedResolver = createUrlEmbedResolver(hosts, flickrResolveEmbed)
 
 // Only embedr's video player answers player.js. A photo and the page player post no ready message.
 export const flickrRenderHint: EmbedRenderHint = {

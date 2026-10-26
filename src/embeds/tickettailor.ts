@@ -7,7 +7,7 @@ import { createMarkupEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'tickettailor'
 
-const tickettailorHosts = ['tickettailor.com']
+const hosts = ['tickettailor.com']
 
 const readKey = (segments: Array<string>): string | undefined => {
   const [route, first, second, third, fourth, fifth] = segments
@@ -75,7 +75,7 @@ export const tickettailorScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const page = parseUrlOnHosts(attr(element, 'data-url'), tickettailorHosts)
+    const page = parseUrlOnHosts(attr(element, 'data-url'), hosts)
 
     if (!page) {
       return
@@ -92,7 +92,7 @@ export const tickettailorScriptEmbedResolver = createMarkupEmbedResolver(
     const fallback = siblings.find((sibling) => sibling.classList.contains('tt-widget-fallback'))
     const fallbackLink = attr(find(fallback, 'a[href]'), 'href')
 
-    if (fallback && parseUrlOnHosts(fallbackLink, tickettailorHosts)?.pathname === page.pathname) {
+    if (fallback && parseUrlOnHosts(fallbackLink, hosts)?.pathname === page.pathname) {
       fallback.remove()
     }
 

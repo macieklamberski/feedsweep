@@ -16,7 +16,7 @@ const episodePlayerRegex = /\/player_e[jk]_([^_/]+)(?:_\d+)?_(\d+)\.html$/i
 // The skin is a number, or `zp` on the current player.
 const showPlayerRegex = /\/player_es_podcast_(\d+)(?:_[^_/]+)?_(\d+)\.html$/i
 
-const ivooxHosts = ['ivoox.com']
+const hosts = ['ivoox.com']
 
 // The heights iVoox's embed dialog states for the current episode and show players.
 const sizes = {
@@ -82,7 +82,7 @@ export const ivooxResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const ivooxEmbedResolver = createUrlEmbedResolver(ivooxHosts, ivooxResolveEmbed)
+export const ivooxEmbedResolver = createUrlEmbedResolver(hosts, ivooxResolveEmbed)
 
 export const ivooxFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'YouTube video player' },

@@ -13,7 +13,7 @@ const sizes = {
   player: { height: 150 },
 }
 
-const podbeanHosts = ['podbean.com']
+const hosts = ['podbean.com']
 
 // Route words that sit where the legacy player's episode id does. `audio/postId/{post}` 301s to
 // the v2 player under a server-assigned episode id the url does not hold, and
@@ -69,7 +69,7 @@ export const podbeanResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // The legacy podbean.com/media/player/{id} iframe, sized for a player Podbean no longer serves.
-export const podbeanEmbedResolver = createUrlEmbedResolver(podbeanHosts, podbeanResolveEmbed)
+export const podbeanEmbedResolver = createUrlEmbedResolver(hosts, podbeanResolveEmbed)
 
 // The player takes no query to start; it speaks player.js.
 export const podbeanRenderHint: EmbedRenderHint = {

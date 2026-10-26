@@ -12,16 +12,16 @@ const sizes = {
 
 const htmlSuffixRegex = /\.html$/i
 
-const tedHosts = ['ted.com']
+const hosts = ['ted.com']
 // Exact: `video.ted.com` and `download.ted.com` serve the talks' files under the same `/talks/`
 // path, such as `video.ted.com/talks/dynamic/{file}.flv`.
-const tedTalkHosts = ['embed.ted.com', 'embed-ssl.ted.com', 'www.ted.com', 'ted.com']
+const talkHosts = ['embed.ted.com', 'embed-ssl.ted.com', 'www.ted.com', 'ted.com']
 
 // `embed.ted.com/talks/{slug}.html`, and a localized variant that inserts the language:
 // `embed.ted.com/talks/lang/{lang}/{slug}.html`. The slug is the talk's canonical id on
 // ted.com, so a watch url follows from it without a lookup.
 export const extractTedTalk = (link: URL): string | undefined => {
-  if (!isHostOf(link, tedTalkHosts)) {
+  if (!isHostOf(link, talkHosts)) {
     return
   }
 
@@ -67,7 +67,7 @@ const readFlashTalk = (
   // The slug comes out of the flashvars decoded, and it goes into a path beside the raw spelling.
   return {
     slug: encodePathSegment(slug),
-    thumbnail: parseUrlOnHosts(poster, tedHosts) ? poster : undefined,
+    thumbnail: parseUrlOnHosts(poster, hosts) ? poster : undefined,
   }
 }
 
@@ -97,7 +97,7 @@ export const tedResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const tedEmbedResolver = createUrlEmbedResolver(tedHosts, tedResolveEmbed)
+export const tedEmbedResolver = createUrlEmbedResolver(hosts, tedResolveEmbed)
 
 // Starts playback on the click that loads the player: the embed reads `autoplay` out of its route
 // query, and its 308 from a short talk slug to the full one keeps the query.

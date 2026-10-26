@@ -5,7 +5,7 @@ import { flashFileRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/ur
 import { readRepairedCarrierUrl } from '../utils/widgets.js'
 
 // Weebly's own copy has a resolver of its own, later in the list.
-const weeblyHost = 'weebly.com'
+const weeblyHosts = ['weebly.com']
 
 const httpUrlRegex = /^https?:\/\//i
 const embedCallRegex = /AudioPlayer\.embed\(\s*["']([^"']+)["']\s*,\s*\{([^}]*)\}/g
@@ -59,7 +59,7 @@ export const onePixelOutFlashMediaResolver: MediaResolver = {
       return
     }
 
-    if (parseUrlOnHosts(carrierUrl, weeblyHost)) {
+    if (parseUrlOnHosts(carrierUrl, weeblyHosts)) {
       return
     }
 

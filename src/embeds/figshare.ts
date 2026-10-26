@@ -7,7 +7,7 @@ const sizes = {
   article: { ratio: '568/351' },
 }
 
-const figshareHosts = ['figshare.com']
+const hosts = ['figshare.com']
 const widgetPathRegex = /^\/articles\/([^/]+)\/embed\/?$/i
 
 // The widget host answers the same shell for any article id. `api.figshare.com/v2/articles/{id}`
@@ -30,4 +30,4 @@ const figshareResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 // figshare's article widget iframe at /articles/{id}/embed.
-export const figshareEmbedResolver = createUrlEmbedResolver(figshareHosts, figshareResolveEmbed)
+export const figshareEmbedResolver = createUrlEmbedResolver(hosts, figshareResolveEmbed)

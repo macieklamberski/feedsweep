@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ccma'
 
-const ccmaHosts = [
+const hosts = [
   '3cat.cat', // The current player frame
   'ccma.cat', // The player frame before the 3Cat rebrand
   'tv3.cat', // The Flash players
@@ -100,7 +100,7 @@ export const ccmaResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const ccmaEmbedResolver = createUrlEmbedResolver(ccmaHosts, ccmaResolveEmbed)
+export const ccmaEmbedResolver = createUrlEmbedResolver(hosts, ccmaResolveEmbed)
 
 export const ccmaRenderHint: EmbedRenderHint = {
   provider,

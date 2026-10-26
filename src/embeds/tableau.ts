@@ -24,13 +24,13 @@ type SizeCommand = {
 
 const provider = 'tableau'
 
-const tableauHosts = [
+const hosts = [
   'public.tableau.com',
   'public.tableausoftware.com', // The retired domain, whose `/views/` redirects to a gallery page
 ]
 
 const staticImageHosts = [
-  ...tableauHosts,
+  ...hosts,
   'publicrevizit.tableausoftware.com', // A retired image host older snippets name
 ]
 
@@ -113,7 +113,7 @@ export const tableauObjectEmbedResolver = createMarkupEmbedResolver(
     const hostUrl = decodeSegment(paramValue(element, 'host_url'))
     const match = paramValue(element, 'name')?.match(viewNameRegex)
 
-    if (!parseUrlOnHosts(hostUrl, tableauHosts) || !match) {
+    if (!parseUrlOnHosts(hostUrl, hosts) || !match) {
       return
     }
 
@@ -147,7 +147,7 @@ const tableauResolveEmbed: ResolveUrlEmbed = (url, element) => {
   return composeNamedEmbed(profileView[1], profileView[2], attr(element, 'title'))
 }
 
-export const tableauIframeEmbedResolver = createUrlEmbedResolver(tableauHosts, tableauResolveEmbed)
+export const tableauIframeEmbedResolver = createUrlEmbedResolver(hosts, tableauResolveEmbed)
 
 // The viz posts its size once it is known, unasked, as a comma-joined string whose last part is
 // JSON holding JSON. A dashboard with a fixed size states it as both bounds, one sized by its

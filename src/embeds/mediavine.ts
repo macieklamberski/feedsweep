@@ -40,7 +40,7 @@ const scriptIdRegex = /^\/videos\/([^/]+)\.js$/i
 
 // The selector matches on a substring, so any host can spell `video.mediavine.com/videos` inside
 // its own path and reach this. The path shape alone must not mint a Mediavine url.
-const mediavineHosts = ['mediavine.com']
+const hosts = ['mediavine.com']
 
 // Mediavine's older snippet: a loader script naming the video beside a div holding only its id.
 // Neither renders: a reader strips the script, then the empty div.
@@ -48,7 +48,7 @@ export const mediavineScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="video.mediavine.com/videos/" i]',
   (element) => {
     // The selector matches a substring any host can carry, so the host is checked here.
-    const parsed = parseUrlOnHosts(attr(element, 'src'), mediavineHosts)
+    const parsed = parseUrlOnHosts(attr(element, 'src'), hosts)
     const videoId = parsed?.pathname.match(scriptIdRegex)?.[1]
 
     if (!videoId) {

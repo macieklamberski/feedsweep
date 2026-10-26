@@ -7,7 +7,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'podigee'
 
-const podigeeHosts = ['podigee.io']
+const hosts = ['podigee.io']
 
 // A show is a subdomain of podigee.io, and `www.podigee.io` is the company site, whose paths can
 // open with a number.
@@ -86,7 +86,7 @@ export const podigeeResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 // An iframe framing a Podigee episode page rather than the player, so the reader gets an article.
-export const podigeeIframeEmbedResolver = createUrlEmbedResolver(podigeeHosts, podigeeResolveEmbed)
+export const podigeeIframeEmbedResolver = createUrlEmbedResolver(hosts, podigeeResolveEmbed)
 
 // The player reports its height under a configurePlayer message serialised to a JSON string, 0
 // before it has rendered and the real value after.

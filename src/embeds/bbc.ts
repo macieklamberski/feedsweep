@@ -16,7 +16,7 @@ const sizes = {
 }
 
 // `bbc.co.uk` 301s every player route onto `bbc.com`.
-const bbcHosts = ['bbc.com', 'bbc.co.uk']
+const hosts = ['bbc.com', 'bbc.co.uk']
 
 // A programme id: eight letters and digits with at least one digit. Where no route fixes its slot,
 // the shape keeps `articles` and the playlist route word `index` out.
@@ -60,7 +60,7 @@ const composeProgrammesEmbed = (pid: string, url?: string): EmbedResolverResult 
 // `embedPageUrl`, `/news/{slug}-{article}`, and states its poster in `holdingImage`.
 const readNewsFlash = (element: Element | undefined): EmbedResolverResult | undefined => {
   const pid = flashVar(element, 'externalIdentifier')
-  const page = parseUrlOnHosts(flashVar(element, 'embedPageUrl'), bbcHosts)
+  const page = parseUrlOnHosts(flashVar(element, 'embedPageUrl'), hosts)
   const article = page?.pathname.match(newsPagePathRegex)?.groups?.article
 
   if (!isPidSlot(pid) || !article) {
@@ -81,7 +81,7 @@ export const bbcResolveEmbed: ResolveUrlEmbed = (url, element) => {
   // `/iplayer/playlist/{pid}` or `/comedy/forge-assets/extra/playlist/{pid}.xml`. News and World
   // Service playlists carry no pid, and the news player names it in other flashvars.
   if (flashFileRegex.test(url.pathname)) {
-    const playlist = parseUrlOnHosts(flashVar(element, 'playlist'), bbcHosts)
+    const playlist = parseUrlOnHosts(flashVar(element, 'playlist'), hosts)
     const pid = playlist?.pathname.match(playlistPathRegex)?.[1]
 
     if (isPid(pid)) {
@@ -135,4 +135,4 @@ export const bbcResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const bbcIframeEmbedResolver = createUrlEmbedResolver(bbcHosts, bbcResolveEmbed)
+export const bbcIframeEmbedResolver = createUrlEmbedResolver(hosts, bbcResolveEmbed)

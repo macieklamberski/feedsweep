@@ -17,7 +17,7 @@ const provider = 'codepen'
 
 // Listed exactly, not by subdomain: blog.codepen.io and cdpn.io name no pen, and www.codepen.io
 // redirects every path to the site root.
-const codepenHosts = ['codepen.io']
+const hosts = ['codepen.io']
 
 const leadingAtRegex = /^@/
 
@@ -76,7 +76,7 @@ const readUser = (value: string | undefined): string | undefined => {
 }
 
 const parseTarget = (value: URL | undefined): CodepenTarget | undefined => {
-  const parsed = parseUrlOnHosts(value, codepenHosts, isHostOf)
+  const parsed = parseUrlOnHosts(value, hosts, isHostOf)
 
   if (!parsed) {
     return
@@ -190,7 +190,7 @@ const readPenReference = (element: Element): CodepenTarget | undefined => {
   const isSlug = alphanumericRegex.test(href)
 
   return (
-    parseTarget(parseUrlOnHosts(href, codepenHosts, isHostOf)) ??
+    parseTarget(parseUrlOnHosts(href, hosts, isHostOf)) ??
     (isSlug ? { kind: 'embed', slug: href } : undefined)
   )
 }
@@ -214,7 +214,7 @@ const readWidget = (element: Element): EmbedResolverResult | undefined => {
 
   // The loader follows the sentence's own link, whose text is the pen's name in an intact snippet.
   for (const anchor of element.querySelectorAll('a[href]')) {
-    const target = parseTarget(parseUrlOnHosts(attr(anchor, 'href'), codepenHosts, isHostOf))
+    const target = parseTarget(parseUrlOnHosts(attr(anchor, 'href'), hosts, isHostOf))
 
     if (target?.kind !== 'pen' || target.slug !== slug) {
       continue
@@ -264,7 +264,7 @@ export const codepenResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // CodePen's player iframe, written by hand or left behind by a CMS that ran ei.js on export.
-export const codepenIframeEmbedResolver = createUrlEmbedResolver(codepenHosts, codepenResolveEmbed)
+export const codepenIframeEmbedResolver = createUrlEmbedResolver(hosts, codepenResolveEmbed)
 
 export const codepenFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: /^codepen (?:embed|by)\b.*$/ },

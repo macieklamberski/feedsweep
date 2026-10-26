@@ -7,7 +7,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const provider = 'slideserve'
 
 // Exact: `cdn6.slideserve.com` and its siblings serve the slide images.
-const slideserveHosts = ['slideserve.com', 'www.slideserve.com']
+const hosts = ['slideserve.com', 'www.slideserve.com']
 
 const movieFileRegex = /^\/video\/([^/]+)\.swf$/i
 // The Flash player's `viewkey`, `presentation/{id}/{title}`.
@@ -37,11 +37,7 @@ const readFlashId = (parsed: URL): string | undefined => {
     return
   }
 
-  const movie = parseUrlOnHosts(
-    getQueryParam(parsed.searchParams, 'moviePath'),
-    slideserveHosts,
-    isHostOf,
-  )
+  const movie = parseUrlOnHosts(getQueryParam(parsed.searchParams, 'moviePath'), hosts, isHostOf)
 
   return movie?.pathname.match(movieFileRegex)?.[1]
 }
@@ -65,8 +61,6 @@ const slideserveResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // SlideServe's presentation iframe, `/embed/{id}`, and the Flash player it replaced.
-export const slideserveEmbedResolver = createUrlEmbedResolver(
-  slideserveHosts,
-  slideserveResolveEmbed,
-  { isOnHost: isHostOf },
-)
+export const slideserveEmbedResolver = createUrlEmbedResolver(hosts, slideserveResolveEmbed, {
+  isOnHost: isHostOf,
+})

@@ -1,4 +1,4 @@
-import { encodePathSegment, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import { encodePathSegment, getPathSegments, getQueryParam, isAnyOf, isHostOf } from 'trousse'
 import type {
   EmbedRenderHint,
   EmbedResolverResult,
@@ -18,12 +18,7 @@ const sizes = {
 // Not wordpress.com itself: every blog frames its posts on that domain, and those are cards.
 // `video.wordpress.com` is the documented player host, the one its oEmbed writes, and the Flash
 // player lived on `s0.videopress.com`, `v0.wordpress.com` and `v.wordpress.com`.
-const videopressHosts = [
-  'videopress.com',
-  'video.wordpress.com',
-  'v0.wordpress.com',
-  'v.wordpress.com',
-]
+const hosts = ['videopress.com', 'video.wordpress.com', 'v0.wordpress.com', 'v.wordpress.com']
 
 // Where playback starts and whether it loops. The rest of the query the block editor writes goes
 // with the rebuilt src: `hd` picks the rendition, `cover` and `useAverageColor` style the player.
@@ -61,15 +56,12 @@ const videopressResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // A VideoPress player iframe, or a frame of its /v/ page, which serves the same player.
-export const videopressIframeEmbedResolver = createUrlEmbedResolver(
-  videopressHosts,
-  videopressResolveEmbed,
-)
+export const videopressIframeEmbedResolver = createUrlEmbedResolver(hosts, videopressResolveEmbed)
 
 // The player url for a caller holding a url nothing has checked: a page builder stores whatever
 // the publisher pasted, so the host is checked here the way the factory checks it for a carrier.
 export const readVideopressEmbedSrc = (link: string): string | undefined => {
-  const url = parseUrlOnHosts(link, videopressHosts)
+  const url = parseUrlOnHosts(link, hosts)
 
   return url ? videopressResolveEmbed(url)?.src : undefined
 }
@@ -78,7 +70,7 @@ export const readVideopressEmbedSrc = (link: string): string | undefined => {
 const flashPlayerPathRegex = /\/(?:flv)?player\.swf$/i
 
 // The host that served the swf at a bare `/{guid}` path, the snippet's other spelling.
-const guidPathHost = 'v.wordpress.com'
+const guidPathHosts = ['v.wordpress.com']
 
 const videopressFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
   if (flashPlayerPathRegex.test(url.pathname)) {
@@ -97,7 +89,7 @@ const videopressFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const [guid, extra] = getPathSegments(url)
 
   // A guid never holds a dot, so a segment with one is a file at the root, such as a swf.
-  if (url.hostname !== guidPathHost || !guid || extra || guid.includes('.')) {
+  if (!isHostOf(url, guidPathHosts) || !guid || extra || guid.includes('.')) {
     return
   }
 
@@ -108,7 +100,7 @@ const videopressFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
 // `<embed>`, on the player's own query where the snippet inlined it, or as the whole path of
 // `v.wordpress.com`. A swf src otherwise carries only the player version.
 export const videopressFlashEmbedResolver = createUrlEmbedResolver(
-  videopressHosts,
+  hosts,
   videopressFlashResolveEmbed,
 )
 

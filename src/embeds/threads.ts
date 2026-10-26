@@ -7,7 +7,7 @@ import { atUsername, createMarkupEmbedResolver, findBareHandle } from '../utils/
 const provider = 'threads'
 
 // `threads.net` is the host older snippets carry, and it serves the same frame.
-const threadsHosts = ['threads.com', 'threads.net']
+const hosts = ['threads.com', 'threads.net']
 
 // `/@{handle}/post/{code}` is the permalink the embed dialog writes, `/t/{code}` the short form.
 // The route words are case-sensitive on threads.com.
@@ -16,7 +16,7 @@ const postPathRegex = /^\/(?:@([^/]+)\/post|t)\/([^/]+)/i
 type Post = { path: string; code: string; handle?: string }
 
 const readPostUrl = (value: string | undefined): Post | undefined => {
-  const parsed = parseUrlOnHosts(value, threadsHosts)
+  const parsed = parseUrlOnHosts(value, hosts)
   const match = parsed?.pathname.match(postPathRegex)
 
   if (!match) {

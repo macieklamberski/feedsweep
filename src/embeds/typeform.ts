@@ -6,7 +6,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'typeform'
 
-const typeformHosts = ['typeform.com']
+const hosts = ['typeform.com']
 
 const sizes = {
   form: { height: 500 },
@@ -77,7 +77,7 @@ export const typeformWidgetEmbedResolver = createMarkupEmbedResolver(
       return composeLiveEmbed(liveId, element, title)
     }
 
-    const url = parseUrlOnHosts(attr(element, 'data-url'), typeformHosts)
+    const url = parseUrlOnHosts(attr(element, 'data-url'), hosts)
 
     if (!url) {
       return
@@ -102,7 +102,4 @@ export const typeformResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // A Typeform form iframe, on form.typeform.com or a per-account subdomain.
-export const typeformIframeEmbedResolver = createUrlEmbedResolver(
-  typeformHosts,
-  typeformResolveEmbed,
-)
+export const typeformIframeEmbedResolver = createUrlEmbedResolver(hosts, typeformResolveEmbed)

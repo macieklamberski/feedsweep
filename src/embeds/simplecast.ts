@@ -13,7 +13,7 @@ const sizes = {
 
 // `embed.simplecast.com/{hex}` and `simplecast.com/e/{numeric}` are legacy spellings of the
 // episode, and `play.simplecast.com/{uuid}` is the share host.
-const simplecastHosts = ['simplecast.com']
+const hosts = ['simplecast.com']
 
 export const extractSimplecastEpisode = (
   link: URL,
@@ -57,7 +57,4 @@ export const simplecastResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // Simplecast's player iframe, player.simplecast.com/{uuid}, and its three legacy spellings.
-export const simplecastEmbedResolver = createUrlEmbedResolver(
-  simplecastHosts,
-  simplecastResolveEmbed,
-)
+export const simplecastEmbedResolver = createUrlEmbedResolver(hosts, simplecastResolveEmbed)

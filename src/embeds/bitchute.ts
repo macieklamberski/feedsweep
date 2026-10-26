@@ -9,7 +9,7 @@ const sizes = {
   video: { ratio: '16/9' },
 }
 
-const bitchuteHosts = ['bitchute.com']
+const hosts = ['bitchute.com']
 
 const bitchuteResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const [route, id] = getPathSegments(url)
@@ -38,7 +38,7 @@ const bitchuteResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // BitChute's player iframe on the www and the old host, carrying only a title.
-export const bitchuteEmbedResolver = createUrlEmbedResolver(bitchuteHosts, bitchuteResolveEmbed)
+export const bitchuteEmbedResolver = createUrlEmbedResolver(hosts, bitchuteResolveEmbed)
 
 // The player starts on `autoPlay` spelled `true` alone. Its default embed mode throws while
 // building the title overlay, before it reaches the autoplay branch, so `embedMode=false` skips

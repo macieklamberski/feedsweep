@@ -14,8 +14,8 @@ const provider = 'flourish'
 
 // `flo.uri.sh` is the canonical player, and `public.flourish.studio/{resource}/{id}/embed`
 // 301s onto it.
-const flourishHosts = ['flo.uri.sh', 'public.flourish.studio']
-const sharePageHost = 'public.flourish.studio'
+const hosts = ['flo.uri.sh', 'public.flourish.studio']
+const sharePageHosts = ['public.flourish.studio']
 
 // `template` has no embed form: its `/embed` answers 403 for a real id.
 const nonEmbeddableResource = 'template'
@@ -72,7 +72,7 @@ export const flourishResolveEmbed: ResolveUrlEmbed = (url, element) => {
   // The share page frames the same player inside the site's header, footer and cookie banner.
   // `flo.uri.sh` serves no page at that path, and the host serves its own files beside it.
   const isSharePage =
-    segments.length === 2 && isHostOf(url, sharePageHost) && !isFileName(segments[1])
+    segments.length === 2 && isHostOf(url, sharePageHosts) && !isFileName(segments[1])
 
   if (!isPlayer && !isSharePage) {
     return
@@ -90,11 +90,9 @@ export const flourishResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const flourishIframeEmbedResolver = createUrlEmbedResolver(
-  flourishHosts,
-  flourishResolveEmbed,
-  { isOnHost: isHostOf },
-)
+export const flourishIframeEmbedResolver = createUrlEmbedResolver(hosts, flourishResolveEmbed, {
+  isOnHost: isHostOf,
+})
 
 // The chart posts its rendered height unasked, as a JSON string and not an object. The value
 // settles over several messages and can be fractional, 400 and then 324.0625 on one chart.

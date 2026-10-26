@@ -11,7 +11,7 @@ const sizes = {
   player: { height: 600 },
 }
 
-const shortLinkHost = 'forms.gle'
+const shortLinkHosts = ['forms.gle']
 
 // A form reads every `entry.{question}` pair off its own query as a prefilled answer.
 const isPrefillParam = (name: string): boolean => {
@@ -41,7 +41,7 @@ const composeShortLink = (url: URL, element?: Element): EmbedResolverResult | un
 // which the server redirects to the published id. The account prefix `/u/{n}/` only picks the
 // sign-in and serves the same form.
 export const googleformsResolveEmbed: ResolveUrlEmbed = (url, element) => {
-  if (isHostOf(url, [shortLinkHost])) {
+  if (isHostOf(url, shortLinkHosts)) {
     return composeShortLink(url, element)
   }
 
@@ -74,7 +74,7 @@ export const googleformsResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 export const googleformsEmbedResolver = createUrlEmbedResolver(
-  ['docs.google.com', shortLinkHost],
+  ['docs.google.com', ...shortLinkHosts],
   googleformsResolveEmbed,
 )
 

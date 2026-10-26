@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'blogger'
 
-const bloggerHosts = ['blogger.com']
+const hosts = ['blogger.com']
 
 const sizes = {
   player: { ratio: '16/9' },
@@ -44,7 +44,7 @@ export const bloggerResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const bloggerEmbedResolver = createUrlEmbedResolver(bloggerHosts, bloggerResolveEmbed)
+export const bloggerEmbedResolver = createUrlEmbedResolver(hosts, bloggerResolveEmbed)
 
 export const bloggerFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'YouTube video player' },

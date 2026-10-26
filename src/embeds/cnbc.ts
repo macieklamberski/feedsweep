@@ -10,7 +10,7 @@ const sizes = {
   player: { ratio: '16/9' },
 }
 
-const cnbcHosts = ['player.cnbc.com']
+const hosts = ['player.cnbc.com']
 
 // CNBC's player.cnbc.com clip iframe, pasted in a box taller than the 16:9 clip it fills.
 // It answers 200 for any guid, with a not-found page in the body for a fabricated one. The
@@ -39,4 +39,4 @@ export const cnbcResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const cnbcIframeEmbedResolver = createUrlEmbedResolver(cnbcHosts, cnbcResolveEmbed)
+export const cnbcIframeEmbedResolver = createUrlEmbedResolver(hosts, cnbcResolveEmbed)

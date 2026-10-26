@@ -10,7 +10,7 @@ const sizes = {
   player: { height: 150 },
 }
 
-const pastebinHosts = ['pastebin.com']
+const hosts = ['pastebin.com']
 
 // Both carriers in both generations. The `.php?i={id}` spelling answers 404 for every id,
 // including one whose paste is alive on the path form, so the two share an id space.
@@ -54,16 +54,13 @@ export const pastebinResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 // Pastebin's paste frame, on the path form or the retired `.php?i={id}` one.
-export const pastebinIframeEmbedResolver = createUrlEmbedResolver(
-  pastebinHosts,
-  pastebinResolveEmbed,
-)
+export const pastebinIframeEmbedResolver = createUrlEmbedResolver(hosts, pastebinResolveEmbed)
 
 // The same paste as a script that writes its markup inline, which a reader never runs.
 export const pastebinScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="pastebin.com/embed_js" i]',
   (element) => {
-    const url = parseUrlOnHosts(attr(element, 'src'), pastebinHosts)
+    const url = parseUrlOnHosts(attr(element, 'src'), hosts)
 
     if (!url) {
       return

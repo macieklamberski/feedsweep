@@ -14,7 +14,7 @@ const sizes = {
   playlist: { height: 600 },
 }
 
-const listennotesHosts = ['listennotes.com']
+const hosts = ['listennotes.com']
 
 const listennotesOrigin = 'https://www.listennotes.com'
 
@@ -140,7 +140,4 @@ export const listennotesResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // Listen Notes' episode, podcast, clip and playlist player iframes.
-export const listennotesEmbedResolver = createUrlEmbedResolver(
-  listennotesHosts,
-  listennotesResolveEmbed,
-)
+export const listennotesEmbedResolver = createUrlEmbedResolver(hosts, listennotesResolveEmbed)

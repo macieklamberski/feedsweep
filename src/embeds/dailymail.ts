@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const provider = 'dailymail'
 
 // Each edition's host serves the same player and 301s onto the reader's own edition.
-const dailymailHosts = ['dailymail.co.uk', 'dailymail.com']
+const hosts = ['dailymail.co.uk', 'dailymail.com']
 
 // The server matches the path in its own case only.
 const playerPathRegex = /^\/embed\/video\/([^/]+)\.html$/i
@@ -35,7 +35,7 @@ export const dailymailResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const dailymailEmbedResolver = createUrlEmbedResolver(dailymailHosts, dailymailResolveEmbed)
+export const dailymailEmbedResolver = createUrlEmbedResolver(hosts, dailymailResolveEmbed)
 
 export const dailymailFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'MailOnline Embed Player' },

@@ -8,7 +8,7 @@ const provider = 'acuityscheduling'
 
 // The page host only, since `embed.acuityscheduling.com` serves the sizing script and the
 // "Book now" button script, which opens the scheduler in an overlay.
-const acuityschedulingHosts = ['app.acuityscheduling.com']
+const hosts = ['app.acuityscheduling.com']
 
 // Each picks what the scheduler offers: one appointment type or a category of them, one
 // calendar, one location.
@@ -39,7 +39,7 @@ export const acuityschedulingResolveEmbed: ResolveUrlEmbed = (url) => {
 
 // Acuity Scheduling's inline scheduler iframe, sized by a script that feeds strip.
 export const acuityschedulingEmbedResolver = createUrlEmbedResolver(
-  acuityschedulingHosts,
+  hosts,
   acuityschedulingResolveEmbed,
 )
 

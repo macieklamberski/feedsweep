@@ -16,7 +16,7 @@ const zohoworkdriveDomains = toMap({
   'workdrive.zohopublic.eu': 'zohopublic.eu',
 })
 
-const zohoworkdriveHosts = [...zohoworkdriveDomains.keys()]
+const hosts = [...zohoworkdriveDomains.keys()]
 
 // `/embed/{fileId}` is the embed dialog's frame. `/external/{linkId}` is a share link's page, and
 // its `/embed` suffix only spins, so it is rebuilt without it.
@@ -73,10 +73,7 @@ export const zohoworkdriveResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
 // Zoho WorkDrive's frame from the embed dialog, and a share link's frame, whose `/embed` suffix
 // only spins.
-export const zohoworkdriveEmbedResolver = createUrlEmbedResolver(
-  zohoworkdriveHosts,
-  zohoworkdriveResolveEmbed,
-)
+export const zohoworkdriveEmbedResolver = createUrlEmbedResolver(hosts, zohoworkdriveResolveEmbed)
 
 export const zohoworkdriveRenderHint: EmbedRenderHint = {
   provider,

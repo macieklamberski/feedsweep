@@ -10,7 +10,7 @@ const sizes = {
   player: { ratio: '16/9' },
 }
 
-const bundestagHosts = ['webtv.bundestag.de']
+const hosts = ['webtv.bundestag.de']
 
 const idParams = toMap({
   'pservices/player/embed/nokey': 'c',
@@ -45,15 +45,12 @@ export const bundestagResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const bundestagIframeEmbedResolver = createUrlEmbedResolver(
-  bundestagHosts,
-  bundestagResolveEmbed,
-)
+export const bundestagIframeEmbedResolver = createUrlEmbedResolver(hosts, bundestagResolveEmbed)
 
 export const bundestagScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="webtv.bundestag.de/player/" i]',
   (element) => {
-    const url = parseUrlOnHosts(attr(element, 'src'), bundestagHosts)
+    const url = parseUrlOnHosts(attr(element, 'src'), hosts)
 
     if (!url) {
       return

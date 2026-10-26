@@ -6,7 +6,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'videa'
 
-const videaHosts = ['videa.hu']
+const hosts = ['videa.hu']
 
 // The player, and the retired Flash player whose `v` plays on it. The server matches both paths
 // in their case only, and answers 404 with a trailing slash.
@@ -40,7 +40,7 @@ export const videaResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const videaEmbedResolver = createUrlEmbedResolver(videaHosts, videaResolveEmbed)
+export const videaEmbedResolver = createUrlEmbedResolver(hosts, videaResolveEmbed)
 
 // The player starts playback when the query carries `autoplay=1`.
 export const videaRenderHint: EmbedRenderHint = {

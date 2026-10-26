@@ -11,7 +11,7 @@ const sizes = {
   image: { ratio: '360/416' },
 }
 
-const amebaHosts = ['static.blog-video.jp']
+const hosts = ['static.blog-video.jp']
 const amebloHosts = ['ameblo.jp']
 
 const reblogCardPathRegex = /^\/s\/embed\/reblog-card\/([^/]+)\/entry-([^/]+)\.html$/i
@@ -30,12 +30,12 @@ export const amebaResolveEmbed: ResolveUrlEmbed = (url) => {
   return {
     provider,
     id: videoId,
-    src: `https://${amebaHosts[0]}/${composeQuery({ v: videoId })}`,
+    src: `https://${hosts[0]}/${composeQuery({ v: videoId })}`,
     ...sizes.video,
   }
 }
 
-export const amebaMoviePlayerEmbedResolver = createUrlEmbedResolver(amebaHosts, amebaResolveEmbed)
+export const amebaMoviePlayerEmbedResolver = createUrlEmbedResolver(hosts, amebaResolveEmbed)
 
 const readReblogCardId = (
   blogId: string | undefined,

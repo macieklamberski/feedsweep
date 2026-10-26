@@ -7,12 +7,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const provider = 'yandexmusic'
 
 // `music.yandex.by` is an alias of `.ru`, and `music.yandex.ua` no longer resolves.
-const yandexMusicHosts = [
-  'music.yandex.ru',
-  'music.yandex.by',
-  'music.yandex.com',
-  'music.yandex.ua',
-]
+const hosts = ['music.yandex.ru', 'music.yandex.by', 'music.yandex.com', 'music.yandex.ua']
 
 // The heights the share dialog writes: the track card, and the album or playlist card with its
 // scrolling track list. Both players fill whatever width they get.
@@ -166,7 +161,7 @@ const readFallbackAnchors = (element: Element | undefined): Array<Element> => {
 }
 
 const readAnchorRoute = (anchor: Element): string => {
-  const parsed = parseUrlOnHosts(attr(anchor, 'href'), yandexMusicHosts)
+  const parsed = parseUrlOnHosts(attr(anchor, 'href'), hosts)
 
   if (!parsed) {
     return ''
@@ -198,7 +193,4 @@ const yandexMusicResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
 // Yandex Music's player iframe, on its path or hash route, and its retired Flash track player in
 // an `<embed>` or `<object>`, which renders nothing and names the track in its path.
-export const yandexMusicEmbedResolver = createUrlEmbedResolver(
-  yandexMusicHosts,
-  yandexMusicResolveEmbed,
-)
+export const yandexMusicEmbedResolver = createUrlEmbedResolver(hosts, yandexMusicResolveEmbed)

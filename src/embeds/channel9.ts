@@ -8,7 +8,7 @@ const sizes = {
   player: { ratio: '16/9' },
 }
 
-const channel9Hosts = ['channel9.msdn.com']
+const hosts = ['channel9.msdn.com']
 
 const embedUrl =
   'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html'
@@ -57,7 +57,7 @@ const channel9ResolveEmbed: ResolveUrlEmbed = (url) => {
 // Channel 9's player iframe renders a blank blocked frame: every hop of its redirect chain to
 // Microsoft Learn carries `x-frame-options: SAMEORIGIN`, while the embed page it ends on carries
 // neither that nor a `frame-ancestors` list.
-export const channel9EmbedResolver = createUrlEmbedResolver(channel9Hosts, channel9ResolveEmbed)
+export const channel9EmbedResolver = createUrlEmbedResolver(hosts, channel9ResolveEmbed)
 
 // The embed page starts the video only on an `autoplay-request` message, and only when
 // `autoplay=true` is on its url. It posts nothing to say it is ready, so the message goes on load.

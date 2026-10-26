@@ -30,11 +30,11 @@ const sizes = {
   event: { ratio: '16/9' },
 }
 
-export const vimeoHosts = ['vimeo.com']
+export const hosts = ['vimeo.com']
 
 // The hosts that serve a video page or a player. Other subdomains serve files and assets, and the
 // numbers in `av.vimeo.com/50935/740/135924474.mp4` are storage segments, not a video id.
-const vimeoPageHosts = [
+const pageHosts = [
   'vimeo.com',
   'www.vimeo.com',
   'player.vimeo.com',
@@ -166,7 +166,7 @@ type VimeoReference = {
 }
 
 const readReference = (url: URL): VimeoReference | undefined => {
-  if (!vimeoPageHosts.includes(url.hostname)) {
+  if (!pageHosts.includes(url.hostname)) {
     return
   }
 
@@ -306,7 +306,7 @@ export const vimeoResolveEmbed: ResolveUrlEmbed = (url, element) => {
 // The player url for a caller holding a url nothing has checked: a page builder stores whatever
 // the publisher pasted, so the host is checked here the way the factory checks it for a carrier.
 export const readVimeoEmbedSrc = (link: string): string | undefined => {
-  const url = parseUrlOnHosts(link, vimeoHosts)
+  const url = parseUrlOnHosts(link, hosts)
 
   if (!url) {
     return
@@ -316,7 +316,7 @@ export const readVimeoEmbedSrc = (link: string): string | undefined => {
 }
 
 // A Vimeo player iframe, a frame of a video, showcase or event page, or the Flash moogaloop player.
-export const vimeoIframeEmbedResolver = createUrlEmbedResolver(vimeoHosts, vimeoResolveEmbed)
+export const vimeoIframeEmbedResolver = createUrlEmbedResolver(hosts, vimeoResolveEmbed)
 
 // MetaSlider Pro's Vimeo slide: an empty div that only the plugin's script builds into a player.
 export const vimeoMetasliderEmbedResolver = createMarkupEmbedResolver(

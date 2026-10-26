@@ -12,7 +12,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'donorbox'
 
-const donorboxHosts = ['donorbox.org']
+const hosts = ['donorbox.org']
 
 // Only `/embed/{slug}` is a form. The campaign page sits at `/{slug}` and is what the
 // placeholder links to; the blog and event routes name nothing embeddable.
@@ -36,7 +36,7 @@ export const donorboxResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 // Donorbox's donation form iframe, sized by a loader script that feeds strip.
-export const donorboxEmbedResolver = createUrlEmbedResolver(donorboxHosts, donorboxResolveEmbed)
+export const donorboxEmbedResolver = createUrlEmbedResolver(hosts, donorboxResolveEmbed)
 
 // The form posts its rendered height unasked, as `{ from: 'dbox', src, height }`, and answers a
 // posted `{ action: 'please-resize-me' }` with the same message.

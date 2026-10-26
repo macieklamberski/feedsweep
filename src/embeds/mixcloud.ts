@@ -13,7 +13,7 @@ const sizes = {
   player: { height: 120 },
 }
 
-const mixcloudHosts = ['mixcloud.com']
+const hosts = ['mixcloud.com']
 
 // An account's sections sit where a show slug does, and the widget answers {user}/uploads with the
 // same empty shell as a fabricated slug.
@@ -112,7 +112,7 @@ export const mixcloudResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // Mixcloud's widget iframe, its Flash player and a bare mixcloud.com/{user}/{slug} show url.
-export const mixcloudEmbedResolver = createUrlEmbedResolver(mixcloudHosts, mixcloudResolveEmbed)
+export const mixcloudEmbedResolver = createUrlEmbedResolver(hosts, mixcloudResolveEmbed)
 
 export const mixcloudRenderHint: EmbedRenderHint = {
   provider,

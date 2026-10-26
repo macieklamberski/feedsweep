@@ -12,7 +12,7 @@ const playerVersionRegex = /^v\d$/i
 
 const currentPlayerVersion = 'v3'
 
-const firesideHosts = ['fireside.fm']
+const hosts = ['fireside.fm']
 
 const sizes = {
   // Fireside's player is one fixed size: every iframe states `height="200"`.
@@ -60,4 +60,4 @@ export const firesideResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 // Fireside's episode player iframe, versioned or on the retired /s/ share route that is gone.
-export const firesideEmbedResolver = createUrlEmbedResolver(firesideHosts, firesideResolveEmbed)
+export const firesideEmbedResolver = createUrlEmbedResolver(hosts, firesideResolveEmbed)

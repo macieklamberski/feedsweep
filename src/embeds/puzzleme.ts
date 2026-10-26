@@ -7,7 +7,7 @@ const provider = 'puzzleme'
 
 // The apex and `www.` 301 a `/pmm/` url onto `puzzleme.`. Other subdomains, such as `cdn3.`,
 // serve their own sets under the same path, which `puzzleme.` answers with an error page.
-const puzzlemeHosts = ['amuselabs.com', 'puzzleme.amuselabs.com', 'www.amuselabs.com']
+const hosts = ['amuselabs.com', 'puzzleme.amuselabs.com', 'www.amuselabs.com']
 
 // `/pmm/{kind}`, where the kind names the game. Any kind the server knows plays the puzzle the
 // id and set name, and one it does not know answers 404.
@@ -44,11 +44,9 @@ const puzzlemeResolveEmbed: ResolveUrlEmbed = (url) => {
   return composePuzzlemeEmbed(kind, id, set)
 }
 
-export const puzzlemeIframeEmbedResolver = createUrlEmbedResolver(
-  puzzlemeHosts,
-  puzzlemeResolveEmbed,
-  { isOnHost: isHostOf },
-)
+export const puzzlemeIframeEmbedResolver = createUrlEmbedResolver(hosts, puzzlemeResolveEmbed, {
+  isOnHost: isHostOf,
+})
 
 // The mount `puzzleme-embed.js` fills with a player frame, which renders nothing without it.
 export const puzzlemeWidgetEmbedResolver = createMarkupEmbedResolver(

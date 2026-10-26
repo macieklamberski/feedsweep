@@ -7,7 +7,7 @@ const provider = 'rtve'
 
 // `irtve.es` is the older spelling of the same broadcaster's asset domain and carries the
 // Flash player under the same path.
-const rtveHosts = ['rtve.es', 'irtve.es']
+const hosts = ['rtve.es', 'irtve.es']
 
 type Kind = 'audio' | 'video'
 
@@ -64,7 +64,7 @@ export const rtveResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // RTVE's player iframe, rtve.es/drmn/embed/{audio|video}/{id}/.
-export const rtveIframeEmbedResolver = createUrlEmbedResolver(rtveHosts, rtveResolveEmbed)
+export const rtveIframeEmbedResolver = createUrlEmbedResolver(hosts, rtveResolveEmbed)
 
 const rtveFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
   if (!flashPlayerPathRegex.test(url.pathname)) {
@@ -105,7 +105,7 @@ const rtveFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // RTVE's retired Flash player under /swf/, which names its asset as {id}_es_{audios|videos}.
-export const rtveFlashEmbedResolver = createUrlEmbedResolver(rtveHosts, rtveFlashResolveEmbed)
+export const rtveFlashEmbedResolver = createUrlEmbedResolver(hosts, rtveFlashResolveEmbed)
 
 export const rtveRenderHint: EmbedRenderHint = {
   provider,

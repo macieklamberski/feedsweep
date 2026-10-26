@@ -6,7 +6,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'slideshare'
 
-const slideshareHosts = ['slideshare.net', 'slidesharecdn.com']
+const hosts = ['slideshare.net', 'slidesharecdn.com']
 
 // The Flash wrapper spells its id `__ss_{id}` on the div and `__sse{id}` on the object inside and
 // on the embed's `name`. Many carriers name the deck on the div alone.
@@ -61,7 +61,7 @@ export const slideshareResolveEmbed: ResolveUrlEmbed = (url) => {
 const captionLinkSelector = 'a[href*="slideshare.net/" i]'
 
 const readPageSegments = (anchor: Nullish<Element>): Array<string> => {
-  const parsed = parseUrlOnHosts(attr(anchor, 'href'), slideshareHosts)
+  const parsed = parseUrlOnHosts(attr(anchor, 'href'), hosts)
 
   return parsed ? getPathSegments(parsed) : []
 }
@@ -207,7 +207,7 @@ const removeAttribution = (caption: Element, page: Element, owner: Element): voi
   }
 
   for (const anchor of Array.from(caption.querySelectorAll(captionLinkSelector))) {
-    const parsed = parseUrlOnHosts(attr(anchor, 'href'), slideshareHosts)
+    const parsed = parseUrlOnHosts(attr(anchor, 'href'), hosts)
 
     if (parsed && getPathSegments(parsed).length === 0) {
       anchor.remove()
@@ -295,7 +295,7 @@ const slideshareResolveIframeEmbed: ResolveUrlEmbed = (url, element) => {
 
 // SlideShare's player iframe, which names only the deck, and the caption the dialog ships with it.
 export const slideshareIframeEmbedResolver = createUrlEmbedResolver(
-  slideshareHosts,
+  hosts,
   slideshareResolveIframeEmbed,
 )
 
@@ -333,6 +333,6 @@ const slideshareFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
 // SlideShare's Flash player, dead since 2020, inside the __ss_{id} wrapper that names the deck.
 export const slideshareFlashEmbedResolver = createUrlEmbedResolver(
-  slideshareHosts,
+  hosts,
   slideshareFlashResolveEmbed,
 )

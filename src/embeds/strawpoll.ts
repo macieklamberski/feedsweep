@@ -7,7 +7,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const provider = 'strawpoll'
 
 // Exact: `cdn.strawpoll.com` serves the loader script and the preview images.
-const strawpollHosts = ['strawpoll.com']
+const hosts = ['strawpoll.com']
 
 // The server answers the route words in lowercase only, so `src` mints them that way. The id is
 // case-sensitive.
@@ -36,11 +36,9 @@ export const strawpollResolveEmbed: ResolveUrlEmbed = (url) => {
   return composeEmbed(pollId)
 }
 
-export const strawpollIframeEmbedResolver = createUrlEmbedResolver(
-  strawpollHosts,
-  strawpollResolveEmbed,
-  { isOnHost: isHostOf },
-)
+export const strawpollIframeEmbedResolver = createUrlEmbedResolver(hosts, strawpollResolveEmbed, {
+  isOnHost: isHostOf,
+})
 
 const emptyMountTags = ['br', 'script']
 

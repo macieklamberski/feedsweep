@@ -3,7 +3,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'dvids'
 
-const dvidsHosts = ['dvidshub.net']
+const hosts = ['dvidshub.net']
 
 // The server matches the path in its own case only.
 const playerPathRegex = /^\/video\/embed\/([^/]+)\/?$/i
@@ -30,4 +30,4 @@ export const dvidsResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const dvidsEmbedResolver = createUrlEmbedResolver(dvidsHosts, dvidsResolveEmbed)
+export const dvidsEmbedResolver = createUrlEmbedResolver(hosts, dvidsResolveEmbed)

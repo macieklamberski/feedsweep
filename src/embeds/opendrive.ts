@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const provider = 'opendrive'
 
 // Not `opendrive.com` and its other subdomains: `web.opendrive.com` serves the files themselves.
-const opendriveHosts = ['www.opendrive.com']
+const hosts = ['www.opendrive.com']
 
 // `listen` is the older route, and it 302s to `player` with the same id.
 const playerRoutes = ['player', 'listen']
@@ -32,4 +32,4 @@ export const opendriveResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const opendriveEmbedResolver = createUrlEmbedResolver(opendriveHosts, opendriveResolveEmbed)
+export const opendriveEmbedResolver = createUrlEmbedResolver(hosts, opendriveResolveEmbed)

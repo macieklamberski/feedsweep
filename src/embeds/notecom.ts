@@ -8,7 +8,7 @@ const provider = 'notecom'
 
 // `note.mu` is the platform's former domain and still 301s to `note.com` on the same path
 // (checked 2026-08-15), so both are matched and only the current one is minted.
-const notecomHosts = ['note.com', 'note.mu']
+const hosts = ['note.com', 'note.mu']
 
 // The player answers 200 for any id: a full body carrying the title, the author and a post link for
 // a real one, an empty shell for a fabricated one.
@@ -38,7 +38,7 @@ type NoteUrl = { noteId: string; kind: 'post' | 'player' }
 // The shapes are the post note.com/{user}/n/{id}, the same post under a publication as
 // biz.note.com/n/{id}, and the player note.com/embed/notes/{id}.
 const readNoteUrl = (link: URL): NoteUrl | undefined => {
-  const parsed = parseUrlOnHosts(link, notecomHosts)
+  const parsed = parseUrlOnHosts(link, hosts)
   const segments = parsed ? getPathSegments(parsed) : []
 
   if (isAnyOf(segments[1], 'n') && segments[2]) {
@@ -56,7 +56,7 @@ const readNoteUrl = (link: URL): NoteUrl | undefined => {
 
 // A note.com embed figure carries the post url, not the player, so a reader frames the article.
 // A CMS that ran the figure's script saves the player iframe itself into the feed.
-export const notecomIframeEmbedResolver = createUrlEmbedResolver(notecomHosts, (url) => {
+export const notecomIframeEmbedResolver = createUrlEmbedResolver(hosts, (url) => {
   const target = readNoteUrl(url)
 
   if (!target) {

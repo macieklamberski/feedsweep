@@ -1,6 +1,6 @@
 import { resolveUrl } from 'trousse'
-import { vimeoHosts, vimeoResolveEmbed } from '../../embeds/vimeo.js'
-import { youtubeHosts, youtubeResolveEmbed } from '../../embeds/youtube.js'
+import { hosts as vimeoHosts, vimeoResolveEmbed } from '../../embeds/vimeo.js'
+import { hosts as youtubeHosts, youtubeResolveEmbed } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
 import { absoluteUrlRegex, parseUrlOnHosts } from '../../utils/urls.js'

@@ -23,11 +23,11 @@ const provider = 'facebook'
 
 // `fb.watch` is the short-link host the mobile app hands out, found inside both widget divs.
 // Posts live on the apex and on `web.`, `m.` and `business.` alike.
-const facebookHosts = ['facebook.com', 'fb.watch']
+const hosts = ['facebook.com', 'fb.watch']
 
 // The page's own username, `facebook.com/{username}/`.
 const readPageUsername = (anchor: Nullish<Element>): string | undefined => {
-  const page = parseUrlOnHosts(attr(anchor, 'href'), facebookHosts)
+  const page = parseUrlOnHosts(attr(anchor, 'href'), hosts)
 
   if (!page) {
     return
@@ -139,7 +139,7 @@ const extractEmbed = (
   attribute = 'data-href',
 ): EmbedResolverResult | undefined => {
   const href = attr(element, attribute)
-  const parsed = parseUrlOnHosts(href, facebookHosts)
+  const parsed = parseUrlOnHosts(href, hosts)
 
   if (!href || !parsed) {
     return
@@ -241,7 +241,7 @@ export const facebookResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 
   const href = getQueryParam(url.searchParams, 'href')
-  const target = parseUrlOnHosts(href, facebookHosts)
+  const target = parseUrlOnHosts(href, hosts)
 
   if (!href || !target) {
     return
@@ -255,10 +255,7 @@ export const facebookResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 // Facebook's plugin iframe, or a pasted post, video or watch page, which x-frame-options blanks.
-export const facebookIframeEmbedResolver = createUrlEmbedResolver(
-  facebookHosts,
-  facebookResolveEmbed,
-)
+export const facebookIframeEmbedResolver = createUrlEmbedResolver(hosts, facebookResolveEmbed)
 
 // The Flash player before `/v/`, `/swf/mvp.swf` on Facebook's static hosts, naming its video in
 // flashvars `video_id`. The share player names only a file and stays unresolved.
@@ -322,7 +319,7 @@ export const facebookBlockquoteEmbedResolver = createMarkupEmbedResolver(
   fallbackSelector,
   (element) => {
     const cite = attr(element, 'cite')
-    const parsed = parseUrlOnHosts(cite, facebookHosts)
+    const parsed = parseUrlOnHosts(cite, hosts)
 
     if (!cite || !parsed) {
       return

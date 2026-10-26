@@ -12,7 +12,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'buzzsprout'
 
-const buzzsproutHosts = ['buzzsprout.com']
+const hosts = ['buzzsprout.com']
 // /{podcast}/{episode}-{slug}.js, with or without episodes/.
 const episodeScriptPathRegex = /^\/(\d+)\/(?:episodes\/)?(\d+)(?:-[^/]*)?\.js$/i
 // A script naming the podcast alone is the show player, which carries every episode.
@@ -65,7 +65,7 @@ export const buzzsproutResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 export const buzzsproutIframeEmbedResolver: EmbedResolver = createUrlEmbedResolver(
-  buzzsproutHosts,
+  hosts,
   buzzsproutResolveEmbed,
 )
 
@@ -76,7 +76,7 @@ export const buzzsproutScriptEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     // The selector guarantees a src containing the host substring, so only the host and
     // path checks can reject.
-    const url = parseUrlOnHosts(attr(element, 'src'), buzzsproutHosts)
+    const url = parseUrlOnHosts(attr(element, 'src'), hosts)
 
     if (!url) {
       return

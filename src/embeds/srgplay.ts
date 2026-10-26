@@ -21,7 +21,7 @@ const playerHosts = toMap({
   rtr: 'rtr.ch',
 })
 
-const srgplayHosts = ['srgssr.ch', ...playerHosts.values()]
+const hosts = ['srgssr.ch', ...playerHosts.values()]
 const srgplayEmbedParams = ['startTime']
 
 // The business unit after `urn:` picks the host. The rest varies in segment count, the corpus
@@ -92,7 +92,7 @@ const srgplayResolveEmbed: ResolveUrlEmbed = (url) => {
 // SRG SSR's shared player, serving SRF, RTS, RSI and RTR. The retired per-show player is
 // dead markup whose own `id` still plays on the current one, and `rts.ch/embed/{code}` is a short
 // code in an id space only the platform's own 301 can read, so it keeps the generic placeholder.
-export const srgplayEmbedResolver = createUrlEmbedResolver(srgplayHosts, srgplayResolveEmbed)
+export const srgplayEmbedResolver = createUrlEmbedResolver(hosts, srgplayResolveEmbed)
 
 export const srgplayRenderHint: EmbedRenderHint = {
   provider,

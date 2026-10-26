@@ -9,7 +9,7 @@ const provider = 'wistia'
 // The script form names the media through a JSONP callback, with no page in the url.
 const jsonpSuffixRegex = /\.jsonp$/i
 
-const wistiaHosts = ['wistia.net', 'wistia.com']
+const hosts = ['wistia.net', 'wistia.com']
 
 // Both spellings ship: channel on the player host and channels on the account host.
 // A channel has no vanity slug anywhere in the url space: the segment is the same hashed id every
@@ -47,9 +47,7 @@ export const extractWistiaEmbed = (
   }
 
   // Only the account host serves /medias/{id}: the player hosts 404 on it.
-  const host = isAnyOf(segments[0], 'medias')
-    ? parseUrlOnHosts(link, wistiaHosts)?.hostname
-    : undefined
+  const host = isAnyOf(segments[0], 'medias') ? parseUrlOnHosts(link, hosts)?.hostname : undefined
 
   return { route, id, page: host ? `https://${host}/medias/${id}` : undefined }
 }
@@ -58,7 +56,7 @@ export const extractWistiaEmbed = (
 // are matched on a substring of their path, so the host is the only thing telling Wistia's own
 // `/embed/medias/{id}` from a foreign path that spells it.
 export const readSrcMediaId = (src: string | undefined): string | undefined => {
-  const url = parseUrlOnHosts(src, wistiaHosts)
+  const url = parseUrlOnHosts(src, hosts)
 
   return url ? extractWistiaEmbed(url)?.id : undefined
 }
@@ -89,7 +87,7 @@ export const wistiaResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // A Wistia media, channel or playlist player iframe, or a frame of the login-gated channel page.
-export const wistiaEmbedResolver = createUrlEmbedResolver(wistiaHosts, wistiaResolveEmbed)
+export const wistiaEmbedResolver = createUrlEmbedResolver(hosts, wistiaResolveEmbed)
 
 export const wistiaFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'Wistia video player' },

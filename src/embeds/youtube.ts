@@ -59,12 +59,7 @@ const gridFragmentIdRegex = /^#p\/.+\/([0-9A-Za-z_-]{11})$/i
 
 // `youtube.googleapis.com/v/{id}` is the Flash player's other host, still shipped by Blogger
 // feeds of that era.
-export const youtubeHosts = [
-  'youtube.com',
-  'youtube-nocookie.com',
-  'youtu.be',
-  'youtube.googleapis.com',
-]
+export const hosts = ['youtube.com', 'youtube-nocookie.com', 'youtu.be', 'youtube.googleapis.com']
 
 // A bare id, already separated from any url: the right shape, and not one of the embed path
 // words that share it.
@@ -177,7 +172,7 @@ const readEmbedParams = (url: URL): Record<string, string> => {
 // The player url for a caller holding a url nothing has checked: a page builder stores whatever
 // the publisher pasted, so the host is checked here the way the factory checks it for a carrier.
 export const readYoutubeEmbedSrc = (link: string): string | undefined => {
-  const url = parseUrlOnHosts(link, youtubeHosts)
+  const url = parseUrlOnHosts(link, hosts)
 
   if (!url) {
     return
@@ -359,7 +354,7 @@ export const youtubeFc2EmbedResolver = createUrlEmbedResolver(
 )
 
 // A YouTube player iframe, a frame of a watch, shorts or playlist page, or the Flash player.
-export const youtubeIframeEmbedResolver = createUrlEmbedResolver(youtubeHosts, youtubeResolveEmbed)
+export const youtubeIframeEmbedResolver = createUrlEmbedResolver(hosts, youtubeResolveEmbed)
 
 // AMP's amp-youtube names the video in data-videoid and renders nothing without the AMP runtime.
 export const youtubeAmpEmbedResolver = createMarkupEmbedResolver(

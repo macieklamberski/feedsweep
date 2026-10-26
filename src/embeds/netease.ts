@@ -4,7 +4,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'netease'
 
-const neteaseHosts = ['music.163.com']
+const hosts = ['music.163.com']
 
 // The map `pt_outchain_player.js` branches on: the number picks the endpoint the player calls
 // and names the page the id belongs to. The retired Flash snippet writes `type=2` for a song too.
@@ -55,7 +55,7 @@ export const neteaseResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const neteaseEmbedResolver = createUrlEmbedResolver(neteaseHosts, neteaseResolveEmbed)
+export const neteaseEmbedResolver = createUrlEmbedResolver(hosts, neteaseResolveEmbed)
 
 export const neteaseRenderHint: EmbedRenderHint = {
   provider,

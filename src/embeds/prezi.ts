@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'prezi'
 
-const preziHosts = ['prezi.com']
+const hosts = ['prezi.com']
 
 const sizes = {
   presentation: { ratio: '550/400' },
@@ -100,4 +100,4 @@ export const preziResolveEmbed: ResolveUrlEmbed = (url, element) => {
   return composeEmbed(id)
 }
 
-export const preziEmbedResolver = createUrlEmbedResolver(preziHosts, preziResolveEmbed)
+export const preziEmbedResolver = createUrlEmbedResolver(hosts, preziResolveEmbed)

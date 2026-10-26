@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ausha'
 
-const aushaHost = 'ausha.co'
+const hosts = ['ausha.co']
 
 // The v3 player is a fixed height on a fluid width.
 const sizes = {
@@ -56,7 +56,7 @@ export const aushaResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 // Ausha's v3 player iframe and the v2 widget, both naming the episode or show in the query.
-export const aushaEmbedResolver = createUrlEmbedResolver([aushaHost], aushaResolveEmbed)
+export const aushaEmbedResolver = createUrlEmbedResolver(hosts, aushaResolveEmbed)
 
 export const aushaRenderHint: EmbedRenderHint = {
   provider,

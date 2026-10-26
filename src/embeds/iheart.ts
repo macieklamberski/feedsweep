@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'iheart'
 
-const iheartHosts = ['iheart.com']
+const hosts = ['iheart.com']
 
 // A route segment is the bare id or a slug hanging before it, `{slug}-{id}`.
 const episodePathRegex = /^\/podcast\/(?:[^/]*-)?(\d+)\/episode\/(?:[^/]*-)?(\d+)\/?$/i
@@ -72,7 +72,7 @@ export const iheartResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const iheartEmbedResolver = createUrlEmbedResolver(iheartHosts, iheartResolveEmbed)
+export const iheartEmbedResolver = createUrlEmbedResolver(hosts, iheartResolveEmbed)
 
 export const iheartRenderHint: EmbedRenderHint = {
   provider,

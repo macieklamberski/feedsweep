@@ -7,7 +7,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'rsscom'
 
-const rsscomHosts = ['player.rss.com']
+const hosts = ['player.rss.com']
 
 // The player reads a numeric second segment as an episode, and `latest` as the newest episode,
 // which no page url names. Any other word, `LATEST` included, plays the whole show.
@@ -51,7 +51,7 @@ export const rsscomResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const rsscomEmbedResolver = createUrlEmbedResolver(rsscomHosts, rsscomResolveEmbed)
+export const rsscomEmbedResolver = createUrlEmbedResolver(hosts, rsscomResolveEmbed)
 
 // The player posts its rendered height unasked as `{ height }`, again whenever it changes.
 export const rsscomRenderHint: EmbedRenderHint = {

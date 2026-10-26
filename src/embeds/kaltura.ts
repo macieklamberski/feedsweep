@@ -17,7 +17,7 @@ const sizes = {
 
 const partnerPathRegex = /^\/p\/([^/]+)\//i
 
-const kalturaHost = 'kaltura.com'
+const hosts = ['kaltura.com']
 
 // The SaaS hosts all serve the player and the thumbnail from `cdnapisec.kaltura.com`; a regional
 // API host (`api.ca.kaltura.com`) serves them only itself, so the carrier's host is kept there.
@@ -93,14 +93,14 @@ export const kalturaResolveEmbed: ResolveUrlEmbed = (url, element) => {
 // Kaltura's embedIframeJs and embedPlaykitJs iframes, which render and only lack a poster.
 // The Flash-era `index.php/kwidget/…` and `extwidget/embedIframe/…` routes have lost their
 // player libraries, and the entry alone does not mint a working player.
-export const kalturaIframeEmbedResolver = createUrlEmbedResolver([kalturaHost], kalturaResolveEmbed)
+export const kalturaIframeEmbedResolver = createUrlEmbedResolver(hosts, kalturaResolveEmbed)
 
 // Kaltura's auto-embed script, which writes the iframe into an empty div at load time. Feeds strip
 // the script, and the emptied div dies as an empty tag with the video.
 export const kalturaScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="kaltura.com/p/" i]',
   (element) => {
-    const entry = readEntry(parseUrlOnHosts(attr(element, 'src'), kalturaHost))
+    const entry = readEntry(parseUrlOnHosts(attr(element, 'src'), hosts))
 
     if (!entry || !isAnyOf(getQueryParam(entry.parsed.searchParams, 'autoembed'), 'true')) {
       return

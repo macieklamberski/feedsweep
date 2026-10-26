@@ -6,7 +6,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'omny'
 
-const omnyHosts = ['omny.fm']
+const hosts = ['omny.fm']
 
 // The boxes Omny's embed dialog writes: 180 tall for the wide audio player, 560 by 315 for the
 // video one, and 500 tall for a playlist, which scrolls its list inside the frame. The square
@@ -68,7 +68,7 @@ export const omnyResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // The omny.fm/shows/{show}/{clip}/embed player iframe, often pasted without a height.
-export const omnyEmbedResolver = createUrlEmbedResolver(omnyHosts, omnyResolveEmbed)
+export const omnyEmbedResolver = createUrlEmbedResolver(hosts, omnyResolveEmbed)
 
 // Starts playback on the click that loads the player.
 export const omnyRenderHint: EmbedRenderHint = {

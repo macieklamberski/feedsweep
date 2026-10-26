@@ -11,7 +11,7 @@ const sizes = {
 }
 
 // `app.media.ccc.de` serves the same player on the same paths.
-const mediacccHosts = ['media.ccc.de']
+const hosts = ['media.ccc.de']
 
 // The server matches the slug in its case only.
 const playerPathRegex = /^\/v\/([^/]+)\/oembed\/?$/i
@@ -43,4 +43,4 @@ export const mediacccResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const mediacccEmbedResolver = createUrlEmbedResolver(mediacccHosts, mediacccResolveEmbed)
+export const mediacccEmbedResolver = createUrlEmbedResolver(hosts, mediacccResolveEmbed)

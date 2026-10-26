@@ -8,7 +8,7 @@ const sizes = {
   presentation: { height: 500 },
 }
 
-const swayHosts = ['sway.cloud.microsoft', 'sway.com', 'sway.office.com']
+const hosts = ['sway.cloud.microsoft', 'sway.com', 'sway.office.com']
 
 // Microsoft Sway's embed iframe, `/s/{id}/embed`, on any of its three hosts. The ids are one space
 // and case-sensitive, and the route words answer in any case.
@@ -29,4 +29,4 @@ export const swayResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const swayEmbedResolver = createUrlEmbedResolver(swayHosts, swayResolveEmbed)
+export const swayEmbedResolver = createUrlEmbedResolver(hosts, swayResolveEmbed)

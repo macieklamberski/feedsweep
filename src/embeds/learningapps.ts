@@ -9,7 +9,7 @@ const sizes = {
   player: { height: 500 },
 }
 
-const learningappsHosts = ['learningapps.org']
+const hosts = ['learningapps.org']
 
 const exerciseRoutes = ['watch', 'show']
 const exerciseParams = ['app', 'v', 'id']
@@ -57,7 +57,4 @@ export const learningappsResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const learningappsEmbedResolver = createUrlEmbedResolver(
-  learningappsHosts,
-  learningappsResolveEmbed,
-)
+export const learningappsEmbedResolver = createUrlEmbedResolver(hosts, learningappsResolveEmbed)

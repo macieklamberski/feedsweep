@@ -6,7 +6,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'acast'
 
-const acastHosts = ['embed.acast.com', 'player.acast.com']
+const hosts = ['embed.acast.com', 'player.acast.com']
 
 // Acast's share code writes `height="190px"` and its pages state `twitter:player:height` 190.
 const sizes = {
@@ -50,7 +50,7 @@ const acastResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // Acast's player iframe, spelled three ways across the embed host and the retired player host.
-export const acastEmbedResolver = createUrlEmbedResolver(acastHosts, acastResolveEmbed)
+export const acastEmbedResolver = createUrlEmbedResolver(hosts, acastResolveEmbed)
 
 export const acastFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'Embed Player' },

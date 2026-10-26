@@ -4,7 +4,7 @@ import { flashVar } from '../utils/dom.js'
 import { audioFileRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { readCarrierUrl } from '../utils/widgets.js'
 
-const libsynMediaHosts = ['media.libsyn.com']
+const hosts = ['media.libsyn.com']
 
 // A licensed JW Player `.swf` uploaded to a show's Libsyn space, which renders nothing since Flash
 // was blocked. Its `file` flashvar names the episode's own audio file.
@@ -12,7 +12,7 @@ export const libsynMediaResolver: MediaResolver = {
   kind: 'media',
   selector: 'embed[src*="/_static/play/player-licensed.swf" i]',
   extract: (element) => {
-    if (!parseUrlOnHosts(readCarrierUrl(element), libsynMediaHosts)) {
+    if (!parseUrlOnHosts(readCarrierUrl(element), hosts)) {
       return
     }
 

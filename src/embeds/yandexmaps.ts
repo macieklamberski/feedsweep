@@ -6,10 +6,10 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'yandexmaps'
 
-const yandexMapsHosts = ['api-maps.yandex.ru']
+const scriptHosts = ['api-maps.yandex.ru']
 // Each host serves the same widget in its own language, yandex.com in English, so a frame keeps
 // the host the publisher wrote. The script names no widget host and takes yandex.ru.
-const yandexMapsWidgetHosts = ['yandex.by', 'yandex.com', 'yandex.ru']
+const hosts = ['yandex.by', 'yandex.com', 'yandex.ru']
 const scriptWidgetHost = 'yandex.ru'
 
 const widgetPath = '/map-widget/v1/'
@@ -97,7 +97,7 @@ export const yandexMapsScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="api-maps.yandex.ru/services/constructor/" i]',
   (element): EmbedResolverResult | undefined => {
     // The selector matches a substring any host can carry, so the host is checked here.
-    const url = parseUrlOnHosts(attr(element, 'src'), yandexMapsHosts)
+    const url = parseUrlOnHosts(attr(element, 'src'), scriptHosts)
 
     if (!url) {
       return
@@ -109,30 +109,27 @@ export const yandexMapsScriptEmbedResolver = createMarkupEmbedResolver(
 
 // The frame the Constructor's iframe snippet writes, which names the map by `um` alone, the frame
 // of a short link, and a coordinate map's frame.
-export const yandexMapsIframeEmbedResolver = createUrlEmbedResolver(
-  yandexMapsWidgetHosts,
-  (url, element) => {
-    const code = url.pathname.match(shortLinkPathRegex)?.groups?.code
+export const yandexMapsIframeEmbedResolver = createUrlEmbedResolver(hosts, (url, element) => {
+  const code = url.pathname.match(shortLinkPathRegex)?.groups?.code
 
-    if (code) {
-      return {
-        provider,
-        id: `-/${code}`,
-        src: `https://${url.hostname}${widgetPath}-/${code}`,
-        url: `https://${url.hostname}/maps/-/${code}`,
-        ...sizes.player,
-      }
+  if (code) {
+    return {
+      provider,
+      id: `-/${code}`,
+      src: `https://${url.hostname}${widgetPath}-/${code}`,
+      url: `https://${url.hostname}/maps/-/${code}`,
+      ...sizes.player,
     }
+  }
 
-    if (!isAnyOf(url.pathname, widgetPath)) {
-      return
-    }
+  if (!isAnyOf(url.pathname, widgetPath)) {
+    return
+  }
 
-    const position = pickQueryParams(url.search, positionParams)
+  const position = pickQueryParams(url.search, positionParams)
 
-    return (
-      resolveConstructorMap(url.hostname, url.searchParams, position) ??
-      resolveCoordinateMap(url.hostname, url.searchParams, element)
-    )
-  },
-)
+  return (
+    resolveConstructorMap(url.hostname, url.searchParams, position) ??
+    resolveCoordinateMap(url.hostname, url.searchParams, element)
+  )
+})

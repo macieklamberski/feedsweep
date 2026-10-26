@@ -10,7 +10,7 @@ const provider = 'tencent'
 const nonVideoWords = ['cover']
 
 // `v.qq.com` serves the player; the other two served the Flash player.
-const tencentHosts = ['v.qq.com', 'static.video.qq.com', 'imgcache.qq.com']
+const hosts = ['v.qq.com', 'static.video.qq.com', 'imgcache.qq.com']
 
 // `/txp/iframe/player.html` is the current player. The older `/iframe/player.html` is a stub that
 // `location.replace`s onto it, and `/iframe/preview.html` is the mobile player of the same era.
@@ -64,7 +64,7 @@ const tencentResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const tencentEmbedResolver = createUrlEmbedResolver(tencentHosts, tencentResolveEmbed)
+export const tencentEmbedResolver = createUrlEmbedResolver(hosts, tencentResolveEmbed)
 
 // The player reads a boolean setting as the string `true`, so `autoplay=1` stays paused.
 export const tencentRenderHint: EmbedRenderHint = {
