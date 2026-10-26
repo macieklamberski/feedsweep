@@ -105,7 +105,9 @@ export const cnnFlashEmbedResolver = createUrlEmbedResolver(cdnHosts, cnnFlashRe
 
 // CNN's 2009 share snippet: a loader script that is gone, beside a <noscript> link.
 export const cnnScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="cdn.turner.com/cnn/.element/js/" i][src*="/video/evp/module.js" i]',
+  cdnHosts
+    .map((host) => `script[src*="${host}/cnn/.element/js/" i][src*="/video/evp/module.js" i]`)
+    .join(', '),
   (element) => {
     const parsed = parseUrlOnHosts(attr(element, 'src'), cdnHosts)
 

@@ -45,7 +45,7 @@ export const aparatIframeEmbedResolver: EmbedResolver = createUrlEmbedResolver(
 // Aparat's WordPress-style facade: a script inside an empty div that never runs in a reader.
 // Its src is `aparat.com/embed/{hash}`, usually with no companion iframe anywhere in the item.
 export const aparatScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="aparat.com/embed/" i]',
+  hosts.map((host) => `script[src*="${host}/embed/" i]`).join(', '),
   (element) => {
     // The selector guarantees the host substring is in the src, so only the host and the path
     // shape can reject here. The `data[rnddiv]` and `data[responsive]` query the facade carries

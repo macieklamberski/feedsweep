@@ -10,8 +10,11 @@ const hosts = ['flash-mp3-player.net']
 // answers 404, so it renders nothing.
 export const flashMp3PlayerMediaResolver: MediaResolver = {
   kind: 'media',
-  selector:
-    'embed[src*="flash-mp3-player.net/medias/" i], object[data*="flash-mp3-player.net/medias/" i]',
+  selector: hosts
+    .flatMap((host) => {
+      return [`embed[src*="${host}/medias/" i]`, `object[data*="${host}/medias/" i]`]
+    })
+    .join(', '),
   extract: (element) => {
     const parsed = parseUrlOnHosts(readCarrierUrl(element), hosts)
 

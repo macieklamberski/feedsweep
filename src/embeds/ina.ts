@@ -55,7 +55,7 @@ export const inaIframeEmbedResolver = createUrlEmbedResolver(hosts, inaResolveEm
 
 // INA's retired script loader, a carrier the iframe fallback cannot read.
 export const inaScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="ina.fr/player/embed/" i]',
+  hosts.map((host) => `script[src*="${host}/player/embed/" i]`).join(', '),
   (element) => {
     const match = parseUrlOnHosts(attr(element, 'src'), hosts)?.pathname.match(scriptPathRegex)
 

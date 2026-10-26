@@ -78,7 +78,7 @@ export const jwplayerIframeEmbedResolver = createUrlEmbedResolver(hosts, jwplaye
 
 // JW Player's script embed: the same players/{mediaId}-{playerId} url beside an empty botr_ div.
 export const jwplayerScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="jwplayer.com/players/" i], script[src*="jwplatform.com/players/" i]',
+  hosts.map((host) => `script[src*="${host}/players/" i]`).join(', '),
   (element) => {
     const url = parseUrlOnHosts(attr(element, 'src'), hosts)
 

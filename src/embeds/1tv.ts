@@ -9,7 +9,7 @@ const sizes = {
   player: { ratio: '16/9' },
 }
 
-const channelOneHosts = ['1tv.ru']
+const hosts = ['1tv.ru']
 
 // The legacy routes the server redirects to the player, each against the type it names.
 const legacyRouteTypes = toMap({
@@ -49,7 +49,4 @@ export const channelOneResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const channelOneEmbedResolver = createUrlEmbedResolver(
-  channelOneHosts,
-  channelOneResolveEmbed,
-)
+export const channelOneEmbedResolver = createUrlEmbedResolver(hosts, channelOneResolveEmbed)

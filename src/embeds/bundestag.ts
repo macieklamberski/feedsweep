@@ -48,7 +48,7 @@ export const bundestagResolveEmbed: ResolveUrlEmbed = (url) => {
 export const bundestagIframeEmbedResolver = createUrlEmbedResolver(hosts, bundestagResolveEmbed)
 
 export const bundestagScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="webtv.bundestag.de/player/" i]',
+  hosts.map((host) => `script[src*="${host}/player/" i]`).join(', '),
   (element) => {
     const url = parseUrlOnHosts(attr(element, 'src'), hosts)
 

@@ -98,7 +98,7 @@ export const kalturaIframeEmbedResolver = createUrlEmbedResolver(hosts, kalturaR
 // Kaltura's auto-embed script, which writes the iframe into an empty div at load time. Feeds strip
 // the script, and the emptied div dies as an empty tag with the video.
 export const kalturaScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="kaltura.com/p/" i]',
+  hosts.map((host) => `script[src*="${host}/p/" i]`).join(', '),
   (element) => {
     const entry = readEntry(parseUrlOnHosts(attr(element, 'src'), hosts))
 

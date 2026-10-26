@@ -72,7 +72,7 @@ export const buzzsproutIframeEmbedResolver: EmbedResolver = createUrlEmbedResolv
 // Buzzsprout's WordPress shortcode: an empty div and a script naming the ids, which no reader runs.
 // Feeds carrying the shortcode have no enclosure for the episode either.
 export const buzzsproutScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="buzzsprout.com" i]',
+  hosts.map((host) => `script[src*="${host}" i]`).join(', '),
   (element) => {
     // The selector guarantees a src containing the host substring, so only the host and
     // path checks can reject.

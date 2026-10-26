@@ -60,7 +60,7 @@ export const speakerdeckScriptEmbedResolver = createMarkupEmbedResolver(
 // Speaker Deck's first embed code, a script whose `document.write` emits the `data-id` script
 // above with the same deck id.
 export const speakerdeckLegacyScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="speakerdeck.com/embed/" i]',
+  hosts.map((host) => `script[src*="${host}/embed/" i]`).join(', '),
   (element) => {
     const url = parseUrlOnHosts(attr(element, 'src'), hosts)
     const deckId = url?.pathname.match(legacyScriptPathRegex)?.[1]

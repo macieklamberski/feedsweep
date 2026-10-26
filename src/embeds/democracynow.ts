@@ -64,7 +64,7 @@ export const democracynowIframeEmbedResolver = createUrlEmbedResolver(
 // Democracy Now!'s retired v2 loader script, `/embed_show_v2/{width}/{y}/{m}/{d}/story/{slug}`,
 // which answers 404.
 export const democracynowScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="democracynow.org/embed_show_v2" i]',
+  hosts.map((host) => `script[src*="${host}/embed_show_v2" i]`).join(', '),
   (element) => {
     const parsed = parseUrlOnHosts(attr(element, 'src'), hosts)
 

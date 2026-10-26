@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = '360cities'
 
-const threeSixtyCitiesHosts = ['360cities.net']
+const hosts = ['360cities.net']
 
 const sizes = {
   player: { ratio: '425/315' },
@@ -30,7 +30,7 @@ const composeEmbed = (slug: string): EmbedResolverResult => {
 // frame `360cities.net/embed_iframe/{slug}`.
 export const threeSixtyCitiesResolveEmbed: ResolveUrlEmbed = (url, element) => {
   if (flashPlayerPathRegex.test(url.pathname)) {
-    const pano = parseUrlOnHosts(flashVar(element, 'pano'), threeSixtyCitiesHosts)
+    const pano = parseUrlOnHosts(flashVar(element, 'pano'), hosts)
     const slug = pano?.pathname.match(flashPanoPathRegex)?.[1]
 
     if (!slug) {
@@ -50,6 +50,6 @@ export const threeSixtyCitiesResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 export const threeSixtyCitiesEmbedResolver = createUrlEmbedResolver(
-  threeSixtyCitiesHosts,
+  hosts,
   threeSixtyCitiesResolveEmbed,
 )

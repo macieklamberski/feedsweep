@@ -58,7 +58,7 @@ export const pastebinIframeEmbedResolver = createUrlEmbedResolver(hosts, pastebi
 
 // The same paste as a script that writes its markup inline, which a reader never runs.
 export const pastebinScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="pastebin.com/embed_js" i]',
+  hosts.map((host) => `script[src*="${host}/embed_js" i]`).join(', '),
   (element) => {
     const url = parseUrlOnHosts(attr(element, 'src'), hosts)
 

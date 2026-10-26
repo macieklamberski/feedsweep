@@ -92,7 +92,10 @@ export const nicovideoIframeEmbedResolver = createUrlEmbedResolver(hosts, nicovi
 // Nicovideo's thumb_watch script writes the player where it stands, and a reader never runs it.
 // Nicovideo answers it with a 302 to embed.nicovideo.jp/watch/{id}/script.
 export const nicovideoScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="nicovideo.jp/thumb_watch" i], script[src*="embed.nicovideo.jp/watch" i]',
+  [
+    ...hosts.map((host) => `script[src*="${host}/thumb_watch" i]`),
+    'script[src*="embed.nicovideo.jp/watch" i]',
+  ].join(', '),
   (element) => {
     const url = parseUrlOnHosts(attr(element, 'src'), hosts)
 

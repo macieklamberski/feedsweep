@@ -70,7 +70,7 @@ const pixivResolveEmbed: ResolveUrlEmbed = (url) => {
 // and the author. The loader writes a frame onto `embed.pixiv.net/embed_mk2.php`, and the result
 // mints the frame pixiv's oEmbed answer names for the same work.
 export const pixivScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="source.pixiv.net/source/embed.js" i][data-id], script[src*="s.pximg.net/source/embed.js" i][data-id]',
+  loaderHosts.map((host) => `script[src*="${host}/source/embed.js" i][data-id]`).join(', '),
   (element) => {
     const workId = attr(element, 'data-id')
     const size = attr(element, 'data-size') ?? ''

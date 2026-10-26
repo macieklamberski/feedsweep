@@ -65,7 +65,7 @@ export const vidyardImageEmbedResolver = createMarkupEmbedResolver(
 // Vidyard's v3 embed: a per-video loader script, `play.vidyard.com/{uuid}.js`, that writes the
 // player in its own place. The script does not survive a feed, so nothing renders.
 export const vidyardScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="play.vidyard.com/" i]',
+  hosts.map((host) => `script[src*="${host}/" i]`).join(', '),
   (element) => {
     // The selector matches a substring any host can carry, so the host is checked here.
     const parsed = parseUrlOnHosts(attr(element, 'src'), hosts)

@@ -93,7 +93,7 @@ const resolveCoordinateMap = (
 // The Constructor's script injects the map where it stands, so a reader strips it and the map
 // renders as nothing. Its own query states the id.
 export const yandexMapsScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="api-maps.yandex.ru/services/constructor/" i]',
+  scriptHosts.map((host) => `script[src*="${host}/services/constructor/" i]`).join(', '),
   (element): EmbedResolverResult | undefined => {
     // The selector matches a substring any host can carry, so the host is checked here.
     const url = parseUrlOnHosts(attr(element, 'src'), scriptHosts)

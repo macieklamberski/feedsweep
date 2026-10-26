@@ -41,7 +41,7 @@ export const podetizeResolveEmbed: ResolveUrlEmbed = (url) => {
 
 // Podetize's ShowCastR loader script mounts the player where it stands, and a reader strips it.
 export const podetizeScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="player.podetize.com/loadShowcasePlayer.js" i][data]',
+  hosts.map((host) => `script[src*="${host}/loadShowcasePlayer.js" i][data]`).join(', '),
   (element) => {
     const id = attr(element, 'data')
 
