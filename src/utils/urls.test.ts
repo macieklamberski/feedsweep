@@ -91,6 +91,18 @@ describe('parseUrlOnHosts', () => {
     expect(parseUrlOnHosts(value, hosts)?.searchParams.get('key')).toBe('abc')
   })
 
+  it('should fold an ampersand WordPress wrote as a percent-encoded entity', () => {
+    const value = 'https://platform.example/watch?v=123&%23038;key=abc'
+
+    expect(parseUrlOnHosts(value, hosts)?.searchParams.get('key')).toBe('abc')
+  })
+
+  it('should fold a percent-encoded WordPress ampersand a twice-escaped feed wrote', () => {
+    const value = 'https://platform.example/watch?v=123&amp;%23038;key=abc'
+
+    expect(parseUrlOnHosts(value, hosts)?.searchParams.get('key')).toBe('abc')
+  })
+
   it('should return undefined for a url on another host', () => {
     expect(parseUrlOnHosts('https://elsewhere.example/watch/123', hosts)).toBeUndefined()
   })
