@@ -341,7 +341,9 @@ export const vimeoMetasliderEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    return vimeoResolveEmbed(new URL(`https://vimeo.com/${encodePathSegment(videoId)}`))
+    const pageUrl = new URL(`https://vimeo.com/${encodePathSegment(videoId)}`)
+
+    return vimeoResolveEmbed(pageUrl)
   },
 )
 

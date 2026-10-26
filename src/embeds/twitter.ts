@@ -138,7 +138,8 @@ const readLeadText = (byline: Nullish<Element>): string | undefined => {
 // the pipeline has wrapped it. A long tweet spans several paragraphs.
 const readContent = (element: Element, status: Status, anchor: Element | undefined) => {
   const byline = anchor?.parentElement
-  const body = Array.from(element.querySelectorAll('p'))
+  const paragraphs = Array.from(element.querySelectorAll('p'))
+  const body = paragraphs
     .filter((paragraph) => paragraph !== byline)
     .map((paragraph) => text(paragraph))
     .filter((value) => !!value)
@@ -303,9 +304,9 @@ export const twitterIframeEmbedResolver = createUrlEmbedResolver(frameHosts, twi
 
 // A forum's s9e MediaEmbed helper frame, naming the status id in its url fragment.
 export const twitterS9eEmbedResolver = createS9eEmbedResolver('twitter', (id) => {
-  return twitterResolveEmbed(
-    new URL(`https://platform.twitter.com/embed/Tweet.html${composeQuery({ id })}`),
-  )
+  const playerUrl = new URL(`https://platform.twitter.com/embed/Tweet.html${composeQuery({ id })}`)
+
+  return twitterResolveEmbed(playerUrl)
 })
 
 // The player reports its rendered height in a JSON-RPC envelope, unprompted, once the frame is

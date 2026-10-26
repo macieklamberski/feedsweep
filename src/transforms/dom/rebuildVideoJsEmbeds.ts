@@ -15,7 +15,8 @@ const buildVideo = (
   context: TransformContext,
 ): Element | undefined => {
   const setup = jsonAttr<SetupConfig>(element, 'data-setup')
-  const child = Array.from(element.querySelectorAll('source'))
+  const sources = Array.from(element.querySelectorAll('source'))
+  const child = sources
     .map((source) => attr(source, 'src'))
     .find((source) => source && videoFileRegex.test(source))
   const source = child ?? setup?.sources?.find(({ src }) => src && videoFileRegex.test(src))?.src

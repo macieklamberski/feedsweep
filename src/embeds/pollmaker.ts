@@ -84,7 +84,8 @@ export const pollmakerFormEmbedResolver = createMarkupEmbedResolver(
 
     // Each option is a radio or, in a multiple-choice poll, a checkbox beside its label, in
     // `div.qp_a` where the snippet has one, else in the input's own `span`.
-    const options = Array.from(form.querySelectorAll('input[type="radio"], input[type="checkbox"]'))
+    const inputs = Array.from(form.querySelectorAll('input[type="radio"], input[type="checkbox"]'))
+    const options = inputs
       .map((input) => text(input.closest('.qp_a') ?? input.parentElement))
       .join('\n')
 

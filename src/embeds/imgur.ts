@@ -220,7 +220,10 @@ export const imgurFieldCleaners: Array<FieldCleaner> = [
 // A forum's s9e MediaEmbed helper frame, naming the post or album in its url fragment. The helper
 // page reads an encoded `%2F` as the slash it stands for.
 export const imgurS9eEmbedResolver = createS9eEmbedResolver('imgur', (path) => {
-  return imgurResolveEmbed(new URL(`https://imgur.com/${path.replaceAll('%2F', '/')}`))
+  const pagePath = path.replaceAll('%2F', '/')
+  const pageUrl = new URL(`https://imgur.com/${pagePath}`)
+
+  return imgurResolveEmbed(pageUrl)
 })
 
 // The embed posts its rendered height on load, unasked, as a JSON string carrying
