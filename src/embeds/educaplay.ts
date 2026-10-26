@@ -18,7 +18,9 @@ const gamePathRegex = /^\/([^/]+)\/([^/-]+)-([^/]+)\.html$/i
 // The retired html5 player, `/{lang}/{resources}/{id}/html5/{slug}.htm`, which answers 404.
 const legacyPathRegex = /^\/[^/]+\/[^/]+\/([^/]+)\/html5\/([^/]+)\.htm$/i
 
-const sizes = { player: { height: 690 } }
+const sizes = {
+  player: { height: 690 },
+}
 
 const readGame = (pathname: string): { id: string; slug: string } | undefined => {
   const game = pathname.match(gamePathRegex)

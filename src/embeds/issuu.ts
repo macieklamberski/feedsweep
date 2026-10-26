@@ -26,7 +26,9 @@ const flashRoute = 'webembed'
 // Only `embed.html` is minted: `anonymous-embed.html` answers 403 for every document.
 const embedPaths = ['embed.html', 'anonymous-embed.html']
 
-const sizes = { player: { ratio: '5/3' } }
+const sizes = {
+  player: { ratio: '5/3' },
+}
 
 const composeConfigEmbed = (configId: string | undefined): EmbedResolverResult | undefined => {
   if (!configId) {

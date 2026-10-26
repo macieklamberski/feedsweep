@@ -14,7 +14,9 @@ const scratchHosts = [
 const projectEmbedRegex = /^\/projects\/(?:([^/]+)\/embed|embed\/([^/]+))\/?$/i
 
 // The box the share snippet writes.
-const sizes = { player: { width: 485, height: 402 } }
+const sizes = {
+  player: { width: 485, height: 402 },
+}
 
 // Scratch's project player.
 export const scratchResolveEmbed: ResolveUrlEmbed = (url) => {

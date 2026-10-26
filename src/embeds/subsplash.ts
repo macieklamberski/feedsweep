@@ -5,7 +5,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'subsplash'
 
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 const subsplashHosts = ['subsplash.com']
 

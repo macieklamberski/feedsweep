@@ -6,7 +6,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ted'
 
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 const htmlSuffixRegex = /\.html$/i
 

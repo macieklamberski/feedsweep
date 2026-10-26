@@ -4,7 +4,10 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'art19'
 
-const sizes = { episode: { height: 200 }, show: { height: 505 } }
+const sizes = {
+  episode: { height: 200 },
+  show: { height: 505 },
+}
 
 const art19Hosts = ['art19.com']
 

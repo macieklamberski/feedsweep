@@ -10,7 +10,9 @@ const matterportHosts = ['my.matterport.com']
 
 const showPathRegex = /^\/show\/?$/i
 
-const sizes = { player: { ratio: '4/3' } }
+const sizes = {
+  player: { ratio: '4/3' },
+}
 
 // The start pose a shared location link writes, the keys the showcase reads to place the camera.
 const navigationParams = ['start', 'sm', 'sp', 'sq', 'sr', 'ss', 'sf', 'sz']

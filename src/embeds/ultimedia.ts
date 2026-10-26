@@ -5,7 +5,9 @@ import { createMarkupEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ultimedia'
 
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 // The account key and the video id each sit directly after their own route word, on the generic
 // player route: another route word with the same segments answers a not-found page.

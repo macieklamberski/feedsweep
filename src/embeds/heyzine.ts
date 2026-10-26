@@ -24,7 +24,9 @@ const htmlExtensionRegex = /\.html$/i
 // The viewer opens on the page a `#page/{n}` fragment names, framed or not.
 const pageFragmentRegex = /^#page\/[^/]+$/i
 
-const sizes = { player: { ratio: '490/600' } }
+const sizes = {
+  player: { ratio: '490/600' },
+}
 
 const readFlipBook = (name: string): FlipBook | undefined => {
   const flipBookId = name.match(flipBookIdRegex)?.[1]

@@ -12,7 +12,9 @@ const libsynHosts = ['libsyn.com']
 const embedKinds = ['episode', 'destination']
 
 // The player renders this tall at any width, whatever height option its path names.
-const sizes = { player: { height: 128 } }
+const sizes = {
+  player: { height: 128 },
+}
 
 // Libsyn spells its player options as path segments, not a query string:
 // `/embed/episode/id/{id}/height/{px}/theme/{name}/thumbnail/{yes|no}/…`.

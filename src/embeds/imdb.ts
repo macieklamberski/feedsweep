@@ -6,7 +6,9 @@ const provider = 'imdb'
 
 const imdbHosts = ['imdb.com']
 
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 const composeEmbed = (id: string): EmbedResolverResult => {
   return {

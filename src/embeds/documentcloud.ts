@@ -6,7 +6,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'documentcloud'
 
-const sizes = { document: { ratio: '17/22' } }
+const sizes = {
+  document: { ratio: '17/22' },
+}
 
 const legacyHosts = ['www.documentcloud.org']
 

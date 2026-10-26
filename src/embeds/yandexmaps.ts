@@ -26,7 +26,9 @@ const constructorIdRegex = /^constructor:(.+)/i
 // as written.
 const positionParams = ['ll', 'z', 'l']
 
-const sizes = { player: { height: 400 } }
+const sizes = {
+  player: { height: 400 },
+}
 
 // Composed from the id alone, with no key and no expiry. The static render answers 400 unless
 // both dimensions are stated, and 400 again above 650 by 450.

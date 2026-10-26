@@ -3,7 +3,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'figshare'
 
-const sizes = { article: { ratio: '568/351' } }
+const sizes = {
+  article: { ratio: '568/351' },
+}
 
 const figshareHosts = ['figshare.com']
 const widgetPathRegex = /^\/articles\/([^/]+)\/embed\/?$/i

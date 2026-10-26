@@ -17,7 +17,9 @@ const playerPathRegex = /^\/(?:embed|play)\/([^/]+)\/([^/]+)$/i
 // The start position, and the token pair a library with embed authentication needs.
 const playbackParams = ['t', 'token', 'expires']
 
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 export const bunnystreamResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const match = url.pathname.match(playerPathRegex)

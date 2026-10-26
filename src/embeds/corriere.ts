@@ -6,7 +6,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'corriere'
 
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 // The regional `video.corrieredelmezzogiorno.corriere.it` keeps its own videos, which
 // `video.corriere.it` answers with a 404, so the frame host is not widened to `corriere.it`.

@@ -13,7 +13,9 @@ const movieFileRegex = /^\/video\/([^/]+)\.swf$/i
 // The Flash player's `viewkey`, `presentation/{id}/{title}`.
 const viewkeyRegex = /^[^/]+\/[^/]+\/(.+)/
 
-const sizes = { player: { ratio: '300/271' } }
+const sizes = {
+  player: { ratio: '300/271' },
+}
 
 // The server ignores a segment after the id.
 const readEmbedId = (parsed: URL): string | undefined => {

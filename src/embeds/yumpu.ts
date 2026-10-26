@@ -6,7 +6,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'yumpu'
 
-const sizes = { document: { ratio: '4/3' } }
+const sizes = {
+  document: { ratio: '4/3' },
+}
 
 // `players.yumpu.com` serves the resizer script and `assets.yumpu.com` the site assets, so only
 // the bare host and its `www.` spelling name a document.

@@ -10,7 +10,9 @@ const provider = 'fliphtml5'
 // the same two-segment shape.
 const fliphtml5Hosts = ['online.fliphtml5.com']
 
-const sizes = { player: { ratio: '4/3' } }
+const sizes = {
+  player: { ratio: '4/3' },
+}
 
 // FlipHTML5's flipbook viewer, `online.fliphtml5.com/{account}/{book}/`, opening at the `#p=` page.
 export const fliphtml5ResolveEmbed: ResolveUrlEmbed = (url, element) => {

@@ -4,7 +4,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ardmediathek'
 
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 const ardmediathekHosts = ['ardmediathek.de']
 

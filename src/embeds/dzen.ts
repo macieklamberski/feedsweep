@@ -4,7 +4,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'dzen'
 
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 const dzenHosts = ['dzen.ru']
 

@@ -6,7 +6,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'sketchfab'
 
-const sizes = { model: { ratio: '4/3' } }
+const sizes = {
+  model: { ratio: '4/3' },
+}
 
 // A model uid is 32 hex characters, and it also ends the slugged page url
 // (`/3d-models/{slug}-{uid}`), which is how a pasted page link is read. The shape tells a uid from

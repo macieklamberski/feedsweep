@@ -5,7 +5,9 @@ import { createMarkupEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'mediavine'
 
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 // Without /iframe the route answers 200 but is served x-frame-options: SAMEORIGIN.
 // A fabricated id answers 404 on the /iframe route.

@@ -5,7 +5,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = '1tv'
 
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 const channelOneHosts = ['1tv.ru']
 

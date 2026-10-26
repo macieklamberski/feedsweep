@@ -7,7 +7,10 @@ const provider = 'prezi'
 
 const preziHosts = ['prezi.com']
 
-const sizes = { presentation: { ratio: '550/400' }, video: { ratio: '16/9' } }
+const sizes = {
+  presentation: { ratio: '550/400' },
+  video: { ratio: '16/9' },
+}
 
 // The Flash snippet's one loader, with the presentation named in flashvars and repeated in the
 // element ids as `prezi_{id}` and `preziEmbed_{id}`.

@@ -9,7 +9,9 @@ const provider = 'mixcloud'
 // Without the publisher's `mini`, `hide_cover`, `hide_artwork` and `light`, the widget is the cover
 // player, which fills whatever box it gets. 120 is the height Mixcloud's oEmbed states for its
 // widget.
-const sizes = { player: { height: 120 } }
+const sizes = {
+  player: { height: 120 },
+}
 
 const mixcloudHosts = ['mixcloud.com']
 

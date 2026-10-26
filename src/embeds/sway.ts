@@ -4,7 +4,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'sway'
 
-const sizes = { presentation: { height: 500 } }
+const sizes = {
+  presentation: { height: 500 },
+}
 
 const swayHosts = ['sway.cloud.microsoft', 'sway.com', 'sway.office.com']
 

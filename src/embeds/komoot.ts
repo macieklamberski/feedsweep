@@ -12,7 +12,9 @@ const provider = 'komoot'
 
 const komootHosts = ['komoot.com', 'komoot.de']
 
-const sizes = { player: { height: 440 } }
+const sizes = {
+  player: { height: 440 },
+}
 
 // `share_token` is what opens a tour its owner has not made public.
 const accessParams = ['share_token']

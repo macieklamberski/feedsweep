@@ -5,7 +5,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'namasha'
 
-const sizes = { video: { ratio: '16/9' } }
+const sizes = {
+  video: { ratio: '16/9' },
+}
 
 const namashaHosts = ['namasha.com']
 

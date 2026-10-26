@@ -4,7 +4,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'gettyimages'
 
-const sizes = { player: { ratio: '3/2' } }
+const sizes = {
+  player: { ratio: '3/2' },
+}
 
 // The asset id Getty calls `items`, and the opaque embed token it calls `et`.
 const embedPathRegex = /^\/embed\/([^/]+)\/?$/i

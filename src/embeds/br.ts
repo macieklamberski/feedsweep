@@ -6,7 +6,9 @@ const provider = 'br'
 
 const brHost = 'br.de'
 
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 // The slug BR writes in front of the token is decorative: the token alone names the media.
 const mediaTokenRegex = /av:[^/]+$/

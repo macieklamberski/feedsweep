@@ -22,7 +22,9 @@ const publishedParams = [
   'embedded', // The embed view, which drops the published-by header and footer
 ]
 
-const sizes = { player: { height: 500 } }
+const sizes = {
+  player: { height: 500 },
+}
 
 // `/document/d/e/{token}` names a doc published to the web and `/document/d/{id}` names it by
 // its Drive file id.

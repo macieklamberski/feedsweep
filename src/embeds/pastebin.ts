@@ -6,7 +6,9 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'pastebin'
 
-const sizes = { player: { height: 150 } }
+const sizes = {
+  player: { height: 150 },
+}
 
 const pastebinHosts = ['pastebin.com']
 

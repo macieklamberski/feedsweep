@@ -5,7 +5,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'reverbnation'
 
-const sizes = { widget: { height: 265 } }
+const sizes = {
+  widget: { height: 265 },
+}
 
 const reverbnationHosts = ['reverbnation.com']
 

@@ -7,7 +7,9 @@ const provider = 'cspan'
 
 const cspanHosts = ['c-span.org']
 
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 const idEndRegex = /[/&]/
 

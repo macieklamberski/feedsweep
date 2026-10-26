@@ -10,7 +10,9 @@ import {
 
 const provider = 'kindle'
 
-const sizes = { card: { height: 550 } }
+const sizes = {
+  card: { height: 550 },
+}
 
 // Each store serves the card on its own reader host, `{verb}.amazon.{store tld}`, such as
 // `read.amazon.co.uk`, `lesen.amazon.de` or `ler.amazon.com.br`.

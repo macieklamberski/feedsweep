@@ -16,7 +16,10 @@ const yandexMusicHosts = [
 
 // The heights the share dialog writes: the track card, and the album or playlist card with its
 // scrolling track list. Both players fill whatever width they get.
-const sizes = { track: { height: 244 }, list: { height: 556 } }
+const sizes = {
+  track: { height: 244 },
+  list: { height: 556 },
+}
 
 type YandexMusicItem =
   | { kind: 'track'; track: string; album?: string }

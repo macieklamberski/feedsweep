@@ -6,7 +6,9 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'livid'
 
-const sizes = { video: { ratio: '16/9' } }
+const sizes = {
+  video: { ratio: '16/9' },
+}
 
 const lividHosts = ['livid.com']
 

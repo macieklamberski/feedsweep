@@ -13,7 +13,10 @@ const redcircleHosts = ['redcircle.com', 'api.podcache.net']
 // Fluid in width and fixed in height, both taken from what the loader scripts set on the iframe
 // they build: 170 for an episode, and `height: 100%` under a `min-height: 320px` for a show,
 // which collapses to the minimum inside the `height: auto` mount the snippet ships.
-const sizes = { episode: { height: 170 }, show: { height: 320 } }
+const sizes = {
+  episode: { height: 170 },
+  show: { height: 320 },
+}
 
 // `embedded-show-webplayer` is the show player's real page: `embedded-show-player` answers 404.
 const routes = toMap<'episode' | 'show'>({

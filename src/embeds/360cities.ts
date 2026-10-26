@@ -7,7 +7,9 @@ const provider = '360cities'
 
 const threeSixtyCitiesHosts = ['360cities.net']
 
-const sizes = { player: { ratio: '425/315' } }
+const sizes = {
+  player: { ratio: '425/315' },
+}
 
 const framePathRegex = /^\/embed_iframe\/([^/]+)$/i
 const flashPlayerPathRegex = /^\/javascripts\/krpano\/krpano\.swf$/i

@@ -9,7 +9,9 @@ const provider = 'hudl'
 // vcloud.hudl.com is the separate broadcast product.
 const hudlHosts = ['www.hudl.com']
 
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 // The server matches the route words in any case and the ids only as written.
 const videoPathRegex = /^\/(?:embed\/)?video\/((?:[^/]+\/[^/]+\/)?[^/]+)\/?$/i

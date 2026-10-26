@@ -5,7 +5,9 @@ import { createMarkupEmbedResolver, readRepairedCarrierUrl } from '../utils/widg
 
 const provider = 'umap'
 
-const sizes = { map: { height: 300 } }
+const sizes = {
+  map: { height: 300 },
+}
 
 // A map page, `/{lang}/map/{slug}_{id}`, under the interface language uMap prefixes every page
 // with. The shape is the whole guard, since uMap runs on many instances and there is no host to

@@ -6,7 +6,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'wordwall'
 
-const sizes = { player: { ratio: '500/380' } }
+const sizes = {
+  player: { ratio: '500/380' },
+}
 
 // `screens.cdn.wordwall.net` serves the activity images, so only the page hosts are claimed.
 const wordwallHosts = ['wordwall.net', 'www.wordwall.net']

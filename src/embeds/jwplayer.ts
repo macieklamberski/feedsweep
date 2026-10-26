@@ -11,7 +11,9 @@ const fileExtensionRegex = /\.[a-z]+$/i
 export const jwplayerHosts = ['jwplayer.com', 'jwplatform.com']
 const libraryHosts = ['jwplatform.com', 'jwpsrv.com']
 
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 // `players` is the embed and `previews` its share page, and both serve the same player for the
 // same id, 404 for a fabricated one. `cdn.jwplayer.com/videos/{id}-1280.mp4` is an enclosure.

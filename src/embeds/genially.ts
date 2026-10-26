@@ -12,7 +12,9 @@ const safeViewIdRegex = /^[0-9a-f]{24}$/i
 
 const geniallyHosts = ['genially.com', 'genial.ly']
 
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 export const extractGeniallyViewId = (link: URL): string | undefined => {
   const segments = getPathSegments(link)

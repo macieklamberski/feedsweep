@@ -22,7 +22,9 @@ const playerRoutes = toMap({
   playlists: 'playlists',
 })
 
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 // The iframe route answers 200 with an error body for a channel id, so the route has to match.
 // The body is a bare `{"error":true,"iframe":true}`, so the status code says nothing.

@@ -16,7 +16,9 @@ const provider = 'codesandbox'
 
 // A height, not a ratio: the editor fills any box, and an unsized frame renders 150 tall.
 // The share dialog writes 500.
-const sizes = { player: { height: 500 } }
+const sizes = {
+  player: { height: 500 },
+}
 
 // Listed exactly, not by subdomain: sse.codesandbox.io and blog.codesandbox.io name no sandbox.
 const codesandboxHosts = ['codesandbox.io', 'www.codesandbox.io']

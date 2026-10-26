@@ -4,7 +4,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'tunein'
 
-const sizes = { player: { height: 100 } }
+const sizes = {
+  player: { height: 100 },
+}
 
 // A guide id opens with its kind letter: `s` for a station, `p` for a program, `t` for a topic.
 const guideIdRegex = /^([a-z])/

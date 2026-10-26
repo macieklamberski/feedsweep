@@ -13,7 +13,9 @@ const condenastHosts = ['player.cnevids.com', 'player-backend.cnevids.com']
 const videoPathRegex = /^\/(?:script|iframe|embed(?:js)?\/[^/]+)\/video\/([^/]+?)(?:\.js)?\/?$/i
 const legacyPathRegex = /^\/embed(?:js)?\/([^/]+)\/[^/]+\/?$/i
 
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 // Condé Nast's video player, shared by The New Yorker, Vanity Fair, Wired and the other brands.
 // The script embed its share dialog writes names no frame url. `/iframe/video/{id}` is the frame

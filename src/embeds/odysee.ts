@@ -4,7 +4,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'odysee'
 
-const sizes = { video: { ratio: '16/9' } }
+const sizes = {
+  video: { ratio: '16/9' },
+}
 
 // lbry.tv and open.lbry.com redirect every url to odysee.com with the path kept.
 const odyseeHosts = ['odysee.com', 'lbry.tv', 'open.lbry.com']

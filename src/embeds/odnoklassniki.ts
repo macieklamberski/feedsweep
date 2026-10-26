@@ -5,7 +5,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const provider = 'odnoklassniki'
 
 // The player fills its box, and the watch page sizes it 16:9.
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 export const odnoklassnikiResolveEmbed: ResolveUrlEmbed = (url) => {
   const [route, videoId, ...rest] = getPathSegments(url)

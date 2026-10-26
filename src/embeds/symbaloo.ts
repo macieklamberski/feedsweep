@@ -7,7 +7,9 @@ const provider = 'symbaloo'
 // Exact: `cdn01.symbaloo.com` serves files, and `blog.symbaloo.com` answers its index to any path.
 const symbalooHosts = ['symbaloo.com', 'www.symbaloo.com', 'edu.symbaloo.com']
 
-const sizes = { player: { height: 500 } }
+const sizes = {
+  player: { height: 500 },
+}
 
 // Symbaloo's embedded webmix, `/embed/{slug}` for a published webmix and `/embed/shared/{token}`
 // for one shared by link. The route words are read in any case. The slug is minted as written,

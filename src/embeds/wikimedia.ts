@@ -12,7 +12,9 @@ import { createMarkupEmbedResolver, readRepairedCarrierUrl } from '../utils/widg
 
 const provider = 'wikimedia'
 
-const sizes = { video: { ratio: '16/9' } }
+const sizes = {
+  video: { ratio: '16/9' },
+}
 
 const extensionRegex = /\.[^.]+$/
 const underscoreRegex = /_/g

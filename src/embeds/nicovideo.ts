@@ -6,7 +6,9 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'nicovideo'
 
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 // lv names a live broadcast, which the video player answers 500 for and the live host serves as a
 // programme card even after the broadcast ends.

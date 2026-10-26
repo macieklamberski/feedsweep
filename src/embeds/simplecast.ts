@@ -7,7 +7,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const provider = 'simplecast'
 
 // The one height every iframe states.
-const sizes = { player: { height: 200 } }
+const sizes = {
+  player: { height: 200 },
+}
 
 // `embed.simplecast.com/{hex}` and `simplecast.com/e/{numeric}` are legacy spellings of the
 // episode, and `play.simplecast.com/{uuid}` is the share host.

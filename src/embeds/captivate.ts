@@ -8,7 +8,10 @@ const provider = 'captivate'
 
 // The boxes Captivate's snippets write: 200 tall for an episode, and 600 for a show, which scrolls
 // its episode list inside the frame. A kind added later gets the episode's.
-const sizes = { episode: { height: 200 }, show: { height: 600 } }
+const sizes = {
+  episode: { height: 200 },
+  show: { height: 600 },
+}
 
 const captivateHosts = ['captivate.fm']
 

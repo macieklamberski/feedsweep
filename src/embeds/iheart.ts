@@ -14,7 +14,11 @@ const stationPathRegex = /^\/(?<kind>live|artist)\/(?:[^/]*-)?(?<id>\d+)\/?$/i
 
 // The episode player fills its frame and switches to a compact bar, drawn whole at 120 tall. The
 // show and station players keep the 300 and 200 their embed code writes.
-const sizes = { episode: { height: 120 }, show: { height: 300 }, station: { height: 200 } }
+const sizes = {
+  episode: { height: 120 },
+  show: { height: 300 },
+  station: { height: 200 },
+}
 
 // An iHeart podcast player, of one episode or of a show, and the live station and artist radio
 // players, on www.iheart.com or beta.iheart.com.

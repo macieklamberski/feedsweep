@@ -8,7 +8,9 @@ const provider = 'canalu'
 // The apex has no DNS, and `vod.canal-u.tv` serves the video files.
 const canaluHosts = ['www.canal-u.tv']
 
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 // Canal-U's video player, `/chaines/{channel}/embed/{id}` today and `/embed/{id}` before, which
 // redirects to the channel the id belongs to. The id is the video's node id, so it is the key on

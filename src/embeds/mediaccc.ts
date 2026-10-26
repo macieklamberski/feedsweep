@@ -6,7 +6,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'mediaccc'
 
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 // `app.media.ccc.de` serves the same player on the same paths.
 const mediacccHosts = ['media.ccc.de']

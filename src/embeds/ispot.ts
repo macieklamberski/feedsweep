@@ -4,7 +4,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ispot'
 
-const sizes = { commercial: { ratio: '16/9' } }
+const sizes = {
+  commercial: { ratio: '16/9' },
+}
 
 const ispotHosts = ['www.ispot.tv']
 

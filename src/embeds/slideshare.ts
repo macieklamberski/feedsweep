@@ -15,7 +15,9 @@ const wrapperIdRegex = /^__ss[e_]?(\d+)$/i
 // Two players, the presentation one and the document one, sharing a query.
 const flashPlayerPathRegex = /\/swf\/(?:ssplayer\d?|doc_player)\.swf$/i
 
-const sizes = { player: { ratio: '595/485' } }
+const sizes = {
+  player: { ratio: '595/485' },
+}
 
 const composeEmbed = (deck: string, fields?: Partial<EmbedResolverResult>): EmbedResolverResult => {
   return {

@@ -5,7 +5,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'zeno'
 
-const sizes = { player: { height: 250 } }
+const sizes = {
+  player: { height: 250 },
+}
 
 const zenoHosts = ['zeno.fm']
 

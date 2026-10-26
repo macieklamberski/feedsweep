@@ -7,7 +7,9 @@ import { getPathSegmentsWithoutWorkspace } from './googledrive.js'
 
 const provider = 'googleforms'
 
-const sizes = { player: { height: 600 } }
+const sizes = {
+  player: { height: 600 },
+}
 
 const shortLinkHost = 'forms.gle'
 

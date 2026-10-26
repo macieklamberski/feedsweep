@@ -13,7 +13,10 @@ const provider = 'npr'
 
 const nprHosts = ['www.npr.org']
 
-const sizes = { story: { height: 290 }, video: { ratio: '16/9' } }
+const sizes = {
+  story: { height: 290 },
+  video: { ratio: '16/9' },
+}
 
 const composeEmbed = (storyId: string, mediaId: string): EmbedResolverResult | undefined => {
   if (!storyId || !mediaId) {

@@ -10,7 +10,11 @@ const transistorHosts = ['transistor.fm']
 
 // The episode player is fixed at 180, and Transistor's own oEmbed agrees. A `/latest` player holds
 // one episode and `/playlist` the whole show.
-const sizes = { e: { height: 180 }, latest: { height: 180 }, playlist: { height: 390 } }
+const sizes = {
+  e: { height: 180 },
+  latest: { height: 180 },
+  playlist: { height: 390 },
+}
 
 // What a placeholder's id names, which has to address the endpoint on its own for enrichment.
 const subjectNames = { e: 'episode', latest: 'latest', playlist: 'playlist' }

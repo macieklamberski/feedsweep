@@ -20,7 +20,9 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const provider = 'youtube'
 
 // A Short gets the same landscape player as a film, so a carrier's portrait box never fills.
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 const safeVideoIdRegex = /^[a-zA-Z0-9_-]{11}$/
 

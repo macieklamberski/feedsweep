@@ -6,7 +6,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'anyflip'
 
-const sizes = { player: { ratio: '550/350' } }
+const sizes = {
+  player: { ratio: '550/350' },
+}
 
 const viewerHost = 'online.anyflip.com'
 // The viewer's S3 bucket, which also serves it path-style with the bucket as the first segment.

@@ -9,7 +9,9 @@ const provider = 'podbean'
 
 // The v2 player renders 150 behind both url forms, and the legacy markup states 122 for a player
 // Podbean retired.
-const sizes = { player: { height: 150 } }
+const sizes = {
+  player: { height: 150 },
+}
 
 const podbeanHosts = ['podbean.com']
 

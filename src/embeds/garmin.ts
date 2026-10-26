@@ -3,7 +3,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'garmin'
 
-const sizes = { player: { height: 548 } }
+const sizes = {
+  player: { height: 548 },
+}
 
 const garminHosts = ['connect.garmin.com']
 

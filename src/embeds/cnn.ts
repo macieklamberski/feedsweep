@@ -26,7 +26,9 @@ const cnnHosts = ['cnn.com', 'cnn.io']
 const cdnHosts = ['cdn.turner.com']
 
 // The fave shell is a `padding-bottom: 56.25%` box, and ids of this form have 16:9 renditions.
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 // The player answers 200 for any id. `cnn.com/videos/{id}` answers 404 for a fabricated id, and for
 // some real ones.

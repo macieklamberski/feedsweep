@@ -6,7 +6,9 @@ import { getPathSegmentsWithoutWorkspace } from './googledrive.js'
 
 const provider = 'googleslides'
 
-const sizes = { player: { ratio: '480/299' } }
+const sizes = {
+  player: { ratio: '480/299' },
+}
 
 // The page routes a deck frame names. `/export` serves the deck as a file, which stays an
 // enclosure.

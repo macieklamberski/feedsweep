@@ -7,7 +7,9 @@ const provider = 'blogger'
 
 const bloggerHosts = ['blogger.com']
 
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 export const extractBloggerToken = (url: URL): string | undefined => {
   if (!isAnyOf(getPathSegments(url)[0], 'video.g')) {

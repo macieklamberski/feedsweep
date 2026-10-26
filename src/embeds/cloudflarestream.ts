@@ -6,7 +6,9 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'cloudflarestream'
 
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 const cloudflarestreamHosts = [
   'cloudflarestream.com', // Every publisher's own `customer-{accountCode}` subdomain

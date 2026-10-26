@@ -19,7 +19,9 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'brightcove'
 
-const sizes = { player: { ratio: '16/9' } }
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 // The minimum length is the only check on the id: `AQ~~` decodes to the number 1.
 // A real Brightcove id runs to ten digits and more.

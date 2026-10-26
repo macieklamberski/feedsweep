@@ -5,7 +5,9 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'learningapps'
 
-const sizes = { player: { height: 500 } }
+const sizes = {
+  player: { height: 500 },
+}
 
 const learningappsHosts = ['learningapps.org']
 
