@@ -12,7 +12,7 @@ const indentUnitRegex = /^(?:[^\S\n]|&nbsp;|&#160;|&#xa0;)/i
 type LineIndent = { tags: string; units: Array<string>; rest: string }
 
 const splitIndent = (line: string): LineIndent => {
-  const tags = line.match(leadingTagsRegex)?.[0] ?? ''
+  const tags = leadingTagsRegex.exec(line)?.[0] ?? ''
   let rest = line.slice(tags.length)
   const units: Array<string> = []
 

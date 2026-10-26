@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { toMap } from 'trousse'
 import { parseHtml } from '../parsers/linkedom.js'
+import { queryElement } from '../tests.js'
 import {
   type EmojiGlyph,
   type EmojiNameTable,
@@ -109,7 +110,7 @@ describe('resolveEmojiImage', () => {
   const mixedNames = toMap<EmojiGlyph>({ grin: '😁', mrgreen: false })
 
   const getImage = (tag: string): Element => {
-    return parseHtml(`<p>${tag}</p>`).querySelector('img') as Element
+    return queryElement(parseHtml(`<p>${tag}</p>`), 'img')
   }
 
   it('should keep a universal code alt in a mixed set as a marked picture', () => {

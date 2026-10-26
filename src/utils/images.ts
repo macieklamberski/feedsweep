@@ -37,17 +37,15 @@ export const countSrcsetCandidates = (srcset: string): number => {
 // Seeded from the last entry: a density-only list states no width and ascends.
 export const widestSrcsetUrl = (srcset: Nullish<string>): string | undefined => {
   const entries = srcset ? parseSrcset(srcset) : []
+  const last = entries.at(-1)
 
-  if (entries.length === 0) {
+  if (!last) {
     return
   }
 
-  const widest = entries.reduce(
-    (best, entry) => {
-      return (entry.width ?? 0) > (best.width ?? 0) ? entry : best
-    },
-    entries[entries.length - 1],
-  )
+  const widest = entries.reduce((best, entry) => {
+    return (entry.width ?? 0) > (best.width ?? 0) ? entry : best
+  }, last)
 
   return widest.url || undefined
 }
@@ -345,7 +343,12 @@ export const getUrlSizeHint = (url: string): number => {
   }
 
   const pairWidth = Number([...url.matchAll(urlPairRegex)].at(-1)?.[1])
-  return pairWidth > 0 ? pairWidth : 0
+
+  if (pairWidth > 0) {
+    return pairWidth
+  }
+
+  return 0
 }
 
 const leafExtensionRegex = /\.[a-z0-9]+$/i

@@ -24,7 +24,7 @@ const sizes = {
 }
 
 const readGame = (pathname: string): { id: string; slug: string } | undefined => {
-  const game = pathname.match(gamePathRegex)
+  const game = gamePathRegex.exec(pathname)
 
   if (game) {
     const [, routeWord = '', id = '', slug = ''] = game
@@ -36,7 +36,7 @@ const readGame = (pathname: string): { id: string; slug: string } | undefined =>
     return { id, slug }
   }
 
-  const legacy = pathname.match(legacyPathRegex)
+  const legacy = legacyPathRegex.exec(pathname)
 
   if (!legacy) {
     return

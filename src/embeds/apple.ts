@@ -46,7 +46,7 @@ export const appleResolveEmbed: ResolveUrlEmbed = (url) => {
   const hasStorefront = !appleHeights.has(storefrontOrKind?.toLowerCase() ?? '')
   const [rawKind, ...rest] = hasStorefront ? segments.slice(1) : segments
   const kind = rawKind?.toLowerCase()
-  const pathId = rest[rest.length - 1]
+  const pathId = rest.at(-1)
 
   // A segment past the id, such as an artist's `see-all`, names a page on the site, not a player.
   if (rest.length > 2) {

@@ -45,7 +45,7 @@ const readWatchUrl = (parsed: URL | undefined): Clip => {
 // A profile url and nothing else: `/@handle`, with no video segment after it.
 const profilePathRegex = /^\/@([^/]+)\/?$/
 // The account's opaque id, which TikTok writes where a handle goes.
-const secUidRegex = /^MS4wLjABAAAA/
+const secUidPrefix = 'MS4wLjABAAAA'
 
 const readProfileHandle = (anchor: Element | undefined): string | undefined => {
   return parseUrlOnHosts(attr(anchor, 'href'), hosts)?.pathname.match(profilePathRegex)?.[1]
@@ -83,7 +83,7 @@ const resolveClip = (element: Element): EmbedResolverResult | undefined => {
   const profileHandle = readProfileHandle(profile)
   // Where the link holds a secUid, the account name survives only in the link's `title`, as
   // `@{name}`, which is not always the handle.
-  const author = secUidRegex.test(profileHandle ?? '') ? attr(profile, 'title') : profileHandle
+  const author = profileHandle?.startsWith(secUidPrefix) ? attr(profile, 'title') : profileHandle
   const caption = find(element, 'section p', (paragraph) => {
     const value = text(paragraph)
 

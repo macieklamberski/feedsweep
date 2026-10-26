@@ -29,7 +29,7 @@ const sizes = {
 }
 
 const readFlipBook = (name: string): FlipBook | undefined => {
-  const flipBookId = name.match(flipBookIdRegex)?.[1]
+  const flipBookId = flipBookIdRegex.exec(name)?.[1]
 
   if (flipBookId) {
     return {

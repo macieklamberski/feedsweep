@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import type { Nullish } from 'trousse'
 import { describeForEachParser, html } from '../tests.js'
 import {
   countSrcsetCandidates,
@@ -80,7 +81,7 @@ describe('widestSrcsetUrl', () => {
     expect(widestSrcsetUrl(value)).toBeUndefined()
   })
 
-  const emptyValues: Array<[string | null | undefined]> = [[''], [null], [undefined]]
+  const emptyValues: Array<[Nullish<string>]> = [[''], [null], [undefined]]
 
   it.each(emptyValues)('should return undefined for %p', (value) => {
     expect(widestSrcsetUrl(value)).toBeUndefined()

@@ -318,8 +318,12 @@ describeForEachParser('stripHiddenElements', (parseHtml) => {
     )
 
     it('should have a specimen for every default revealable selector', () => {
-      const specimenSelectors = Object.keys(specimens).sort()
-      const defaultSelectors = [...defaultRevealableSelectors].sort()
+      const specimenSelectors = Object.keys(specimens).sort((left, right) => {
+        return left.localeCompare(right)
+      })
+      const defaultSelectors = [...defaultRevealableSelectors].sort((left, right) => {
+        return left.localeCompare(right)
+      })
 
       expect(specimenSelectors).toEqual(defaultSelectors)
     })

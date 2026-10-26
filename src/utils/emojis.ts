@@ -117,7 +117,7 @@ export const rendersNothing = (src: string): boolean => {
 export const getFileStem = (src: string): string => {
   // A Google image proxy keeps the real file after the hash, as in
   // `…=s0-d-e1-ft#https://…/1f4cc.png`.
-  const proxied = src.match(proxiedFileRegex)?.[1]
+  const proxied = proxiedFileRegex.exec(src)?.[1]
   const path = (proxied ?? src).split(queryOrHashRegex)[0]
   const name = path.slice(path.lastIndexOf('/') + 1)
   const extension = name.lastIndexOf('.')

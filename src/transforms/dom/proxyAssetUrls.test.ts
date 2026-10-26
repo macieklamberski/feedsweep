@@ -515,9 +515,9 @@ describeForEachParser('proxyAssetUrls', (parseHtml) => {
       .filter(({ tag, asset }) => !tag && !asset)
       .map(({ attribute }) => attribute)
 
-    // Stands in for a result with every field populated. The point is to fill each field the mint
-    // path knows, not to be a valid result, so the declared field types are asserted away.
+    // Stands in for a result with every field populated, not a valid result.
     const markerFields = <Type>(names: Array<string>): Type => {
+      // biome-ignore lint/plugin/noReturnAssertion: Every field gets a string, whatever its type.
       return Object.fromEntries(names.map((name) => [name, 'not-a-url'])) as Type
     }
 

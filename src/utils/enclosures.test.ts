@@ -691,7 +691,13 @@ describe('isEnclosureKind', () => {
 
 describeForEachParser('buildMediaKey', (parseHtml) => {
   const getElement = (value: string): Element => {
-    return parseHtml(value).body.firstElementChild as Element
+    const element = parseHtml(value).body.firstElementChild
+
+    if (!element) {
+      throw new Error(`No element in fixture: ${value}.`)
+    }
+
+    return element
   }
 
   it('should key an image rendition like the original image', () => {

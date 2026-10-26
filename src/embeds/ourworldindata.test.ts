@@ -234,13 +234,13 @@ describeForEachParser('ourworldindata through the pipeline', (parseHtml) => {
         data-embed-height="600"
       ></div>
     `
-    const output = await transformContent(value, {
+    const result = await transformContent(value, {
       parseHtmlFn: parseHtml,
       baseUrl: 'https://example.com/post',
       cleanUrlFn: (url) => url.replace('utm_source=newsletter&', ''),
     })
 
-    expect(output).toEqualHtml(expected)
+    expect(result).toEqualHtml(expected)
   })
 
   it('should leave a chart image enclosure an image', async () => {

@@ -718,11 +718,7 @@ describeForEachParser('Substack', (parseHtml) => {
       language: 'markdown',
       nodeId: 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d',
     })
-    const value = `<div
-      class="highlighted_code_block"
-      data-attrs="${codeAttrs}"
-      data-component-name="HighlightedCodeBlockToDOM"
-    ><pre class="shiki"><code class="language-markdown">- [ ] Onboarding form\n- [ ] Wins feed</code></pre></div>`
+    const value = `<div class="highlighted_code_block" data-attrs="${codeAttrs}" data-component-name="HighlightedCodeBlockToDOM"><pre class="shiki"><code class="language-markdown">- [ ] Onboarding form\n- [ ] Wins feed</code></pre></div>`
     const expected = `<pre data-pre-label="Markdown" data-pre-language="markdown" class="shiki"><code class="language-markdown hljs"><span class="hljs-bullet">-</span> [ ] Onboarding form\n<span class="hljs-bullet">-</span> [ ] Wins feed</code></pre>`
     const result = await transformContent(value, { parseHtmlFn: parseHtml })
 

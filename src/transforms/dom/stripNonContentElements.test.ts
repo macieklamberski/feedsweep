@@ -335,8 +335,12 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
 
   describe('with default selectors', () => {
     it('should have a specimen for every default selector', () => {
-      const specimenSelectors = Object.keys(specimens).sort()
-      const defaultSelectors = [...defaultNonContentSelectors].sort()
+      const specimenSelectors = Object.keys(specimens).sort((left, right) => {
+        return left.localeCompare(right)
+      })
+      const defaultSelectors = [...defaultNonContentSelectors].sort((left, right) => {
+        return left.localeCompare(right)
+      })
 
       expect(specimenSelectors).toEqual(defaultSelectors)
     })

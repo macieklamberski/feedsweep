@@ -41,7 +41,7 @@ type Slugged = {
 }
 
 const composeSlugged = (slugged: Slugged): EmbedResolverResult | undefined => {
-  const shortId = slugged.slug.match(shortIdRegex)?.[1]
+  const shortId = shortIdRegex.exec(slugged.slug)?.[1]
 
   if (!shortId) {
     return

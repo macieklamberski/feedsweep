@@ -44,14 +44,14 @@ const readReleases = (url: URL): Array<[string, string]> => {
   }
 
   for (const segment of getPathSegments(url)) {
-    const match = segment.match(releaseRegex)
+    const match = releaseRegex.exec(segment)
 
     // A path value is decoded, like a query one, so the player url encodes it once.
     if (match) {
       claim(match[1].toLowerCase(), decodeSegment(match[2]) ?? match[2])
     }
 
-    const signed = segment.match(signedTrackRegex)
+    const signed = signedTrackRegex.exec(segment)
 
     if (signed) {
       claim('track', decodeSegment(signed[1]) ?? signed[1])

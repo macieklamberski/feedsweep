@@ -53,7 +53,7 @@ type SubstackPostAttributes = {
 
 const extractBlueskyPost = (uri: string): BlueskyPost | undefined => {
   // Not `new URL`: it reads the colon in a DID authority as a port and fails.
-  const match = uri.match(atUriRegex)
+  const match = atUriRegex.exec(uri)
 
   if (!match || match[2] !== postCollection) {
     return

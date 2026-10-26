@@ -67,7 +67,9 @@ export const shortenSamePageLinkFragments: DomTransform = ({
         continue
       }
 
-      targetFragments ??= collectFragmentTargets(document)
+      if (targetFragments === undefined) {
+        targetFragments = collectFragmentTargets(document)
+      }
 
       if (!targetFragments.has(href.slice(hashIndex + 1))) {
         continue

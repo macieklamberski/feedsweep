@@ -1,4 +1,4 @@
-import { coerceNumber, getQueryParam, type Nullish, startsWithAnyOf } from 'trousse'
+import { coerceNumber, getQueryParam, isAnyOf, type Nullish, startsWithAnyOf } from 'trousse'
 import * as styles from './styles.js'
 import { foldEscapedAmpersands, isUrlShaped } from './urls.js'
 
@@ -364,15 +364,17 @@ const maxSelectorLength = 2000
 
 export const batchSelectors = (selectors: ReadonlyArray<string>): Array<string> => {
   const batches: Array<Array<string>> = []
+  let batch: Array<string> = []
   let length = maxSelectorLength
 
   for (const selector of selectors) {
     if (length + selector.length + 1 > maxSelectorLength) {
-      batches.push([])
+      batch = []
+      batches.push(batch)
       length = 0
     }
 
-    batches[batches.length - 1].push(selector)
+    batch.push(selector)
     length += selector.length + 1
   }
 
@@ -536,7 +538,7 @@ const elementRatioSources: Array<(element: Element) => string | undefined> = [
       return
     }
 
-    const stated = ratio.split(whitespaceRegex).filter((token) => token.toLowerCase() !== 'auto')
+    const stated = ratio.split(whitespaceRegex).filter((token) => !isAnyOf(token, 'auto'))
 
     return parseRatio(stated.join(' '))
   },

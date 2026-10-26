@@ -1022,7 +1022,7 @@ describeForEachParser('createCitePlaceholder', (parseHtml) => {
 describeForEachParser('readCarrierSize', (parseHtml) => {
   const base: EmbedResolverResult = { provider: 'example', id: 'abc', src: 'https://x.test/abc' }
 
-  const resolve = (
+  const extractResult = (
     resolver: { selector: string; extract: (element: Element) => unknown },
     value: string,
   ) => {
@@ -1043,7 +1043,7 @@ describeForEachParser('readCarrierSize', (parseHtml) => {
       `
       const expected: EmbedResolverResult = { ...base, height: 200 }
 
-      expect(resolve(resolver, value)).toEqual(expected)
+      expect(extractResult(resolver, value)).toEqual(expected)
     })
 
     it('should keep its own ratio over the box a url carrier declares', () => {
@@ -1057,7 +1057,7 @@ describeForEachParser('readCarrierSize', (parseHtml) => {
       `
       const expected: EmbedResolverResult = { ...base, ratio: '16/9' }
 
-      expect(resolve(resolver, value)).toEqual(expected)
+      expect(extractResult(resolver, value)).toEqual(expected)
     })
 
     it('should keep its own ratio over a carrier sized 100% inside a wrapper', () => {
@@ -1072,7 +1072,7 @@ describeForEachParser('readCarrierSize', (parseHtml) => {
       `
       const expected: EmbedResolverResult = { ...base, ratio: '16/9' }
 
-      expect(resolve(resolver, value)).toEqual(expected)
+      expect(extractResult(resolver, value)).toEqual(expected)
     })
 
     it('should state no size when it states none, whatever the carrier declares', () => {
@@ -1085,7 +1085,7 @@ describeForEachParser('readCarrierSize', (parseHtml) => {
         ></iframe>
       `
 
-      expect(resolve(resolver, value)).toEqual(base)
+      expect(extractResult(resolver, value)).toEqual(base)
     })
 
     it('should state no size when it states none, whatever an ancestor wrapper implies', () => {
@@ -1096,7 +1096,7 @@ describeForEachParser('readCarrierSize', (parseHtml) => {
         </div>
       `
 
-      expect(resolve(resolver, value)).toEqual(base)
+      expect(extractResult(resolver, value)).toEqual(base)
     })
   })
 
@@ -1114,7 +1114,7 @@ describeForEachParser('readCarrierSize', (parseHtml) => {
       `
       const expected: EmbedResolverResult = { ...base, width: 640, height: 360 }
 
-      expect(resolve(resolver, value)).toEqual(expected)
+      expect(extractResult(resolver, value)).toEqual(expected)
     })
 
     it('should take the box a url carrier declares', () => {
@@ -1130,7 +1130,7 @@ describeForEachParser('readCarrierSize', (parseHtml) => {
       `
       const expected: EmbedResolverResult = { ...base, width: 1080, height: 1920 }
 
-      expect(resolve(resolver, value)).toEqual(expected)
+      expect(extractResult(resolver, value)).toEqual(expected)
     })
 
     it('should keep its own size where the carrier declares none', () => {
@@ -1140,7 +1140,7 @@ describeForEachParser('readCarrierSize', (parseHtml) => {
       const value = '<iframe src="https://x.test/abc"></iframe>'
       const expected: EmbedResolverResult = { ...base, ratio: '16/9' }
 
-      expect(resolve(resolver, value)).toEqual(expected)
+      expect(extractResult(resolver, value)).toEqual(expected)
     })
   })
 
@@ -1155,7 +1155,7 @@ describeForEachParser('readCarrierSize', (parseHtml) => {
     const withHeight: EmbedResolverResult = { ...base, height: 300 }
 
     const build = (result: EmbedResolverResult, markup: string) => {
-      return resolve(
+      return extractResult(
         createMarkupEmbedResolver('div.player', () => result, { readCarrierSize: true }),
         markup,
       )

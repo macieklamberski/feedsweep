@@ -128,19 +128,19 @@ const decodePathValue = (owner: string): string => {
 }
 
 const readPageSubject = (page: string): FlickrSubject | undefined => {
-  const set = page.match(setPathRegex)
+  const set = setPathRegex.exec(page)
 
   if (set) {
     return { owner: decodePathValue(set[1]), setId: decodePathValue(set[2]) }
   }
 
-  const group = page.match(groupPathRegex)
+  const group = groupPathRegex.exec(page)
 
   if (group && nsidRegex.test(group[1])) {
     return { groupId: group[1] }
   }
 
-  const stream = page.match(streamPathRegex)
+  const stream = streamPathRegex.exec(page)
 
   if (stream) {
     return { owner: decodePathValue(stream[1]) }

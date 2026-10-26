@@ -818,8 +818,8 @@ describeForEachParser('highlightCode', (parseHtml) => {
 
   it('should highlight Shiki code blocks using data-language on pre', async () => {
     // The newline inside `<code>` is code, and `html` would join the lines without it.
-    const value = `<pre class="astro-code" data-language="scss"><code><span class="line"><span>header</span><span> {</span></span>
-<span class="line"><span>  ul</span><span> {</span></span></code></pre>`
+    const value =
+      '<pre class="astro-code" data-language="scss"><code><span class="line"><span>header</span><span> {</span></span>\n<span class="line"><span>  ul</span><span> {</span></span></code></pre>'
     const expected =
       '<pre class="astro-code" data-language="scss" data-pre-language="scss" data-pre-label="SCSS"><code class="hljs"><span class="hljs-selector-tag">header</span> {\n  <span class="hljs-selector-tag">ul</span> {</code></pre>'
 
