@@ -25,7 +25,7 @@ export const fc2EmojiResolver: EmojiResolver = {
     'img[src*=".fc2.com/image/v/" i]',
   ].join(', '),
   extract: (element) => {
-    const host = parseUrl(element.getAttribute('src') ?? '', placeholderBaseUrl)?.hostname ?? ''
+    const host = parseUrl(element.getAttribute('src'), placeholderBaseUrl)?.hostname ?? ''
 
     if (!element.matches(classSelector) && !pictogramHostRegex.test(host)) {
       return

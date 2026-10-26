@@ -44,7 +44,7 @@ const spotifyShowPathRegex = /^\/pod\/(?:show|profile)\/([^/]+)\/embed\/?$/i
 // `anchor.fm/{show}/embed`, `podcasters.spotify.com/pod/show/{show}/embed`,
 // `creators.spotify.com/pod/profile/{show}/embed`.
 const extractAnchorShow = (url: URL): string | undefined => {
-  const pathRegex = isHostOrSubdomainOf(url, ['anchor.fm'])
+  const pathRegex = isHostOrSubdomainOf(url, 'anchor.fm')
     ? anchorShowPathRegex
     : spotifyShowPathRegex
 
@@ -53,7 +53,7 @@ const extractAnchorShow = (url: URL): string | undefined => {
 
 // The episode page, `anchor.fm/{show}/episodes/{slug}`, names the same episode as its player.
 const extractAnchorEpisodePage = (url: URL): string | undefined => {
-  if (!isHostOrSubdomainOf(url, ['anchor.fm'])) {
+  if (!isHostOrSubdomainOf(url, 'anchor.fm')) {
     return
   }
 

@@ -34,7 +34,7 @@ export const linkifyPodomaticPlaylists: DomTransform = () => (document) => {
   for (const element of document.querySelectorAll(playerSelector)) {
     const player = parseUrlOnHosts(readCarrierUrl(element), podomaticHost)
 
-    if (!player || !startsWithAnyOf(player.pathname, [playerPath])) {
+    if (!player || !startsWithAnyOf(player.pathname, playerPath)) {
       continue
     }
 

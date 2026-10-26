@@ -510,7 +510,7 @@ export const updateEmbedPlaceholder = (
 type CleanableResult = { provider?: string; title?: string; description?: string }
 
 const stripPrefix = (value: string, prefix: string): string => {
-  return startsWithAnyOf(value, [prefix]) ? value.slice(prefix.length) : value
+  return startsWithAnyOf(value, prefix) ? value.slice(prefix.length) : value
 }
 
 // A field the platform's snippet may have filled with its own label rather than the item's.
@@ -526,7 +526,7 @@ const cleanField = (
       continue
     }
 
-    if (cleaner.drop && isAnyOf(value, [cleaner.drop])) {
+    if (cleaner.drop && isAnyOf(value, cleaner.drop)) {
       return
     }
 
