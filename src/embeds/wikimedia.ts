@@ -44,7 +44,7 @@ export const composeFilePathUrl = (
     return
   }
 
-  const query = composeQuery(width ? { width: String(width) } : {})
+  const query = composeQuery(width ? { width } : {})
 
   return `https://${parsed.hostname}/wiki/Special:FilePath/${fileName}${query}`
 }
