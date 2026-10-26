@@ -578,6 +578,25 @@ describeForEachParser('blubrryPowerpressEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should size a MediaElement video player as video', async () => {
+      const value = html`
+        <iframe
+          width="500"
+          height="500"
+          src="https://example.com/?powerpress_embed=46474-podcast&amp;amp;powerpress_player=mediaelement-video"
+          title="Blubrry Podcast Player"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'blubrry',
+        id: 'example.com/46474-podcast',
+        src: 'https://example.com/?powerpress_embed=46474-podcast&powerpress_player=mediaelement-video',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should use a feed slug other than podcast as written', async () => {
       const value =
         '<iframe src="https://example.com/?powerpress_embed=618-timbernook-tips&amp;powerpress_player=mediaelement-audio"></iframe>'
