@@ -8,7 +8,7 @@ const sizes = {
   player: { ratio: '16/9' },
 }
 
-const dzenHosts = ['dzen.ru']
+const hosts = ['dzen.ru']
 
 const embedPathRegex = /^\/embed\/([^/]+)\/?$/i
 
@@ -28,7 +28,7 @@ export const dzenResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const dzenEmbedResolver = createUrlEmbedResolver(dzenHosts, dzenResolveEmbed)
+export const dzenEmbedResolver = createUrlEmbedResolver(hosts, dzenResolveEmbed)
 
 export const dzenRenderHint: EmbedRenderHint = {
   provider,

@@ -17,7 +17,7 @@ import {
 
 const provider = 'blubrry'
 
-const blubrryHosts = ['blubrry.com']
+const hosts = ['blubrry.com']
 
 const sizes = {
   // The player is 164 tall, one less than the 165 publishers write.
@@ -117,7 +117,7 @@ export const blubrryResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const blubrryIframeEmbedResolver = createUrlEmbedResolver(blubrryHosts, blubrryResolveEmbed)
+export const blubrryIframeEmbedResolver = createUrlEmbedResolver(hosts, blubrryResolveEmbed)
 
 // PowerPress, Blubrry's WordPress plugin, frames an episode from the publisher's own site as
 // `{site}/?powerpress_embed={postId}-{feed}`. The post id belongs to that site and maps onto no

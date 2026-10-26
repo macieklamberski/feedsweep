@@ -15,10 +15,10 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'pbs'
 
-const playerHost = 'player.pbs.org'
+const playerHosts = ['player.pbs.org']
 
 // The retired player host, which redirects to the player host on the same path.
-const legacyPlayerHost = 'video.pbs.org'
+const legacyHosts = ['video.pbs.org']
 
 // Member stations' player hosts, which serve the player's routes and ids or redirect onto them.
 const stationPlayerHosts = [
@@ -30,19 +30,15 @@ const stationPlayerHosts = [
   'watch.weta.org',
 ]
 
-// The retired Flash player's host, which also serves files.
-const flashHost = 'www-tc.pbs.org'
-
-// The CDN host that served the same Flash player.
-const flashCdnHost = 'dgjigvacl6ipj.cloudfront.net'
+// The retired Flash player's host, which also serves files, and the CDN host that served the same
+// Flash player.
+const flashHosts = ['www-tc.pbs.org', 'dgjigvacl6ipj.cloudfront.net']
 
 const flashPlayerPaths = [
   '/video/media/swf/PBSPlayer.swf',
   '/s3/pbs.videoportal-prod.cdn/media/swf/PBSPlayer.swf',
   '/media/swf/PBSPlayer.swf',
 ]
-
-const flashHosts = [flashHost, flashCdnHost]
 
 // The route a carrier names, against the id space it belongs to. `viralplayer` and
 // `widget/partnerplayer` serve each other's numeric ids; `partnerplayer` takes a base64url slug
@@ -86,7 +82,7 @@ const composeEmbed = (
   return {
     provider,
     id: `${idSpace}/${videoId}`,
-    src: `https://${playerHost}/${route}/${videoId}/${query}`,
+    src: `https://player.pbs.org/${route}/${videoId}/${query}`,
     ...sizes.player,
     ratioHeightOffset: route === 'viralplayer' ? viralTopBarHeight : undefined,
   }
@@ -133,19 +129,16 @@ export const pbsResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const route = segments.slice(0, -1).join('/')
 
   // The retired host served the viral route alone.
-  if (isHostOf(url, legacyPlayerHost) && !isAnyOf(route, 'viralplayer')) {
+  if (isHostOf(url, legacyHosts) && !isAnyOf(route, 'viralplayer')) {
     return
   }
 
   return composeEmbed(route, segments.at(-1), pickUrlParams(url, playbackParams))
 }
 
-export const pbsIframeEmbedResolver = createUrlEmbedResolver([playerHost], pbsResolveEmbed)
+export const pbsIframeEmbedResolver = createUrlEmbedResolver(playerHosts, pbsResolveEmbed)
 
-export const pbsLegacyIframeEmbedResolver = createUrlEmbedResolver(
-  [legacyPlayerHost],
-  pbsResolveEmbed,
-)
+export const pbsLegacyIframeEmbedResolver = createUrlEmbedResolver(legacyHosts, pbsResolveEmbed)
 
 export const pbsStationIframeEmbedResolver = createUrlEmbedResolver(
   stationPlayerHosts,

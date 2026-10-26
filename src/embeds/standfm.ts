@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'standfm'
 
-const standfmHosts = ['stand.fm']
+const hosts = ['stand.fm']
 
 // stand.fm's own snippet sizes the iframe with a `<style>` beside it, which is stripped before the
 // iframe reaches a reader. A channel embed scrolls its list of episodes inside a fixed card.
@@ -30,4 +30,4 @@ export const standfmResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const standfmEmbedResolver = createUrlEmbedResolver(standfmHosts, standfmResolveEmbed)
+export const standfmEmbedResolver = createUrlEmbedResolver(hosts, standfmResolveEmbed)

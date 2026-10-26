@@ -21,7 +21,7 @@ const sizes = {
 }
 
 // Listed exactly, not by subdomain: sse.codesandbox.io and blog.codesandbox.io name no sandbox.
-const codesandboxHosts = ['codesandbox.io', 'www.codesandbox.io']
+const hosts = ['codesandbox.io', 'www.codesandbox.io']
 
 // Words CodeSandbox owns where a slug sits. `new` opens a starter template with nothing saved
 // behind it.
@@ -54,7 +54,7 @@ const readId = (slug: string): string => {
 }
 
 const parseTarget = (value: URL | undefined): CodesandboxTarget | undefined => {
-  const parsed = parseUrlOnHosts(value, codesandboxHosts, isHostOf)
+  const parsed = parseUrlOnHosts(value, hosts, isHostOf)
 
   if (!parsed) {
     return
@@ -124,10 +124,7 @@ export const codesandboxResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // CodeSandbox's editor iframe, under /embed/, /s/ or the DevBox-era /p/ routes.
-export const codesandboxIframeEmbedResolver = createUrlEmbedResolver(
-  codesandboxHosts,
-  codesandboxResolveEmbed,
-)
+export const codesandboxIframeEmbedResolver = createUrlEmbedResolver(hosts, codesandboxResolveEmbed)
 
 // The editor posts its rendered height unasked.
 export const codesandboxRenderHint: EmbedRenderHint = {

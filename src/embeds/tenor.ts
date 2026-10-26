@@ -6,7 +6,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const provider = 'tenor'
 
 // Listed exactly, not by subdomain: media.tenor.com and media1.tenor.com serve the GIF's files.
-const tenorHosts = ['tenor.com', 'www.tenor.com']
+const hosts = ['tenor.com', 'www.tenor.com']
 
 const composeEmbed = (postId: string): EmbedResolverResult => {
   return {
@@ -56,6 +56,6 @@ export const tenorWidgetEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-export const tenorIframeEmbedResolver = createUrlEmbedResolver(tenorHosts, tenorResolveEmbed, {
+export const tenorIframeEmbedResolver = createUrlEmbedResolver(hosts, tenorResolveEmbed, {
   isOnHost: isHostOf,
 })

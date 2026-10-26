@@ -7,7 +7,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const provider = 'pollmaker'
 
 // Exact: `scripts.poll-maker.com` and `cdn.poll-maker.com` serve the loader and its images.
-const pollmakerHosts = ['poll-maker.com', 'www.poll-maker.com']
+const hosts = ['poll-maker.com', 'www.poll-maker.com']
 
 // The route word is glued to the id. A digit after it tells a poll from site pages such as
 // `/polls`. The route words are case-insensitive.
@@ -37,7 +37,7 @@ const composeEmbed = (
 }
 
 const readPollId = (url: URL | undefined): string | undefined => {
-  const parsed = parseUrlOnHosts(url, pollmakerHosts, isHostOf)
+  const parsed = parseUrlOnHosts(url, hosts, isHostOf)
 
   if (!parsed) {
     return
@@ -57,10 +57,7 @@ export const pollmakerResolveEmbed: ResolveUrlEmbed = (url) => {
   return composeEmbed(pollId)
 }
 
-export const pollmakerIframeEmbedResolver = createUrlEmbedResolver(
-  pollmakerHosts,
-  pollmakerResolveEmbed,
-)
+export const pollmakerIframeEmbedResolver = createUrlEmbedResolver(hosts, pollmakerResolveEmbed)
 
 // The form snippet: `form#qp_form{n}` posting to `/results{id}` inside `div#qp_main{n}`, which
 // `scpolls.js` drives. Without the script, and with forms stripped by a reader, the options are
@@ -75,7 +72,7 @@ export const pollmakerFormEmbedResolver = createMarkupEmbedResolver(
     }
 
     const form = element.querySelector(`#qp_form${pollNumber}[action]`)
-    const pollId = readPollId(parseUrlOnHosts(attr(form, 'action'), pollmakerHosts, isHostOf))
+    const pollId = readPollId(parseUrlOnHosts(attr(form, 'action'), hosts, isHostOf))
 
     if (!form || !pollId) {
       return

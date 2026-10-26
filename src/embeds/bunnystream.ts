@@ -6,7 +6,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'bunnystream'
 
-const bunnystreamHosts = [
+const hosts = [
   'iframe.mediadelivery.net', // The older player, still served
   'player.mediadelivery.net',
 ]
@@ -46,10 +46,7 @@ export const bunnystreamResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
 // Bunny Stream's player iframe or its full-window `/play` page, which renders on its own but
 // autoplays unless the library turns it off.
-export const bunnystreamEmbedResolver = createUrlEmbedResolver(
-  bunnystreamHosts,
-  bunnystreamResolveEmbed,
-)
+export const bunnystreamEmbedResolver = createUrlEmbedResolver(hosts, bunnystreamResolveEmbed)
 
 export const bunnystreamRenderHint: EmbedRenderHint = {
   provider,

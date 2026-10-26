@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'office'
 
-const officeHosts = ['view.officeapps.live.com']
+const hosts = ['view.officeapps.live.com']
 
 // The snippet writes `embed.aspx` and the share link `view.aspx`. Both render the same document,
 // and the viewer answers any casing.
@@ -50,4 +50,4 @@ export const officeResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const officeEmbedResolver = createUrlEmbedResolver(officeHosts, officeResolveEmbed)
+export const officeEmbedResolver = createUrlEmbedResolver(hosts, officeResolveEmbed)

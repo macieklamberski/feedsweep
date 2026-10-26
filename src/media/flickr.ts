@@ -2,7 +2,7 @@ import type { MediaResolver } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 
-const flickrHost = 'flickr.com'
+const hosts = ['flickr.com']
 
 // Flickr's `iphone_wifi` route answers 404, while `360p` redirects the same item to a signed
 // mp4. The other qualities still play as written.
@@ -15,7 +15,7 @@ export const flickrMediaResolver: MediaResolver = {
   kind: 'media',
   selector: 'video[src*="/play/iphone_wifi/" i]',
   extract: (element) => {
-    const url = parseUrlOnHosts(attr(element, 'src'), flickrHost)
+    const url = parseUrlOnHosts(attr(element, 'src'), hosts)
 
     if (!url || !retiredRouteRegex.test(url.pathname)) {
       return

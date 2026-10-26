@@ -6,7 +6,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'libsyn'
 
-const libsynHosts = ['libsyn.com']
+const hosts = ['libsyn.com']
 
 // `show` renders an error and `destination` is another id space, so a show carrier falls through.
 const embedKinds = ['episode', 'destination']
@@ -80,7 +80,7 @@ export const libsynResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
 // Libsyn's player iframe, whose old html5-player.libsyn.com host answers 500 for older episodes.
 // `play.libsyn.com` serves all of them.
-export const libsynEmbedResolver = createUrlEmbedResolver(libsynHosts, libsynResolveEmbed)
+export const libsynEmbedResolver = createUrlEmbedResolver(hosts, libsynResolveEmbed)
 
 export const libsynFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'Embed Player' },

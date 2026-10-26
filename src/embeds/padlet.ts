@@ -4,7 +4,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'padlet'
 
-const padletHosts = ['padlet.com']
+const hosts = ['padlet.com']
 const embedPathRegex = /^\/embed\/([^/]+)\/?$/i
 const previewPathRegex = /^\/padlets\/([^/]+)\/embeds\/preview_embed\/?$/i
 // The board page, `/{user}/{slug}-{id}`, refuses framing. Its id follows the slug's last hyphen.
@@ -46,4 +46,4 @@ const padletResolveEmbed: ResolveUrlEmbed = (url) => {
 
 // The padlet.com/embed/{board} iframe, its preview form, which sizes itself height: 100%, and the
 // board page, rebuilt onto the embed.
-export const padletEmbedResolver = createUrlEmbedResolver(padletHosts, padletResolveEmbed)
+export const padletEmbedResolver = createUrlEmbedResolver(hosts, padletResolveEmbed)

@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'smore'
 
-const legacyHost = 'www.smore.com'
+const legacyHosts = ['www.smore.com']
 
 const sizes = {
   // The newsletter page posts no height to its parent, so a long newsletter scrolls inside the
@@ -16,10 +16,10 @@ const sizes = {
 // A newsletter is `www.smore.com/{key}-{slug}` on the legacy host and `/n/{key}-{slug}` on
 // `app.smore.com` and `secure.smore.com`. The slug is cosmetic and the key is case-sensitive.
 export const smoreEmbedResolver = createUrlEmbedResolver(
-  [legacyHost, 'app.smore.com', 'secure.smore.com'],
+  [...legacyHosts, 'app.smore.com', 'secure.smore.com'],
   (url, element) => {
     const segments = getPathSegments(url)
-    const isLegacy = isHostOf(url, [legacyHost])
+    const isLegacy = isHostOf(url, legacyHosts)
 
     if (!isLegacy && !isAnyOf(segments[0], 'n')) {
       return

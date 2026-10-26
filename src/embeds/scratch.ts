@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const provider = 'scratch'
 
 // The subdomains `assets`, `cdn2` and `uploads` serve files, so only the page hosts are read.
-const scratchHosts = [
+const hosts = [
   'alpha.scratch.mit.edu', // The retired Scratch 2.0 host, sharing the main site's ids
   'scratch.mit.edu',
 ]
@@ -37,6 +37,6 @@ export const scratchResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const scratchEmbedResolver = createUrlEmbedResolver(scratchHosts, scratchResolveEmbed, {
+export const scratchEmbedResolver = createUrlEmbedResolver(hosts, scratchResolveEmbed, {
   isOnHost: isHostOf,
 })

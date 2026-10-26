@@ -11,7 +11,7 @@ import {
   resolveUrl,
   toMap,
 } from 'trousse'
-import { extractVideoId, youtubeHosts } from '../embeds/youtube.js'
+import { extractVideoId, hosts as youtubeHosts } from '../embeds/youtube.js'
 import type { CleanUrlFn } from '../types.js'
 import { pixelDimensionLimit } from './dom.js'
 import { isFileName, parseUrlOnHosts, placeholderBaseUrl } from './urls.js'

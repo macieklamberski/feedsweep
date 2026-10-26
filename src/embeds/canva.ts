@@ -6,7 +6,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const provider = 'canva'
 
 // Exact: `document-export.canva.com` serves the files a design exports.
-const canvaHosts = ['canva.com', 'www.canva.com']
+const hosts = ['canva.com', 'www.canva.com']
 
 // /design/{designId}/{shareToken}/{view|watch}, where older snippets leave the token out.
 const designPathRegex = /^\/design\/([^/]+(?:\/[^/]+)?)\/(view|watch)\/?$/i
@@ -36,7 +36,7 @@ export const canvaResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const canvaIframeEmbedResolver = createUrlEmbedResolver(canvaHosts, canvaResolveEmbed, {
+export const canvaIframeEmbedResolver = createUrlEmbedResolver(hosts, canvaResolveEmbed, {
   isOnHost: isHostOf,
 })
 

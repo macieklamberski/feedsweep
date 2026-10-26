@@ -9,7 +9,7 @@ const sizes = {
 }
 
 // The eight ABC owned stations, on one site platform and one video id space.
-const abcotvHosts = [
+const hosts = [
   '6abc.com', // Philadelphia
   'abc11.com', // Raleigh-Durham
   'abc13.com', // Houston
@@ -48,4 +48,4 @@ export const abcotvResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const abcotvEmbedResolver = createUrlEmbedResolver(abcotvHosts, abcotvResolveEmbed)
+export const abcotvEmbedResolver = createUrlEmbedResolver(hosts, abcotvResolveEmbed)

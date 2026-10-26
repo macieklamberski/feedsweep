@@ -8,7 +8,7 @@ const sizes = {
   player: { ratio: '16/9' },
 }
 
-const ardmediathekHosts = ['ardmediathek.de']
+const hosts = ['ardmediathek.de']
 
 // The legacy `/{channel}/embed/{id}` route 404s.
 const embedPathRegex = /^\/(?:\w+\/)?embed\/([^/]+)\/?$/i
@@ -32,7 +32,4 @@ const ardmediathekResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 // The ARD Mediathek player iframe on the `/embed/{id}` route and the legacy channel route.
-export const ardmediathekEmbedResolver = createUrlEmbedResolver(
-  ardmediathekHosts,
-  ardmediathekResolveEmbed,
-)
+export const ardmediathekEmbedResolver = createUrlEmbedResolver(hosts, ardmediathekResolveEmbed)

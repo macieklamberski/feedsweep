@@ -9,7 +9,7 @@ const sizes = {
   player: { ratio: '16/9' },
 }
 
-const washingtonpostHosts = ['washingtonpost.com']
+const hosts = ['washingtonpost.com']
 
 const embedPathRegex = /^\/video\/c\/embed\/([^/]+)\/?$/i
 const inlinePathRegex = /\/([^/]+)_inline\.html$/i
@@ -33,7 +33,4 @@ export const washingtonpostResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const washingtonpostEmbedResolver = createUrlEmbedResolver(
-  washingtonpostHosts,
-  washingtonpostResolveEmbed,
-)
+export const washingtonpostEmbedResolver = createUrlEmbedResolver(hosts, washingtonpostResolveEmbed)

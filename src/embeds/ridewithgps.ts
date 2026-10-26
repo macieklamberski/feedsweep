@@ -19,7 +19,7 @@ type EmbedShape = {
 
 const provider = 'ridewithgps'
 
-const ridewithgpsHosts = ['ridewithgps.com']
+const hosts = ['ridewithgps.com']
 
 const embedParams = ['title', 'privacyCode']
 const privateParams = ['privacyCode']
@@ -143,7 +143,4 @@ const ridewithgpsResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 // The Ride with GPS route map iframe, in both its query and its path spelling.
-export const ridewithgpsEmbedResolver = createUrlEmbedResolver(
-  ridewithgpsHosts,
-  ridewithgpsResolveEmbed,
-)
+export const ridewithgpsEmbedResolver = createUrlEmbedResolver(hosts, ridewithgpsResolveEmbed)

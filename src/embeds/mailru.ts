@@ -13,7 +13,7 @@ const sizes = {
 
 // `my.mail.ru` serves the player, `api.video.mail.ru` was the host of the older embed and no
 // longer resolves, and `img.mail.ru` and the `imgsmail.ru` asset hosts served the Flash player.
-const mailruHosts = ['my.mail.ru', 'api.video.mail.ru', 'img.mail.ru', 'imgsmail.ru']
+const hosts = ['my.mail.ru', 'api.video.mail.ru', 'img.mail.ru', 'imgsmail.ru']
 // The asset hosts also serve images, so only their `/r` Flash route is read.
 const flashHosts = ['img.mail.ru', 'imgsmail.ru']
 
@@ -68,7 +68,7 @@ const composeSubject = (subject: string): EmbedResolverResult | undefined => {
 }
 
 const resolveTarget = (url: URL, element?: Element): EmbedResolverResult | undefined => {
-  const parsed = parseUrlOnHosts(url, mailruHosts)
+  const parsed = parseUrlOnHosts(url, hosts)
 
   if (!parsed) {
     return
@@ -134,7 +134,7 @@ export const mailruResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // A Mail.ru video: the my.mail.ru iframe, the dead api.video.mail.ru embed or the Flash player.
-export const mailruIframeEmbedResolver = createUrlEmbedResolver(mailruHosts, mailruResolveEmbed)
+export const mailruIframeEmbedResolver = createUrlEmbedResolver(hosts, mailruResolveEmbed)
 
 // A my.mail.ru journal post's video: a span only Mail.ru's own page script turned into its player,
 // naming the video as `/{type}/{user}/{album}/{counter}`.
@@ -154,7 +154,7 @@ export const mailruWidgetEmbedResolver = createMarkupEmbedResolver(
 
     // A republished card sits beside the my.mail.ru iframe of the same video, which already plays.
     for (const frame of frames) {
-      const frameUrl = parseUrlOnHosts(attr(frame, 'src'), mailruHosts)
+      const frameUrl = parseUrlOnHosts(attr(frame, 'src'), hosts)
       const framedId = frameUrl && mailruResolveEmbed(frameUrl)?.id
 
       if (framedId && videoIds.includes(framedId)) {

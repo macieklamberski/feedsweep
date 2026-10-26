@@ -1,5 +1,5 @@
 import { getQueryParam, isAnyOf, isHostOrSubdomainOf, isHttpUrl, parseUrl } from 'trousse'
-import { jwplayerHosts } from '../../embeds/jwplayer.js'
+import { hosts as jwplayerHosts } from '../../embeds/jwplayer.js'
 import { composeTwitterStatusUrl } from '../../embeds/twitter.js'
 import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'

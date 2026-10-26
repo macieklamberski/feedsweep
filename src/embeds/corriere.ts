@@ -12,8 +12,8 @@ const sizes = {
 
 // The regional `video.corrieredelmezzogiorno.corriere.it` keeps its own videos, which
 // `video.corriere.it` answers with a 404, so the frame host is not widened to `corriere.it`.
-const corriereFrameHosts = ['video.corriere.it']
-const corriereFlashHosts = ['corriereobjects.it']
+const hosts = ['video.corriere.it']
+const flashHosts = ['corriereobjects.it']
 
 const rssFileRegex = /^video_(.+)\.rss$/i
 
@@ -30,7 +30,7 @@ const composeEmbed = (id: string): EmbedResolverResult => {
 // The retired players named the video by its feed, `…/widget/content/video/rss/video_{id}.rss`,
 // and the id is the one the current player takes.
 const readFeedVideo = (value: string | undefined): EmbedResolverResult | undefined => {
-  const feed = parseUrlOnHosts(value, corriereFlashHosts)
+  const feed = parseUrlOnHosts(value, flashHosts)
 
   if (!feed) {
     return
@@ -49,7 +49,7 @@ const readFeedVideo = (value: string | undefined): EmbedResolverResult | undefin
 // that render nothing: the Flash widget `static2.video.corriereobjects.it/widget/swf/`, with the
 // feed in the `videoUrl` flashvar, and `video.corriere.it/widget/players/`, in the `videoId` query.
 export const corriereResolveEmbed: ResolveUrlEmbed = (url, element) => {
-  const flash = parseUrlOnHosts(url, corriereFlashHosts)
+  const flash = parseUrlOnHosts(url, flashHosts)
 
   if (flash) {
     const [widget, swf, , ...rest] = getPathSegments(flash)
@@ -85,6 +85,6 @@ export const corriereResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 export const corriereEmbedResolver = createUrlEmbedResolver(
-  [...corriereFrameHosts, ...corriereFlashHosts],
+  [...hosts, ...flashHosts],
   corriereResolveEmbed,
 )

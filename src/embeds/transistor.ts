@@ -6,7 +6,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'transistor'
 
-const transistorHosts = ['transistor.fm']
+const hosts = ['transistor.fm']
 
 // The episode player is fixed at 180, and Transistor's own oEmbed agrees. A `/latest` player holds
 // one episode and `/playlist` the whole show.
@@ -73,10 +73,7 @@ export const transistorResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 // A Transistor player iframe, or a frame of the share page, which refuses framing.
-export const transistorEmbedResolver = createUrlEmbedResolver(
-  transistorHosts,
-  transistorResolveEmbed,
-)
+export const transistorEmbedResolver = createUrlEmbedResolver(hosts, transistorResolveEmbed)
 
 export const transistorRenderHint: EmbedRenderHint = {
   provider,

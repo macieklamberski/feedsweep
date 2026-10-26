@@ -12,7 +12,7 @@ const sizes = {
 
 // `players.yumpu.com` serves the resizer script and `assets.yumpu.com` the site assets, so only
 // the bare host and its `www.` spelling name a document.
-const yumpuHosts = ['yumpu.com', 'www.yumpu.com']
+const hosts = ['yumpu.com', 'www.yumpu.com']
 
 const documentPathRegex = /^\/[a-z]+\/document\/view\/\d+(?:\/|$)/i
 
@@ -29,7 +29,7 @@ const readCompanion = (element: Element | undefined): Partial<EmbedResolverResul
 
   const anchor = isElement(node) ? node : undefined
   const href = attr(anchor, 'href')
-  const page = parseUrlOnHosts(href, yumpuHosts, isHostOf)
+  const page = parseUrlOnHosts(href, hosts, isHostOf)
 
   if (!page || !documentPathRegex.test(page.pathname)) {
     return
@@ -79,6 +79,6 @@ const yumpuResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
 // YUMPU's flipbook iframe, which names a document by an opaque embed hash. The document page sits
 // in a numeric id space that only the embed page's own canonical link joins to that hash.
-export const yumpuEmbedResolver = createUrlEmbedResolver(yumpuHosts, yumpuResolveEmbed, {
+export const yumpuEmbedResolver = createUrlEmbedResolver(hosts, yumpuResolveEmbed, {
   isOnHost: isHostOf,
 })

@@ -11,7 +11,7 @@ const sizes = {
   player: { ratio: '16/9' },
 }
 
-const rutubeHosts = ['rutube.ru']
+const hosts = ['rutube.ru']
 
 // The player reads its id off the last path segment, so `/play/embed/private/{id}` plays `{id}`.
 const embedPathRegex = /^\/(?:play\/embed(?:\/private)?|video\/embed|embed)\/([^/]+)\/?$/i
@@ -56,7 +56,7 @@ export const rutubeResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // Rutube's player iframe, rutube.ru/play/embed/{id}, and the three older spellings that 301 to it.
-export const rutubeEmbedResolver = createUrlEmbedResolver(rutubeHosts, rutubeResolveEmbed)
+export const rutubeEmbedResolver = createUrlEmbedResolver(hosts, rutubeResolveEmbed)
 
 export const rutubeRenderHint: EmbedRenderHint = {
   provider,

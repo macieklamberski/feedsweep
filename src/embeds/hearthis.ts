@@ -4,7 +4,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'hearthis'
 
-const hearthisHosts = ['hearthis.at']
+const hosts = ['hearthis.at']
 
 const sizes = {
   // The track bar is a fixed height at any width.
@@ -42,7 +42,7 @@ export const hearthisResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 // hearthis.at's track and set player iframes, on hearthis.at or app.hearthis.at.
-export const hearthisEmbedResolver = createUrlEmbedResolver(hearthisHosts, hearthisResolveEmbed)
+export const hearthisEmbedResolver = createUrlEmbedResolver(hosts, hearthisResolveEmbed)
 
 // A set page ignores `autoplay=1`, and its `play` message plays the track whose id equals the set id.
 export const hearthisRenderHint: EmbedRenderHint = {

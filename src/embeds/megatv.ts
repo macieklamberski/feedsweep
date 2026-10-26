@@ -4,7 +4,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'megatv'
 
-const megatvHosts = ['megatv.com']
+const hosts = ['megatv.com']
 
 // The 2020 is a fixed prefix the player plugin writes, not the year: a June 2026 article embeds
 // 20202420350 behind it, checked 2026-09-07.
@@ -44,4 +44,4 @@ const megatvResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 // Mega TV's player iframe, megatv.com/embed/?p={id}.
-export const megatvEmbedResolver = createUrlEmbedResolver(megatvHosts, megatvResolveEmbed)
+export const megatvEmbedResolver = createUrlEmbedResolver(hosts, megatvResolveEmbed)

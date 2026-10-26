@@ -78,7 +78,7 @@ export const extractBandcampRelease = (url: URL): string | undefined => {
   return release ? `${release[0]}/${release[1]}` : undefined
 }
 
-const bandcampHosts = ['bandcamp.com']
+const hosts = ['bandcamp.com']
 
 const parseFallback = (element: Nullish<Element>): Element | undefined => {
   if (!element) {
@@ -91,7 +91,7 @@ const parseFallback = (element: Nullish<Element>): Element | undefined => {
   holder.innerHTML = element.innerHTML
 
   return Array.from(holder.querySelectorAll('a[href]')).find((anchor) =>
-    parseUrlOnHosts(attr(anchor, 'href'), bandcampHosts),
+    parseUrlOnHosts(attr(anchor, 'href'), hosts),
   )
 }
 
@@ -135,7 +135,7 @@ const bandcampResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // Bandcamp's player iframe, whose fallback anchor is the only place the release page appears.
-export const bandcampEmbedResolver = createUrlEmbedResolver(bandcampHosts, bandcampResolveEmbed)
+export const bandcampEmbedResolver = createUrlEmbedResolver(hosts, bandcampResolveEmbed)
 
 export const bandcampFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'YouTube video player' },

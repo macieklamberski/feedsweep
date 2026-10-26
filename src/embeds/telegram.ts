@@ -20,7 +20,7 @@ const reservedRoutes = ['c', 's']
 
 // The third apex Telegram has always answered on, serving the identical widget: probed live, a
 // real post answers 200 there.
-const telegramHosts = ['t.me', 'telegram.me', 'telegram.dog']
+const hosts = ['t.me', 'telegram.me', 'telegram.dog']
 
 const composePost = (channel: string, messageId: string): EmbedResolverResult => {
   return {
@@ -73,10 +73,7 @@ const telegramResolveEmbed: ResolveUrlEmbed = (url) => {
 // The iframe the script above builds at runtime, saved into the feed by a CMS that ran the
 // script first, plus the hand-written form some publishers use instead. `telegram.me` serves the
 // same page as `t.me` and never redirects to it, so both hosts mint the canonical `t.me` url.
-export const telegramIframeEmbedResolver = createUrlEmbedResolver(
-  telegramHosts,
-  telegramResolveEmbed,
-)
+export const telegramIframeEmbedResolver = createUrlEmbedResolver(hosts, telegramResolveEmbed)
 
 // A forum's s9e MediaEmbed helper frame, naming the post as `{channel}/{id}` in its url fragment.
 export const telegramS9eEmbedResolver = createS9eEmbedResolver('telegram', (fragment) => {

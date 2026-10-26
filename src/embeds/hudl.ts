@@ -7,7 +7,7 @@ const provider = 'hudl'
 
 // Listed exactly: vi.hudl.com, vc.hudl.com and static.hudl.com serve the files, and
 // vcloud.hudl.com is the separate broadcast product.
-const hudlHosts = ['www.hudl.com']
+const hosts = ['www.hudl.com']
 
 const sizes = {
   player: { ratio: '16/9' },
@@ -47,14 +47,14 @@ export const hudlResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const hudlIframeEmbedResolver = createUrlEmbedResolver(hudlHosts, hudlResolveEmbed)
+export const hudlIframeEmbedResolver = createUrlEmbedResolver(hosts, hudlResolveEmbed)
 
 // The SB Nation snippet: a div holding a "View Link" anchor to the video, which a feed shows as
 // that link alone.
 export const hudlWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.hudl-embed, div.hudl-highlights-embed',
   (element) => {
-    const url = parseUrlOnHosts(attr(find(element, 'a[href]'), 'href'), hudlHosts)
+    const url = parseUrlOnHosts(attr(find(element, 'a[href]'), 'href'), hosts)
 
     if (!url) {
       return

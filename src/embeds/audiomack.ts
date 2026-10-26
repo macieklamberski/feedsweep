@@ -6,7 +6,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'audiomack'
 
-const audiomackHost = 'audiomack.com'
+const hosts = ['audiomack.com']
 
 // A fixed height on a fluid width, which the kind sets. The embed opens behind a consent wall.
 const audiomackHeights = toMap({
@@ -78,4 +78,4 @@ export const audiomackResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // Audiomack's player iframe, on the current embed route or a retired embed3 or embed4 one.
-export const audiomackEmbedResolver = createUrlEmbedResolver([audiomackHost], audiomackResolveEmbed)
+export const audiomackEmbedResolver = createUrlEmbedResolver(hosts, audiomackResolveEmbed)

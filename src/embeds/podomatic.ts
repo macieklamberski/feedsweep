@@ -4,7 +4,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'podomatic'
 
-const podomaticHost = 'podomatic.com'
+const hosts = ['podomatic.com']
 
 const sizes = {
   // The html5 player, measured in Chrome at 320, 480, 640 and 960 pixels wide and 300 and 700
@@ -79,4 +79,4 @@ export const podomaticResolveEmbed: ResolveUrlEmbed = (url) => {
 
 // Podomatic's player iframe, the html5 player `embed/html5/{kind}/{id}` and the current snippet
 // `embed/v2/podcast/{podcast}?episode_id={episode}`.
-export const podomaticEmbedResolver = createUrlEmbedResolver([podomaticHost], podomaticResolveEmbed)
+export const podomaticEmbedResolver = createUrlEmbedResolver(hosts, podomaticResolveEmbed)

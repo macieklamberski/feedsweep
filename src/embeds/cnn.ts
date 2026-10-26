@@ -22,7 +22,7 @@ const readDate = (id: string): string | undefined => {
   return parts ? `${parts[1]}-${parts[2]}-${parts[3]}` : undefined
 }
 
-const cnnHosts = ['cnn.com', 'cnn.io']
+const hosts = ['cnn.com', 'cnn.io']
 const cdnHosts = ['cdn.turner.com']
 
 // The fave shell is a `padding-bottom: 56.25%` box, and ids of this form have 16:9 renditions.
@@ -85,7 +85,7 @@ export const cnnResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
 // CNN's player iframe. The fave shell serves but its video does not play: the stream host answers
 // 400 "[No Host]". The 2014 and 2008 ones load nothing today.
-export const cnnIframeEmbedResolver = createUrlEmbedResolver(cnnHosts, cnnResolveEmbed)
+export const cnnIframeEmbedResolver = createUrlEmbedResolver(hosts, cnnResolveEmbed)
 
 // The Flash player, `i.cdn.turner.com/cnn/.element/apps/cvp/3.0/swf/{player}.swf?…&videoId={id}`,
 // as an `<embed>` or an `<object>`. The id sits in the swf's own query on every specimen, and in
@@ -105,7 +105,9 @@ export const cnnFlashEmbedResolver = createUrlEmbedResolver(cdnHosts, cnnFlashRe
 
 // CNN's 2009 share snippet: a loader script that is gone, beside a <noscript> link.
 export const cnnScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="cdn.turner.com/cnn/.element/js/" i][src*="/video/evp/module.js" i]',
+  cdnHosts
+    .map((host) => `script[src*="${host}/cnn/.element/js/" i][src*="/video/evp/module.js" i]`)
+    .join(', '),
   (element) => {
     const parsed = parseUrlOnHosts(attr(element, 'src'), cdnHosts)
 

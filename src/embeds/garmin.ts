@@ -7,7 +7,7 @@ const sizes = {
   player: { height: 548 },
 }
 
-const garminHosts = ['connect.garmin.com']
+const hosts = ['connect.garmin.com']
 
 // The spellings publishers pasted. Garmin chains them onto `embed/activity/{id}`, which is what
 // the mint takes, and that route 404s for an activity that does not exist.
@@ -31,4 +31,4 @@ export const garminResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const garminEmbedResolver = createUrlEmbedResolver(garminHosts, garminResolveEmbed)
+export const garminEmbedResolver = createUrlEmbedResolver(hosts, garminResolveEmbed)

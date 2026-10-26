@@ -10,7 +10,7 @@ const sizes = {
   player: { ratio: '16/9' },
 }
 
-const glomexHosts = ['player.glomex.com']
+const hosts = ['player.glomex.com']
 const playerPathRegex = /^\/integration\/[^/]+\/(?:integration|iframe-player)\.html$/i
 
 // The url glomex's own loader builds from a `<glomex-player>` element. The host answers the same
@@ -48,7 +48,7 @@ const glomexResolveEmbed: ResolveUrlEmbed = (url) => {
   return readEmbed(integrationId, playlistId)
 }
 
-export const glomexIframeEmbedResolver = createUrlEmbedResolver(glomexHosts, glomexResolveEmbed)
+export const glomexIframeEmbedResolver = createUrlEmbedResolver(hosts, glomexResolveEmbed)
 
 // The `<glomex-player>` custom element, which only glomex's loader script turns into a player.
 export const glomexElementEmbedResolver = createMarkupEmbedResolver(

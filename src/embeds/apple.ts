@@ -16,8 +16,8 @@ const podcastsProvider = 'applepodcasts'
 
 // Music and podcasts embed through the same player, served from `embed.music.apple.com` and
 // `embed.podcasts.apple.com`, so both resolve here and only the provider name differs.
-const appleHosts = ['music.apple.com', 'podcasts.apple.com']
-const applePodcastsHosts = ['podcasts.apple.com']
+const hosts = ['music.apple.com', 'podcasts.apple.com']
+const podcastsHosts = ['podcasts.apple.com']
 
 // The path is `/{storefront}/{kind}/{slug}/{id}`, with the storefront and the slug both
 // optional. A music id is numeric, a playlist or station id carries a two-letter prefix
@@ -56,7 +56,7 @@ export const appleResolveEmbed: ResolveUrlEmbed = (url) => {
     return
   }
 
-  const isPodcast = isHostOrSubdomainOf(url, applePodcastsHosts)
+  const isPodcast = isHostOrSubdomainOf(url, podcastsHosts)
   const host = isPodcast ? 'podcasts.apple.com' : 'music.apple.com'
   const trackId = getQueryParam(url.searchParams, 'i')
   const id = trackId ? trackId : pathId.replace(podcastIdPrefixRegex, '')
@@ -126,7 +126,7 @@ const readSubstackPodcast = (element: Nullish<Element>): Partial<EmbedResolverRe
 }
 
 // Apple's music and podcast player iframe. Substack wraps it in a card carrying JSON metadata.
-export const appleIframeEmbedResolver = createUrlEmbedResolver(appleHosts, (url, element) => {
+export const appleIframeEmbedResolver = createUrlEmbedResolver(hosts, (url, element) => {
   const result = appleResolveEmbed(url)
   const card = readSubstackPodcast(element)
 
@@ -143,14 +143,14 @@ export const appleIframeEmbedResolver = createUrlEmbedResolver(appleHosts, (url,
 
 // The retired Apple Music Marketing Tools host. Every id on it, real or not, redirects to the
 // same marketing page, so the frame shows no player for anybody.
-const appleToolsHosts = ['tools.applemusic.com']
+const toolsHosts = ['tools.applemusic.com']
 
 const toolsPathRegex = /^\/embed\/v1\/([a-z]+)\/([^/]+)$/i
 
 // The same album, playlist or song as the modern player, reached through the retired tool's url.
 // The tool wrote the storefront as `country`. A missing `country` drops the segment, and Apple
 // serves a storefront-less url from the US store.
-export const appleToolsEmbedResolver = createUrlEmbedResolver(appleToolsHosts, (url) => {
+export const appleToolsEmbedResolver = createUrlEmbedResolver(toolsHosts, (url) => {
   const match = url.pathname.match(toolsPathRegex)
 
   if (!match) {

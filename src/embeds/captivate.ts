@@ -13,7 +13,7 @@ const sizes = {
   show: { height: 600 },
 }
 
-const captivateHosts = ['captivate.fm']
+const hosts = ['captivate.fm']
 
 export const extractCaptivateEmbed = (link: URL): { kind: string; id: string } | undefined => {
   const segments = getPathSegments(link)
@@ -45,7 +45,7 @@ export const captivateResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const captivateEmbedResolver = createUrlEmbedResolver(captivateHosts, captivateResolveEmbed)
+export const captivateEmbedResolver = createUrlEmbedResolver(hosts, captivateResolveEmbed)
 
 // The player takes no query to start. Its own embed API posts this action into the frame, and
 // the frame posts nothing first, so the request goes on load.

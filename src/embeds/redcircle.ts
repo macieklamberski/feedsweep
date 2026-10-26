@@ -8,7 +8,7 @@ const provider = 'redcircle'
 
 // The loader is served from `api.podcache.net` and the player it builds from `redcircle.com`, on
 // the same path, so one reader covers both.
-const redcircleHosts = ['redcircle.com', 'api.podcache.net']
+const hosts = ['redcircle.com', 'api.podcache.net']
 
 // Fluid in width and fixed in height, both taken from what the loader scripts set on the iframe
 // they build: 170 for an episode, and `height: 100%` under a `min-height: 320px` for a show,
@@ -89,7 +89,7 @@ export const redcircleResolveEmbed: ResolveUrlEmbed = (url) => {
 export const redcircleScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="podcache.net/embedded-" i]',
   (element) => {
-    const url = parseUrlOnHosts(attr(element, 'src'), redcircleHosts)
+    const url = parseUrlOnHosts(attr(element, 'src'), hosts)
 
     if (!url) {
       return
@@ -99,7 +99,4 @@ export const redcircleScriptEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-export const redcircleIframeEmbedResolver = createUrlEmbedResolver(
-  redcircleHosts,
-  redcircleResolveEmbed,
-)
+export const redcircleIframeEmbedResolver = createUrlEmbedResolver(hosts, redcircleResolveEmbed)

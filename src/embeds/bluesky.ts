@@ -10,11 +10,11 @@ const provider = 'bluesky'
 // The fork host only widens what is read: the player is always minted on embed.bsky.app.
 // `main.bsky.dev` is first-party and `deer.social` a third-party soft fork, and both serve the
 // same `/profile/{authority}/post/{rkey}` path.
-export const blueskyHosts = ['bsky.app', 'deer.social', 'main.bsky.dev']
+export const hosts = ['bsky.app', 'deer.social', 'main.bsky.dev']
 
 // Images come off `cdn.bsky.app` today and off `cdn.bsky.social` in older records, both plain
 // paths with no signature and no expiry.
-const blueskyMediaHosts = ['bsky.app', 'bsky.social']
+const mediaHosts = ['bsky.app', 'bsky.social']
 
 // An AT URI addresses a record as `at://{authority}/{collection}/{rkey}`, and only the post
 // collection is embeddable. WHATWG url parsing is no use here: `at://did:plc:x/…` reads the
@@ -133,7 +133,7 @@ const findPostAnchor = (element: Element): Element | undefined => {
 
   // The last one: a media marker links the post too, and the date link is always later.
   for (const anchor of element.querySelectorAll('a[href]')) {
-    if (extractBlueskyPostFromUrl(parseUrlOnHosts(attr(anchor, 'href'), blueskyHosts))) {
+    if (extractBlueskyPostFromUrl(parseUrlOnHosts(attr(anchor, 'href'), hosts))) {
       found = anchor
     }
   }
@@ -178,7 +178,7 @@ const readPostText = (element: Element, postAnchor: Element | undefined): string
     const isMediaMarker =
       isElement(node) &&
       node.localName === 'a' &&
-      Boolean(extractBlueskyPostFromUrl(parseUrlOnHosts(attr(node, 'href'), blueskyHosts)))
+      Boolean(extractBlueskyPostFromUrl(parseUrlOnHosts(attr(node, 'href'), hosts)))
 
     if (!isMediaMarker) {
       body += node.textContent ?? ''
@@ -194,7 +194,7 @@ const readQuotedPost = (
   const postAnchor = findPostAnchor(element)
 
   return {
-    post: extractBlueskyPostFromUrl(parseUrlOnHosts(attr(postAnchor, 'href'), blueskyHosts)),
+    post: extractBlueskyPostFromUrl(parseUrlOnHosts(attr(postAnchor, 'href'), hosts)),
     fields: {
       description: readPostText(element, postAnchor),
       author: postAnchor && readAuthor(postAnchor),
@@ -241,17 +241,17 @@ const readSubstackPost = (element: Nullish<Element>): Partial<EmbedResolverResul
   return {
     description: attributes.text,
     author: composeAuthor(attributes.authorName, attributes.authorHandle),
-    avatar: parseUrlOnHosts(attributes.authorAvatarUrl, blueskyMediaHosts)
+    avatar: parseUrlOnHosts(attributes.authorAvatarUrl, mediaHosts)
       ? attributes.authorAvatarUrl
       : undefined,
-    thumbnail: parseUrlOnHosts(image, blueskyMediaHosts) ? image : undefined,
+    thumbnail: parseUrlOnHosts(image, mediaHosts) ? image : undefined,
     date: attributes.createdAt,
   }
 }
 
 // The embed.bsky.app player iframe, saved by a CMS that ran the script or pasted by hand.
 // A post has no name: its words go to `description`, and the frame's title is not read.
-export const blueskyIframeEmbedResolver = createUrlEmbedResolver(blueskyHosts, (url, element) => {
+export const blueskyIframeEmbedResolver = createUrlEmbedResolver(hosts, (url, element) => {
   const post = extractBlueskyPostFromUrl(url)
 
   if (!post) {

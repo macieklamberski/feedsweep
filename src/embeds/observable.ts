@@ -7,7 +7,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'observable'
 
-const observableHosts = ['observablehq.com']
+const hosts = ['observablehq.com']
 
 const versionSuffixRegex = /@[^@/]*$/
 
@@ -63,10 +63,7 @@ const observableResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const observableEmbedResolver = createUrlEmbedResolver(
-  observableHosts,
-  observableResolveEmbed,
-)
+export const observableEmbedResolver = createUrlEmbedResolver(hosts, observableResolveEmbed)
 
 // The notebook posts its rendered height unasked, again as each cell finishes.
 export const observableRenderHint: EmbedRenderHint = {

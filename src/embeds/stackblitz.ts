@@ -8,7 +8,7 @@ const provider = 'stackblitz'
 
 // `blog.stackblitz.com` and `developer.stackblitz.com` are prose, and a project's running preview
 // lives on `*.stackblitz.io`, so only the bare host and its `www.` spelling name a project.
-const stackblitzHosts = ['stackblitz.com', 'www.stackblitz.com']
+const hosts = ['stackblitz.com', 'www.stackblitz.com']
 
 const sizes = {
   // What the share dialog writes beside `width="100%"`.
@@ -27,7 +27,7 @@ type StackblitzTarget = {
 }
 
 const parseTarget = (value: URL | undefined): StackblitzTarget | undefined => {
-  const parsed = parseUrlOnHosts(value, stackblitzHosts, isHostOf)
+  const parsed = parseUrlOnHosts(value, hosts, isHostOf)
 
   if (!parsed) {
     return
@@ -72,7 +72,4 @@ export const stackblitzResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const stackblitzIframeEmbedResolver = createUrlEmbedResolver(
-  stackblitzHosts,
-  stackblitzResolveEmbed,
-)
+export const stackblitzIframeEmbedResolver = createUrlEmbedResolver(hosts, stackblitzResolveEmbed)

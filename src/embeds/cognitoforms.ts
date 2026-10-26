@@ -7,7 +7,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const provider = 'cognitoforms'
 
 // `services.cognitoforms.com` is the older embed host, and still serves the same forms.
-const cognitoformsHosts = ['www.cognitoforms.com', 'services.cognitoforms.com']
+const hosts = ['www.cognitoforms.com', 'services.cognitoforms.com']
 
 const seamlessPathRegex = /^\/f\/seamless\.js$/i
 // The loader's `Cognito.load` refuses any kind but `"forms"`, and mounts the form named by `id`.
@@ -49,7 +49,7 @@ export const cognitoformsResolveEmbed: ResolveUrlEmbed = (url) => {
 export const cognitoformsScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="cognitoforms.com/f/seamless.js" i][data-key][data-form]',
   (element) => {
-    const loader = parseUrlOnHosts(attr(element, 'src'), cognitoformsHosts)
+    const loader = parseUrlOnHosts(attr(element, 'src'), hosts)
     // Both come out of their attributes decoded, and both go into a path.
     const orgKey = encodePathSegment(attr(element, 'data-key') ?? '')
     const formNumber = encodePathSegment(attr(element, 'data-form') ?? '')
@@ -63,7 +63,7 @@ export const cognitoformsScriptEmbedResolver = createMarkupEmbedResolver(
 )
 
 export const cognitoformsIframeEmbedResolver = createUrlEmbedResolver(
-  cognitoformsHosts,
+  hosts,
   cognitoformsResolveEmbed,
 )
 
@@ -72,7 +72,7 @@ export const cognitoformsIframeEmbedResolver = createUrlEmbedResolver(
 export const cognitoformsWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.cognito',
   (element) => {
-    const loader = parseUrlOnHosts(attr(find(element, 'script[src]'), 'src'), cognitoformsHosts)
+    const loader = parseUrlOnHosts(attr(find(element, 'script[src]'), 'src'), hosts)
 
     if (!loader) {
       return

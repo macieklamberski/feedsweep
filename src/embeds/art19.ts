@@ -9,7 +9,7 @@ const sizes = {
   show: { height: 505 },
 }
 
-const art19Hosts = ['art19.com']
+const hosts = ['art19.com']
 
 // The server matches the route words and a slug show in their case only, and a uuid show and the
 // episode uuid in any case.
@@ -47,4 +47,4 @@ export const art19ResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const art19EmbedResolver = createUrlEmbedResolver(art19Hosts, art19ResolveEmbed)
+export const art19EmbedResolver = createUrlEmbedResolver(hosts, art19ResolveEmbed)

@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const provider = 'symbaloo'
 
 // Exact: `cdn01.symbaloo.com` serves files, and `blog.symbaloo.com` answers its index to any path.
-const symbalooHosts = ['symbaloo.com', 'www.symbaloo.com', 'edu.symbaloo.com']
+const hosts = ['symbaloo.com', 'www.symbaloo.com', 'edu.symbaloo.com']
 
 const sizes = {
   player: { height: 500 },
@@ -44,6 +44,6 @@ export const symbalooResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const symbalooEmbedResolver = createUrlEmbedResolver(symbalooHosts, symbalooResolveEmbed, {
+export const symbalooEmbedResolver = createUrlEmbedResolver(hosts, symbalooResolveEmbed, {
   isOnHost: isHostOf,
 })

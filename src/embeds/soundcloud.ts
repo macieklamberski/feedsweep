@@ -160,10 +160,10 @@ const classicPlayerHeights = toMap({
 // Any carrier, because the Flash player shipped the same `url=` reference on an `<embed>` and an
 // `<object>`: `player.soundcloud.com/player.swf?url=api.soundcloud.com/tracks/{id}`. The host
 // check the factory applies is what narrows it, so no player path is spelled in a selector.
-const soundcloudHosts = ['soundcloud.com']
+const hosts = ['soundcloud.com']
 
 const pageDepth = (anchor: Element | undefined): number => {
-  const page = parseUrlOnHosts(attr(anchor, 'href'), soundcloudHosts)
+  const page = parseUrlOnHosts(attr(anchor, 'href'), hosts)
 
   return page ? getPathSegments(page).length : 0
 }
@@ -201,7 +201,7 @@ const readSubstackTrack = (element: Nullish<Element>): Partial<EmbedResolverResu
 
 // Answers whether a url is SoundCloud's feed stream, the episode file named after its track.
 export const isSoundcloudStream = (url: string): boolean => {
-  const parsed = parseUrlOnHosts(url, soundcloudHosts)
+  const parsed = parseUrlOnHosts(url, hosts)
 
   return streamPathRegex.test(parsed?.pathname ?? '')
 }
@@ -234,8 +234,7 @@ const soundcloudResolveEmbed: ResolveUrlEmbed = (url, element) => {
   // What the carrier names when it holds no reference: the page itself, either inside the
   // widget's `url=` or as the whole src. A page states its kind in the path, which is enough to
   // size the player and to give the placeholder a url a reader can follow.
-  const page =
-    reference || streamTrackId ? undefined : parseUrlOnHosts(inner ?? url, soundcloudHosts)
+  const page = reference || streamTrackId ? undefined : parseUrlOnHosts(inner ?? url, hosts)
   const shortLink = page && shortLinkHostRegex.test(page.hostname) ? page : undefined
   const pageSegments = page && pageHostRegex.test(page.hostname) ? getPathSegments(page) : []
   const secretToken = pageSegments.find((segment) => secretTokenRegex.test(segment))
@@ -285,7 +284,7 @@ const soundcloudResolveEmbed: ResolveUrlEmbed = (url, element) => {
   // the title and the url before the block is deleted.
   const sibling = element?.nextElementSibling
   const anchors = Array.from(sibling?.querySelectorAll('a[href]') ?? []).filter((anchor) => {
-    const page = parseUrlOnHosts(attr(anchor, 'href'), soundcloudHosts)
+    const page = parseUrlOnHosts(attr(anchor, 'href'), hosts)
 
     return page && pageHostRegex.test(page.hostname)
   })
@@ -305,10 +304,7 @@ const soundcloudResolveEmbed: ResolveUrlEmbed = (url, element) => {
   return result
 }
 
-export const soundcloudEmbedResolver = createUrlEmbedResolver(
-  soundcloudHosts,
-  soundcloudResolveEmbed,
-)
+export const soundcloudEmbedResolver = createUrlEmbedResolver(hosts, soundcloudResolveEmbed)
 
 export const soundcloudFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'soundcloud' },

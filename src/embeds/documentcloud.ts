@@ -12,7 +12,7 @@ const sizes = {
 
 const legacyHosts = ['www.documentcloud.org']
 
-const documentcloudHosts = ['embed.documentcloud.org', ...legacyHosts]
+const hosts = ['embed.documentcloud.org', ...legacyHosts]
 
 // s3.documentcloud.org serves the page image under the slug in the exact case the path spells it.
 const documentSegmentRegex = /^(\d+)-(.+?)(\.html)?$/i
@@ -48,7 +48,7 @@ export const composeLoaderViewerUrl = (url: string | undefined): string | undefi
 // DocumentCloud's viewer iframe, `embed.documentcloud.org/documents/{id}-{slug}/`, and the older
 // `www.documentcloud.org/documents/{id}-{slug}.html`, which redirects to it. The carrier `title`
 // is the document's own name with `" (Hosted by DocumentCloud)"` appended, so it is left unread.
-export const documentcloudEmbedResolver = createUrlEmbedResolver(documentcloudHosts, (url) => {
+export const documentcloudEmbedResolver = createUrlEmbedResolver(hosts, (url) => {
   const isLegacyHost = isHostOf(url, legacyHosts)
   const [route, documentSegment, partSegment] = getPathSegments(url)
 

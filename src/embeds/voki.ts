@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const provider = 'voki'
 
 const flashHosts = ['vhss-a.oddcast.com', 'vhss-d.oddcast.com']
-const pickupHost = 'www.voki.com'
+const hosts = ['www.voki.com']
 
 const flashPlayerPathRegex = /^\/vhss_editors\/voki_player\.swf$/i
 const pickupPathRegex = /^\/site\/pickup\/?$/i
@@ -73,4 +73,4 @@ const vokiResolveEmbed: ResolveUrlEmbed = (url) => {
 
 // The share page `www.voki.com/site/pickup?scid={sc}&chsm={chsm}` in a frame, which
 // `rebuildVokiEmbeds` writes for the script embed.
-export const vokiIframeEmbedResolver = createUrlEmbedResolver([pickupHost], vokiResolveEmbed)
+export const vokiIframeEmbedResolver = createUrlEmbedResolver(hosts, vokiResolveEmbed)

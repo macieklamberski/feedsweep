@@ -14,7 +14,7 @@ const mountIdRegex = /^([^?]+)(?:\?(.*))?$/
 // The loader's script id, `infogram_{width}_{chart id}`.
 const scriptIdRegex = /^infogram_\d+_(.+)$/i
 
-const infogramHosts = [
+const hosts = [
   'e.infogram.com',
   'infogr.am', // The retired domain, `e.infogr.am` included
 ]
@@ -68,7 +68,7 @@ export const infogramWidgetEmbedResolver = createMarkupEmbedResolver(
 export const infogramScriptEmbedResolver = createMarkupEmbedResolver(
   'script[id^="infogram_" i]',
   (element) => {
-    if (!parseUrlOnHosts(attr(element, 'src'), infogramHosts)) {
+    if (!parseUrlOnHosts(attr(element, 'src'), hosts)) {
       return
     }
 
@@ -93,10 +93,7 @@ const infogramResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // The chart frame on either domain, and the retired `infogr.am/{id}` page.
-export const infogramIframeEmbedResolver = createUrlEmbedResolver(
-  infogramHosts,
-  infogramResolveEmbed,
-)
+export const infogramIframeEmbedResolver = createUrlEmbedResolver(hosts, infogramResolveEmbed)
 
 // The chart posts its rendered height unasked, again whenever its width changes it.
 export const infogramRenderHint: EmbedRenderHint = {

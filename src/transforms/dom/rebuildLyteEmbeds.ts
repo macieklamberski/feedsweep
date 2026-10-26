@@ -1,5 +1,10 @@
 import { encodePathSegment, getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import { composeEmbedUrl, extractVideoId, isVideoId, youtubeHosts } from '../../embeds/youtube.js'
+import {
+  composeEmbedUrl,
+  extractVideoId,
+  isVideoId,
+  hosts as youtubeHosts,
+} from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
 import {
   attr,

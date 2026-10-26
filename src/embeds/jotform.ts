@@ -8,7 +8,7 @@ const provider = 'jotform'
 
 // The page hosts only, since `files.jotform.com` and other subdomains serve uploads. Every
 // regional and legacy host serves the same form ids.
-const jotformHosts = [
+const hosts = [
   'form.jotform.co',
   'form.jotform.com',
   'form.jotform.me',
@@ -61,7 +61,7 @@ export const jotformResolveEmbed: ResolveUrlEmbed = (url) => {
 export const jotformScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="jotform" i][src*="/jsform/" i]',
   (element) => {
-    const loader = parseUrlOnHosts(attr(element, 'src'), jotformHosts)
+    const loader = parseUrlOnHosts(attr(element, 'src'), hosts)
     const formId = loader?.pathname.match(loaderPathRegex)?.[1]
 
     if (!loader || !formId) {
@@ -72,4 +72,4 @@ export const jotformScriptEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-export const jotformIframeEmbedResolver = createUrlEmbedResolver(jotformHosts, jotformResolveEmbed)
+export const jotformIframeEmbedResolver = createUrlEmbedResolver(hosts, jotformResolveEmbed)

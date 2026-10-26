@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'nbcnews'
 
-const nbcnewsHosts = ['nbcnews.com', 'today.com']
+const hosts = ['nbcnews.com', 'today.com']
 
 // NBC News and TODAY share one player and one `mmvo{digits}` id space. The widget route's bare
 // digits and the offsite route's trailing digits 301 onto `/embedded-video/mmvo{digits}`, so
@@ -72,7 +72,7 @@ const nbcnewsResolveEmbed: ResolveUrlEmbed = (url) => {
 // NBC News' own video player, nbcnews.com/news/embedded-video/mmvo{id} and the earlier
 // nbcnews.com/widget/video-embed/{id}, and the same player on today.com/today/embedded-video
 // and today.com/offsite/{slug}-{id}.
-export const nbcnewsEmbedResolver = createUrlEmbedResolver(nbcnewsHosts, nbcnewsResolveEmbed)
+export const nbcnewsEmbedResolver = createUrlEmbedResolver(hosts, nbcnewsResolveEmbed)
 
 export const nbcnewsRenderHint: EmbedRenderHint = {
   provider,

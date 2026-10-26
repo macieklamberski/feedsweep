@@ -12,7 +12,7 @@ const sizes = {
 
 // Exact: `cdn.mrcvideo.org` serves the video files. `mrctv.org` and `www.mrctv.org` 301 onto
 // `mrcvideo.org/embed/{same id}`.
-const mrcvideoHosts = ['mrcvideo.org', 'mrctv.org', 'www.mrctv.org']
+const hosts = ['mrcvideo.org', 'mrctv.org', 'www.mrctv.org']
 
 // The sharing snippet in the Flash player's flashvars lost the closing quote of its `src`.
 const sharingSrcRegex = /src="([^"\s]+)/
@@ -45,11 +45,11 @@ const readEmbedId = (url: URL | undefined): string | undefined => {
 const readSharingId = (element: Element | undefined): string | undefined => {
   const code = flashVar(element, 'sharing.code')
 
-  return readEmbedId(parseUrlOnHosts(code?.match(sharingSrcRegex)?.[1], mrcvideoHosts, isHostOf))
+  return readEmbedId(parseUrlOnHosts(code?.match(sharingSrcRegex)?.[1], hosts, isHostOf))
 }
 
 const readCallbackId = (element: Element | undefined): string | undefined => {
-  const parsed = parseUrlOnHosts(flashVar(element, 'yourlytics.callback'), mrcvideoHosts, isHostOf)
+  const parsed = parseUrlOnHosts(flashVar(element, 'yourlytics.callback'), hosts, isHostOf)
 
   return getQueryParam(parsed?.searchParams, 'nodeid')
 }
@@ -65,11 +65,9 @@ const mrcvideoResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 // MRC Video's embed iframe, `/embed/{id}`, on the current host and the former MRCTV ones.
-export const mrcvideoIframeEmbedResolver = createUrlEmbedResolver(
-  mrcvideoHosts,
-  mrcvideoResolveEmbed,
-  { isOnHost: isHostOf },
-)
+export const mrcvideoIframeEmbedResolver = createUrlEmbedResolver(hosts, mrcvideoResolveEmbed, {
+  isOnHost: isHostOf,
+})
 
 const mrcvideoFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const [directory, file, ...rest] = getPathSegments(url)
@@ -89,11 +87,9 @@ const mrcvideoFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
 // The former MRCTV JW Player Flash embed, dead since Flash. Its flashvars name an mp4 by file id,
 // and the node id the embed page takes only in the sharing snippet and the view callback.
-export const mrcvideoFlashEmbedResolver = createUrlEmbedResolver(
-  mrcvideoHosts,
-  mrcvideoFlashResolveEmbed,
-  { isOnHost: isHostOf },
-)
+export const mrcvideoFlashEmbedResolver = createUrlEmbedResolver(hosts, mrcvideoFlashResolveEmbed, {
+  isOnHost: isHostOf,
+})
 
 // The player calls `play()` when its query holds `autoplay`, whatever the value.
 export const mrcvideoRenderHint: EmbedRenderHint = {

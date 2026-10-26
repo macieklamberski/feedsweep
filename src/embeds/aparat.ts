@@ -10,7 +10,7 @@ const sizes = {
   player: { ratio: '16/9' },
 }
 
-const aparatHosts = ['aparat.com']
+const hosts = ['aparat.com']
 const scriptPathRegex = /^\/embed\/([^/]+)$/i
 const framePathRegex = /^\/video\/video\/embed\/videohash\/([^/]+)(?:\/vt\/frame)?\/?$/i
 
@@ -38,22 +38,19 @@ const aparatResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
 // Aparat's player iframe.
 export const aparatIframeEmbedResolver: EmbedResolver = createUrlEmbedResolver(
-  aparatHosts,
+  hosts,
   aparatResolveEmbed,
 )
 
 // Aparat's WordPress-style facade: a script inside an empty div that never runs in a reader.
 // Its src is `aparat.com/embed/{hash}`, usually with no companion iframe anywhere in the item.
 export const aparatScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="aparat.com/embed/" i]',
+  hosts.map((host) => `script[src*="${host}/embed/" i]`).join(', '),
   (element) => {
     // The selector guarantees the host substring is in the src, so only the host and the path
     // shape can reject here. The `data[rnddiv]` and `data[responsive]` query the facade carries
     // name the div the script would have written into, and say nothing about the video.
-    const videoHash = readVideoHash(
-      parseUrlOnHosts(attr(element, 'src'), aparatHosts),
-      scriptPathRegex,
-    )
+    const videoHash = readVideoHash(parseUrlOnHosts(attr(element, 'src'), hosts), scriptPathRegex)
 
     return videoHash ? composeEmbed(videoHash) : undefined
   },

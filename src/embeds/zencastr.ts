@@ -7,7 +7,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const provider = 'zencastr'
 
 // `zen.ai` 301s every zencastr.com path, the episode files on `redirect.zen.ai` included.
-const zencastrHosts = ['zencastr.com', 'zen.ai']
+const hosts = ['zencastr.com', 'zen.ai']
 
 const sizes = {
   // The carrier's box is a pixel square the snippet fixed, not a size the publisher chose.
@@ -40,7 +40,7 @@ export const zencastrResolveEmbed: ResolveUrlEmbed = (url) => {
 export const zencastrBlockquoteEmbedResolver = createMarkupEmbedResolver(
   'blockquote.zenplayer[data-episode-href]',
   (element) => {
-    const url = parseUrlOnHosts(attr(element, 'data-episode-href'), zencastrHosts)
+    const url = parseUrlOnHosts(attr(element, 'data-episode-href'), hosts)
 
     if (!url) {
       return
@@ -51,7 +51,4 @@ export const zencastrBlockquoteEmbedResolver = createMarkupEmbedResolver(
 )
 
 // A Zencastr episode player iframe, which renders on its own but names no poster or page.
-export const zencastrIframeEmbedResolver = createUrlEmbedResolver(
-  zencastrHosts,
-  zencastrResolveEmbed,
-)
+export const zencastrIframeEmbedResolver = createUrlEmbedResolver(hosts, zencastrResolveEmbed)

@@ -23,7 +23,7 @@ type Item = {
 
 const provider = 'arcgis'
 
-const arcgisHosts = ['arcgis.com']
+const hosts = ['arcgis.com']
 const portalHosts = ['arcgis.com', 'www.arcgis.com']
 // An organization's own host, `{org}.maps.arcgis.com`. It serves anonymous readers only when the
 // organization allows them, while the public host serves every public item.
@@ -213,7 +213,7 @@ export const arcgisResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const arcgisIframeEmbedResolver = createUrlEmbedResolver(arcgisHosts, arcgisResolveEmbed)
+export const arcgisIframeEmbedResolver = createUrlEmbedResolver(hosts, arcgisResolveEmbed)
 
 // The Embeddable Components map and the Maps SDK map, custom elements the `js.arcgis.com` loader
 // builds into a map, so they render nothing once the loader is stripped. `center` is longitude

@@ -17,12 +17,12 @@ const provider = 'audioboom'
 const postIdRegex = /^(\d+)(?:-[^.]*)?$/
 
 // `audioboo.fm` is the pre-rename host.
-const audioboomHosts = ['audioboom.com', 'audioboo.fm']
+const hosts = ['audioboom.com', 'audioboo.fm']
 
 // Audioboo's Flash players, on its own host and on its S3 bucket.
 const flashHosts = ['boos.audioboo.fm', 'abfiles.s3.amazonaws.com']
 // S3 serves a bucket path-style too, on its own host with the bucket as the first segment.
-const bucketHost = 's3.amazonaws.com'
+const bucketHosts = ['s3.amazonaws.com']
 
 // The `mp3` flashvar names the audio file, the post page with `.mp3` on its last segment.
 const mp3ExtensionRegex = /\.mp3(?=\?|$)/i
@@ -69,17 +69,14 @@ export const audioboomResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // Audioboom's player iframe, the full v4 player or the older compact bar.
-export const audioboomIframeEmbedResolver = createUrlEmbedResolver(
-  audioboomHosts,
-  audioboomResolveEmbed,
-)
+export const audioboomIframeEmbedResolver = createUrlEmbedResolver(hosts, audioboomResolveEmbed)
 
 // Audioboo's WordPress plugin: a div holding the player url, hydrated by a script the feed lacks.
 // `data-boourl` holds the same player url the iframe form holds.
 export const audioboomWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.ab-player[data-boourl]',
   (element) => {
-    const parsed = parseUrlOnHosts(attr(element, 'data-boourl'), audioboomHosts)
+    const parsed = parseUrlOnHosts(attr(element, 'data-boourl'), hosts)
 
     return parsed && audioboomResolveEmbed(parsed)
   },
@@ -89,14 +86,14 @@ export const audioboomWidgetEmbedResolver = createMarkupEmbedResolver(
 // page in `mp3LinkURL` or the audio file in `mp3`.
 const audioboomFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
   // Another bucket, path-style or on its own subdomain of S3's host, is not Audioboo's.
-  const bucket = url.hostname === bucketHost ? getPathSegments(url)[0] : url.hostname
+  const bucket = bucketHosts.includes(url.hostname) ? getPathSegments(url)[0] : url.hostname
 
   if (!bucket || !flashHosts.includes(bucket)) {
     return
   }
 
   const link = flashVar(element, 'mp3LinkURL') ?? flashVar(element, 'mp3')
-  const parsed = parseUrlOnHosts(link?.replace(mp3ExtensionRegex, ''), audioboomHosts)
+  const parsed = parseUrlOnHosts(link?.replace(mp3ExtensionRegex, ''), hosts)
 
   if (!parsed) {
     return
@@ -116,7 +113,7 @@ const audioboomFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 export const audioboomFlashEmbedResolver = createUrlEmbedResolver(
-  [...flashHosts, bucketHost],
+  [...flashHosts, ...bucketHosts],
   audioboomFlashResolveEmbed,
 )
 

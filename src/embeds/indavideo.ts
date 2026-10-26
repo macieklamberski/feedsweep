@@ -9,7 +9,7 @@ const sizes = {
   player: { ratio: '16/9' },
 }
 
-const indavideoHosts = ['indavideo.hu']
+const hosts = ['indavideo.hu']
 
 const playerPathRegex = /^\/player\/video\/([^/]+)\/?$/i
 
@@ -56,7 +56,7 @@ export const indavideoResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const indavideoEmbedResolver = createUrlEmbedResolver(indavideoHosts, indavideoResolveEmbed)
+export const indavideoEmbedResolver = createUrlEmbedResolver(hosts, indavideoResolveEmbed)
 
 export const indavideoFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'indavideo video player' },

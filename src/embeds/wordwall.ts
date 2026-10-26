@@ -11,13 +11,13 @@ const sizes = {
 }
 
 // `screens.cdn.wordwall.net` serves the activity images, so only the page hosts are claimed.
-const wordwallHosts = ['wordwall.net', 'www.wordwall.net']
+const hosts = ['wordwall.net', 'www.wordwall.net']
 
 // `templateId` picks the game the activity is played as, over the one the activity stores.
 const playParams = ['templateId']
 
 const extractActivityId = (link: URL): string | undefined => {
-  if (!isHostOf(link, wordwallHosts)) {
+  if (!isHostOf(link, hosts)) {
     return
   }
 
@@ -70,4 +70,4 @@ const wordwallResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const wordwallEmbedResolver = createUrlEmbedResolver(wordwallHosts, wordwallResolveEmbed)
+export const wordwallEmbedResolver = createUrlEmbedResolver(hosts, wordwallResolveEmbed)

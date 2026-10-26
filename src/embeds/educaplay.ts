@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'educaplay'
 
-const educaplayHosts = ['es.educaplay.com', 'fr.educaplay.com', 'www.educaplay.com']
+const hosts = ['es.educaplay.com', 'fr.educaplay.com', 'www.educaplay.com']
 
 // The game route in each language Educaplay serves it in.
 const gameRouteWords = [
@@ -65,4 +65,4 @@ const educaplayResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const educaplayEmbedResolver = createUrlEmbedResolver(educaplayHosts, educaplayResolveEmbed)
+export const educaplayEmbedResolver = createUrlEmbedResolver(hosts, educaplayResolveEmbed)

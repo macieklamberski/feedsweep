@@ -10,7 +10,7 @@ const provider = 'genially'
 // such as `genially.com/de`, whose name is hex too.
 const safeViewIdRegex = /^[0-9a-f]{24}$/i
 
-const geniallyHosts = ['genially.com', 'genial.ly']
+const hosts = ['genially.com', 'genial.ly']
 
 const sizes = {
   player: { ratio: '16/9' },
@@ -58,4 +58,4 @@ export const geniallyResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const geniallyEmbedResolver = createUrlEmbedResolver(geniallyHosts, geniallyResolveEmbed)
+export const geniallyEmbedResolver = createUrlEmbedResolver(hosts, geniallyResolveEmbed)

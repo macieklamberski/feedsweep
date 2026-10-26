@@ -27,7 +27,7 @@ import {
 const provider = 'instagram'
 
 // `instagr.am` is the short host the pre-2013 snippets still carry.
-const instagramHosts = ['instagram.com', 'instagr.am']
+const hosts = ['instagram.com', 'instagr.am']
 
 // `audio` sits where a shortcode does, under `/reels/audio/{id}`, and names a sound, not a post.
 const nonShortcodeSegments = ['audio']
@@ -92,23 +92,21 @@ const wrapperSelector = 'figure[data-provider="instagram"]'
 const readWrapperPost = (element: Element): Post | undefined => {
   const dataUrl = attr(element.closest(wrapperSelector), 'data-url')
 
-  return readPostUrl(parseUrlOnHosts(decodeSegment(dataUrl) ?? dataUrl, instagramHosts))
+  return readPostUrl(parseUrlOnHosts(decodeSegment(dataUrl) ?? dataUrl, hosts))
 }
 
 // Where the post is named, in the order the shapes provide it: the attribute the dialog writes,
 // then any anchor in the quote, which the pre-2018 versions and every sanitized copy leave as
 // the only trace.
 const findPost = (element: Element): Post | undefined => {
-  const declared = readPostUrl(
-    parseUrlOnHosts(attr(element, 'data-instgrm-permalink'), instagramHosts),
-  )
+  const declared = readPostUrl(parseUrlOnHosts(attr(element, 'data-instgrm-permalink'), hosts))
 
   if (declared) {
     return declared
   }
 
   for (const anchor of element.querySelectorAll('a[href]')) {
-    const post = readPostUrl(parseUrlOnHosts(attr(anchor, 'href'), instagramHosts))
+    const post = readPostUrl(parseUrlOnHosts(attr(anchor, 'href'), hosts))
 
     if (post) {
       return post
@@ -125,7 +123,7 @@ const bylineHandleRegex = /\(@([A-Za-z0-9_.]+)\)/
 
 const readProfileHandle = (element: Element): string | undefined => {
   for (const anchor of element.querySelectorAll('a[href]')) {
-    const parsed = parseUrlOnHosts(attr(anchor, 'href'), instagramHosts)
+    const parsed = parseUrlOnHosts(attr(anchor, 'href'), hosts)
 
     if (!parsed) {
       continue
@@ -287,10 +285,7 @@ export const instagramResolveEmbed: ResolveUrlEmbed = (url) => {
   return composeEmbed(post, url.pathname.toLowerCase().includes('/embed/captioned') === true)
 }
 
-export const instagramIframeEmbedResolver = createUrlEmbedResolver(
-  instagramHosts,
-  instagramResolveEmbed,
-)
+export const instagramIframeEmbedResolver = createUrlEmbedResolver(hosts, instagramResolveEmbed)
 
 // A forum's s9e MediaEmbed helper frame, naming the post's shortcode in its url fragment.
 export const instagramS9eEmbedResolver = createS9eEmbedResolver('instagram', (shortcode) => {

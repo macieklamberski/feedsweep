@@ -9,7 +9,7 @@ const sizes = {
   player: { height: 250 },
 }
 
-const zenoHosts = ['zeno.fm']
+const hosts = ['zeno.fm']
 
 // Zeno.FM's station widget, `zeno.fm/player/{slug}`. The widget reads the slug from the second
 // path segment and loads the station by it, case included, so a later segment changes nothing.
@@ -30,4 +30,4 @@ export const zenoResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const zenoEmbedResolver = createUrlEmbedResolver(zenoHosts, zenoResolveEmbed)
+export const zenoEmbedResolver = createUrlEmbedResolver(hosts, zenoResolveEmbed)

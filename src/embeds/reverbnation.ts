@@ -9,7 +9,7 @@ const sizes = {
   widget: { height: 265 },
 }
 
-const reverbnationHosts = ['reverbnation.com']
+const hosts = ['reverbnation.com']
 
 // Every widget names what it plays as a kind and a number: `artist_1018382`, `Playlist_957851`,
 // `Album_170738`, and the rarer `fan_` and `promoter_`. The kind is capitalised inconsistently by
@@ -80,10 +80,7 @@ export const reverbnationResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 // ReverbNation's html widget iframe and the Flash players under widgets/swf/ naming the same id.
-export const reverbnationEmbedResolver = createUrlEmbedResolver(
-  reverbnationHosts,
-  reverbnationResolveEmbed,
-)
+export const reverbnationEmbedResolver = createUrlEmbedResolver(hosts, reverbnationResolveEmbed)
 
 export const reverbnationRenderHint: EmbedRenderHint = {
   provider,

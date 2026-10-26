@@ -8,7 +8,7 @@ const sizes = {
   player: { ratio: '16/9' },
 }
 
-const allocineHosts = ['allocine.fr']
+const hosts = ['allocine.fr']
 
 // The server answers every route in lowercase only, so `src` mints the route words that way.
 const blogPlayerPathRegex = /^\/_video\/iblogvision\.aspx$/i
@@ -46,4 +46,4 @@ export const allocineResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const allocineEmbedResolver = createUrlEmbedResolver(allocineHosts, allocineResolveEmbed)
+export const allocineEmbedResolver = createUrlEmbedResolver(hosts, allocineResolveEmbed)

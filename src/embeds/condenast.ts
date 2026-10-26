@@ -5,7 +5,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'condenast'
 
-const condenastHosts = ['player.cnevids.com', 'player-backend.cnevids.com']
+const hosts = ['player.cnevids.com', 'player-backend.cnevids.com']
 
 // The loader's own url grammar, with the route words in the only case the server answers.
 // `/script/video/{id}.js`, `/iframe/video/{id}` and `/embedjs/{player}/video/{id}.js` end in
@@ -35,16 +35,13 @@ export const condenastResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const condenastIframeEmbedResolver = createUrlEmbedResolver(
-  condenastHosts,
-  condenastResolveEmbed,
-)
+export const condenastIframeEmbedResolver = createUrlEmbedResolver(hosts, condenastResolveEmbed)
 
 // The script embed, which writes a frame with no `src` and renders nothing in a feed.
 export const condenastScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="cnevids.com/" i]',
   (element) => {
-    const url = parseUrlOnHosts(attr(element, 'src'), condenastHosts)
+    const url = parseUrlOnHosts(attr(element, 'src'), hosts)
 
     if (!url) {
       return

@@ -11,7 +11,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'npr'
 
-const nprHosts = ['www.npr.org']
+const hosts = ['www.npr.org']
 
 const sizes = {
   story: { height: 290 },
@@ -99,6 +99,6 @@ export const nprFlashResolveEmbed: ResolveUrlEmbed = (url) => {
   return composeEmbed(encodePathSegment(storyId), encodePathSegment(mediaId))
 }
 
-export const nprFlashEmbedResolver = createUrlEmbedResolver(nprHosts, nprFlashResolveEmbed)
+export const nprFlashEmbedResolver = createUrlEmbedResolver(hosts, nprFlashResolveEmbed)
 
-export const nprIframeEmbedResolver = createUrlEmbedResolver(nprHosts, nprResolveEmbed)
+export const nprIframeEmbedResolver = createUrlEmbedResolver(hosts, nprResolveEmbed)

@@ -6,7 +6,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'speakerdeck'
 
-const speakerdeckHosts = ['speakerdeck.com']
+const hosts = ['speakerdeck.com']
 
 const sizes = {
   player: { ratio: '16/9' },
@@ -60,9 +60,9 @@ export const speakerdeckScriptEmbedResolver = createMarkupEmbedResolver(
 // Speaker Deck's first embed code, a script whose `document.write` emits the `data-id` script
 // above with the same deck id.
 export const speakerdeckLegacyScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="speakerdeck.com/embed/" i]',
+  hosts.map((host) => `script[src*="${host}/embed/" i]`).join(', '),
   (element) => {
-    const url = parseUrlOnHosts(attr(element, 'src'), speakerdeckHosts)
+    const url = parseUrlOnHosts(attr(element, 'src'), hosts)
     const deckId = url?.pathname.match(legacyScriptPathRegex)?.[1]
 
     if (!deckId) {
@@ -88,10 +88,7 @@ export const speakerdeckResolveEmbed: ResolveUrlEmbed = (url, element) => {
   return composeEmbed(deckId, { slide, title: attr(element, 'title') })
 }
 
-export const speakerdeckIframeEmbedResolver = createUrlEmbedResolver(
-  speakerdeckHosts,
-  speakerdeckResolveEmbed,
-)
+export const speakerdeckIframeEmbedResolver = createUrlEmbedResolver(hosts, speakerdeckResolveEmbed)
 
 export const speakerdeckFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'null' },

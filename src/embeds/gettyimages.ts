@@ -11,7 +11,7 @@ const sizes = {
 // The asset id Getty calls `items`, and the opaque embed token it calls `et`.
 const embedPathRegex = /^\/embed\/([^/]+)\/?$/i
 
-const gettyImagesHosts = ['gettyimages.com']
+const hosts = ['gettyimages.com']
 
 type WidgetConfig = {
   items: string
@@ -51,10 +51,7 @@ const gettyImagesResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 // Getty's player iframe, `embed.gettyimages.com/embed/{id}` signed for one publisher in its query.
-export const gettyImagesEmbedResolver = createUrlEmbedResolver(
-  gettyImagesHosts,
-  gettyImagesResolveEmbed,
-)
+export const gettyImagesEmbedResolver = createUrlEmbedResolver(hosts, gettyImagesResolveEmbed)
 
 // The config is a JavaScript object literal, not JSON, with unquoted keys and free spacing around
 // the values, `items: '674950774' ,`.

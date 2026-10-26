@@ -11,7 +11,7 @@ import {
 
 const provider = 'reddit'
 
-const redditHosts = ['reddit.com', 'redditmedia.com']
+const hosts = ['reddit.com', 'redditmedia.com']
 
 // A removed account's byline links `/user/[deleted]/`, which names nobody.
 const deletedAccountNames = ['[deleted]', '%5Bdeleted%5D']
@@ -90,7 +90,7 @@ const parseTarget = (value: URL | undefined): RedditTarget | undefined => {
 
 // A profile link, which names the poster and nothing embeddable.
 const parseAuthor = (value: string | undefined): string | undefined => {
-  const [segment, name, rest] = parseRedditPath(parseUrlOnHosts(value, redditHosts)) ?? []
+  const [segment, name, rest] = parseRedditPath(parseUrlOnHosts(value, hosts)) ?? []
 
   if (
     readScope(segment) !== 'user' ||
@@ -127,7 +127,7 @@ const readWidget = (element: Element): EmbedResolverResult | undefined => {
 
   for (const anchor of element.querySelectorAll('a[href]')) {
     const href = attr(anchor, 'href')
-    const anchorTarget = parseTarget(parseUrlOnHosts(href, redditHosts))
+    const anchorTarget = parseTarget(parseUrlOnHosts(href, hosts))
 
     target ??= anchorTarget
 
@@ -168,7 +168,7 @@ export const redditResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
 // The embed.reddit.com frame the loader builds, kept by exports that stored the rendered page.
 // redditmedia.com redirects to embed.reddit.com path for path.
-export const redditIframeEmbedResolver = createUrlEmbedResolver(redditHosts, redditResolveEmbed)
+export const redditIframeEmbedResolver = createUrlEmbedResolver(hosts, redditResolveEmbed)
 
 // A forum's s9e MediaEmbed helper frame, naming the post as `{subreddit}/comments/{id}` in its
 // url fragment.

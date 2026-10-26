@@ -9,7 +9,7 @@ const sizes = {
   player: { ratio: '16/9' },
 }
 
-const subsplashHosts = ['subsplash.com']
+const hosts = ['subsplash.com']
 
 const leadingPlusRegex = /^\+/
 
@@ -66,4 +66,4 @@ export const subsplashResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const subsplashEmbedResolver = createUrlEmbedResolver(subsplashHosts, subsplashResolveEmbed)
+export const subsplashEmbedResolver = createUrlEmbedResolver(hosts, subsplashResolveEmbed)

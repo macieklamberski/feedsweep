@@ -4,7 +4,7 @@ import { describeForEachParser, html } from '../tests.js'
 
 describeForEachParser('YouTube', (parseHtml) => {
   // The widest spread. youtubeIframeEmbedResolver and youtubeAmpEmbedResolver claim the
-  // carriers and amp-youtube elements (youtubeHosts includes youtube.googleapis.com, the
+  // carriers and amp-youtube elements (its hosts include youtube.googleapis.com, the
   // Flash-era host Blogger feeds still ship), and youtubeFc2EmbedResolver claims the FC2 blog
   // player shell. Each plugin facade has its own rebuild:
   // rebuildLazyYtEmbeds, rebuildLyteEmbeds, rebuildRocketYoutubePreviews,

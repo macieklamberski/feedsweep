@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ourworldindata'
 
-const ourworldindataHosts = ['ourworldindata.org']
+const hosts = ['ourworldindata.org']
 
 // The site serves the route words in lowercase only, and answers 404 to `/GRAPHER/{slug}`.
 const chartPathRegex = /^\/(grapher|explorers)\/([^/]+)$/i
@@ -79,7 +79,4 @@ const ourworldindataResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const ourworldindataEmbedResolver = createUrlEmbedResolver(
-  ourworldindataHosts,
-  ourworldindataResolveEmbed,
-)
+export const ourworldindataEmbedResolver = createUrlEmbedResolver(hosts, ourworldindataResolveEmbed)

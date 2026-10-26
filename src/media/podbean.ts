@@ -4,7 +4,7 @@ import { paramValue } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { readRepairedCarrierUrl } from '../utils/widgets.js'
 
-const podbeanHosts = ['podbean.com']
+const hosts = ['podbean.com']
 const playerRoute = 'podcast-audio-video-blog-player'
 
 // Podbean's Flash mp3 player, an `<embed>` or `<object>` whose swf query names the file in
@@ -24,7 +24,7 @@ export const podbeanFlashMediaResolver: MediaResolver = {
       playerUrl = paramValue(element, 'movie')
     }
 
-    const player = parseUrlOnHosts(playerUrl, podbeanHosts)
+    const player = parseUrlOnHosts(playerUrl, hosts)
 
     if (!player || !isAnyOf(getPathSegments(player)[0], playerRoute)) {
       return

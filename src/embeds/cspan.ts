@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'cspan'
 
-const cspanHosts = ['c-span.org']
+const hosts = ['c-span.org']
 
 const sizes = {
   player: { ratio: '16/9' },
@@ -42,4 +42,4 @@ export const cspanResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const cspanEmbedResolver = createUrlEmbedResolver(cspanHosts, cspanResolveEmbed)
+export const cspanEmbedResolver = createUrlEmbedResolver(hosts, cspanResolveEmbed)

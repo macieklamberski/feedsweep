@@ -6,7 +6,7 @@ const provider = 'geogebra'
 
 // Listed exactly, not by subdomain: tube.geogebra.org no longer resolves and its numeric ids
 // do not map onto the current materials.
-const geogebraHosts = ['geogebra.org', 'www.geogebra.org']
+const hosts = ['geogebra.org', 'www.geogebra.org']
 
 const sizes = {
   // The iframe lays the applet out at 800 by 600 when the path names no width and height, and
@@ -87,6 +87,6 @@ export const geogebraResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const geogebraEmbedResolver = createUrlEmbedResolver(geogebraHosts, geogebraResolveEmbed, {
+export const geogebraEmbedResolver = createUrlEmbedResolver(hosts, geogebraResolveEmbed, {
   isOnHost: isHostOf,
 })

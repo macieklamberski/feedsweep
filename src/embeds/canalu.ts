@@ -6,7 +6,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const provider = 'canalu'
 
 // The apex has no DNS, and `vod.canal-u.tv` serves the video files.
-const canaluHosts = ['www.canal-u.tv']
+const hosts = ['www.canal-u.tv']
 
 const sizes = {
   player: { ratio: '16/9' },
@@ -50,4 +50,4 @@ export const canaluResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const canaluEmbedResolver = createUrlEmbedResolver(canaluHosts, canaluResolveEmbed)
+export const canaluEmbedResolver = createUrlEmbedResolver(hosts, canaluResolveEmbed)

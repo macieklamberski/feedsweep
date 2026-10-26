@@ -15,7 +15,7 @@ import {
 
 const provider = 'archive'
 
-export const archiveHosts = ['archive.org']
+export const hosts = ['archive.org']
 
 // Not `download`: that route serves the files themselves.
 // `stream` is the retired BookReader url, and it 302s to `details/{identifier}?view=theater`.
@@ -39,7 +39,7 @@ const readSegmentParts = (url: URL | undefined): SegmentParts => {
 }
 
 export const extractArchiveIdentifier = (link: string): string | undefined => {
-  const { head } = readSegmentParts(parseUrlOnHosts(link, archiveHosts))
+  const { head } = readSegmentParts(parseUrlOnHosts(link, hosts))
 
   if (!head) {
     return
@@ -118,7 +118,7 @@ export const archiveResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // The Internet Archive's player iframe, which renders on its own but names no poster or page link.
-export const archiveIframeEmbedResolver = createUrlEmbedResolver(archiveHosts, archiveResolveEmbed)
+export const archiveIframeEmbedResolver = createUrlEmbedResolver(hosts, archiveResolveEmbed)
 
 // A WordPress audio block or a hand-written `<audio>` naming the item's page, which no browser
 // plays. An element that also names a file under `download` or on a storage host plays that.
@@ -132,7 +132,7 @@ export const archiveAudioEmbedResolver = createMarkupEmbedResolver('audio', (ele
       continue
     }
 
-    const url = parseUrlOnHosts(src, archiveHosts)
+    const url = parseUrlOnHosts(src, hosts)
     const embed = url && readItemEmbed(url)
 
     if (!embed) {
@@ -182,10 +182,7 @@ const namesAudioFile = (config: string): boolean => {
 
 // The XSPF player loads `audio/xspf-maker.php?identifier={identifier}`, a playlist of the item.
 const readXspfPlayer = (player: URL): EmbedResolverResult | undefined => {
-  const playlist = parseUrlOnHosts(
-    getQueryParam(player.searchParams, 'playlist_url') ?? '',
-    archiveHosts,
-  )
+  const playlist = parseUrlOnHosts(getQueryParam(player.searchParams, 'playlist_url'), hosts)
   const identifier = getQueryParam(playlist?.searchParams, 'identifier')
 
   if (!identifier) {
@@ -198,7 +195,7 @@ const readXspfPlayer = (player: URL): EmbedResolverResult | undefined => {
 
 // The `soundFile` flashvar names one file of an item that can hold hundreds, so the file is kept.
 const readItemPlayer = (element: Element | undefined): EmbedResolverResult | undefined => {
-  const soundFile = parseUrlOnHosts(flashVar(element, 'soundFile'), archiveHosts)
+  const soundFile = parseUrlOnHosts(flashVar(element, 'soundFile'), hosts)
   const [, identifier, file] = soundFile?.pathname.match(itemFilePathRegex) ?? []
 
   if (!identifier) {
@@ -240,10 +237,7 @@ const archiveFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
 // The archive's retired Flash players: Flowplayer, which names its item only in the Flash config,
 // the XSPF audio player and the WordPress audio player swf an item hosts.
-export const archiveFlashEmbedResolver = createUrlEmbedResolver(
-  archiveHosts,
-  archiveFlashResolveEmbed,
-)
+export const archiveFlashEmbedResolver = createUrlEmbedResolver(hosts, archiveFlashResolveEmbed)
 
 export const archiveFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'Embedded digital audio resource' },

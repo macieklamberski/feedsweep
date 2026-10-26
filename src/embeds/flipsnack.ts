@@ -1,12 +1,12 @@
-import { composeQuery, getQueryParam, isAnyOf } from 'trousse'
+import { composeQuery, getQueryParam, isAnyOf, isHostOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'flipsnack'
 
-const flipsnackHosts = ['cdn.flipsnack.com', 'files.flipsnack.com', 'player.flipsnack.com']
-const playerHost = 'player.flipsnack.com'
+const hosts = ['cdn.flipsnack.com', 'files.flipsnack.com', 'player.flipsnack.com']
+const playerHosts = ['player.flipsnack.com']
 
 // The routes that name the item hash in `hash`, on `cdn.flipsnack.com` and `files.flipsnack.com`.
 const itemHashPaths = [
@@ -30,7 +30,7 @@ const decodePlayerHash = (hash: string): string | undefined => {
 const readItemHash = (parsed: URL): string | undefined => {
   const hash = getQueryParam(parsed.searchParams, 'hash') ?? ''
 
-  if (parsed.hostname === playerHost) {
+  if (isHostOf(parsed, playerHosts)) {
     if (parsed.pathname !== '/') {
       return
     }
@@ -63,4 +63,4 @@ const flipsnackResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const flipsnackEmbedResolver = createUrlEmbedResolver(flipsnackHosts, flipsnackResolveEmbed)
+export const flipsnackEmbedResolver = createUrlEmbedResolver(hosts, flipsnackResolveEmbed)

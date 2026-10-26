@@ -6,7 +6,7 @@ import { absoluteUrlRegex, parseUrlOnHosts } from '../utils/urls.js'
 
 const provider = 'nytimes'
 
-const cardHost = 'nytimes.com'
+const hosts = ['nytimes.com']
 const cardPath = '/svc/oembed/html/'
 const articleBaseUrl = 'https://www.nytimes.com'
 
@@ -17,7 +17,7 @@ export const nytimesCiteResolver: CiteResolver = {
   kind: 'cite',
   selector: `iframe[src*="nytimes.com${cardPath}" i]`,
   extract: (element) => {
-    const card = parseUrlOnHosts(attr(element, 'src'), cardHost)
+    const card = parseUrlOnHosts(attr(element, 'src'), hosts)
 
     if (!card || !isAnyOf(card.pathname, cardPath)) {
       return

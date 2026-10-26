@@ -1,12 +1,12 @@
 import { getPathSegments, isAnyOf } from 'trousse'
 import { parseUrlOnHosts } from '../utils/urls.js'
 
-const jsfiddleHosts = ['jsfiddle.net']
+const hosts = ['jsfiddle.net']
 
 // Every embed spelling redirects onto the fiddle's own page, which allows framing, so that page
 // is what the loader gets rebuilt onto.
 export const composeFiddleUrl = (url: string | undefined): string | undefined => {
-  const parsed = parseUrlOnHosts(url, jsfiddleHosts)
+  const parsed = parseUrlOnHosts(url, hosts)
   const segments = parsed ? getPathSegments(parsed) : []
   // The loader path is `/{author}/{slug}/{version}/embed/{panels}/`, with the author and the
   // version each optional.

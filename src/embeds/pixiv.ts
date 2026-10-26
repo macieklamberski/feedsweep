@@ -8,7 +8,7 @@ const provider = 'pixiv'
 
 const loaderHosts = ['source.pixiv.net', 's.pximg.net']
 const frameHosts = ['embed.pixiv.net']
-const pixivHosts = ['pixiv.net']
+const pageHosts = ['pixiv.net']
 
 // A work id is the illustration's number and an upload hash. The endpoint keys on the number.
 const illustIdRegex = /^(\d+)(?:_[0-9a-f]+)?$/
@@ -34,7 +34,7 @@ const composeFrameUrl = (illustId: string): string => {
 
 const findAnchor = (anchors: Array<Element>, pathRegex: RegExp): Element | undefined => {
   return anchors.find((anchor) => {
-    const url = parseUrlOnHosts(attr(anchor, 'href'), pixivHosts)
+    const url = parseUrlOnHosts(attr(anchor, 'href'), pageHosts)
 
     return url && pathRegex.test(url.pathname)
   })
@@ -70,7 +70,7 @@ const pixivResolveEmbed: ResolveUrlEmbed = (url) => {
 // and the author. The loader writes a frame onto `embed.pixiv.net/embed_mk2.php`, and the result
 // mints the frame pixiv's oEmbed answer names for the same work.
 export const pixivScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="source.pixiv.net/source/embed.js" i][data-id], script[src*="s.pximg.net/source/embed.js" i][data-id]',
+  loaderHosts.map((host) => `script[src*="${host}/source/embed.js" i][data-id]`).join(', '),
   (element) => {
     const workId = attr(element, 'data-id')
     const size = attr(element, 'data-size') ?? ''
@@ -104,7 +104,7 @@ export const pixivScriptEmbedResolver = createMarkupEmbedResolver(
     // A block holding any anchor off pixiv is another publisher's markup and is neither read nor
     // removed.
     const isPixivBlock = anchors.every((anchor) => {
-      return parseUrlOnHosts(attr(anchor, 'href'), pixivHosts)
+      return parseUrlOnHosts(attr(anchor, 'href'), pageHosts)
     })
     const work = isPixivBlock ? findAnchor(anchors, workPathRegex) : undefined
     const result: EmbedResolverResult = {

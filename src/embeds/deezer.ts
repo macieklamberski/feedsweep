@@ -6,7 +6,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'deezer'
 
-const deezerHosts = ['deezer.com']
+const hosts = ['deezer.com']
 
 // No artist: the widget answers 200 for one and renders nothing.
 // The widget fills the box it is given at every width, so these are the heights publishers write.
@@ -97,7 +97,7 @@ export const deezerResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
 // Deezer's widget iframe, the plugin player that redirects to it, and the Flash swfs, which
 // play nothing today.
-export const deezerEmbedResolver = createUrlEmbedResolver(deezerHosts, deezerResolveEmbed)
+export const deezerEmbedResolver = createUrlEmbedResolver(hosts, deezerResolveEmbed)
 
 export const deezerFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'deezer-widget' },

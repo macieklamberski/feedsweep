@@ -5,14 +5,14 @@ import { attr, find, text } from '../utils/dom.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 
 const provider = 'hatena'
-const cardHost = 'hatenablog-parts.com'
+const hosts = ['hatenablog-parts.com']
 
 // The iframe's class is not dependable: embed-card is the common spelling, and the rest ship
 // hatenablogcard, wp-embedded-content, a theme's own class, or nothing at all.
 const cardIframeSelector = [
   'iframe.embed-card',
   'iframe.hatenablogcard',
-  `iframe[src*="${cardHost}/embed" i]`,
+  ...hosts.map((host) => `iframe[src*="${host}/embed" i]`),
 ].join(', ')
 
 // A host list misses this: a blog on a custom domain serves its own card from that domain.
@@ -40,7 +40,7 @@ export const hatenaCiteResolver: CiteResolver = {
     const citation = sibling?.matches('cite.hatena-citation') ? sibling : undefined
     const citationLink = find(citation, 'a')
     const citationHref = attr(citationLink, 'href')
-    const cardUrl = parseUrlOnHosts(source, cardHost)
+    const cardUrl = parseUrlOnHosts(source, hosts)
 
     // A foreign player carrying the class would become a cite.
     if (!cardUrl && !isSelfHosted(source, citationHref)) {

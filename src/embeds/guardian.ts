@@ -6,7 +6,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'guardian'
 
-const guardianHosts = ['embed.theguardian.com']
+const hosts = ['embed.theguardian.com']
 
 // `/embed/video/{section}/video/{yyyy}/{mon}/{dd}/{slug}`.
 // The video's page is the same path on `www`, and a real path answers 200 where a fabricated
@@ -73,31 +73,25 @@ export const guardianResolveEmbed: ResolveUrlEmbed = (url) => {
 
 // The Guardian's video player iframe, `embed.theguardian.com/embed/video/{path}`, whose path is the
 // video page's own.
-export const guardianIframeEmbedResolver = createUrlEmbedResolver(
-  guardianHosts,
-  guardianResolveEmbed,
-)
+export const guardianIframeEmbedResolver = createUrlEmbedResolver(hosts, guardianResolveEmbed)
 
-const guardianFlashHosts = ['guardian.co.uk', 'theguardian.com']
+const flashHosts = ['guardian.co.uk', 'theguardian.com']
 const flashPlayerPathRegex = /^\/video\/embed\/?$/i
 const endpointPathRegex = /^(?<path>\/.+)\/json$/i
 
 // The retired Flash player, `guardian.co.uk/video/embed`, names the video in its `endpoint`
 // flashvar, `{page}/json`, and the page's path plays on today's player.
-export const guardianFlashEmbedResolver = createUrlEmbedResolver(
-  guardianFlashHosts,
-  (url, element) => {
-    if (!flashPlayerPathRegex.test(url.pathname)) {
-      return
-    }
+export const guardianFlashEmbedResolver = createUrlEmbedResolver(flashHosts, (url, element) => {
+  if (!flashPlayerPathRegex.test(url.pathname)) {
+    return
+  }
 
-    const endpoint = parseUrlOnHosts(flashVar(element, 'endpoint'), guardianFlashHosts)
-    const path = endpoint?.pathname.match(endpointPathRegex)?.groups?.path
+  const endpoint = parseUrlOnHosts(flashVar(element, 'endpoint'), flashHosts)
+  const path = endpoint?.pathname.match(endpointPathRegex)?.groups?.path
 
-    if (!path) {
-      return
-    }
+  if (!path) {
+    return
+  }
 
-    return guardianResolveEmbed(new URL(`https://embed.theguardian.com/embed/video${path}`))
-  },
-)
+  return guardianResolveEmbed(new URL(`https://embed.theguardian.com/embed/video${path}`))
+})

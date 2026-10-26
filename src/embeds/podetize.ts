@@ -6,7 +6,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'podetize'
 
-const podetizeHosts = ['player.podetize.com']
+const hosts = ['player.podetize.com']
 
 const sizes = {
   // Fluid in width and fixed in height: every iframe the corpus carries states 200, which is
@@ -41,12 +41,12 @@ export const podetizeResolveEmbed: ResolveUrlEmbed = (url) => {
 
 // Podetize's ShowCastR loader script mounts the player where it stands, and a reader strips it.
 export const podetizeScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="player.podetize.com/loadShowcasePlayer.js" i][data]',
+  hosts.map((host) => `script[src*="${host}/loadShowcasePlayer.js" i][data]`).join(', '),
   (element) => {
     const id = attr(element, 'data')
 
     // The selector matches a substring any host can carry, so the host is checked here.
-    if (!parseUrlOnHosts(attr(element, 'src'), podetizeHosts) || !id) {
+    if (!parseUrlOnHosts(attr(element, 'src'), hosts) || !id) {
       return
     }
 
@@ -55,7 +55,4 @@ export const podetizeScriptEmbedResolver = createMarkupEmbedResolver(
 )
 
 // The player.podetize.com iframe, carrying the episode id and mode as query parameters.
-export const podetizeIframeEmbedResolver = createUrlEmbedResolver(
-  podetizeHosts,
-  podetizeResolveEmbed,
-)
+export const podetizeIframeEmbedResolver = createUrlEmbedResolver(hosts, podetizeResolveEmbed)

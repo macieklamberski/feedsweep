@@ -8,7 +8,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const provider = '123formbuilder'
 
 // 123ContactForm is the platform's former name, and its host still serves the same form ids.
-const oneTwoThreeFormBuilderHosts = ['123formbuilder.com', '123contactform.com']
+const hosts = ['123formbuilder.com', '123contactform.com']
 
 const loaderPathRegex = /^\/embed\/([^/]+)\.js$/i
 const formPathRegex = /^\/(\d+)\/?$/
@@ -39,9 +39,9 @@ export const oneTwoThreeFormBuilderResolveEmbed: ResolveUrlEmbed = (url) => {
 // The inline form, written in place by `/embed/{id}.js`, a script the pipeline drops. The frame
 // the loader writes carries the host page's address in `ref`, so the form page is minted instead.
 export const oneTwoThreeFormBuilderScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="123formbuilder.com/embed/" i], script[src*="123contactform.com/embed/" i]',
+  hosts.map((host) => `script[src*="${host}/embed/" i]`).join(', '),
   (element) => {
-    const loader = parseUrlOnHosts(attr(element, 'src'), oneTwoThreeFormBuilderHosts)
+    const loader = parseUrlOnHosts(attr(element, 'src'), hosts)
     const formId = loader?.pathname.match(loaderPathRegex)?.[1]
 
     if (!loader || !formId) {
@@ -62,7 +62,7 @@ export const oneTwoThreeFormBuilderScriptEmbedResolver = createMarkupEmbedResolv
 )
 
 export const oneTwoThreeFormBuilderIframeEmbedResolver = createUrlEmbedResolver(
-  oneTwoThreeFormBuilderHosts,
+  hosts,
   oneTwoThreeFormBuilderResolveEmbed,
 )
 

@@ -4,7 +4,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'br'
 
-const brHost = 'br.de'
+const hosts = ['br.de']
 
 const sizes = {
   player: { ratio: '16/9' },
@@ -35,7 +35,7 @@ const brResolveEmbed: ResolveUrlEmbed = (url) => {
 // BR's Mediathek player, framed as `br.de/mediathek/embed/{slug}av:{id}`. The podcast sibling on
 // `/mediathek/podcast/embed` redirects onto the podcast index for a real episode, a fabricated
 // one and no episode at all, so an episode id addresses nothing and stays unresolved.
-export const brEmbedResolver = createUrlEmbedResolver([brHost], brResolveEmbed)
+export const brEmbedResolver = createUrlEmbedResolver(hosts, brResolveEmbed)
 
 export const brRenderHint: EmbedRenderHint = {
   provider,

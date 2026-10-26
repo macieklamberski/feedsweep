@@ -20,9 +20,9 @@ const sizes = {
 // The embed routes are the site's own. `scribdassets.com` served the Flash player and serves the
 // document images beside it, `img/document/{id}/…` among them, so only the Flash resolver takes
 // it: read as an embed those images mint a player over a picture the feed attached.
-const scribdHosts = ['scribd.com']
+const hosts = ['scribd.com']
 // scribdassets.com serves img/document/{id}/ images too, which would read here as documents.
-const scribdFlashHosts = [...scribdHosts, 'scribdassets.com']
+const flashHosts = [...hosts, 'scribdassets.com']
 
 const documentIdMarkers = ['embeds', 'document', 'doc']
 
@@ -76,7 +76,7 @@ export const scribdResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // Scribd's player iframe, /embeds/{id}/content.
-export const scribdIframeEmbedResolver = createUrlEmbedResolver(scribdHosts, scribdResolveEmbed)
+export const scribdIframeEmbedResolver = createUrlEmbedResolver(hosts, scribdResolveEmbed)
 
 export const scribdFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
   if (!flashPlayerPathRegex.test(url.pathname)) {
@@ -95,7 +95,4 @@ export const scribdFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // Scribd's Flash viewer, scribdviewer.swf, dead since 2020 and naming its document in document_id.
-export const scribdFlashEmbedResolver = createUrlEmbedResolver(
-  scribdFlashHosts,
-  scribdFlashResolveEmbed,
-)
+export const scribdFlashEmbedResolver = createUrlEmbedResolver(flashHosts, scribdFlashResolveEmbed)

@@ -4,7 +4,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'patronite'
 
-const patroniteHosts = ['patronite.pl']
+const hosts = ['patronite.pl']
 
 const sizes = {
   // The widget card stays this tall at any width from 300 up.
@@ -29,4 +29,4 @@ export const patroniteResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const patroniteEmbedResolver = createUrlEmbedResolver(patroniteHosts, patroniteResolveEmbed)
+export const patroniteEmbedResolver = createUrlEmbedResolver(hosts, patroniteResolveEmbed)

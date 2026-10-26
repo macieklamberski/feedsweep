@@ -9,7 +9,7 @@ const provider = 'formmailer'
 
 // The host is part of the form's address: `pro` serves the paid plan's forms, and a form id
 // answers 404 on the other host.
-const formmailerHosts = ['ssl.form-mailer.jp', 'pro.form-mailer.jp']
+const hosts = ['ssl.form-mailer.jp', 'pro.form-mailer.jp']
 
 // The form reads any field name off its query as a prefill, such as `タイトル[0]`, so the query
 // goes to the frame as the carrier sends it. `errorScroll` is the loader's own display setting.
@@ -49,10 +49,7 @@ export const formmailerWidgetEmbedResolver = createMarkupEmbedResolver(
 
     const query = prefill.length ? `?${prefill.join('?')}` : ''
 
-    const url = parseUrlOnHosts(
-      `https://${host}/fms/${encodePathSegment(hash)}${query}`,
-      formmailerHosts,
-    )
+    const url = parseUrlOnHosts(`https://${host}/fms/${encodePathSegment(hash)}${query}`, hosts)
 
     if (!url) {
       return
@@ -62,10 +59,7 @@ export const formmailerWidgetEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-export const formmailerIframeEmbedResolver = createUrlEmbedResolver(
-  formmailerHosts,
-  formmailerResolveEmbed,
-)
+export const formmailerIframeEmbedResolver = createUrlEmbedResolver(hosts, formmailerResolveEmbed)
 
 // The form posts its rendered height unasked, as `{ app: 'formmailer', message: 'heightChanged',
 // params: { height } }`, again on each change.

@@ -11,7 +11,7 @@ const sizes = {
 }
 
 // `ganjing.com` 301s onto `www.ganjingworld.com/embed/{same id}`, so both hosts name one embed.
-const ganjingworldHosts = ['ganjingworld.com', 'ganjing.com']
+const hosts = ['ganjingworld.com', 'ganjing.com']
 
 const readVideoId = (url: URL): string | undefined => {
   const [first, second, third] = getPathSegments(url)
@@ -54,7 +54,4 @@ const ganjingworldResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
 // Gan Jing World's share iframe on the canonical host and on the `ganjing.com` mirror, with or
 // without a locale segment.
-export const ganjingworldEmbedResolver = createUrlEmbedResolver(
-  ganjingworldHosts,
-  ganjingworldResolveEmbed,
-)
+export const ganjingworldEmbedResolver = createUrlEmbedResolver(hosts, ganjingworldResolveEmbed)

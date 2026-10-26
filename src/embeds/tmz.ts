@@ -4,7 +4,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'tmz'
 
-const tmzHosts = ['share.tmz.com']
+const hosts = ['share.tmz.com']
 
 // `/watch/` redirects onto the player route with the same slug.
 const playerRoutes = ['videos', 'watch']
@@ -31,4 +31,4 @@ export const tmzResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const tmzEmbedResolver = createUrlEmbedResolver(tmzHosts, tmzResolveEmbed)
+export const tmzEmbedResolver = createUrlEmbedResolver(hosts, tmzResolveEmbed)

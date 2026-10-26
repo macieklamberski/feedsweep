@@ -1,4 +1,11 @@
-import { composeQuery, encodePathSegment, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import {
+  composeQuery,
+  encodePathSegment,
+  getPathSegments,
+  getQueryParam,
+  isAnyOf,
+  isHostOf,
+} from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -8,7 +15,7 @@ const sizes = {
   player: { ratio: '16/9' },
 }
 
-const traileraddictHosts = ['traileraddict.com']
+const hosts = ['traileraddict.com']
 
 // The Flash player's two routes, which now 301 to the trailer's watch page.
 const flashRoutes = ['emb', 'emd']
@@ -16,7 +23,7 @@ const flashRoutes = ['emb', 'emd']
 const playerPath = '/iframe.php'
 
 // Only this host takes the id as its only segment. The apex serves pages there, such as `/search`.
-const shortHost = 'v.traileraddict.com'
+const shortHosts = ['v.traileraddict.com']
 
 const composeEmbed = (id: string): EmbedResolverResult => {
   return {
@@ -32,7 +39,7 @@ const composeEmbed = (id: string): EmbedResolverResult => {
 // player, `/emd/{id}` or `/emb/{id}`, and the short `v.traileraddict.com/{id}` took the same id,
 // so both are rebuilt onto the current one.
 export const traileraddictResolveEmbed: ResolveUrlEmbed = (url) => {
-  if (url.hostname === shortHost) {
+  if (isHostOf(url, shortHosts)) {
     const [id, ...rest] = getPathSegments(url)
 
     if (!id || rest.length > 0) {
@@ -61,7 +68,4 @@ export const traileraddictResolveEmbed: ResolveUrlEmbed = (url) => {
   return composeEmbed(id)
 }
 
-export const traileraddictEmbedResolver = createUrlEmbedResolver(
-  traileraddictHosts,
-  traileraddictResolveEmbed,
-)
+export const traileraddictEmbedResolver = createUrlEmbedResolver(hosts, traileraddictResolveEmbed)

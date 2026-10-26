@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'thinglink'
 
-const thinglinkHost = 'thinglink.com'
+const hosts = ['thinglink.com']
 
 const sizes = {
   scene: { ratio: '3/2' },
@@ -58,4 +58,4 @@ export const thinglinkResolveEmbed: ResolveUrlEmbed = (url) => {
 // ThingLink's interactive-image viewer, framed at `card`, `view/scene`, `mediacard` or
 // `videocard`. The `cdn.thinglink.me/jse/embed.js` script form is not read: it hydrates the
 // `img.alwaysThinglink` beside it, which survives as the scene's static render.
-export const thinglinkEmbedResolver = createUrlEmbedResolver([thinglinkHost], thinglinkResolveEmbed)
+export const thinglinkEmbedResolver = createUrlEmbedResolver(hosts, thinglinkResolveEmbed)

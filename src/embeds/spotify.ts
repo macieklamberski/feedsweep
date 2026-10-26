@@ -40,8 +40,8 @@ type SubstackItemAttributes = {
 }
 
 const provider = 'spotify'
-const spotifyHosts = ['spotify.com']
-const spotifyImageHosts = ['scdn.co']
+const hosts = ['spotify.com']
+const imageHosts = ['scdn.co']
 
 // The act under the title is the publisher Spotify's own show page prints: the show's own, and
 // for an episode the publisher of the show it ran in.
@@ -66,7 +66,7 @@ const readSubstackItem = (element: Element, type: string): Partial<EmbedResolver
     publisher: isPublisherType ? attributes.subtitle : undefined,
     // Some payloads carry an empty description string.
     description: attributes.description?.trim() || undefined,
-    thumbnail: parseUrlOnHosts(attributes.image, spotifyImageHosts) ? attributes.image : undefined,
+    thumbnail: parseUrlOnHosts(attributes.image, imageHosts) ? attributes.image : undefined,
   }
 }
 
@@ -100,7 +100,7 @@ export const spotifyResolveEmbed: ResolveUrlEmbed = (url, element) => {
   // resource's id under another's type.
   const pair =
     readPathPair(url) ??
-    (legacy ? [legacy[1], legacy[2]] : readPathPair(parseUrlOnHosts(uri, spotifyHosts)))
+    (legacy ? [legacy[1], legacy[2]] : readPathPair(parseUrlOnHosts(uri, hosts)))
   const [rawType, id] = pair ?? []
   const type = rawType?.toLowerCase()
 
@@ -125,7 +125,7 @@ export const spotifyResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const spotifyEmbedResolver = createUrlEmbedResolver(spotifyHosts, spotifyResolveEmbed)
+export const spotifyEmbedResolver = createUrlEmbedResolver(hosts, spotifyResolveEmbed)
 
 export const spotifyFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', strip: 'Spotify Embed:' },

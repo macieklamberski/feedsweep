@@ -6,7 +6,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'megaphone'
 
-const megaphoneHosts = ['megaphone.fm']
+const hosts = ['megaphone.fm']
 
 const legacyPlayerPathRegex = /^\/(?<id>[A-Z]+\d+)\/?$/
 
@@ -78,7 +78,7 @@ export const megaphoneResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 // Megaphone's player iframe, ?e= for an episode or ?p= for a playlist, some with no height at all.
-export const megaphoneEmbedResolver = createUrlEmbedResolver(megaphoneHosts, megaphoneResolveEmbed)
+export const megaphoneEmbedResolver = createUrlEmbedResolver(hosts, megaphoneResolveEmbed)
 
 export const megaphoneRenderHint: EmbedRenderHint = {
   provider,

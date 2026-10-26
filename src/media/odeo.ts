@@ -3,7 +3,7 @@ import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { readCarrierUrl } from '../utils/widgets.js'
 
-const odeoHosts = ['odeo.com']
+const hosts = ['odeo.com']
 
 // Odeo's own media host stopped resolving, so a file it names cannot be recovered.
 const deadFileHosts = ['media.odeo.com']
@@ -12,9 +12,13 @@ const deadFileHosts = ['media.odeo.com']
 // player is gone and the file it names is usually on the publisher's own host.
 export const odeoMediaResolver: MediaResolver = {
   kind: 'media',
-  selector: 'embed[src*="odeo.com/flash/" i], object[data*="odeo.com/flash/" i]',
+  selector: hosts
+    .flatMap((host) => {
+      return [`embed[src*="${host}/flash/" i]`, `object[data*="${host}/flash/" i]`]
+    })
+    .join(', '),
   extract: (element) => {
-    if (!parseUrlOnHosts(readCarrierUrl(element), odeoHosts)) {
+    if (!parseUrlOnHosts(readCarrierUrl(element), hosts)) {
       return
     }
 

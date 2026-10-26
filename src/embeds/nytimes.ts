@@ -6,7 +6,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const provider = 'nytimes'
 
 // `static01.nyt.com` is the static host, which 301s the player onto `www.nytimes.com`.
-const nytimesHosts = ['nytimes.com', 'static01.nyt.com']
+const hosts = ['nytimes.com', 'static01.nyt.com']
 
 // The player pages: the current one, which `graphics8.nytimes.com` 301s onto `www`, and the
 // Brightcove-era `bcvideo` one, which answers 400 for every id today. Both name the video the
@@ -46,7 +46,7 @@ export const nytimesResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // NYT's offsite video player iframe, current or Brightcove-era bcvideo, keyed by videoId.
-export const nytimesIframeEmbedResolver = createUrlEmbedResolver(nytimesHosts, nytimesResolveEmbed)
+export const nytimesIframeEmbedResolver = createUrlEmbedResolver(hosts, nytimesResolveEmbed)
 
 export const nytimesFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'New York Times Video - Embed Player' },

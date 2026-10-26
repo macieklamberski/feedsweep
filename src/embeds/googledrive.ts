@@ -38,7 +38,7 @@ const readFileId = (segments: Array<string>, url: URL, isAudio?: boolean): strin
   }
 }
 
-const googledriveHosts = [
+const hosts = [
   'docs.google.com', // Legacy spelling of the same file frame
   'drive.google.com',
 ]
@@ -101,10 +101,7 @@ export const googledriveResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const googledriveEmbedResolver = createUrlEmbedResolver(
-  googledriveHosts,
-  googledriveResolveEmbed,
-)
+export const googledriveEmbedResolver = createUrlEmbedResolver(hosts, googledriveResolveEmbed)
 
 export const googledriveRenderHint: EmbedRenderHint = {
   provider,

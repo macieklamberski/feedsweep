@@ -9,7 +9,7 @@ const sizes = {
   video: { ratio: '16/9' },
 }
 
-const namashaHosts = ['namasha.com']
+const hosts = ['namasha.com']
 
 // The server answers the route word and the id in any case.
 const embedPathRegex = /^\/embed\/([^/]+)\/?$/i
@@ -32,7 +32,7 @@ export const namashaResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const namashaEmbedResolver = createUrlEmbedResolver(namashaHosts, namashaResolveEmbed)
+export const namashaEmbedResolver = createUrlEmbedResolver(hosts, namashaResolveEmbed)
 
 // The embed page is a poster that loads the player on `autoplay=true`, which starts playback.
 export const namashaRenderHint: EmbedRenderHint = {

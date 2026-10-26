@@ -10,7 +10,7 @@ const sizes = {
 
 // `abcnews.go.com` is the host the embed snippet wrote for years, and it 301s onto `abcnews.com`
 // with the path and query kept.
-const abcnewsHosts = ['abcnews.com', 'abcnews.go.com']
+const hosts = ['abcnews.com', 'abcnews.go.com']
 
 // The server matches the route words in any case.
 const playerPathRegex = /^\/video\/embed\/?$/i
@@ -37,4 +37,4 @@ export const abcnewsResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 }
 
-export const abcnewsEmbedResolver = createUrlEmbedResolver(abcnewsHosts, abcnewsResolveEmbed)
+export const abcnewsEmbedResolver = createUrlEmbedResolver(hosts, abcnewsResolveEmbed)

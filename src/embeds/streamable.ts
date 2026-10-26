@@ -7,7 +7,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const provider = 'streamable'
 
 // Exact: `cdn-cf-east.streamable.com` and its siblings serve the files.
-const streamableHosts = ['streamable.com', 'www.streamable.com']
+const hosts = ['streamable.com', 'www.streamable.com']
 
 // The embed `/e/{id}` and the frame the oEmbed answer writes, `/o/{id}`.
 const embedRoutes = ['e', 'o']
@@ -70,11 +70,9 @@ export const streamableResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const streamableIframeEmbedResolver = createUrlEmbedResolver(
-  streamableHosts,
-  streamableResolveEmbed,
-  { isOnHost: isHostOf },
-)
+export const streamableIframeEmbedResolver = createUrlEmbedResolver(hosts, streamableResolveEmbed, {
+  isOnHost: isHostOf,
+})
 
 // The SB Nation MLB snippet: a div holding a "View Link" anchor to the clip's page on mlb.com, which
 // the site's own page frames as `streamable.com/m/{slug}`. A legacy `/c-{id}` page is left: the
@@ -104,7 +102,7 @@ export const streamableMlbEmbedResolver = createMarkupEmbedResolver(
 export const streamableWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.streamable-embed',
   (element) => {
-    const url = parseUrlOnHosts(attr(find(element, 'a[href]'), 'href'), streamableHosts, isHostOf)
+    const url = parseUrlOnHosts(attr(find(element, 'a[href]'), 'href'), hosts, isHostOf)
 
     if (!url) {
       return

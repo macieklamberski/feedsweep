@@ -5,7 +5,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'lglforms'
 
-const lglformsHosts = ['secure.lglforms.com']
+const hosts = ['secure.lglforms.com']
 
 const formPathRegex = /^\/form_engine\/s\/([^/]+)$/i
 const loaderPathRegex = /^\/form_engine\/s\/([^/]+)\.js$/i
@@ -42,7 +42,7 @@ export const lglformsResolveEmbed: ResolveUrlEmbed = (url) => {
 export const lglformsScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="lglforms.com/form_engine/s/" i]',
   (element) => {
-    const loader = parseUrlOnHosts(attr(element, 'src'), lglformsHosts)
+    const loader = parseUrlOnHosts(attr(element, 'src'), hosts)
     const formKey = loader?.pathname.match(loaderPathRegex)?.[1]
 
     if (!formKey) {
@@ -53,7 +53,4 @@ export const lglformsScriptEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-export const lglformsIframeEmbedResolver = createUrlEmbedResolver(
-  lglformsHosts,
-  lglformsResolveEmbed,
-)
+export const lglformsIframeEmbedResolver = createUrlEmbedResolver(hosts, lglformsResolveEmbed)

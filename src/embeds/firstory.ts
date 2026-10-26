@@ -5,7 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const provider = 'firstory'
 
 // The player moved from `open.firstory.me`, which redirects every path onto `open.firstory.fm`.
-const firstoryHosts = ['open.firstory.fm', 'open.firstory.me']
+const hosts = ['open.firstory.fm', 'open.firstory.me']
 
 const storyPathRegex = /^\/embed\/story\/([^/]+)\/?$/i
 
@@ -33,7 +33,7 @@ export const firstoryResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const firstoryEmbedResolver = createUrlEmbedResolver(firstoryHosts, firstoryResolveEmbed)
+export const firstoryEmbedResolver = createUrlEmbedResolver(hosts, firstoryResolveEmbed)
 
 export const firstoryFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: 'Firstory' },

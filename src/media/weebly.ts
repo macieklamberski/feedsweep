@@ -4,7 +4,7 @@ import { flashVars, parseFlashVars } from '../utils/dom.js'
 import { audioFileRegex, imageFileRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { readCarrierUrl } from '../utils/widgets.js'
 
-const weeblyHost = 'weebly.com'
+const hosts = ['weebly.com']
 const audioPlayerPath = '/weebly/apps/audioPlayer2.swf'
 
 // The upload path is /uploads/b/{user}-{pathId}/{name}, which only the poster url carries.
@@ -55,12 +55,16 @@ export const weeblyMediaResolver: MediaResolver = {
 // The Flash audio block: Flash no longer runs, and the mp3 url and its label sit in flashvars.
 export const weeblyFlashMediaResolver: MediaResolver = {
   kind: 'media',
-  selector: [
-    `object[data*="${weeblyHost}${audioPlayerPath}" i]`,
-    `embed[src*="${weeblyHost}${audioPlayerPath}" i]`,
-  ].join(', '),
+  selector: hosts
+    .flatMap((host) => {
+      return [
+        `object[data*="${host}${audioPlayerPath}" i]`,
+        `embed[src*="${host}${audioPlayerPath}" i]`,
+      ]
+    })
+    .join(', '),
   extract: (element) => {
-    const player = parseUrlOnHosts(readCarrierUrl(element), weeblyHost)
+    const player = parseUrlOnHosts(readCarrierUrl(element), hosts)
 
     if (!player || !isAnyOf(player.pathname, audioPlayerPath)) {
       return

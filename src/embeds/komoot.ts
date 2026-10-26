@@ -10,7 +10,7 @@ type Resource = {
 
 const provider = 'komoot'
 
-const komootHosts = ['komoot.com', 'komoot.de']
+const hosts = ['komoot.com', 'komoot.de']
 
 const sizes = {
   player: { height: 440 },
@@ -62,4 +62,4 @@ export const komootResolveEmbed: ResolveUrlEmbed = (url) => {
   return params.share_token ? result : { ...result, url: `https://www.komoot.com/${resource.path}` }
 }
 
-export const komootEmbedResolver = createUrlEmbedResolver(komootHosts, komootResolveEmbed)
+export const komootEmbedResolver = createUrlEmbedResolver(hosts, komootResolveEmbed)

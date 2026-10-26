@@ -9,7 +9,7 @@ const sizes = {
 }
 
 // lbry.tv and open.lbry.com redirect every url to odysee.com with the path kept.
-const odyseeHosts = ['odysee.com', 'lbry.tv', 'open.lbry.com']
+const hosts = ['odysee.com', 'lbry.tv', 'open.lbry.com']
 
 // A claim, `{name}:{hex claim id}`, with an optional leading `@` for a channel and an optional id.
 // A bare name addresses the winning claim for it.
@@ -80,4 +80,4 @@ const odyseeResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 // The odysee.com/$/embed player, pasted under its former lbry.tv and open.lbry.com hosts too.
-export const odyseeEmbedResolver = createUrlEmbedResolver(odyseeHosts, odyseeResolveEmbed)
+export const odyseeEmbedResolver = createUrlEmbedResolver(hosts, odyseeResolveEmbed)

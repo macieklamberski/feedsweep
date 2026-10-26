@@ -14,7 +14,7 @@ const sizes = {
 // programme card even after the broadcast ends.
 const liveIdRegex = /^lv\d+$/
 
-export const nicovideoHosts = ['nicovideo.jp']
+export const hosts = ['nicovideo.jp']
 
 // Seiga and manga write ext.{site}.nicovideo.jp/thumb/{kind}{digits}, and news writes
 // news.nicovideo.jp/watch/nw{digits}.
@@ -28,7 +28,7 @@ const nicovideoEmbedParams = ['from']
 export const extractNicovideoId = (link: URL): string | undefined => {
   // The script selector matches on a substring, so any host can spell `nicovideo.jp/thumb_watch`
   // inside its own path and reach this. The path shape alone must not mint a nicovideo url.
-  const parsed = parseUrlOnHosts(link, nicovideoHosts)
+  const parsed = parseUrlOnHosts(link, hosts)
 
   // Seiga, manga and news ids pass the video grammar, and the video player answers 500 for them.
   if (!parsed || parseUrlOnHosts(link, nonVideoHosts)) {
@@ -76,7 +76,7 @@ export const nicovideoResolveEmbed: ResolveUrlEmbed = (url) => {
 
 // The player url for a caller holding a url nothing has checked, such as a page builder's config.
 export const readNicovideoEmbedSrc = (link: string): string | undefined => {
-  const url = parseUrlOnHosts(link, nicovideoHosts)
+  const url = parseUrlOnHosts(link, hosts)
 
   if (!url) {
     return
@@ -87,17 +87,17 @@ export const readNicovideoEmbedSrc = (link: string): string | undefined => {
 
 // The legacy ext.nicovideo.jp/thumb/{id} iframe card, an info card rather than a player, which
 // serves only readers in Japan.
-export const nicovideoIframeEmbedResolver = createUrlEmbedResolver(
-  nicovideoHosts,
-  nicovideoResolveEmbed,
-)
+export const nicovideoIframeEmbedResolver = createUrlEmbedResolver(hosts, nicovideoResolveEmbed)
 
 // Nicovideo's thumb_watch script writes the player where it stands, and a reader never runs it.
 // Nicovideo answers it with a 302 to embed.nicovideo.jp/watch/{id}/script.
 export const nicovideoScriptEmbedResolver = createMarkupEmbedResolver(
-  'script[src*="nicovideo.jp/thumb_watch" i], script[src*="embed.nicovideo.jp/watch" i]',
+  [
+    ...hosts.map((host) => `script[src*="${host}/thumb_watch" i]`),
+    'script[src*="embed.nicovideo.jp/watch" i]',
+  ].join(', '),
   (element) => {
-    const url = parseUrlOnHosts(attr(element, 'src'), nicovideoHosts)
+    const url = parseUrlOnHosts(attr(element, 'src'), hosts)
 
     if (!url) {
       return

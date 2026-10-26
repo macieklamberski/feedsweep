@@ -5,10 +5,10 @@ import type { EmbedResolverResult } from '../types.js'
 import {
   archiveAudioEmbedResolver,
   archiveFlashEmbedResolver,
-  archiveHosts,
   archiveIframeEmbedResolver,
   archiveResolveEmbed,
   extractArchiveIdentifier,
+  hosts,
 } from './archive.js'
 
 describe('extractArchiveIdentifier', () => {
@@ -90,7 +90,7 @@ describe('archiveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(archiveResolveEmbed(carrierUrl(value, archiveHosts))).toEqual(expected)
+      expect(archiveResolveEmbed(carrierUrl(value, hosts))).toEqual(expected)
     })
 
     // The query says which of the item's files play and which part of them.
@@ -105,7 +105,7 @@ describe('archiveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(archiveResolveEmbed(carrierUrl(value, archiveHosts))).toEqual(expected)
+      expect(archiveResolveEmbed(carrierUrl(value, hosts))).toEqual(expected)
     })
 
     it('should keep the end of the span that plays', () => {
@@ -119,7 +119,7 @@ describe('archiveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(archiveResolveEmbed(carrierUrl(value, archiveHosts))).toEqual(expected)
+      expect(archiveResolveEmbed(carrierUrl(value, hosts))).toEqual(expected)
     })
 
     // archive.org's own details pages spell the query with a leading ampersand, and that url
@@ -135,7 +135,7 @@ describe('archiveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(archiveResolveEmbed(carrierUrl(value, archiveHosts))).toEqual(expected)
+      expect(archiveResolveEmbed(carrierUrl(value, hosts))).toEqual(expected)
     })
 
     it('should trim whitespace around the identifier', () => {
@@ -149,7 +149,7 @@ describe('archiveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(archiveResolveEmbed(carrierUrl(value, archiveHosts))).toEqual(expected)
+      expect(archiveResolveEmbed(carrierUrl(value, hosts))).toEqual(expected)
     })
 
     it('should keep every stranded parameter, not just the first', () => {
@@ -163,7 +163,7 @@ describe('archiveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(archiveResolveEmbed(carrierUrl(value, archiveHosts))).toEqual(expected)
+      expect(archiveResolveEmbed(carrierUrl(value, hosts))).toEqual(expected)
     })
 
     // Autoplay is the reader's call and the render hint carries it, so a publisher who asked for
@@ -180,7 +180,7 @@ describe('archiveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(archiveResolveEmbed(carrierUrl(value, archiveHosts))).toEqual(expected)
+      expect(archiveResolveEmbed(carrierUrl(value, hosts))).toEqual(expected)
     })
 
     // greatscottgadgets.com strands a poster url, and its slashes are no file inside the item.
@@ -196,7 +196,7 @@ describe('archiveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(archiveResolveEmbed(carrierUrl(value, archiveHosts))).toEqual(expected)
+      expect(archiveResolveEmbed(carrierUrl(value, hosts))).toEqual(expected)
     })
 
     // `ui`, `wrapper` and `view` describe the details page, and this mints the embed route, so
@@ -212,7 +212,7 @@ describe('archiveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(archiveResolveEmbed(carrierUrl(value, archiveHosts))).toEqual(expected)
+      expect(archiveResolveEmbed(carrierUrl(value, hosts))).toEqual(expected)
     })
 
     it('should mint the embed url from a details url', () => {
@@ -226,7 +226,7 @@ describe('archiveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(archiveResolveEmbed(carrierUrl(value, archiveHosts))).toEqual(expected)
+      expect(archiveResolveEmbed(carrierUrl(value, hosts))).toEqual(expected)
     })
 
     it('should send a BookReader stream url to the modern player', () => {
@@ -240,7 +240,7 @@ describe('archiveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(archiveResolveEmbed(carrierUrl(value, archiveHosts))).toEqual(expected)
+      expect(archiveResolveEmbed(carrierUrl(value, hosts))).toEqual(expected)
     })
 
     // `embed/{identifier}` plays the item's first file, so dropping the file plays another one.
@@ -255,7 +255,7 @@ describe('archiveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(archiveResolveEmbed(carrierUrl(value, archiveHosts))).toEqual(expected)
+      expect(archiveResolveEmbed(carrierUrl(value, hosts))).toEqual(expected)
     })
 
     it('should keep a file a details url names inside a folder of the item', () => {
@@ -269,7 +269,7 @@ describe('archiveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(archiveResolveEmbed(carrierUrl(value, archiveHosts))).toEqual(expected)
+      expect(archiveResolveEmbed(carrierUrl(value, hosts))).toEqual(expected)
     })
 
     // The stream route names the book's own file, which the embed route does not take.
@@ -284,7 +284,7 @@ describe('archiveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(archiveResolveEmbed(carrierUrl(value, archiveHosts))).toEqual(expected)
+      expect(archiveResolveEmbed(carrierUrl(value, hosts))).toEqual(expected)
     })
   })
 
@@ -292,7 +292,7 @@ describe('archiveResolveEmbed', () => {
     it('should return undefined for an archive url naming no item', () => {
       const value = 'https://archive.org/about'
 
-      expect(archiveResolveEmbed(carrierUrl(value, archiveHosts))).toBeUndefined()
+      expect(archiveResolveEmbed(carrierUrl(value, hosts))).toBeUndefined()
     })
 
     it('should use a malformed identifier as written, even if the player answers an error', () => {
@@ -306,7 +306,7 @@ describe('archiveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(archiveResolveEmbed(carrierUrl(value, archiveHosts))).toEqual(expected)
+      expect(archiveResolveEmbed(carrierUrl(value, hosts))).toEqual(expected)
     })
   })
 })

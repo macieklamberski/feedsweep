@@ -4,7 +4,7 @@ import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { readCarrierUrl } from '../utils/widgets.js'
 
-const podomaticHost = 'podomatic.com'
+const hosts = ['podomatic.com']
 const playerPath = '/swf/joeplayer'
 
 // Podomatic's Flash "joeplayer", whose `jsonLocation` flashvar names the episode by its timestamp
@@ -12,18 +12,19 @@ const playerPath = '/swf/joeplayer'
 // nothing, and the same timestamp names the episode's file on `/enclosure/{timestamp}.mp3`.
 export const podomaticFlashMediaResolver: MediaResolver = {
   kind: 'media',
-  selector: [
-    `embed[src*="${podomaticHost}${playerPath}" i]`,
-    `object[data*="${podomaticHost}${playerPath}" i]`,
-  ].join(', '),
+  selector: hosts
+    .flatMap((host) => {
+      return [`embed[src*="${host}${playerPath}" i]`, `object[data*="${host}${playerPath}" i]`]
+    })
+    .join(', '),
   extract: (element) => {
-    const player = parseUrlOnHosts(readCarrierUrl(element), podomaticHost)
+    const player = parseUrlOnHosts(readCarrierUrl(element), hosts)
 
     if (!player || !startsWithAnyOf(player.pathname, [playerPath])) {
       return
     }
 
-    const location = parseUrlOnHosts(flashVar(element, 'jsonLocation'), podomaticHost)
+    const location = parseUrlOnHosts(flashVar(element, 'jsonLocation'), hosts)
 
     if (!location) {
       return
