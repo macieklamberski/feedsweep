@@ -21,7 +21,7 @@ describe('kalturaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(kalturaResolveEmbed(value)).toEqual(expected)
+      expect(kalturaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the session token of an access-controlled entry and mint no poster', () => {
@@ -34,7 +34,7 @@ describe('kalturaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(kalturaResolveEmbed(value)).toEqual(expected)
+      expect(kalturaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the newer playkit player', () => {
@@ -49,7 +49,7 @@ describe('kalturaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(kalturaResolveEmbed(value)).toEqual(expected)
+      expect(kalturaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the player and the poster on the secure host for the plain api host', () => {
@@ -63,7 +63,7 @@ describe('kalturaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(kalturaResolveEmbed(value)).toEqual(expected)
+      expect(kalturaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep a regional api host for the player and the poster', () => {
@@ -77,7 +77,7 @@ describe('kalturaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(kalturaResolveEmbed(value)).toEqual(expected)
+      expect(kalturaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read an entry whose tail runs past eight characters', () => {
@@ -92,7 +92,7 @@ describe('kalturaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(kalturaResolveEmbed(value)).toEqual(expected)
+      expect(kalturaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read an entry on a namespace past the first two', () => {
@@ -107,7 +107,7 @@ describe('kalturaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(kalturaResolveEmbed(value)).toEqual(expected)
+      expect(kalturaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // Whether Kaltura issues a counter past one digit was not settled, so nothing here bets on it.
@@ -123,7 +123,7 @@ describe('kalturaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(kalturaResolveEmbed(value)).toEqual(expected)
+      expect(kalturaResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -132,21 +132,21 @@ describe('kalturaResolveEmbed', () => {
       const value =
         'https://evil.test/p/520801/embedPlaykitJs/uiconf_id/1?iframeembed=true&entry_id=1_w0bwzism'
 
-      expect(kalturaResolveEmbed(value)).toBeUndefined()
+      expect(kalturaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a partner path behind another segment', () => {
       const value =
         'https://cdnapisec.kaltura.com/x/p/520801/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=1_w0bwzism'
 
-      expect(kalturaResolveEmbed(value)).toBeUndefined()
+      expect(kalturaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a player that names no entry', () => {
       const value =
         'https://cdnapisec.kaltura.com/p/520801/sp/52080100/embedIframeJs/uiconf_id/31230141/partner_id/520801?iframeembed=true'
 
-      expect(kalturaResolveEmbed(value)).toBeUndefined()
+      expect(kalturaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed entry id as written, even if the thumbnail answers an error', () => {
@@ -160,7 +160,7 @@ describe('kalturaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(kalturaResolveEmbed(value)).toEqual(expected)
+      expect(kalturaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep a decoded entry id carrying a separator in one thumbnail path segment', () => {
@@ -175,28 +175,28 @@ describe('kalturaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(kalturaResolveEmbed(value)).toEqual(expected)
+      expect(kalturaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should leave the Flash widget alone', () => {
       const value =
         'http://www.kaltura.com/index.php/kwidget/wid/_203822/uiconf_id/1898102/entry_id/1_s2i7y09d/'
 
-      expect(kalturaResolveEmbed(value)).toBeUndefined()
+      expect(kalturaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should leave the legacy extwidget iframe alone', () => {
       const value =
         'http://cdnapi.kaltura.com/index.php/extwidget/embedIframe/entry_id/0_hjiuf078/widget_id/_483511/uiconf_id/5590821'
 
-      expect(kalturaResolveEmbed(value)).toBeUndefined()
+      expect(kalturaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should leave the MediaSpace secure embed alone', () => {
       const value =
         'https://2401761.mediaspace.kaltura.com/embed/secure/iframe/entryId/0_kfreggwh/uiConfId/42593641'
 
-      expect(kalturaResolveEmbed(value)).toBeUndefined()
+      expect(kalturaResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

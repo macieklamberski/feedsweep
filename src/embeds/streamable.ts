@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf, isHostOf } from 'trousse'
-import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr, find } from '../utils/dom.js'
 import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -38,7 +38,7 @@ const readVideoId = (segments: Array<string>): string | undefined => {
 // A Streamable video by its shortcode, framed as the embed, the oEmbed frame, the share route or
 // the watch page, and an MLB clip by its slug on `/m/{slug}`, which oEmbed does not answer for.
 // No thumbnail: the unsigned image sits on an east or a west CDN host the carrier does not name.
-export const streamableResolveEmbed: ResolveEmbed = (url, element) => {
+export const streamableResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, streamableHosts, isHostOf)
 
   if (!parsed) {
@@ -98,7 +98,7 @@ export const streamableMlbEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    return streamableResolveEmbed(`https://streamable.com/m/${segments.at(-1)}`)
+    return streamableResolveEmbed(new URL(`https://streamable.com/m/${segments.at(-1)}`))
   },
 )
 
@@ -107,7 +107,13 @@ export const streamableMlbEmbedResolver = createMarkupEmbedResolver(
 export const streamableWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.streamable-embed',
   (element) => {
-    return streamableResolveEmbed(attr(find(element, 'a[href]'), 'href') ?? '')
+    const url = parseUrlOnHosts(attr(find(element, 'a[href]'), 'href'), streamableHosts, isHostOf)
+
+    if (!url) {
+      return
+    }
+
+    return streamableResolveEmbed(url)
   },
 )
 

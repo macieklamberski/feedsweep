@@ -209,7 +209,7 @@ describe('typeformResolveEmbed', () => {
       height: 500,
     }
 
-    expect(typeformResolveEmbed(value)).toEqual(expected)
+    expect(typeformResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should resolve a form id of unusual length as written', () => {
@@ -222,13 +222,13 @@ describe('typeformResolveEmbed', () => {
       height: 500,
     }
 
-    expect(typeformResolveEmbed(value)).toEqual(expected)
+    expect(typeformResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a form id outside the alphanumeric alphabet', () => {
     const value = 'https://form.typeform.com/to/MTt3-Pw7K'
 
-    expect(typeformResolveEmbed(value)).toBeUndefined()
+    expect(typeformResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should resolve a per-account subdomain to the canonical form url', () => {
@@ -241,7 +241,7 @@ describe('typeformResolveEmbed', () => {
       height: 500,
     }
 
-    expect(typeformResolveEmbed(value)).toEqual(expected)
+    expect(typeformResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should drop the telemetry query the oembed iframe carries', () => {
@@ -255,19 +255,19 @@ describe('typeformResolveEmbed', () => {
       height: 500,
     }
 
-    expect(typeformResolveEmbed(value)).toEqual(expected)
+    expect(typeformResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should ignore a typeform url that names no form', () => {
     const value = 'https://www.typeform.com/explore'
 
-    expect(typeformResolveEmbed(value)).toBeUndefined()
+    expect(typeformResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should ignore another host carrying the form path', () => {
     const value = 'https://evil.test/to/MTt3Pw7K'
 
-    expect(typeformResolveEmbed(value)).toBeUndefined()
+    expect(typeformResolveEmbed(new URL(value))).toBeUndefined()
   })
 })
 

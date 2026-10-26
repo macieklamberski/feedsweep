@@ -1,5 +1,5 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import { getPathSegments, isAnyOf } from 'trousse'
+import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { hexRegex, uuidRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -12,7 +12,7 @@ const simplecastHosts = ['simplecast.com']
 const playerHeight = 200
 
 export const extractSimplecastEpisode = (
-  link: string,
+  link: URL,
 ): { id: string; isCurrent: boolean } | undefined => {
   const segments = getPathSegments(link)
   const id = isAnyOf(segments[0], 'e') ? segments[1] : segments[0]
@@ -30,16 +30,15 @@ export const extractSimplecastEpisode = (
   }
 }
 
-export const simplecastResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url)
+export const simplecastResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const episode = extractSimplecastEpisode(url)
 
-  if (!parsed || !episode) {
+  if (!episode) {
     return
   }
 
   // The legacy query holds only display values, such as `style` and `color`.
-  const legacySource = `${parsed.origin}${parsed.pathname}`
+  const legacySource = `${url.origin}${url.pathname}`
 
   return {
     provider: 'simplecast',

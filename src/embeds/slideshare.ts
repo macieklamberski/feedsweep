@@ -1,14 +1,7 @@
-import {
-  encodePathSegment,
-  getPathSegments,
-  getQueryParam,
-  isAnyOf,
-  type Nullish,
-  parseUrl,
-} from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { encodePathSegment, getPathSegments, getQueryParam, isAnyOf, type Nullish } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, find, text } from '../utils/dom.js'
-import { isFileName, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const slideshareHosts = ['slideshare.net', 'slidesharecdn.com']
@@ -32,14 +25,8 @@ const composeEmbed = (deck: string, fields?: Partial<EmbedResolverResult>): Embe
   }
 }
 
-export const slideshareResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
-  const segments = getPathSegments(parsed)
+export const slideshareResolveEmbed: ResolveUrlEmbed = (url) => {
+  const segments = getPathSegments(url)
   const marker = segments.findIndex((segment) => isAnyOf(segment, 'embed_code'))
 
   if (marker < 0) {
@@ -288,7 +275,7 @@ const readWrapper = (element: Nullish<Element>): { deck?: string; wrapper?: Elem
 
 // The embed url names the deck and nothing else, so its page, its name and its owner come from
 // the caption the snippet ships with the iframe, the same one the Flash repair reads.
-const slideshareResolveIframeEmbed: ResolveEmbed = (url, element) => {
+const slideshareResolveIframeEmbed: ResolveUrlEmbed = (url, element) => {
   const resolved = slideshareResolveEmbed(url)
 
   if (!resolved) {
@@ -311,10 +298,8 @@ export const slideshareIframeEmbedResolver = createUrlEmbedResolver(
 // Flash died in 2020 and these embeds have rendered nothing since, but the markup is still in
 // old posts and their feeds. The numeric id in the wrapper is the same id the modern embed
 // route accepts, so the dead player can be replaced by one that works.
-const slideshareFlashResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
+const slideshareFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  if (!flashPlayerPathRegex.test(url.pathname)) {
     return
   }
 
@@ -327,8 +312,8 @@ const slideshareFlashResolveEmbed: ResolveEmbed = (url, element) => {
   // The swf query names the deck's owner and slug, which compose the same page the wrapper
   // links to. It is the fallback for a snippet that kept the player and dropped the wrapper's
   // anchor.
-  const account = getQueryParam(parsed.searchParams, 'userName')
-  const slug = getQueryParam(parsed.searchParams, 'stripped_title')
+  const account = getQueryParam(url.searchParams, 'userName')
+  const slug = getQueryParam(url.searchParams, 'stripped_title')
   // Both come out of the query decoded, and each goes into a path segment of its own.
   const composed =
     account && slug

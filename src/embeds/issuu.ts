@@ -5,10 +5,9 @@ import {
   getPathSegments,
   getQueryParam,
   isAnyOf,
-  parseUrl,
   trimObject,
 } from 'trousse'
-import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
+import type { EmbedResolverResult, FieldCleaner, ResolveUrlEmbed } from '../types.js'
 
 const provider = 'issuu'
 
@@ -67,7 +66,7 @@ const composeDocumentEmbed = (
 }
 
 // A reader url, `issuu.com/{publisher}/docs/{document}` with an optional page number after it.
-const readDocumentUrl = (url: string): EmbedResolverResult | undefined => {
+const readDocumentUrl = (url: string | URL): EmbedResolverResult | undefined => {
   const parsed = parseUrlOnHosts(url, issuuHosts)
 
   if (!parsed) {
@@ -127,17 +126,11 @@ const readFlashDocument = (parsed: URL, element?: Element): EmbedResolverResult 
 
 // The reader iframe, at `e.issuu.com/embed.html` or the document page pasted from the address bar,
 // and the retired Flash reader.
-const issuuResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url)
-
-  if (!parsed) {
-    return
-  }
-
-  const route = getPathSegments(parsed)[0] ?? ''
+const issuuResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const route = getPathSegments(url)[0] ?? ''
 
   if (isAnyOf(route, flashRoute)) {
-    return readFlashDocument(parsed, element)
+    return readFlashDocument(url, element)
   }
 
   // The share snippet writes the publication name on the iframe, which neither url form holds.
@@ -151,11 +144,11 @@ const issuuResolveEmbed: ResolveEmbed = (url, element) => {
   // The two id spaces the carrier can name, in the order the reader states them: a config id
   // pair in the fragment, else the publisher and document names in the query.
   const embed =
-    composeConfigEmbed(parsed.hash.replace('#', '')) ??
+    composeConfigEmbed(url.hash.replace('#', '')) ??
     composeDocumentEmbed(
-      getQueryParam(parsed.searchParams, 'u'),
-      getQueryParam(parsed.searchParams, 'd'),
-      getQueryParam(parsed.searchParams, 'p'),
+      getQueryParam(url.searchParams, 'u'),
+      getQueryParam(url.searchParams, 'd'),
+      getQueryParam(url.searchParams, 'p'),
     )
 
   return embed && { ...embed, title }

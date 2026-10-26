@@ -16,7 +16,7 @@ describe('dvidsResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(dvidsResolveEmbed(value)).toEqual(expected)
+      expect(dvidsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the canonical host from the apex', () => {
@@ -29,7 +29,7 @@ describe('dvidsResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(dvidsResolveEmbed(value)).toEqual(expected)
+      expect(dvidsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a query the player does not read', () => {
@@ -42,7 +42,7 @@ describe('dvidsResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(dvidsResolveEmbed(value)).toEqual(expected)
+      expect(dvidsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the route in capitals and mint it in lowercase', () => {
@@ -55,7 +55,7 @@ describe('dvidsResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(dvidsResolveEmbed(value)).toEqual(expected)
+      expect(dvidsResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -63,26 +63,26 @@ describe('dvidsResolveEmbed', () => {
     it('should return undefined for the route below another segment', () => {
       const value = 'https://www.dvidshub.net/unit/video/embed/549765'
 
-      expect(dvidsResolveEmbed(value)).toBeUndefined()
+      expect(dvidsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a segment after the id', () => {
       const value = 'https://www.dvidshub.net/video/embed/549765/extra'
 
-      expect(dvidsResolveEmbed(value)).toBeUndefined()
+      expect(dvidsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the video page', () => {
       const value =
         'https://www.dvidshub.net/video/549765/102nd-intelligence-wing-airmen-provide-disaster-relief'
 
-      expect(dvidsResolveEmbed(value)).toBeUndefined()
+      expect(dvidsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a webcast', () => {
       const value = 'https://www.dvidshub.net/webcast/embed/12345'
 
-      expect(dvidsResolveEmbed(value)).toBeUndefined()
+      expect(dvidsResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -97,7 +97,7 @@ describe('dvidsResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(dvidsResolveEmbed(value)).toEqual(expected)
+      expect(dvidsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass an id that is not a number as written', () => {
@@ -110,7 +110,7 @@ describe('dvidsResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(dvidsResolveEmbed(value)).toEqual(expected)
+      expect(dvidsResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

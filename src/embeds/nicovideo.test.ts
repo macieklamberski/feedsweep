@@ -244,7 +244,7 @@ describe('nicovideoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(nicovideoResolveEmbed(value)).toEqual(expected)
+    expect(nicovideoResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should keep the start position the player url names', () => {
@@ -257,7 +257,7 @@ describe('nicovideoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(nicovideoResolveEmbed(value)).toEqual(expected)
+    expect(nicovideoResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should leave a modern player url as it stands', () => {
@@ -270,7 +270,7 @@ describe('nicovideoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(nicovideoResolveEmbed(value)).toEqual(expected)
+    expect(nicovideoResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should mint the player for a numeric channel upload id', () => {
@@ -283,7 +283,7 @@ describe('nicovideoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(nicovideoResolveEmbed(value)).toEqual(expected)
+    expect(nicovideoResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should use a malformed video id as written, even if the player answers an error', () => {
@@ -296,13 +296,13 @@ describe('nicovideoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(nicovideoResolveEmbed(value)).toEqual(expected)
+    expect(nicovideoResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a nicovideo url naming no video', () => {
     const value = 'https://www.nicovideo.jp/ranking'
 
-    expect(nicovideoResolveEmbed(value)).toBeUndefined()
+    expect(nicovideoResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   // The video player answers 500 for a broadcast, so the two kinds cannot share a player url.
@@ -316,7 +316,7 @@ describe('nicovideoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(nicovideoResolveEmbed(value)).toEqual(expected)
+    expect(nicovideoResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // A broadcast written under the video host still names a broadcast.
@@ -330,7 +330,7 @@ describe('nicovideoResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(nicovideoResolveEmbed(value)).toEqual(expected)
+    expect(nicovideoResolveEmbed(new URL(value))).toEqual(expected)
   })
 })
 

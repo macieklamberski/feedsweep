@@ -1,6 +1,5 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { getPathSegments, isAnyOf } from 'trousse'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'hearthis'
@@ -12,9 +11,8 @@ const hearthisHosts = ['hearthis.at']
 const trackHeight = 150
 const setHeight = 350
 
-export const hearthisResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const [route, id, third, ...rest] = parsed ? getPathSegments(parsed) : []
+export const hearthisResolveEmbed: ResolveUrlEmbed = (url) => {
+  const [route, id, third, ...rest] = getPathSegments(url)
 
   // `embed/{id}/{theme}/`, where the theme segment only colours the player.
   if (isAnyOf(route, 'embed') && id) {

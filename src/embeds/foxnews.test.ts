@@ -20,7 +20,7 @@ describe('foxnewsResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(foxnewsResolveEmbed(value)).toEqual(expected)
+      expect(foxnewsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // The embedding page's location and referrer ride along in the pasted iframe and are
@@ -36,7 +36,7 @@ describe('foxnewsResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(foxnewsResolveEmbed(value)).toEqual(expected)
+      expect(foxnewsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should build the Fox Business placeholder from the Fox Business script url', () => {
@@ -49,7 +49,7 @@ describe('foxnewsResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(foxnewsResolveEmbed(value)).toEqual(expected)
+      expect(foxnewsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should rebuild the video page onto the player', () => {
@@ -62,7 +62,7 @@ describe('foxnewsResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(foxnewsResolveEmbed(value)).toEqual(expected)
+      expect(foxnewsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should rebuild a Fox Business video page and drop its fragment', () => {
@@ -75,7 +75,7 @@ describe('foxnewsResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(foxnewsResolveEmbed(value)).toEqual(expected)
+      expect(foxnewsResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -83,49 +83,43 @@ describe('foxnewsResolveEmbed', () => {
     it('should return undefined for a script carrying no id', () => {
       const value = 'https://video.foxnews.com/v/embed.js?w=466&h=263'
 
-      expect(foxnewsResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for a url that does not parse', () => {
-      const value = 'http://['
-
-      expect(foxnewsResolveEmbed(value)).toBeUndefined()
+      expect(foxnewsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a lookalike host', () => {
       const value = 'https://video.foxnews.com.evil.test/v/embed.js?id=5406119088001'
 
-      expect(foxnewsResolveEmbed(value)).toBeUndefined()
+      expect(foxnewsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a subdomain of the Fox News player host', () => {
       const value = 'https://cdn.video.foxnews.com/v/embed.js?id=5406119088001'
 
-      expect(foxnewsResolveEmbed(value)).toBeUndefined()
+      expect(foxnewsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a subdomain of the Fox Business player host', () => {
       const value = 'https://cdn.video.foxbusiness.com/v/embed.js?id=6355436296112'
 
-      expect(foxnewsResolveEmbed(value)).toBeUndefined()
+      expect(foxnewsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the retired root embed.js route', () => {
       const value = 'https://video.foxnews.com/embed.js?id=11896855&w=432&h=266'
 
-      expect(foxnewsResolveEmbed(value)).toBeUndefined()
+      expect(foxnewsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the player script outside the player route', () => {
       const value = 'https://video.foxnews.com/static/embed.js?id=5406119088001'
 
-      expect(foxnewsResolveEmbed(value)).toBeUndefined()
+      expect(foxnewsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for another page under the player route', () => {
       const value = 'https://video.foxbusiness.com/v/other.html?id=6355436296112'
 
-      expect(foxnewsResolveEmbed(value)).toBeUndefined()
+      expect(foxnewsResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -141,7 +135,7 @@ describe('foxnewsResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(foxnewsResolveEmbed(value)).toEqual(expected)
+      expect(foxnewsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use a malformed id as written, even if the player answers an error', () => {
@@ -154,7 +148,7 @@ describe('foxnewsResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(foxnewsResolveEmbed(value)).toEqual(expected)
+      expect(foxnewsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep a decoded id carrying a separator in one path segment', () => {
@@ -167,7 +161,7 @@ describe('foxnewsResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(foxnewsResolveEmbed(value)).toEqual(expected)
+      expect(foxnewsResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })
@@ -217,6 +211,12 @@ describeForEachParser('foxnewsScriptEmbedResolver', (parseHtml) => {
     it('should ignore a foreign host carrying the same path', async () => {
       const value =
         '<script src="https://evil.test/v/embed.js?id=5406119088001&video.foxnews.com/v/embed.js"></script>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a src that does not parse', async () => {
+      const value = '<script src="https://[video.foxnews.com/v/embed.js?id=5406119088001"></script>'
 
       expect(await extract(value)).toBeUndefined()
     })

@@ -1,5 +1,10 @@
 import { encodePathSegment, getPathSegments, isAnyOf, isHostOf, isPlainObject } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
+import type {
+  EmbedRenderHint,
+  EmbedResolverResult,
+  FieldCleaner,
+  ResolveUrlEmbed,
+} from '../types.js'
 import { attr, find, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
@@ -154,7 +159,7 @@ export const imgurBlockquoteEmbedResolver = createMarkupEmbedResolver(
 
 // The frame the embed script builds, kept by exports that stored the page after it rendered.
 // Its query (`pub`, `ref`, `context`, `analytics`, `w`) describes the embedding page.
-export const imgurResolveEmbed: ResolveEmbed = (url) => {
+export const imgurResolveEmbed: ResolveUrlEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, imgurPageHosts, isHostOf)
 
   if (!parsed) {
@@ -220,7 +225,7 @@ export const imgurFieldCleaners: Array<FieldCleaner> = [
 // A forum's s9e MediaEmbed helper frame, naming the post or album in its url fragment. The helper
 // page reads an encoded `%2F` as the slash it stands for.
 export const imgurS9eEmbedResolver = createS9eEmbedResolver('imgur', (path) => {
-  return imgurResolveEmbed(`https://imgur.com/${path.replaceAll('%2F', '/')}`)
+  return imgurResolveEmbed(new URL(`https://imgur.com/${path.replaceAll('%2F', '/')}`))
 })
 
 // The embed posts its rendered height on load, unasked, as a JSON string carrying

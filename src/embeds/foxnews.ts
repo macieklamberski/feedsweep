@@ -6,7 +6,7 @@ import {
   isAnyOf,
   parseUrl,
 } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -57,17 +57,10 @@ const composeEmbed = (brand: FoxBrand, id: string): EmbedResolverResult => {
 // iframe, or the legacy video page in its path, and the rest of the query is the snippet's size
 // or the embedding page's referrer. The ids of the retired root `embed.js` route are gone from
 // both the player and the page.
-export const foxnewsResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
-  const brand = foxBrands.find((brand) => brand.playerHost === parsed.hostname)
-  const id =
-    getQueryParam(parsed.searchParams, 'video_id') ?? getQueryParam(parsed.searchParams, 'id')
-  const [route, page] = getPathSegments(parsed)
+export const foxnewsResolveEmbed: ResolveUrlEmbed = (url) => {
+  const brand = foxBrands.find((brand) => brand.playerHost === url.hostname)
+  const id = getQueryParam(url.searchParams, 'video_id') ?? getQueryParam(url.searchParams, 'id')
+  const [route, page] = getPathSegments(url)
 
   if (!brand || !isAnyOf(route, 'v')) {
     return
@@ -94,7 +87,13 @@ export const foxnewsResolveEmbed: ResolveEmbed = (url) => {
 export const foxnewsScriptEmbedResolver = createMarkupEmbedResolver(
   playerHosts.map((host) => `script[src*="${host}/v/embed.js" i]`).join(', '),
   (element) => {
-    return foxnewsResolveEmbed(attr(element, 'src') ?? '')
+    const url = parseUrl(attr(element, 'src') ?? '', placeholderBaseUrl)
+
+    if (!url) {
+      return
+    }
+
+    return foxnewsResolveEmbed(url)
   },
 )
 

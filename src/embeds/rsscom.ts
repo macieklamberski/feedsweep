@@ -1,8 +1,8 @@
-import { composeQuery, getPathSegments, parseUrl } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { composeQuery, getPathSegments } from 'trousse'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readObjectHeight } from '../utils/hints.js'
-import { digitsRegex, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'rsscom'
@@ -18,20 +18,14 @@ const playerParams = { v: '2' }
 
 // An RSS.com podcast player, framed as `/{slug}/{episodeId}` for an episode and `/{slug}` for the
 // show with its episode list, which `/{slug}/{word}` plays too.
-export const rsscomResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
-  const [slug, episodeId, ...rest] = getPathSegments(parsed)
+export const rsscomResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const [slug, episodeId, ...rest] = getPathSegments(url)
 
   if (!slug || rest.length > 0) {
     return
   }
 
-  const query = composeQuery({ ...playerParams, ...pickQueryParams(parsed.search, ['time']) })
+  const query = composeQuery({ ...playerParams, ...pickQueryParams(url.search, ['time']) })
   const title = attr(element, 'title')
 
   if (episodeId === latestSegment) {

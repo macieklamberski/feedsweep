@@ -1,5 +1,5 @@
 import { encodePathSegment, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -12,14 +12,8 @@ const pastebinHosts = ['pastebin.com']
 // including one whose paste is alive on the path form, so the two share an id space.
 const embedRoutes = ['embed_iframe', 'embed_js', 'embed_iframe.php', 'embed_js.php']
 
-const readPasteId = (url: string | undefined): string | undefined => {
-  const parsed = parseUrlOnHosts(url, pastebinHosts)
-
-  if (!parsed) {
-    return
-  }
-
-  const [route, pasteId, ...rest] = getPathSegments(parsed)
+const readPasteId = (url: URL): string | undefined => {
+  const [route, pasteId, ...rest] = getPathSegments(url)
 
   if (!route || !isAnyOf(route, embedRoutes) || rest.length) {
     return
@@ -29,7 +23,7 @@ const readPasteId = (url: string | undefined): string | undefined => {
     return pasteId
   }
 
-  const queryId = getQueryParam(parsed.searchParams, 'i')
+  const queryId = getQueryParam(url.searchParams, 'i')
 
   if (!queryId) {
     return
@@ -39,7 +33,7 @@ const readPasteId = (url: string | undefined): string | undefined => {
   return encodePathSegment(queryId)
 }
 
-export const pastebinResolveEmbed: ResolveEmbed = (url) => {
+export const pastebinResolveEmbed: ResolveUrlEmbed = (url) => {
   const pasteId = readPasteId(url)
 
   if (!pasteId) {
@@ -65,6 +59,12 @@ export const pastebinIframeEmbedResolver = createUrlEmbedResolver(
 export const pastebinScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="pastebin.com/embed_js" i]',
   (element) => {
-    return pastebinResolveEmbed(attr(element, 'src') ?? '')
+    const url = parseUrlOnHosts(attr(element, 'src'), pastebinHosts)
+
+    if (!url) {
+      return
+    }
+
+    return pastebinResolveEmbed(url)
   },
 )

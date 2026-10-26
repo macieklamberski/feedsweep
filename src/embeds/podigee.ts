@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf, isPlainObject, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest, readPixels } from '../utils/hints.js'
 import { placeholderBaseUrl, repairCarrierUrl } from '../utils/urls.js'
@@ -50,22 +50,24 @@ export const podigeeScriptEmbedResolver = createMarkupEmbedResolver(
     const configuration = repairCarrierUrl(attr(element, 'data-configuration') ?? '')
     const parsed = parseUrl(configuration, placeholderBaseUrl)
 
-    if (parsed && showHostRegex.test(parsed.hostname) && isAnyOf(parsed.pathname, '/embed')) {
+    if (!parsed) {
+      return
+    }
+
+    if (showHostRegex.test(parsed.hostname) && isAnyOf(parsed.pathname, '/embed')) {
       return composeEmbed(parsed)
     }
 
-    return podigeeResolveEmbed(configuration)
+    return podigeeResolveEmbed(parsed, element)
   },
 )
 
-export const podigeeResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed || !showHostRegex.test(parsed.hostname)) {
+export const podigeeResolveEmbed: ResolveUrlEmbed = (url) => {
+  if (!showHostRegex.test(url.hostname)) {
     return
   }
 
-  const [episode, ...rest] = getPathSegments(parsed)
+  const [episode, ...rest] = getPathSegments(url)
 
   if (!episode) {
     return
@@ -73,12 +75,12 @@ export const podigeeResolveEmbed: ResolveEmbed = (url) => {
 
   // With anything after `embed` the show serves its website page.
   if (isAnyOf(rest[0], 'embed') && rest.length === 1) {
-    return composeEmbed(parsed, episode)
+    return composeEmbed(url, episode)
   }
 
   // {episode}/embed answers 302 to player.podigee-cdn.net/podcast-player/podigee-podcast-player
   // .html for a real episode and 404 for an invented one.
-  return safeEpisodeRegex.test(episode) ? composeEmbed(parsed, episode) : undefined
+  return safeEpisodeRegex.test(episode) ? composeEmbed(url, episode) : undefined
 }
 
 // An iframe framing a Podigee episode page rather than the player, so the reader gets an article.

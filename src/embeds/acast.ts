@@ -1,8 +1,7 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
+import { getPathSegments, isAnyOf } from 'trousse'
+import type { EmbedRenderHint, FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'acast'
@@ -16,11 +15,10 @@ const playerHeight = 190
 // `embed.acast.com/$/{show}/{episode}`, the same path without the `$`, and the older
 // `player.acast.com/{show}/episodes/{episode}`, with or without `episodes`. A show alone is the
 // playlist player.
-const extractAcastEmbed = (link: string): { show: string; episode?: string } | undefined => {
-  const parsed = parseUrl(link, placeholderBaseUrl)
-  const allSegments = parsed ? getPathSegments(parsed) : []
+const extractAcastEmbed = (url: URL): { show: string; episode?: string } | undefined => {
+  const allSegments = getPathSegments(url)
   const segments = allSegments[0] === '$' ? allSegments.slice(1) : allSegments
-  const isPlayerHost = parsed?.hostname === 'player.acast.com'
+  const isPlayerHost = url.hostname === 'player.acast.com'
   const isEpisodesRoute = isPlayerHost && isAnyOf(segments[1], 'episodes')
   const [show, episode] = isEpisodesRoute ? [segments[0], segments[2]] : segments
 
@@ -31,7 +29,7 @@ const extractAcastEmbed = (link: string): { show: string; episode?: string } | u
   return { show, episode }
 }
 
-const acastResolveEmbed: ResolveEmbed = (url, element) => {
+const acastResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const embed = extractAcastEmbed(url)
 
   if (!embed) {

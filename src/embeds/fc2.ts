@@ -1,7 +1,7 @@
-import { encodePathSegment, getQueryParam, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { encodePathSegment, getQueryParam } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'fc2'
@@ -26,25 +26,22 @@ const composeEmbed = (contentId: string): EmbedResolverResult => {
   }
 }
 
-const fc2IframeResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const contentId = parsed?.pathname.match(embedPlayerRegex)?.[1]
+const fc2IframeResolveEmbed: ResolveUrlEmbed = (url) => {
+  const contentId = url.pathname.match(embedPlayerRegex)?.[1]
 
-  if (!parsed || !contentId) {
+  if (!contentId) {
     return
   }
 
   return composeEmbed(contentId)
 }
 
-const fc2FlashResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed || !flashPlayerRegex.test(parsed.pathname)) {
+const fc2FlashResolveEmbed: ResolveUrlEmbed = (url) => {
+  if (!flashPlayerRegex.test(url.pathname)) {
     return
   }
 
-  const videoId = getQueryParam(parsed.searchParams, 'i')
+  const videoId = getQueryParam(url.searchParams, 'i')
 
   if (!videoId) {
     return
@@ -53,11 +50,11 @@ const fc2FlashResolveEmbed: ResolveEmbed = (url) => {
   // The id comes out of the query decoded, and it goes into a path.
   const contentId = encodePathSegment(videoId)
 
-  const duration = Number(getQueryParam(parsed.searchParams, 'd'))
+  const duration = Number(getQueryParam(url.searchParams, 'd'))
 
   return {
     ...composeEmbed(contentId),
-    title: getQueryParam(parsed.searchParams, 'tl'),
+    title: getQueryParam(url.searchParams, 'tl'),
     duration: duration > 0 ? duration : undefined,
   }
 }

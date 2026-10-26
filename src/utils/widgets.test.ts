@@ -1857,7 +1857,7 @@ describeForEachParser('objects naming their player in a movie param', (parseHtml
 
 describeForEachParser('createUrlEmbedResolver', (parseHtml) => {
   const resolver = createUrlEmbedResolver(['x.test'], (url) => {
-    return { provider: 'example', id: 'abc', src: url }
+    return { provider: 'example', id: 'abc', src: url.href }
   })
 
   const extract = (value: string) => {

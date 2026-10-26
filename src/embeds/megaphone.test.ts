@@ -18,7 +18,7 @@ describe('extractMegaphoneEmbed', () => {
       height: 200,
     }
 
-    expect(extractMegaphoneEmbed(value)).toEqual(expected)
+    expect(extractMegaphoneEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read a playlist embed', () => {
@@ -30,19 +30,13 @@ describe('extractMegaphoneEmbed', () => {
       height: 482,
     }
 
-    expect(extractMegaphoneEmbed(value)).toEqual(expected)
+    expect(extractMegaphoneEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined when nothing is named', () => {
     const value = 'https://playlist.megaphone.fm/?light=true'
 
-    expect(extractMegaphoneEmbed(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a url that cannot be parsed', () => {
-    const value = 'https://['
-
-    expect(extractMegaphoneEmbed(value)).toBeUndefined()
+    expect(extractMegaphoneEmbed(new URL(value))).toBeUndefined()
   })
 
   // The parameters on a media url belong to the publisher, not to Megaphone. NPR names its own
@@ -51,13 +45,13 @@ describe('extractMegaphoneEmbed', () => {
   it('should not read a publisher parameter off the episode audio', () => {
     const value = 'https://dcs.megaphone.fm/NPR9963319425.mp3?e=nx-s1-5501163&p=510310'
 
-    expect(extractMegaphoneEmbed(value)).toBeUndefined()
+    expect(extractMegaphoneEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should not read a media url that names no parameter at all', () => {
     const value = 'https://dcs.megaphone.fm/NPR9963319425.mp3'
 
-    expect(extractMegaphoneEmbed(value)).toBeUndefined()
+    expect(extractMegaphoneEmbed(new URL(value))).toBeUndefined()
   })
 
   // The refusal covers every file the reader can already show and not only the playable ones. A
@@ -71,14 +65,14 @@ describe('extractMegaphoneEmbed', () => {
   ]
 
   it.each(fileUrls)('should not read a publisher parameter off a file url (%s)', (url) => {
-    expect(extractMegaphoneEmbed(url)).toBeUndefined()
+    expect(extractMegaphoneEmbed(new URL(url))).toBeUndefined()
   })
 
   // NPR writes its bare story number into ?e=, and an episode id opens with letters.
   it('should not read a bare number as an episode id', () => {
     const value = 'https://playlist.megaphone.fm/?e=510310'
 
-    expect(extractMegaphoneEmbed(value)).toBeUndefined()
+    expect(extractMegaphoneEmbed(new URL(value))).toBeUndefined()
   })
 
   // The prefix is the publisher's own name, so it has no length anyone controls. Both of these
@@ -94,7 +88,7 @@ describe('extractMegaphoneEmbed', () => {
       const value = `https://playlist.megaphone.fm/?e=${id}`
       const expected = { param: 'e', kind: 'episode', id, height: 200 }
 
-      expect(extractMegaphoneEmbed(value)).toEqual(expected)
+      expect(extractMegaphoneEmbed(new URL(value))).toEqual(expected)
     },
   )
 
@@ -109,7 +103,7 @@ describe('extractMegaphoneEmbed', () => {
       height: 200,
     }
 
-    expect(extractMegaphoneEmbed(value)).toEqual(expected)
+    expect(extractMegaphoneEmbed(new URL(value))).toEqual(expected)
   })
 
   // A playlist is named by a slug, which has no digit grammar to check.
@@ -122,7 +116,7 @@ describe('extractMegaphoneEmbed', () => {
       height: 482,
     }
 
-    expect(extractMegaphoneEmbed(value)).toEqual(expected)
+    expect(extractMegaphoneEmbed(new URL(value))).toEqual(expected)
   })
 })
 
@@ -136,7 +130,7 @@ describe('extractMegaphoneEmbed on the legacy episode player', () => {
       height: 200,
     }
 
-    expect(extractMegaphoneEmbed(value)).toEqual(expected)
+    expect(extractMegaphoneEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read the episode with a trailing slash', () => {
@@ -148,38 +142,38 @@ describe('extractMegaphoneEmbed on the legacy episode player', () => {
       height: 200,
     }
 
-    expect(extractMegaphoneEmbed(value)).toEqual(expected)
+    expect(extractMegaphoneEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should ignore the same path on the current player host', () => {
     const value = 'https://playlist.megaphone.fm/VMP9785445903'
 
-    expect(extractMegaphoneEmbed(value)).toBeUndefined()
+    expect(extractMegaphoneEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should ignore a path segment outside the episode format', () => {
     const value = 'https://player.megaphone.fm/settings'
 
-    expect(extractMegaphoneEmbed(value)).toBeUndefined()
+    expect(extractMegaphoneEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should ignore the episode nested under another segment', () => {
     const value = 'https://player.megaphone.fm/x/VMP9785445903'
 
-    expect(extractMegaphoneEmbed(value)).toBeUndefined()
+    expect(extractMegaphoneEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should ignore a segment after the episode', () => {
     const value = 'https://player.megaphone.fm/VMP9785445903/extra'
 
-    expect(extractMegaphoneEmbed(value)).toBeUndefined()
+    expect(extractMegaphoneEmbed(new URL(value))).toBeUndefined()
   })
 
   // Constructed: no lab carrier writes anything but letters before the episode digits.
   it('should ignore a percent sign inside the episode prefix', () => {
     const value = 'https://player.megaphone.fm/VMP%9785445903'
 
-    expect(extractMegaphoneEmbed(value)).toBeUndefined()
+    expect(extractMegaphoneEmbed(new URL(value))).toBeUndefined()
   })
 })
 
@@ -193,7 +187,7 @@ describe('megaphoneResolveEmbed', () => {
       height: 200,
     }
 
-    expect(megaphoneResolveEmbed(value)).toEqual(expected)
+    expect(megaphoneResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // A playlist squeezed into the episode height is the visible failure this separation avoids.
@@ -206,7 +200,7 @@ describe('megaphoneResolveEmbed', () => {
       height: 482,
     }
 
-    expect(megaphoneResolveEmbed(value)).toEqual(expected)
+    expect(megaphoneResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should keep the start position and drop a tracker', () => {
@@ -218,7 +212,7 @@ describe('megaphoneResolveEmbed', () => {
       height: 200,
     }
 
-    expect(megaphoneResolveEmbed(value)).toEqual(expected)
+    expect(megaphoneResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should keep a start position of zero as written', () => {
@@ -230,7 +224,7 @@ describe('megaphoneResolveEmbed', () => {
       height: 200,
     }
 
-    expect(megaphoneResolveEmbed(value)).toEqual(expected)
+    expect(megaphoneResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should use a malformed episode id as written, even if the player answers an error', () => {
@@ -242,7 +236,7 @@ describe('megaphoneResolveEmbed', () => {
       height: 200,
     }
 
-    expect(megaphoneResolveEmbed(value)).toEqual(expected)
+    expect(megaphoneResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should use a malformed playlist id as written, even if the player answers an error', () => {
@@ -254,13 +248,13 @@ describe('megaphoneResolveEmbed', () => {
       height: 482,
     }
 
-    expect(megaphoneResolveEmbed(value)).toEqual(expected)
+    expect(megaphoneResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a megaphone url naming no episode', () => {
     const value = 'https://playlist.megaphone.fm/?x=ABC123'
 
-    expect(megaphoneResolveEmbed(value)).toBeUndefined()
+    expect(megaphoneResolveEmbed(new URL(value))).toBeUndefined()
   })
 })
 

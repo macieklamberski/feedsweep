@@ -1,7 +1,6 @@
-import { composeQuery, encodePathSegment, getQueryParam, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import { composeQuery, encodePathSegment, getQueryParam } from 'trousse'
+import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const amebaHosts = ['static.blog-video.jp']
@@ -13,8 +12,8 @@ const imagePagePathRegex = /^\/p\/embed\/([^/]+\/image-[^/]+)\.html$/i
 // Ameba's movie player, `static.blog-video.jp/?v={id}`, for a video uploaded into a blog post.
 // The id is the whole key the platform's own endpoint takes. Its thumbnails are pathed by the
 // blog's own user id, which the carrier does not name, so no poster is minted.
-export const amebaResolveEmbed: ResolveEmbed = (url) => {
-  const videoId = getQueryParam(parseUrl(url, placeholderBaseUrl)?.searchParams, 'v')
+export const amebaResolveEmbed: ResolveUrlEmbed = (url) => {
+  const videoId = getQueryParam(url.searchParams, 'v')
 
   if (!videoId) {
     return
@@ -45,7 +44,7 @@ const readReblogCardId = (
 // a blogger gets when reblogging another Ameba post. Only the blog and the entry together name
 // the reblogged post, so the id carries the pair and composes the post's own page from it.
 export const amebaReblogCardEmbedResolver = createUrlEmbedResolver(amebloHosts, (url, element) => {
-  const match = reblogCardPathRegex.exec(parseUrl(url, placeholderBaseUrl)?.pathname ?? '')
+  const match = reblogCardPathRegex.exec(url.pathname)
 
   if (!match) {
     return
@@ -75,7 +74,7 @@ export const amebaReblogCardEmbedResolver = createUrlEmbedResolver(amebloHosts, 
 // the iframe for one image inside a post. The image file's url carries an upload date, an hour and
 // three hashed path segments the carrier does not name, so no thumbnail is minted.
 export const amebaImagePageEmbedResolver = createUrlEmbedResolver(amebloHosts, (url) => {
-  const match = imagePagePathRegex.exec(parseUrl(url, placeholderBaseUrl)?.pathname ?? '')
+  const match = imagePagePathRegex.exec(url.pathname)
 
   if (!match) {
     return

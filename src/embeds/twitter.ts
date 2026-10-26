@@ -6,7 +6,7 @@ import {
   isPlainObject,
   parseUrl,
 } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, find, jsonAttr, keepIfMatches, setInnerHtml, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
@@ -60,8 +60,9 @@ const handleStandIn = 'i'
 
 type Status = { handle: string; id: string }
 
-const readStatusUrl = (value: string | undefined): Status | undefined => {
-  const parsed = parseUrl(value ?? '', placeholderBaseUrl)
+const readStatusUrl = (value: string | URL | undefined): Status | undefined => {
+  // The url createUrlEmbedResolver hands its reader is already parsed.
+  const parsed = value instanceof URL ? value : parseUrl(value ?? '', placeholderBaseUrl)
 
   if (!parsed || !isTweetUrl(parsed)) {
     return
@@ -279,12 +280,10 @@ const playerPaths = ['/embed/Tweet.html', '/embed/index.html']
 
 // A post has no name: its words go to `description`, and the frame titles itself `Twitter Tweet`
 // or `X Post`.
-export const twitterResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url)
-  const framed =
-    parsed && isAnyOf(parsed.pathname, playerPaths)
-      ? getQueryParam(parsed.searchParams, 'id')
-      : undefined
+export const twitterResolveEmbed: ResolveUrlEmbed = (url) => {
+  const framed = isAnyOf(url.pathname, playerPaths)
+    ? getQueryParam(url.searchParams, 'id')
+    : undefined
   const id = keepIfMatches(framed, digitsRegex)
 
   if (id) {
@@ -306,7 +305,9 @@ export const twitterIframeEmbedResolver = createUrlEmbedResolver(
 
 // A forum's s9e MediaEmbed helper frame, naming the status id in its url fragment.
 export const twitterS9eEmbedResolver = createS9eEmbedResolver('twitter', (id) => {
-  return twitterResolveEmbed(`https://platform.twitter.com/embed/Tweet.html${composeQuery({ id })}`)
+  return twitterResolveEmbed(
+    new URL(`https://platform.twitter.com/embed/Tweet.html${composeQuery({ id })}`),
+  )
 })
 
 // The player reports its rendered height in a JSON-RPC envelope, unprompted, once the frame is

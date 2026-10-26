@@ -9,39 +9,33 @@ describe('extractAnchorEpisode', () => {
     const value = 'https://anchor.fm/myshow/embed/episodes/my-title-e123'
     const expected = 'myshow/my-title-e123'
 
-    expect(extractAnchorEpisode(value)).toBe(expected)
+    expect(extractAnchorEpisode(new URL(value))).toBe(expected)
   })
 
   it('should read the podcasters.spotify.com form', () => {
     const value = 'https://podcasters.spotify.com/pod/show/myshow/embed/episodes/my-title-e123'
     const expected = 'myshow/my-title-e123'
 
-    expect(extractAnchorEpisode(value)).toBe(expected)
+    expect(extractAnchorEpisode(new URL(value))).toBe(expected)
   })
 
   it('should read the creators.spotify.com form', () => {
     const value = 'https://creators.spotify.com/pod/profile/me/embed/episodes/my-title-e1/a-abc'
     const expected = 'me/my-title-e1'
 
-    expect(extractAnchorEpisode(value)).toBe(expected)
+    expect(extractAnchorEpisode(new URL(value))).toBe(expected)
   })
 
   it('should return undefined for a show page rather than an embed', () => {
     const value = 'https://anchor.fm/myshow'
 
-    expect(extractAnchorEpisode(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a url that cannot be parsed', () => {
-    const value = 'https://['
-
-    expect(extractAnchorEpisode(value)).toBeUndefined()
+    expect(extractAnchorEpisode(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a anchor url naming no episode', () => {
     const value = 'https://anchor.fm/pricing'
 
-    expect(extractAnchorEpisode(value)).toBeUndefined()
+    expect(extractAnchorEpisode(new URL(value))).toBeUndefined()
   })
 
   // The marker is present but the episode segment is not, which is a different guard from a
@@ -49,13 +43,13 @@ describe('extractAnchorEpisode', () => {
   it('should return undefined when the embed marker names no episode', () => {
     const value = 'https://anchor.fm/myshow/embed/episodes'
 
-    expect(extractAnchorEpisode(value)).toBeUndefined()
+    expect(extractAnchorEpisode(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined when no show precedes the embed marker', () => {
     const value = 'https://anchor.fm/embed/episodes/my-title-e123'
 
-    expect(extractAnchorEpisode(value)).toBeUndefined()
+    expect(extractAnchorEpisode(new URL(value))).toBeUndefined()
   })
 })
 
@@ -69,7 +63,7 @@ describe('anchorResolveEmbed', () => {
       height: 100,
     }
 
-    expect(anchorResolveEmbed(value)).toEqual(expected)
+    expect(anchorResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should mint the creators player from a podcasters.spotify.com episode', () => {
@@ -81,7 +75,7 @@ describe('anchorResolveEmbed', () => {
       height: 100,
     }
 
-    expect(anchorResolveEmbed(value)).toEqual(expected)
+    expect(anchorResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should mint the profile route from a creators.spotify.com show route', () => {
@@ -93,7 +87,7 @@ describe('anchorResolveEmbed', () => {
       height: 100,
     }
 
-    expect(anchorResolveEmbed(value)).toEqual(expected)
+    expect(anchorResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should drop the audio segment', () => {
@@ -105,7 +99,7 @@ describe('anchorResolveEmbed', () => {
       height: 100,
     }
 
-    expect(anchorResolveEmbed(value)).toEqual(expected)
+    expect(anchorResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should drop the secret WordPress writes into the query', () => {
@@ -117,7 +111,7 @@ describe('anchorResolveEmbed', () => {
       height: 100,
     }
 
-    expect(anchorResolveEmbed(value)).toEqual(expected)
+    expect(anchorResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should insert the show and episode as written', () => {
@@ -129,13 +123,13 @@ describe('anchorResolveEmbed', () => {
       height: 100,
     }
 
-    expect(anchorResolveEmbed(value)).toEqual(expected)
+    expect(anchorResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a anchor url naming no episode', () => {
     const value = 'https://anchor.fm/pricing'
 
-    expect(anchorResolveEmbed(value)).toBeUndefined()
+    expect(anchorResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should mint the creators show player from an anchor.fm show', () => {
@@ -147,7 +141,7 @@ describe('anchorResolveEmbed', () => {
       height: 100,
     }
 
-    expect(anchorResolveEmbed(value)).toEqual(expected)
+    expect(anchorResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should drop the secret WordPress writes into the hash of a show player', () => {
@@ -159,7 +153,7 @@ describe('anchorResolveEmbed', () => {
       height: 100,
     }
 
-    expect(anchorResolveEmbed(value)).toEqual(expected)
+    expect(anchorResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should mint the creators show player from a podcasters.spotify.com show', () => {
@@ -171,7 +165,7 @@ describe('anchorResolveEmbed', () => {
       height: 100,
     }
 
-    expect(anchorResolveEmbed(value)).toEqual(expected)
+    expect(anchorResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should mint the profile route from a creators.spotify.com show player on the show route', () => {
@@ -183,7 +177,7 @@ describe('anchorResolveEmbed', () => {
       height: 100,
     }
 
-    expect(anchorResolveEmbed(value)).toEqual(expected)
+    expect(anchorResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read the creators.spotify.com show player it mints', () => {
@@ -195,7 +189,7 @@ describe('anchorResolveEmbed', () => {
       height: 100,
     }
 
-    expect(anchorResolveEmbed(value)).toEqual(expected)
+    expect(anchorResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should rebuild an episode page onto its player', () => {
@@ -207,7 +201,7 @@ describe('anchorResolveEmbed', () => {
       height: 100,
     }
 
-    expect(anchorResolveEmbed(value)).toEqual(expected)
+    expect(anchorResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should rebuild the episode page a publisher framed', () => {
@@ -220,79 +214,73 @@ describe('anchorResolveEmbed', () => {
       height: 100,
     }
 
-    expect(anchorResolveEmbed(value)).toEqual(expected)
+    expect(anchorResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should ignore the episode page path on a Spotify host', () => {
     const value = 'https://creators.spotify.com/myshow/episodes/my-title-e123'
 
-    expect(anchorResolveEmbed(value)).toBeUndefined()
+    expect(anchorResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should ignore an episode page path under another segment', () => {
     const value = 'https://anchor.fm/x/myshow/episodes/my-title-e123'
 
-    expect(anchorResolveEmbed(value)).toBeUndefined()
+    expect(anchorResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should ignore a segment after the episode page slug', () => {
     const value = 'https://anchor.fm/myshow/episodes/my-title-e123/extra'
 
-    expect(anchorResolveEmbed(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a url that cannot be parsed', () => {
-    const value = 'https://['
-
-    expect(anchorResolveEmbed(value)).toBeUndefined()
+    expect(anchorResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a player naming no show', () => {
     const value = 'https://anchor.fm/embed'
 
-    expect(anchorResolveEmbed(value)).toBeUndefined()
+    expect(anchorResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for an anchor.fm show player under a prefixed path', () => {
     const value = 'https://anchor.fm/x/turpentine-productions/embed'
 
-    expect(anchorResolveEmbed(value)).toBeUndefined()
+    expect(anchorResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for an anchor.fm show player with a trailing segment', () => {
     const value = 'https://anchor.fm/turpentine-productions/embed/extra'
 
-    expect(anchorResolveEmbed(value)).toBeUndefined()
+    expect(anchorResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for an embed segment after an episode page', () => {
     const value = 'https://anchor.fm/show/episodes/foo-e1/embed'
 
-    expect(anchorResolveEmbed(value)).toBeUndefined()
+    expect(anchorResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for the anchor.fm shape on a Spotify host', () => {
     const value = 'https://podcasters.spotify.com/pod/embed'
 
-    expect(anchorResolveEmbed(value)).toBeUndefined()
+    expect(anchorResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a Spotify route other than a show or profile', () => {
     const value = 'https://creators.spotify.com/pod/dashboard/embed'
 
-    expect(anchorResolveEmbed(value)).toBeUndefined()
+    expect(anchorResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a Spotify show player under a prefixed path', () => {
     const value = 'https://creators.spotify.com/x/pod/profile/turpentine-productions/embed'
 
-    expect(anchorResolveEmbed(value)).toBeUndefined()
+    expect(anchorResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a Spotify show player with a trailing segment', () => {
     const value = 'https://creators.spotify.com/pod/profile/turpentine-productions/embed/extra'
 
-    expect(anchorResolveEmbed(value)).toBeUndefined()
+    expect(anchorResolveEmbed(new URL(value))).toBeUndefined()
   })
 })
 

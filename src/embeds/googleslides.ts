@@ -1,5 +1,5 @@
-import { composeQuery, encodePathSegment, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { composeQuery, encodePathSegment, getQueryParam, isAnyOf } from 'trousse'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { pickQueryParams, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 import { getPathSegmentsWithoutWorkspace } from './googledrive.js'
@@ -26,16 +26,15 @@ const readDeckFragment = (parsed: URL): string => {
 
 // `/presentation/d/e/{id}` names a deck published to the web and `/presentation/d/{id}` names it
 // by its Drive file id. The legacy `/presentation/embed?id={id}` 301s onto the second.
-export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url)
+export const googleslidesResolveEmbed: ResolveUrlEmbed = (url) => {
   const segments = getPathSegmentsWithoutWorkspace(url)
 
-  if (!parsed || !isAnyOf(segments[0], 'presentation')) {
+  if (!isAnyOf(segments[0], 'presentation')) {
     return
   }
 
   if (isAnyOf(segments[1], 'embed')) {
-    const fileId = getQueryParam(parsed.searchParams, 'id')
+    const fileId = getQueryParam(url.searchParams, 'id')
 
     if (!fileId) {
       return
@@ -47,7 +46,7 @@ export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
     return {
       provider,
       id: fileId,
-      src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${readDeckFragment(parsed)}`,
+      src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${readDeckFragment(url)}`,
       url: `https://docs.google.com/presentation/d/${deckPath}/pub`,
       ratio: deckRatio,
     }
@@ -76,7 +75,7 @@ export const googleslidesResolveEmbed: ResolveEmbed = (url) => {
   return {
     provider,
     id: deckId,
-    src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${readDeckFragment(parsed)}`,
+    src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${readDeckFragment(url)}`,
     url: `https://docs.google.com/presentation/d/${deckPath}/pub`,
     ratio: deckRatio,
   }

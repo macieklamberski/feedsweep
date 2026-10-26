@@ -15,7 +15,7 @@ describe('podomaticResolveEmbed', () => {
         height: 208,
       }
 
-      expect(podomaticResolveEmbed(value)).toEqual(expected)
+      expect(podomaticResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read a podcast off the html5 player', () => {
@@ -27,7 +27,7 @@ describe('podomaticResolveEmbed', () => {
         height: 208,
       }
 
-      expect(podomaticResolveEmbed(value)).toEqual(expected)
+      expect(podomaticResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -35,13 +35,7 @@ describe('podomaticResolveEmbed', () => {
     it('should ignore a podomatic url naming no player', () => {
       const value = 'https://www.podomatic.com/podcasts/lisboalowcost'
 
-      expect(podomaticResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should ignore a url that cannot be parsed', () => {
-      const value = 'https://['
-
-      expect(podomaticResolveEmbed(value)).toBeUndefined()
+      expect(podomaticResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -55,7 +49,7 @@ describe('podomaticResolveEmbed', () => {
         height: 208,
       }
 
-      expect(podomaticResolveEmbed(value)).toEqual(expected)
+      expect(podomaticResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read a kind PodOmatic has not published yet', () => {
@@ -67,19 +61,19 @@ describe('podomaticResolveEmbed', () => {
         height: 208,
       }
 
-      expect(podomaticResolveEmbed(value)).toEqual(expected)
+      expect(podomaticResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should refuse an id sitting where the kind belongs', () => {
       const value = 'https://www.podomatic.com/embed/html5/2295001'
 
-      expect(podomaticResolveEmbed(value)).toBeUndefined()
+      expect(podomaticResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should refuse a player path under a route other than embed', () => {
       const value = 'https://www.podomatic.com/widget/html5/episode/10076958'
 
-      expect(podomaticResolveEmbed(value)).toBeUndefined()
+      expect(podomaticResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed kind as written, even if the player answers an error', () => {
@@ -91,7 +85,7 @@ describe('podomaticResolveEmbed', () => {
         height: 208,
       }
 
-      expect(podomaticResolveEmbed(value)).toEqual(expected)
+      expect(podomaticResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -105,7 +99,7 @@ describe('podomaticResolveEmbed', () => {
         height: 208,
       }
 
-      expect(podomaticResolveEmbed(value)).toEqual(expected)
+      expect(podomaticResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the square style and state the platform height', () => {
@@ -117,7 +111,7 @@ describe('podomaticResolveEmbed', () => {
         height: 208,
       }
 
-      expect(podomaticResolveEmbed(value)).toEqual(expected)
+      expect(podomaticResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -132,7 +126,7 @@ describe('podomaticResolveEmbed', () => {
         height: 205,
       }
 
-      expect(podomaticResolveEmbed(value)).toEqual(expected)
+      expect(podomaticResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should fall back to the podcast when no episode is picked', () => {
@@ -144,7 +138,7 @@ describe('podomaticResolveEmbed', () => {
         height: 205,
       }
 
-      expect(podomaticResolveEmbed(value)).toEqual(expected)
+      expect(podomaticResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use a malformed episode id as written, even if the player answers an error', () => {
@@ -156,7 +150,7 @@ describe('podomaticResolveEmbed', () => {
         height: 205,
       }
 
-      expect(podomaticResolveEmbed(value)).toEqual(expected)
+      expect(podomaticResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use a malformed podcast id as written, even if the player answers an error', () => {
@@ -168,7 +162,7 @@ describe('podomaticResolveEmbed', () => {
         height: 205,
       }
 
-      expect(podomaticResolveEmbed(value)).toEqual(expected)
+      expect(podomaticResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -179,7 +173,7 @@ describe('podomaticResolveEmbed', () => {
       const value =
         'https://www.podomatic.com/embed/frame/multi/0?json_url=http%3A%2F%2Ffilmdonthurt.podomatic.com%2Fembed%2Fmulti%2F0%3Fcolor%3Def3435'
 
-      expect(podomaticResolveEmbed(value)).toBeUndefined()
+      expect(podomaticResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     // The Flash player names its episode by account and timestamp, and only a fetch turns that
@@ -187,7 +181,7 @@ describe('podomaticResolveEmbed', () => {
     it('should leave the Flash player alone', () => {
       const value = 'https://lisboalowcost.podomatic.com/swf/joeplayer_v20.swf'
 
-      expect(podomaticResolveEmbed(value)).toBeUndefined()
+      expect(podomaticResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     // The posting frame 404s for a real entry as for a fabricated one, and it names the entry by
@@ -196,7 +190,7 @@ describe('podomaticResolveEmbed', () => {
       const value =
         'http://rebelliondogs12stepradio.podomatic.com/embed/frame/posting/2016-07-08T15_06_10-07_00?json_url=http%3A%2F%2Frebelliondogs12stepradio.podomatic.com%2Fentry%2Fembed_params%2F2016-07-08T15_06_10-07_00%3Fcolor%3D43bee7%26autoPlay%3Dfalse%26facebook%3Dtrue%26height%3D85%26minicast%3Dfalse%26objembed%3D0%26width%3D440&notb=1'
 
-      expect(podomaticResolveEmbed(value)).toBeUndefined()
+      expect(podomaticResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

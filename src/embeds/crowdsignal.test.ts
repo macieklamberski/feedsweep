@@ -21,7 +21,7 @@ describe('crowdsignalResolveEmbed', () => {
         height: 533,
       }
 
-      expect(crowdsignalResolveEmbed(value)).toEqual(expected)
+      expect(crowdsignalResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should frame the poll page the same way', () => {
@@ -34,7 +34,7 @@ describe('crowdsignalResolveEmbed', () => {
         height: 533,
       }
 
-      expect(crowdsignalResolveEmbed(value)).toEqual(expected)
+      expect(crowdsignalResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the poll frame written with a trailing slash', () => {
@@ -47,7 +47,7 @@ describe('crowdsignalResolveEmbed', () => {
         height: 533,
       }
 
-      expect(crowdsignalResolveEmbed(value)).toEqual(expected)
+      expect(crowdsignalResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the font size the snippet writes into the frame query', () => {
@@ -60,7 +60,7 @@ describe('crowdsignalResolveEmbed', () => {
         height: 533,
       }
 
-      expect(crowdsignalResolveEmbed(value)).toEqual(expected)
+      expect(crowdsignalResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a tracker from the frame query', () => {
@@ -73,7 +73,7 @@ describe('crowdsignalResolveEmbed', () => {
         height: 533,
       }
 
-      expect(crowdsignalResolveEmbed(value)).toEqual(expected)
+      expect(crowdsignalResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -81,25 +81,25 @@ describe('crowdsignalResolveEmbed', () => {
     it('should ignore a path that is not a poll', () => {
       const value = 'https://poll.fm/about'
 
-      expect(crowdsignalResolveEmbed(value)).toBeUndefined()
+      expect(crowdsignalResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the poll results page', () => {
       const value = 'https://poll.fm/17125374/results'
 
-      expect(crowdsignalResolveEmbed(value)).toBeUndefined()
+      expect(crowdsignalResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a poll id under another route', () => {
       const value = 'https://poll.fm/x/17125374/embed'
 
-      expect(crowdsignalResolveEmbed(value)).toBeUndefined()
+      expect(crowdsignalResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a segment past the frame route', () => {
       const value = 'https://poll.fm/17125374/embed/extra'
 
-      expect(crowdsignalResolveEmbed(value)).toBeUndefined()
+      expect(crowdsignalResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

@@ -18,7 +18,7 @@ describe('extractIvooxSubject', () => {
       page: '1',
     }
 
-    expect(extractIvooxSubject(value)).toEqual(expected)
+    expect(extractIvooxSubject(new URL(value))).toEqual(expected)
   })
 
   it('should read an episode from the legacy player', () => {
@@ -29,7 +29,7 @@ describe('extractIvooxSubject', () => {
       page: '1',
     }
 
-    expect(extractIvooxSubject(value)).toEqual(expected)
+    expect(extractIvooxSubject(new URL(value))).toEqual(expected)
   })
 
   // The other two legacy generations, `_ep_` and `_em_`, name the episode with the same id.
@@ -41,7 +41,7 @@ describe('extractIvooxSubject', () => {
       page: '1',
     }
 
-    expect(extractIvooxSubject(value)).toEqual(expected)
+    expect(extractIvooxSubject(new URL(value))).toEqual(expected)
   })
 
   it('should read an episode from the earliest legacy generation', () => {
@@ -52,7 +52,7 @@ describe('extractIvooxSubject', () => {
       page: '1',
     }
 
-    expect(extractIvooxSubject(value)).toEqual(expected)
+    expect(extractIvooxSubject(new URL(value))).toEqual(expected)
   })
 
   it('should read a legacy player whose file name spells iVoox with a capital V', () => {
@@ -63,7 +63,7 @@ describe('extractIvooxSubject', () => {
       page: '1',
     }
 
-    expect(extractIvooxSubject(value)).toEqual(expected)
+    expect(extractIvooxSubject(new URL(value))).toEqual(expected)
   })
 
   // The letters are enumerated because they are not a sequence: the ones outside the list answer
@@ -72,7 +72,7 @@ describe('extractIvooxSubject', () => {
   it('should ignore an unlisted legacy generation letter', () => {
     const value = 'http://www.ivoox.com/playerivoox_ez_1617339_1.html'
 
-    expect(extractIvooxSubject(value)).toBeUndefined()
+    expect(extractIvooxSubject(new URL(value))).toBeUndefined()
   })
 
   it('should read the regional player host', () => {
@@ -83,7 +83,7 @@ describe('extractIvooxSubject', () => {
       page: '1',
     }
 
-    expect(extractIvooxSubject(value)).toEqual(expected)
+    expect(extractIvooxSubject(new URL(value))).toEqual(expected)
   })
 
   it('should read an episode from the newer player generation', () => {
@@ -94,7 +94,7 @@ describe('extractIvooxSubject', () => {
       page: '1',
     }
 
-    expect(extractIvooxSubject(value)).toEqual(expected)
+    expect(extractIvooxSubject(new URL(value))).toEqual(expected)
   })
 
   it('should read the newer generation written without a skin', () => {
@@ -105,7 +105,7 @@ describe('extractIvooxSubject', () => {
       page: '1',
     }
 
-    expect(extractIvooxSubject(value)).toEqual(expected)
+    expect(extractIvooxSubject(new URL(value))).toEqual(expected)
   })
 
   it('should read a show from the podcast player', () => {
@@ -116,7 +116,7 @@ describe('extractIvooxSubject', () => {
       page: '1',
     }
 
-    expect(extractIvooxSubject(value)).toEqual(expected)
+    expect(extractIvooxSubject(new URL(value))).toEqual(expected)
   })
 
   it('should read the playlist page a show states', () => {
@@ -127,7 +127,7 @@ describe('extractIvooxSubject', () => {
       page: '3',
     }
 
-    expect(extractIvooxSubject(value)).toEqual(expected)
+    expect(extractIvooxSubject(new URL(value))).toEqual(expected)
   })
 
   it('should read a show written with the page alone', () => {
@@ -138,7 +138,7 @@ describe('extractIvooxSubject', () => {
       page: '3',
     }
 
-    expect(extractIvooxSubject(value)).toEqual(expected)
+    expect(extractIvooxSubject(new URL(value))).toEqual(expected)
   })
 
   it('should use a malformed episode id as written, even if the player answers an error', () => {
@@ -149,7 +149,7 @@ describe('extractIvooxSubject', () => {
       page: '1',
     }
 
-    expect(extractIvooxSubject(value)).toEqual(expected)
+    expect(extractIvooxSubject(new URL(value))).toEqual(expected)
   })
 
   it('should use a malformed legacy episode id as written, even if the player answers an error', () => {
@@ -160,13 +160,13 @@ describe('extractIvooxSubject', () => {
       page: '1',
     }
 
-    expect(extractIvooxSubject(value)).toEqual(expected)
+    expect(extractIvooxSubject(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a podcast id that is not digits', () => {
     const value = 'https://www.ivoox.com/player_es_podcast_x1267769_1.html'
 
-    expect(extractIvooxSubject(value)).toBeUndefined()
+    expect(extractIvooxSubject(new URL(value))).toBeUndefined()
   })
 
   it('should read a podcast id of unusual length as written', () => {
@@ -177,7 +177,7 @@ describe('extractIvooxSubject', () => {
       page: '1',
     }
 
-    expect(extractIvooxSubject(value)).toEqual(expected)
+    expect(extractIvooxSubject(new URL(value))).toEqual(expected)
   })
 
   it('should read the legacy player in the case its own snippet wrote', () => {
@@ -188,43 +188,37 @@ describe('extractIvooxSubject', () => {
       page: '1',
     }
 
-    expect(extractIvooxSubject(value)).toEqual(expected)
+    expect(extractIvooxSubject(new URL(value))).toEqual(expected)
   })
 
   it('should ignore a slugged page whose file name ends in a player', () => {
     const value = 'https://www.ivoox.com/mi-podcast-player_ej_123456_1_1.html'
 
-    expect(extractIvooxSubject(value)).toBeUndefined()
+    expect(extractIvooxSubject(new URL(value))).toBeUndefined()
   })
 
   it('should ignore a current player path followed by another segment', () => {
     const value = 'https://www.ivoox.com/player_ej_80807760_6_1.html/extra'
 
-    expect(extractIvooxSubject(value)).toBeUndefined()
+    expect(extractIvooxSubject(new URL(value))).toBeUndefined()
   })
 
   it('should ignore a legacy player path followed by another segment', () => {
     const value = 'http://www.ivoox.com/playerivoox_ee_8292430_1.html/extra'
 
-    expect(extractIvooxSubject(value)).toBeUndefined()
+    expect(extractIvooxSubject(new URL(value))).toBeUndefined()
   })
 
   it('should ignore a show player path followed by another segment', () => {
     const value = 'https://www.ivoox.com/player_es_podcast_1267769_1.html/extra'
 
-    expect(extractIvooxSubject(value)).toBeUndefined()
+    expect(extractIvooxSubject(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for an ivoox url that is not a player', () => {
     const value = 'https://www.ivoox.com/podcast-something_sq_f1_1.html'
 
-    expect(extractIvooxSubject(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a url that cannot be parsed', () => {
-    const value = 'https://['
-
-    expect(extractIvooxSubject(value)).toBeUndefined()
+    expect(extractIvooxSubject(new URL(value))).toBeUndefined()
   })
 })
 
@@ -239,7 +233,7 @@ describe('ivooxResolveEmbed', () => {
       height: 200,
     }
 
-    expect(ivooxResolveEmbed(value)).toEqual(expected)
+    expect(ivooxResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should rewrite the second legacy generation onto the same player', () => {
@@ -251,7 +245,7 @@ describe('ivooxResolveEmbed', () => {
       height: 200,
     }
 
-    expect(ivooxResolveEmbed(value)).toEqual(expected)
+    expect(ivooxResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should keep the current player as written', () => {
@@ -263,7 +257,7 @@ describe('ivooxResolveEmbed', () => {
       height: 200,
     }
 
-    expect(ivooxResolveEmbed(value)).toEqual(expected)
+    expect(ivooxResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should mint the current player in place of the mini one', () => {
@@ -275,7 +269,7 @@ describe('ivooxResolveEmbed', () => {
       height: 200,
     }
 
-    expect(ivooxResolveEmbed(value)).toEqual(expected)
+    expect(ivooxResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // A show id is a different id space from an episode id, so the kind stays in the placeholder.
@@ -288,7 +282,7 @@ describe('ivooxResolveEmbed', () => {
       height: 400,
     }
 
-    expect(ivooxResolveEmbed(value)).toEqual(expected)
+    expect(ivooxResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // The trailing segment opens the show's playlist on a different episode, so resetting it to 1
@@ -302,13 +296,13 @@ describe('ivooxResolveEmbed', () => {
       height: 400,
     }
 
-    expect(ivooxResolveEmbed(value)).toEqual(expected)
+    expect(ivooxResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a ivoox url naming no episode', () => {
     const value = 'https://www.ivoox.com/index.html'
 
-    expect(ivooxResolveEmbed(value)).toBeUndefined()
+    expect(ivooxResolveEmbed(new URL(value))).toBeUndefined()
   })
 })
 

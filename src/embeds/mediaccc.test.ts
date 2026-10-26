@@ -17,7 +17,7 @@ describe('mediacccResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(mediacccResolveEmbed(value)).toEqual(expected)
+      expect(mediacccResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the main host for the app host', () => {
@@ -31,7 +31,7 @@ describe('mediacccResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(mediacccResolveEmbed(value)).toEqual(expected)
+      expect(mediacccResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the trailing slash', () => {
@@ -44,7 +44,7 @@ describe('mediacccResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(mediacccResolveEmbed(value)).toEqual(expected)
+      expect(mediacccResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the slug in the case it was written', () => {
@@ -58,7 +58,7 @@ describe('mediacccResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(mediacccResolveEmbed(value)).toEqual(expected)
+      expect(mediacccResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the start position', () => {
@@ -71,7 +71,7 @@ describe('mediacccResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(mediacccResolveEmbed(value)).toEqual(expected)
+      expect(mediacccResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the language and subtitle picks beside the start position', () => {
@@ -84,7 +84,7 @@ describe('mediacccResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(mediacccResolveEmbed(value)).toEqual(expected)
+      expect(mediacccResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a query on the player', () => {
@@ -97,7 +97,7 @@ describe('mediacccResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(mediacccResolveEmbed(value)).toEqual(expected)
+      expect(mediacccResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the route words in another case and mint them in lowercase', () => {
@@ -110,7 +110,7 @@ describe('mediacccResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(mediacccResolveEmbed(value)).toEqual(expected)
+      expect(mediacccResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -118,32 +118,32 @@ describe('mediacccResolveEmbed', () => {
     it('should ignore the talk page, which refuses framing', () => {
       const value = 'https://media.ccc.de/v/why2025-23-tic-80-byte-jam'
 
-      expect(mediacccResolveEmbed(value)).toBeUndefined()
+      expect(mediacccResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path with a leading segment', () => {
       const value = 'https://media.ccc.de/x/v/why2025-23-tic-80-byte-jam/oembed'
 
-      expect(mediacccResolveEmbed(value)).toBeUndefined()
+      expect(mediacccResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path with a trailing segment', () => {
       const value = 'https://media.ccc.de/v/why2025-23-tic-80-byte-jam/oembed/extra'
 
-      expect(mediacccResolveEmbed(value)).toBeUndefined()
+      expect(mediacccResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a conference listing', () => {
       const value = 'https://media.ccc.de/c/38c3'
 
-      expect(mediacccResolveEmbed(value)).toBeUndefined()
+      expect(mediacccResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a recording file', () => {
       const value =
         'https://cdn.media.ccc.de/congress/2024/h264-hd/38c3-276-eng-Going_Long_Sending_weird_signals_over_long_haul_optical_networks.mp4'
 
-      expect(mediacccResolveEmbed(value)).toBeUndefined()
+      expect(mediacccResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

@@ -19,7 +19,7 @@ describe('zencastrResolveEmbed', () => {
       ratio: '1/1',
     }
 
-    expect(zencastrResolveEmbed(value)).toEqual(expected)
+    expect(zencastrResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should build the placeholder from the short host that forwards to the embed', () => {
@@ -32,7 +32,7 @@ describe('zencastrResolveEmbed', () => {
       ratio: '1/1',
     }
 
-    expect(zencastrResolveEmbed(value)).toEqual(expected)
+    expect(zencastrResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should build the placeholder from an id longer than the eight characters minted today', () => {
@@ -45,38 +45,38 @@ describe('zencastrResolveEmbed', () => {
       ratio: '1/1',
     }
 
-    expect(zencastrResolveEmbed(value)).toEqual(expected)
+    expect(zencastrResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a page that is not the embed', () => {
     const value = 'https://zencastr.com/pricing'
 
-    expect(zencastrResolveEmbed(value)).toBeUndefined()
+    expect(zencastrResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for the public episode page', () => {
     const value = 'https://zencastr.com/z/cK98nMcr'
 
-    expect(zencastrResolveEmbed(value)).toBeUndefined()
+    expect(zencastrResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for an embed path naming no episode', () => {
     const value = 'https://zencastr.com/embed'
 
-    expect(zencastrResolveEmbed(value)).toBeUndefined()
+    expect(zencastrResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   // The short host forwards the whole site, so Zencastr's vanity show links reach the resolver too.
   it('should return undefined for a show link on the short host', () => {
     const value = 'https://zen.ai/engineeringourfuture'
 
-    expect(zencastrResolveEmbed(value)).toBeUndefined()
+    expect(zencastrResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for an embed path going on past the id', () => {
     const value = 'https://zencastr.com/embed/cK98nMcr/transcript'
 
-    expect(zencastrResolveEmbed(value)).toBeUndefined()
+    expect(zencastrResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should use a malformed id as written, even if the player answers an error', () => {
@@ -89,13 +89,13 @@ describe('zencastrResolveEmbed', () => {
       ratio: '1/1',
     }
 
-    expect(zencastrResolveEmbed(value)).toEqual(expected)
+    expect(zencastrResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a lookalike host', () => {
     const value = 'https://zencastr.com.evil.test/embed/cK98nMcr'
 
-    expect(zencastrResolveEmbed(value)).toBeUndefined()
+    expect(zencastrResolveEmbed(new URL(value))).toBeUndefined()
   })
 })
 

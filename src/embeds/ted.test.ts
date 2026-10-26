@@ -9,7 +9,7 @@ describe('extractTedTalk', () => {
     const value = 'https://embed.ted.com/talks/ethan_zuckerman.html'
     const expected = 'ethan_zuckerman'
 
-    expect(extractTedTalk(value)).toBe(expected)
+    expect(extractTedTalk(new URL(value))).toBe(expected)
   })
 
   // The localized player inserts the language between the slug and the path.
@@ -17,14 +17,14 @@ describe('extractTedTalk', () => {
     const value = 'https://embed.ted.com/talks/lang/ja/ethan_zuckerman.html'
     const expected = 'ethan_zuckerman'
 
-    expect(extractTedTalk(value)).toBe(expected)
+    expect(extractTedTalk(new URL(value))).toBe(expected)
   })
 
   it('should read a slug with no html suffix', () => {
     const value = 'https://embed.ted.com/talks/ethan_zuckerman'
     const expected = 'ethan_zuckerman'
 
-    expect(extractTedTalk(value)).toBe(expected)
+    expect(extractTedTalk(new URL(value))).toBe(expected)
   })
 
   it('should read a talk slug from the embed-ssl player', () => {
@@ -32,67 +32,61 @@ describe('extractTedTalk', () => {
       'https://embed-ssl.ted.com/talks/carol_dweck_the_power_of_believing_that_you_can_improve.html'
     const expected = 'carol_dweck_the_power_of_believing_that_you_can_improve'
 
-    expect(extractTedTalk(value)).toBe(expected)
+    expect(extractTedTalk(new URL(value))).toBe(expected)
   })
 
   it('should read a talk slug from the talk page', () => {
     const value = 'https://www.ted.com/talks/diana_laufenberg_3_ways_to_teach'
     const expected = 'diana_laufenberg_3_ways_to_teach'
 
-    expect(extractTedTalk(value)).toBe(expected)
+    expect(extractTedTalk(new URL(value))).toBe(expected)
   })
 
   it('should read a talk slug from the talk page on the bare host', () => {
     const value = 'https://ted.com/talks/diana_laufenberg_3_ways_to_teach'
     const expected = 'diana_laufenberg_3_ways_to_teach'
 
-    expect(extractTedTalk(value)).toBe(expected)
+    expect(extractTedTalk(new URL(value))).toBe(expected)
   })
 
   it('should read a talk slug carrying a digit', () => {
     const value = 'https://embed.ted.com/talks/julian_treasure_5_ways_to_listen_better'
     const expected = 'julian_treasure_5_ways_to_listen_better'
 
-    expect(extractTedTalk(value)).toBe(expected)
+    expect(extractTedTalk(new URL(value))).toBe(expected)
   })
 
   it('should use a malformed slug as written, even if the player answers an error', () => {
     const value = 'https://embed.ted.com/talks/ethan_zuckerman%2F..%2Fx.html'
     const expected = 'ethan_zuckerman%2F..%2Fx'
 
-    expect(extractTedTalk(value)).toBe(expected)
+    expect(extractTedTalk(new URL(value))).toBe(expected)
   })
 
   it('should use a malformed slug suffix as written, even if the player answers an error', () => {
     const value = 'https://embed.ted.com/talks/ethan_zuckerman.htmlx'
     const expected = 'ethan_zuckerman.htmlx'
 
-    expect(extractTedTalk(value)).toBe(expected)
+    expect(extractTedTalk(new URL(value))).toBe(expected)
   })
 
   it('should return undefined for a ted url that is not a talk', () => {
     const value = 'https://www.ted.com/playlists/123/something'
 
-    expect(extractTedTalk(value)).toBeUndefined()
+    expect(extractTedTalk(new URL(value))).toBeUndefined()
   })
 
   // The talk video file sits under `/talks/` too, and its folder is not a talk.
   it('should return undefined for a talk file on the video host', () => {
     const value = 'http://video.ted.com/talks/dynamic/DianaLaufenberg_2010X-medium.flv'
 
-    expect(extractTedTalk(value)).toBeUndefined()
+    expect(extractTedTalk(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a foreign host carrying a talk path', () => {
     const value = 'https://evil.test/talks/ethan_zuckerman.html'
 
-    expect(extractTedTalk(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a url that cannot be parsed', () => {
-    const value = 'https://['
-
-    expect(extractTedTalk(value)).toBeUndefined()
+    expect(extractTedTalk(new URL(value))).toBeUndefined()
   })
 })
 
@@ -107,13 +101,13 @@ describe('tedResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(tedResolveEmbed(value)).toEqual(expected)
+    expect(tedResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a ted url naming no talk', () => {
     const value = 'https://embed.ted.com/about'
 
-    expect(tedResolveEmbed(value)).toBeUndefined()
+    expect(tedResolveEmbed(new URL(value))).toBeUndefined()
   })
 })
 

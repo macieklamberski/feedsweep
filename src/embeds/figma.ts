@@ -1,12 +1,6 @@
-import { composeQuery, getPathSegments, getQueryParam, isAnyOf, isHostOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import {
-  alphanumericRegex,
-  lettersRegex,
-  parseUrlOnHosts,
-  pickQueryParams,
-  placeholderBaseUrl,
-} from '../utils/urls.js'
+import { composeQuery, getPathSegments, getQueryParam, isAnyOf, isHostOf } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
+import { alphanumericRegex, lettersRegex, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const figmaHost = 'figma.com'
@@ -58,19 +52,13 @@ const readFileEmbed = (url: URL): EmbedResolverResult | undefined => {
   }
 }
 
-const resolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
-  const segments = getPathSegments(parsed)
+const resolveEmbed: ResolveUrlEmbed = (url) => {
+  const segments = getPathSegments(url)
 
   if (segments.length === 1 && isAnyOf(segments[0], 'embed')) {
     // The wrapper frames whatever its `url` names, so a value off figma is refused and never minted.
     const wrapped = parseUrlOnHosts(
-      getQueryParam(parsed.searchParams, 'url'),
+      getQueryParam(url.searchParams, 'url'),
       figmaFileHosts,
       isHostOf,
     )
@@ -82,11 +70,11 @@ const resolveEmbed: ResolveEmbed = (url) => {
     return readFileEmbed(wrapped)
   }
 
-  if (!isHostOf(parsed, figmaEmbedHost)) {
+  if (!isHostOf(url, figmaEmbedHost)) {
     return
   }
 
-  return readFileEmbed(parsed)
+  return readFileEmbed(url)
 }
 
 // Figma's two embed codes: the older `figma.com/embed?embed_host=share&url={encoded figma url}`,

@@ -14,7 +14,7 @@ describe('cnbcResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cnbcResolveEmbed(value)).toEqual(expected)
+      expect(cnbcResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // The `byGuid` slot says which value is the clip, so nothing is left for a width to tell.
@@ -27,7 +27,7 @@ describe('cnbcResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cnbcResolveEmbed(value)).toEqual(expected)
+      expect(cnbcResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the share snippet player for another player name', () => {
@@ -40,7 +40,7 @@ describe('cnbcResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cnbcResolveEmbed(value)).toEqual(expected)
+      expect(cnbcResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -48,7 +48,7 @@ describe('cnbcResolveEmbed', () => {
     it('should return undefined for a player naming no clip', () => {
       const value = 'https://player.cnbc.com/p/gZWlPC/cnbc_global?playertype=synd'
 
-      expect(cnbcResolveEmbed(value)).toBeUndefined()
+      expect(cnbcResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed guid as written, even if the player answers an error', () => {
@@ -60,7 +60,7 @@ describe('cnbcResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cnbcResolveEmbed(value)).toEqual(expected)
+      expect(cnbcResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use a malformed account as written, even if the player answers an error', () => {
@@ -73,7 +73,7 @@ describe('cnbcResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cnbcResolveEmbed(value)).toEqual(expected)
+      expect(cnbcResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the share snippet player over a malformed player name', () => {
@@ -86,25 +86,25 @@ describe('cnbcResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cnbcResolveEmbed(value)).toEqual(expected)
+      expect(cnbcResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should return undefined for another route on the player host', () => {
       const value = 'https://player.cnbc.com/x/gZWlPC/cnbc_global?playertype=synd&byGuid=7000344703'
 
-      expect(cnbcResolveEmbed(value)).toBeUndefined()
+      expect(cnbcResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a player route naming no player', () => {
       const value = 'https://player.cnbc.com/p/gZWlPC?byGuid=7000344703'
 
-      expect(cnbcResolveEmbed(value)).toBeUndefined()
+      expect(cnbcResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a path that is not a player', () => {
       const value = 'https://player.cnbc.com/p/gZWlPC/cnbc_global/extra?byGuid=7000344703'
 
-      expect(cnbcResolveEmbed(value)).toBeUndefined()
+      expect(cnbcResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

@@ -30,7 +30,7 @@ describe('condenastResolveEmbed', () => {
   describe('happy paths', () => {
     it('should mint the frame from the script embed the share dialog writes', () => {
       const value =
-        '//player-backend.cnevids.com/script/video/5be1fd3d8c1abc6e6400000f.js?iu=/3379/newyorker.dart/share'
+        'https://player-backend.cnevids.com/script/video/5be1fd3d8c1abc6e6400000f.js?iu=/3379/newyorker.dart/share'
       const expected: EmbedResolverResult = {
         provider: 'condenast',
         id: '5be1fd3d8c1abc6e6400000f',
@@ -38,12 +38,12 @@ describe('condenastResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(condenastResolveEmbed(value)).toEqual(expected)
+      expect(condenastResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the video after the player in the older script embed', () => {
       const value =
-        '//player.cnevids.com/embedjs/5345874069702d66a4000000/video/55cb6a6c61646d6a30000011.js'
+        'https://player.cnevids.com/embedjs/5345874069702d66a4000000/video/55cb6a6c61646d6a30000011.js'
       const expected: EmbedResolverResult = {
         provider: 'condenast',
         id: '55cb6a6c61646d6a30000011',
@@ -51,7 +51,7 @@ describe('condenastResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(condenastResolveEmbed(value)).toEqual(expected)
+      expect(condenastResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the video before the player in the oldest frame', () => {
@@ -64,7 +64,7 @@ describe('condenastResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(condenastResolveEmbed(value)).toEqual(expected)
+      expect(condenastResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the minted frame back to the same video', () => {
@@ -76,7 +76,7 @@ describe('condenastResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(condenastResolveEmbed(value)).toEqual(expected)
+      expect(condenastResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass an id through as written', () => {
@@ -88,7 +88,7 @@ describe('condenastResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(condenastResolveEmbed(value)).toEqual(expected)
+      expect(condenastResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a tracker from the query', () => {
@@ -101,7 +101,7 @@ describe('condenastResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(condenastResolveEmbed(value)).toEqual(expected)
+      expect(condenastResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the route in capitals and mint it in lowercase', () => {
@@ -113,7 +113,7 @@ describe('condenastResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(condenastResolveEmbed(value)).toEqual(expected)
+      expect(condenastResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -121,45 +121,45 @@ describe('condenastResolveEmbed', () => {
     it('should return undefined for a foreign host carrying the same path', () => {
       const value = 'https://evil.test/script/video/5be1fd3d8c1abc6e6400000f.js'
 
-      expect(condenastResolveEmbed(value)).toBeUndefined()
+      expect(condenastResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the player route below another segment', () => {
       const value = 'https://player.cnevids.com/x/iframe/video/5ce439aa34e7941264b4701c'
 
-      expect(condenastResolveEmbed(value)).toBeUndefined()
+      expect(condenastResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a segment after the video', () => {
       const value = 'https://player.cnevids.com/iframe/video/5ce439aa34e7941264b4701c/extra'
 
-      expect(condenastResolveEmbed(value)).toBeUndefined()
+      expect(condenastResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the oldest frame below another segment', () => {
       const value =
         'https://player.cnevids.com/x/embed/54627cfc61646d2fc1030000/52f2ad0169702d21a5080000'
 
-      expect(condenastResolveEmbed(value)).toBeUndefined()
+      expect(condenastResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a segment after the oldest frame', () => {
       const value =
         'https://player.cnevids.com/embed/54627cfc61646d2fc1030000/52f2ad0169702d21a5080000/extra'
 
-      expect(condenastResolveEmbed(value)).toBeUndefined()
+      expect(condenastResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a playlist', () => {
       const value = 'https://player.cnevids.com/iframe/playlist/5ce439aa34e7941264b4701c'
 
-      expect(condenastResolveEmbed(value)).toBeUndefined()
+      expect(condenastResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a player bundle on the frontend host', () => {
       const value = 'https://player-frontend.cnevids.com/player/main-b8528c70fedb0a451c7d.js'
 
-      expect(condenastResolveEmbed(value)).toBeUndefined()
+      expect(condenastResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

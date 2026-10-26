@@ -16,7 +16,7 @@ describe('tenorResolveEmbed', () => {
         ratio: '1.33/1',
       }
 
-      expect(tenorResolveEmbed(value)).toEqual(expected)
+      expect(tenorResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should build the player from an embed url on the www host', () => {
@@ -29,7 +29,7 @@ describe('tenorResolveEmbed', () => {
         ratio: '1.33/1',
       }
 
-      expect(tenorResolveEmbed(value)).toEqual(expected)
+      expect(tenorResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -37,25 +37,25 @@ describe('tenorResolveEmbed', () => {
     it('should ignore the embed path on the host that serves the files', () => {
       const value = 'https://media.tenor.com/embed/16892698'
 
-      expect(tenorResolveEmbed(value)).toBeUndefined()
+      expect(tenorResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the view page, which is not a frame', () => {
       const value = 'https://tenor.com/view/madam-cj-walker-gif-16892698'
 
-      expect(tenorResolveEmbed(value)).toBeUndefined()
+      expect(tenorResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the view page addressed by its bare post id', () => {
       const value = 'https://tenor.com/view/16892698'
 
-      expect(tenorResolveEmbed(value)).toBeUndefined()
+      expect(tenorResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a search page', () => {
       const value = 'https://tenor.com/search/cats-gifs'
 
-      expect(tenorResolveEmbed(value)).toBeUndefined()
+      expect(tenorResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed post id as written, even if the player answers an error', () => {
@@ -68,7 +68,7 @@ describe('tenorResolveEmbed', () => {
         ratio: '1.33/1',
       }
 
-      expect(tenorResolveEmbed(value)).toEqual(expected)
+      expect(tenorResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

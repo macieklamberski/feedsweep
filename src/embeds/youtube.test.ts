@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
+import { repairCarrierUrl } from '../utils/urls.js'
 import {
   composeEmbedUrl,
   composeThumbnailUrl,
@@ -229,7 +230,7 @@ describe('youtubeResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(youtubeResolveEmbed(value)).toEqual(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
   })
 
   it('should resolve youtube embed url', () => {
@@ -243,7 +244,7 @@ describe('youtubeResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(youtubeResolveEmbed(value)).toEqual(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
   })
 
   it('should preserve the start offset', () => {
@@ -257,7 +258,7 @@ describe('youtubeResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(youtubeResolveEmbed(value)).toEqual(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
   })
 
   it('should carry a share link offset over as the start', () => {
@@ -271,56 +272,56 @@ describe('youtubeResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(youtubeResolveEmbed(value)).toEqual(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
   })
 
   it.each(watchOffsetCases)('should read the offset t=%s as %s seconds', (t, start) => {
     const value = `https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=${t}`
     const expected = `https://www.youtube.com/embed/dQw4w9WgXcQ?start=${start}`
 
-    expect(youtubeResolveEmbed(value)?.src).toBe(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))?.src).toBe(expected)
   })
 
   it('should let a stated start win over the watch link offset', () => {
     const value = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&start=10&t=42'
     const expected = 'https://www.youtube.com/embed/dQw4w9WgXcQ?start=10'
 
-    expect(youtubeResolveEmbed(value)?.src).toBe(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))?.src).toBe(expected)
   })
 
   it('should ignore a watch link offset that is not a duration', () => {
     const value = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=abc'
     const expected = 'https://www.youtube.com/embed/dQw4w9WgXcQ'
 
-    expect(youtubeResolveEmbed(value)?.src).toBe(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))?.src).toBe(expected)
   })
 
   it('should ignore a watch link offset with a trailing word', () => {
     const value = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=90x'
     const expected = 'https://www.youtube.com/embed/dQw4w9WgXcQ'
 
-    expect(youtubeResolveEmbed(value)?.src).toBe(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))?.src).toBe(expected)
   })
 
   it('should ignore a watch link offset with a leading word', () => {
     const value = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=x90'
     const expected = 'https://www.youtube.com/embed/dQw4w9WgXcQ'
 
-    expect(youtubeResolveEmbed(value)?.src).toBe(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))?.src).toBe(expected)
   })
 
   it('should ignore a clock offset with a trailing word', () => {
     const value = 'https://www.youtube.com/embed/vy9FEjsBVvY#t=24:09x'
     const expected = 'https://www.youtube.com/embed/vy9FEjsBVvY'
 
-    expect(youtubeResolveEmbed(value)?.src).toBe(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))?.src).toBe(expected)
   })
 
   it('should ignore a clock offset with a leading word', () => {
     const value = 'https://www.youtube.com/embed/vy9FEjsBVvY#t=x24:09'
     const expected = 'https://www.youtube.com/embed/vy9FEjsBVvY'
 
-    expect(youtubeResolveEmbed(value)?.src).toBe(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))?.src).toBe(expected)
   })
 
   it('should carry the offset the Flash-era path spelling leaves after the id', () => {
@@ -334,14 +335,14 @@ describe('youtubeResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(youtubeResolveEmbed(value)).toEqual(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
   })
 
   it('should read the query after a name the Flash-era path spelling leaves after the id', () => {
     const value = 'https://www.youtube.com/embed/OgiAa5Xi6ok&t?start=30'
     const expected = 'https://www.youtube.com/embed/OgiAa5Xi6ok?start=30'
 
-    expect(youtubeResolveEmbed(value)?.src).toBe(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))?.src).toBe(expected)
   })
 
   it('should carry a fragment offset over as the start', () => {
@@ -355,7 +356,7 @@ describe('youtubeResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(youtubeResolveEmbed(value)).toEqual(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
   })
 
   it('should read a fragment offset spelled in minutes and seconds', () => {
@@ -369,7 +370,7 @@ describe('youtubeResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(youtubeResolveEmbed(value)).toEqual(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
   })
 
   it('should read a fragment offset spelled as a clock', () => {
@@ -383,7 +384,7 @@ describe('youtubeResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(youtubeResolveEmbed(value)).toEqual(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
   })
 
   it('should preserve the playlist and its position', () => {
@@ -397,7 +398,7 @@ describe('youtubeResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(youtubeResolveEmbed(value)).toEqual(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
   })
 
   it('should preserve both halves of a clip', () => {
@@ -411,7 +412,7 @@ describe('youtubeResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(youtubeResolveEmbed(value)).toEqual(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
   })
 
   it('should drop player and tracking parameters', () => {
@@ -425,7 +426,7 @@ describe('youtubeResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(youtubeResolveEmbed(value)).toEqual(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
   })
 
   it('should resolve youtu.be short url', () => {
@@ -439,7 +440,7 @@ describe('youtubeResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(youtubeResolveEmbed(value)).toEqual(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
   })
 
   it('should resolve youtube-nocookie embed url', () => {
@@ -453,7 +454,7 @@ describe('youtubeResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(youtubeResolveEmbed(value)).toEqual(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
   })
 
   it('should preserve the self-loop playlist pair', () => {
@@ -467,7 +468,7 @@ describe('youtubeResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(youtubeResolveEmbed(value)).toEqual(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
   })
 
   // Every spelling of a playlist embed: the videoseries path word, the bare embed path some
@@ -490,7 +491,7 @@ describe('youtubeResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(youtubeResolveEmbed(value)).toEqual(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
   })
 
   const playlistRouteUrls = [
@@ -507,7 +508,7 @@ describe('youtubeResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(youtubeResolveEmbed(value)).toEqual(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
   })
 
   it('should resolve a user_uploads embed to the channel uploads, posterless', () => {
@@ -520,7 +521,7 @@ describe('youtubeResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(youtubeResolveEmbed(value)).toEqual(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
   })
 
   it('should resolve a live_stream channel embed, posterless', () => {
@@ -533,7 +534,7 @@ describe('youtubeResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(youtubeResolveEmbed(value)).toEqual(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
   })
 
   // One id is legal in all three collection spaces, and enrichment receives the provider and the
@@ -547,19 +548,21 @@ describe('youtubeResolveEmbed', () => {
     ]
     const expected = ['playlist/PBS', 'user/PBS', 'channel/PBS']
 
-    expect(values.map((value) => youtubeResolveEmbed(value)?.id)).toEqual(expected)
+    expect(
+      values.map((value) => youtubeResolveEmbed(new URL(repairCarrierUrl(value)))?.id),
+    ).toEqual(expected)
   })
 
   it('should return undefined for a videoseries embed with no list', () => {
     const value = 'https://www.youtube.com/embed/videoseries'
 
-    expect(youtubeResolveEmbed(value)).toBeUndefined()
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toBeUndefined()
   })
 
   it('should return undefined for a bare embed url naming no content', () => {
     const value = 'https://www.youtube.com/embed/?wmode=transparent'
 
-    expect(youtubeResolveEmbed(value)).toBeUndefined()
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toBeUndefined()
   })
 
   // `listType=search` named a query, not an id, and YouTube removed it in 2020: deliberately
@@ -567,7 +570,7 @@ describe('youtubeResolveEmbed', () => {
   it('should not claim a listType=search embed', () => {
     const value = 'https://www.youtube.com/embed?listType=search&list=timelapse'
 
-    expect(youtubeResolveEmbed(value)).toBeUndefined()
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toBeUndefined()
   })
 
   it('should use a malformed playlist id as written, even if the player answers an error', () => {
@@ -581,7 +584,7 @@ describe('youtubeResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(youtubeResolveEmbed(value)).toEqual(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
   })
 
   it('should use a malformed channel id as written, even if the player answers an error', () => {
@@ -595,7 +598,7 @@ describe('youtubeResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(youtubeResolveEmbed(value)).toEqual(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
   })
 
   it('should keep a decoded uploads username carrying a separator in one path segment', () => {
@@ -608,25 +611,19 @@ describe('youtubeResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(youtubeResolveEmbed(value)).toEqual(expected)
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
   })
 
   it('should return undefined for a user_uploads embed with no list', () => {
     const value = 'https://www.youtube.com/embed?listType=user_uploads'
 
-    expect(youtubeResolveEmbed(value)).toBeUndefined()
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toBeUndefined()
   })
 
   it('should return undefined for a live_stream embed with no channel', () => {
     const value = 'https://www.youtube.com/embed/live_stream'
 
-    expect(youtubeResolveEmbed(value)).toBeUndefined()
-  })
-
-  it('should return undefined for invalid url', () => {
-    const value = 'not-a-url'
-
-    expect(youtubeResolveEmbed(value)).toBeUndefined()
+    expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toBeUndefined()
   })
 
   // The Flash player took its playlist on `/p/{id}`, the modern `list=PL{id}` without the prefix.
@@ -642,7 +639,7 @@ describe('youtubeResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(youtubeResolveEmbed(value)).toEqual(expected)
+      expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
     })
 
     it('should decode a /p/ playlist id before it moves into the query', () => {
@@ -655,7 +652,7 @@ describe('youtubeResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(youtubeResolveEmbed(value)).toEqual(expected)
+      expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
     })
 
     // Half the corpus specimens join the player options with `&` instead of `?`, so the id
@@ -670,7 +667,7 @@ describe('youtubeResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(youtubeResolveEmbed(value)).toEqual(expected)
+      expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
     })
 
     it('should use a malformed /p/ id as written, even if the player answers an error', () => {
@@ -683,13 +680,13 @@ describe('youtubeResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(youtubeResolveEmbed(value)).toEqual(expected)
+      expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
     })
 
     it('should refuse a bare /p/ path naming no playlist', () => {
       const value = 'http://www.youtube.com/p/'
 
-      expect(youtubeResolveEmbed(value)).toBeUndefined()
+      expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toBeUndefined()
     })
   })
 
@@ -705,7 +702,7 @@ describe('youtubeResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(youtubeResolveEmbed(value)).toEqual(expected)
+      expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
     })
 
     it('should drop the interface language the playlist page carries', () => {
@@ -718,13 +715,13 @@ describe('youtubeResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(youtubeResolveEmbed(value)).toEqual(expected)
+      expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
     })
 
     it('should refuse a bare playlist page naming no list', () => {
       const value = 'https://www.youtube.com/playlist'
 
-      expect(youtubeResolveEmbed(value)).toBeUndefined()
+      expect(youtubeResolveEmbed(new URL(repairCarrierUrl(value)))).toBeUndefined()
     })
   })
 })

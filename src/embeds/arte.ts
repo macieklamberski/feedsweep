@@ -1,7 +1,7 @@
-import { getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'arte'
@@ -68,9 +68,8 @@ const readProgramFromPlayer = (parsed: URL): Program | undefined => {
   }
 }
 
-const arteResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const program = parsed && readProgramFromPlayer(parsed)
+const arteResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const program = readProgramFromPlayer(url)
 
   if (!program) {
     return

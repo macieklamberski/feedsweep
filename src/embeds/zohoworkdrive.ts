@@ -1,6 +1,6 @@
-import { parseUrl, toMap } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
+import { toMap } from 'trousse'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
+import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'zohoworkdrive'
@@ -32,15 +32,14 @@ const readRatio = (element: Element | undefined): string => {
   return element?.classList.contains('zpvideo') ? '16/9' : '4/3'
 }
 
-export const zohoworkdriveResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const domain = parsed ? zohoworkdriveDomains.get(parsed.hostname) : undefined
+export const zohoworkdriveResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const domain = zohoworkdriveDomains.get(url.hostname)
 
-  if (!parsed || !domain) {
+  if (!domain) {
     return
   }
 
-  const fileId = parsed.pathname.match(embedPathRegex)?.[1]
+  const fileId = url.pathname.match(embedPathRegex)?.[1]
 
   if (fileId) {
     const page = `https://workdrive.${domain}/embed/${fileId}`
@@ -55,7 +54,7 @@ export const zohoworkdriveResolveEmbed: ResolveEmbed = (url, element) => {
     }
   }
 
-  const linkId = parsed.pathname.match(externalPathRegex)?.[1]
+  const linkId = url.pathname.match(externalPathRegex)?.[1]
 
   if (!linkId) {
     return

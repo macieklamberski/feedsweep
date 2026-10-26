@@ -15,7 +15,7 @@ describe('appleResolveEmbed', () => {
         height: 450,
       }
 
-      expect(appleResolveEmbed(value)).toEqual(expected)
+      expect(appleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should take the track inside an album as the id and shorten the player', () => {
@@ -28,7 +28,7 @@ describe('appleResolveEmbed', () => {
         height: 175,
       }
 
-      expect(appleResolveEmbed(value)).toEqual(expected)
+      expect(appleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should give a standalone song the shorter player', () => {
@@ -41,7 +41,7 @@ describe('appleResolveEmbed', () => {
         height: 175,
       }
 
-      expect(appleResolveEmbed(value)).toEqual(expected)
+      expect(appleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should leave a music video without a height', () => {
@@ -53,7 +53,7 @@ describe('appleResolveEmbed', () => {
         url: 'https://music.apple.com/us/music-video/beat-it/454551983',
       }
 
-      expect(appleResolveEmbed(value)).toEqual(expected)
+      expect(appleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should resolve an artist', () => {
@@ -66,7 +66,7 @@ describe('appleResolveEmbed', () => {
         height: 450,
       }
 
-      expect(appleResolveEmbed(value)).toEqual(expected)
+      expect(appleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should resolve a playlist', () => {
@@ -80,7 +80,7 @@ describe('appleResolveEmbed', () => {
         height: 450,
       }
 
-      expect(appleResolveEmbed(value)).toEqual(expected)
+      expect(appleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should resolve a user playlist whose id carries a hyphen', () => {
@@ -93,7 +93,7 @@ describe('appleResolveEmbed', () => {
         height: 450,
       }
 
-      expect(appleResolveEmbed(value)).toEqual(expected)
+      expect(appleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should resolve a station', () => {
@@ -106,7 +106,7 @@ describe('appleResolveEmbed', () => {
         height: 450,
       }
 
-      expect(appleResolveEmbed(value)).toEqual(expected)
+      expect(appleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should resolve a podcast episode as its own provider', () => {
@@ -120,7 +120,7 @@ describe('appleResolveEmbed', () => {
         height: 175,
       }
 
-      expect(appleResolveEmbed(value)).toEqual(expected)
+      expect(appleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should strip the id prefix from a show without an episode', () => {
@@ -133,7 +133,7 @@ describe('appleResolveEmbed', () => {
         height: 450,
       }
 
-      expect(appleResolveEmbed(value)).toEqual(expected)
+      expect(appleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should resolve a slug-less url', () => {
@@ -146,7 +146,7 @@ describe('appleResolveEmbed', () => {
         height: 450,
       }
 
-      expect(appleResolveEmbed(value)).toEqual(expected)
+      expect(appleResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -161,7 +161,7 @@ describe('appleResolveEmbed', () => {
         height: 450,
       }
 
-      expect(appleResolveEmbed(value)).toEqual(expected)
+      expect(appleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop tracking parameters', () => {
@@ -174,7 +174,7 @@ describe('appleResolveEmbed', () => {
         height: 450,
       }
 
-      expect(appleResolveEmbed(value)).toEqual(expected)
+      expect(appleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // `searchParams` hands `i` back decoded, and the id is composed from it, so a value that is
@@ -190,25 +190,25 @@ describe('appleResolveEmbed', () => {
         height: 175,
       }
 
-      expect(appleResolveEmbed(value)).toEqual(expected)
+      expect(appleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should return undefined for a kind that does not embed', () => {
       const value = 'https://music.apple.com/us/browse/1440857781'
 
-      expect(appleResolveEmbed(value)).toBeUndefined()
+      expect(appleResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a kind naming an inherited method', () => {
       const value = 'https://embed.podcasts.apple.com/us/toString/the-daily/id1200361736'
 
-      expect(appleResolveEmbed(value)).toBeUndefined()
+      expect(appleResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a kind naming the prototype itself', () => {
       const value = 'https://embed.podcasts.apple.com/us/__proto__/the-daily/id1200361736'
 
-      expect(appleResolveEmbed(value)).toBeUndefined()
+      expect(appleResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed id as written, even if the player answers an error', () => {
@@ -221,13 +221,13 @@ describe('appleResolveEmbed', () => {
         height: 450,
       }
 
-      expect(appleResolveEmbed(value)).toEqual(expected)
+      expect(appleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should return undefined for a page past the id', () => {
       const value = 'https://music.apple.com/us/artist/michael-jackson/32940/see-all'
 
-      expect(appleResolveEmbed(value)).toBeUndefined()
+      expect(appleResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

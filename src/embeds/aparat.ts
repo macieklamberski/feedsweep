@@ -1,4 +1,4 @@
-import type { EmbedResolver, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedResolver, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -20,11 +20,11 @@ const composeEmbed = (videoHash: string): EmbedResolverResult => {
   }
 }
 
-const readVideoHash = (url: string | undefined, pathRegex: RegExp): string | undefined => {
+const readVideoHash = (url: string | URL | undefined, pathRegex: RegExp): string | undefined => {
   return parseUrlOnHosts(url, aparatHosts)?.pathname.match(pathRegex)?.[1]
 }
 
-const aparatResolveEmbed: ResolveEmbed = (url, element) => {
+const aparatResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const videoHash = readVideoHash(url, framePathRegex)
 
   return videoHash ? { ...composeEmbed(videoHash), title: attr(element, 'title') } : undefined

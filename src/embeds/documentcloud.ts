@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf, isHostOf, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf } from 'trousse'
 import type { EmbedRenderHint } from '../types.js'
 import { readObjectHeight } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -45,12 +45,6 @@ export const composeLoaderViewerUrl = (url: string | undefined): string | undefi
 // `www.documentcloud.org/documents/{id}-{slug}.html`, which redirects to it. The carrier `title`
 // is the document's own name with `" (Hosted by DocumentCloud)"` appended, so it is left unread.
 export const documentcloudEmbedResolver = createUrlEmbedResolver(documentcloudHosts, (url) => {
-  const parsed = parseUrl(url)
-
-  if (!parsed) {
-    return
-  }
-
   const isLegacyHost = isHostOf(url, legacyHosts)
   const [route, documentSegment, partSegment] = getPathSegments(url)
 
@@ -65,7 +59,7 @@ export const documentcloudEmbedResolver = createUrlEmbedResolver(documentcloudHo
   // host answers with a 404.
   if (partSegment) {
     const partRegex = isLegacyHost ? legacyNotePathRegex : partPathRegex
-    const partMatch = parsed.pathname.match(partRegex)
+    const partMatch = url.pathname.match(partRegex)
 
     if (!partMatch) {
       return

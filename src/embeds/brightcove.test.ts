@@ -281,7 +281,7 @@ describe('brightcoveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(brightcoveResolveEmbed(value)).toEqual(expected)
+      expect(brightcoveResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep a named player rather than assuming the default', () => {
@@ -294,7 +294,7 @@ describe('brightcoveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(brightcoveResolveEmbed(value)).toEqual(expected)
+      expect(brightcoveResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the other player parameters', () => {
@@ -306,7 +306,7 @@ describe('brightcoveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(brightcoveResolveEmbed(value)).toEqual(expected)
+      expect(brightcoveResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read a short account and video id out of the player url', () => {
@@ -318,7 +318,7 @@ describe('brightcoveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(brightcoveResolveEmbed(value)).toEqual(expected)
+      expect(brightcoveResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -333,13 +333,13 @@ describe('brightcoveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(brightcoveResolveEmbed(value)).toEqual(expected)
+      expect(brightcoveResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should return undefined when the url names no video', () => {
       const value = 'https://players.brightcove.net/1234567890/default_default/index.html'
 
-      expect(brightcoveResolveEmbed(value)).toBeUndefined()
+      expect(brightcoveResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed account as written, even if the player answers an error', () => {
@@ -352,33 +352,27 @@ describe('brightcoveResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(brightcoveResolveEmbed(value)).toEqual(expected)
+      expect(brightcoveResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // `{player}_{embed}` is one segment holding two ids.
     it('should return undefined when the player segment is not a player path', () => {
       const value = 'https://players.brightcove.net/1234567890/index.html?videoId=6098765432'
 
-      expect(brightcoveResolveEmbed(value)).toBeUndefined()
+      expect(brightcoveResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined when the player segment names no player id', () => {
       const value =
         'https://players.brightcove.net/1234567890/_default_default/index.html?videoId=6098765432'
 
-      expect(brightcoveResolveEmbed(value)).toBeUndefined()
+      expect(brightcoveResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for another brightcove.net host', () => {
       const value = 'https://studio.brightcove.net/1234567890/default_default/index.html?videoId=1'
 
-      expect(brightcoveResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for a url that cannot be parsed', () => {
-      const value = 'https://['
-
-      expect(brightcoveResolveEmbed(value)).toBeUndefined()
+      expect(brightcoveResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

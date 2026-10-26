@@ -114,6 +114,40 @@ describeForEachParser('rebuildLazyLoadForVideos', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should rebuild a youtube facade whose href glues the query onto the id', async () => {
+    const value = html`
+      <a
+        href="https://www.youtube.com/embed/dQw4w9WgXcQ&amp;t=30s"
+        class="preview-lazyload preview-youtube"
+      ></a>
+    `
+    const expected = '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?start=30"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a vimeo facade whose href glues the query onto the id untouched', async () => {
+    const value = html`
+      <a
+        href="https://vimeo.com/76979871&amp;h=abcdef"
+        class="preview-lazyload preview-vimeo"
+      ></a>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave the facade untouched when its url does not parse', async () => {
+    const value = html`
+      <a
+        href="https://[vimeo.com/76979871"
+        class="preview-lazyload preview-vimeo"
+      ></a>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should produce a youtube placeholder end to end', async () => {
     const value = html`
       <div class="container-lazyload preview-lazyload container-youtube">

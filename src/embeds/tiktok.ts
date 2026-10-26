@@ -1,7 +1,7 @@
-import { encodePathSegment, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { encodePathSegment } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, find, text, textNode } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import {
   atUsername,
   createMarkupEmbedResolver,
@@ -28,7 +28,7 @@ const profileHeight = 478
 
 type Clip = { handle?: string; videoId?: string }
 
-const readWatchUrl = (url: string | undefined): Clip => {
+const readWatchUrl = (url: string | URL | undefined): Clip => {
   const parsed = parseUrlOnHosts(url, tiktokHosts)
 
   if (!parsed) {
@@ -157,9 +157,8 @@ export const tiktokBlockquoteEmbedResolver = createMarkupEmbedResolver(
 )
 
 // A post has no name: its words go to `description`, and the frame's title is not read.
-export const tiktokResolveEmbed: ResolveEmbed = (src) => {
-  const parsed = parseUrl(src, placeholderBaseUrl)
-  const playerId = parsed?.pathname.match(playerPathRegex)?.[1]
+export const tiktokResolveEmbed: ResolveUrlEmbed = (url) => {
+  const playerId = url.pathname.match(playerPathRegex)?.[1]
 
   if (playerId) {
     return {
@@ -170,7 +169,7 @@ export const tiktokResolveEmbed: ResolveEmbed = (src) => {
     }
   }
 
-  const { handle, videoId } = readWatchUrl(src)
+  const { handle, videoId } = readWatchUrl(url)
 
   if (!videoId) {
     return
@@ -180,7 +179,7 @@ export const tiktokResolveEmbed: ResolveEmbed = (src) => {
     provider: 'tiktok',
     id: handle ? `@${handle}/video/${videoId}` : videoId,
     src: `https://www.tiktok.com/embed/v2/${videoId}`,
-    url: src,
+    url: url.href,
     height: playerHeight,
   }
 }
@@ -190,7 +189,9 @@ export const tiktokIframeEmbedResolver = createUrlEmbedResolver(tiktokHosts, tik
 
 // A forum's s9e MediaEmbed helper frame, naming the clip id in its url fragment.
 export const tiktokS9eEmbedResolver = createS9eEmbedResolver('tiktok', (videoId) => {
-  return tiktokResolveEmbed(`https://www.tiktok.com/embed/v2/${encodePathSegment(videoId)}`)
+  return tiktokResolveEmbed(
+    new URL(`https://www.tiktok.com/embed/v2/${encodePathSegment(videoId)}`),
+  )
 })
 
 // MetaSlider Pro's TikTok slide: a poster image that only the plugin's script swaps for the player.

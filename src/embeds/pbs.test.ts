@@ -22,7 +22,7 @@ describe('pbsResolveEmbed', () => {
         ratioHeightOffset: 40,
       }
 
-      expect(pbsResolveEmbed(value)).toEqual(expected)
+      expect(pbsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should give the widget route the same key and keep only its clip bounds', () => {
@@ -35,7 +35,7 @@ describe('pbsResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(pbsResolveEmbed(value)).toEqual(expected)
+      expect(pbsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the base64 slug the partner route takes', () => {
@@ -47,7 +47,7 @@ describe('pbsResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(pbsResolveEmbed(value)).toEqual(expected)
+      expect(pbsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop trackers, the reader settings and the layout from the query', () => {
@@ -61,7 +61,7 @@ describe('pbsResolveEmbed', () => {
         ratioHeightOffset: 40,
       }
 
-      expect(pbsResolveEmbed(value)).toEqual(expected)
+      expect(pbsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // The clip bounds and the chapter, which decide what plays.
@@ -77,7 +77,7 @@ describe('pbsResolveEmbed', () => {
         ratioHeightOffset: 40,
       }
 
-      expect(pbsResolveEmbed(value)).toEqual(expected)
+      expect(pbsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // The layout and the settings the publisher chose for this one embed.
@@ -101,7 +101,7 @@ describe('pbsResolveEmbed', () => {
         ratioHeightOffset: 40,
       }
 
-      expect(pbsResolveEmbed(value)).toEqual(expected)
+      expect(pbsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the https player for an http carrier', () => {
@@ -114,7 +114,7 @@ describe('pbsResolveEmbed', () => {
         ratioHeightOffset: 40,
       }
 
-      expect(pbsResolveEmbed(value)).toEqual(expected)
+      expect(pbsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should move the retired host onto the player host', () => {
@@ -127,7 +127,7 @@ describe('pbsResolveEmbed', () => {
         ratioHeightOffset: 40,
       }
 
-      expect(pbsResolveEmbed(value)).toEqual(expected)
+      expect(pbsResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -135,25 +135,25 @@ describe('pbsResolveEmbed', () => {
     it('should ignore a route naming a member of the object prototype', () => {
       const value = 'https://player.pbs.org/toString/3005825044/'
 
-      expect(pbsResolveEmbed(value)).toBeUndefined()
+      expect(pbsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a route that is not a known player', () => {
       const value = 'https://player.pbs.org/bananaplayer/3005825044/'
 
-      expect(pbsResolveEmbed(value)).toBeUndefined()
+      expect(pbsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a player route naming no video', () => {
       const value = 'https://player.pbs.org/viralplayer/'
 
-      expect(pbsResolveEmbed(value)).toBeUndefined()
+      expect(pbsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a deeper path under a player route', () => {
       const value = 'https://player.pbs.org/viralplayer/3005825044/captions/'
 
-      expect(pbsResolveEmbed(value)).toBeUndefined()
+      expect(pbsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed video id as written, even if the player answers an error', () => {
@@ -166,13 +166,13 @@ describe('pbsResolveEmbed', () => {
         ratioHeightOffset: 40,
       }
 
-      expect(pbsResolveEmbed(value)).toEqual(expected)
+      expect(pbsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should ignore a route the retired host did not serve', () => {
       const value = 'http://video.pbs.org/partnerplayer/Nt5uxMIZd-YQIx5g14yatg==/'
 
-      expect(pbsResolveEmbed(value)).toBeUndefined()
+      expect(pbsResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

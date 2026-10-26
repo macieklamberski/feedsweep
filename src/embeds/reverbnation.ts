@@ -1,6 +1,6 @@
-import { getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { filterUrlQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
+import { filterUrlQuery } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'reverbnation'
@@ -57,15 +57,9 @@ const readFlashId = (url: URL): string | undefined => {
   }
 }
 
-export const reverbnationResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
-  const widget = readWidgetId(parsed)
-  const id = widget ?? readFlashId(parsed)
+export const reverbnationResolveEmbed: ResolveUrlEmbed = (url) => {
+  const widget = readWidgetId(url)
+  const id = widget ?? readFlashId(url)
 
   if (!id || !safeIdRegex.test(id)) {
     return
@@ -76,7 +70,7 @@ export const reverbnationResolveEmbed: ResolveEmbed = (url) => {
   return {
     provider,
     id,
-    src: composeSource(id, widget ? filterUrlQuery(parsed, isWidgetParam) : ''),
+    src: composeSource(id, widget ? filterUrlQuery(url, isWidgetParam) : ''),
     height: 265,
   }
 }

@@ -20,7 +20,7 @@ describe('nprResolveEmbed', () => {
         height: 290,
       }
 
-      expect(nprResolveEmbed(value)).toEqual(expected)
+      expect(nprResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should carry a pair in the current id format', () => {
@@ -32,7 +32,7 @@ describe('nprResolveEmbed', () => {
         height: 290,
       }
 
-      expect(nprResolveEmbed(value)).toEqual(expected)
+      expect(nprResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should carry a media id in the current uuid format', () => {
@@ -45,7 +45,7 @@ describe('nprResolveEmbed', () => {
         height: 290,
       }
 
-      expect(nprResolveEmbed(value)).toEqual(expected)
+      expect(nprResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should carry a pair off the video player without the media type', () => {
@@ -58,7 +58,7 @@ describe('nprResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(nprResolveEmbed(value)).toEqual(expected)
+      expect(nprResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should repair the retired video template onto the video player', () => {
@@ -71,7 +71,7 @@ describe('nprResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(nprResolveEmbed(value)).toEqual(expected)
+      expect(nprResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should repair the dead video player page onto the video player', () => {
@@ -84,7 +84,7 @@ describe('nprResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(nprResolveEmbed(value)).toEqual(expected)
+      expect(nprResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -92,73 +92,73 @@ describe('nprResolveEmbed', () => {
     it('should ignore a story page', () => {
       const value = 'https://www.npr.org/sections/thetwo-way/2017/01/01/500000000/a-story'
 
-      expect(nprResolveEmbed(value)).toBeUndefined()
+      expect(nprResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a player naming one id only', () => {
       const value = 'https://www.npr.org/player/embed/550179668'
 
-      expect(nprResolveEmbed(value)).toBeUndefined()
+      expect(nprResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a pair on a route other than the player', () => {
       const value = 'https://www.npr.org/foo/bar/1/2'
 
-      expect(nprResolveEmbed(value)).toBeUndefined()
+      expect(nprResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a pair under the player on a route other than embed', () => {
       const value = 'https://www.npr.org/player/foo/340005056/340005057'
 
-      expect(nprResolveEmbed(value)).toBeUndefined()
+      expect(nprResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a pair under embed on a route other than the player', () => {
       const value = 'https://www.npr.org/foo/embed/340005056/340005057'
 
-      expect(nprResolveEmbed(value)).toBeUndefined()
+      expect(nprResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a player naming a third segment', () => {
       const value = 'https://www.npr.org/player/embed/1/2/3'
 
-      expect(nprResolveEmbed(value)).toBeUndefined()
+      expect(nprResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an episode file', () => {
       const value = 'https://ondemand.npr.org/anon.npr-mp3/npr/me/2026/09/20260928_me_01.mp3'
 
-      expect(nprResolveEmbed(value)).toBeUndefined()
+      expect(nprResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a video player naming no media', () => {
       const value = 'https://www.npr.org/embedded-video?storyId=141331825'
 
-      expect(nprResolveEmbed(value)).toBeUndefined()
+      expect(nprResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a video player naming no story', () => {
       const value = 'https://www.npr.org/embedded-video?mediaId=141398010'
 
-      expect(nprResolveEmbed(value)).toBeUndefined()
+      expect(nprResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the video player below another path', () => {
       const value = 'https://www.npr.org/x/embedded-video?storyId=141331825&mediaId=141398010'
 
-      expect(nprResolveEmbed(value)).toBeUndefined()
+      expect(nprResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path below the video player', () => {
       const value = 'https://www.npr.org/embedded-video/extra?storyId=141331825&mediaId=141398010'
 
-      expect(nprResolveEmbed(value)).toBeUndefined()
+      expect(nprResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a route other than the video player', () => {
       const value = 'https://www.npr.org/embedded-foo?storyId=141331825&mediaId=141398010'
 
-      expect(nprResolveEmbed(value)).toBeUndefined()
+      expect(nprResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -172,7 +172,7 @@ describe('nprResolveEmbed', () => {
         height: 290,
       }
 
-      expect(nprResolveEmbed(value)).toEqual(expected)
+      expect(nprResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use a malformed video media id as written, even if the player answers an error', () => {
@@ -184,7 +184,7 @@ describe('nprResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(nprResolveEmbed(value)).toEqual(expected)
+      expect(nprResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })
@@ -200,7 +200,7 @@ describe('nprFlashResolveEmbed', () => {
         height: 290,
       }
 
-      expect(nprFlashResolveEmbed(value)).toEqual(expected)
+      expect(nprFlashResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read a Flash player spelled without its trailing slash', () => {
@@ -212,7 +212,7 @@ describe('nprFlashResolveEmbed', () => {
         height: 290,
       }
 
-      expect(nprFlashResolveEmbed(value)).toEqual(expected)
+      expect(nprFlashResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read a Flash query joined with semicolons', () => {
@@ -224,7 +224,7 @@ describe('nprFlashResolveEmbed', () => {
         height: 290,
       }
 
-      expect(nprFlashResolveEmbed(value)).toEqual(expected)
+      expect(nprFlashResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint a video pair onto the video player', () => {
@@ -236,7 +236,7 @@ describe('nprFlashResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(nprFlashResolveEmbed(value)).toEqual(expected)
+      expect(nprFlashResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint a video pair joined with semicolons onto the video player', () => {
@@ -248,7 +248,7 @@ describe('nprFlashResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(nprFlashResolveEmbed(value)).toEqual(expected)
+      expect(nprFlashResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -256,31 +256,31 @@ describe('nprFlashResolveEmbed', () => {
     it('should ignore a Flash player naming no media', () => {
       const value = 'http://www.npr.org/v2/?i=340005056&t=audio'
 
-      expect(nprFlashResolveEmbed(value)).toBeUndefined()
+      expect(nprFlashResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a video pair naming no media', () => {
       const value = 'http://www.npr.org/v2/?i=131050832&t=video'
 
-      expect(nprFlashResolveEmbed(value)).toBeUndefined()
+      expect(nprFlashResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path other than the Flash player', () => {
       const value = 'http://www.npr.org/v3/?i=340005056&m=340005057&t=audio'
 
-      expect(nprFlashResolveEmbed(value)).toBeUndefined()
+      expect(nprFlashResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path below the Flash player', () => {
       const value = 'http://www.npr.org/v2/player/?i=340005056&m=340005057&t=audio'
 
-      expect(nprFlashResolveEmbed(value)).toBeUndefined()
+      expect(nprFlashResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the story player', () => {
       const value = 'https://www.npr.org/player/embed/550179668/551339989'
 
-      expect(nprFlashResolveEmbed(value)).toBeUndefined()
+      expect(nprFlashResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -294,7 +294,7 @@ describe('nprFlashResolveEmbed', () => {
         height: 290,
       }
 
-      expect(nprFlashResolveEmbed(value)).toEqual(expected)
+      expect(nprFlashResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

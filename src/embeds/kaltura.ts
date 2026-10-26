@@ -1,5 +1,10 @@
 import { composeQuery, encodePathSegment, getQueryParam, isAnyOf } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
+import type {
+  EmbedRenderHint,
+  EmbedResolverResult,
+  FieldCleaner,
+  ResolveUrlEmbed,
+} from '../types.js'
 import { attr } from '../utils/dom.js'
 import { filterUrlQuery, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -36,7 +41,7 @@ type Entry = {
   parsed: URL
 }
 
-const readEntry = (url: string | undefined): Entry | undefined => {
+const readEntry = (url: string | URL | undefined): Entry | undefined => {
   const parsed = parseUrlOnHosts(url, kalturaHost)
   const partner = parsed?.pathname.match(partnerPathRegex)?.[1]
   const entryId = getQueryParam(parsed?.searchParams, 'entry_id')
@@ -72,7 +77,7 @@ const composeEmbed = ({ partner, entryId, parsed }: Entry): EmbedResolverResult 
   }
 }
 
-export const kalturaResolveEmbed: ResolveEmbed = (url, element) => {
+export const kalturaResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const entry = readEntry(url)
 
   if (!entry) {

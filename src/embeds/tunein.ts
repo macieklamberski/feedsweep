@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'tunein'
@@ -14,7 +14,7 @@ const pageKinds = ['s', 'p']
 // TuneIn's player, `tunein.com/embed/player/{guideId}/`. The player page answers a real and a
 // fabricated id alike. A station or program page on `tunein.com/radio/{guideId}/` redirects for a
 // real id and 404s a fabricated one, and its logo sits on the cdn under the guide id.
-export const tuneinResolveEmbed: ResolveEmbed = (url) => {
+export const tuneinResolveEmbed: ResolveUrlEmbed = (url) => {
   const [embed, player, guideId, ...rest] = getPathSegments(url)
   const kind = guideId?.match(guideIdRegex)?.[1]
 

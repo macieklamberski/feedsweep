@@ -1,7 +1,5 @@
-import { parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'piktochart'
@@ -32,8 +30,8 @@ const composePiktochartEmbed = (uid: string, title: string | undefined): EmbedRe
   }
 }
 
-const piktochartResolveEmbed: ResolveEmbed = (url, element) => {
-  const uid = parseUrl(url, placeholderBaseUrl)?.pathname.match(embedPathRegex)?.[1]
+const piktochartResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const uid = url.pathname.match(embedPathRegex)?.[1]
 
   if (!uid) {
     return

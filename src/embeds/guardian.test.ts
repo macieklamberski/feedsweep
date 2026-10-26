@@ -21,7 +21,7 @@ describe('guardianResolveEmbed', () => {
         date: '2015-06-18',
       }
 
-      expect(guardianResolveEmbed(value)).toEqual(expected)
+      expect(guardianResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should date the video from a path naming a double-digit month', () => {
@@ -36,7 +36,7 @@ describe('guardianResolveEmbed', () => {
         date: '2015-10-08',
       }
 
-      expect(guardianResolveEmbed(value)).toEqual(expected)
+      expect(guardianResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read a hyphenated section and a day in the thirties', () => {
@@ -51,7 +51,7 @@ describe('guardianResolveEmbed', () => {
         date: '2015-04-30',
       }
 
-      expect(guardianResolveEmbed(value)).toEqual(expected)
+      expect(guardianResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read a slug carrying digits and a day in the twenties', () => {
@@ -66,7 +66,7 @@ describe('guardianResolveEmbed', () => {
         date: '2015-09-21',
       }
 
-      expect(guardianResolveEmbed(value)).toEqual(expected)
+      expect(guardianResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -76,27 +76,27 @@ describe('guardianResolveEmbed', () => {
       const value =
         'https://embed.theguardian.com/x/embed/video/world/video/2015/sep/21/viola-davis-speech-2015-emmys-video'
 
-      expect(guardianResolveEmbed(value)).toBeUndefined()
+      expect(guardianResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the player path followed by a trailing segment', () => {
       const value =
         'https://embed.theguardian.com/embed/video/world/video/2015/sep/21/viola-davis-speech-2015-emmys-video/extra'
 
-      expect(guardianResolveEmbed(value)).toBeUndefined()
+      expect(guardianResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the video page itself', () => {
       const value =
         'https://www.theguardian.com/society/video/2015/jun/18/superbugs-la-mrsa-pigs-antibiotics-video'
 
-      expect(guardianResolveEmbed(value)).toBeUndefined()
+      expect(guardianResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for an embed path that is not a video', () => {
       const value = 'https://embed.theguardian.com/embed/video/society/2015/jun/18/superbugs'
 
-      expect(guardianResolveEmbed(value)).toBeUndefined()
+      expect(guardianResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -112,7 +112,7 @@ describe('guardianResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(guardianResolveEmbed(value)).toEqual(expected)
+      expect(guardianResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should state no date for a word that starts like a month', () => {
@@ -126,7 +126,7 @@ describe('guardianResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(guardianResolveEmbed(value)).toEqual(expected)
+      expect(guardianResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should state no date for a month named after an object key', () => {
@@ -140,7 +140,7 @@ describe('guardianResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(guardianResolveEmbed(value)).toEqual(expected)
+      expect(guardianResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should state no date for a day outside the calendar', () => {
@@ -154,7 +154,7 @@ describe('guardianResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(guardianResolveEmbed(value)).toEqual(expected)
+      expect(guardianResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use a malformed path as written, even if the player answers an error', () => {
@@ -168,7 +168,7 @@ describe('guardianResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(guardianResolveEmbed(value)).toEqual(expected)
+      expect(guardianResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

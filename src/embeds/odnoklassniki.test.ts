@@ -15,7 +15,7 @@ describe('odnoklassnikiResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(odnoklassnikiResolveEmbed(value)).toEqual(expected)
+      expect(odnoklassnikiResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the route spelled in mixed case', () => {
@@ -28,7 +28,7 @@ describe('odnoklassnikiResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(odnoklassnikiResolveEmbed(value)).toEqual(expected)
+      expect(odnoklassnikiResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -36,13 +36,13 @@ describe('odnoklassnikiResolveEmbed', () => {
     it('should ignore the watch page itself', () => {
       const value = 'https://ok.ru/video/36463446577'
 
-      expect(odnoklassnikiResolveEmbed(value)).toBeUndefined()
+      expect(odnoklassnikiResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path going on past the video id', () => {
       const value = 'https://ok.ru/videoembed/36463446577/extra'
 
-      expect(odnoklassnikiResolveEmbed(value)).toBeUndefined()
+      expect(odnoklassnikiResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -57,7 +57,7 @@ describe('odnoklassnikiResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(odnoklassnikiResolveEmbed(value)).toEqual(expected)
+      expect(odnoklassnikiResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

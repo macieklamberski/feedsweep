@@ -37,7 +37,7 @@ type NoteUrl = { noteId: string; kind: 'post' | 'player' }
 // Each id is read at its position: off the end, a trailing slug would be handed over as the note.
 // The shapes are the post note.com/{user}/n/{id}, the same post under a publication as
 // biz.note.com/n/{id}, and the player note.com/embed/notes/{id}.
-const readNoteUrl = (link: string): NoteUrl | undefined => {
+const readNoteUrl = (link: string | URL): NoteUrl | undefined => {
   const parsed = parseUrlOnHosts(link, notecomHosts)
   const segments = parsed ? getPathSegments(parsed) : []
 
@@ -64,7 +64,7 @@ export const notecomIframeEmbedResolver = createUrlEmbedResolver(notecomHosts, (
   }
 
   // Only the post form names the user, so only it can state the canonical url outright.
-  return composeEmbed(target.noteId, target.kind === 'post' ? url : undefined)
+  return composeEmbed(target.noteId, target.kind === 'post' ? url.href : undefined)
 })
 
 // The player's height message, `height::{player url}::{pixels}`.

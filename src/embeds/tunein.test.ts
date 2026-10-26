@@ -16,7 +16,7 @@ describe('tuneinResolveEmbed', () => {
         height: 100,
       }
 
-      expect(tuneinResolveEmbed(value)).toEqual(expected)
+      expect(tuneinResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should build a program with its logo', () => {
@@ -30,7 +30,7 @@ describe('tuneinResolveEmbed', () => {
         height: 100,
       }
 
-      expect(tuneinResolveEmbed(value)).toEqual(expected)
+      expect(tuneinResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should build a topic without a page or a logo', () => {
@@ -42,7 +42,7 @@ describe('tuneinResolveEmbed', () => {
         height: 100,
       }
 
-      expect(tuneinResolveEmbed(value)).toEqual(expected)
+      expect(tuneinResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -50,7 +50,7 @@ describe('tuneinResolveEmbed', () => {
     it('should ignore the station page itself', () => {
       const value = 'https://tunein.com/radio/s285269/'
 
-      expect(tuneinResolveEmbed(value)).toBeUndefined()
+      expect(tuneinResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a guide id of an unknown kind as written, with no page and no logo', () => {
@@ -62,25 +62,25 @@ describe('tuneinResolveEmbed', () => {
         height: 100,
       }
 
-      expect(tuneinResolveEmbed(value)).toEqual(expected)
+      expect(tuneinResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should ignore the follow button', () => {
       const value = 'https://tunein.com/embed/follow/p950157/?wmode=opaque'
 
-      expect(tuneinResolveEmbed(value)).toBeUndefined()
+      expect(tuneinResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a player route outside embed', () => {
       const value = 'https://tunein.com/foo/player/s285269/'
 
-      expect(tuneinResolveEmbed(value)).toBeUndefined()
+      expect(tuneinResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a segment after the guide id', () => {
       const value = 'https://tunein.com/embed/player/s285269/extra/'
 
-      expect(tuneinResolveEmbed(value)).toBeUndefined()
+      expect(tuneinResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed guide id as written, even if the player answers an error', () => {
@@ -94,13 +94,13 @@ describe('tuneinResolveEmbed', () => {
         height: 100,
       }
 
-      expect(tuneinResolveEmbed(value)).toEqual(expected)
+      expect(tuneinResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should ignore a guide id whose kind letter is a separator', () => {
       const value = 'https://tunein.com/embed/player/&285269/'
 
-      expect(tuneinResolveEmbed(value)).toBeUndefined()
+      expect(tuneinResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

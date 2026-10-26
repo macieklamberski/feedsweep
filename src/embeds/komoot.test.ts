@@ -15,7 +15,7 @@ describe('komootResolveEmbed', () => {
         height: 440,
       }
 
-      expect(komootResolveEmbed(value)).toEqual(expected)
+      expect(komootResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the locale from the map and the page', () => {
@@ -28,7 +28,7 @@ describe('komootResolveEmbed', () => {
         height: 440,
       }
 
-      expect(komootResolveEmbed(value)).toEqual(expected)
+      expect(komootResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // The route 404s on the uppercase locale, and the map minted without the locale serves the
@@ -43,7 +43,7 @@ describe('komootResolveEmbed', () => {
         height: 440,
       }
 
-      expect(komootResolveEmbed(value)).toEqual(expected)
+      expect(komootResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the share token and drop the language and the gallery layout', () => {
@@ -56,7 +56,7 @@ describe('komootResolveEmbed', () => {
         height: 440,
       }
 
-      expect(komootResolveEmbed(value)).toEqual(expected)
+      expect(komootResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the classic layout the publisher chose', () => {
@@ -69,7 +69,7 @@ describe('komootResolveEmbed', () => {
         height: 440,
       }
 
-      expect(komootResolveEmbed(value)).toEqual(expected)
+      expect(komootResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should build the collection map and page and drop the map layout', () => {
@@ -83,7 +83,7 @@ describe('komootResolveEmbed', () => {
         height: 440,
       }
 
-      expect(komootResolveEmbed(value)).toEqual(expected)
+      expect(komootResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -91,20 +91,20 @@ describe('komootResolveEmbed', () => {
     it('should ignore the tour page itself', () => {
       const value = 'https://www.komoot.com/tour/727321743'
 
-      expect(komootResolveEmbed(value)).toBeUndefined()
+      expect(komootResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a collection with no slug, which no carrier writes', () => {
       const value = 'https://www.komoot.com/collection/3965053/embed'
 
-      expect(komootResolveEmbed(value)).toBeUndefined()
+      expect(komootResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a collection page that is not the map', () => {
       const value =
         'https://www.komoot.com/collection/3965053/best-of-national-cycling-routes-of-estonian-islands/share'
 
-      expect(komootResolveEmbed(value)).toBeUndefined()
+      expect(komootResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed collection slug as written, even if the player answers an error', () => {
@@ -117,7 +117,7 @@ describe('komootResolveEmbed', () => {
         height: 440,
       }
 
-      expect(komootResolveEmbed(value)).toEqual(expected)
+      expect(komootResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use a malformed collection id as written, even if the player answers an error', () => {
@@ -131,14 +131,14 @@ describe('komootResolveEmbed', () => {
         height: 440,
       }
 
-      expect(komootResolveEmbed(value)).toEqual(expected)
+      expect(komootResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should ignore a route word that is neither a tour nor a collection', () => {
       const value =
         'https://www.komoot.com/highlight/3965053/best-of-national-cycling-routes-of-estonian-islands/embed'
 
-      expect(komootResolveEmbed(value)).toBeUndefined()
+      expect(komootResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed tour id as written, even if the player answers an error', () => {
@@ -151,31 +151,31 @@ describe('komootResolveEmbed', () => {
         height: 440,
       }
 
-      expect(komootResolveEmbed(value)).toEqual(expected)
+      expect(komootResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should ignore a locale segment with a digit before it', () => {
       const value = 'https://www.komoot.com/1de-de/tour/727321743/embed'
 
-      expect(komootResolveEmbed(value)).toBeUndefined()
+      expect(komootResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a locale segment with a digit after it', () => {
       const value = 'https://www.komoot.com/de-de1/tour/727321743/embed'
 
-      expect(komootResolveEmbed(value)).toBeUndefined()
+      expect(komootResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a locale language carrying a query separator', () => {
       const value = 'https://www.komoot.com/d&-de/tour/727321743/embed'
 
-      expect(komootResolveEmbed(value)).toBeUndefined()
+      expect(komootResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a locale region carrying a query separator', () => {
       const value = 'https://www.komoot.com/de-d=/tour/727321743/embed'
 
-      expect(komootResolveEmbed(value)).toBeUndefined()
+      expect(komootResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -190,7 +190,7 @@ describe('komootResolveEmbed', () => {
         height: 440,
       }
 
-      expect(komootResolveEmbed(value)).toEqual(expected)
+      expect(komootResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a locale with a three-letter region', () => {
@@ -203,7 +203,7 @@ describe('komootResolveEmbed', () => {
         height: 440,
       }
 
-      expect(komootResolveEmbed(value)).toEqual(expected)
+      expect(komootResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the share token and name no page for a private tour', () => {
@@ -216,7 +216,7 @@ describe('komootResolveEmbed', () => {
         height: 440,
       }
 
-      expect(komootResolveEmbed(value)).toEqual(expected)
+      expect(komootResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a tracking parameter the player does not read', () => {
@@ -229,7 +229,7 @@ describe('komootResolveEmbed', () => {
         height: 440,
       }
 
-      expect(komootResolveEmbed(value)).toEqual(expected)
+      expect(komootResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint no locale for a tour framed on the German host', () => {
@@ -242,7 +242,7 @@ describe('komootResolveEmbed', () => {
         height: 440,
       }
 
-      expect(komootResolveEmbed(value)).toEqual(expected)
+      expect(komootResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint no locale for a tour framed on the English subdomain of the German host', () => {
@@ -255,7 +255,7 @@ describe('komootResolveEmbed', () => {
         height: 440,
       }
 
-      expect(komootResolveEmbed(value)).toEqual(expected)
+      expect(komootResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

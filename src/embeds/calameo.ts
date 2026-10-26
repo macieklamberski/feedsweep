@@ -1,14 +1,6 @@
-import {
-  composeQuery,
-  encodePathSegment,
-  getQueryParam,
-  isAnyOf,
-  parseUrl,
-  trimObject,
-} from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { composeQuery, encodePathSegment, getQueryParam, isAnyOf, trimObject } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVars, parseFlashVars } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const viewerRatio = '300/194'
@@ -41,14 +33,12 @@ const resolveLibrary = (url: URL): EmbedResolverResult | undefined => {
 // Calaméo's viewer, `v.calameo.com/?bkcode={code}`, and the retired Flash players before it,
 // `cviewer.swf` and `cmini.swf`, take the same code in the same query parameter, or in the
 // player's flashvars when the `<embed src>` names a bare `cmini.swf`.
-export const calameoResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsedUrl = parseUrl(url, placeholderBaseUrl)
-
-  if (parsedUrl && libraryPathRegex.test(parsedUrl.pathname)) {
-    return resolveLibrary(parsedUrl)
+export const calameoResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  if (libraryPathRegex.test(url.pathname)) {
+    return resolveLibrary(url)
   }
 
-  const urlParams = parsedUrl?.searchParams
+  const urlParams = url.searchParams
   const params =
     urlParams && getQueryParam(urlParams, 'bkcode') !== undefined
       ? urlParams

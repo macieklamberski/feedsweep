@@ -15,7 +15,7 @@ describe('channelOneResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(channelOneResolveEmbed(value)).toEqual(expected)
+      expect(channelOneResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the type of a news item in the key', () => {
@@ -27,7 +27,7 @@ describe('channelOneResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(channelOneResolveEmbed(value)).toEqual(expected)
+      expect(channelOneResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the start position and drop the autostart', () => {
@@ -39,7 +39,7 @@ describe('channelOneResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(channelOneResolveEmbed(value)).toEqual(expected)
+      expect(channelOneResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the Flash news player onto the legacy news type', () => {
@@ -51,7 +51,7 @@ describe('channelOneResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(channelOneResolveEmbed(value)).toEqual(expected)
+      expect(channelOneResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the Flash promo player onto the legacy video type', () => {
@@ -63,7 +63,7 @@ describe('channelOneResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(channelOneResolveEmbed(value)).toEqual(expected)
+      expect(channelOneResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the framed video route onto the legacy video type', () => {
@@ -75,7 +75,7 @@ describe('channelOneResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(channelOneResolveEmbed(value)).toEqual(expected)
+      expect(channelOneResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the framed news route onto its legacy news type', () => {
@@ -87,7 +87,7 @@ describe('channelOneResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(channelOneResolveEmbed(value)).toEqual(expected)
+      expect(channelOneResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the www host from the bare one', () => {
@@ -99,7 +99,7 @@ describe('channelOneResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(channelOneResolveEmbed(value)).toEqual(expected)
+      expect(channelOneResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass the id through as written', () => {
@@ -111,7 +111,7 @@ describe('channelOneResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(channelOneResolveEmbed(value)).toEqual(expected)
+      expect(channelOneResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -119,37 +119,37 @@ describe('channelOneResolveEmbed', () => {
     it('should ignore a path with a leading segment', () => {
       const value = 'https://www.1tv.ru/x/embed/147417:12'
 
-      expect(channelOneResolveEmbed(value)).toBeUndefined()
+      expect(channelOneResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path with a trailing segment', () => {
       const value = 'https://www.1tv.ru/embed/147417:12/extra'
 
-      expect(channelOneResolveEmbed(value)).toBeUndefined()
+      expect(channelOneResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore another route word', () => {
       const value = 'https://www.1tv.ru/embeds/147417:12'
 
-      expect(channelOneResolveEmbed(value)).toBeUndefined()
+      expect(channelOneResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a route word that only contains the Flash news route', () => {
       const value = 'http://www.1tv.ru/oldnewsvideo/173017'
 
-      expect(channelOneResolveEmbed(value)).toBeUndefined()
+      expect(channelOneResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the route with no id', () => {
       const value = 'https://www.1tv.ru/embed/'
 
-      expect(channelOneResolveEmbed(value)).toBeUndefined()
+      expect(channelOneResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an id with no type', () => {
       const value = 'https://www.1tv.ru/embed/147417'
 
-      expect(channelOneResolveEmbed(value)).toBeUndefined()
+      expect(channelOneResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

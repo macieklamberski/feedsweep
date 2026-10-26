@@ -1,6 +1,6 @@
-import { composeQuery, encodePathSegment, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
-import { isFileName, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, encodePathSegment, getQueryParam, isAnyOf } from 'trousse'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
+import { isFileName } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'tencent'
@@ -21,15 +21,14 @@ const flashPathRegex = /\/TPout\.swf$/i
 // The player is chromeless and fills its box, and Tencent's own snippet states no size at all.
 const playerRatio = '16/9'
 
-const readVideoId = (url: string): string | undefined => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const pathRegex = parsed?.hostname === 'v.qq.com' ? playerPathRegex : flashPathRegex
+const readVideoId = (url: URL): string | undefined => {
+  const pathRegex = url.hostname === 'v.qq.com' ? playerPathRegex : flashPathRegex
 
-  if (!parsed || !pathRegex.test(parsed.pathname)) {
+  if (!pathRegex.test(url.pathname)) {
     return
   }
 
-  const videoId = getQueryParam(parsed.searchParams, 'vid')
+  const videoId = getQueryParam(url.searchParams, 'vid')
 
   // Tencent serves video on the player host, so a file name in vid is an enclosure.
   if (!videoId || isFileName(videoId) || isAnyOf(videoId, nonVideoWords)) {
@@ -40,7 +39,7 @@ const readVideoId = (url: string): string | undefined => {
 }
 
 // Tencent Video's player iframe and the dead Flash TPout.swf carrier, both naming the video in vid.
-const tencentResolveEmbed: ResolveEmbed = (url) => {
+const tencentResolveEmbed: ResolveUrlEmbed = (url) => {
   const videoId = readVideoId(url)
 
   if (!videoId) {

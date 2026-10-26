@@ -21,7 +21,7 @@ describe('bundestagResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(bundestagResolveEmbed(value)).toEqual(expected)
+      expect(bundestagResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the player from the loader script', () => {
@@ -35,7 +35,7 @@ describe('bundestagResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(bundestagResolveEmbed(value)).toEqual(expected)
+      expect(bundestagResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass the id through as written', () => {
@@ -48,7 +48,7 @@ describe('bundestagResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(bundestagResolveEmbed(value)).toEqual(expected)
+      expect(bundestagResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep an id holding a slash inside one page path segment', () => {
@@ -61,7 +61,7 @@ describe('bundestagResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(bundestagResolveEmbed(value)).toEqual(expected)
+      expect(bundestagResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -69,43 +69,43 @@ describe('bundestagResolveEmbed', () => {
     it('should ignore a foreign host carrying the same path', () => {
       const value = 'https://evil.test/pservices/player/embed/nokey?e=bt-od&ep=69&c=7657467'
 
-      expect(bundestagResolveEmbed(value)).toBeUndefined()
+      expect(bundestagResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path with a leading segment', () => {
       const value = 'https://webtv.bundestag.de/x/pservices/player/embed/nokey?c=7657467'
 
-      expect(bundestagResolveEmbed(value)).toBeUndefined()
+      expect(bundestagResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path with a trailing segment', () => {
       const value = 'https://webtv.bundestag.de/pservices/player/embed/nokey/extra?c=7657467'
 
-      expect(bundestagResolveEmbed(value)).toBeUndefined()
+      expect(bundestagResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the player with no video', () => {
       const value = 'https://webtv.bundestag.de/pservices/player/embed/nokey?e=bt-od&ep=69'
 
-      expect(bundestagResolveEmbed(value)).toBeUndefined()
+      expect(bundestagResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the loader with no video', () => {
       const value = 'https://webtv.bundestag.de/player/macros/bttv/hls/player.js?phi=default'
 
-      expect(bundestagResolveEmbed(value)).toBeUndefined()
+      expect(bundestagResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should read the loader video from its own parameter only', () => {
       const value = 'https://webtv.bundestag.de/player/macros/bttv/hls/player.js?c=7197510'
 
-      expect(bundestagResolveEmbed(value)).toBeUndefined()
+      expect(bundestagResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should leave the Flash player alone', () => {
       const value = 'https://webtv.bundestag.de/iptv/swf/xflv/showIt3.swf'
 
-      expect(bundestagResolveEmbed(value)).toBeUndefined()
+      expect(bundestagResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

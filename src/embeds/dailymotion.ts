@@ -12,7 +12,12 @@ import {
   parseUrl,
   trimObject,
 } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
+import type {
+  EmbedRenderHint,
+  EmbedResolverResult,
+  FieldCleaner,
+  ResolveUrlEmbed,
+} from '../types.js'
 import { attr, find } from '../utils/dom.js'
 
 const provider = 'dailymotion'
@@ -121,13 +126,7 @@ const readWidgetEntry = (url: URL): Array<string> => {
 
 // A playlist names no single video, so it is read separately and only once the video readers have
 // found nothing: `/embed/video/{id}?playlist={id}` is a video playing inside one, not a playlist.
-const extractDailymotionPlaylistId = (link: string): string | undefined => {
-  const url = parseDailymotionUrl(link)
-
-  if (!url) {
-    return
-  }
-
+const extractDailymotionPlaylistId = (url: URL): string | undefined => {
   const segments = getPathSegments(url)
   const marker = skipRouteWords(segments)
 
@@ -162,13 +161,7 @@ const readPathId = (url: URL, segments: Array<string>): string | undefined => {
   return decodeSegment(candidate) ?? candidate
 }
 
-export const extractDailymotionId = (link: string): string | undefined => {
-  const url = parseDailymotionUrl(link)
-
-  if (!url) {
-    return
-  }
-
+export const extractDailymotionId = (url: URL): string | undefined => {
   const [kind, widgetIds] = readWidgetEntry(url)
   // The jukebox joins its videos with `+`, which the query decodes to a space.
   const widgetId = isAnyOf(kind, 'vids') ? widgetIds?.split(' ')[0] : undefined
@@ -196,7 +189,9 @@ export const composeEmbedUrl = (
 // the publisher pasted, so the host is checked here the way the factory checks it for a carrier.
 export const readDailymotionEmbedSrc = (link: string): string | undefined => {
   const url = parseUrlOnHosts(link, dailymotionHosts)
-  const videoId = url && extractDailymotionId(url.href)
+  // The id is read past the carrier repairs, which the host check does not make.
+  const repaired = url && parseDailymotionUrl(url.href)
+  const videoId = repaired && extractDailymotionId(repaired)
 
   return videoId ? composeEmbedUrl('video', videoId) : undefined
 }
@@ -207,8 +202,8 @@ export const readDailymotionEmbedSrc = (link: string): string | undefined => {
 const dailymotionEmbedParams = ['start', 'startTime', 'loop', 'playlist']
 
 // A player id's player reads the start as `startTime` and ignores the old `start`.
-const readPlayerParams = (url: string): Record<string, string> => {
-  const params = pickQueryParams(parseUrl(url)?.search ?? '', dailymotionEmbedParams)
+const readPlayerParams = (url: URL): Record<string, string> => {
+  const params = pickQueryParams(url.search, dailymotionEmbedParams)
 
   return {
     ...trimObject(
@@ -218,7 +213,7 @@ const readPlayerParams = (url: string): Record<string, string> => {
   }
 }
 
-export const dailymotionResolveEmbed: ResolveEmbed = (url, element) => {
+export const dailymotionResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const videoId = extractDailymotionId(url)
 
   if (videoId) {
@@ -274,7 +269,9 @@ const readSnippetFields = (
     return attr(find(element.parentElement, `meta[itemprop="${name}"]`), 'content')
   }
 
-  if (dailymotionResolveEmbed(readMeta('embedUrl') ?? '')?.id !== result.id) {
+  const embedUrl = parseDailymotionUrl(readMeta('embedUrl') ?? '')
+
+  if (!embedUrl || dailymotionResolveEmbed(embedUrl)?.id !== result.id) {
     return
   }
 
@@ -303,7 +300,9 @@ export const dailymotionScriptEmbedResolver = createMarkupEmbedResolver(
       trimObject({ video: attr(element, 'data-video'), playlist: attr(element, 'data-playlist') }),
     )
     // The script writes its player's iframe with the same query.
-    const result = dailymotionResolveEmbed(`https://geo.dailymotion.com/player.html${query}`)
+    const result = dailymotionResolveEmbed(
+      new URL(`https://geo.dailymotion.com/player.html${query}`),
+    )
 
     if (!result) {
       return

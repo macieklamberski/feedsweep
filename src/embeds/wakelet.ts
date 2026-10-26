@@ -1,6 +1,4 @@
-import { parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import type { ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'wakelet'
@@ -16,8 +14,8 @@ const wakePathRegex = /^\/wakes\/([^/]+)(?:\/[^/]+)?$/i
 
 // The collection frame Wakelet's embed dialog writes, embed.wakelet.com/wakes/{id}/list.
 // The layout and `border` are display, so every carrier is rebuilt onto the dialog's list.
-const wakeletResolveEmbed: ResolveEmbed = (url) => {
-  const id = parseUrl(url, placeholderBaseUrl)?.pathname.match(wakePathRegex)?.[1]
+const wakeletResolveEmbed: ResolveUrlEmbed = (url) => {
+  const id = url.pathname.match(wakePathRegex)?.[1]
 
   if (!id) {
     return

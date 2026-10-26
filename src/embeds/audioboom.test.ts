@@ -15,21 +15,21 @@ describe('extractAudioboomPost', () => {
     const value = 'https://embeds.audioboom.com/posts/8292430/embed/v4'
     const expected = '8292430'
 
-    expect(extractAudioboomPost(value)).toEqual(expected)
+    expect(extractAudioboomPost(new URL(value))).toEqual(expected)
   })
 
   it('should read the compact player', () => {
     const value = 'https://embeds.audioboom.com/posts/8292430/embed'
     const expected = '8292430'
 
-    expect(extractAudioboomPost(value)).toEqual(expected)
+    expect(extractAudioboomPost(new URL(value))).toEqual(expected)
   })
 
   it('should read the pre-rename boos spelling', () => {
     const value = 'https://audioboo.fm/boos/123456/embed'
     const expected = '123456'
 
-    expect(extractAudioboomPost(value)).toEqual(expected)
+    expect(extractAudioboomPost(new URL(value))).toEqual(expected)
   })
 
   it('should drop the episode slug the share code hangs off the id', () => {
@@ -37,32 +37,26 @@ describe('extractAudioboomPost', () => {
       'https://embeds.audioboom.com/posts/6479208-eddie-jones-england-s-forward-power/embed/v4'
     const expected = '6479208'
 
-    expect(extractAudioboomPost(value)).toEqual(expected)
+    expect(extractAudioboomPost(new URL(value))).toEqual(expected)
   })
 
   it('should drop the episode slug on the pre-rename boos spelling too', () => {
     const value = 'https://audioboo.fm/boos/2682680-joyous-jingles/embed'
     const expected = '2682680'
 
-    expect(extractAudioboomPost(value)).toEqual(expected)
+    expect(extractAudioboomPost(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a segment that starts with the slug', () => {
     const value = 'https://embeds.audioboom.com/posts/joyous-jingles/embed'
 
-    expect(extractAudioboomPost(value)).toBeUndefined()
+    expect(extractAudioboomPost(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for an audioboom url naming no post', () => {
     const value = 'https://audioboom.com/channels/something'
 
-    expect(extractAudioboomPost(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a url that cannot be parsed', () => {
-    const value = 'https://['
-
-    expect(extractAudioboomPost(value)).toBeUndefined()
+    expect(extractAudioboomPost(new URL(value))).toBeUndefined()
   })
 })
 
@@ -76,7 +70,7 @@ describe('audioboomResolveEmbed', () => {
       height: 300,
     }
 
-    expect(audioboomResolveEmbed(value)).toEqual(expected)
+    expect(audioboomResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should rebuild the compact player onto the current one', () => {
@@ -88,7 +82,7 @@ describe('audioboomResolveEmbed', () => {
       height: 300,
     }
 
-    expect(audioboomResolveEmbed(value)).toEqual(expected)
+    expect(audioboomResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should mint the bare id from a slugged url', () => {
@@ -101,13 +95,13 @@ describe('audioboomResolveEmbed', () => {
       height: 300,
     }
 
-    expect(audioboomResolveEmbed(value)).toEqual(expected)
+    expect(audioboomResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a audioboom url naming no post', () => {
     const value = 'https://audioboom.com/about'
 
-    expect(audioboomResolveEmbed(value)).toBeUndefined()
+    expect(audioboomResolveEmbed(new URL(value))).toBeUndefined()
   })
 })
 

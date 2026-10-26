@@ -16,7 +16,7 @@ describe('learningappsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(learningappsResolveEmbed(value)).toEqual(expected)
+      expect(learningappsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should map the retired route onto the current one', () => {
@@ -28,7 +28,7 @@ describe('learningappsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(learningappsResolveEmbed(value)).toEqual(expected)
+      expect(learningappsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the exercise from the video parameter', () => {
@@ -40,7 +40,7 @@ describe('learningappsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(learningappsResolveEmbed(value)).toEqual(expected)
+      expect(learningappsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the exercise parameter on the retired route', () => {
@@ -54,7 +54,7 @@ describe('learningappsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(learningappsResolveEmbed(value)).toEqual(expected)
+      expect(learningappsResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -62,25 +62,25 @@ describe('learningappsResolveEmbed', () => {
     it('should ignore a route naming no exercise', () => {
       const value = 'https://learningapps.org/watch'
 
-      expect(learningappsResolveEmbed(value)).toBeUndefined()
+      expect(learningappsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore another page of the site naming an exercise', () => {
       const value = 'https://learningapps.org/index.php?app=12554379'
 
-      expect(learningappsResolveEmbed(value)).toBeUndefined()
+      expect(learningappsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a numeric id on the retired parameter', () => {
       const value = 'https://learningapps.org/show?id=12554379'
 
-      expect(learningappsResolveEmbed(value)).toBeUndefined()
+      expect(learningappsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a numeric id on the video parameter', () => {
       const value = 'https://learningapps.org/watch?v=12554379'
 
-      expect(learningappsResolveEmbed(value)).toBeUndefined()
+      expect(learningappsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed exercise id as written, even if the player answers an error', () => {
@@ -92,7 +92,7 @@ describe('learningappsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(learningappsResolveEmbed(value)).toEqual(expected)
+      expect(learningappsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep an exercise id carrying an encoded separator as one parameter', () => {
@@ -104,7 +104,7 @@ describe('learningappsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(learningappsResolveEmbed(value)).toEqual(expected)
+      expect(learningappsResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -118,7 +118,7 @@ describe('learningappsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(learningappsResolveEmbed(value)).toEqual(expected)
+      expect(learningappsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should leave a mixed exercise id starting with a digit without an icon', () => {
@@ -130,7 +130,7 @@ describe('learningappsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(learningappsResolveEmbed(value)).toEqual(expected)
+      expect(learningappsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep an uppercase exercise id as written', () => {
@@ -142,7 +142,7 @@ describe('learningappsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(learningappsResolveEmbed(value)).toEqual(expected)
+      expect(learningappsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should rebuild a subdomain on the apex, which alone serves the exercise', () => {
@@ -156,7 +156,7 @@ describe('learningappsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(learningappsResolveEmbed(value)).toEqual(expected)
+      expect(learningappsResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

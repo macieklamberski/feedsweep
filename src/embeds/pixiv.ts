@@ -1,5 +1,5 @@
-import { composeQuery, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { composeQuery, getQueryParam, isAnyOf } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -39,15 +39,9 @@ const findAnchor = (anchors: Array<Element>, pathRegex: RegExp): Element | undef
   })
 }
 
-const pixivResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url)
-
-  if (!parsed) {
-    return
-  }
-
-  const route = parsed.pathname.match(framePathRegex)?.[1]?.toLowerCase()
-  const workId = getQueryParam(parsed.searchParams, 'id')
+const pixivResolveEmbed: ResolveUrlEmbed = (url) => {
+  const route = url.pathname.match(framePathRegex)?.[1]?.toLowerCase()
+  const workId = getQueryParam(url.searchParams, 'id')
 
   if (!route || !workId) {
     return
@@ -57,7 +51,7 @@ const pixivResolveEmbed: ResolveEmbed = (url) => {
   const page = illustIdRegex.test(workId) ? `https://www.pixiv.net/artworks/${illustId}` : undefined
 
   // `type` picks the id space, and a novel's number reads the same as an illustration's.
-  if (route === 'oembed_iframe' && !isAnyOf(getQueryParam(parsed.searchParams, 'type'), 'illust')) {
+  if (route === 'oembed_iframe' && !isAnyOf(getQueryParam(url.searchParams, 'type'), 'illust')) {
     return
   }
 

@@ -483,7 +483,7 @@ describe('redditResolveEmbed', () => {
       publisher: 'r/Birdwatching',
     }
 
-    expect(redditResolveEmbed(value)).toEqual(expected)
+    expect(redditResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // Reddit's post counter started at one base36 character, so the oldest permalinks a feed still
@@ -498,7 +498,7 @@ describe('redditResolveEmbed', () => {
       publisher: 'r/Birdwatching',
     }
 
-    expect(redditResolveEmbed(value)).toEqual(expected)
+    expect(redditResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should resolve a subreddit name longer than Reddit lets anyone pick today', () => {
@@ -512,7 +512,7 @@ describe('redditResolveEmbed', () => {
       publisher: 'r/aVeryLongSubredditNameLongerThanReddit',
     }
 
-    expect(redditResolveEmbed(value)).toEqual(expected)
+    expect(redditResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should drop the query naming the embedding page', () => {
@@ -526,7 +526,7 @@ describe('redditResolveEmbed', () => {
       publisher: 'r/Birdwatching',
     }
 
-    expect(redditResolveEmbed(value)).toEqual(expected)
+    expect(redditResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should rebuild a profile post spelled with u onto the user route', () => {
@@ -539,37 +539,37 @@ describe('redditResolveEmbed', () => {
       publisher: 'u/photo_poster',
     }
 
-    expect(redditResolveEmbed(value)).toEqual(expected)
+    expect(redditResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should ignore a reddit url that names no post', () => {
     const value = 'https://www.reddit.com/'
 
-    expect(redditResolveEmbed(value)).toBeUndefined()
+    expect(redditResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should ignore a subreddit page that is not a discussion', () => {
     const value = 'https://www.reddit.com/r/pics/wiki/index/'
 
-    expect(redditResolveEmbed(value)).toBeUndefined()
+    expect(redditResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should ignore a discussion path with no post id', () => {
     const value = 'https://www.reddit.com/r/pics/comments/'
 
-    expect(redditResolveEmbed(value)).toBeUndefined()
+    expect(redditResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should ignore a permalink under a scope that is neither a subreddit nor an account', () => {
     const value = 'https://www.reddit.com/x/pics/comments/dq4m1v/my_garden/'
 
-    expect(redditResolveEmbed(value)).toBeUndefined()
+    expect(redditResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should ignore a subreddit route naming no subreddit', () => {
     const value = 'https://www.reddit.com/r/'
 
-    expect(redditResolveEmbed(value)).toBeUndefined()
+    expect(redditResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should use a malformed subreddit name as written, even if the player answers an error', () => {
@@ -582,7 +582,7 @@ describe('redditResolveEmbed', () => {
       publisher: 'r/pics%2F..%2Fadmin',
     }
 
-    expect(redditResolveEmbed(value)).toEqual(expected)
+    expect(redditResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should use a malformed post id as written, even if the player answers an error', () => {
@@ -595,7 +595,7 @@ describe('redditResolveEmbed', () => {
       publisher: 'r/pics',
     }
 
-    expect(redditResolveEmbed(value)).toEqual(expected)
+    expect(redditResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should use a malformed comment id as written, even if the player answers an error', () => {
@@ -608,19 +608,19 @@ describe('redditResolveEmbed', () => {
       publisher: 'r/pics',
     }
 
-    expect(redditResolveEmbed(value)).toEqual(expected)
+    expect(redditResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should ignore the media host serving a post its attachments', () => {
     const value = 'https://g.redditmedia.com/f1cqmjhrnoshoediji58x/poster.jpg'
 
-    expect(redditResolveEmbed(value)).toBeUndefined()
+    expect(redditResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should ignore another host carrying the permalink path', () => {
     const value = 'https://embed.reddit.com.evil.test/r/pics/comments/dq4m1v/my_garden/'
 
-    expect(redditResolveEmbed(value)).toBeUndefined()
+    expect(redditResolveEmbed(new URL(value))).toBeUndefined()
   })
 })
 

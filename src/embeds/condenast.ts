@@ -1,4 +1,4 @@
-import type { ResolveEmbed } from '../types.js'
+import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -16,7 +16,7 @@ const legacyPathRegex = /^\/embed(?:js)?\/([^/]+)\/[^/]+\/?$/i
 // Condé Nast's video player, shared by The New Yorker, Vanity Fair, Wired and the other brands.
 // The script embed its share dialog writes names no frame url. `/iframe/video/{id}` is the frame
 // url the loader's grammar parses, and it plays the same video.
-export const condenastResolveEmbed: ResolveEmbed = (url) => {
+export const condenastResolveEmbed: ResolveUrlEmbed = (url) => {
   const parsed = parseUrlOnHosts(url, condenastHosts)
 
   if (!parsed) {
@@ -47,6 +47,12 @@ export const condenastIframeEmbedResolver = createUrlEmbedResolver(
 export const condenastScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="cnevids.com/" i]',
   (element) => {
-    return condenastResolveEmbed(attr(element, 'src') ?? '')
+    const url = parseUrlOnHosts(attr(element, 'src'), condenastHosts)
+
+    if (!url) {
+      return
+    }
+
+    return condenastResolveEmbed(url)
   },
 )

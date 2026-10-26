@@ -1,5 +1,5 @@
 import { composeQuery, decodeSegment, getPathSegments, getQueryParam, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { ResolveUrlEmbed } from '../types.js'
 import { absoluteUrlRegex, isFileName, placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -24,11 +24,10 @@ const readFileName = (documentUrl: string): string | undefined => {
 
 // Microsoft's Office viewer, which renders somebody else's document and carries the whole payload
 // as the `src` query parameter.
-export const officeResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const documentUrl = getQueryParam(parsed?.searchParams, 'src')
+export const officeResolveEmbed: ResolveUrlEmbed = (url) => {
+  const documentUrl = getQueryParam(url.searchParams, 'src')
 
-  if (!parsed || !documentUrl || !viewerPathRegex.test(parsed.pathname)) {
+  if (!documentUrl || !viewerPathRegex.test(url.pathname)) {
     return
   }
 

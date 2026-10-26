@@ -49,6 +49,9 @@ export type EmbedResolverResult = {
 
 export type ResolveEmbed = (url: string, element?: Element) => EmbedResolverResult | undefined
 
+// The reader createUrlEmbedResolver calls, handed the carrier url it already parsed.
+export type ResolveUrlEmbed = (url: URL, element?: Element) => EmbedResolverResult | undefined
+
 export type EmbedRenderHint = {
   provider: string
   // The origin the player's messages arrive from, for a reader to check `event.origin` against.

@@ -1,5 +1,5 @@
 import { getPathSegments } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isFileName, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -11,7 +11,7 @@ const provider = 'fliphtml5'
 const fliphtml5Hosts = ['online.fliphtml5.com']
 
 // FlipHTML5's flipbook viewer, `online.fliphtml5.com/{account}/{book}/`, opening at the `#p=` page.
-export const fliphtml5ResolveEmbed: ResolveEmbed = (url, element) => {
+export const fliphtml5ResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, fliphtml5Hosts)
 
   if (!parsed) {
@@ -51,6 +51,12 @@ export const fliphtml5IframeEmbedResolver = createUrlEmbedResolver(
 export const fliphtml5LightBoxEmbedResolver = createMarkupEmbedResolver(
   'img[data-rel="fh5-light-box-demo"][data-href]',
   (element) => {
-    return fliphtml5ResolveEmbed(attr(element, 'data-href') ?? '')
+    const url = parseUrlOnHosts(attr(element, 'data-href'), fliphtml5Hosts)
+
+    if (!url) {
+      return
+    }
+
+    return fliphtml5ResolveEmbed(url)
   },
 )

@@ -1,5 +1,5 @@
-import { isAnyOf, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import { isAnyOf } from 'trousse'
+import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -46,8 +46,8 @@ const readGame = (pathname: string): { id: string; slug: string } | undefined =>
 
 // An Educaplay game: the current player in any language, or the retired html5 player, whose id
 // and slug play on the current one.
-const educaplayResolveEmbed: ResolveEmbed = (url, element) => {
-  const game = readGame(parseUrl(url)?.pathname ?? '')
+const educaplayResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const game = readGame(url.pathname)
 
   if (!game) {
     return

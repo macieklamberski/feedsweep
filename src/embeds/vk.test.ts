@@ -23,7 +23,7 @@ describe('vkResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(vkResolveEmbed(value)).toEqual(expected)
+      expect(vkResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the hash in the player alone and drop the rest', () => {
@@ -37,7 +37,7 @@ describe('vkResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(vkResolveEmbed(value)).toEqual(expected)
+      expect(vkResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep a start position in the player as written', () => {
@@ -51,7 +51,7 @@ describe('vkResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(vkResolveEmbed(value)).toEqual(expected)
+      expect(vkResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep a start position in seconds as written', () => {
@@ -64,7 +64,7 @@ describe('vkResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(vkResolveEmbed(value)).toEqual(expected)
+      expect(vkResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the video_embed route onto the player', () => {
@@ -77,7 +77,7 @@ describe('vkResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(vkResolveEmbed(value)).toEqual(expected)
+      expect(vkResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should open a clip on the clip page', () => {
@@ -90,7 +90,7 @@ describe('vkResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(vkResolveEmbed(value)).toEqual(expected)
+      expect(vkResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it("should mint a video's page onto its player", () => {
@@ -103,7 +103,7 @@ describe('vkResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(vkResolveEmbed(value)).toEqual(expected)
+      expect(vkResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it("should drop the query of a video's page", () => {
@@ -116,7 +116,7 @@ describe('vkResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(vkResolveEmbed(value)).toEqual(expected)
+      expect(vkResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it("should carry a start position from a video's page onto the player", () => {
@@ -129,7 +129,7 @@ describe('vkResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(vkResolveEmbed(value)).toEqual(expected)
+      expect(vkResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -137,37 +137,37 @@ describe('vkResolveEmbed', () => {
     it('should ignore a wall post', () => {
       const value = 'https://vk.com/wall534385176_47599'
 
-      expect(vkResolveEmbed(value)).toBeUndefined()
+      expect(vkResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it("should ignore a community's video list", () => {
       const value = 'https://vk.com/videos-214240511'
 
-      expect(vkResolveEmbed(value)).toBeUndefined()
+      expect(vkResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a video page under another path', () => {
       const value = 'https://vk.com/x/video-214240511_456239169'
 
-      expect(vkResolveEmbed(value)).toBeUndefined()
+      expect(vkResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path past the video page', () => {
       const value = 'https://vk.com/video-214240511_456239169/extra'
 
-      expect(vkResolveEmbed(value)).toBeUndefined()
+      expect(vkResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path that is not a player', () => {
       const value = 'https://vk.com/al_video.php?oid=1&id=2'
 
-      expect(vkResolveEmbed(value)).toBeUndefined()
+      expect(vkResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a player naming no video', () => {
       const value = 'https://vk.com/video_ext.php?oid=-1'
 
-      expect(vkResolveEmbed(value)).toBeUndefined()
+      expect(vkResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed owner id as written, even if the player answers an error', () => {
@@ -180,7 +180,7 @@ describe('vkResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(vkResolveEmbed(value)).toEqual(expected)
+      expect(vkResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use a malformed video id as written, even if the player answers an error', () => {
@@ -193,7 +193,7 @@ describe('vkResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(vkResolveEmbed(value)).toEqual(expected)
+      expect(vkResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

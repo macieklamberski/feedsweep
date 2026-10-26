@@ -15,7 +15,7 @@ describe('spotifyResolveEmbed', () => {
         height: 152,
       }
 
-      expect(spotifyResolveEmbed(value)).toEqual(expected)
+      expect(spotifyResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read an id longer than the 22 characters Spotify mints today', () => {
@@ -28,7 +28,7 @@ describe('spotifyResolveEmbed', () => {
         height: 152,
       }
 
-      expect(spotifyResolveEmbed(value)).toEqual(expected)
+      expect(spotifyResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should give a collection the taller player height', () => {
@@ -41,7 +41,7 @@ describe('spotifyResolveEmbed', () => {
         height: 352,
       }
 
-      expect(spotifyResolveEmbed(value)).toEqual(expected)
+      expect(spotifyResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should resolve the older podcast player path', () => {
@@ -54,7 +54,7 @@ describe('spotifyResolveEmbed', () => {
         height: 152,
       }
 
-      expect(spotifyResolveEmbed(value)).toEqual(expected)
+      expect(spotifyResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should resolve a localized page url', () => {
@@ -67,7 +67,7 @@ describe('spotifyResolveEmbed', () => {
         height: 152,
       }
 
-      expect(spotifyResolveEmbed(value)).toEqual(expected)
+      expect(spotifyResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should resolve the legacy uri form', () => {
@@ -80,7 +80,7 @@ describe('spotifyResolveEmbed', () => {
         height: 152,
       }
 
-      expect(spotifyResolveEmbed(value)).toEqual(expected)
+      expect(spotifyResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // The parameter also carries an ordinary open.spotify.com url. It is read by the same path
@@ -102,7 +102,7 @@ describe('spotifyResolveEmbed', () => {
         height: 152,
       }
 
-      expect(spotifyResolveEmbed(value)).toEqual(expected)
+      expect(spotifyResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // The ownership form, which this file already reads in the other two spellings.
@@ -117,7 +117,7 @@ describe('spotifyResolveEmbed', () => {
         height: 352,
       }
 
-      expect(spotifyResolveEmbed(value)).toEqual(expected)
+      expect(spotifyResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // The type and id are taken as a pair. A path naming a type but no id must not borrow the
@@ -134,7 +134,7 @@ describe('spotifyResolveEmbed', () => {
         height: 352,
       }
 
-      expect(spotifyResolveEmbed(value)).toEqual(expected)
+      expect(spotifyResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // A playlist is named through its owner, so the type and id are the last pair in the uri
@@ -150,7 +150,7 @@ describe('spotifyResolveEmbed', () => {
         height: 352,
       }
 
-      expect(spotifyResolveEmbed(value)).toEqual(expected)
+      expect(spotifyResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should resolve the same ownership spelled as a path', () => {
@@ -163,7 +163,7 @@ describe('spotifyResolveEmbed', () => {
         height: 352,
       }
 
-      expect(spotifyResolveEmbed(value)).toEqual(expected)
+      expect(spotifyResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should give an artist the taller player height', () => {
@@ -176,7 +176,7 @@ describe('spotifyResolveEmbed', () => {
         height: 352,
       }
 
-      expect(spotifyResolveEmbed(value)).toEqual(expected)
+      expect(spotifyResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should ignore what follows the id', () => {
@@ -189,7 +189,7 @@ describe('spotifyResolveEmbed', () => {
         height: 152,
       }
 
-      expect(spotifyResolveEmbed(value)).toEqual(expected)
+      expect(spotifyResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the start position and drop the generator tag', () => {
@@ -203,7 +203,7 @@ describe('spotifyResolveEmbed', () => {
         height: 152,
       }
 
-      expect(spotifyResolveEmbed(value)).toEqual(expected)
+      expect(spotifyResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep a start position of 0 as written', () => {
@@ -217,7 +217,7 @@ describe('spotifyResolveEmbed', () => {
         height: 152,
       }
 
-      expect(spotifyResolveEmbed(value)).toEqual(expected)
+      expect(spotifyResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -226,43 +226,43 @@ describe('spotifyResolveEmbed', () => {
       const uri = 'https://example.com/track/2ikQOoW9SMmgec0xdU94B0'
       const value = `https://open.spotify.com/embed?uri=${encodeURIComponent(uri)}`
 
-      expect(spotifyResolveEmbed(value)).toBeUndefined()
+      expect(spotifyResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a type that does not embed', () => {
       const value = 'https://open.spotify.com/user/4cOdK2wGLETKBW3PvgPWqT'
 
-      expect(spotifyResolveEmbed(value)).toBeUndefined()
+      expect(spotifyResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a two-segment route that is not a type', () => {
       const value = 'https://open.spotify.com/concert/38rJfCcp1DPmGqDbYE3xoR'
 
-      expect(spotifyResolveEmbed(value)).toBeUndefined()
+      expect(spotifyResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a type naming an inherited method', () => {
       const value = 'https://open.spotify.com/embed/toString/4uLU6hMCjMI75M1A2tKUQC'
 
-      expect(spotifyResolveEmbed(value)).toBeUndefined()
+      expect(spotifyResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a type naming the prototype itself', () => {
       const value = 'https://open.spotify.com/embed/__proto__/4uLU6hMCjMI75M1A2tKUQC'
 
-      expect(spotifyResolveEmbed(value)).toBeUndefined()
+      expect(spotifyResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a path naming a type and no id', () => {
       const value = 'https://open.spotify.com/embed/track'
 
-      expect(spotifyResolveEmbed(value)).toBeUndefined()
+      expect(spotifyResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a legacy uri that names no id', () => {
       const value = 'https://embed.spotify.com/?uri=spotify:track'
 
-      expect(spotifyResolveEmbed(value)).toBeUndefined()
+      expect(spotifyResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed id as written, even if the player answers an error', () => {
@@ -275,25 +275,25 @@ describe('spotifyResolveEmbed', () => {
         height: 152,
       }
 
-      expect(spotifyResolveEmbed(value)).toEqual(expected)
+      expect(spotifyResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should return undefined for a route prefix that only ends in embed', () => {
       const value = 'https://open.spotify.com/noembed/track/4cOdK2wGLETKBW3PvgPWqT'
 
-      expect(spotifyResolveEmbed(value)).toBeUndefined()
+      expect(spotifyResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a route prefix that only starts with embed', () => {
       const value = 'https://open.spotify.com/embedded/track/4cOdK2wGLETKBW3PvgPWqT'
 
-      expect(spotifyResolveEmbed(value)).toBeUndefined()
+      expect(spotifyResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a legacy uri under another scheme', () => {
       const value = 'https://embed.spotify.com/?uri=notspotify:track:4cOdK2wGLETKBW3PvgPWqT'
 
-      expect(spotifyResolveEmbed(value)).toBeUndefined()
+      expect(spotifyResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should resolve a legacy uri id of unusual length as written', () => {
@@ -306,13 +306,13 @@ describe('spotifyResolveEmbed', () => {
         height: 152,
       }
 
-      expect(spotifyResolveEmbed(value)).toEqual(expected)
+      expect(spotifyResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should return undefined for a legacy uri that runs on past the id', () => {
       const value = 'https://embed.spotify.com/?uri=spotify:track:4cOdK2wGLETKBW3PvgPWqT/extra'
 
-      expect(spotifyResolveEmbed(value)).toBeUndefined()
+      expect(spotifyResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

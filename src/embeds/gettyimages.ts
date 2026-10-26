@@ -1,6 +1,5 @@
-import { composeQuery, encodePathSegment, parseUrl, startsWithAnyOf, trimObject } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, encodePathSegment, startsWithAnyOf, trimObject } from 'trousse'
+import type { ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The asset id Getty calls `items`, and the opaque embed token it calls `et`.
@@ -27,11 +26,10 @@ const readSignedQuery = (url: URL): string => {
   return signedPairs.length > 0 ? `?${signedPairs.join('&')}` : ''
 }
 
-const gettyImagesResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const itemId = parsed?.pathname.match(embedPathRegex)?.[1]
+const gettyImagesResolveEmbed: ResolveUrlEmbed = (url) => {
+  const itemId = url.pathname.match(embedPathRegex)?.[1]
 
-  if (!parsed || !itemId) {
+  if (!itemId) {
     return
   }
 
@@ -40,7 +38,7 @@ const gettyImagesResolveEmbed: ResolveEmbed = (url) => {
     // `embed.gettyimages.com/oembed?url=http://gty.im/{items}` answers title, caption,
     // photographer, collection and a thumbnail with no key, and 404s on an invented id.
     id: itemId,
-    src: `https://embed.gettyimages.com/embed/${itemId}${readSignedQuery(parsed)}`,
+    src: `https://embed.gettyimages.com/embed/${itemId}${readSignedQuery(url)}`,
     url: `https://www.gettyimages.com/detail/${itemId}`,
     ratio: '3/2',
   }

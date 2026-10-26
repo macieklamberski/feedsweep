@@ -1,4 +1,4 @@
-import { composeQuery, getQueryParam, isAnyOf, parseUrl } from 'trousse'
+import { composeQuery, getQueryParam, isAnyOf } from 'trousse'
 import type { EmbedResolverResult } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
@@ -110,33 +110,27 @@ export const yandexMapsScriptEmbedResolver = createMarkupEmbedResolver(
 export const yandexMapsIframeEmbedResolver = createUrlEmbedResolver(
   yandexMapsWidgetHosts,
   (url, element) => {
-    const parsed = parseUrl(url)
-
-    if (!parsed) {
-      return
-    }
-
-    const code = parsed.pathname.match(shortLinkPathRegex)?.groups?.code
+    const code = url.pathname.match(shortLinkPathRegex)?.groups?.code
 
     if (code) {
       return {
         provider,
         id: `-/${code}`,
-        src: `https://${parsed.hostname}${widgetPath}-/${code}`,
-        url: `https://${parsed.hostname}/maps/-/${code}`,
+        src: `https://${url.hostname}${widgetPath}-/${code}`,
+        url: `https://${url.hostname}/maps/-/${code}`,
         height: mapHeight,
       }
     }
 
-    if (!isAnyOf(parsed.pathname, widgetPath)) {
+    if (!isAnyOf(url.pathname, widgetPath)) {
       return
     }
 
-    const position = pickQueryParams(parsed.search, positionParams)
+    const position = pickQueryParams(url.search, positionParams)
 
     return (
-      resolveConstructorMap(parsed.hostname, parsed.searchParams, position) ??
-      resolveCoordinateMap(parsed.hostname, parsed.searchParams, element)
+      resolveConstructorMap(url.hostname, url.searchParams, position) ??
+      resolveCoordinateMap(url.hostname, url.searchParams, element)
     )
   },
 )

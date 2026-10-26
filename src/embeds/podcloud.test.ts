@@ -22,7 +22,7 @@ describe('podcloudResolveEmbed', () => {
         url: 'https://podcloud.fr/podcast/danslajungledunumerique/episode/plaider-pour-un-numerique-plus-responsable-dans-les-organisations-publiques-ou-privees',
       }
 
-      expect(podcloudResolveEmbed(value)).toEqual(expected)
+      expect(podcloudResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the show player and page', () => {
@@ -34,7 +34,7 @@ describe('podcloudResolveEmbed', () => {
         url: 'https://podcloud.fr/podcast/oxymut',
       }
 
-      expect(podcloudResolveEmbed(value)).toEqual(expected)
+      expect(podcloudResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass an encoded slug through as written', () => {
@@ -46,7 +46,7 @@ describe('podcloudResolveEmbed', () => {
         url: 'https://podcloud.fr/podcast/oxymut/episode/caf%C3%A9-du-matin',
       }
 
-      expect(podcloudResolveEmbed(value)).toEqual(expected)
+      expect(podcloudResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -54,31 +54,31 @@ describe('podcloudResolveEmbed', () => {
     it('should ignore a show subdomain, which answers 404 to the player path', () => {
       const value = 'https://oec.podcloud.fr/podcast/oxymut/player'
 
-      expect(podcloudResolveEmbed(value)).toBeUndefined()
+      expect(podcloudResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a route other than podcast', () => {
       const value = 'https://podcloud.fr/zzzword/oxymut/player'
 
-      expect(podcloudResolveEmbed(value)).toBeUndefined()
+      expect(podcloudResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the show page', () => {
       const value = 'https://podcloud.fr/podcast/oxymut'
 
-      expect(podcloudResolveEmbed(value)).toBeUndefined()
+      expect(podcloudResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the episode page', () => {
       const value = 'https://podcloud.fr/podcast/oxymut/episode/oxymut-appel-au-casting'
 
-      expect(podcloudResolveEmbed(value)).toBeUndefined()
+      expect(podcloudResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a player under a segment other than episode', () => {
       const value = 'https://podcloud.fr/podcast/oxymut/zzzword/oxymut-appel-au-casting/player'
 
-      expect(podcloudResolveEmbed(value)).toBeUndefined()
+      expect(podcloudResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -93,7 +93,7 @@ describe('podcloudResolveEmbed', () => {
         url: 'https://podcloud.fr/podcast/danslajungledunumerique/episode/plaider-pour-un-numerique-plus-responsable-dans-les-organisations-publiques-ou-privees',
       }
 
-      expect(podcloudResolveEmbed(value)).toEqual(expected)
+      expect(podcloudResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should fold the opened list option onto the show player', () => {
@@ -105,7 +105,7 @@ describe('podcloudResolveEmbed', () => {
         url: 'https://podcloud.fr/podcast/backseat',
       }
 
-      expect(podcloudResolveEmbed(value)).toEqual(expected)
+      expect(podcloudResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a tracker in the query', () => {
@@ -117,7 +117,7 @@ describe('podcloudResolveEmbed', () => {
         url: 'https://podcloud.fr/podcast/oxymut',
       }
 
-      expect(podcloudResolveEmbed(value)).toEqual(expected)
+      expect(podcloudResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -131,7 +131,7 @@ describe('podcloudResolveEmbed', () => {
         src: 'https://podcloud.fr/podcast/danslajungledunumerique/episode/plaider-pour-un-numerique-plus-responsable-dans-les-organisations-publiques-ou-privees/player/guid:61ebca9c439904127e67a5d1',
       }
 
-      expect(podcloudResolveEmbed(value)).toEqual(expected)
+      expect(podcloudResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep a guid on the show player', () => {
@@ -142,7 +142,7 @@ describe('podcloudResolveEmbed', () => {
         src: 'https://podcloud.fr/podcast/oxymut/player/guid:6404f24035f425550919c39b',
       }
 
-      expect(podcloudResolveEmbed(value)).toEqual(expected)
+      expect(podcloudResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // The playlist id in this case and the next is constructed. No lab feed carries one, and the
@@ -156,7 +156,7 @@ describe('podcloudResolveEmbed', () => {
         src: 'https://podcloud.fr/podcast/oxymut/player/playlist:5e1f0c2a8b3d4e0011223344-5e1f0c2a8b3d4e0055667788',
       }
 
-      expect(podcloudResolveEmbed(value)).toEqual(expected)
+      expect(podcloudResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should key on the playlist when a guid is named beside it', () => {
@@ -168,7 +168,7 @@ describe('podcloudResolveEmbed', () => {
         src: 'https://podcloud.fr/podcast/oxymut/player/guid:6404f24035f425550919c39b/playlist:5e1f0c2a8b3d4e0011223344-5e1f0c2a8b3d4e0055667788',
       }
 
-      expect(podcloudResolveEmbed(value)).toEqual(expected)
+      expect(podcloudResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the display option and keep the guid joined to it by a semicolon', () => {
@@ -180,7 +180,7 @@ describe('podcloudResolveEmbed', () => {
         src: 'https://podcloud.fr/podcast/oxymut/player/guid:6404f24035f425550919c39b',
       }
 
-      expect(podcloudResolveEmbed(value)).toEqual(expected)
+      expect(podcloudResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

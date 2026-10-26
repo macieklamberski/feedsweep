@@ -1,7 +1,7 @@
-import { composeQuery, getPathSegments, isAnyOf, parseUrl, trimObject } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { composeQuery, getPathSegments, isAnyOf, trimObject } from 'trousse'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'omny'
@@ -18,7 +18,7 @@ const videoRatio = '16/9'
 // `/shows/{show}/{clip}/embed` is a clip and `/shows/{show}/playlists/{slug}/embed` a playlist.
 // White-label customers serve the same paths from their own domain, which host matching cannot
 // reach: those keep the generic placeholder.
-export const extractOmnyClip = (link: string): string | undefined => {
+export const extractOmnyClip = (link: URL): string | undefined => {
   const segments = getPathSegments(link)
 
   if (!isAnyOf(segments[0], 'shows') || !isAnyOf(segments[segments.length - 1], 'embed')) {
@@ -39,17 +39,14 @@ export const extractOmnyClip = (link: string): string | undefined => {
 // rendering, so only `Video` is written.
 const omnyEmbedParams = ['media', 't']
 
-export const omnyResolveEmbed: ResolveEmbed = (url, element) => {
+export const omnyResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const clip = extractOmnyClip(url)
 
   if (!clip) {
     return
   }
 
-  const { media, t } = pickQueryParams(
-    parseUrl(url, placeholderBaseUrl)?.search ?? '',
-    omnyEmbedParams,
-  )
+  const { media, t } = pickQueryParams(url.search, omnyEmbedParams)
   // The player reads the value in any case.
   const isVideo = media?.toLowerCase() === 'video'
   const isPlaylist = clip.toLowerCase().includes('/playlists/')

@@ -13,7 +13,7 @@ describe('cnnResolveEmbed', () => {
   describe('happy paths', () => {
     it('should build the placeholder from the current player url', () => {
       const value =
-        '//fave.api.cnn.io/v1/fav/?video=arts/2018/07/09/spencer-tunick-nude-art-melbourne.cnn&customer=cnn&edition=international&env=prod'
+        'https://fave.api.cnn.io/v1/fav/?video=arts/2018/07/09/spencer-tunick-nude-art-melbourne.cnn&customer=cnn&edition=international&env=prod'
       const expected: EmbedResolverResult = {
         provider: 'cnn',
         id: 'arts/2018/07/09/spencer-tunick-nude-art-melbourne.cnn',
@@ -23,7 +23,7 @@ describe('cnnResolveEmbed', () => {
         date: '2018-07-09',
       }
 
-      expect(cnnResolveEmbed(value)).toEqual(expected)
+      expect(cnnResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should move the 2014 player onto the current one', () => {
@@ -38,7 +38,7 @@ describe('cnnResolveEmbed', () => {
         date: '2014-01-11',
       }
 
-      expect(cnnResolveEmbed(value)).toEqual(expected)
+      expect(cnnResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should move the 2008 player onto the current one', () => {
@@ -53,7 +53,7 @@ describe('cnnResolveEmbed', () => {
         date: '2008-04-22',
       }
 
-      expect(cnnResolveEmbed(value)).toEqual(expected)
+      expect(cnnResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should build the placeholder for a video in a hyphenated section', () => {
@@ -68,7 +68,7 @@ describe('cnnResolveEmbed', () => {
         date: '2018-02-16',
       }
 
-      expect(cnnResolveEmbed(value)).toEqual(expected)
+      expect(cnnResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -77,19 +77,19 @@ describe('cnnResolveEmbed', () => {
       const value =
         'https://www.cnn.com/videos/us/2013/11/22/nr-rowlands-charles-manson-fiance-speaks.cnn'
 
-      expect(cnnResolveEmbed(value)).toBeUndefined()
+      expect(cnnResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a player naming no video', () => {
       const value = 'https://fave.api.cnn.io/v1/fav/?customer=cnn&edition=domestic&env=prod'
 
-      expect(cnnResolveEmbed(value)).toBeUndefined()
+      expect(cnnResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for an id that is not a video path', () => {
       const value = 'https://fave.api.cnn.io/v1/fav/?video=19701&customer=cnn'
 
-      expect(cnnResolveEmbed(value)).toBeUndefined()
+      expect(cnnResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed section as written, even if the player answers an error', () => {
@@ -104,7 +104,7 @@ describe('cnnResolveEmbed', () => {
         date: '2018-07-09',
       }
 
-      expect(cnnResolveEmbed(value)).toEqual(expected)
+      expect(cnnResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep a slug holding a query separator inside its page path segment', () => {
@@ -118,14 +118,14 @@ describe('cnnResolveEmbed', () => {
         date: '2018-07-09',
       }
 
-      expect(cnnResolveEmbed(value)).toEqual(expected)
+      expect(cnnResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should return undefined for an id followed by another query pair', () => {
       const value =
         'https://fave.api.cnn.io/v1/fav/?video=arts/2018/07/09/spencer-tunick-nude-art-melbourne.cnn%26env%3Ddev'
 
-      expect(cnnResolveEmbed(value)).toBeUndefined()
+      expect(cnnResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed slug as written, even if the player answers an error', () => {
@@ -140,7 +140,7 @@ describe('cnnResolveEmbed', () => {
         date: '2018-07-09',
       }
 
-      expect(cnnResolveEmbed(value)).toEqual(expected)
+      expect(cnnResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -155,7 +155,7 @@ describe('cnnResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(cnnResolveEmbed(value)).toEqual(expected)
+      expect(cnnResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should date the video from the segments in front of the slug, not from an earlier year', () => {
@@ -169,7 +169,7 @@ describe('cnnResolveEmbed', () => {
         date: '2018-07-09',
       }
 
-      expect(cnnResolveEmbed(value)).toEqual(expected)
+      expect(cnnResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should date the video from the segments in front of the slug, not from an earlier date', () => {
@@ -183,7 +183,7 @@ describe('cnnResolveEmbed', () => {
         date: '2018-07-09',
       }
 
-      expect(cnnResolveEmbed(value)).toEqual(expected)
+      expect(cnnResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should date a video from the thirtieth of the month', () => {
@@ -198,7 +198,7 @@ describe('cnnResolveEmbed', () => {
         date: '2009-07-30',
       }
 
-      expect(cnnResolveEmbed(value)).toEqual(expected)
+      expect(cnnResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })
@@ -217,7 +217,7 @@ describe('cnnFlashResolveEmbed', () => {
         date: '2011-05-31',
       }
 
-      expect(cnnFlashResolveEmbed(value)).toEqual(expected)
+      expect(cnnFlashResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the video out of the swf query', () => {
@@ -232,7 +232,7 @@ describe('cnnFlashResolveEmbed', () => {
         date: '2011-02-27',
       }
 
-      expect(cnnFlashResolveEmbed(value)).toEqual(expected)
+      expect(cnnFlashResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -241,27 +241,27 @@ describe('cnnFlashResolveEmbed', () => {
       const value =
         'http://i.cdn.turner.com/v5cache/TBS/cvp/teamcoco_drupal_embed.swf?context=teamcoco_embed_offsite&videoId=19701'
 
-      expect(cnnFlashResolveEmbed(value)).toBeUndefined()
+      expect(cnnFlashResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a swf naming no video', () => {
       const value = 'http://i.cdn.turner.com/cnn/.element/apps/cvp/3.0/swf/cnn_416x234_embed.swf'
 
-      expect(cnnFlashResolveEmbed(value)).toBeUndefined()
+      expect(cnnFlashResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the player path under another segment', () => {
       const value =
         'http://i.cdn.turner.com/x/cnn/.element/apps/cvp/3.0/swf/cnn_416x234_embed.swf?context=embed&videoId=politics/2011/02/27/rs.book.google.power.cnn'
 
-      expect(cnnFlashResolveEmbed(value)).toBeUndefined()
+      expect(cnnFlashResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a path below the player swf', () => {
       const value =
         'http://i.cdn.turner.com/cnn/.element/apps/cvp/3.0/swf/cnn_416x234_embed.swf/extra?context=embed&videoId=politics/2011/02/27/rs.book.google.power.cnn'
 
-      expect(cnnFlashResolveEmbed(value)).toBeUndefined()
+      expect(cnnFlashResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

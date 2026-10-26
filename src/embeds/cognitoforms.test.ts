@@ -21,7 +21,7 @@ describe('cognitoformsResolveEmbed', () => {
         height: 600,
       }
 
-      expect(cognitoformsResolveEmbed(value)).toEqual(expected)
+      expect(cognitoformsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should rebuild the older embed host onto the form page', () => {
@@ -34,7 +34,7 @@ describe('cognitoformsResolveEmbed', () => {
         height: 600,
       }
 
-      expect(cognitoformsResolveEmbed(value)).toEqual(expected)
+      expect(cognitoformsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep a query form number holding a slash inside one path segment', () => {
@@ -47,7 +47,7 @@ describe('cognitoformsResolveEmbed', () => {
         height: 600,
       }
 
-      expect(cognitoformsResolveEmbed(value)).toEqual(expected)
+      expect(cognitoformsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the prefill entry in the frame only', () => {
@@ -61,7 +61,7 @@ describe('cognitoformsResolveEmbed', () => {
         height: 600,
       }
 
-      expect(cognitoformsResolveEmbed(value)).toEqual(expected)
+      expect(cognitoformsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should take the form route word in any case, as the platform does', () => {
@@ -74,7 +74,7 @@ describe('cognitoformsResolveEmbed', () => {
         height: 600,
       }
 
-      expect(cognitoformsResolveEmbed(value)).toEqual(expected)
+      expect(cognitoformsResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -82,25 +82,25 @@ describe('cognitoformsResolveEmbed', () => {
     it('should ignore another route on the host', () => {
       const value = 'https://www.cognitoforms.com/notaroute/yExCAh1c_E2nq69zMpV9RA/48'
 
-      expect(cognitoformsResolveEmbed(value)).toBeUndefined()
+      expect(cognitoformsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the form route with no organisation', () => {
       const value = 'https://services.cognitoforms.com/f/?id=2'
 
-      expect(cognitoformsResolveEmbed(value)).toBeUndefined()
+      expect(cognitoformsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an organisation with no form', () => {
       const value = 'https://services.cognitoforms.com/f/udBVZe3Z5EWT79cmnukmOA'
 
-      expect(cognitoformsResolveEmbed(value)).toBeUndefined()
+      expect(cognitoformsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a route below the form', () => {
       const value = 'https://www.cognitoforms.com/f/yExCAh1c_E2nq69zMpV9RA/48/extra'
 
-      expect(cognitoformsResolveEmbed(value)).toBeUndefined()
+      expect(cognitoformsResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

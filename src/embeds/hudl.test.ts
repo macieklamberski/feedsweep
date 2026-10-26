@@ -7,7 +7,7 @@ import { hudlIframeEmbedResolver, hudlResolveEmbed, hudlWidgetEmbedResolver } fr
 describe('hudlResolveEmbed', () => {
   describe('happy paths', () => {
     it('should read the video embed route', () => {
-      const value = '//www.hudl.com/embed/video/3/6929219/5858bdefff0d1a25e4a19c68'
+      const value = 'https://www.hudl.com/embed/video/3/6929219/5858bdefff0d1a25e4a19c68'
       const expected: EmbedResolverResult = {
         provider: 'hudl',
         id: 'video/3/6929219/5858bdefff0d1a25e4a19c68',
@@ -16,11 +16,11 @@ describe('hudlResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(hudlResolveEmbed(value)).toEqual(expected)
+      expect(hudlResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass the video kind through as written', () => {
-      const value = '//www.hudl.com/embed/video/2/406080/60860fcc02b1891750b467cb'
+      const value = 'https://www.hudl.com/embed/video/2/406080/60860fcc02b1891750b467cb'
       const expected: EmbedResolverResult = {
         provider: 'hudl',
         id: 'video/2/406080/60860fcc02b1891750b467cb',
@@ -29,7 +29,7 @@ describe('hudlResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(hudlResolveEmbed(value)).toEqual(expected)
+      expect(hudlResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should rebuild the video page, which refuses framing, onto the embed route', () => {
@@ -42,7 +42,7 @@ describe('hudlResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(hudlResolveEmbed(value)).toEqual(expected)
+      expect(hudlResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should rebuild the video page of a bare id onto the embed route', () => {
@@ -55,11 +55,11 @@ describe('hudlResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(hudlResolveEmbed(value)).toEqual(expected)
+      expect(hudlResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the athlete highlights route', () => {
-      const value = '//www.hudl.com/embed/athlete/3949971/highlights/207852394'
+      const value = 'https://www.hudl.com/embed/athlete/3949971/highlights/207852394'
       const expected: EmbedResolverResult = {
         provider: 'hudl',
         id: 'athlete/3949971/207852394',
@@ -67,11 +67,12 @@ describe('hudlResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(hudlResolveEmbed(value)).toEqual(expected)
+      expect(hudlResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass an athlete reel id through as written', () => {
-      const value = '//www.hudl.com/embed/athlete/15370417/highlights/5fdd6cc8b3d2ee108cc3709f'
+      const value =
+        'https://www.hudl.com/embed/athlete/15370417/highlights/5fdd6cc8b3d2ee108cc3709f'
       const expected: EmbedResolverResult = {
         provider: 'hudl',
         id: 'athlete/15370417/5fdd6cc8b3d2ee108cc3709f',
@@ -79,7 +80,7 @@ describe('hudlResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(hudlResolveEmbed(value)).toEqual(expected)
+      expect(hudlResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass a video id through in its own case', () => {
@@ -92,7 +93,7 @@ describe('hudlResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(hudlResolveEmbed(value)).toEqual(expected)
+      expect(hudlResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the video route words in capitals', () => {
@@ -105,7 +106,7 @@ describe('hudlResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(hudlResolveEmbed(value)).toEqual(expected)
+      expect(hudlResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the athlete route words in capitals', () => {
@@ -117,7 +118,7 @@ describe('hudlResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(hudlResolveEmbed(value)).toEqual(expected)
+      expect(hudlResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the video route with a trailing slash', () => {
@@ -130,7 +131,7 @@ describe('hudlResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(hudlResolveEmbed(value)).toEqual(expected)
+      expect(hudlResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the athlete route with a trailing slash', () => {
@@ -142,7 +143,7 @@ describe('hudlResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(hudlResolveEmbed(value)).toEqual(expected)
+      expect(hudlResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the query', () => {
@@ -156,75 +157,63 @@ describe('hudlResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(hudlResolveEmbed(value)).toEqual(expected)
+      expect(hudlResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/embed/video/3/6929219/5858bdefff0d1a25e4a19c68'
-
-      expect(hudlResolveEmbed(value)).toBeUndefined()
-    })
-
     it('should return undefined for the video route below another segment', () => {
       const value = 'https://www.hudl.com/x/embed/video/3/6929219/5858bdefff0d1a25e4a19c68'
 
-      expect(hudlResolveEmbed(value)).toBeUndefined()
+      expect(hudlResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a segment after the video', () => {
       const value = 'https://www.hudl.com/embed/video/3/6929219/5858bdefff0d1a25e4a19c68/extra'
 
-      expect(hudlResolveEmbed(value)).toBeUndefined()
+      expect(hudlResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a video route with two segments, which answers 404', () => {
       const value = 'https://www.hudl.com/embed/video/6929219/5858bdefff0d1a25e4a19c68'
 
-      expect(hudlResolveEmbed(value)).toBeUndefined()
-    })
-
-    it('should return undefined for the gt.hudl.com host, whose certificate does not match', () => {
-      const value = 'http://www.gt.hudl.com/video/3/5398614/5a209cecd45e2a267c46e61b'
-
-      expect(hudlResolveEmbed(value)).toBeUndefined()
+      expect(hudlResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the athlete route below another segment', () => {
       const value = 'https://www.hudl.com/x/embed/athlete/3949971/highlights/207852394'
 
-      expect(hudlResolveEmbed(value)).toBeUndefined()
+      expect(hudlResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a segment after the reel', () => {
       const value = 'https://www.hudl.com/embed/athlete/3949971/highlights/207852394/extra'
 
-      expect(hudlResolveEmbed(value)).toBeUndefined()
+      expect(hudlResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for an athlete route with another route word', () => {
       const value = 'https://www.hudl.com/embed/athlete/3949971/clips/207852394'
 
-      expect(hudlResolveEmbed(value)).toBeUndefined()
+      expect(hudlResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a short link, which redirects to the fan site home', () => {
       const value = 'http://www.hudl.com/v/13TVBJ'
 
-      expect(hudlResolveEmbed(value)).toBeUndefined()
+      expect(hudlResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the technique player, which answers 404', () => {
-      const value = '//www.hudl.com/technique/video/embed/gsX6IvOM'
+      const value = 'https://www.hudl.com/technique/video/embed/gsX6IvOM'
 
-      expect(hudlResolveEmbed(value)).toBeUndefined()
+      expect(hudlResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the broadcast player on its own host', () => {
       const value = 'https://vcloud.hudl.com/broadcast/embed/4047725?autoplay=0&volume=100'
 
-      expect(hudlResolveEmbed(value)).toBeUndefined()
+      expect(hudlResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })
@@ -322,6 +311,26 @@ describeForEachParser('hudlWidgetEmbedResolver', (parseHtml) => {
             target="_blank"
             rel="noopener noreferrer"
           >View Link</a>
+        </div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a snippet linking the gt.hudl.com host, whose certificate does not match', async () => {
+      const value = html`
+        <div class="hudl-embed">
+          <a href="http://www.gt.hudl.com/video/3/5398614/5a209cecd45e2a267c46e61b">View Link</a>
+        </div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a snippet linking a foreign host carrying the same path', async () => {
+      const value = html`
+        <div class="hudl-embed">
+          <a href="https://evil.test/video/3/5290399/57e98e2d842eb2648c8f2338">View Link</a>
         </div>
       `
 

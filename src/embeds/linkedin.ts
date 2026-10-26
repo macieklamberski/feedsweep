@@ -1,5 +1,5 @@
 import { decodeSegment, encodePathSegment, getPathSegments, isAnyOf } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const linkedinHosts = ['linkedin.com']
@@ -10,7 +10,7 @@ const linkedinHosts = ['linkedin.com']
 const postHeight = 800
 
 // A post has no name, and the frame titles itself `Embedded post` in the reader's language.
-const linkedinResolveEmbed: ResolveEmbed = (url) => {
+const linkedinResolveEmbed: ResolveUrlEmbed = (url) => {
   const [route, section, action, urn] = getPathSegments(url)
 
   if (!isAnyOf(route, 'embed') || !isAnyOf(section, 'feed') || !isAnyOf(action, 'update')) {

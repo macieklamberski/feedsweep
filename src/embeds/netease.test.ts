@@ -36,7 +36,7 @@ describe('neteaseResolveEmbed', () => {
         height: 250,
       }
 
-      expect(neteaseResolveEmbed(value)).toEqual(expected)
+      expect(neteaseResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should name the playlist page for the playlist type', () => {
@@ -49,7 +49,7 @@ describe('neteaseResolveEmbed', () => {
         height: 250,
       }
 
-      expect(neteaseResolveEmbed(value)).toEqual(expected)
+      expect(neteaseResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should name the radio page for the djradio type', () => {
@@ -62,7 +62,7 @@ describe('neteaseResolveEmbed', () => {
         height: 250,
       }
 
-      expect(neteaseResolveEmbed(value)).toEqual(expected)
+      expect(neteaseResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -70,31 +70,31 @@ describe('neteaseResolveEmbed', () => {
     it('should ignore a type the player names no endpoint for', () => {
       const value = 'https://music.163.com/outchain/player?type=9&id=1392990601&height=66'
 
-      expect(neteaseResolveEmbed(value)).toBeUndefined()
+      expect(neteaseResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a type naming a member of the object prototype', () => {
       const value = 'https://music.163.com/outchain/player?type=toString&id=1392990601'
 
-      expect(neteaseResolveEmbed(value)).toBeUndefined()
+      expect(neteaseResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the song page, which is not a player', () => {
       const value = 'https://music.163.com/song?id=1392990601'
 
-      expect(neteaseResolveEmbed(value)).toBeUndefined()
+      expect(neteaseResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the player route under another path', () => {
       const value = 'https://music.163.com/x/outchain/player?type=2&id=1392990601'
 
-      expect(neteaseResolveEmbed(value)).toBeUndefined()
+      expect(neteaseResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path below the player route', () => {
       const value = 'https://music.163.com/outchain/player/extra?type=2&id=1392990601'
 
-      expect(neteaseResolveEmbed(value)).toBeUndefined()
+      expect(neteaseResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -109,7 +109,7 @@ describe('neteaseResolveEmbed', () => {
         height: 250,
       }
 
-      expect(neteaseResolveEmbed(value)).toEqual(expected)
+      expect(neteaseResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a tracker the carrier appends', () => {
@@ -123,7 +123,7 @@ describe('neteaseResolveEmbed', () => {
         height: 250,
       }
 
-      expect(neteaseResolveEmbed(value)).toEqual(expected)
+      expect(neteaseResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should name the album page for the album type', () => {
@@ -136,7 +136,7 @@ describe('neteaseResolveEmbed', () => {
         height: 250,
       }
 
-      expect(neteaseResolveEmbed(value)).toEqual(expected)
+      expect(neteaseResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the player route with a trailing slash', () => {
@@ -149,7 +149,7 @@ describe('neteaseResolveEmbed', () => {
         height: 250,
       }
 
-      expect(neteaseResolveEmbed(value)).toEqual(expected)
+      expect(neteaseResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -165,25 +165,25 @@ describe('neteaseResolveEmbed', () => {
         height: 250,
       }
 
-      expect(neteaseResolveEmbed(value)).toEqual(expected)
+      expect(neteaseResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should ignore the swf without a sid', () => {
       const value = 'https://music.163.com/style/swf/widget.swf?type=2&auto=0'
 
-      expect(neteaseResolveEmbed(value)).toBeUndefined()
+      expect(neteaseResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the swf under another path', () => {
       const value = 'https://music.163.com/x/style/swf/widget.swf?sid=409872507&type=2'
 
-      expect(neteaseResolveEmbed(value)).toBeUndefined()
+      expect(neteaseResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path below the swf', () => {
       const value = 'https://music.163.com/style/swf/widget.swf/extra?sid=409872507&type=2'
 
-      expect(neteaseResolveEmbed(value)).toBeUndefined()
+      expect(neteaseResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

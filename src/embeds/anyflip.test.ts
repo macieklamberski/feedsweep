@@ -17,7 +17,7 @@ describe('anyflipResolveEmbed', () => {
         ratio: '550/350',
       }
 
-      expect(anyflipResolveEmbed(value)).toEqual(expected)
+      expect(anyflipResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the dialog url from the book folder', () => {
@@ -31,7 +31,7 @@ describe('anyflipResolveEmbed', () => {
         ratio: '550/350',
       }
 
-      expect(anyflipResolveEmbed(value)).toEqual(expected)
+      expect(anyflipResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the dialog url from the mobile viewer it redirects to', () => {
@@ -45,7 +45,7 @@ describe('anyflipResolveEmbed', () => {
         ratio: '550/350',
       }
 
-      expect(anyflipResolveEmbed(value)).toEqual(expected)
+      expect(anyflipResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the viewer host from the path-style S3 bucket', () => {
@@ -59,7 +59,7 @@ describe('anyflipResolveEmbed', () => {
         ratio: '550/350',
       }
 
-      expect(anyflipResolveEmbed(value)).toEqual(expected)
+      expect(anyflipResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the page the dialog sends the reader to', () => {
@@ -73,7 +73,7 @@ describe('anyflipResolveEmbed', () => {
         ratio: '550/350',
       }
 
-      expect(anyflipResolveEmbed(value)).toEqual(expected)
+      expect(anyflipResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a tracker from the query', () => {
@@ -87,7 +87,7 @@ describe('anyflipResolveEmbed', () => {
         ratio: '550/350',
       }
 
-      expect(anyflipResolveEmbed(value)).toEqual(expected)
+      expect(anyflipResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the https viewer from an http carrier', () => {
@@ -101,7 +101,7 @@ describe('anyflipResolveEmbed', () => {
         ratio: '550/350',
       }
 
-      expect(anyflipResolveEmbed(value)).toEqual(expected)
+      expect(anyflipResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use a malformed user and book as written, even if the viewer answers an error', () => {
@@ -115,7 +115,7 @@ describe('anyflipResolveEmbed', () => {
         ratio: '550/350',
       }
 
-      expect(anyflipResolveEmbed(value)).toEqual(expected)
+      expect(anyflipResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -123,31 +123,31 @@ describe('anyflipResolveEmbed', () => {
     it('should ignore a user with no book, which the viewer host refuses', () => {
       const value = 'https://online.anyflip.com/zruyy/'
 
-      expect(anyflipResolveEmbed(value)).toBeUndefined()
+      expect(anyflipResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the cover under the book', () => {
       const value = 'https://online.anyflip.com/zruyy/qaan/files/shot.jpg'
 
-      expect(anyflipResolveEmbed(value)).toBeUndefined()
+      expect(anyflipResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore another bucket served path-style from S3', () => {
       const value = 'https://s3.amazonaws.com/evil.test/zruyy/qaan/index.html'
 
-      expect(anyflipResolveEmbed(value)).toBeUndefined()
+      expect(anyflipResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore another bucket served from an S3 subdomain', () => {
       const value = 'https://evil.s3.amazonaws.com/zruyy/qaan/index.html'
 
-      expect(anyflipResolveEmbed(value)).toBeUndefined()
+      expect(anyflipResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the book page on the apex host', () => {
       const value = 'https://anyflip.com/zruyy/qaan'
 
-      expect(anyflipResolveEmbed(value)).toBeUndefined()
+      expect(anyflipResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

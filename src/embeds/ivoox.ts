@@ -1,10 +1,8 @@
-import { parseUrl } from 'trousse'
-import type { FieldCleaner, ResolveEmbed } from '../types.js'
+import type { FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 
 const provider = 'ivoox'
 
-import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `playerivoox_ee_`, `_ep_` and `_em_` are three generations of the legacy episode player, and
@@ -32,20 +30,14 @@ export type IvooxSubject = {
   page: string
 }
 
-export const extractIvooxSubject = (link: string): IvooxSubject | undefined => {
-  const parsed = parseUrl(link, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
-  const show = parsed.pathname.match(showPlayerRegex)
+export const extractIvooxSubject = (url: URL): IvooxSubject | undefined => {
+  const show = url.pathname.match(showPlayerRegex)
 
   if (show?.[1]) {
     return { kind: 'show', id: show[1], page: show[2] }
   }
 
-  const episode = parsed.pathname.match(episodePlayerRegex)
+  const episode = url.pathname.match(episodePlayerRegex)
 
   if (episode?.[1]) {
     return { kind: 'episode', id: episode[1], page: episode[2] }
@@ -53,7 +45,7 @@ export const extractIvooxSubject = (link: string): IvooxSubject | undefined => {
 
   // The three generations share one id space: `ivoox.com/x_rf_{id}_1.html` redirects to the
   // episode's own page for a legacy id and 404s for a fabricated one.
-  const legacy = parsed.pathname.match(legacyPlayerRegex)
+  const legacy = url.pathname.match(legacyPlayerRegex)
 
   return legacy?.[1] ? { kind: 'episode', id: legacy[1], page: '1' } : undefined
 }
@@ -62,7 +54,7 @@ export const extractIvooxSubject = (link: string): IvooxSubject | undefined => {
 // Every generation and skin is minted as the player the embed dialog calls current:
 // `player_ej_{id}_6_{page}` for an episode and `player_es_podcast_{id}_zp_{page}` for a show.
 // `player_ej_` answers 200 to any id at all, a javascript shell that resolves the id on load.
-export const ivooxResolveEmbed: ResolveEmbed = (url, element) => {
+export const ivooxResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const subject = extractIvooxSubject(url)
 
   if (!subject) {

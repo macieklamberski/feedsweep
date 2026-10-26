@@ -1,5 +1,5 @@
 import { isHostOf } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -34,7 +34,7 @@ const composeEmbed = (
   }
 }
 
-const readPollId = (url: string): string | undefined => {
+const readPollId = (url: string | URL): string | undefined => {
   const parsed = parseUrlOnHosts(url, pollmakerHosts, isHostOf)
 
   if (!parsed) {
@@ -45,7 +45,7 @@ const readPollId = (url: string): string | undefined => {
 }
 
 // Poll Maker's poll frame, `/frame{id}`, and the poll page, `/poll{id}`, framed whole.
-export const pollmakerResolveEmbed: ResolveEmbed = (url) => {
+export const pollmakerResolveEmbed: ResolveUrlEmbed = (url) => {
   const pollId = readPollId(url)
 
   if (!pollId) {

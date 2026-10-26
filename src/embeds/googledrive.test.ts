@@ -18,7 +18,7 @@ describe('googledriveResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(googledriveResolveEmbed(value)).toEqual(expected)
+      expect(googledriveResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should frame a file page the same way as its preview', () => {
@@ -34,7 +34,7 @@ describe('googledriveResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(googledriveResolveEmbed(value)).toEqual(expected)
+      expect(googledriveResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the drive spelling from a legacy docs frame', () => {
@@ -48,7 +48,7 @@ describe('googledriveResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(googledriveResolveEmbed(value)).toEqual(expected)
+      expect(googledriveResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep a resource key in the frame alone', () => {
@@ -61,7 +61,7 @@ describe('googledriveResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(googledriveResolveEmbed(value)).toEqual(expected)
+      expect(googledriveResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -69,32 +69,32 @@ describe('googledriveResolveEmbed', () => {
     it('should ignore a google doc on the legacy host', () => {
       const value = 'https://docs.google.com/document/d/1UVR7LiwlrKoff6cJI32-H6zWrwyu4-4R/edit'
 
-      expect(googledriveResolveEmbed(value)).toBeUndefined()
+      expect(googledriveResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a file route with an account segment before the id', () => {
       const value = 'https://drive.google.com/file/u/0/d/1UVR7LiwlrKoff6cJI32-H6zWrwyu4-4R/preview'
 
-      expect(googledriveResolveEmbed(value)).toBeUndefined()
+      expect(googledriveResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a folder listing', () => {
       const value =
         'https://drive.google.com/embeddedfolderview?id=1UVR7LiwlrKoff6cJI32-H6zWrwyu4-4R'
 
-      expect(googledriveResolveEmbed(value)).toBeUndefined()
+      expect(googledriveResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a folder page', () => {
       const value = 'https://drive.google.com/drive/folders/1UVR7LiwlrKoff6cJI32-H6zWrwyu4-4R'
 
-      expect(googledriveResolveEmbed(value)).toBeUndefined()
+      expect(googledriveResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an open link that states no type', () => {
       const value = 'https://drive.google.com/open?id=1-Y-8cPyGXZKDSo4wl4HgZ6-t2c1pH10_'
 
-      expect(googledriveResolveEmbed(value)).toBeUndefined()
+      expect(googledriveResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -110,7 +110,7 @@ describe('googledriveResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(googledriveResolveEmbed(value)).toEqual(expected)
+      expect(googledriveResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use a malformed file id carrying a query separator as written, even if the player answers an error', () => {
@@ -124,7 +124,7 @@ describe('googledriveResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(googledriveResolveEmbed(value)).toEqual(expected)
+      expect(googledriveResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -141,7 +141,7 @@ describe('googledriveResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(googledriveResolveEmbed(value)).toEqual(expected)
+      expect(googledriveResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the Workspace prefix from a legacy docs frame', () => {
@@ -156,14 +156,14 @@ describe('googledriveResolveEmbed', () => {
         ratio: '4/3',
       }
 
-      expect(googledriveResolveEmbed(value)).toEqual(expected)
+      expect(googledriveResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should ignore a file behind a prefix that is not a Workspace domain', () => {
       const value =
         'https://drive.google.com/x/example.com/file/d/0B9tSCABkwqlyRzNlZGNaZ0hIYU0/preview'
 
-      expect(googledriveResolveEmbed(value)).toBeUndefined()
+      expect(googledriveResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

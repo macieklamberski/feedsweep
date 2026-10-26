@@ -21,7 +21,7 @@ describe('redcircleResolveEmbed', () => {
         height: 170,
       }
 
-      expect(redcircleResolveEmbed(value)).toEqual(expected)
+      expect(redcircleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // The loader is fetched from one path and builds its iframe on another, so the show id has
@@ -37,7 +37,7 @@ describe('redcircleResolveEmbed', () => {
         height: 320,
       }
 
-      expect(redcircleResolveEmbed(value)).toEqual(expected)
+      expect(redcircleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the theme from the show webplayer', () => {
@@ -51,7 +51,7 @@ describe('redcircleResolveEmbed', () => {
         height: 320,
       }
 
-      expect(redcircleResolveEmbed(value)).toEqual(expected)
+      expect(redcircleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the theme and the rest of the show query', () => {
@@ -65,7 +65,7 @@ describe('redcircleResolveEmbed', () => {
         height: 320,
       }
 
-      expect(redcircleResolveEmbed(value)).toEqual(expected)
+      expect(redcircleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a tracking query from the episode player', () => {
@@ -79,7 +79,7 @@ describe('redcircleResolveEmbed', () => {
         height: 170,
       }
 
-      expect(redcircleResolveEmbed(value)).toEqual(expected)
+      expect(redcircleResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -87,7 +87,7 @@ describe('redcircleResolveEmbed', () => {
     it('should return undefined for an episode path missing the episode', () => {
       const value = 'https://redcircle.com/embedded-player/sh/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a'
 
-      expect(redcircleResolveEmbed(value)).toBeUndefined()
+      expect(redcircleResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed episode id as written, even if the player answers an error', () => {
@@ -101,7 +101,7 @@ describe('redcircleResolveEmbed', () => {
         height: 170,
       }
 
-      expect(redcircleResolveEmbed(value)).toEqual(expected)
+      expect(redcircleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should use a malformed show id as written, even if the player answers an error', () => {
@@ -114,41 +114,41 @@ describe('redcircleResolveEmbed', () => {
         height: 320,
       }
 
-      expect(redcircleResolveEmbed(value)).toEqual(expected)
+      expect(redcircleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should return undefined for the player path under a route that is not a player', () => {
       const value =
         'https://redcircle.com/embedded-podcast/sh/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/cb6cd735-0017-48dd-b387-ecc8a20818e5'
 
-      expect(redcircleResolveEmbed(value)).toBeUndefined()
+      expect(redcircleResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the player path under a route named after an object key', () => {
       const value =
         'https://redcircle.com/constructor/sh/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/cb6cd735-0017-48dd-b387-ecc8a20818e5'
 
-      expect(redcircleResolveEmbed(value)).toBeUndefined()
+      expect(redcircleResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for an episode player missing the sh marker', () => {
       const value =
         'https://redcircle.com/embedded-player/show/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/cb6cd735-0017-48dd-b387-ecc8a20818e5'
 
-      expect(redcircleResolveEmbed(value)).toBeUndefined()
+      expect(redcircleResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the show page itself', () => {
       const value = 'https://redcircle.com/shows/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a'
 
-      expect(redcircleResolveEmbed(value)).toBeUndefined()
+      expect(redcircleResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a lookalike host', () => {
       const value =
         'https://redcircle.com.evil.test/embedded-player/sh/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/cb6cd735-0017-48dd-b387-ecc8a20818e5'
 
-      expect(redcircleResolveEmbed(value)).toBeUndefined()
+      expect(redcircleResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

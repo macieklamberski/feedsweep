@@ -1,6 +1,6 @@
-import { composeQuery, getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
-import { hyphenatedLettersRegex, pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, getPathSegments, isAnyOf } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
+import { hyphenatedLettersRegex, pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 type Resource = {
@@ -33,14 +33,8 @@ const readResource = (segments: Array<string>): Resource | undefined => {
 
 // Komoot's tour map, `komoot.com/tour/{tourId}/embed`, and its collection map,
 // `komoot.com/collection/{collectionId}/{slug}/embed`, sometimes behind a locale segment.
-export const komootResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
-  const [first = '', ...rest] = getPathSegments(parsed)
+export const komootResolveEmbed: ResolveUrlEmbed = (url) => {
+  const [first = '', ...rest] = getPathSegments(url)
   // In any case: the mint drops the locale, so `/DE-DE/tour/{tourId}/embed`, which answers 404,
   // still names the tour.
   const hasLocale = hyphenatedLettersRegex.test(first)
@@ -50,7 +44,7 @@ export const komootResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const params = pickQueryParams(parsed.search, accessParams)
+  const params = pickQueryParams(url.search, accessParams)
   const result: EmbedResolverResult = {
     provider: 'komoot',
     id: resource.id,

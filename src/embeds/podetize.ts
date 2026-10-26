@@ -1,7 +1,7 @@
-import { composeQuery, getQueryParam, isAnyOf, parseUrl, trimObject } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { composeQuery, getQueryParam, isAnyOf, trimObject } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const podetizeHosts = ['player.podetize.com']
@@ -25,15 +25,14 @@ const composeEmbed = (id: string, isEpisodeMode: boolean): EmbedResolverResult =
   }
 }
 
-export const podetizeResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const id = getQueryParam(parsed?.searchParams, 'id')
+export const podetizeResolveEmbed: ResolveUrlEmbed = (url) => {
+  const id = getQueryParam(url.searchParams, 'id')
 
-  if (parsed?.pathname !== '/' || !id) {
+  if (url.pathname !== '/' || !id) {
     return
   }
 
-  return composeEmbed(id, isAnyOf(getQueryParam(parsed.searchParams, 'epmode'), 'true'))
+  return composeEmbed(id, isAnyOf(getQueryParam(url.searchParams, 'epmode'), 'true'))
 }
 
 // Podetize's ShowCastR loader script mounts the player where it stands, and a reader strips it.

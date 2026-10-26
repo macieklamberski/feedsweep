@@ -19,7 +19,7 @@ describe('lividResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(lividResolveEmbed(value)).toEqual(expected)
+      expect(lividResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should build the placeholder from a video page url', () => {
@@ -32,7 +32,7 @@ describe('lividResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(lividResolveEmbed(value)).toEqual(expected)
+      expect(lividResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the older player route, keyed by account and number', () => {
@@ -44,7 +44,7 @@ describe('lividResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(lividResolveEmbed(value)).toEqual(expected)
+      expect(lividResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -52,37 +52,37 @@ describe('lividResolveEmbed', () => {
     it('should ignore a path with no video route', () => {
       const value = 'https://api.livid.com/v1/thumbnails/IoMGtM7uIDai.jpg'
 
-      expect(lividResolveEmbed(value)).toBeUndefined()
+      expect(lividResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the home page', () => {
       const value = 'https://livid.com/'
 
-      expect(lividResolveEmbed(value)).toBeUndefined()
+      expect(lividResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a video route behind another segment', () => {
       const value = 'https://livid.com/channel/watch/IoMGtM7uIDai'
 
-      expect(lividResolveEmbed(value)).toBeUndefined()
+      expect(lividResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a video route with no id', () => {
       const value = 'https://livid.com/watch/'
 
-      expect(lividResolveEmbed(value)).toBeUndefined()
+      expect(lividResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the older player route with no number', () => {
       const value = 'https://livid.com/oe/qvN5Xsn5Hh-H/video/'
 
-      expect(lividResolveEmbed(value)).toBeUndefined()
+      expect(lividResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the older player route naming something other than a video', () => {
       const value = 'https://livid.com/oe/qvN5Xsn5Hh-H/videos/451811888'
 
-      expect(lividResolveEmbed(value)).toBeUndefined()
+      expect(lividResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -97,7 +97,7 @@ describe('lividResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(lividResolveEmbed(value)).toEqual(expected)
+      expect(lividResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the player query', () => {
@@ -110,7 +110,7 @@ describe('lividResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(lividResolveEmbed(value)).toEqual(expected)
+      expect(lividResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the older route words in any case and keep the account as written', () => {
@@ -122,7 +122,7 @@ describe('lividResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(lividResolveEmbed(value)).toEqual(expected)
+      expect(lividResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the query of the older player route', () => {
@@ -134,7 +134,7 @@ describe('lividResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(lividResolveEmbed(value)).toEqual(expected)
+      expect(lividResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

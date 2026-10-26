@@ -12,21 +12,21 @@ describe('extractWistiaEmbed', () => {
     const value = 'https://fast.wistia.net/embed/iframe/2fg072pftb'
     const expected = { route: 'iframe', id: '2fg072pftb' }
 
-    expect(extractWistiaEmbed(value)).toEqual(expected)
+    expect(extractWistiaEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should extract id from a player url carrying options', () => {
     const value = 'https://fast.wistia.net/embed/iframe/2fg072pftb?web_component=true&seo=false'
     const expected = { route: 'iframe', id: '2fg072pftb' }
 
-    expect(extractWistiaEmbed(value)).toEqual(expected)
+    expect(extractWistiaEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should extract id from the script form jsonp url', () => {
     const value = 'https://fast.wistia.com/embed/medias/0inlutl9au.jsonp'
     const expected = { route: 'iframe', id: '0inlutl9au' }
 
-    expect(extractWistiaEmbed(value)).toEqual(expected)
+    expect(extractWistiaEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should extract id and page from an account media page', () => {
@@ -37,7 +37,7 @@ describe('extractWistiaEmbed', () => {
       page: 'https://acme.wistia.com/medias/jjxva47kic',
     }
 
-    expect(extractWistiaEmbed(value)).toEqual(expected)
+    expect(extractWistiaEmbed(new URL(value))).toEqual(expected)
   })
 
   // The share parameter names nothing the page needs, and the page has to be one url whatever
@@ -50,27 +50,27 @@ describe('extractWistiaEmbed', () => {
       page: 'https://acme.wistia.com/medias/jjxva47kic',
     }
 
-    expect(extractWistiaEmbed(value)).toEqual(expected)
+    expect(extractWistiaEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read an id longer than the ten characters Wistia mints today', () => {
     const value = 'https://fast.wistia.net/embed/iframe/2fg072pftb9'
     const expected = { route: 'iframe', id: '2fg072pftb9' }
 
-    expect(extractWistiaEmbed(value)).toEqual(expected)
+    expect(extractWistiaEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should keep the case the carrier spells the id in', () => {
     const value = 'https://fast.wistia.net/embed/iframe/2FG072PFTB'
     const expected = { route: 'iframe', id: '2FG072PFTB' }
 
-    expect(extractWistiaEmbed(value)).toEqual(expected)
+    expect(extractWistiaEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a wistia url naming no media', () => {
     const value = 'https://wistia.com/pricing'
 
-    expect(extractWistiaEmbed(value)).toBeUndefined()
+    expect(extractWistiaEmbed(new URL(value))).toBeUndefined()
   })
 
   // A channel and a playlist are separate players, so the route travels with the id.
@@ -78,7 +78,7 @@ describe('extractWistiaEmbed', () => {
     const value = 'https://fast.wistia.net/embed/channel/sapab9p6qd'
     const expected = { route: 'channel', id: 'sapab9p6qd' }
 
-    expect(extractWistiaEmbed(value)).toEqual(expected)
+    expect(extractWistiaEmbed(new URL(value))).toEqual(expected)
   })
 
   // The account host spells the channel page with the plural, and the page is login-gated even
@@ -87,14 +87,14 @@ describe('extractWistiaEmbed', () => {
     const value = 'https://home.wistia.com/channels/sapab9p6qd'
     const expected = { route: 'channel', id: 'sapab9p6qd' }
 
-    expect(extractWistiaEmbed(value)).toEqual(expected)
+    expect(extractWistiaEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should use a malformed channel id as written, even if the player answers an error', () => {
     const value = 'https://home.wistia.com/channels/talking-too-loud'
     const expected = { route: 'channel', id: 'talking-too-loud' }
 
-    expect(extractWistiaEmbed(value)).toEqual(expected)
+    expect(extractWistiaEmbed(new URL(value))).toEqual(expected)
   })
 
   // The route is a path segment, so it can name a member every object inherits. That has to
@@ -102,33 +102,33 @@ describe('extractWistiaEmbed', () => {
   it('should return undefined for a route naming an inherited member', () => {
     const value = 'https://fast.wistia.net/embed/constructor/sapab9p6qd'
 
-    expect(extractWistiaEmbed(value)).toBeUndefined()
+    expect(extractWistiaEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should use a malformed media id as written, even if the player answers an error', () => {
     const value = 'https://fast.wistia.net/embed/iframe/2fg072pftb%2Fsapab9p6qd'
     const expected = { route: 'iframe', id: '2fg072pftb%2Fsapab9p6qd' }
 
-    expect(extractWistiaEmbed(value)).toEqual(expected)
+    expect(extractWistiaEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for the media JSON file', () => {
     const value = 'https://fast.wistia.com/embed/medias/2fg072pftb.json'
 
-    expect(extractWistiaEmbed(value)).toBeUndefined()
+    expect(extractWistiaEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a route the player does not serve', () => {
     const value = 'https://fast.wistia.net/embed/gallery/sapab9p6qd'
 
-    expect(extractWistiaEmbed(value)).toBeUndefined()
+    expect(extractWistiaEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should read a playlist with its own route', () => {
     const value = 'https://fast.wistia.net/embed/playlists/aodt9etokc'
     const expected = { route: 'playlists', id: 'aodt9etokc' }
 
-    expect(extractWistiaEmbed(value)).toEqual(expected)
+    expect(extractWistiaEmbed(new URL(value))).toEqual(expected)
   })
 })
 
@@ -144,7 +144,7 @@ describe('wistiaResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(wistiaResolveEmbed(value)).toEqual(expected)
+    expect(wistiaResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should mint the playlist player and qualify its id', () => {
@@ -156,7 +156,7 @@ describe('wistiaResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(wistiaResolveEmbed(value)).toEqual(expected)
+    expect(wistiaResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // Only the account page names the account, so it is the one carrier that can state a url.
@@ -170,7 +170,7 @@ describe('wistiaResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(wistiaResolveEmbed(value)).toEqual(expected)
+    expect(wistiaResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should fold case in the key alone for an account media page spelled in capitals', () => {
@@ -183,7 +183,7 @@ describe('wistiaResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(wistiaResolveEmbed(value)).toEqual(expected)
+    expect(wistiaResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should mint the player url from the id', () => {
@@ -195,7 +195,7 @@ describe('wistiaResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(wistiaResolveEmbed(value)).toEqual(expected)
+    expect(wistiaResolveEmbed(new URL(value))).toEqual(expected)
   })
 })
 

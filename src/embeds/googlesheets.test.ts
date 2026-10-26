@@ -17,7 +17,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the single tab flag of a sheet', () => {
@@ -31,7 +31,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the cell range of a sheet', () => {
@@ -45,7 +45,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the tab bar and header flags the publish dialog writes', () => {
@@ -59,7 +59,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the flag that moves the tab bar to the top', () => {
@@ -73,7 +73,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the header flag of a sheet', () => {
@@ -87,7 +87,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the title bar flag of a sheet', () => {
@@ -101,7 +101,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the minimal toolbar flag of a sheet', () => {
@@ -115,7 +115,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the share tracker of a sheet', () => {
@@ -129,7 +129,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the output flag of a sheet', () => {
@@ -143,7 +143,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the embedded flag of a sheet', () => {
@@ -157,7 +157,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the format flag of a sheet', () => {
@@ -171,7 +171,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a parameter it does not know', () => {
@@ -185,7 +185,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the single sheet route of a sheet', () => {
@@ -199,7 +199,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the chart a published chart names', () => {
@@ -213,7 +213,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 371,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the interactive format of a chart', () => {
@@ -227,7 +227,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 371,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the image format of a chart published by its token', () => {
@@ -241,7 +241,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 371,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -250,69 +250,69 @@ describe('googlesheetsResolveEmbed', () => {
       const value =
         'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x/edit'
 
-      expect(googlesheetsResolveEmbed(value)).toBeUndefined()
+      expect(googlesheetsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a published sheet framed on its preview page', () => {
       const value =
         'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x/preview'
 
-      expect(googlesheetsResolveEmbed(value)).toBeUndefined()
+      expect(googlesheetsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a chart drawn by the visualization api', () => {
       const value =
         'https://docs.google.com/spreadsheets/d/1MtX643H0wJWuvAETl1UJTBxaMO8DN5niRRvfYRydDVs/gviz/chartiframe?oid=1063393785'
 
-      expect(googlesheetsResolveEmbed(value)).toBeUndefined()
+      expect(googlesheetsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a sheet on its html embed route', () => {
       const value =
         'https://docs.google.com/spreadsheets/d/1ZXkA7dZDAvp78rfhz_HPurHEOrB_fM86sNvrQ5YDHFg/htmlembed'
 
-      expect(googlesheetsResolveEmbed(value)).toBeUndefined()
+      expect(googlesheetsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a sheet exported as a file', () => {
       const value =
         'https://docs.google.com/spreadsheets/d/1ZXkA7dZDAvp78rfhz_HPurHEOrB_fM86sNvrQ5YDHFg/export?format=xlsx'
 
-      expect(googlesheetsResolveEmbed(value)).toBeUndefined()
+      expect(googlesheetsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a published sheet whose token the carrier wrote twice', () => {
       const value =
         'https://docs.google.com/spreadsheets/d/e/2PACX-1vRu96x6GEP9i0hMcHTcR72FzgU8LHKu6nY0-GPLiy2K6jl5GCvWuF-S7BlG1yLaZRyISf_OQ2ODnryr/2PACX-1vRu96x6GEP9i0hMcHTcR72FzgU8LHKu6nY0-GPLiy2K6jl5GCvWuF-S7BlG1yLaZRyISf_OQ2ODnryr/pubhtml'
 
-      expect(googlesheetsResolveEmbed(value)).toBeUndefined()
+      expect(googlesheetsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a sheet route with a foreign word before the id', () => {
       const value =
         'https://docs.google.com/spreadsheets/x/e/2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x/pubhtml'
 
-      expect(googlesheetsResolveEmbed(value)).toBeUndefined()
+      expect(googlesheetsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a sheet route that names no id', () => {
       const value = 'https://docs.google.com/spreadsheets/d/'
 
-      expect(googlesheetsResolveEmbed(value)).toBeUndefined()
+      expect(googlesheetsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the legacy published sheet', () => {
       const value =
         'https://docs.google.com/spreadsheet/pub?key=0AuGPdilGXWBhdEZPbjRUQ0ZJSnhLLV91aHBWWVlXZ3c&output=html&widget=true'
 
-      expect(googlesheetsResolveEmbed(value)).toBeUndefined()
+      expect(googlesheetsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a deck on the same host', () => {
       const value =
         'https://docs.google.com/presentation/d/e/2PACX-1vTrfBoW3wH95ukhsgLZ6cmoSYewTL4-eamSe5ajsiM6UJqYH50L6rdR_udIG40Gfw/pubhtml'
 
-      expect(googlesheetsResolveEmbed(value)).toBeUndefined()
+      expect(googlesheetsResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -327,7 +327,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should frame a published sheet whose path doubles the slash before the token', () => {
@@ -341,7 +341,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop an empty fragment', () => {
@@ -355,7 +355,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop an empty pair from the query', () => {
@@ -369,7 +369,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -387,7 +387,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the share tracker from a preview page', () => {
@@ -403,7 +403,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the tab a preview page names in its query', () => {
@@ -419,7 +419,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the tab a preview page names in its fragment', () => {
@@ -435,7 +435,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop an empty tab from the fragment of a preview page', () => {
@@ -451,7 +451,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -469,7 +469,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the tab an edit page names in its fragment', () => {
@@ -485,7 +485,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the tab an edit page names in its query and its fragment', () => {
@@ -501,7 +501,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the minimal toolbar flag from an edit page', () => {
@@ -517,7 +517,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the Office upload flags from an edit page', () => {
@@ -533,7 +533,7 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -551,14 +551,14 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should ignore a published sheet framed by its token with no route', () => {
       const value =
         'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGFJDoBb2POn_awnKgtowDGlMDAdue4UQCM9HlSxOwl0GtF8j0pv3UAkRW6GiLDf5G13atG4Pysk4x'
 
-      expect(googlesheetsResolveEmbed(value)).toBeUndefined()
+      expect(googlesheetsResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -574,14 +574,14 @@ describe('googlesheetsResolveEmbed', () => {
         height: 500,
       }
 
-      expect(googlesheetsResolveEmbed(value)).toEqual(expected)
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should ignore a published sheet behind a Workspace prefix', () => {
       const value =
         'https://docs.google.com/a/example.com/spreadsheets/d/e/2PACX-1vSycY-A50zVwI1MTL21nGd-CbjRD3hg6jOeujz18Rcy26K07py-fwJsmSkTbn89Lc1yfdREFGEHX7V9/pubhtml?gid=0&single=true'
 
-      expect(googlesheetsResolveEmbed(value)).toBeUndefined()
+      expect(googlesheetsResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

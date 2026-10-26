@@ -1091,7 +1091,7 @@ describe('instagramResolveEmbed', () => {
       url: 'https://www.instagram.com/p/CaUsPbUquKV/',
     }
 
-    expect(instagramResolveEmbed(value)).toEqual(expected)
+    expect(instagramResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should keep the captioned form of the frame', () => {
@@ -1103,7 +1103,7 @@ describe('instagramResolveEmbed', () => {
       url: 'https://www.instagram.com/reel/DGPdABWz84n/',
     }
 
-    expect(instagramResolveEmbed(value)).toEqual(expected)
+    expect(instagramResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should use a malformed shortcode as written, even if the player answers an error', () => {
@@ -1115,7 +1115,7 @@ describe('instagramResolveEmbed', () => {
       url: 'https://www.instagram.com/p/abc.def/',
     }
 
-    expect(instagramResolveEmbed(value)).toEqual(expected)
+    expect(instagramResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read the legacy short host', () => {
@@ -1127,7 +1127,7 @@ describe('instagramResolveEmbed', () => {
       url: 'https://www.instagram.com/p/CaUsPbUquKV/',
     }
 
-    expect(instagramResolveEmbed(value)).toEqual(expected)
+    expect(instagramResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // The app's share sheet writes the account in front of the post today. It names the poster
@@ -1141,7 +1141,7 @@ describe('instagramResolveEmbed', () => {
       url: 'https://www.instagram.com/p/CaUsPbUquKV/',
     }
 
-    expect(instagramResolveEmbed(value)).toEqual(expected)
+    expect(instagramResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read a post whose account runs past thirty characters', () => {
@@ -1153,7 +1153,7 @@ describe('instagramResolveEmbed', () => {
       url: 'https://www.instagram.com/p/CaUsPbUquKV/',
     }
 
-    expect(instagramResolveEmbed(value)).toEqual(expected)
+    expect(instagramResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read a reel addressed through its account', () => {
@@ -1165,7 +1165,7 @@ describe('instagramResolveEmbed', () => {
       url: 'https://www.instagram.com/reel/CaUsPbUquKV/',
     }
 
-    expect(instagramResolveEmbed(value)).toEqual(expected)
+    expect(instagramResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read a post addressed through an account carrying a dot', () => {
@@ -1177,7 +1177,7 @@ describe('instagramResolveEmbed', () => {
       url: 'https://www.instagram.com/p/DFnlw8jsKPG/',
     }
 
-    expect(instagramResolveEmbed(value)).toEqual(expected)
+    expect(instagramResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read a post addressed through an account carrying a digit', () => {
@@ -1189,7 +1189,7 @@ describe('instagramResolveEmbed', () => {
       url: 'https://www.instagram.com/p/CaUsPbUquKV/',
     }
 
-    expect(instagramResolveEmbed(value)).toEqual(expected)
+    expect(instagramResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // Instagram redirects an account spelled with capitals to its lowercase path.
@@ -1202,7 +1202,7 @@ describe('instagramResolveEmbed', () => {
       url: 'https://www.instagram.com/p/BXKQsxVgaJq/',
     }
 
-    expect(instagramResolveEmbed(value)).toEqual(expected)
+    expect(instagramResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read a shortcode carrying an underscore', () => {
@@ -1214,19 +1214,19 @@ describe('instagramResolveEmbed', () => {
       url: 'https://www.instagram.com/p/C_YIsLIOOro/',
     }
 
-    expect(instagramResolveEmbed(value)).toEqual(expected)
+    expect(instagramResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a post path nested two segments deep', () => {
     const value = 'https://www.instagram.com/x/y/p/CaUsPbUquKV/'
 
-    expect(instagramResolveEmbed(value)).toBeUndefined()
+    expect(instagramResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for an account page naming no post', () => {
     const value = 'https://www.instagram.com/makoto57gpr?igsh=MWVhNHdjZXZvbDByZA=='
 
-    expect(instagramResolveEmbed(value)).toBeUndefined()
+    expect(instagramResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   // `audio` sits where a shortcode does but names the sound a reel used, not a post. Instagram
@@ -1239,7 +1239,7 @@ describe('instagramResolveEmbed', () => {
   ]
 
   it.each(soundPageUrls)('should return undefined for the sound page %s', (value) => {
-    expect(instagramResolveEmbed(value)).toBeUndefined()
+    expect(instagramResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   // The exclusion is a whole segment, so a real shortcode merely beginning with those five
@@ -1253,7 +1253,7 @@ describe('instagramResolveEmbed', () => {
       url: 'https://www.instagram.com/reel/audioXYZ123/',
     }
 
-    expect(instagramResolveEmbed(value)).toEqual(expected)
+    expect(instagramResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // Instagram's own routes take the same shape as a handle, and the share route names a
@@ -1267,7 +1267,7 @@ describe('instagramResolveEmbed', () => {
   ]
 
   it.each(reservedRouteUrls)('should return undefined for %s', (value) => {
-    expect(instagramResolveEmbed(value)).toBeUndefined()
+    expect(instagramResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   // Instagram redirects each of these to the post's own page, the same as an account prefix.
@@ -1289,19 +1289,13 @@ describe('instagramResolveEmbed', () => {
       url: 'https://www.instagram.com/p/BXKQsxVgaJq/',
     }
 
-    expect(instagramResolveEmbed(value)).toEqual(expected)
+    expect(instagramResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a profile frame', () => {
     const value = 'https://www.instagram.com/someuser/embed/'
 
-    expect(instagramResolveEmbed(value)).toBeUndefined()
-  })
-
-  it('should return undefined for a url that cannot be parsed', () => {
-    const value = 'https://['
-
-    expect(instagramResolveEmbed(value)).toBeUndefined()
+    expect(instagramResolveEmbed(new URL(value))).toBeUndefined()
   })
 })
 

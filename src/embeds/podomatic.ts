@@ -1,6 +1,5 @@
-import { composeQuery, getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { composeQuery, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import type { ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const podomaticHost = 'podomatic.com'
@@ -56,9 +55,8 @@ const readPlayer = (url: URL): Player | undefined => {
   }
 }
 
-export const podomaticResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const player = parsed && readPlayer(parsed)
+export const podomaticResolveEmbed: ResolveUrlEmbed = (url) => {
+  const player = readPlayer(url)
 
   if (!player?.id) {
     return

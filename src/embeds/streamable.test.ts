@@ -22,7 +22,7 @@ describe('streamableResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(streamableResolveEmbed(value)).toEqual(expected)
+      expect(streamableResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should rebuild the oEmbed frame onto the embed route', () => {
@@ -35,7 +35,7 @@ describe('streamableResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(streamableResolveEmbed(value)).toEqual(expected)
+      expect(streamableResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should rebuild the share route onto the embed route and drop its token', () => {
@@ -48,7 +48,7 @@ describe('streamableResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(streamableResolveEmbed(value)).toEqual(expected)
+      expect(streamableResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should rebuild the watch page onto the embed route', () => {
@@ -61,7 +61,7 @@ describe('streamableResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(streamableResolveEmbed(value)).toEqual(expected)
+      expect(streamableResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read an MLB clip by its slug, with no page url', () => {
@@ -74,7 +74,7 @@ describe('streamableResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(streamableResolveEmbed(value)).toEqual(expected)
+      expect(streamableResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the www host', () => {
@@ -87,20 +87,7 @@ describe('streamableResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(streamableResolveEmbed(value)).toEqual(expected)
-    })
-
-    it('should read a protocol-relative url', () => {
-      const value = '//streamable.com/e/n2run'
-      const expected: EmbedResolverResult = {
-        provider: 'streamable',
-        id: 'n2run',
-        src: 'https://streamable.com/e/n2run',
-        url: 'https://streamable.com/n2run',
-        ratio: '16/9',
-      }
-
-      expect(streamableResolveEmbed(value)).toEqual(expected)
+      expect(streamableResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read a route word in another case and mint it in lowercase', () => {
@@ -113,7 +100,7 @@ describe('streamableResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(streamableResolveEmbed(value)).toEqual(expected)
+      expect(streamableResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -121,49 +108,49 @@ describe('streamableResolveEmbed', () => {
     it('should ignore a foreign host carrying the same path', () => {
       const value = 'https://evil.test/e/qun2ij'
 
-      expect(streamableResolveEmbed(value)).toBeUndefined()
+      expect(streamableResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a file host of the platform', () => {
       const value = 'https://cdn-cf-east.streamable.com/qun2ij'
 
-      expect(streamableResolveEmbed(value)).toBeUndefined()
+      expect(streamableResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a route nested under another segment', () => {
       const value = 'https://streamable.com/x/e/qun2ij'
 
-      expect(streamableResolveEmbed(value)).toBeUndefined()
+      expect(streamableResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a segment after the embed id', () => {
       const value = 'https://streamable.com/e/qun2ij/extra'
 
-      expect(streamableResolveEmbed(value)).toBeUndefined()
+      expect(streamableResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a share route with no token', () => {
       const value = 'https://streamable.com/s/55miv'
 
-      expect(streamableResolveEmbed(value)).toBeUndefined()
+      expect(streamableResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a segment after the share token', () => {
       const value = 'https://streamable.com/s/55miv/pnbzup/extra'
 
-      expect(streamableResolveEmbed(value)).toBeUndefined()
+      expect(streamableResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a segment after the MLB slug', () => {
       const value = 'https://streamable.com/m/andy-pages-covers-121-ft-to-send-game-7-to-extras/x'
 
-      expect(streamableResolveEmbed(value)).toBeUndefined()
+      expect(streamableResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the bare host', () => {
       const value = 'https://streamable.com/'
 
-      expect(streamableResolveEmbed(value)).toBeUndefined()
+      expect(streamableResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -178,7 +165,7 @@ describe('streamableResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(streamableResolveEmbed(value)).toEqual(expected)
+      expect(streamableResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep loop and drop a tracker', () => {
@@ -191,7 +178,7 @@ describe('streamableResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(streamableResolveEmbed(value)).toEqual(expected)
+      expect(streamableResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it("should drop the publisher's autoplay and the player flags", () => {
@@ -204,7 +191,7 @@ describe('streamableResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(streamableResolveEmbed(value)).toEqual(expected)
+      expect(streamableResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass an id through as written', () => {
@@ -217,7 +204,7 @@ describe('streamableResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(streamableResolveEmbed(value)).toEqual(expected)
+      expect(streamableResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

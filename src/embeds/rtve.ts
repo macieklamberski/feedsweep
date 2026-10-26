@@ -1,14 +1,6 @@
-import {
-  encodePathSegment,
-  getAnyOf,
-  getPathSegments,
-  getQueryParam,
-  isAnyOf,
-  parseUrl,
-} from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { encodePathSegment, getAnyOf, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'rtve'
@@ -51,14 +43,8 @@ const composeEmbed = (kind: Kind, id: string): EmbedResolverResult => {
   }
 }
 
-export const rtveResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
-  const [drmn, embed, route, id] = getPathSegments(parsed)
+export const rtveResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const [drmn, embed, route, id] = getPathSegments(url)
   const kind = getAnyOf(route, kinds)
 
   if (!isAnyOf(drmn, 'drmn') || !isAnyOf(embed, 'embed') || !kind) {
@@ -78,18 +64,16 @@ export const rtveResolveEmbed: ResolveEmbed = (url, element) => {
 // RTVE's player iframe, rtve.es/drmn/embed/{audio|video}/{id}/.
 export const rtveIframeEmbedResolver = createUrlEmbedResolver(rtveHosts, rtveResolveEmbed)
 
-const rtveFlashResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
+const rtveFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  if (!flashPlayerPathRegex.test(url.pathname)) {
     return
   }
 
   // The FLVPlayer names its asset only in the nielsen beacon, assetID::{id},title::{title}, and
   // says the asset is audio only through its config file.
-  if (flvPlayerPathRegex.test(parsed.pathname)) {
-    const config = getQueryParam(parsed.searchParams, 'config') ?? flashVar(element, 'config')
-    const nielsen = getQueryParam(parsed.searchParams, 'nielsen') ?? flashVar(element, 'nielsen')
+  if (flvPlayerPathRegex.test(url.pathname)) {
+    const config = getQueryParam(url.searchParams, 'config') ?? flashVar(element, 'config')
+    const nielsen = getQueryParam(url.searchParams, 'nielsen') ?? flashVar(element, 'nielsen')
     // The asset goes from a decoded query or flashvar into a path.
     const id = encodePathSegment(nielsen?.match(nielsenAssetRegex)?.[1] ?? '')
 
@@ -101,9 +85,9 @@ const rtveFlashResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   const asset =
-    getQueryParam(parsed.searchParams, 'assetID') ??
+    getQueryParam(url.searchParams, 'assetID') ??
     flashVar(element, 'assetID') ??
-    parsed.pathname.match(flashEmbedPathRegex)?.[1]
+    url.pathname.match(flashEmbedPathRegex)?.[1]
   const match = asset?.match(flashAssetRegex)
 
   if (!match) {

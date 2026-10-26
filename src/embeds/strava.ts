@@ -1,5 +1,5 @@
 import { encodePathSegment, getPathSegments, isAnyOf, toMap } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { pickUrlParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -58,7 +58,7 @@ export const stravaPlaceholderEmbedResolver = createMarkupEmbedResolver(
 // The player frame `embed.js` writes, `strava-embeds.com/{kind}/{id}`, and the retired apex
 // embed. The id survives the move to the current host and the apex token does not, so it is
 // dropped.
-export const stravaResolveEmbed: ResolveEmbed = (url) => {
+export const stravaResolveEmbed: ResolveUrlEmbed = (url) => {
   const [route, id, embed] = getPathSegments(url)
   const retiredKind = retiredEmbedKinds.get(route?.toLowerCase() ?? '')
 

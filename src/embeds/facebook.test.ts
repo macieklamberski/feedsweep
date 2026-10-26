@@ -1326,16 +1326,10 @@ describeForEachParser('facebookS9eEmbedResolver', (parseHtml) => {
 })
 
 describe('facebookResolveEmbed', () => {
-  it('should return undefined for a url that does not parse', () => {
-    const value = 'not a url'
-
-    expect(facebookResolveEmbed(value)).toBeUndefined()
-  })
-
   it('should return undefined for a legacy video frame with no video_id', () => {
     const value = 'https://www.facebook.com/video/embed?autoplay=1'
 
-    expect(facebookResolveEmbed(value)).toBeUndefined()
+    expect(facebookResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should use a malformed legacy video id as written, even if the player answers an error', () => {
@@ -1348,7 +1342,7 @@ describe('facebookResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(facebookResolveEmbed(value)).toEqual(expected)
+    expect(facebookResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should use a malformed watch id as written, even if the player answers an error', () => {
@@ -1361,7 +1355,7 @@ describe('facebookResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(facebookResolveEmbed(value)).toEqual(expected)
+    expect(facebookResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should use a malformed watch id of one space as written, even if the player answers an error', () => {
@@ -1374,19 +1368,19 @@ describe('facebookResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(facebookResolveEmbed(value)).toEqual(expected)
+    expect(facebookResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for the legacy video path under another segment', () => {
     const value = 'https://www.facebook.com/x/video/embed?video_id=123456'
 
-    expect(facebookResolveEmbed(value)).toBeUndefined()
+    expect(facebookResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a path below the legacy video frame', () => {
     const value = 'https://www.facebook.com/video/embed/extra?video_id=123456'
 
-    expect(facebookResolveEmbed(value)).toBeUndefined()
+    expect(facebookResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should use a malformed Flash video id as written, even if the player answers an error', () => {
@@ -1399,51 +1393,51 @@ describe('facebookResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(facebookResolveEmbed(value)).toEqual(expected)
+    expect(facebookResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for the Flash video path under another segment', () => {
     const value = 'https://www.facebook.com/x/v/377994148950512'
 
-    expect(facebookResolveEmbed(value)).toBeUndefined()
+    expect(facebookResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for an fb.watch short link under the Flash path', () => {
     const value = 'https://fb.watch/v/6Rhfg0Bzq'
 
-    expect(facebookResolveEmbed(value)).toBeUndefined()
+    expect(facebookResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a path below the Flash video', () => {
     const value = 'https://www.facebook.com/v/377994148950512/extra'
 
-    expect(facebookResolveEmbed(value)).toBeUndefined()
+    expect(facebookResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for the plugin path under another segment', () => {
     const value =
       'https://www.facebook.com/x/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123'
 
-    expect(facebookResolveEmbed(value)).toBeUndefined()
+    expect(facebookResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a path below the plugin', () => {
     const value =
       'https://www.facebook.com/plugins/post.php/extra?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123'
 
-    expect(facebookResolveEmbed(value)).toBeUndefined()
+    expect(facebookResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for the watch path under another segment', () => {
     const value = 'https://www.facebook.com/x/watch/?v=1010445561578533'
 
-    expect(facebookResolveEmbed(value)).toBeUndefined()
+    expect(facebookResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a path below the watch page', () => {
     const value = 'https://www.facebook.com/watch/extra?v=1010445561578533'
 
-    expect(facebookResolveEmbed(value)).toBeUndefined()
+    expect(facebookResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   // A carrier framing the page itself, which is what a publisher pastes from the address bar.
@@ -1466,7 +1460,7 @@ describe('facebookResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(facebookResolveEmbed(value)).toEqual(expected)
+    expect(facebookResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should mint the post plugin url from a page post', () => {
@@ -1478,7 +1472,7 @@ describe('facebookResolveEmbed', () => {
       url: value,
     }
 
-    expect(facebookResolveEmbed(value)).toEqual(expected)
+    expect(facebookResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // A page's vanity name may contain a route word. The plugin is chosen by the whole segment,
@@ -1496,7 +1490,7 @@ describe('facebookResolveEmbed', () => {
       url: value,
     }
 
-    expect(facebookResolveEmbed(value)).toEqual(expected)
+    expect(facebookResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // Everything else the host serves. A share or like button is the publisher's own chrome, the
@@ -1522,7 +1516,7 @@ describe('facebookResolveEmbed', () => {
   ]
 
   it.each(unmintableUrls)('should return undefined for %s', (value) => {
-    expect(facebookResolveEmbed(value)).toBeUndefined()
+    expect(facebookResolveEmbed(new URL(value))).toBeUndefined()
   })
 })
 

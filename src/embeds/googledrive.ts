@@ -6,7 +6,7 @@ import {
   getQueryParam,
   isAnyOf,
 } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -22,11 +22,7 @@ const audioPlayerHeight = 252
 
 // `/open?id={id}` redirects a file to its page and a folder to its listing, so only an audio
 // type says the id is a file.
-const readFileId = (
-  segments: Array<string>,
-  url: string,
-  isAudio?: boolean,
-): string | undefined => {
+const readFileId = (segments: Array<string>, url: URL, isAudio?: boolean): string | undefined => {
   if (isAnyOf(segments[0], 'file') && isAnyOf(segments[1], 'd')) {
     return segments[2]
   }
@@ -59,7 +55,7 @@ export const composeDriveThumbnail = (fileId: string): string => {
 
 // `/file/d/{id}/preview` frames the file and `/file/d/{id}/view` is its page. A folder on
 // `/drive/folders` or `/embeddedfolderview` is a listing, not a file, and stays unclaimed.
-export const googledriveResolveEmbed: ResolveEmbed = (url, element) => {
+export const googledriveResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const segments = getPathSegmentsWithoutWorkspace(url)
   const isAudio = attr(element, 'type')?.toLowerCase().startsWith('audio/')
   const fileId = readFileId(segments, url, isAudio)

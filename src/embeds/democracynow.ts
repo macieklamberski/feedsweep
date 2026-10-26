@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { getPathSegments, isAnyOf } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'democracynow'
@@ -22,14 +22,8 @@ const composeEmbed = (path: string, page: string): EmbedResolverResult => {
 // Democracy Now!'s video player, `/embed/{kind}/{y}/{m}/{d}`, which plays a day's whole show or
 // its headlines, or one story when a slug follows the date. The server matches the route words in
 // their own case only.
-export const democracynowResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
-  const [embed, kind, year, month, day, slug, ...rest] = getPathSegments(parsed)
+export const democracynowResolveEmbed: ResolveUrlEmbed = (url) => {
+  const [embed, kind, year, month, day, slug, ...rest] = getPathSegments(url)
 
   if (!isAnyOf(embed, 'embed') || !day || rest.length > 0) {
     return

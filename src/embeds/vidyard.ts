@@ -1,7 +1,7 @@
-import { encodePathSegment, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { encodePathSegment } from 'trousse'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
-import { alphanumericRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { alphanumericRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'vidyard'
@@ -26,11 +26,10 @@ const composeEmbed = (uuid: string, thumbnail?: string): EmbedResolverResult => 
   }
 }
 
-const vidyardResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
+const vidyardResolveEmbed: ResolveUrlEmbed = (url) => {
   // Every carrier names the video with the same uuid, so one key serves them. The alphabet is what
   // refuses `{uuid}.jpg` and `{uuid}.js`, which share the player's root segment.
-  const uuid = keepIfMatches(parsed?.pathname.match(playerPathRegex)?.[1], alphanumericRegex)
+  const uuid = keepIfMatches(url.pathname.match(playerPathRegex)?.[1], alphanumericRegex)
 
   if (!uuid) {
     return

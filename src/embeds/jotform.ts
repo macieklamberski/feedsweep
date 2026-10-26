@@ -1,5 +1,5 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { getPathSegments, isAnyOf } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -41,14 +41,8 @@ const composeEmbed = (formId: string, carrier: URL): EmbedResolverResult => {
 }
 
 // The form frame, which the platform serves at the bare id and at `/form/{id}` alike.
-export const jotformResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url)
-
-  if (!parsed) {
-    return
-  }
-
-  const segments = getPathSegments(parsed)
+export const jotformResolveEmbed: ResolveUrlEmbed = (url) => {
+  const segments = getPathSegments(url)
   const route = isAnyOf(segments[0], 'form') ? segments.slice(1) : segments
   const formId = route[0]
 
@@ -56,7 +50,7 @@ export const jotformResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  return composeEmbed(formId, parsed)
+  return composeEmbed(formId, url)
 }
 
 // Jotform's inline form, written in place by a script the pipeline drops, so an item whose whole

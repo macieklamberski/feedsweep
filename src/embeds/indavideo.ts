@@ -1,7 +1,6 @@
-import { encodePathSegment, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
+import { encodePathSegment, getQueryParam, isAnyOf } from 'trousse'
+import type { EmbedRenderHint, FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'indavideo'
@@ -36,14 +35,8 @@ const readVideoId = (url: URL, element?: Element): string | undefined => {
 
 // An Indavideo player: the iframe on indavideo.hu or embed.indavideo.hu, or the retired Flash
 // player, whose video id plays on the current one.
-export const indavideoResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
-  const id = readVideoId(parsed, element)
+export const indavideoResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const id = readVideoId(url, element)
 
   if (!id) {
     return

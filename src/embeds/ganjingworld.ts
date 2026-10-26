@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { hyphenatedLettersRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -7,7 +7,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 // `ganjing.com` 301s onto `www.ganjingworld.com/embed/{same id}`, so both hosts name one embed.
 const ganjingworldHosts = ['ganjingworld.com', 'ganjing.com']
 
-const readVideoId = (url: string): string | undefined => {
+const readVideoId = (url: URL): string | undefined => {
   const [first, second, third] = getPathSegments(url)
 
   // The route word tells an embed from a channel, `/channel`, or a shared post, `/s`.
@@ -28,7 +28,7 @@ const readVideoId = (url: string): string | undefined => {
 }
 
 // No thumbnail: the poster is a uuid on a separate cdn and nothing composes it from the video id.
-const ganjingworldResolveEmbed: ResolveEmbed = (url, element) => {
+const ganjingworldResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const videoId = readVideoId(url)
 
   if (!videoId) {

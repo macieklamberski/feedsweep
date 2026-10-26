@@ -16,7 +16,7 @@ describe('firstoryResolveEmbed', () => {
         height: 182,
       }
 
-      expect(firstoryResolveEmbed(value)).toEqual(expected)
+      expect(firstoryResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should move the old host onto the current one', () => {
@@ -29,7 +29,7 @@ describe('firstoryResolveEmbed', () => {
         height: 182,
       }
 
-      expect(firstoryResolveEmbed(value)).toEqual(expected)
+      expect(firstoryResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the description flag', () => {
@@ -42,7 +42,7 @@ describe('firstoryResolveEmbed', () => {
         height: 182,
       }
 
-      expect(firstoryResolveEmbed(value)).toEqual(expected)
+      expect(firstoryResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a tracker on the query', () => {
@@ -56,7 +56,7 @@ describe('firstoryResolveEmbed', () => {
         height: 182,
       }
 
-      expect(firstoryResolveEmbed(value)).toEqual(expected)
+      expect(firstoryResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a trailing slash', () => {
@@ -69,7 +69,7 @@ describe('firstoryResolveEmbed', () => {
         height: 182,
       }
 
-      expect(firstoryResolveEmbed(value)).toEqual(expected)
+      expect(firstoryResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass the id on as written', () => {
@@ -82,7 +82,7 @@ describe('firstoryResolveEmbed', () => {
         height: 182,
       }
 
-      expect(firstoryResolveEmbed(value)).toEqual(expected)
+      expect(firstoryResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the story route in capitals and mint it in lowercase', () => {
@@ -95,7 +95,7 @@ describe('firstoryResolveEmbed', () => {
         height: 182,
       }
 
-      expect(firstoryResolveEmbed(value)).toEqual(expected)
+      expect(firstoryResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -103,31 +103,31 @@ describe('firstoryResolveEmbed', () => {
     it('should ignore the story route behind another segment', () => {
       const value = 'https://open.firstory.fm/x/embed/story/cmm2q46gw0o4d01y9g95lctm9'
 
-      expect(firstoryResolveEmbed(value)).toBeUndefined()
+      expect(firstoryResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the story route followed by another segment', () => {
       const value = 'https://open.firstory.fm/embed/story/cmm2q46gw0o4d01y9g95lctm9/extra'
 
-      expect(firstoryResolveEmbed(value)).toBeUndefined()
+      expect(firstoryResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the story route with no id', () => {
       const value = 'https://open.firstory.fm/embed/story/'
 
-      expect(firstoryResolveEmbed(value)).toBeUndefined()
+      expect(firstoryResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an unknown route word', () => {
       const value = 'https://open.firstory.fm/embed/clip/cmm2q46gw0o4d01y9g95lctm9'
 
-      expect(firstoryResolveEmbed(value)).toBeUndefined()
+      expect(firstoryResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the show player', () => {
       const value = 'https://open.firstory.fm/embed/user/clr09edvi002601tzc2jy3cfi'
 
-      expect(firstoryResolveEmbed(value)).toBeUndefined()
+      expect(firstoryResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

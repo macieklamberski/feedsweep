@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // `{show}+{episode}`: the `+` tells a token from a single word in the same slot.
@@ -20,7 +20,7 @@ type FiresidePlayer = { version: string; token: string }
 // The version sits before the token on both hosts, `fireside.fm/player/{version}/{token}` and
 // `player.fireside.fm/{version}/{token}`. `fireside.fm/s/{token}/iframe` is the retired share
 // route, naming the same token and no version.
-export const extractFiresideToken = (link: string): FiresidePlayer | undefined => {
+export const extractFiresideToken = (link: URL): FiresidePlayer | undefined => {
   const segments = getPathSegments(link)
   const versioned = isAnyOf(segments[0], 'player') ? segments.slice(1) : segments
   const [version, token] = isAnyOf(segments[0], 's')
@@ -36,7 +36,7 @@ export const extractFiresideToken = (link: string): FiresidePlayer | undefined =
   }
 }
 
-export const firesideResolveEmbed: ResolveEmbed = (url) => {
+export const firesideResolveEmbed: ResolveUrlEmbed = (url) => {
   const player = extractFiresideToken(url)
 
   if (!player) {

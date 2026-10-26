@@ -5,14 +5,13 @@ import {
   getPathSegments,
   getQueryParam,
   type Nullish,
-  parseUrl,
 } from 'trousse'
-import type { FieldCleaner, ResolveEmbed } from '../types.js'
+import type { FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
 
 const provider = 'bandcamp'
 
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // A release is either an album or a single track.
@@ -33,13 +32,8 @@ const videoPathRegex = /\/videoembed/i
 
 // A player pointing at a track inside an album names both, and the two orders both occur: the
 // modern path writes `album=` first and the legacy `v=2/` path writes `track=` first.
-const readReleases = (link: string): Array<[string, string]> => {
-  const parsed = parseUrl(link, placeholderBaseUrl)
+const readReleases = (url: URL): Array<[string, string]> => {
   const releases: Array<[string, string]> = []
-
-  if (!parsed) {
-    return releases
-  }
 
   const claim = (kind: string, id: string) => {
     if (!releases.some(([named]) => named === kind)) {
@@ -47,7 +41,7 @@ const readReleases = (link: string): Array<[string, string]> => {
     }
   }
 
-  for (const segment of getPathSegments(parsed)) {
+  for (const segment of getPathSegments(url)) {
     const match = segment.match(releaseRegex)
 
     // A path value is decoded, like a query one, so the player url encodes it once.
@@ -63,7 +57,7 @@ const readReleases = (link: string): Array<[string, string]> => {
   }
 
   for (const kind of releaseKinds) {
-    const id = getQueryParam(parsed.searchParams, kind)
+    const id = getQueryParam(url.searchParams, kind)
 
     if (id) {
       claim(kind, id)
@@ -73,8 +67,8 @@ const readReleases = (link: string): Array<[string, string]> => {
   return releases
 }
 
-export const extractBandcampRelease = (link: string): string | undefined => {
-  const releases = readReleases(link)
+export const extractBandcampRelease = (url: URL): string | undefined => {
+  const releases = readReleases(url)
   // The track, not the first spelled: that gave two tracks off one album the same id.
   // Naming both is what the builder writes when a publisher picks a track off an album page.
   const release = releases.find(([kind]) => kind === 'track') ?? releases[0]
@@ -99,11 +93,10 @@ const parseFallback = (element: Nullish<Element>): Element | undefined => {
   )
 }
 
-const bandcampResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
+const bandcampResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const release = extractBandcampRelease(url)
 
-  if (!parsed || !release) {
+  if (!release) {
     return
   }
 
@@ -111,8 +104,8 @@ const bandcampResolveEmbed: ResolveEmbed = (url, element) => {
   const [kind, id] = release.split('/')
   // The video player names a track and only a track: `VideoEmbed?album={id}` answers 404. A video
   // carrier whose only release is an album falls back to the audio player, which does serve it.
-  const isVideo = videoPathRegex.test(parsed.pathname) && kind === 'track'
-  const startTrack = getPathSegments(parsed).find((segment) => startTrackRegex.test(segment))
+  const isVideo = videoPathRegex.test(url.pathname) && kind === 'track'
+  const startTrack = getPathSegments(url).find((segment) => startTrackRegex.test(segment))
   const start = startTrack ? `${startTrack}/` : ''
   // A query id comes out decoded, and it goes into a path.
   const segments = new Map(releases.map(([named, value]) => [named, encodePathSegment(value)]))

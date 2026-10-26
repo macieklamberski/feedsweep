@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf, isPlainObject } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -29,7 +29,7 @@ type RedditTarget = {
   publisher: string
 }
 
-const parseRedditPath = (value: string | undefined): Array<string> | undefined => {
+const parseRedditPath = (value: string | URL | undefined): Array<string> | undefined => {
   const parsed = parseUrlOnHosts(value, redditHosts)
 
   if (!parsed) {
@@ -49,7 +49,7 @@ const readScope = (segment: string | undefined): 'r' | 'user' | undefined => {
   }
 }
 
-const parseTarget = (value: string | undefined): RedditTarget | undefined => {
+const parseTarget = (value: string | URL | undefined): RedditTarget | undefined => {
   const segments = parseRedditPath(value)
 
   if (!segments) {
@@ -162,7 +162,7 @@ export const redditWidgetEmbedResolver = createMarkupEmbedResolver(
   readWidget,
 )
 
-export const redditResolveEmbed: ResolveEmbed = (url, element) => {
+export const redditResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const target = parseTarget(url)
 
   return target ? composeEmbed(target, { title: attr(element, 'title') }) : undefined
@@ -175,7 +175,7 @@ export const redditIframeEmbedResolver = createUrlEmbedResolver(redditHosts, red
 // A forum's s9e MediaEmbed helper frame, naming the post as `{subreddit}/comments/{id}` in its
 // url fragment.
 export const redditS9eEmbedResolver = createS9eEmbedResolver('reddit', (fragment) => {
-  return redditResolveEmbed(`https://www.reddit.com/r/${fragment}`)
+  return redditResolveEmbed(new URL(`https://www.reddit.com/r/${fragment}`))
 })
 
 // The player reports its height under a `resize.embed` type, first as 0 and then as the rendered

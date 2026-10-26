@@ -1,7 +1,7 @@
-import { composeQuery, encodePathSegment, getQueryParam, parseUrl } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { composeQuery, encodePathSegment, getQueryParam } from 'trousse'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'matterport'
@@ -14,20 +14,18 @@ const showPathRegex = /^\/show\/?$/i
 const navigationParams = ['start', 'sm', 'sp', 'sq', 'sr', 'ss', 'sf', 'sz']
 
 // A Matterport 3D Showcase, `my.matterport.com/show/?m={id}`, a walk-through of a scanned space.
-const matterportResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed || !showPathRegex.test(parsed.pathname)) {
+const matterportResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  if (!showPathRegex.test(url.pathname)) {
     return
   }
 
-  const id = getQueryParam(parsed.searchParams, 'm')
+  const id = getQueryParam(url.searchParams, 'm')
 
   if (!id) {
     return
   }
 
-  const query = composeQuery({ m: id, ...pickQueryParams(parsed.search, navigationParams) })
+  const query = composeQuery({ m: id, ...pickQueryParams(url.search, navigationParams) })
 
   return {
     provider,

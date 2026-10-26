@@ -1,5 +1,5 @@
-import { isAnyOf, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import { isAnyOf } from 'trousse'
+import type { ResolveUrlEmbed } from '../types.js'
 import { filterUrlQuery, isFileName } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -43,11 +43,10 @@ const displayParams = [
 const chartHeight = 600
 const explorerHeight = 696
 
-const ourworldindataResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url)
-  const match = parsed?.pathname.match(chartPathRegex)
+const ourworldindataResolveEmbed: ResolveUrlEmbed = (url) => {
+  const match = url.pathname.match(chartPathRegex)
 
-  if (!parsed || !match) {
+  if (!match) {
     return
   }
 
@@ -59,7 +58,7 @@ const ourworldindataResolveEmbed: ResolveEmbed = (url) => {
   }
 
   const isChart = isAnyOf(kind, 'grapher')
-  const query = filterUrlQuery(parsed, (name) => {
+  const query = filterUrlQuery(url, (name) => {
     return !isAnyOf(name, displayParams)
   })
   const src = `https://ourworldindata.org/${kind}/${slug}${query}`

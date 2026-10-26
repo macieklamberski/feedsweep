@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
+import { getPathSegments, isAnyOf } from 'trousse'
+import type { EmbedRenderHint, FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
-import { alphanumericRegex, placeholderBaseUrl } from '../utils/urls.js'
+import { alphanumericRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'sketchfab'
@@ -37,9 +37,8 @@ const readModelUid = (parsed: URL): string | undefined => {
 
 // The thumbnail sits under a per-model hash that the uid does not yield, and
 // `sketchfab.com/oembed?url=…` answers with it and the title, with no key.
-const sketchfabResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const uid = parsed ? readModelUid(parsed) : undefined
+const sketchfabResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const uid = readModelUid(url)
 
   if (!uid) {
     return

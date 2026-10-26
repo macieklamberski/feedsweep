@@ -15,7 +15,7 @@ describe('mailruResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(mailruResolveEmbed(value)).toEqual(expected)
+      expect(mailruResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep the sign of a negative id', () => {
@@ -27,7 +27,7 @@ describe('mailruResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(mailruResolveEmbed(value)).toEqual(expected)
+      expect(mailruResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should move the dead api host onto the player that serves the same path', () => {
@@ -41,7 +41,7 @@ describe('mailruResolveEmbed', () => {
         author: 'lady',
       }
 
-      expect(mailruResolveEmbed(value)).toEqual(expected)
+      expect(mailruResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the end of the redirect the videoapi host sends', () => {
@@ -55,7 +55,7 @@ describe('mailruResolveEmbed', () => {
         author: 'eduspb.com',
       }
 
-      expect(mailruResolveEmbed(value)).toEqual(expected)
+      expect(mailruResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the path form the player already serves', () => {
@@ -69,7 +69,7 @@ describe('mailruResolveEmbed', () => {
         author: 'shels_1991',
       }
 
-      expect(mailruResolveEmbed(value)).toEqual(expected)
+      expect(mailruResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the path form whose user carries a dot', () => {
@@ -83,7 +83,7 @@ describe('mailruResolveEmbed', () => {
         author: 'eduspb.com',
       }
 
-      expect(mailruResolveEmbed(value)).toEqual(expected)
+      expect(mailruResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the path form whose user carries a hyphen', () => {
@@ -97,7 +97,7 @@ describe('mailruResolveEmbed', () => {
         author: 'art-ifact',
       }
 
-      expect(mailruResolveEmbed(value)).toEqual(expected)
+      expect(mailruResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should move the dead api host onto the player for an album carrying a hyphen', () => {
@@ -112,7 +112,7 @@ describe('mailruResolveEmbed', () => {
         author: 'hitech',
       }
 
-      expect(mailruResolveEmbed(value)).toEqual(expected)
+      expect(mailruResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     // The player finds the video by its counter and serves it under any album spelling.
@@ -128,7 +128,7 @@ describe('mailruResolveEmbed', () => {
         author: 'hitech',
       }
 
-      expect(mailruResolveEmbed(value)).toEqual(expected)
+      expect(mailruResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the path form whose album carries a hyphen', () => {
@@ -142,7 +142,7 @@ describe('mailruResolveEmbed', () => {
         author: 'hitech',
       }
 
-      expect(mailruResolveEmbed(value)).toEqual(expected)
+      expect(mailruResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the path form whose album carries a dot', () => {
@@ -156,7 +156,7 @@ describe('mailruResolveEmbed', () => {
         author: 'hitech',
       }
 
-      expect(mailruResolveEmbed(value)).toEqual(expected)
+      expect(mailruResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the video the Flash player names on its query', () => {
@@ -171,7 +171,7 @@ describe('mailruResolveEmbed', () => {
         author: 'anizm.com',
       }
 
-      expect(mailruResolveEmbed(value)).toEqual(expected)
+      expect(mailruResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the video the older Flash player names in its par path', () => {
@@ -186,7 +186,7 @@ describe('mailruResolveEmbed', () => {
         author: 'gsavinich',
       }
 
-      expect(mailruResolveEmbed(value)).toEqual(expected)
+      expect(mailruResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the par path of the full size Flash player', () => {
@@ -201,7 +201,7 @@ describe('mailruResolveEmbed', () => {
         author: 'vi-talik',
       }
 
-      expect(mailruResolveEmbed(value)).toEqual(expected)
+      expect(mailruResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read a par path whose dollar signs are percent-encoded', () => {
@@ -216,7 +216,7 @@ describe('mailruResolveEmbed', () => {
         author: 'pavelbazhenov',
       }
 
-      expect(mailruResolveEmbed(value)).toEqual(expected)
+      expect(mailruResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -224,13 +224,13 @@ describe('mailruResolveEmbed', () => {
     it('should ignore a foreign host carrying the same path', () => {
       const value = 'https://evil.test/video/embed/253943806846567285'
 
-      expect(mailruResolveEmbed(value)).toBeUndefined()
+      expect(mailruResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the watch page, which frames nothing', () => {
       const value = 'https://my.mail.ru/mail/shels_1991/video/20/885.html'
 
-      expect(mailruResolveEmbed(value)).toBeUndefined()
+      expect(mailruResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed numeric id as written, even if the player answers an error', () => {
@@ -242,75 +242,75 @@ describe('mailruResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(mailruResolveEmbed(value)).toEqual(expected)
+      expect(mailruResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should ignore the numeric route behind another segment', () => {
       const value = 'https://my.mail.ru/x/video/embed/253943806846567285'
 
-      expect(mailruResolveEmbed(value)).toBeUndefined()
+      expect(mailruResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the numeric route followed by another segment', () => {
       const value = 'https://my.mail.ru/video/embed/253943806846567285/extra'
 
-      expect(mailruResolveEmbed(value)).toBeUndefined()
+      expect(mailruResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the legacy route behind another segment', () => {
       const value = 'https://videoapi.my.mail.ru/x/videos/embed/mail/eduspb.com/_myvideo/248.html'
 
-      expect(mailruResolveEmbed(value)).toBeUndefined()
+      expect(mailruResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the legacy route followed by another segment', () => {
       const value =
         'https://videoapi.my.mail.ru/videos/embed/mail/eduspb.com/_myvideo/248.html/extra'
 
-      expect(mailruResolveEmbed(value)).toBeUndefined()
+      expect(mailruResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the path form behind another segment', () => {
       const value = 'https://my.mail.ru/x/mail/shels_1991/video/embed/20/885'
 
-      expect(mailruResolveEmbed(value)).toBeUndefined()
+      expect(mailruResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the path form followed by another segment', () => {
       const value = 'https://my.mail.ru/mail/shels_1991/video/embed/20/885/extra'
 
-      expect(mailruResolveEmbed(value)).toBeUndefined()
+      expect(mailruResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a legacy path that does not name a video', () => {
       const value = 'https://videoapi.my.mail.ru/videos/embed/mail/eduspb.com/list.html'
 
-      expect(mailruResolveEmbed(value)).toBeUndefined()
+      expect(mailruResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a swf on the image host that is not the player', () => {
       const value = 'http://img.mail.ru/r/banners/promo.swf?movieSrc=mail/anizm.com/4418/4427'
 
-      expect(mailruResolveEmbed(value)).toBeUndefined()
+      expect(mailruResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the Flash player path behind another segment', () => {
       const value = 'http://img.mail.ru/x/r/video2/uvpv3.swf?2&movieSrc=mail/anizm.com/4418/4427'
 
-      expect(mailruResolveEmbed(value)).toBeUndefined()
+      expect(mailruResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the Flash player path followed by another segment', () => {
       const value =
         'http://img.mail.ru/r/video2/uvpv3.swf/extra?2&movieSrc=mail/anizm.com/4418/4427'
 
-      expect(mailruResolveEmbed(value)).toBeUndefined()
+      expect(mailruResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the Flash player when nothing names a video', () => {
       const value = 'http://img.mail.ru/r/video2/uvpv3.swf?3'
 
-      expect(mailruResolveEmbed(value)).toBeUndefined()
+      expect(mailruResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed movieSrc as written, even if the player answers an error', () => {
@@ -324,7 +324,7 @@ describe('mailruResolveEmbed', () => {
         author: '..',
       }
 
-      expect(mailruResolveEmbed(value)).toEqual(expected)
+      expect(mailruResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep a movieSrc counter holding a query separator inside its path segment', () => {
@@ -338,58 +338,58 @@ describe('mailruResolveEmbed', () => {
         author: 'anizm.com',
       }
 
-      expect(mailruResolveEmbed(value)).toEqual(expected)
+      expect(mailruResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should refuse a movieSrc behind a dot segment', () => {
       const value = 'http://img.mail.ru/r/video2/uvpv3.swf?2&movieSrc=../mail/anizm.com/4418/4427'
 
-      expect(mailruResolveEmbed(value)).toBeUndefined()
+      expect(mailruResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should refuse a movieSrc followed by a dot segment', () => {
       const value = 'http://img.mail.ru/r/video2/uvpv3.swf?2&movieSrc=mail/anizm.com/4418/4427/..'
 
-      expect(mailruResolveEmbed(value)).toBeUndefined()
+      expect(mailruResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should refuse a movieSrc carrying an extra segment after the type', () => {
       const value = 'http://img.mail.ru/r/video2/uvpv3.swf?2&movieSrc=mail/x/anizm.com/4418/4427'
 
-      expect(mailruResolveEmbed(value)).toBeUndefined()
+      expect(mailruResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should refuse a movieSrc carrying an extra segment in the album', () => {
       const value = 'http://img.mail.ru/r/video2/uvpv3.swf?2&movieSrc=mail/anizm.com/44/18/4427'
 
-      expect(mailruResolveEmbed(value)).toBeUndefined()
+      expect(mailruResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an asset host path outside the Flash route', () => {
       const value = 'https://my2.imgsmail.ru/mail/gsavinich/video/embed/10/44'
 
-      expect(mailruResolveEmbed(value)).toBeUndefined()
+      expect(mailruResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a par path that names no counter', () => {
       const value =
         'http://img.mail.ru/r/video2/player_v2.swf?par=http://content.video.mail.ru/mail/gsavinich/10/44'
 
-      expect(mailruResolveEmbed(value)).toBeUndefined()
+      expect(mailruResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a par path behind another segment', () => {
       const value =
         'http://img.mail.ru/r/video2/player_v2.swf?par=http://content.video.mail.ru/x/mail/gsavinich/10/$44$0$143'
 
-      expect(mailruResolveEmbed(value)).toBeUndefined()
+      expect(mailruResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a par path followed by another segment', () => {
       const value =
         'http://img.mail.ru/r/video2/player_v2.swf?par=http://content.video.mail.ru/mail/gsavinich/10/$44$0$143/extra'
 
-      expect(mailruResolveEmbed(value)).toBeUndefined()
+      expect(mailruResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

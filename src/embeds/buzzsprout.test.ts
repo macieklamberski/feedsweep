@@ -20,19 +20,19 @@ describe('buzzsproutResolveEmbed', () => {
       height: 200,
     }
 
-    expect(buzzsproutResolveEmbed(value)).toEqual(expected)
+    expect(buzzsproutResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should return undefined for a show-level url', () => {
     const value = 'https://www.buzzsprout.com/1735722'
 
-    expect(buzzsproutResolveEmbed(value)).toBeUndefined()
+    expect(buzzsproutResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for an episode path under another segment', () => {
     const value = 'https://www.buzzsprout.com/x/1735722/8166676'
 
-    expect(buzzsproutResolveEmbed(value)).toBeUndefined()
+    expect(buzzsproutResolveEmbed(new URL(value))).toBeUndefined()
   })
 })
 

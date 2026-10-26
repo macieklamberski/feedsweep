@@ -9,14 +9,14 @@ describe('extractBandcampRelease', () => {
       'https://bandcamp.com/EmbeddedPlayer/album=3373381116/size=large/bgcol=ffffff/transparent=true/'
     const expected = 'album/3373381116'
 
-    expect(extractBandcampRelease(value)).toBe(expected)
+    expect(extractBandcampRelease(new URL(value))).toBe(expected)
   })
 
   it('should read a track from the player path', () => {
     const value = 'https://bandcamp.com/EmbeddedPlayer/track=42/size=small/'
     const expected = 'track/42'
 
-    expect(extractBandcampRelease(value)).toBe(expected)
+    expect(extractBandcampRelease(new URL(value))).toBe(expected)
   })
 
   // The video player spells its options as a query string instead.
@@ -24,7 +24,7 @@ describe('extractBandcampRelease', () => {
     const value = 'https://bandcamp.com/VideoEmbed?track=1959185434&bgcol=ffffff&linkcol=7137dc'
     const expected = 'track/1959185434'
 
-    expect(extractBandcampRelease(value)).toBe(expected)
+    expect(extractBandcampRelease(new URL(value))).toBe(expected)
   })
 
   // A player pointing into an album names both, and whichever kind the url spells first is the
@@ -34,7 +34,7 @@ describe('extractBandcampRelease', () => {
       'https://bandcamp.com/EmbeddedPlayer/album=1578579597/size=large/artwork=small/track=1637967854/'
     const expected = 'track/1637967854'
 
-    expect(extractBandcampRelease(value)).toBe(expected)
+    expect(extractBandcampRelease(new URL(value))).toBe(expected)
   })
 
   it('should read the track from the legacy path that names the album second', () => {
@@ -42,7 +42,7 @@ describe('extractBandcampRelease', () => {
       'https://bandcamp.com/EmbeddedPlayer/v=2/track=2747530839/album=2568747696/size=large/'
     const expected = 'track/2747530839'
 
-    expect(extractBandcampRelease(value)).toBe(expected)
+    expect(extractBandcampRelease(new URL(value))).toBe(expected)
   })
 
   it('should read the one track a signed carrier names', () => {
@@ -50,46 +50,40 @@ describe('extractBandcampRelease', () => {
       'https://bandcamp.com/EmbeddedPlayer/album=3807347294/size=large/tracklist=false/tracks=2464352004/esig=76671557f3fab5a5a868dbbabaa73d70/'
     const expected = 'track/2464352004'
 
-    expect(extractBandcampRelease(value)).toBe(expected)
+    expect(extractBandcampRelease(new URL(value))).toBe(expected)
   })
 
   it('should use a signed track id that does not decode as written', () => {
     const value = 'https://bandcamp.com/EmbeddedPlayer/album=42/tracks=7%E0%A4/esig=abc/'
     const expected = 'track/7%E0%A4'
 
-    expect(extractBandcampRelease(value)).toBe(expected)
+    expect(extractBandcampRelease(new URL(value))).toBe(expected)
   })
 
   it('should return undefined when no release is named', () => {
     const value = 'https://bandcamp.com/EmbeddedPlayer/size=small/bgcol=ffffff/'
 
-    expect(extractBandcampRelease(value)).toBeUndefined()
+    expect(extractBandcampRelease(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a release option behind a prefix', () => {
     const value = 'https://bandcamp.com/EmbeddedPlayer/xalbum=42/size=small/'
 
-    expect(extractBandcampRelease(value)).toBeUndefined()
+    expect(extractBandcampRelease(new URL(value))).toBeUndefined()
   })
 
   it('should use a malformed release id as written, even if the player answers an error', () => {
     const value = 'https://bandcamp.com/EmbeddedPlayer/album=42x/size=small/'
     const expected = 'album/42x'
 
-    expect(extractBandcampRelease(value)).toEqual(expected)
+    expect(extractBandcampRelease(new URL(value))).toEqual(expected)
   })
 
   it('should use a malformed query id as written, even if the player answers an error', () => {
     const value = 'https://bandcamp.com/VideoEmbed?track=abc'
     const expected = 'track/abc'
 
-    expect(extractBandcampRelease(value)).toEqual(expected)
-  })
-
-  it('should return undefined for a url that cannot be parsed', () => {
-    const value = 'https://['
-
-    expect(extractBandcampRelease(value)).toBeUndefined()
+    expect(extractBandcampRelease(new URL(value))).toEqual(expected)
   })
 })
 

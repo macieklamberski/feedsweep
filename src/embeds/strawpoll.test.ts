@@ -21,7 +21,7 @@ describe('strawpollResolveEmbed', () => {
         thumbnail: 'https://cdn.strawpoll.com/images/polls/previews/e7ZJaM1BPg3-c.png',
       }
 
-      expect(strawpollResolveEmbed(value)).toEqual(expected)
+      expect(strawpollResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the current frame from the older polls route', () => {
@@ -34,7 +34,7 @@ describe('strawpollResolveEmbed', () => {
         thumbnail: 'https://cdn.strawpoll.com/images/polls/previews/XOgONJpzrn3-c.png',
       }
 
-      expect(strawpollResolveEmbed(value)).toEqual(expected)
+      expect(strawpollResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the poll frame written with a trailing slash', () => {
@@ -47,7 +47,7 @@ describe('strawpollResolveEmbed', () => {
         thumbnail: 'https://cdn.strawpoll.com/images/polls/previews/e7ZJaM1BPg3-c.png',
       }
 
-      expect(strawpollResolveEmbed(value)).toEqual(expected)
+      expect(strawpollResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the embed route in uppercase and mint it in lowercase', () => {
@@ -60,7 +60,7 @@ describe('strawpollResolveEmbed', () => {
         thumbnail: 'https://cdn.strawpoll.com/images/polls/previews/e7ZJaM1BPg3-c.png',
       }
 
-      expect(strawpollResolveEmbed(value)).toEqual(expected)
+      expect(strawpollResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -68,37 +68,37 @@ describe('strawpollResolveEmbed', () => {
     it('should ignore the embed route with no poll', () => {
       const value = 'https://strawpoll.com/embed'
 
-      expect(strawpollResolveEmbed(value)).toBeUndefined()
+      expect(strawpollResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the embed route under a leading segment', () => {
       const value = 'https://strawpoll.com/x/embed/e7ZJaM1BPg3'
 
-      expect(strawpollResolveEmbed(value)).toBeUndefined()
+      expect(strawpollResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a trailing segment after the poll', () => {
       const value = 'https://strawpoll.com/embed/e7ZJaM1BPg3/results'
 
-      expect(strawpollResolveEmbed(value)).toBeUndefined()
+      expect(strawpollResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the poll page, which refuses framing', () => {
       const value = 'https://strawpoll.com/e7ZJaM1BPg3'
 
-      expect(strawpollResolveEmbed(value)).toBeUndefined()
+      expect(strawpollResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the embed route on the file subdomain', () => {
       const value = 'https://cdn.strawpoll.com/embed/e7ZJaM1BPg3'
 
-      expect(strawpollResolveEmbed(value)).toBeUndefined()
+      expect(strawpollResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a foreign host carrying the same path', () => {
       const value = 'https://evil.test/embed/e7ZJaM1BPg3'
 
-      expect(strawpollResolveEmbed(value)).toBeUndefined()
+      expect(strawpollResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -113,7 +113,7 @@ describe('strawpollResolveEmbed', () => {
         thumbnail: 'https://cdn.strawpoll.com/images/polls/previews/zzzzzzzzzzz-c.png',
       }
 
-      expect(strawpollResolveEmbed(value)).toEqual(expected)
+      expect(strawpollResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a query the frame does not need', () => {
@@ -126,7 +126,7 @@ describe('strawpollResolveEmbed', () => {
         thumbnail: 'https://cdn.strawpoll.com/images/polls/previews/e7ZJaM1BPg3-c.png',
       }
 
-      expect(strawpollResolveEmbed(value)).toEqual(expected)
+      expect(strawpollResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

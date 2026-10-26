@@ -7,7 +7,12 @@ import {
   isHostOrSubdomainOf,
   parseUrl,
 } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
+import type {
+  EmbedRenderHint,
+  EmbedResolverResult,
+  FieldCleaner,
+  ResolveUrlEmbed,
+} from '../types.js'
 import { attr, flashVar, flashVars } from '../utils/dom.js'
 import {
   audioFileRegex,
@@ -101,21 +106,20 @@ const declaresAudioPlayer = (element: Element): boolean => {
   return height !== undefined && height < audioCarrierHeightLimit
 }
 
-const readItemEmbed = (url: string): EmbedResolverResult | undefined => {
-  const parsed = parseArchiveUrl(url)
-  const { head: identifier, file } = readSegmentParts(parsed)
+const readItemEmbed = (url: URL | undefined): EmbedResolverResult | undefined => {
+  const { head: identifier, file } = readSegmentParts(url)
 
   if (!identifier) {
     return
   }
 
   // The parameters that say what plays are carried over; the rest is dropped.
-  const query = composeQuery(pickQueryParams(parsed?.search ?? '', archiveEmbedParams))
+  const query = composeQuery(pickQueryParams(url?.search ?? '', archiveEmbedParams))
 
   return composeEmbedResult(identifier, query, file)
 }
 
-export const archiveResolveEmbed: ResolveEmbed = (url, element) => {
+export const archiveResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const embed = readItemEmbed(url)
 
   if (!embed) {
@@ -147,7 +151,9 @@ export const archiveAudioEmbedResolver = createMarkupEmbedResolver('audio', (ele
       continue
     }
 
-    const embed = isHostOrSubdomainOf(src, archiveHosts) ? readItemEmbed(src) : undefined
+    const embed = isHostOrSubdomainOf(src, archiveHosts)
+      ? readItemEmbed(parseArchiveUrl(src))
+      : undefined
 
     if (!embed) {
       return
@@ -222,27 +228,21 @@ const readItemPlayer = (element: Element | undefined): EmbedResolverResult | und
   return { ...composeEmbedResult(identifier, '', file), height: audioPlayerHeight }
 }
 
-const archiveFlashResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
+const archiveFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  if (xspfPlayerPathRegex.test(url.pathname)) {
+    return readXspfPlayer(url)
   }
 
-  if (xspfPlayerPathRegex.test(parsed.pathname)) {
-    return readXspfPlayer(parsed)
-  }
-
-  if (itemPlayerPathRegex.test(parsed.pathname)) {
+  if (itemPlayerPathRegex.test(url.pathname)) {
     return readItemPlayer(element)
   }
 
-  if (!flowPlayerPathRegex.test(parsed.pathname)) {
+  if (!flowPlayerPathRegex.test(url.pathname)) {
     return
   }
 
   // The config arrives as the `flashVars` attribute or, on the older player, as a `config` query.
-  const config = flashVars(element) ?? getQueryParam(parsed.searchParams, 'config')
+  const config = flashVars(element) ?? getQueryParam(url.searchParams, 'config')
   const identifier = config?.match(downloadIdentifierRegex)?.[1]
 
   if (!identifier || !config) {

@@ -20,7 +20,7 @@ describe('pollmakerResolveEmbed', () => {
         height: 372,
       }
 
-      expect(pollmakerResolveEmbed(value)).toEqual(expected)
+      expect(pollmakerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the poll frame from the framed poll page', () => {
@@ -33,7 +33,7 @@ describe('pollmakerResolveEmbed', () => {
         height: 372,
       }
 
-      expect(pollmakerResolveEmbed(value)).toEqual(expected)
+      expect(pollmakerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the poll frame from the results route on the www host', () => {
@@ -46,7 +46,7 @@ describe('pollmakerResolveEmbed', () => {
         height: 372,
       }
 
-      expect(pollmakerResolveEmbed(value)).toEqual(expected)
+      expect(pollmakerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the route word in any case and keep the id as written', () => {
@@ -59,7 +59,7 @@ describe('pollmakerResolveEmbed', () => {
         height: 372,
       }
 
-      expect(pollmakerResolveEmbed(value)).toEqual(expected)
+      expect(pollmakerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the query', () => {
@@ -72,7 +72,7 @@ describe('pollmakerResolveEmbed', () => {
         height: 372,
       }
 
-      expect(pollmakerResolveEmbed(value)).toEqual(expected)
+      expect(pollmakerResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -80,37 +80,37 @@ describe('pollmakerResolveEmbed', () => {
     it('should ignore a foreign host carrying the same path', () => {
       const value = 'https://evil.test/frame4654868x583844A9-146'
 
-      expect(pollmakerResolveEmbed(value)).toBeUndefined()
+      expect(pollmakerResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the loader host', () => {
       const value = 'https://scripts.poll-maker.com/frame4654868x583844A9-146'
 
-      expect(pollmakerResolveEmbed(value)).toBeUndefined()
+      expect(pollmakerResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a site page that starts with a route word', () => {
       const value = 'https://poll-maker.com/polls'
 
-      expect(pollmakerResolveEmbed(value)).toBeUndefined()
+      expect(pollmakerResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an unknown route word', () => {
       const value = 'https://poll-maker.com/survey4654868x583844A9-146'
 
-      expect(pollmakerResolveEmbed(value)).toBeUndefined()
+      expect(pollmakerResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the route under a prefix', () => {
       const value = 'https://poll-maker.com/x/frame4654868x583844A9-146'
 
-      expect(pollmakerResolveEmbed(value)).toBeUndefined()
+      expect(pollmakerResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the route with a trailing segment', () => {
       const value = 'https://poll-maker.com/frame4654868x583844A9-146/extra'
 
-      expect(pollmakerResolveEmbed(value)).toBeUndefined()
+      expect(pollmakerResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

@@ -1,7 +1,7 @@
-import { getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The regional `video.corrieredelmezzogiorno.corriere.it` keeps its own videos, which
@@ -42,7 +42,7 @@ const readFeedVideo = (value: string | undefined): EmbedResolverResult | undefin
 // Corriere della Sera's player, `video.corriere.it/video-embed/{id}`, and two retired players
 // that render nothing: the Flash widget `static2.video.corriereobjects.it/widget/swf/`, with the
 // feed in the `videoUrl` flashvar, and `video.corriere.it/widget/players/`, in the `videoId` query.
-export const corriereResolveEmbed: ResolveEmbed = (url, element) => {
+export const corriereResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const flash = parseUrlOnHosts(url, corriereFlashHosts)
 
   if (flash) {
@@ -55,13 +55,7 @@ export const corriereResolveEmbed: ResolveEmbed = (url, element) => {
     return readFeedVideo(flashVar(element, 'videoUrl'))
   }
 
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
-  const segments = getPathSegments(parsed)
+  const segments = getPathSegments(url)
 
   if (segments.length === 3) {
     const [widget, players] = segments
@@ -70,7 +64,7 @@ export const corriereResolveEmbed: ResolveEmbed = (url, element) => {
       return
     }
 
-    return readFeedVideo(getQueryParam(parsed.searchParams, 'videoId'))
+    return readFeedVideo(getQueryParam(url.searchParams, 'videoId'))
   }
 
   if (segments.length === 2) {

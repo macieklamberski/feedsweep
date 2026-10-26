@@ -1,5 +1,5 @@
-import { composeQuery, getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { composeQuery, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { digitsRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -11,18 +11,15 @@ const exerciseParams = ['app', 'v', 'id']
 // LearningApps's exercise player, `learningapps.org/watch?app={id}`, and its `show` route and `v`
 // and `id` spellings. A numeric id also names its page and its icon. An alphanumeric one keys
 // both by an internal number the url does not carry.
-export const learningappsResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url)
-  const [route] = parsed ? getPathSegments(parsed) : []
+export const learningappsResolveEmbed: ResolveUrlEmbed = (url) => {
+  const [route] = getPathSegments(url)
 
-  if (!parsed || !route || !isAnyOf(route, exerciseRoutes)) {
+  if (!route || !isAnyOf(route, exerciseRoutes)) {
     return
   }
 
-  const param = exerciseParams.find(
-    (name) => getQueryParam(parsed.searchParams, name) !== undefined,
-  )
-  const appId = param ? getQueryParam(parsed.searchParams, param) : undefined
+  const param = exerciseParams.find((name) => getQueryParam(url.searchParams, name) !== undefined)
+  const appId = param ? getQueryParam(url.searchParams, param) : undefined
 
   if (!appId) {
     return

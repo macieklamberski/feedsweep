@@ -58,7 +58,7 @@ const extractBlueskyPost = (uri: string): BlueskyPost | undefined => {
   return { authority: encodePathSegment(match[1]), rkey: encodePathSegment(match[3]) }
 }
 
-const extractBlueskyPostFromUrl = (link: string): BlueskyPost | undefined => {
+const extractBlueskyPostFromUrl = (link: string | URL): BlueskyPost | undefined => {
   const parsed = parseUrlOnHosts(link, blueskyHosts)
 
   if (!parsed) {

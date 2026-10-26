@@ -7,7 +7,7 @@ import { radioradicaleEmbedResolver, radioradicaleResolveEmbed } from './radiora
 describe('radioradicaleResolveEmbed', () => {
   describe('happy paths', () => {
     it('should mint the player the embed snippet writes and its page', () => {
-      const value = '//www.radioradicale.it/scheda/542812/iframe'
+      const value = 'https://www.radioradicale.it/scheda/542812/iframe'
       const expected: EmbedResolverResult = {
         provider: 'radioradicale',
         id: '542812',
@@ -16,7 +16,7 @@ describe('radioradicaleResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(radioradicaleResolveEmbed(value)).toEqual(expected)
+      expect(radioradicaleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint the canonical host from the apex', () => {
@@ -29,7 +29,7 @@ describe('radioradicaleResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(radioradicaleResolveEmbed(value)).toEqual(expected)
+      expect(radioradicaleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should keep every playback parameter the player reads', () => {
@@ -42,7 +42,7 @@ describe('radioradicaleResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(radioradicaleResolveEmbed(value)).toEqual(expected)
+      expect(radioradicaleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the autoplay, branding and tracking parameters', () => {
@@ -56,7 +56,7 @@ describe('radioradicaleResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(radioradicaleResolveEmbed(value)).toEqual(expected)
+      expect(radioradicaleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the date and hour the player does not read', () => {
@@ -69,7 +69,7 @@ describe('radioradicaleResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(radioradicaleResolveEmbed(value)).toEqual(expected)
+      expect(radioradicaleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should rebuild the Flash player onto the whole recording', () => {
@@ -83,7 +83,7 @@ describe('radioradicaleResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(radioradicaleResolveEmbed(value)).toEqual(expected)
+      expect(radioradicaleResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -91,59 +91,59 @@ describe('radioradicaleResolveEmbed', () => {
     it('should return undefined for the route below another segment', () => {
       const value = 'https://www.radioradicale.it/x/scheda/542812/iframe'
 
-      expect(radioradicaleResolveEmbed(value)).toBeUndefined()
+      expect(radioradicaleResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a route word the player does not serve', () => {
       const value = 'https://www.radioradicale.it/video/542812/iframe'
 
-      expect(radioradicaleResolveEmbed(value)).toBeUndefined()
+      expect(radioradicaleResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the page', () => {
       const value = 'https://www.radioradicale.it/scheda/542812'
 
-      expect(radioradicaleResolveEmbed(value)).toBeUndefined()
+      expect(radioradicaleResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a segment after the player', () => {
       const value = 'https://www.radioradicale.it/scheda/542812/iframe/extra'
 
-      expect(radioradicaleResolveEmbed(value)).toBeUndefined()
+      expect(radioradicaleResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for the Flash player configuration', () => {
       const value = 'http://www.radioradicale.it/scheda/embedcfg/401265/2838705'
 
-      expect(radioradicaleResolveEmbed(value)).toBeUndefined()
+      expect(radioradicaleResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a Flash configuration on a foreign host', () => {
       const value =
         'http://www.radioradicale.it/swf/fp/flowplayer-3.2.7.swf?config=https://evil.test/scheda/embedcfg/401265/2838705'
 
-      expect(radioradicaleResolveEmbed(value)).toBeUndefined()
+      expect(radioradicaleResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a Flash configuration below another segment', () => {
       const value =
         'http://www.radioradicale.it/swf/fp/flowplayer-3.2.7.swf?config=http://www.radioradicale.it/x/embedcfg/401265/2838705'
 
-      expect(radioradicaleResolveEmbed(value)).toBeUndefined()
+      expect(radioradicaleResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a Flash configuration route word the server does not serve', () => {
       const value =
         'http://www.radioradicale.it/swf/fp/flowplayer-3.2.7.swf?config=http://www.radioradicale.it/scheda/playlist/401265/2838705'
 
-      expect(radioradicaleResolveEmbed(value)).toBeUndefined()
+      expect(radioradicaleResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should return undefined for a Flash configuration with a segment after the clip', () => {
       const value =
         'http://www.radioradicale.it/swf/fp/flowplayer-3.2.7.swf?config=http://www.radioradicale.it/scheda/embedcfg/401265/2838705/extra'
 
-      expect(radioradicaleResolveEmbed(value)).toBeUndefined()
+      expect(radioradicaleResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 
@@ -158,7 +158,7 @@ describe('radioradicaleResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(radioradicaleResolveEmbed(value)).toEqual(expected)
+      expect(radioradicaleResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass an id that is not a number as written', () => {
@@ -171,7 +171,7 @@ describe('radioradicaleResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(radioradicaleResolveEmbed(value)).toEqual(expected)
+      expect(radioradicaleResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

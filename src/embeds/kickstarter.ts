@@ -1,5 +1,5 @@
 import { encodePathSegment, getAnyOf, getPathSegments, isAnyOf } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -10,7 +10,7 @@ const cardHeight = 420
 
 // Kickstarter's project widgets, `/projects/{creator}/{slug}/widget/card.html` for the project
 // card and `/widget/video.html` for the pitch video.
-export const kickstarterResolveEmbed: ResolveEmbed = (url, element) => {
+export const kickstarterResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const [route, creator, slug, widgetRoute, kind, ...rest] = getPathSegments(url)
   const widget = getAnyOf(kind, widgets)
 

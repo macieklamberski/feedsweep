@@ -1,5 +1,5 @@
-import { composeQuery, getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import type { FieldCleaner, ResolveEmbed } from '../types.js'
+import { composeQuery, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import type { FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 
 const provider = 'blogger'
@@ -8,14 +8,12 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const bloggerHosts = ['blogger.com']
 
-export const extractBloggerToken = (link: string): string | undefined => {
-  const parsed = parseUrl(link)
-
-  if (!parsed || !isAnyOf(getPathSegments(parsed)[0], 'video.g')) {
+export const extractBloggerToken = (url: URL): string | undefined => {
+  if (!isAnyOf(getPathSegments(url)[0], 'video.g')) {
     return
   }
 
-  const token = getQueryParam(parsed.searchParams, 'token')
+  const token = getQueryParam(url.searchParams, 'token')
 
   if (!token) {
     return
@@ -27,7 +25,7 @@ export const extractBloggerToken = (link: string): string | undefined => {
 // Blogger's own hosted video: an iframe on blogger.com/video.g with no poster and no page to open.
 // The poster is a css background on `i9.ytimg.com/vi_blogger/{internalId}/1.jpg`, and that id is
 // in neither the token nor the feed. A live, a deleted and an invented token all answer 200.
-export const bloggerResolveEmbed: ResolveEmbed = (url, element) => {
+export const bloggerResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const token = extractBloggerToken(url)
 
   if (!token) {

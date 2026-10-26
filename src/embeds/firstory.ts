@@ -1,7 +1,5 @@
-import { parseUrl } from 'trousse'
-import type { FieldCleaner, ResolveEmbed } from '../types.js'
+import type { FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'firstory'
@@ -15,8 +13,8 @@ const storyPathRegex = /^\/embed\/story\/([^/]+)\/?$/i
 const playerHeight = 182
 
 // A Firstory episode player.
-export const firstoryResolveEmbed: ResolveEmbed = (url, element) => {
-  const pathname = parseUrl(url, placeholderBaseUrl)?.pathname ?? ''
+export const firstoryResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const pathname = url.pathname
   const id = pathname.match(storyPathRegex)?.[1]
 
   if (!id) {

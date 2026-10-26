@@ -1,7 +1,7 @@
-import { composeQuery, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import { composeQuery } from 'trousse'
+import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'mediaccc'
@@ -22,18 +22,17 @@ const readStartFragment = (parsed: URL): string => {
 
 // The player of a media.ccc.de talk, the iframe its oEmbed answer writes. The talk page refuses
 // framing.
-export const mediacccResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const slug = parsed?.pathname.match(playerPathRegex)?.[1]
+export const mediacccResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const slug = url.pathname.match(playerPathRegex)?.[1]
 
-  if (!parsed || !slug) {
+  if (!slug) {
     return
   }
 
   return {
     provider,
     id: slug,
-    src: `https://media.ccc.de/v/${slug}/oembed${readStartFragment(parsed)}`,
+    src: `https://media.ccc.de/v/${slug}/oembed${readStartFragment(url)}`,
     url: `https://media.ccc.de/v/${slug}`,
     ratio: '16/9',
     title: attr(element, 'title'),

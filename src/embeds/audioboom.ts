@@ -1,7 +1,12 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
+import { getPathSegments, isAnyOf } from 'trousse'
+import type {
+  EmbedRenderHint,
+  EmbedResolverResult,
+  FieldCleaner,
+  ResolveUrlEmbed,
+} from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'audioboom'
@@ -29,7 +34,7 @@ const postIdMarkers = ['posts', 'boos']
 // accepts.
 const playerHeight = 300
 
-export const extractAudioboomPost = (link: string): string | undefined => {
+export const extractAudioboomPost = (link: URL): string | undefined => {
   const segments = getPathSegments(link)
   const marker = segments.findIndex((segment) => isAnyOf(segment, postIdMarkers))
 
@@ -48,7 +53,7 @@ const composeEmbed = (postId: string): EmbedResolverResult => {
 
 // No metadata offline: Audioboom's oEmbed accepts only `audioboom.com` page urls, not the
 // `embeds.` player url the markup carries, so a title needs a lookup the enricher would do.
-export const audioboomResolveEmbed: ResolveEmbed = (url, element) => {
+export const audioboomResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const postId = extractAudioboomPost(url)
 
   if (!postId) {
@@ -74,21 +79,15 @@ export const audioboomWidgetEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     const parsed = parseUrlOnHosts(attr(element, 'data-boourl'), audioboomHosts)
 
-    return parsed && audioboomResolveEmbed(parsed.href)
+    return parsed && audioboomResolveEmbed(parsed)
   },
 )
 
 // Audioboo's Flash player, which no browser runs. It names the post only in its flashvars, as the
 // page in `mp3LinkURL` or the audio file in `mp3`.
-const audioboomFlashResolveEmbed: ResolveEmbed = (url, element) => {
-  const player = parseUrl(url, placeholderBaseUrl)
-
-  if (!player) {
-    return
-  }
-
+const audioboomFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
   // Another bucket, path-style or on its own subdomain of S3's host, is not Audioboo's.
-  const bucket = player.hostname === bucketHost ? getPathSegments(player)[0] : player.hostname
+  const bucket = url.hostname === bucketHost ? getPathSegments(url)[0] : url.hostname
 
   if (!bucket || !flashHosts.includes(bucket)) {
     return
@@ -101,7 +100,7 @@ const audioboomFlashResolveEmbed: ResolveEmbed = (url, element) => {
     return
   }
 
-  const postId = extractAudioboomPost(parsed.href)
+  const postId = extractAudioboomPost(parsed)
 
   if (!postId) {
     return

@@ -4,12 +4,11 @@ import {
   getQueryParam,
   isHostOrSubdomainOf,
   type Nullish,
-  parseUrl,
   toMap,
 } from 'trousse'
-import type { EmbedResolverResult, FieldCleaner, ResolveEmbed } from '../types.js'
+import type { EmbedResolverResult, FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr, jsonAttr } from '../utils/dom.js'
-import { pickUrlParams, placeholderBaseUrl } from '../utils/urls.js'
+import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const musicProvider = 'applemusic'
@@ -40,14 +39,8 @@ const appleHeights = toMap({
   'music-video': undefined,
 })
 
-export const appleResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
-  const segments = getPathSegments(parsed)
+export const appleResolveEmbed: ResolveUrlEmbed = (url) => {
+  const segments = getPathSegments(url)
   // Any first segment that is not a kind is the storefront.
   const hasStorefront = !appleHeights.has(segments[0]?.toLowerCase() ?? '')
   const [rawKind, ...rest] = hasStorefront ? segments.slice(1) : segments
@@ -63,17 +56,17 @@ export const appleResolveEmbed: ResolveEmbed = (url) => {
     return
   }
 
-  const isPodcast = isHostOrSubdomainOf(parsed, applePodcastsHosts)
+  const isPodcast = isHostOrSubdomainOf(url, applePodcastsHosts)
   const host = isPodcast ? 'podcasts.apple.com' : 'music.apple.com'
-  const trackId = getQueryParam(parsed.searchParams, 'i')
+  const trackId = getQueryParam(url.searchParams, 'i')
   const id = trackId ? trackId : pathId.replace(podcastIdPrefixRegex, '')
   const query = trackId ? pickUrlParams(url, ['i']) : ''
 
   return {
     provider: isPodcast ? podcastsProvider : musicProvider,
     id: `${kind}/${id}`,
-    src: `https://embed.${host}${parsed.pathname}${query}`,
-    url: `https://${host}${parsed.pathname}${query}`,
+    src: `https://embed.${host}${url.pathname}${query}`,
+    url: `https://${host}${url.pathname}${query}`,
     height: appleHeights.get(trackId ? 'song' : kind),
   }
 }
@@ -150,8 +143,7 @@ const toolsPathRegex = /^\/embed\/v1\/([a-z]+)\/([^/]+)$/i
 // The tool wrote the storefront as `country`. A missing `country` drops the segment, and Apple
 // serves a storefront-less url from the US store.
 export const appleToolsEmbedResolver = createUrlEmbedResolver(appleToolsHosts, (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-  const match = parsed?.pathname.match(toolsPathRegex)
+  const match = url.pathname.match(toolsPathRegex)
 
   if (!match) {
     return
@@ -159,11 +151,11 @@ export const appleToolsEmbedResolver = createUrlEmbedResolver(appleToolsHosts, (
 
   const [, kind, pathId] = match
 
-  const country = getQueryParam(parsed?.searchParams, 'country')?.toLowerCase()
+  const country = getQueryParam(url.searchParams, 'country')?.toLowerCase()
   const storefront = country ? encodePathSegment(country) : undefined
   const modernUrl = `https://music.apple.com/${storefront ? `${storefront}/` : ''}${kind}/${pathId}`
 
-  return appleResolveEmbed(modernUrl)
+  return appleResolveEmbed(new URL(modernUrl))
 })
 
 export const appleFieldCleaners: Array<FieldCleaner> = [

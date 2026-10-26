@@ -20,7 +20,7 @@ describe('pastebinResolveEmbed', () => {
         height: 150,
       }
 
-      expect(pastebinResolveEmbed(value)).toEqual(expected)
+      expect(pastebinResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the dark theme the snippet chose', () => {
@@ -33,7 +33,7 @@ describe('pastebinResolveEmbed', () => {
         height: 150,
       }
 
-      expect(pastebinResolveEmbed(value)).toEqual(expected)
+      expect(pastebinResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should move the retired query form onto the route that serves', () => {
@@ -46,7 +46,7 @@ describe('pastebinResolveEmbed', () => {
         height: 150,
       }
 
-      expect(pastebinResolveEmbed(value)).toEqual(expected)
+      expect(pastebinResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should mint https for an http carrier, which the host redirects there', () => {
@@ -59,7 +59,7 @@ describe('pastebinResolveEmbed', () => {
         height: 150,
       }
 
-      expect(pastebinResolveEmbed(value)).toEqual(expected)
+      expect(pastebinResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should read the script route onto the same frame', () => {
@@ -72,7 +72,7 @@ describe('pastebinResolveEmbed', () => {
         height: 150,
       }
 
-      expect(pastebinResolveEmbed(value)).toEqual(expected)
+      expect(pastebinResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -80,19 +80,19 @@ describe('pastebinResolveEmbed', () => {
     it('should ignore the paste page itself, which is not an embed', () => {
       const value = 'https://pastebin.com/AbCd1234'
 
-      expect(pastebinResolveEmbed(value)).toBeUndefined()
+      expect(pastebinResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a route that is not one of the embed four', () => {
       const value = 'https://pastebin.com/raw/AbCd1234'
 
-      expect(pastebinResolveEmbed(value)).toBeUndefined()
+      expect(pastebinResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an embed route naming no paste', () => {
       const value = 'https://pastebin.com/embed_iframe.php'
 
-      expect(pastebinResolveEmbed(value)).toBeUndefined()
+      expect(pastebinResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed paste id as written, even if the player answers an error', () => {
@@ -105,13 +105,13 @@ describe('pastebinResolveEmbed', () => {
         height: 150,
       }
 
-      expect(pastebinResolveEmbed(value)).toEqual(expected)
+      expect(pastebinResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should ignore a deeper path under the embed route', () => {
       const value = 'https://pastebin.com/embed_iframe/AbCd1234/raw'
 
-      expect(pastebinResolveEmbed(value)).toBeUndefined()
+      expect(pastebinResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

@@ -16,7 +16,7 @@ describe('zenoResolveEmbed', () => {
         height: 250,
       }
 
-      expect(zenoResolveEmbed(value)).toEqual(expected)
+      expect(zenoResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should fold the www host onto the one the widget dialog writes', () => {
@@ -29,7 +29,7 @@ describe('zenoResolveEmbed', () => {
         height: 250,
       }
 
-      expect(zenoResolveEmbed(value)).toEqual(expected)
+      expect(zenoResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass the slug on as written, case included', () => {
@@ -42,7 +42,7 @@ describe('zenoResolveEmbed', () => {
         height: 250,
       }
 
-      expect(zenoResolveEmbed(value)).toEqual(expected)
+      expect(zenoResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a segment after the slug, which the widget ignores', () => {
@@ -55,7 +55,7 @@ describe('zenoResolveEmbed', () => {
         height: 250,
       }
 
-      expect(zenoResolveEmbed(value)).toEqual(expected)
+      expect(zenoResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -63,13 +63,13 @@ describe('zenoResolveEmbed', () => {
     it('should ignore the station page', () => {
       const value = 'https://zeno.fm/radio/halshack/'
 
-      expect(zenoResolveEmbed(value)).toBeUndefined()
+      expect(zenoResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the player route with no slug', () => {
       const value = 'https://zeno.fm/player/'
 
-      expect(zenoResolveEmbed(value)).toBeUndefined()
+      expect(zenoResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

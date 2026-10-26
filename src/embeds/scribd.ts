@@ -5,11 +5,10 @@ import {
   getPathSegments,
   getQueryParam,
   isAnyOf,
-  parseUrl,
 } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVar, flashVars } from '../utils/dom.js'
-import { pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The embed routes are the site's own. `scribdassets.com` served the Flash player and serves the
@@ -60,33 +59,25 @@ const readDocumentId = (parsed: URL): string | undefined => {
 // The modern player, `scribd.com/embeds/{id}/content`. `/doc/{id}` is the pre-2018 spelling of
 // the same document and its embed lived at `/embeds/{id}` with no `/content` suffix. Both
 // address the id space this composes from.
-export const scribdResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
-  const document = readDocumentId(parsed)
+export const scribdResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const document = readDocumentId(url)
 
   if (!document) {
     return
   }
 
-  return { ...composeEmbed(document, parsed.search), title: attr(element, 'title') }
+  return { ...composeEmbed(document, url.search), title: attr(element, 'title') }
 }
 
 // Scribd's player iframe, /embeds/{id}/content.
 export const scribdIframeEmbedResolver = createUrlEmbedResolver(scribdHosts, scribdResolveEmbed)
 
-export const scribdFlashResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed || !flashPlayerPathRegex.test(parsed.pathname)) {
+export const scribdFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  if (!flashPlayerPathRegex.test(url.pathname)) {
     return
   }
 
-  const queryDocument = getQueryParam(parsed.searchParams, 'document_id')
+  const queryDocument = getQueryParam(url.searchParams, 'document_id')
   const document = queryDocument ?? flashVar(element, 'document_id')
 
   if (!document) {
@@ -94,7 +85,7 @@ export const scribdFlashResolveEmbed: ResolveEmbed = (url, element) => {
   }
 
   // The access key sits beside the document id, in the swf query or in the flashvars.
-  return composeEmbed(document, queryDocument ? parsed.search : flashVars(element))
+  return composeEmbed(document, queryDocument ? url.search : flashVars(element))
 }
 
 // Scribd's Flash viewer, scribdviewer.swf, dead since 2020 and naming its document in document_id.

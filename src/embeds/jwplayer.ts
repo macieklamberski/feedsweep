@@ -1,5 +1,5 @@
 import { encodePathSegment, getPathSegments, isAnyOf, isPlainObject } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, findConfigScript } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -15,7 +15,7 @@ const libraryHosts = ['jwplatform.com', 'jwpsrv.com']
 // same id, 404 for a fabricated one. `cdn.jwplayer.com/videos/{id}-1280.mp4` is an enclosure.
 const playerRoutes = ['players', 'previews']
 
-export const extractJwplayerId = (link: string): string | undefined => {
+export const extractJwplayerId = (link: URL): string | undefined => {
   const [route, lastSegment] = getPathSegments(link).slice(-2)
 
   if (!lastSegment || !isAnyOf(route ?? '', playerRoutes)) {
@@ -54,7 +54,7 @@ const composePlayerEmbed = (mediaId: string, playerId?: string): EmbedResolverRe
   return { ...result, src: `https://cdn.jwplayer.com/players/${mediaId}-${playerId}.html` }
 }
 
-export const jwplayerResolveEmbed: ResolveEmbed = (url, element) => {
+export const jwplayerResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const mediaId = extractJwplayerId(url)
 
   if (!mediaId) {
@@ -79,13 +79,13 @@ export const jwplayerIframeEmbedResolver = createUrlEmbedResolver(
 export const jwplayerScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="jwplayer.com/players/" i], script[src*="jwplatform.com/players/" i]',
   (element) => {
-    const src = attr(element, 'src') ?? ''
+    const url = parseUrlOnHosts(attr(element, 'src'), jwplayerHosts)
 
-    if (!parseUrlOnHosts(src, jwplayerHosts)) {
+    if (!url) {
       return
     }
 
-    return jwplayerResolveEmbed(src)
+    return jwplayerResolveEmbed(url)
   },
 )
 

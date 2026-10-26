@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf, isHostOf } from 'trousse'
-import type { EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, isElement, isWhitespaceText, text } from '../utils/dom.js'
 import { lettersRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -50,7 +50,7 @@ const readHash = (segments: Array<string>): string | undefined => {
   }
 }
 
-const yumpuResolveEmbed: ResolveEmbed = (url, element) => {
+const yumpuResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, yumpuHosts, isHostOf)
 
   if (!parsed) {

@@ -1,5 +1,5 @@
-import { encodePathSegment, parseUrl } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import { encodePathSegment } from 'trousse'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -66,36 +66,30 @@ const readFlashVideoId = (element: Element | undefined, name: string): string | 
 // The player frame in its 3Cat and CCMA spellings, the CCMA audio frame, and CCMA's two Flash
 // players, both dead: the EVP generation carrying `videoid` in its flashvars, and the older SVP2
 // carrying `VIDEO_ID`.
-export const ccmaResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url)
-
-  if (!parsed) {
-    return
-  }
-
-  const framedVideoId = parsed.pathname.match(embedPathRegex)?.[1]
+export const ccmaResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const framedVideoId = url.pathname.match(embedPathRegex)?.[1]
 
   if (framedVideoId) {
     return composeResult(framedVideoId)
   }
 
-  const legacyFramed = parsed.pathname.match(legacyEmbedPathRegex)
+  const legacyFramed = url.pathname.match(legacyEmbedPathRegex)
 
   if (legacyFramed) {
     return composeResult(legacyFramed[2], !!legacyFramed[1])
   }
 
-  const audioId = parsed.pathname.match(audioEmbedPathRegex)?.[1]
+  const audioId = url.pathname.match(audioEmbedPathRegex)?.[1]
 
   if (audioId) {
     return composeAudioResult(audioId)
   }
 
-  if (evpPlayerPathRegex.test(parsed.pathname)) {
+  if (evpPlayerPathRegex.test(url.pathname)) {
     return composeResult(readFlashVideoId(element, 'videoid'))
   }
 
-  if (svpPlayerPathRegex.test(parsed.pathname)) {
+  if (svpPlayerPathRegex.test(url.pathname)) {
     const objectId = attr(element?.closest('object'), 'id')
 
     return composeResult(

@@ -4,13 +4,12 @@ import {
   getQueryParam,
   isPlainObject,
   isPresent,
-  parseUrl,
   toMap,
   trimObject,
 } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { readPixels } from '../utils/hints.js'
-import { pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { pickQueryParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'vk'
@@ -53,25 +52,19 @@ const widgetFrameKey = 'feeds'
 
 // VK's player, `video_ext.php?oid={ownerId}&id={videoId}`, the clip player beside it, and a
 // video's page.
-export const vkResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
-  const page = parsed.pathname.match(videoPageRegex)?.groups
-  const player = players.get(page ? '/video_ext.php' : parsed.pathname.toLowerCase())
-  const ownerId = page?.owner ?? getQueryParam(parsed.searchParams, 'oid') ?? ''
-  const videoId = page?.video ?? getQueryParam(parsed.searchParams, 'id') ?? ''
+export const vkResolveEmbed: ResolveUrlEmbed = (url) => {
+  const page = url.pathname.match(videoPageRegex)?.groups
+  const player = players.get(page ? '/video_ext.php' : url.pathname.toLowerCase())
+  const ownerId = page?.owner ?? getQueryParam(url.searchParams, 'oid') ?? ''
+  const videoId = page?.video ?? getQueryParam(url.searchParams, 'id') ?? ''
 
   if (!player || !ownerId || !videoId) {
     return
   }
 
   const params = page
-    ? { oid: ownerId, id: videoId, ...pickQueryParams(parsed.search, ['t']) }
-    : pickQueryParams(parsed.search, playerParams)
+    ? { oid: ownerId, id: videoId, ...pickQueryParams(url.search, ['t']) }
+    : pickQueryParams(url.search, playerParams)
   const id = `${ownerId}_${videoId}`
   // See: https://dev.vk.com/ru/widgets/video, which writes the player on vk.ru.
   const src = `https://vk.ru${player.path}${composeQuery(params)}`

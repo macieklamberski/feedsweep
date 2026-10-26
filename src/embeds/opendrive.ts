@@ -1,6 +1,5 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { getPathSegments, isAnyOf } from 'trousse'
+import type { ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'opendrive'
@@ -15,14 +14,8 @@ const playerRoutes = ['player', 'listen']
 const playerHeight = 25
 
 // An OpenDrive file player, framed as `/player/{fileId}`.
-export const opendriveResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
-  const [route, fileId, ...rest] = getPathSegments(parsed)
+export const opendriveResolveEmbed: ResolveUrlEmbed = (url) => {
+  const [route, fileId, ...rest] = getPathSegments(url)
 
   if (!fileId || rest.length > 0 || !isAnyOf(route, playerRoutes)) {
     return

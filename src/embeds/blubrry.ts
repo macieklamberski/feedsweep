@@ -6,12 +6,12 @@ import {
   isAnyOf,
   parseUrl,
 } from 'trousse'
-import type { EmbedRenderHint, FieldCleaner, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 
 const provider = 'blubrry'
 
-import { filterUrlQuery, placeholderBaseUrl } from '../utils/urls.js'
+import { filterUrlQuery } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
@@ -49,14 +49,8 @@ export type BlubrryPlayer =
 // Two forms: `/id/{episodeId}/` names the episode, while `/?media_url={mp3}` names the file
 // directly. The media url is not promoted to a native <audio>: a provider's player iframe stays
 // an embed placeholder, and the raw file is only input for the enrichment hook.
-export const extractBlubrryEmbed = (link: string): BlubrryPlayer | undefined => {
-  const parsed = parseUrl(link, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
-  const segments = getPathSegments(parsed)
+export const extractBlubrryEmbed = (url: URL): BlubrryPlayer | undefined => {
+  const segments = getPathSegments(url)
 
   if (isAnyOf(segments[0], 'id') && segments[1]) {
     return { kind: 'episode', id: segments[1] }
@@ -66,7 +60,7 @@ export const extractBlubrryEmbed = (link: string): BlubrryPlayer | undefined => 
 
   if (segments.length === 2 && keyword && route && isAnyOf(route, showRoutes)) {
     const position = isAnyOf(route, 'playlist')
-      ? filterUrlQuery(parsed, (name) => isAnyOf(name, playlistPositionParams))
+      ? filterUrlQuery(url, (name) => isAnyOf(name, playlistPositionParams))
       : ''
 
     return { kind: 'show', id: keyword, route, position }
@@ -74,13 +68,13 @@ export const extractBlubrryEmbed = (link: string): BlubrryPlayer | undefined => 
 
   // A `podcast_id` beside a media url can name another episode: one feed writes the same id
   // on ten players with ten different mp3s, so the media url wins.
-  const mediaUrl = getQueryParam(parsed.searchParams, 'media_url')
+  const mediaUrl = getQueryParam(url.searchParams, 'media_url')
 
   if (mediaUrl) {
     return { kind: 'media', id: mediaUrl }
   }
 
-  const podcastId = getQueryParam(parsed.searchParams, 'podcast_id')
+  const podcastId = getQueryParam(url.searchParams, 'podcast_id')
 
   if (!podcastId) {
     return
@@ -91,7 +85,7 @@ export const extractBlubrryEmbed = (link: string): BlubrryPlayer | undefined => 
 
 // Blubrry's player iframe, by episode id, media url or show. The player answers an undocumented
 // oEmbed at `?target=oembed&oembed=json` whose height the measurement does not follow.
-export const blubrryResolveEmbed: ResolveEmbed = (url, element) => {
+export const blubrryResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const player = extractBlubrryEmbed(url)
 
   if (!player) {

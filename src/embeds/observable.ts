@@ -1,5 +1,5 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { getPathSegments, isAnyOf } from 'trousse'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 import { readIframeResizeHeight } from '../utils/hints.js'
 import { hexRegex } from '../utils/urls.js'
@@ -13,17 +13,16 @@ const versionSuffixRegex = /@[^@/]*$/
 
 // Observable's notebook frame, observablehq.com/embed/@{user}/{notebook}[@{version}]?cells={names},
 // or embed/{16 hex}[@{version}] for a notebook addressed by its id.
-const observableResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url)
+const observableResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const segments = getPathSegments(url)
 
-  if (!parsed || !isAnyOf(segments[0], 'embed')) {
+  if (!isAnyOf(segments[0], 'embed')) {
     return
   }
 
   // The query names which cells the frame renders, in `cells` or a repeated `cell`, and the frame
   // hands the rest to the notebook's own code, so all of it is kept.
-  const src = parsed.href
+  const src = url.href
 
   // `@{version}` pins one revision of a notebook rather than naming another one, and the document
   // endpoint takes the notebook alone, so the suffix stays out of the id.

@@ -20,7 +20,7 @@ describe('amebaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(amebaResolveEmbed(value)).toEqual(expected)
+      expect(amebaResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -28,7 +28,7 @@ describe('amebaResolveEmbed', () => {
     it('should ignore a player naming no video', () => {
       const value = 'https://static.blog-video.jp/'
 
-      expect(amebaResolveEmbed(value)).toBeUndefined()
+      expect(amebaResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should use a malformed video id as written, even if the player answers an error', () => {
@@ -40,7 +40,7 @@ describe('amebaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(amebaResolveEmbed(value)).toEqual(expected)
+      expect(amebaResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -54,7 +54,7 @@ describe('amebaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(amebaResolveEmbed(value)).toEqual(expected)
+      expect(amebaResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop a tracker from the carrier query', () => {
@@ -66,7 +66,7 @@ describe('amebaResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(amebaResolveEmbed(value)).toEqual(expected)
+      expect(amebaResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 })

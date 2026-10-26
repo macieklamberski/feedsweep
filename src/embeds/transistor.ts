@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { isFileName } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -22,7 +22,7 @@ const showModes = ['latest', 'playlist'] as const
 // `mode` is the show mode segment as the feed wrote it, for a show player only.
 type Subject = { kind: keyof typeof playerHeights; id: string; mode?: string }
 
-export const extractTransistorEmbed = (link: string): Subject | undefined => {
+export const extractTransistorEmbed = (link: URL): Subject | undefined => {
   const segments = getPathSegments(link)
   const kind = segments[0]
   const subject = segments[1]
@@ -47,7 +47,7 @@ export const extractTransistorEmbed = (link: string): Subject | undefined => {
   return { kind: 'e', id: subject }
 }
 
-export const transistorResolveEmbed: ResolveEmbed = (url) => {
+export const transistorResolveEmbed: ResolveUrlEmbed = (url) => {
   const embed = extractTransistorEmbed(url)
 
   if (!embed) {

@@ -16,7 +16,7 @@ describe('imdbResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(imdbResolveEmbed(value)).toEqual(expected)
+      expect(imdbResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should fold the videoembed route onto the current player', () => {
@@ -29,7 +29,7 @@ describe('imdbResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(imdbResolveEmbed(value)).toEqual(expected)
+      expect(imdbResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should fold the source route onto the current player and drop its query', () => {
@@ -43,7 +43,7 @@ describe('imdbResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(imdbResolveEmbed(value)).toEqual(expected)
+      expect(imdbResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should take any source word on the source route', () => {
@@ -56,7 +56,7 @@ describe('imdbResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(imdbResolveEmbed(value)).toEqual(expected)
+      expect(imdbResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should pass the id through as written', () => {
@@ -69,7 +69,7 @@ describe('imdbResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(imdbResolveEmbed(value)).toEqual(expected)
+      expect(imdbResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -77,49 +77,49 @@ describe('imdbResolveEmbed', () => {
     it('should ignore the watch page', () => {
       const value = 'https://www.imdb.com/video/vi3012802841/'
 
-      expect(imdbResolveEmbed(value)).toBeUndefined()
+      expect(imdbResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore another two-segment route', () => {
       const value = 'https://www.imdb.com/title/tt5013056'
 
-      expect(imdbResolveEmbed(value)).toBeUndefined()
+      expect(imdbResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore an embed route under another section', () => {
       const value = 'https://www.imdb.com/x/embed/vi3012802841/'
 
-      expect(imdbResolveEmbed(value)).toBeUndefined()
+      expect(imdbResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a three-segment video route that is not an embed', () => {
       const value = 'https://www.imdb.com/video/imdb/vi3012802841'
 
-      expect(imdbResolveEmbed(value)).toBeUndefined()
+      expect(imdbResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a source route under another section', () => {
       const value = 'https://www.imdb.com/x/imdb/vi3012802841/imdb/embed'
 
-      expect(imdbResolveEmbed(value)).toBeUndefined()
+      expect(imdbResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a source route with another fourth word', () => {
       const value = 'https://www.imdb.com/video/imdb/vi3012802841/x/embed'
 
-      expect(imdbResolveEmbed(value)).toBeUndefined()
+      expect(imdbResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a source route that is not an embed', () => {
       const value = 'https://www.imdb.com/video/imdb/vi3012802841/imdb/x'
 
-      expect(imdbResolveEmbed(value)).toBeUndefined()
+      expect(imdbResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a path with a trailing segment', () => {
       const value = 'https://www.imdb.com/video/embed/vi3012802841/extra'
 
-      expect(imdbResolveEmbed(value)).toBeUndefined()
+      expect(imdbResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })

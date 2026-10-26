@@ -1,8 +1,6 @@
-import { parseUrl } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'iheart'
@@ -20,8 +18,8 @@ const playerHeights = { episode: 120, show: 300, station: 200 }
 
 // An iHeart podcast player, of one episode or of a show, and the live station and artist radio
 // players, on www.iheart.com or beta.iheart.com.
-export const iheartResolveEmbed: ResolveEmbed = (url, element) => {
-  const pathname = parseUrl(url, placeholderBaseUrl)?.pathname ?? ''
+export const iheartResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  const pathname = url.pathname
   const episode = pathname.match(episodePathRegex)
 
   if (episode) {

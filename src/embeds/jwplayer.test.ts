@@ -19,14 +19,14 @@ describe('extractJwplayerId', () => {
     const value = 'https://cdn.jwplayer.com/players/H4GXr873-abc12345.html'
     const expected = 'H4GXr873'
 
-    expect(extractJwplayerId(value)).toBe(expected)
+    expect(extractJwplayerId(new URL(value))).toBe(expected)
   })
 
   it('should extract the media id when no player id is present', () => {
     const value = 'https://cdn.jwplayer.com/players/H4GXr873.html'
     const expected = 'H4GXr873'
 
-    expect(extractJwplayerId(value)).toBe(expected)
+    expect(extractJwplayerId(new URL(value))).toBe(expected)
   })
 
   // Business Insider's feed ships JW Player embeds with an empty player id, leaving a
@@ -37,47 +37,41 @@ describe('extractJwplayerId', () => {
     const value = 'https://cdn.jwplayer.com/players/H4GXr873-.html'
     const expected = 'H4GXr873'
 
-    expect(extractJwplayerId(value)).toBe(expected)
+    expect(extractJwplayerId(new URL(value))).toBe(expected)
   })
 
   it('should extract the media id from a jwplatform.com host', () => {
     const value = 'https://content.jwplatform.com/players/H4GXr873-abc12345.html'
     const expected = 'H4GXr873'
 
-    expect(extractJwplayerId(value)).toBe(expected)
+    expect(extractJwplayerId(new URL(value))).toBe(expected)
   })
 
   it('should return undefined for the player route naming no media', () => {
     const value = 'https://cdn.jwplayer.com/players'
 
-    expect(extractJwplayerId(value)).toBeUndefined()
-  })
-
-  it('should return undefined for an invalid url', () => {
-    const value = 'not a url'
-
-    expect(extractJwplayerId(value)).toBeUndefined()
+    expect(extractJwplayerId(new URL(value))).toBeUndefined()
   })
 
   it('should read an id off the previews route', () => {
     const value = 'https://cdn.jwplayer.com/previews/H4GXr873'
     const expected = 'H4GXr873'
 
-    expect(extractJwplayerId(value)).toBe(expected)
+    expect(extractJwplayerId(new URL(value))).toBe(expected)
   })
 
   // `products` is eight characters, so the bound this replaces read it as a media id.
   it('should return undefined for a marketing page whose slug fits the id shape', () => {
     const value = 'https://www.jwplayer.com/products'
 
-    expect(extractJwplayerId(value)).toBeUndefined()
+    expect(extractJwplayerId(new URL(value))).toBeUndefined()
   })
 
   it('should read an id longer than the eight characters JW mints today', () => {
     const value = 'https://cdn.jwplayer.com/players/H4GXr873xyz-abc12345.html'
     const expected = 'H4GXr873xyz'
 
-    expect(extractJwplayerId(value)).toBe(expected)
+    expect(extractJwplayerId(new URL(value))).toBe(expected)
   })
 
   // An underscore is outside the alphabet a media id is written in, and it is what tells a
@@ -86,7 +80,7 @@ describe('extractJwplayerId', () => {
     const value = 'https://cdn.jwplayer.com/players/H4GX_r873-abc12345.html'
     const expected = 'H4GX_r873'
 
-    expect(extractJwplayerId(value)).toEqual(expected)
+    expect(extractJwplayerId(new URL(value))).toEqual(expected)
   })
 })
 
@@ -101,7 +95,7 @@ describe('jwplayerResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(jwplayerResolveEmbed(value)).toEqual(expected)
+    expect(jwplayerResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // The rebuilt src drops the empty player-id segment that 404s in the Business Insider feed.
@@ -115,13 +109,7 @@ describe('jwplayerResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(jwplayerResolveEmbed(value)).toEqual(expected)
-  })
-
-  it('should return undefined when no media id can be extracted', () => {
-    const value = 'not a url'
-
-    expect(jwplayerResolveEmbed(value)).toBeUndefined()
+    expect(jwplayerResolveEmbed(new URL(value))).toEqual(expected)
   })
 })
 

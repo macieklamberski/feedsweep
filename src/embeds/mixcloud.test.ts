@@ -10,7 +10,7 @@ describe('extractMixcloudShow', () => {
       'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fno-filter-may-28-2018-hour-one%2F'
     const expected = 'photogmusic/no-filter-may-28-2018-hour-one'
 
-    expect(extractMixcloudShow(value)).toBe(expected)
+    expect(extractMixcloudShow(new URL(value))).toBe(expected)
   })
 
   it('should read a feed parameter holding a whole url', () => {
@@ -18,7 +18,7 @@ describe('extractMixcloudShow', () => {
       'http://www.mixcloud.com/media/swf/player/mixcloudLoader.swf?feed=http%3A%2F%2Fwww.mixcloud.com%2Ffrederik%2Foct-2011-exclusive-set%2F&embed_type=widget_standard'
     const expected = 'frederik/oct-2011-exclusive-set'
 
-    expect(extractMixcloudShow(value)).toBe(expected)
+    expect(extractMixcloudShow(new URL(value))).toBe(expected)
   })
 
   it('should read the widget on its own host', () => {
@@ -26,7 +26,7 @@ describe('extractMixcloudShow', () => {
       'https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&light=1&feed=%2Fdjgavinboyd%2Fsoul-has-no-tempo%2F'
     const expected = 'djgavinboyd/soul-has-no-tempo'
 
-    expect(extractMixcloudShow(value)).toBe(expected)
+    expect(extractMixcloudShow(new URL(value))).toBe(expected)
   })
 
   // The page url a person copies from the address bar. It carries no `feed` parameter, so the
@@ -35,7 +35,7 @@ describe('extractMixcloudShow', () => {
     const value = 'https://www.mixcloud.com/photogmusic/no-filter-may-28-2018-hour-one/'
     const expected = 'photogmusic/no-filter-may-28-2018-hour-one'
 
-    expect(extractMixcloudShow(value)).toBe(expected)
+    expect(extractMixcloudShow(new URL(value))).toBe(expected)
   })
 
   // Each of these takes the shape of a show and is a page of the site instead. The show above
@@ -65,7 +65,7 @@ describe('extractMixcloudShow', () => {
   ]
 
   it.each(sitePageUrls)('should return undefined for the site page %s', (value) => {
-    expect(extractMixcloudShow(value)).toBeUndefined()
+    expect(extractMixcloudShow(new URL(value))).toBeUndefined()
   })
 
   // `MEDIA` and `Search` are real users, answered in any case, so a missing show under either
@@ -80,14 +80,14 @@ describe('extractMixcloudShow', () => {
   ]
 
   it.each(siteWordUserUrls)('should read the site-word user in %s', (value, expected) => {
-    expect(extractMixcloudShow(value)).toBe(expected)
+    expect(extractMixcloudShow(new URL(value))).toBe(expected)
   })
 
   it('should use a malformed slug as written, even if the player answers an error', () => {
     const value = 'https://www.mixcloud.com/FakeIDRadio/.4-natty-champs/'
     const expected = 'FakeIDRadio/.4-natty-champs'
 
-    expect(extractMixcloudShow(value)).toBe(expected)
+    expect(extractMixcloudShow(new URL(value))).toBe(expected)
   })
 
   // The section words are matched whole, so a show whose title starts with one is still a show.
@@ -95,7 +95,7 @@ describe('extractMixcloudShow', () => {
     const value = 'https://www.mixcloud.com/photogmusic/followers-only-mix/'
     const expected = 'photogmusic/followers-only-mix'
 
-    expect(extractMixcloudShow(value)).toBe(expected)
+    expect(extractMixcloudShow(new URL(value))).toBe(expected)
   })
 
   // Without the site-segment check the widget's own two-segment url reads as the user `widget`
@@ -103,7 +103,7 @@ describe('extractMixcloudShow', () => {
   it('should return undefined for the widget url carrying no feed parameter', () => {
     const value = 'https://www.mixcloud.com/widget/iframe/'
 
-    expect(extractMixcloudShow(value)).toBeUndefined()
+    expect(extractMixcloudShow(new URL(value))).toBeUndefined()
   })
 
   // The same exclusion reaches the parameter, where it was already wrong: this minted
@@ -111,14 +111,14 @@ describe('extractMixcloudShow', () => {
   it('should return undefined for a feed parameter naming a listing page', () => {
     const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2Fphotogmusic%2Fuploads%2F'
 
-    expect(extractMixcloudShow(value)).toBeUndefined()
+    expect(extractMixcloudShow(new URL(value))).toBeUndefined()
   })
 
   // A show is exactly user plus slug. Anything deeper is a section of the site.
   it('should return undefined for a path that is not a show', () => {
     const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2Fcategories%2Fhouse%2Ftop%2F'
 
-    expect(extractMixcloudShow(value)).toBeUndefined()
+    expect(extractMixcloudShow(new URL(value))).toBeUndefined()
   })
 
   // Mixcloud keeps the script a publisher titled the show in, so a slug is as often Japanese or
@@ -128,46 +128,46 @@ describe('extractMixcloudShow', () => {
       'https://www.mixcloud.com/widget/iframe/?feed=%2Ffunairacing%2F9-%E3%81%82%E3%81%B9c%E9%96%A2%E6%9D%B1%2F'
     const expected = 'funairacing/9-あべc関東'
 
-    expect(extractMixcloudShow(value)).toBe(expected)
+    expect(extractMixcloudShow(new URL(value))).toBe(expected)
   })
 
   it('should read an accented user name', () => {
     const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2Fszita-j%25C3%25A1nos%2Fshow%2F'
     const expected = 'szita-jános/show'
 
-    expect(extractMixcloudShow(value)).toBe(expected)
+    expect(extractMixcloudShow(new URL(value))).toBe(expected)
   })
 
   it('should return undefined for a show path followed by another segment', () => {
     const value = 'https://www.mixcloud.com/photogmusic/no-filter/extra/'
 
-    expect(extractMixcloudShow(value)).toBeUndefined()
+    expect(extractMixcloudShow(new URL(value))).toBeUndefined()
   })
 
   it('should decode a user segment carrying an encoded slash for the key', () => {
     const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2F..%252Fetc%2Fno-filter%2F'
     const expected = '../etc/no-filter'
 
-    expect(extractMixcloudShow(value)).toBe(expected)
+    expect(extractMixcloudShow(new URL(value))).toBe(expected)
   })
 
   it('should return undefined for a feed parameter that cannot be parsed', () => {
     const value = 'https://www.mixcloud.com/widget/iframe/?feed=http%3A%2F%2F%5B'
 
-    expect(extractMixcloudShow(value)).toBeUndefined()
+    expect(extractMixcloudShow(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for a segment that climbs out of the path', () => {
     const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2Fuser%2F..%2F'
 
-    expect(extractMixcloudShow(value)).toBeUndefined()
+    expect(extractMixcloudShow(new URL(value))).toBeUndefined()
   })
 
   it('should keep a malformed escape as written', () => {
     const value = 'https://www.mixcloud.com/widget/iframe/?feed=%2Fuser%2F%E0%A4%A%2F'
     const expected = 'user/%EF%BF%BD%A'
 
-    expect(extractMixcloudShow(value)).toBe(expected)
+    expect(extractMixcloudShow(new URL(value))).toBe(expected)
   })
 
   // The audio, the artwork and their subdomains are all on the host list, and each file path
@@ -179,7 +179,7 @@ describe('extractMixcloudShow', () => {
   ]
 
   it.each(fileUrls)('should return undefined for the file %s', (value) => {
-    expect(extractMixcloudShow(value)).toBeUndefined()
+    expect(extractMixcloudShow(new URL(value))).toBeUndefined()
   })
 })
 
@@ -195,7 +195,7 @@ describe('mixcloudResolveEmbed', () => {
       author: 'photogmusic',
     }
 
-    expect(mixcloudResolveEmbed(value)).toEqual(expected)
+    expect(mixcloudResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should key and query a show by its decoded names and link it by the written path', () => {
@@ -209,7 +209,7 @@ describe('mixcloudResolveEmbed', () => {
       author: '..',
     }
 
-    expect(mixcloudResolveEmbed(value)).toEqual(expected)
+    expect(mixcloudResolveEmbed(new URL(value))).toEqual(expected)
   })
 
   // The display options pick another look, so the widget is minted as the cover player.
@@ -225,7 +225,7 @@ describe('mixcloudResolveEmbed', () => {
       author: 'djgavinboyd',
     }
 
-    expect(mixcloudResolveEmbed(value)).toEqual(expected)
+    expect(mixcloudResolveEmbed(new URL(value))).toEqual(expected)
   })
 })
 

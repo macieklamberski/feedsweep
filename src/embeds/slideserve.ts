@@ -1,5 +1,5 @@
 import { getPathSegments, getQueryParam, isAnyOf, isHostOf } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { ResolveUrlEmbed } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -46,7 +46,7 @@ const readFlashId = (parsed: URL): string | undefined => {
 
 // No `url` and no `thumbnail`: the deck page is `/{user}/{slug}`, and the slide images sit on a
 // numbered cdn host, neither of which the id composes.
-const slideserveResolveEmbed: ResolveEmbed = (url, element) => {
+const slideserveResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const parsed = parseUrlOnHosts(url, slideserveHosts, isHostOf)
 
   if (!parsed) {

@@ -1,6 +1,5 @@
-import { encodePathSegment, getQueryParam, isHostOf, parseUrl } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
-import { placeholderBaseUrl } from '../utils/urls.js'
+import { encodePathSegment, getQueryParam, isHostOf } from 'trousse'
+import type { ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'allocine'
@@ -28,14 +27,8 @@ const readCmedia = (parsed: URL): string | null | undefined => {
 // AlloCiné's trailer player, `player.allocine.fr/{cmedia}.html`, the embed the video page names.
 // The blog player, `/_video/iblogvision.aspx?cmedia={cmedia}`, and the retired Flash player,
 // `/blogvision/{cmedia}`, take the same id. The video page also needs the film's id, so no `url`.
-export const allocineResolveEmbed: ResolveEmbed = (url) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed) {
-    return
-  }
-
-  const cmedia = readCmedia(parsed)
+export const allocineResolveEmbed: ResolveUrlEmbed = (url) => {
+  const cmedia = readCmedia(url)
 
   if (!cmedia) {
     return

@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf, isHostOf } from 'trousse'
-import type { ResolveEmbed } from '../types.js'
+import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { filterUrlQuery, isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -22,7 +22,7 @@ type StackblitzTarget = {
   query: string
 }
 
-const parseTarget = (value: string | undefined): StackblitzTarget | undefined => {
+const parseTarget = (value: string | URL | undefined): StackblitzTarget | undefined => {
   const parsed = parseUrlOnHosts(value, stackblitzHosts, isHostOf)
 
   if (!parsed) {
@@ -48,7 +48,7 @@ const parseTarget = (value: string | undefined): StackblitzTarget | undefined =>
 }
 
 // StackBlitz's editor iframe, whose retired /run/{slug} route answers 404 while /edit/ serves.
-export const stackblitzResolveEmbed: ResolveEmbed = (url, element) => {
+export const stackblitzResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const target = parseTarget(url)
 
   if (!target) {

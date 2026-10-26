@@ -1,7 +1,7 @@
-import { composeQuery, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import { composeQuery, getQueryParam, isAnyOf } from 'trousse'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import { pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'videa'
@@ -14,20 +14,18 @@ const playerPaths = ['/player', '/flvplayer.swf']
 
 // A Videa video player, the iframe or the retired Flash player in an `<embed>` or `<object>`.
 // The player reads the start position from `start`. The server answers an id in any case.
-export const videaResolveEmbed: ResolveEmbed = (url, element) => {
-  const parsed = parseUrl(url, placeholderBaseUrl)
-
-  if (!parsed || !isAnyOf(parsed.pathname, playerPaths)) {
+export const videaResolveEmbed: ResolveUrlEmbed = (url, element) => {
+  if (!isAnyOf(url.pathname, playerPaths)) {
     return
   }
 
-  const id = getQueryParam(parsed.searchParams, 'v')
+  const id = getQueryParam(url.searchParams, 'v')
 
   if (!id) {
     return
   }
 
-  const query = composeQuery({ v: id, ...pickQueryParams(parsed.search, ['start']) })
+  const query = composeQuery({ v: id, ...pickQueryParams(url.search, ['start']) })
 
   return {
     provider,

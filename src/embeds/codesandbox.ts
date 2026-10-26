@@ -6,7 +6,7 @@ import {
   isHostOf,
   trimObject,
 } from 'trousse'
-import type { EmbedRenderHint, ResolveEmbed } from '../types.js'
+import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readIframeResizeHeight } from '../utils/hints.js'
 import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
@@ -51,7 +51,7 @@ const readId = (slug: string): string => {
   return slug.slice(slug.lastIndexOf('-') + 1)
 }
 
-const parseTarget = (value: string | undefined): CodesandboxTarget | undefined => {
+const parseTarget = (value: string | URL | undefined): CodesandboxTarget | undefined => {
   const parsed = parseUrlOnHosts(value, codesandboxHosts, isHostOf)
 
   if (!parsed) {
@@ -99,7 +99,7 @@ const parseTarget = (value: string | undefined): CodesandboxTarget | undefined =
   return { slug, id, pagePath: `s/${slug}`, src: `https://codesandbox.io/embed/${slug}${query}` }
 }
 
-export const codesandboxResolveEmbed: ResolveEmbed = (url, element) => {
+export const codesandboxResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const target = parseTarget(url)
 
   if (!target) {

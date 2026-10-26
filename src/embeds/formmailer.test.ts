@@ -20,7 +20,7 @@ describe('formmailerResolveEmbed', () => {
         url: 'https://ssl.form-mailer.jp/fms/6662b06a268383',
       }
 
-      expect(formmailerResolveEmbed(value)).toEqual(expected)
+      expect(formmailerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should build the form on the pro host', () => {
@@ -32,7 +32,7 @@ describe('formmailerResolveEmbed', () => {
         url: 'https://pro.form-mailer.jp/fms/d47fd8f1163544',
       }
 
-      expect(formmailerResolveEmbed(value)).toEqual(expected)
+      expect(formmailerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should carry a prefill over in the frame only', () => {
@@ -45,7 +45,7 @@ describe('formmailerResolveEmbed', () => {
         url: 'https://ssl.form-mailer.jp/fms/00db3f63809293',
       }
 
-      expect(formmailerResolveEmbed(value)).toEqual(expected)
+      expect(formmailerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
     it('should drop the loader display setting', () => {
@@ -57,7 +57,7 @@ describe('formmailerResolveEmbed', () => {
         url: 'https://ssl.form-mailer.jp/fms/6662b06a268383',
       }
 
-      expect(formmailerResolveEmbed(value)).toEqual(expected)
+      expect(formmailerResolveEmbed(new URL(value))).toEqual(expected)
     })
   })
 
@@ -65,25 +65,25 @@ describe('formmailerResolveEmbed', () => {
     it('should ignore another route on the host', () => {
       const value = 'https://ssl.form-mailer.jp/notaroute/6662b06a268383'
 
-      expect(formmailerResolveEmbed(value)).toBeUndefined()
+      expect(formmailerResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the form route with no hash', () => {
       const value = 'https://ssl.form-mailer.jp/fms/'
 
-      expect(formmailerResolveEmbed(value)).toBeUndefined()
+      expect(formmailerResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a route below the form', () => {
       const value = 'https://ssl.form-mailer.jp/fms/6662b06a268383/extra'
 
-      expect(formmailerResolveEmbed(value)).toBeUndefined()
+      expect(formmailerResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the form path on another host of the domain', () => {
       const value = 'https://www.form-mailer.jp/fms/6662b06a268383'
 
-      expect(formmailerResolveEmbed(value)).toBeUndefined()
+      expect(formmailerResolveEmbed(new URL(value))).toBeUndefined()
     })
   })
 })
