@@ -34,7 +34,7 @@ const sizes = {
 
 // The players PowerPress writes into an embed url for a video file, per
 // `powerpressplayer_embedable` in its powerpress-player.php. Every other value is an audio player.
-const powerpressVideoPlayers = new Set(['html5video', 'mediaelement-video'])
+const powerpressVideoPlayers = ['html5video', 'mediaelement-video']
 
 // A show's player follows its newest episode, and its playlist lists the show's episodes.
 const showRoutes = ['latest', 'playlist']
@@ -139,8 +139,8 @@ export const blubrryPowerpressEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const player = getQueryParam(url.searchParams, 'powerpress_player') ?? ''
-    const isVideo = powerpressVideoPlayers.has(player)
+    const player = getQueryParam(url.searchParams, 'powerpress_player')
+    const isVideo = isAnyOf(player, powerpressVideoPlayers)
 
     return {
       provider,
