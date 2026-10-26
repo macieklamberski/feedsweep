@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import { composeFileTitle, wikimediaEmbedResolver } from './wikimedia.js'
@@ -282,5 +283,33 @@ describeForEachParser('wikimediaEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+  })
+})
+
+// The resolver's selector is a bare iframe, so it sees every enclosure probe, and Commons serves
+// the files it frames from upload.wikimedia.org.
+describeForEachParser('wikimedia through the pipeline', (parseHtml) => {
+  const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
+  }
+
+  it('should leave a wikimedia video enclosure playable', async () => {
+    const enclosures = [
+      {
+        url: 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Sidang_Tahunan.webm',
+        type: 'video/webm',
+      },
+    ]
+
+    const expected = html`
+      <video data-enclosure="" controls src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Sidang_Tahunan.webm"></video>
+      <p>Body</p>
+    `
+
+    expect(await convert('<p>Body</p>', enclosures)).toEqualHtml(expected)
   })
 })
