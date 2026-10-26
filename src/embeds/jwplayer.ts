@@ -19,16 +19,25 @@ const sizes = {
 // same id, 404 for a fabricated one. `cdn.jwplayer.com/videos/{id}-1280.mp4` is an enclosure.
 const playerRoutes = ['players', 'previews']
 
-export const extractJwplayerId = (link: URL): string | undefined => {
+type PlayerFile = { mediaId: string; playerId: string }
+
+// Embed URLs end in `{mediaId}-{playerId}.html`. The media id is the part before the first dash,
+// with the file extension dropped, and the player id is the rest.
+const readPlayerFile = (link: URL): PlayerFile | undefined => {
   const [route, lastSegment] = getPathSegments(link).slice(-2)
 
   if (!lastSegment || !isAnyOf(route, playerRoutes)) {
     return
   }
 
-  // Embed URLs end in `{mediaId}-{playerId}.html`. The media id is the part before the
-  // first dash, with the file extension dropped.
-  return lastSegment.replace(fileExtensionRegex, '').split('-')[0]
+  const fileName = lastSegment.replace(fileExtensionRegex, '')
+  const [mediaId] = fileName.split('-')
+
+  return { mediaId, playerId: fileName.slice(mediaId.length + 1) }
+}
+
+export const extractJwplayerId = (link: URL): string | undefined => {
+  return readPlayerFile(link)?.mediaId
 }
 
 // The poster endpoint answers about a media and 404s for anything else, so a playlist id must
@@ -59,16 +68,14 @@ const composePlayerEmbed = (mediaId: string, playerId?: string): EmbedResolverRe
 }
 
 export const jwplayerResolveEmbed: ResolveUrlEmbed = (url, element) => {
-  const mediaId = extractJwplayerId(url)
+  const file = readPlayerFile(url)
 
-  if (!mediaId) {
+  if (!file?.mediaId) {
     return
   }
 
-  const fileName = getPathSegments(url).at(-1)?.replace(fileExtensionRegex, '') ?? ''
-
   return {
-    ...composePlayerEmbed(mediaId, fileName.slice(mediaId.length + 1)),
+    ...composePlayerEmbed(file.mediaId, file.playerId),
     title: attr(element, 'title'),
   }
 }

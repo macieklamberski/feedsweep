@@ -58,11 +58,11 @@ describe('tmzResolveEmbed', () => {
       expect(tmzResolveEmbed(new URL(value))).toEqual(expected)
     })
 
-    it('should fold the case of the slug in the key only', () => {
+    it('should keep the case of the slug in the key', () => {
       const value = 'https://share.tmz.com/videos/0-AW46WCAJ/'
       const expected: EmbedResolverResult = {
         provider: 'tmz',
-        id: '0-aw46wcaj',
+        id: '0-AW46WCAJ',
         src: 'https://share.tmz.com/videos/0-AW46WCAJ/',
         url: 'https://www.tmz.com/watch/0-AW46WCAJ/',
         ratio: '16/9',

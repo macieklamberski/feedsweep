@@ -59,13 +59,10 @@ export const rebuildEmbedlyEmbeds: DomTransform = () => (document) => {
     }
 
     if (payload && isUsableUrl(payload.url)) {
-      element.replaceWith(
-        composeIframe(
-          document,
-          payload.url,
-          isUsableUrl(payload.thumbnail_url) ? payload.thumbnail_url : undefined,
-        ),
-      )
+      const thumbnail = isUsableUrl(payload.thumbnail_url) ? payload.thumbnail_url : undefined
+      const iframe = composeIframe(document, payload.url, thumbnail)
+
+      element.replaceWith(iframe)
       continue
     }
 

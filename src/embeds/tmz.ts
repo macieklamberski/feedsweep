@@ -24,7 +24,7 @@ export const tmzResolveEmbed: ResolveUrlEmbed = (url) => {
 
   return {
     provider,
-    id: slug.toLowerCase(),
+    id: slug,
     src: `https://share.tmz.com/videos/${slug}/`,
     url: `https://www.tmz.com/watch/${slug}/`,
     ...sizes.player,
