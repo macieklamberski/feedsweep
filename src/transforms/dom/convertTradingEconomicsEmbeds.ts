@@ -17,10 +17,6 @@ export const convertTradingEconomicsEmbeds: DomTransform = () => (document) => {
       continue
     }
 
-    // WordPress writes `&#038;` for `&`, and some feeds then percent-encode its `#`, leaving
-    // `&%23038;` between query pairs, which hides `h`, `w` and `ref` from Trading Economics.
-    url.search = url.search.replaceAll('&%23038;', '&')
-
     const ref = getQueryParam(url.searchParams, 'ref')
     const dimensions = getElementDimensions(iframe)
 

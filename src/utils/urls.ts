@@ -26,7 +26,7 @@ export const placeholderBaseUrl = 'https://example.com'
 const urlShapeRegex = /[:/.]/
 const queryOrHashRegex = /[?#]/
 const pathSlashRunRegex = /^https?:\/\/[^/?#]+[^?#]*\/\//i
-const escapedAmpersandRegex = /&(?:amp;)+/g
+const escapedAmpersandRegex = /&(?:amp;)+|&%23038;/g
 
 // Protocol-relative `//host/path` is left unmatched, so it resolves to the base url's scheme.
 export const absoluteUrlRegex = /^[a-z][a-z0-9+.-]*:/i
@@ -179,8 +179,8 @@ export const collapseSlashRuns = (url: string): string => {
 }
 
 // A feed that escapes its markup twice leaves `&amp;` in the attribute, so every pair after it
-// reads as `amp;{name}`. resolveUrl decodes one level on the way out, so without this a resolver
-// reads another query than the one the placeholder carries.
+// reads as `amp;{name}`. WordPress writes `&#038;` for `&`, and a feed that then percent-encodes
+// its `#` leaves `&%23038;`. Without the fold a resolver reads another query than the url's own.
 export const foldEscapedAmpersands = (url: string): string => {
   return url.replace(escapedAmpersandRegex, '&')
 }
