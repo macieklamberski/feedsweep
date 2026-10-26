@@ -72,7 +72,7 @@ const readUser = (value: string | undefined): string | undefined => {
   return name
 }
 
-const parseTarget = (value: string | URL | undefined): CodepenTarget | undefined => {
+const parseTarget = (value: URL | undefined): CodepenTarget | undefined => {
   const parsed = parseUrlOnHosts(value, codepenHosts, isHostOf)
 
   if (!parsed) {
@@ -186,7 +186,10 @@ const readPenReference = (element: Element): CodepenTarget | undefined => {
   // Pens saved in the 2.0 editor take a uuid instead.
   const isSlug = alphanumericRegex.test(href)
 
-  return parseTarget(href) ?? (isSlug ? { kind: 'embed', slug: href } : undefined)
+  return (
+    parseTarget(parseUrlOnHosts(href, codepenHosts, isHostOf)) ??
+    (isSlug ? { kind: 'embed', slug: href } : undefined)
+  )
 }
 
 const readWidget = (element: Element): EmbedResolverResult | undefined => {
@@ -208,7 +211,7 @@ const readWidget = (element: Element): EmbedResolverResult | undefined => {
 
   // The loader follows the sentence's own link, whose text is the pen's name in an intact snippet.
   for (const anchor of element.querySelectorAll('a[href]')) {
-    const target = parseTarget(attr(anchor, 'href'))
+    const target = parseTarget(parseUrlOnHosts(attr(anchor, 'href'), codepenHosts, isHostOf))
 
     if (target?.kind !== 'pen' || target.slug !== slug) {
       continue

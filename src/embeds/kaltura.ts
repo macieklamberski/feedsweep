@@ -41,8 +41,7 @@ type Entry = {
   parsed: URL
 }
 
-const readEntry = (url: string | URL | undefined): Entry | undefined => {
-  const parsed = parseUrlOnHosts(url, kalturaHost)
+const readEntry = (parsed: URL | undefined): Entry | undefined => {
   const partner = parsed?.pathname.match(partnerPathRegex)?.[1]
   const entryId = getQueryParam(parsed?.searchParams, 'entry_id')
 
@@ -97,7 +96,7 @@ export const kalturaIframeEmbedResolver = createUrlEmbedResolver([kalturaHost], 
 export const kalturaScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="kaltura.com/p/" i]',
   (element) => {
-    const entry = readEntry(attr(element, 'src'))
+    const entry = readEntry(parseUrlOnHosts(attr(element, 'src'), kalturaHost))
 
     if (!entry || !isAnyOf(getQueryParam(entry.parsed.searchParams, 'autoembed'), 'true')) {
       return

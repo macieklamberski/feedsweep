@@ -1,11 +1,4 @@
-import {
-  isAnyOf,
-  isHostOrSubdomainOf,
-  type MaybePromise,
-  parseUrl,
-  startsWithAnyOf,
-  trimObject,
-} from 'trousse'
+import { isAnyOf, type MaybePromise, startsWithAnyOf, trimObject } from 'trousse'
 import type {
   CiteResolverResult,
   EmbedResolver,
@@ -266,22 +259,13 @@ export const createUrlEmbedResolver = (
     selector: embedCarrierSelector,
     extract: (element) => {
       const src = readCarrierUrl(element)
-      const carrier = parseUrl(src)
-
-      if (!carrier || !isHostOrSubdomainOf(carrier, hosts)) {
-        return
-      }
+      const url = parseUrlOnHosts(src, hosts)
 
       // A script that never filled its template, `embed/$1`, names no item, and its frame stays
       // as written.
-      if (unfilledTemplateRegex.test(src)) {
+      if (!url || unfilledTemplateRegex.test(src)) {
         return
       }
-
-      // Only a resolver reads the glued-query and whitespace repairs. Every frame, claimed or not,
-      // reads the ampersands readCarrierUrl folded. The repairs rewrite only after the host, so
-      // the repaired url parses whenever the carrier did.
-      const url = parseUrl(repairCarrierUrl(src)) ?? carrier
 
       return decideSize(element, extract(url, element), options.readCarrierSize)
     },

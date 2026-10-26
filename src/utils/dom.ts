@@ -220,19 +220,19 @@ export const svgHrefAttribute = (element: Element): string => {
   return element.hasAttribute('href') ? 'href' : 'xlink:href'
 }
 
-export const isElement = (node: Node | null | undefined): node is Element => {
+export const isElement = (node: Nullish<Node>): node is Element => {
   return node?.nodeType === Node.ELEMENT_NODE
 }
 
-export const isText = (node: Node | null | undefined): node is Text => {
+export const isText = (node: Nullish<Node>): node is Text => {
   return node?.nodeType === Node.TEXT_NODE
 }
 
-export const isComment = (node: Node | null | undefined): node is Comment => {
+export const isComment = (node: Nullish<Node>): node is Comment => {
   return node?.nodeType === Node.COMMENT_NODE
 }
 
-export const hasText = (node: Node | null | undefined): boolean => {
+export const hasText = (node: Nullish<Node>): boolean => {
   return isNonEmptyString(node?.textContent)
 }
 

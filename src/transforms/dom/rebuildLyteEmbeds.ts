@@ -1,5 +1,5 @@
 import { encodePathSegment, getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import { composeEmbedUrl, extractVideoId, isVideoId } from '../../embeds/youtube.js'
+import { composeEmbedUrl, extractVideoId, isVideoId, youtubeHosts } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
 import {
   attr,
@@ -66,7 +66,7 @@ const removeFeedLabel = (thumbnail: Element, videoId: string): void => {
     return
   }
 
-  if (extractVideoId(url.href) !== videoId) {
+  if (extractVideoId(url) !== videoId) {
     return
   }
 
@@ -101,7 +101,7 @@ const rebuildFeedThumbnails = (document: Document): void => {
 
     // The plugin links the thumbnail to the post. A thumbnail linked to the video itself is a
     // link the author wrote.
-    if (extractVideoId(attr(thumbnail, 'href') ?? '') === videoId) {
+    if (extractVideoId(parseUrlOnHosts(attr(thumbnail, 'href'), youtubeHosts)) === videoId) {
       continue
     }
 

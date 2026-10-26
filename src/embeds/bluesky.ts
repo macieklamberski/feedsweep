@@ -58,14 +58,12 @@ const extractBlueskyPost = (uri: string): BlueskyPost | undefined => {
   return { authority: encodePathSegment(match[1]), rkey: encodePathSegment(match[3]) }
 }
 
-const extractBlueskyPostFromUrl = (link: string | URL): BlueskyPost | undefined => {
-  const parsed = parseUrlOnHosts(link, blueskyHosts)
-
-  if (!parsed) {
+const extractBlueskyPostFromUrl = (link: URL | undefined): BlueskyPost | undefined => {
+  if (!link) {
     return
   }
 
-  const [root, authority, collection, rkey] = getPathSegments(parsed)
+  const [root, authority, collection, rkey] = getPathSegments(link)
 
   if (!authority || !rkey) {
     return
@@ -135,7 +133,7 @@ const findPostAnchor = (element: Element): Element | undefined => {
 
   // The last one: a media marker links the post too, and the date link is always later.
   for (const anchor of element.querySelectorAll('a[href]')) {
-    if (extractBlueskyPostFromUrl(attr(anchor, 'href') ?? '')) {
+    if (extractBlueskyPostFromUrl(parseUrlOnHosts(attr(anchor, 'href'), blueskyHosts))) {
       found = anchor
     }
   }
@@ -180,7 +178,7 @@ const readPostText = (element: Element, postAnchor: Element | undefined): string
     const isMediaMarker =
       isElement(node) &&
       node.localName === 'a' &&
-      Boolean(extractBlueskyPostFromUrl(attr(node, 'href') ?? ''))
+      Boolean(extractBlueskyPostFromUrl(parseUrlOnHosts(attr(node, 'href'), blueskyHosts)))
 
     if (!isMediaMarker) {
       body += node.textContent ?? ''
@@ -196,7 +194,7 @@ const readQuotedPost = (
   const postAnchor = findPostAnchor(element)
 
   return {
-    post: extractBlueskyPostFromUrl(attr(postAnchor, 'href') ?? ''),
+    post: extractBlueskyPostFromUrl(parseUrlOnHosts(attr(postAnchor, 'href'), blueskyHosts)),
     fields: {
       description: readPostText(element, postAnchor),
       author: postAnchor && readAuthor(postAnchor),

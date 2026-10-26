@@ -24,7 +24,7 @@ const composeEmbed = (id: string): EmbedResolverResult => {
 }
 
 // The route word answers in any case.
-const readEmbedId = (url: string | URL | undefined): string | undefined => {
+const readEmbedId = (url: URL | undefined): string | undefined => {
   const parsed = parseUrlOnHosts(url, mrcvideoHosts, isHostOf)
 
   if (!parsed) {
@@ -43,7 +43,7 @@ const readEmbedId = (url: string | URL | undefined): string | undefined => {
 const readSharingId = (element: Element | undefined): string | undefined => {
   const code = flashVar(element, 'sharing.code')
 
-  return readEmbedId(code?.match(sharingSrcRegex)?.[1])
+  return readEmbedId(parseUrlOnHosts(code?.match(sharingSrcRegex)?.[1], mrcvideoHosts, isHostOf))
 }
 
 const readCallbackId = (element: Element | undefined): string | undefined => {

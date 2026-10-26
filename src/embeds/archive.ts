@@ -1,12 +1,4 @@
-import {
-  composeQuery,
-  encodePathSegment,
-  getPathSegments,
-  getQueryParam,
-  isAnyOf,
-  isHostOrSubdomainOf,
-  parseUrl,
-} from 'trousse'
+import { composeQuery, encodePathSegment, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
 import type {
   EmbedRenderHint,
   EmbedResolverResult,
@@ -14,13 +6,7 @@ import type {
   ResolveUrlEmbed,
 } from '../types.js'
 import { attr, flashVar, flashVars } from '../utils/dom.js'
-import {
-  audioFileRegex,
-  parseUrlOnHosts,
-  pickQueryParams,
-  placeholderBaseUrl,
-  repairCarrierUrl,
-} from '../utils/urls.js'
+import { audioFileRegex, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
@@ -29,7 +15,7 @@ import {
 
 const provider = 'archive'
 
-const archiveHosts = ['archive.org']
+export const archiveHosts = ['archive.org']
 
 // Not `download`: that route serves the files themselves.
 // `stream` is the retired BookReader url, and it 302s to `details/{identifier}?view=theater`.
@@ -43,13 +29,6 @@ type SegmentParts = {
   file: string
 }
 
-// archive.org's own details pages write `embed/{identifier}&playlist=1` into their player meta,
-// an ampersand where the query should begin. Its player still served that spelling in 2023 and
-// answers 404 for it now, while `?playlist=1` answers 200.
-const parseArchiveUrl = (link: string): URL | undefined => {
-  return parseUrl(repairCarrierUrl(link), placeholderBaseUrl)
-}
-
 const readSegmentParts = (url: URL | undefined): SegmentParts => {
   const [route = '', segment = '', ...rest] = url ? getPathSegments(url) : []
 
@@ -60,7 +39,7 @@ const readSegmentParts = (url: URL | undefined): SegmentParts => {
 }
 
 export const extractArchiveIdentifier = (link: string): string | undefined => {
-  const { head } = readSegmentParts(parseArchiveUrl(link))
+  const { head } = readSegmentParts(parseUrlOnHosts(link, archiveHosts))
 
   if (!head) {
     return
@@ -151,9 +130,8 @@ export const archiveAudioEmbedResolver = createMarkupEmbedResolver('audio', (ele
       continue
     }
 
-    const embed = isHostOrSubdomainOf(src, archiveHosts)
-      ? readItemEmbed(parseArchiveUrl(src))
-      : undefined
+    const url = parseUrlOnHosts(src, archiveHosts)
+    const embed = url && readItemEmbed(url)
 
     if (!embed) {
       return

@@ -20,9 +20,7 @@ const tumblrHosts = ['tumblr.com']
 // spellings address the same post, so the id keeps the bare one and `src` the current one.
 const blogKeyPrefixRegex = /^t:/i
 
-const readPostEmbed = (href: string | URL | undefined): EmbedResolverResult | undefined => {
-  const parsed = parseUrlOnHosts(href, tumblrEmbedHosts)
-
+const readPostEmbed = (parsed: URL | undefined): EmbedResolverResult | undefined => {
   if (!parsed) {
     return
   }
@@ -51,7 +49,7 @@ export const tumblrIframeEmbedResolver = createUrlEmbedResolver(tumblrEmbedHosts
 export const tumblrPostEmbedResolver = createMarkupEmbedResolver(
   'div.tumblr-post[data-href]',
   (element) => {
-    const result = readPostEmbed(attr(element, 'data-href'))
+    const result = readPostEmbed(parseUrlOnHosts(attr(element, 'data-href'), tumblrEmbedHosts))
 
     if (!result) {
       return
@@ -67,7 +65,7 @@ export const tumblrPostEmbedResolver = createMarkupEmbedResolver(
 // A forum's s9e MediaEmbed helper frame, naming the post as `{blogKey}/{postId}` in its url
 // fragment.
 export const tumblrS9eEmbedResolver = createS9eEmbedResolver('tumblr', (fragment) => {
-  return readPostEmbed(`https://embed.tumblr.com/embed/post/${fragment}`)
+  return readPostEmbed(new URL(`https://embed.tumblr.com/embed/post/${fragment}`))
 })
 
 // The frame posts its height unasked, as a JSON string whose `args` holds the body's scroll

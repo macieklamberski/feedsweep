@@ -42,7 +42,7 @@ const googledriveHosts = [
 
 // The path segments of a Google Docs-family url past a Workspace prefix, `/a/{domain}/`, which
 // only picks the sign-in and serves the same item.
-export const getPathSegmentsWithoutWorkspace = (url: string | URL): Array<string> => {
+export const getPathSegmentsWithoutWorkspace = (url: URL): Array<string> => {
   const pathSegments = getPathSegments(url)
 
   return isAnyOf(pathSegments[0], 'a') ? pathSegments.slice(2) : pathSegments

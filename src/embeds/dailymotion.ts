@@ -9,7 +9,6 @@ import {
   isHostOrSubdomainOf,
   isPlainObject,
   type Nullish,
-  parseUrl,
   trimObject,
 } from 'trousse'
 import type {
@@ -22,17 +21,12 @@ import { attr, find } from '../utils/dom.js'
 
 const provider = 'dailymotion'
 
-import {
-  parseUrlOnHosts,
-  pickQueryParams,
-  placeholderBaseUrl,
-  repairCarrierUrl,
-} from '../utils/urls.js'
+import { parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 // Listed one by one: `dailymotion.de` is third-party, and a tld pattern would trust it.
 // Each apex redirects to a language landing page, dropping the video.
-const dailymotionHosts = [
+export const dailymotionHosts = [
   'dailymotion.com',
   'dailymotion.co.uk',
   'dailymotion.es',
@@ -90,12 +84,6 @@ const readId = (candidate: Nullish<string>): string | undefined => {
   }
 
   return candidate.split('_')[0]
-}
-
-// The Flash player wrote `/swf/{id}&colors=…`, the query glued onto the id, and transforms outside
-// the resolver factory read urls here too.
-const parseDailymotionUrl = (link: string): URL | undefined => {
-  return parseUrl(repairCarrierUrl(link), placeholderBaseUrl)
 }
 
 const wallWords = ['videowall', 'videozap']
@@ -189,9 +177,7 @@ export const composeEmbedUrl = (
 // the publisher pasted, so the host is checked here the way the factory checks it for a carrier.
 export const readDailymotionEmbedSrc = (link: string): string | undefined => {
   const url = parseUrlOnHosts(link, dailymotionHosts)
-  // The id is read past the carrier repairs, which the host check does not make.
-  const repaired = url && parseDailymotionUrl(url.href)
-  const videoId = repaired && extractDailymotionId(repaired)
+  const videoId = url && extractDailymotionId(url)
 
   return videoId ? composeEmbedUrl('video', videoId) : undefined
 }
@@ -269,7 +255,7 @@ const readSnippetFields = (
     return attr(find(element.parentElement, `meta[itemprop="${name}"]`), 'content')
   }
 
-  const embedUrl = parseDailymotionUrl(readMeta('embedUrl') ?? '')
+  const embedUrl = parseUrlOnHosts(readMeta('embedUrl'), dailymotionHosts)
 
   if (!embedUrl || dailymotionResolveEmbed(embedUrl)?.id !== result.id) {
     return

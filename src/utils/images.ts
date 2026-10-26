@@ -5,15 +5,16 @@ import {
   escapeRegex,
   getPathSegments,
   isAnyOf,
+  type Nullish,
   normalizeUrl,
   parseUrl,
   resolveUrl,
   toMap,
 } from 'trousse'
-import { extractVideoId } from '../embeds/youtube.js'
+import { extractVideoId, youtubeHosts } from '../embeds/youtube.js'
 import type { CleanUrlFn } from '../types.js'
 import { pixelDimensionLimit } from './dom.js'
-import { isFileName, placeholderBaseUrl } from './urls.js'
+import { isFileName, parseUrlOnHosts, placeholderBaseUrl } from './urls.js'
 
 // The parser reads a bare `225w` with no url as that candidate's url, and a proxy 404s on it.
 // Jetpack's feed export keeps only the first url, `…768w, 225w, 563w`, while the page has them all.
@@ -34,7 +35,7 @@ export const countSrcsetCandidates = (srcset: string): number => {
 }
 
 // Seeded from the last entry: a density-only list states no width and ascends.
-export const widestSrcsetUrl = (srcset: string | null | undefined): string | undefined => {
+export const widestSrcsetUrl = (srcset: Nullish<string>): string | undefined => {
   const entries = srcset ? parseSrcset(srcset) : []
 
   if (entries.length === 0) {
@@ -310,7 +311,7 @@ const urlQueryHeightRegex = /[?&](?:h|height)=(\d{2,5})\b/i
 
 // A `data:` src is a lazy placeholder and carries no size.
 export const getUrlDimensions = (
-  src: string | null | undefined,
+  src: Nullish<string>,
 ): { width: number; height: number } | undefined => {
   if (!src || src.startsWith('data:')) {
     return
@@ -474,8 +475,7 @@ const getVideoIds = (video: Element): Array<string> => {
   }
 
   for (const attribute of ['data-embed-src', 'data-embed-url', 'src']) {
-    const value = video.getAttribute(attribute)
-    const id = value ? extractVideoId(value) : undefined
+    const id = extractVideoId(parseUrlOnHosts(video.getAttribute(attribute), youtubeHosts))
 
     if (id) {
       ids.add(id)

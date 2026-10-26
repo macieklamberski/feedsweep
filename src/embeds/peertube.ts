@@ -50,11 +50,10 @@ const readPathId = (segments: Array<string>): string | undefined => {
   }
 }
 
-const parseVideo = (link: string): PeertubeVideo | undefined => {
-  const url = parseUrl(link)
+const parseVideo = (url: URL): PeertubeVideo | undefined => {
   const origin = readOrigin(url)
 
-  if (!url || !origin) {
+  if (!origin) {
     return
   }
 
@@ -86,8 +85,13 @@ const peertubePlaylistParams = ['playlistPosition']
 export const peertubeEmbedResolver = createMarkupEmbedResolver(
   'iframe[src*="/videos/embed/" i], iframe[src*="/videos/watch/" i], iframe[src*="/w/" i], iframe[src*="/video-playlists/embed/" i]',
   (element) => {
-    const link = readRepairedCarrierUrl(element)
-    const video = parseVideo(link)
+    const url = parseUrl(readRepairedCarrierUrl(element))
+
+    if (!url) {
+      return
+    }
+
+    const video = parseVideo(url)
 
     if (!video) {
       return
@@ -97,7 +101,7 @@ export const peertubeEmbedResolver = createMarkupEmbedResolver(
       return {
         provider,
         id: `playlist/${video.id}`,
-        src: `${video.origin}/video-playlists/embed/${video.id}${pickUrlParams(link, peertubePlaylistParams)}`,
+        src: `${video.origin}/video-playlists/embed/${video.id}${pickUrlParams(url, peertubePlaylistParams)}`,
         url: `${video.origin}/w/p/${video.id}`,
         ratio: playerRatio,
         title: attr(element, 'title'),
@@ -110,7 +114,7 @@ export const peertubeEmbedResolver = createMarkupEmbedResolver(
     return {
       provider,
       id: video.id,
-      src: `${video.origin}/videos/embed/${video.id}${pickUrlParams(link, peertubeEmbedParams)}`,
+      src: `${video.origin}/videos/embed/${video.id}${pickUrlParams(url, peertubeEmbedParams)}`,
       url: `${video.origin}/w/${video.id}`,
       ratio: playerRatio,
       title: attr(element, 'title'),

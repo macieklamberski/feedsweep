@@ -64,7 +64,7 @@ const composeSubject = (subject: string): EmbedResolverResult | undefined => {
   }
 }
 
-const resolveTarget = (url: string | URL, element?: Element): EmbedResolverResult | undefined => {
+const resolveTarget = (url: URL, element?: Element): EmbedResolverResult | undefined => {
   const parsed = parseUrlOnHosts(url, mailruHosts)
 
   if (!parsed) {

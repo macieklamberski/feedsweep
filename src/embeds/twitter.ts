@@ -4,12 +4,13 @@ import {
   isAnyOf,
   isHostOrSubdomainOf,
   isPlainObject,
+  type Nullish,
   parseUrl,
 } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, find, jsonAttr, keepIfMatches, setInnerHtml, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import {
   atUsername,
   createMarkupEmbedResolver,
@@ -38,10 +39,8 @@ const tweetHosts = [
 // name of its own.
 const nitterHostRegex = /(^|\.)nitter\./
 
-const isTweetUrl = (url: URL): boolean => {
-  const isKnownHost = isHostOrSubdomainOf(url, tweetHosts)
-
-  return isKnownHost || nitterHostRegex.test(url.hostname)
+const isTweetUrl = (url: URL, hosts: string | ReadonlyArray<string>): boolean => {
+  return isHostOrSubdomainOf(url, hosts) || nitterHostRegex.test(url.hostname)
 }
 
 // `/{handle}/status/{id}`, with the plural `statuses` form from the earliest era. The id is its
@@ -60,11 +59,8 @@ const handleStandIn = 'i'
 
 type Status = { handle: string; id: string }
 
-const readStatusUrl = (value: string | URL | undefined): Status | undefined => {
-  // The url createUrlEmbedResolver hands its reader is already parsed.
-  const parsed = value instanceof URL ? value : parseUrl(value ?? '', placeholderBaseUrl)
-
-  if (!parsed || !isTweetUrl(parsed)) {
+const readStatusUrl = (parsed: URL | undefined): Status | undefined => {
+  if (!parsed) {
     return
   }
 
@@ -86,7 +82,7 @@ const findStatus = (element: Element): { status: Status; anchor?: Element } | un
   const anchors = Array.from(element.querySelectorAll('a[href]')).reverse()
 
   for (const anchor of anchors) {
-    const status = readStatusUrl(attr(anchor, 'href'))
+    const status = readStatusUrl(parseUrlOnHosts(attr(anchor, 'href'), tweetHosts, isTweetUrl))
 
     if (status) {
       return { status, anchor }
@@ -96,7 +92,8 @@ const findStatus = (element: Element): { status: Status; anchor?: Element } | un
   // The frame has to be the platform's own: `id` is an ordinary parameter name, so any other
   // iframe a publisher nested in the quote would otherwise name the tweet.
   const frame = parseUrl(attr(find(element, 'iframe[src]'), 'src') ?? '', placeholderBaseUrl)
-  const framed = frame && isTweetUrl(frame) ? getQueryParam(frame.searchParams, 'id') : undefined
+  const framed =
+    frame && isTweetUrl(frame, tweetHosts) ? getQueryParam(frame.searchParams, 'id') : undefined
   const declared =
     attr(element, 'data-twitter-tweet-id') ??
     attr(element, 'data-tweet-id') ??
@@ -120,7 +117,7 @@ const readAuthor = (status: Status): string | undefined => {
 
 // A blockquote with no paragraph of its own keeps the tweet text in the byline's paragraph,
 // ahead of the line break before the byline.
-const readLeadText = (byline: Element | null | undefined): string | undefined => {
+const readLeadText = (byline: Nullish<Element>): string | undefined => {
   const parts: Array<string> = []
 
   for (const node of Array.from(byline?.childNodes ?? [])) {
@@ -250,7 +247,7 @@ const extractSubstackTweet = (element: Element): EmbedResolverResult | undefined
     return
   }
 
-  const status = readStatusUrl(attrs.url)
+  const status = readStatusUrl(parseUrlOnHosts(attrs.url, tweetHosts, isTweetUrl))
 
   if (!status) {
     return

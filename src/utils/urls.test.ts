@@ -42,6 +42,12 @@ describe('parseUrlOnHosts', () => {
     expect(parseUrlOnHosts(value, hosts, isHostOf)).toBeUndefined()
   })
 
+  it('should read a scheme followed by one slash as the host, not a path on the base', () => {
+    const value = 'https:/platform.example/watch/123'
+
+    expect(parseUrlOnHosts(value, hosts)?.hostname).toBe('platform.example')
+  })
+
   it('should accept a protocol-relative url on a host', () => {
     const value = '//platform.example/watch/123'
 
@@ -58,6 +64,26 @@ describe('parseUrlOnHosts', () => {
     const value = 'https://platform.example/watch/123%20'
 
     expect(parseUrlOnHosts(value, hosts)?.pathname).toBe('/watch/123')
+  })
+
+  it('should repair a query glued onto the path after the host check', () => {
+    const value = 'https://platform.example/v/123&t=6s'
+
+    expect(parseUrlOnHosts(value, hosts)?.pathname).toBe('/v/123')
+    expect(parseUrlOnHosts(value, hosts)?.searchParams.get('t')).toBe('6s')
+  })
+
+  it('should collapse a run of slashes in the path', () => {
+    const value = 'https://platform.example//watch//123'
+
+    expect(parseUrlOnHosts(value, hosts)?.pathname).toBe('/watch/123')
+  })
+
+  it('should hand a parsed url back once its host is checked', () => {
+    const value = new URL('https://platform.example/v/123&t=6s')
+
+    expect(parseUrlOnHosts(value, hosts)).toBe(value)
+    expect(parseUrlOnHosts(new URL('https://elsewhere.example/v/1'), hosts)).toBeUndefined()
   })
 
   it('should fold a twice-escaped ampersand before the next parameter', () => {
@@ -397,36 +423,28 @@ describe('pickUrlParams', () => {
     const value = 'https://example.com/e/x?utm_source=feed&index=4&list=PLabc&start=90'
     const expected = '?start=90&list=PLabc&index=4'
 
-    expect(pickUrlParams(value, ['start', 'list', 'index'])).toBe(expected)
+    expect(pickUrlParams(new URL(value), ['start', 'list', 'index'])).toBe(expected)
   })
 
   it('should return an empty string when none are present', () => {
     const value = 'https://example.com/e/x?utm_source=feed'
     const expected = ''
 
-    expect(pickUrlParams(value, ['start'])).toBe(expected)
+    expect(pickUrlParams(new URL(value), ['start'])).toBe(expected)
   })
 
   it('should return an empty string when there is no query', () => {
-    expect(pickUrlParams('https://example.com/e/x', ['start'])).toBe('')
+    expect(pickUrlParams(new URL('https://example.com/e/x'), ['start'])).toBe('')
   })
 
   it('should skip a parameter present but empty', () => {
-    expect(pickUrlParams('https://example.com/e/x?start=', ['start'])).toBe('')
-  })
-
-  it('should return an empty string for an unparseable url', () => {
-    expect(pickUrlParams('not a url', ['start'])).toBe('')
-  })
-
-  it('should return an empty string for a protocol-relative url', () => {
-    expect(pickUrlParams('//example.com/e/x?start=90', ['start'])).toBe('')
+    expect(pickUrlParams(new URL('https://example.com/e/x?start='), ['start'])).toBe('')
   })
 
   it('should escape a decoded plus sign and write a decoded slash back bare', () => {
     const value = 'https://example.com/e/x?clipt=a%2Bb%2Fc'
     const expected = '?clipt=a%2Bb/c'
 
-    expect(pickUrlParams(value, ['clipt'])).toBe(expected)
+    expect(pickUrlParams(new URL(value), ['clipt'])).toBe(expected)
   })
 })

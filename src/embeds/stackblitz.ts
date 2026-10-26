@@ -22,7 +22,7 @@ type StackblitzTarget = {
   query: string
 }
 
-const parseTarget = (value: string | URL | undefined): StackblitzTarget | undefined => {
+const parseTarget = (value: URL | undefined): StackblitzTarget | undefined => {
   const parsed = parseUrlOnHosts(value, stackblitzHosts, isHostOf)
 
   if (!parsed) {

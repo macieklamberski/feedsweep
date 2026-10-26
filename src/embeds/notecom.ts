@@ -37,7 +37,7 @@ type NoteUrl = { noteId: string; kind: 'post' | 'player' }
 // Each id is read at its position: off the end, a trailing slug would be handed over as the note.
 // The shapes are the post note.com/{user}/n/{id}, the same post under a publication as
 // biz.note.com/n/{id}, and the player note.com/embed/notes/{id}.
-const readNoteUrl = (link: string | URL): NoteUrl | undefined => {
+const readNoteUrl = (link: URL): NoteUrl | undefined => {
   const parsed = parseUrlOnHosts(link, notecomHosts)
   const segments = parsed ? getPathSegments(parsed) : []
 

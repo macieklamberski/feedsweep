@@ -40,7 +40,7 @@ export const umapEmbedResolver = createMarkupEmbedResolver('iframe[src*="/map/"]
     provider,
     // A map id is unique only within its instance, so the host travels in the id.
     id: `${url.host}/${mapId}`,
-    src: `${page}${pickUrlParams(link, umapEmbedParams)}${url.hash}`,
+    src: `${page}${pickUrlParams(url, umapEmbedParams)}${url.hash}`,
     url: page,
     height: mapHeight,
     title: attr(element, 'title'),

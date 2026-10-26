@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
-import { describeForEachParser, html, resolverExtractor } from '../tests.js'
+import { carrierUrl, describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { repairCarrierUrl } from '../utils/urls.js'
 import {
   dailymotionEmbedResolver,
+  dailymotionHosts,
   dailymotionRenderHint,
   dailymotionResolveEmbed,
   dailymotionScriptEmbedResolver,
@@ -70,11 +70,11 @@ const routeWordUrls = [
 
 describe('extractDailymotionId', () => {
   it.each(videoUrls)('should extract the id from %s', (value) => {
-    expect(extractDailymotionId(new URL(repairCarrierUrl(value)))).toBe('x7tgad0')
+    expect(extractDailymotionId(carrierUrl(value, dailymotionHosts))).toBe('x7tgad0')
   })
 
   it.each(playlistUrls)('should extract no video id from %s', (value) => {
-    expect(extractDailymotionId(new URL(repairCarrierUrl(value)))).toBeUndefined()
+    expect(extractDailymotionId(carrierUrl(value, dailymotionHosts))).toBeUndefined()
   })
 
   // The geo player states the video in its query, and a publisher who kept the path prefix
@@ -82,7 +82,7 @@ describe('extractDailymotionId', () => {
   it('should read the query id when the path names no video', () => {
     const value = 'https://www.dailymotion.com/video/?video=x7tgad0'
 
-    expect(extractDailymotionId(new URL(repairCarrierUrl(value)))).toBe('x7tgad0')
+    expect(extractDailymotionId(carrierUrl(value, dailymotionHosts))).toBe('x7tgad0')
   })
 
   // The oldest videos on the platform carry four characters, so an id test with a length floor
@@ -95,7 +95,7 @@ describe('extractDailymotionId', () => {
   ]
 
   it.each(fourCharacterIdUrls)('should extract a four-character id from %s', (value) => {
-    expect(extractDailymotionId(new URL(repairCarrierUrl(value)))).toBe('x13i')
+    expect(extractDailymotionId(carrierUrl(value, dailymotionHosts))).toBe('x13i')
   })
 
   // A locale is only stepped over where a route word follows it. Dailymotion's own account
@@ -106,27 +106,27 @@ describe('extractDailymotionId', () => {
   ]
 
   it.each(accountPageUrls)('should extract no id from %s', (value) => {
-    expect(extractDailymotionId(new URL(repairCarrierUrl(value)))).toBeUndefined()
+    expect(extractDailymotionId(carrierUrl(value, dailymotionHosts))).toBeUndefined()
   })
 
   it('should use a malformed id with an encoded slash after it as written, even if the player answers an error', () => {
     const value = 'https://www.dailymotion.com/video/x7tgad0%2F'
     const expected = 'x7tgad0/'
 
-    expect(extractDailymotionId(new URL(repairCarrierUrl(value)))).toEqual(expected)
+    expect(extractDailymotionId(carrierUrl(value, dailymotionHosts))).toEqual(expected)
   })
 
   it('should use a malformed id with an encoded slash before it as written, even if the player answers an error', () => {
     const value = 'https://www.dailymotion.com/video/%2Fx7tgad0'
     const expected = '/x7tgad0'
 
-    expect(extractDailymotionId(new URL(repairCarrierUrl(value)))).toEqual(expected)
+    expect(extractDailymotionId(carrierUrl(value, dailymotionHosts))).toEqual(expected)
   })
 
   it('should extract no id behind a three-letter segment where the locale sits', () => {
     const value = 'https://www.dailymotion.com/fra/video/x7tgad0'
 
-    expect(extractDailymotionId(new URL(repairCarrierUrl(value)))).toBeUndefined()
+    expect(extractDailymotionId(carrierUrl(value, dailymotionHosts))).toBeUndefined()
   })
 })
 
@@ -142,7 +142,7 @@ describe('dailymotionResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
+    expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toEqual(expected)
   })
 
   it('should encode a path id carrying an encoded slash once', () => {
@@ -156,7 +156,7 @@ describe('dailymotionResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
+    expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toEqual(expected)
   })
 
   it('should encode a playlist path id carrying an encoded slash once', () => {
@@ -169,7 +169,7 @@ describe('dailymotionResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
+    expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toEqual(expected)
   })
 
   it('should preserve the start offset', () => {
@@ -183,7 +183,7 @@ describe('dailymotionResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
+    expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toEqual(expected)
   })
 
   it('should read the start the player id form states', () => {
@@ -197,7 +197,7 @@ describe('dailymotionResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
+    expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toEqual(expected)
   })
 
   it('should rebuild a player the publisher created on the player id', () => {
@@ -211,7 +211,7 @@ describe('dailymotionResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
+    expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toEqual(expected)
   })
 
   it('should keep the start and playlist of a player the publisher created', () => {
@@ -226,7 +226,7 @@ describe('dailymotionResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
+    expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toEqual(expected)
   })
 
   it('should keep the loop of a player the publisher created', () => {
@@ -240,7 +240,7 @@ describe('dailymotionResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
+    expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toEqual(expected)
   })
 
   it('should drop the settings of a player the publisher created', () => {
@@ -254,7 +254,7 @@ describe('dailymotionResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
+    expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toEqual(expected)
   })
 
   it('should rebuild the generic player on the player id', () => {
@@ -268,7 +268,7 @@ describe('dailymotionResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
+    expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toEqual(expected)
   })
 
   it('should rebuild a player path behind another segment', () => {
@@ -282,7 +282,7 @@ describe('dailymotionResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
+    expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toEqual(expected)
   })
 
   it('should rebuild a player path with a segment after it', () => {
@@ -296,7 +296,7 @@ describe('dailymotionResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
+    expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toEqual(expected)
   })
 
   it('should drop tracking parameters', () => {
@@ -310,13 +310,13 @@ describe('dailymotionResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
+    expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toEqual(expected)
   })
 
   it('should return undefined for a dailymotion url naming no video', () => {
     const value = 'https://www.dailymotion.com/about'
 
-    expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toBeUndefined()
+    expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toBeUndefined()
   })
 
   // The id is qualified because a playlist and a video share one grammar, and enrichment sees
@@ -330,7 +330,7 @@ describe('dailymotionResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
+    expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toEqual(expected)
   })
 
   // The word only names a playlist where the route prefix ends. Scanning the whole path for it
@@ -339,14 +339,14 @@ describe('dailymotionResolveEmbed', () => {
   it('should refuse the playlist word sitting deeper in the path', () => {
     const value = 'https://www.dailymotion.com/search/playlist/videos'
 
-    expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toBeUndefined()
+    expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toBeUndefined()
   })
 
   // Reading one of these as an id mints a player for whichever video happens to own the word:
   // `/embed/channel/{id}` yielded `channel` and pointed the placeholder at
   // `dailymotion.com/video/channel`.
   it.each(routeWordUrls)('should refuse the route word in %s', (value) => {
-    expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toBeUndefined()
+    expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toBeUndefined()
   })
 
   // A video playing inside a playlist is still a video, so the playlist branch must not take it.
@@ -361,7 +361,7 @@ describe('dailymotionResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
+    expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toEqual(expected)
   })
 
   it('should keep a decoded video id carrying a separator in one path segment', () => {
@@ -375,7 +375,7 @@ describe('dailymotionResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
+    expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toEqual(expected)
   })
 
   it('should keep a decoded playlist id carrying a separator in one path segment', () => {
@@ -388,7 +388,7 @@ describe('dailymotionResolveEmbed', () => {
       ratio: '16/9',
     }
 
-    expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
+    expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toEqual(expected)
   })
 
   describe('the retired jukebox, video wall and videozap widgets', () => {
@@ -404,7 +404,7 @@ describe('dailymotionResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
+      expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toEqual(expected)
     })
 
     it('should rebuild the first video of a jukebox naming several', () => {
@@ -419,7 +419,7 @@ describe('dailymotionResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
+      expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toEqual(expected)
     })
 
     it('should rebuild a jukebox naming an encoded playlist with a slug and a page', () => {
@@ -433,7 +433,7 @@ describe('dailymotionResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
+      expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toEqual(expected)
     })
 
     it('should rebuild a jukebox whose list key is encoded', () => {
@@ -447,7 +447,7 @@ describe('dailymotionResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
+      expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toEqual(expected)
     })
 
     it('should rebuild a video wall naming a playlist, its settings in the path', () => {
@@ -461,7 +461,7 @@ describe('dailymotionResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
+      expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toEqual(expected)
     })
 
     it('should rebuild a videozap naming a playlist', () => {
@@ -475,7 +475,7 @@ describe('dailymotionResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
+      expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toEqual(expected)
     })
 
     // A group, a user or another listing maps onto no player. These stay as written.
@@ -493,7 +493,7 @@ describe('dailymotionResolveEmbed', () => {
     ]
 
     it.each(listingWidgetUrls)('should leave the listing in %s', (value) => {
-      expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toBeUndefined()
+      expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toBeUndefined()
     })
 
     it('should rebuild the first playlist of a jukebox listing a user before it', () => {
@@ -507,14 +507,14 @@ describe('dailymotionResolveEmbed', () => {
         ratio: '16/9',
       }
 
-      expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toEqual(expected)
+      expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toEqual(expected)
     })
 
     it('should leave a jukebox listing only a bookmark list and a user', () => {
       const value =
         'http://www.dailymotion.com/widget/jukebox?list[]=%2Fbookmarks%2Fangelpuente&list%5B%5D=%2Fangelpuente&skin=default'
 
-      expect(dailymotionResolveEmbed(new URL(repairCarrierUrl(value)))).toBeUndefined()
+      expect(dailymotionResolveEmbed(carrierUrl(value, dailymotionHosts))).toBeUndefined()
     })
   })
 })

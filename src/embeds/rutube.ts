@@ -25,7 +25,7 @@ const composeEmbed = (videoId: string, parsed: URL): EmbedResolverResult => {
   return {
     provider,
     id: videoId,
-    src: `https://rutube.ru/play/embed/${segment}${pickUrlParams(parsed.href, rutubeEmbedParams)}`,
+    src: `https://rutube.ru/play/embed/${segment}${pickUrlParams(parsed, rutubeEmbedParams)}`,
     url: getQueryParam(parsed.searchParams, 'p')
       ? undefined
       : `https://rutube.ru/video/${segment}/`,

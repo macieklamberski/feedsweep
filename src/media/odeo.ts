@@ -1,7 +1,7 @@
 import type { MediaResolver } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { readRepairedCarrierUrl } from '../utils/widgets.js'
+import { readCarrierUrl } from '../utils/widgets.js'
 
 const odeoHosts = ['odeo.com']
 
@@ -14,7 +14,7 @@ export const odeoMediaResolver: MediaResolver = {
   kind: 'media',
   selector: 'embed[src*="odeo.com/flash/" i], object[data*="odeo.com/flash/" i]',
   extract: (element) => {
-    if (!parseUrlOnHosts(readRepairedCarrierUrl(element), odeoHosts)) {
+    if (!parseUrlOnHosts(readCarrierUrl(element), odeoHosts)) {
       return
     }
 

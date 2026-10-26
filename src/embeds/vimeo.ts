@@ -25,7 +25,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const provider = 'vimeo'
 const playerRatio = '16/9'
 
-const vimeoHosts = ['vimeo.com']
+export const vimeoHosts = ['vimeo.com']
 
 // The hosts that serve a video page or a player. Other subdomains serve files and assets, and the
 // numbers in `av.vimeo.com/50935/740/135924474.mp4` are storage segments, not a video id.

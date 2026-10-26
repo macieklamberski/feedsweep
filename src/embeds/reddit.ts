@@ -29,14 +29,12 @@ type RedditTarget = {
   publisher: string
 }
 
-const parseRedditPath = (value: string | URL | undefined): Array<string> | undefined => {
-  const parsed = parseUrlOnHosts(value, redditHosts)
-
-  if (!parsed) {
+const parseRedditPath = (value: URL | undefined): Array<string> | undefined => {
+  if (!value) {
     return
   }
 
-  return getPathSegments(parsed)
+  return getPathSegments(value)
 }
 
 const readScope = (segment: string | undefined): 'r' | 'user' | undefined => {
@@ -49,7 +47,7 @@ const readScope = (segment: string | undefined): 'r' | 'user' | undefined => {
   }
 }
 
-const parseTarget = (value: string | URL | undefined): RedditTarget | undefined => {
+const parseTarget = (value: URL | undefined): RedditTarget | undefined => {
   const segments = parseRedditPath(value)
 
   if (!segments) {
@@ -92,7 +90,7 @@ const parseTarget = (value: string | URL | undefined): RedditTarget | undefined 
 
 // A profile link, which names the poster and nothing embeddable.
 const parseAuthor = (value: string | undefined): string | undefined => {
-  const [segment, name, rest] = parseRedditPath(value) ?? []
+  const [segment, name, rest] = parseRedditPath(parseUrlOnHosts(value, redditHosts)) ?? []
 
   if (
     readScope(segment) !== 'user' ||
@@ -129,7 +127,7 @@ const readWidget = (element: Element): EmbedResolverResult | undefined => {
 
   for (const anchor of element.querySelectorAll('a[href]')) {
     const href = attr(anchor, 'href')
-    const anchorTarget = parseTarget(href)
+    const anchorTarget = parseTarget(parseUrlOnHosts(href, redditHosts))
 
     target ??= anchorTarget
 
