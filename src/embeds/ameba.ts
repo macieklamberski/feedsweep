@@ -30,7 +30,7 @@ export const amebaResolveEmbed: ResolveUrlEmbed = (url) => {
   return {
     provider,
     id: videoId,
-    src: `https://${hosts[0]}/${composeQuery({ v: videoId })}`,
+    src: `https://static.blog-video.jp/${composeQuery({ v: videoId })}`,
     ...sizes.video,
   }
 }
@@ -72,8 +72,8 @@ export const amebaReblogCardEmbedResolver = createUrlEmbedResolver(amebloHosts, 
   return {
     provider,
     id,
-    src: `https://${amebloHosts[0]}/s/embed/reblog-card/${id}.html`,
-    url: `https://${amebloHosts[0]}/${id}.html`,
+    src: `https://ameblo.jp/s/embed/reblog-card/${id}.html`,
+    url: `https://ameblo.jp/${id}.html`,
     ...sizes.reblogCard,
   }
 })
@@ -91,8 +91,8 @@ export const amebaImagePageEmbedResolver = createUrlEmbedResolver(amebloHosts, (
   return {
     provider,
     id: match[1],
-    src: `https://${amebloHosts[0]}/p/embed/${match[1]}.html`,
-    url: `https://${amebloHosts[0]}/${match[1]}.html`,
+    src: `https://ameblo.jp/p/embed/${match[1]}.html`,
+    url: `https://ameblo.jp/${match[1]}.html`,
     ...sizes.image,
   }
 })

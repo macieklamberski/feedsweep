@@ -15,7 +15,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'pbs'
 
-const playerHost = 'player.pbs.org'
+const playerHosts = ['player.pbs.org']
 
 // The retired player host, which redirects to the player host on the same path.
 const legacyHosts = ['video.pbs.org']
@@ -82,7 +82,7 @@ const composeEmbed = (
   return {
     provider,
     id: `${idSpace}/${videoId}`,
-    src: `https://${playerHost}/${route}/${videoId}/${query}`,
+    src: `https://player.pbs.org/${route}/${videoId}/${query}`,
     ...sizes.player,
     ratioHeightOffset: route === 'viralplayer' ? viralTopBarHeight : undefined,
   }
@@ -136,7 +136,7 @@ export const pbsResolveEmbed: ResolveUrlEmbed = (url, element) => {
   return composeEmbed(route, segments.at(-1), pickUrlParams(url, playbackParams))
 }
 
-export const pbsIframeEmbedResolver = createUrlEmbedResolver([playerHost], pbsResolveEmbed)
+export const pbsIframeEmbedResolver = createUrlEmbedResolver(playerHosts, pbsResolveEmbed)
 
 export const pbsLegacyIframeEmbedResolver = createUrlEmbedResolver(legacyHosts, pbsResolveEmbed)
 

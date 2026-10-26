@@ -10,7 +10,6 @@ const scriptHosts = ['api-maps.yandex.ru']
 // Each host serves the same widget in its own language, yandex.com in English, so a frame keeps
 // the host the publisher wrote. The script names no widget host and takes yandex.ru.
 const hosts = ['yandex.by', 'yandex.com', 'yandex.ru']
-const scriptWidgetHost = 'yandex.ru'
 
 const widgetPath = '/map-widget/v1/'
 // A short link the map's share dialog writes, `/map-widget/v1/-/{code}`. The code names the same
@@ -103,7 +102,7 @@ export const yandexMapsScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    return resolveConstructorMap(scriptWidgetHost, url.searchParams, {})
+    return resolveConstructorMap('yandex.ru', url.searchParams, {})
   },
 )
 

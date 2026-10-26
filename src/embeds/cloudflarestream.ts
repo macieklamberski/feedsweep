@@ -1,4 +1,4 @@
-import { encodePathSegment, getQueryParam, isHostOrSubdomainOf } from 'trousse'
+import { encodePathSegment, getQueryParam, isHostOf, isHostOrSubdomainOf } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 import { absoluteUrlRegex, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
@@ -16,11 +16,7 @@ const hosts = [
 ]
 
 // On the shared host the player answers under `iframe.` only: the bare host 404s the same path.
-const deliveryPlayerHost = 'iframe.videodelivery.net'
-
-// `iframe.videodelivery.net/{videoId}/thumbnails/thumbnail.jpg` answers with the player page.
-// The image is served from the bare host.
-const deliveryThumbnailHost = 'videodelivery.net'
+const deliveryPlayerHosts = ['iframe.videodelivery.net']
 
 const playerPathRegex = /^\/([^/]+)\/iframe\/?$/i
 const deliveryPathRegex = /^\/([^/]+)\/?$/
@@ -33,7 +29,7 @@ const composeThumbnail = (videoId: string, host: string): string => {
 }
 
 const readVideoId = (parsed: URL): string | undefined => {
-  if (parsed.hostname === deliveryPlayerHost) {
+  if (isHostOf(parsed, deliveryPlayerHosts)) {
     return parsed.pathname.match(deliveryPathRegex)?.[1]
   }
 
@@ -49,9 +45,11 @@ export const cloudflarestreamResolveEmbed: ResolveUrlEmbed = (url) => {
     return
   }
 
-  const isDelivery = url.hostname === deliveryPlayerHost
+  const isDelivery = isHostOf(url, deliveryPlayerHosts)
   const playerPath = isDelivery ? `/${videoId}` : `/${videoId}/iframe`
-  const thumbnailHost = isDelivery ? deliveryThumbnailHost : url.hostname
+  // `iframe.videodelivery.net/{videoId}/thumbnails/thumbnail.jpg` answers with the player page.
+  // The image is served from the bare host.
+  const thumbnailHost = isDelivery ? 'videodelivery.net' : url.hostname
   // A relative `poster` would resolve against the feed, not the player, so it is not read.
   const poster = keepIfMatches(getQueryParam(url.searchParams, 'poster'), absoluteUrlRegex)
 
@@ -92,8 +90,8 @@ export const cloudflarestreamScriptEmbedResolver = createMarkupEmbedResolver(
     return {
       provider,
       id: videoId,
-      src: `https://${deliveryPlayerHost}/${segment}`,
-      thumbnail: composeThumbnail(segment, deliveryThumbnailHost),
+      src: `https://iframe.videodelivery.net/${segment}`,
+      thumbnail: composeThumbnail(segment, 'videodelivery.net'),
       ...sizes.player,
     }
   },
