@@ -12,7 +12,7 @@ const hosts = ['hatenablog-parts.com']
 const cardIframeSelector = [
   'iframe.embed-card',
   'iframe.hatenablogcard',
-  'iframe[src*="hatenablog-parts.com/embed" i]',
+  ...hosts.map((host) => `iframe[src*="${host}/embed" i]`),
 ].join(', ')
 
 // A host list misses this: a blog on a custom domain serves its own card from that domain.

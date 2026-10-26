@@ -55,10 +55,14 @@ export const weeblyMediaResolver: MediaResolver = {
 // The Flash audio block: Flash no longer runs, and the mp3 url and its label sit in flashvars.
 export const weeblyFlashMediaResolver: MediaResolver = {
   kind: 'media',
-  selector: [
-    `object[data*="${hosts[0]}${audioPlayerPath}" i]`,
-    `embed[src*="${hosts[0]}${audioPlayerPath}" i]`,
-  ].join(', '),
+  selector: hosts
+    .flatMap((host) => {
+      return [
+        `object[data*="${host}${audioPlayerPath}" i]`,
+        `embed[src*="${host}${audioPlayerPath}" i]`,
+      ]
+    })
+    .join(', '),
   extract: (element) => {
     const player = parseUrlOnHosts(readCarrierUrl(element), hosts)
 
