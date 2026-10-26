@@ -1,4 +1,4 @@
-import { composeQuery, encodePathSegment, getQueryParam, isAnyOf } from 'trousse'
+import { composeQuery, encodePathSegment, getQueryParam, isAnyOf, type Nullish } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -48,7 +48,7 @@ const composeEmbed = (id: string): EmbedResolverResult => {
 // The loader script and the 2014 iframe spell the id with a `/video/` prefix.
 const videoPrefixRegex = /^\/?video\//i
 
-const resolveVideoId = (value: string | null | undefined): EmbedResolverResult | undefined => {
+const resolveVideoId = (value: Nullish<string>): EmbedResolverResult | undefined => {
   const id = value?.replace(videoPrefixRegex, '')
 
   return id && videoIdRegex.test(id) ? composeEmbed(id) : undefined

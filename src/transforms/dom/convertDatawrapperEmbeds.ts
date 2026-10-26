@@ -1,4 +1,4 @@
-import { encodePathSegment } from 'trousse'
+import { encodePathSegment, type Nullish } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
 import { createLinkedImage } from '../../utils/widgets.js'
@@ -11,7 +11,7 @@ const visWrapperIdRegex = /^datawrapper-vis-(.+)$/
 const resizeScriptRegex = /datawrapper-height|window\.datawrapper/
 
 // The url is read unparsed, and the chart id goes into a path.
-const getChartId = (url: string | null | undefined): string | undefined => {
+const getChartId = (url: Nullish<string>): string | undefined => {
   return encodePathSegment(url?.match(chartIdRegex)?.[1] ?? '')
 }
 

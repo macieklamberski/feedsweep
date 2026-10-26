@@ -4,6 +4,7 @@ import {
   includesAnyOf,
   isAnyOf,
   isPlainObject,
+  type Nullish,
   toMap,
 } from 'trousse'
 import type {
@@ -237,7 +238,7 @@ const readPayloadCaption = (title: string | undefined): string | undefined => {
 }
 
 // Only a rehosted copy: the earliest payloads carry Instagram's signed CDN url, long expired.
-const readRehostedUrl = (url: string | null | undefined): string | undefined => {
+const readRehostedUrl = (url: Nullish<string>): string | undefined => {
   if (!url || !includesAnyOf(url, ['__ss-rehost__'])) {
     return
   }
