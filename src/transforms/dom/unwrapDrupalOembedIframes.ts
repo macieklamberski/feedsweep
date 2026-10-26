@@ -1,7 +1,7 @@
-import { getQueryParam, parseUrl } from 'trousse'
+import { getQueryParam } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { getLazyValue } from '../../utils/dom.js'
-import { isUrlShaped, placeholderBaseUrl } from '../../utils/urls.js'
+import { isUrlShaped, parseRepairedUrl } from '../../utils/urls.js'
 
 // Drupal's /media/oembed frame around a remote video, naming the site rather than the provider,
 // so the placeholder gets no poster, no shape and no provider.
@@ -17,7 +17,7 @@ export const unwrapDrupalOembedIframes: DomTransform = (context) => {
       const proxyUrl = getLazyValue(iframe, attributes, (value) =>
         value.toLowerCase().includes('/media/oembed?'),
       )
-      const url = getQueryParam(parseUrl(proxyUrl ?? '', placeholderBaseUrl)?.searchParams, 'url')
+      const url = getQueryParam(parseRepairedUrl(proxyUrl)?.searchParams, 'url')
 
       // Requiring a scheme here drops protocol-relative and site-relative urls later passes resolve.
       if (!url || !isUrlShaped(url)) {

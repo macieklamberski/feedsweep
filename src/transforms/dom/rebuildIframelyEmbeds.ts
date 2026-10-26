@@ -1,4 +1,4 @@
-import { getQueryParam } from 'trousse'
+import { getQueryParam, isAnyOf } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr, hasText } from '../../utils/dom.js'
 import { isUrlShaped, parseUrlOnHosts } from '../../utils/urls.js'
@@ -25,7 +25,7 @@ export const rebuildIframelyEmbeds: DomTransform = (context) => {
     const src = attr(frame, 'src')
     const apiUrl = parseUrlOnHosts(src, iframelyApiHosts)
 
-    if (apiUrl?.pathname === '/api/iframe') {
+    if (apiUrl && isAnyOf(apiUrl.pathname, '/api/iframe')) {
       return getQueryParam(apiUrl.searchParams, 'url')
     }
 

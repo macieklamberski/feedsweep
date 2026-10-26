@@ -1,4 +1,4 @@
-import { getQueryParam, parseUrl } from 'trousse'
+import { getQueryParam, isHostOf, parseUrl } from 'trousse'
 import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
@@ -20,8 +20,13 @@ const cardIframeSelector = [
 // names the same host.
 const isSelfHosted = (source: string, citationHref: string | undefined): boolean => {
   const citation = citationHref ? parseUrl(citationHref, placeholderBaseUrl) : undefined
+  const card = parseUrl(source, placeholderBaseUrl)
 
-  return citation !== undefined && parseUrl(source, placeholderBaseUrl)?.host === citation.host
+  if (!citation || !card) {
+    return false
+  }
+
+  return isHostOf(card, citation.hostname)
 }
 
 // Hatena Blog's link card: an iframe at its card renderer, with a <cite> holding the real link.

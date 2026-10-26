@@ -34,6 +34,17 @@ describeForEachParser('unwrapDrupalOembedIframes', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should read the page url behind a doubly escaped ampersand', async () => {
+    const value = html`
+      <iframe src="https://www.example.com/media/oembed?max_width=0&amp;amp;url=https%3A//www.youtube.com/watch%3Fv%3D2dEj10uaqAs"></iframe>
+    `
+    const expected = html`
+      <iframe src="https://www.youtube.com/watch?v=2dEj10uaqAs"></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should keep an unencoded query inside the page url', async () => {
     const value = html`
       <iframe src="https://www.example.com/media/oembed?url=https://www.youtube.com/watch?v=2dEj10uaqAs&amp;hash=abc"></iframe>

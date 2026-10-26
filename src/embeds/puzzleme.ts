@@ -20,14 +20,14 @@ const sizes = {
 
 // The player finds a puzzle by its id within the publisher's set.
 const composePuzzlemeEmbed = (kind: string, id: string, set: string): EmbedResolverResult => {
-  const page = `https://puzzleme.amuselabs.com/pmm/${kind}${composeQuery({ id, set })}`
+  const page = `https://puzzleme.amuselabs.com/pmm/${kind}`
 
   return {
     provider,
     id: `${set}/${id}`,
     // `embed=1` turns the page into the embedded player, without the site's own chrome.
-    src: `${page}&embed=1`,
-    url: page,
+    src: `${page}${composeQuery({ id, set, embed: '1' })}`,
+    url: `${page}${composeQuery({ id, set })}`,
     ...sizes.player,
   }
 }

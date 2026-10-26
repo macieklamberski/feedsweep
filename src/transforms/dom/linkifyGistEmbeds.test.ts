@@ -138,6 +138,13 @@ describeForEachParser('linkifyGistEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should leave a foreign script naming a gist url in its query untouched', async () => {
+    const value =
+      '<script src="https://evil.test/embed.js?url=https://gist.github.com/octocat/6cad326836d38bd3a7ae.js"></script>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should replace a gist-Blogger mount holding its loader with a link to the gist', async () => {
     const value = html`
       <div

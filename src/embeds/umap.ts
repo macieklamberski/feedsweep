@@ -36,12 +36,12 @@ export const umapEmbedResolver = createMarkupEmbedResolver('iframe[src*="/map/"]
 
   const [, lang, slug, mapId] = match
   // Every instance 301s `http:` to `https:`, and an https page blocks an `http:` frame.
-  const page = `https://${url.host}/${lang}/map/${slug}_${mapId}`
+  const page = `https://${url.hostname}/${lang}/map/${slug}_${mapId}`
 
   return {
     provider,
     // A map id is unique only within its instance, so the host travels in the id.
-    id: `${url.host}/${mapId}`,
+    id: `${url.hostname}/${mapId}`,
     src: `${page}${pickUrlParams(url, umapEmbedParams)}${url.hash}`,
     url: page,
     ...sizes.map,

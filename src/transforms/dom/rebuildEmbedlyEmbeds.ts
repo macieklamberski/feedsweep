@@ -1,8 +1,10 @@
-import { getQueryParam, type Nullish, parseUrl } from 'trousse'
+import { getQueryParam, type Nullish } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr, jsonAttr } from '../../utils/dom.js'
-import { isUrlShaped, placeholderBaseUrl } from '../../utils/urls.js'
+import { isUrlShaped, parseUrlOnHosts } from '../../utils/urls.js'
 import { createIframe, createLink } from '../../utils/widgets.js'
+
+const embedlyHosts = ['cdn.embedly.com']
 
 const embedlyCarrierSelector = [
   'iframe[src*="cdn.embedly.com/widgets/media.html" i]',
@@ -34,7 +36,7 @@ export const rebuildEmbedlyEmbeds: DomTransform = () => (document) => {
   for (const element of document.querySelectorAll(embedlyCarrierSelector)) {
     if (element.localName === 'iframe') {
       // The wrapper's query holds the embed as src, its poster as image and the canonical as url.
-      const params = parseUrl(attr(element, 'src') ?? '', placeholderBaseUrl)?.searchParams
+      const params = parseUrlOnHosts(attr(element, 'src'), embedlyHosts)?.searchParams
       const inner = getQueryParam(params, 'src')
 
       if (!isUsableUrl(inner)) {

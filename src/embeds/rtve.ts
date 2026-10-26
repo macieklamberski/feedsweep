@@ -1,6 +1,6 @@
 import { encodePathSegment, getAnyOf, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
-import { attr, flashVar } from '../utils/dom.js'
+import { attr, flashVar, text } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'rtve'
@@ -97,7 +97,7 @@ const rtveFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 
   // The 4.x snippet writes the asset's page link as the object's fallback, named after it.
-  const title = element?.closest('object')?.querySelector(':scope > a')?.textContent?.trim()
+  const title = text(element?.closest('object'), ':scope > a')
 
   const kind = isAnyOf(match[2], 'audios') ? 'audio' : 'video'
 

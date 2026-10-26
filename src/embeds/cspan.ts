@@ -1,6 +1,6 @@
 import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
-import { pickQueryParams } from '../utils/urls.js'
+import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'cspan'
@@ -30,8 +30,8 @@ export const cspanResolveEmbed: ResolveUrlEmbed = (url) => {
     return
   }
 
-  const params = new URLSearchParams(pickQueryParams(url.search, ['start']))
-  const query = params.size ? `&${params}` : ''
+  // The id leads the query with no name, so the kept pairs follow it after `&`.
+  const query = pickUrlParams(url, ['start']).replace('?', '&')
 
   return {
     provider,

@@ -8,6 +8,7 @@ import {
   trimObject,
 } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
+import { attr, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { pickQueryParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -142,7 +143,7 @@ export const vkWidgetEmbedResolver = createMarkupEmbedResolver(
   'div[id^="vk_post_"], div[id^="vk_playlist_"], div[id^="vk_podcast_"], div[id^="vk_poll"]',
   (element) => {
     // A mount that already holds the post's text keeps it.
-    if (element.textContent?.trim()) {
+    if (text(element)) {
       return
     }
 
@@ -158,7 +159,7 @@ export const vkWidgetEmbedResolver = createMarkupEmbedResolver(
       const calls = [widgetCallRegex, podcastCallRegex, pollCallRegex].flatMap((regex) => {
         return [...code.matchAll(regex)]
       })
-      const call = calls.find((match) => match.groups?.element === element.id)
+      const call = calls.find((match) => match.groups?.element === attr(element, 'id'))
 
       if (!call?.groups) {
         continue

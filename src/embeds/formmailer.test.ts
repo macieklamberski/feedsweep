@@ -48,8 +48,20 @@ describe('formmailerResolveEmbed', () => {
       expect(formmailerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
-    it('should drop the loader display setting', () => {
+    it('should pass the loader display setting through with the rest of the query', () => {
       const value = 'https://ssl.form-mailer.jp/fms/6662b06a268383?errorScroll=0'
+      const expected: EmbedResolverResult = {
+        provider: 'formmailer',
+        id: '6662b06a268383',
+        src: 'https://ssl.form-mailer.jp/fms/6662b06a268383?errorScroll=0',
+        url: 'https://ssl.form-mailer.jp/fms/6662b06a268383',
+      }
+
+      expect(formmailerResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
+    it('should drop a port the carrier names from the form host', () => {
+      const value = 'https://ssl.form-mailer.jp:8443/fms/6662b06a268383'
       const expected: EmbedResolverResult = {
         provider: 'formmailer',
         id: '6662b06a268383',
@@ -133,7 +145,7 @@ describeForEachParser('formmailerWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'formmailer',
         id: '9f273042809537',
-        src: 'https://ssl.form-mailer.jp/fms/9f273042809537?%E3%82%BF%E3%82%A4%E3%83%88%E3%83%AB[0]=12%E6%9C%882%E6%97%A5',
+        src: 'https://ssl.form-mailer.jp/fms/9f273042809537?%E3%82%BF%E3%82%A4%E3%83%88%E3%83%AB[0]=12%E6%9C%882%E6%97%A5&',
         url: 'https://ssl.form-mailer.jp/fms/9f273042809537',
       }
 

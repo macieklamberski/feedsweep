@@ -6,7 +6,7 @@ import {
   extractRenderCastId,
 } from '../../embeds/asciinema.js'
 import type { DomTransform } from '../../types.js'
-import { attr } from '../../utils/dom.js'
+import { attr, text } from '../../utils/dom.js'
 import { createLinkedImage } from '../../utils/widgets.js'
 
 // Publishers pair the loader with their own copy of the render, in a <noscript> or a bare link,
@@ -24,7 +24,7 @@ const findFallback = (script: Element, castId: string) => {
     }
 
     // A caption or a link elsewhere is the publisher's own content, which the render lacks.
-    if (sibling.textContent?.trim()) {
+    if (text(sibling)) {
       continue
     }
 

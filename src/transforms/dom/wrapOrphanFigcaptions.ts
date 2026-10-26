@@ -1,5 +1,5 @@
 import type { DomTransform } from '../../types.js'
-import { isElement } from '../../utils/dom.js'
+import { hasText, isElement } from '../../utils/dom.js'
 
 const mediaSelector = 'img, picture, video, audio, iframe'
 
@@ -42,7 +42,7 @@ const precedingFigures = (anchor: Element): Array<Element> => {
 
 // stripEmptyTags has already run, so an emptied wrapper would stay for good.
 const discardEmptyAnchor = (anchor: Element, figcaption: Element): void => {
-  if (anchor !== figcaption && !anchor.textContent?.trim() && anchor.children.length === 0) {
+  if (anchor !== figcaption && !hasText(anchor) && anchor.children.length === 0) {
     anchor.remove()
   }
 }
@@ -101,7 +101,7 @@ export const wrapOrphanFigcaptions: DomTransform = () => {
         continue
       }
 
-      if (previous.textContent?.trim()) {
+      if (hasText(previous)) {
         continue
       }
 

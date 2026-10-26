@@ -218,6 +218,25 @@ describeForEachParser('flattenPictureElements', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should give an img whose src is about:blank a src from its own srcset', async () => {
+    const value = html`
+      <picture>
+        <img
+          src="about:blank"
+          srcset="https://example.com/a-400.jpg 400w, https://example.com/a-800.jpg 800w"
+        >
+      </picture>
+    `
+    const expected = html`
+      <img
+        src="https://example.com/a-800.jpg"
+        srcset="https://example.com/a-400.jpg 400w, https://example.com/a-800.jpg 800w"
+      >
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should flatten multiple pictures in one document', async () => {
     const value = html`
       <picture>

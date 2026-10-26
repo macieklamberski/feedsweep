@@ -1,4 +1,5 @@
 import type { EmojiResolver } from '../types.js'
+import { text } from '../utils/dom.js'
 import { getFileStem, glyphFromCodepoints, isEmojiShaped } from '../utils/emojis.js'
 import { bgImage } from '../utils/styles.js'
 
@@ -18,10 +19,10 @@ export const whatsappEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: `span[style*="${paintedPath}" i]`,
   extract: (element) => {
-    const text = element.textContent?.trim()
+    const typed = text(element)
 
-    if (text) {
-      return isEmojiShaped(text) ? { glyph: text } : undefined
+    if (typed) {
+      return isEmojiShaped(typed) ? { glyph: typed } : undefined
     }
 
     const url = bgImage(element)

@@ -1,10 +1,8 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
-import type { CleanUrlFn, EmbedResolverResult } from '../types.js'
+import type { EmbedResolverResult } from '../types.js'
 import { patroniteEmbedResolver, patroniteResolveEmbed } from './patronite.js'
-
-const utmParamRegex = /[?&]utm_\w+=\w+/g
 
 describe('patroniteResolveEmbed', () => {
   describe('happy paths', () => {
@@ -13,7 +11,7 @@ describe('patroniteResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'patronite',
         id: '114344',
-        src: 'https://patronite.pl/widget/strajk/114344/small/FF3E3E/FEFFF8',
+        src: 'https://patronite.pl/widget/strajk/114344/small/light/colorful',
         url: 'https://patronite.pl/strajk',
         height: 306,
       }
@@ -21,13 +19,13 @@ describe('patroniteResolveEmbed', () => {
       expect(patroniteResolveEmbed(new URL(value))).toEqual(expected)
     })
 
-    it('should keep the theme and description the publisher chose', () => {
+    it('should drop the description the publisher wrote', () => {
       const value =
         'https://patronite.pl/widget/czlowiekplus/667937/small/light/colorful?description=Dzi%C4%99kuj%C4%99%20za%20Twoje%20wsparcie!'
       const expected: EmbedResolverResult = {
         provider: 'patronite',
         id: '667937',
-        src: 'https://patronite.pl/widget/czlowiekplus/667937/small/light/colorful?description=Dzi%C4%99kuj%C4%99%20za%20Twoje%20wsparcie!',
+        src: 'https://patronite.pl/widget/czlowiekplus/667937/small/light/colorful',
         url: 'https://patronite.pl/czlowiekplus',
         height: 306,
       }
@@ -68,7 +66,7 @@ describeForEachParser('patroniteEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'patronite',
         id: '114344',
-        src: 'https://patronite.pl/widget/strajk/114344/small/FF3E3E/FEFFF8',
+        src: 'https://patronite.pl/widget/strajk/114344/small/light/colorful',
         url: 'https://patronite.pl/strajk',
         height: 306,
       }
@@ -82,7 +80,7 @@ describeForEachParser('patroniteEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'patronite',
         id: '114344',
-        src: 'https://patronite.pl/widget/strajk/114344/small/FF3E3E/FEFFF8',
+        src: 'https://patronite.pl/widget/strajk/114344/small/light/colorful',
         url: 'https://patronite.pl/strajk',
         height: 306,
       }
@@ -102,11 +100,10 @@ describeForEachParser('patroniteEmbedResolver', (parseHtml) => {
 })
 
 describeForEachParser('patronite widget through the pipeline', (parseHtml) => {
-  const convert = (value: string, cleanUrlFn?: CleanUrlFn) => {
+  const convert = (value: string) => {
     return transformContent(value, {
       parseHtmlFn: parseHtml,
       baseUrl: 'https://example.com/post',
-      cleanUrlFn,
     })
   }
 
@@ -127,33 +124,11 @@ describeForEachParser('patronite widget through the pipeline', (parseHtml) => {
         data-embed-height="306"
         data-embed-provider="patronite"
         data-embed-id="114344"
-        data-embed-src="https://patronite.pl/widget/strajk/114344/small/FF3E3E/FEFFF8"
+        data-embed-src="https://patronite.pl/widget/strajk/114344/small/light/colorful"
         data-embed-url="https://patronite.pl/strajk"
       ></div>
     `
 
     expect(await convert(value)).toEqualHtml(expected)
-  })
-
-  it("should hand the carrier src to the caller's cleaner", async () => {
-    const value = html`
-      <iframe
-        src="https://patronite.pl/widget/strajk/114344/small/FF3E3E/FEFFF8?utm_source=blog"
-        width="300"
-        height="450"
-      ></iframe>
-    `
-    const expected = html`
-      <div
-        data-embed-height="306"
-        data-embed-provider="patronite"
-        data-embed-id="114344"
-        data-embed-src="https://patronite.pl/widget/strajk/114344/small/FF3E3E/FEFFF8"
-        data-embed-url="https://patronite.pl/strajk"
-      ></div>
-    `
-    const cleanUrlFn = (url: string) => url.replace(utmParamRegex, '')
-
-    expect(await convert(value, cleanUrlFn)).toEqualHtml(expected)
   })
 })

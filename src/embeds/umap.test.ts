@@ -29,6 +29,26 @@ describeForEachParser('umapEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should drop the port of a self-hosted instance from the src and the id', async () => {
+      const value = html`
+        <iframe
+          width="100%"
+          height="300px"
+          frameborder="0"
+          src="https://umap.example.org:8443/fr/map/les-hautes-chaumes_13219?scaleControl=false"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'umap',
+        id: 'umap.example.org/13219',
+        src: 'https://umap.example.org/fr/map/les-hautes-chaumes_13219',
+        url: 'https://umap.example.org/fr/map/les-hautes-chaumes_13219',
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should claim a map on Framacarte', async () => {
       const value = html`
         <iframe

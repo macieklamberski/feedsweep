@@ -86,6 +86,16 @@ describeForEachParser('rebuildEmbedlyEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should leave a foreign host carrying the wrapper path in its query untouched', async () => {
+    const value = html`
+      <iframe
+        src="https://evil.test/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2FdQw4w9WgXcQ&cdn.embedly.com/widgets/media.html"
+      ></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should leave a non-embedly iframe untouched', async () => {
     const value = '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>'
 

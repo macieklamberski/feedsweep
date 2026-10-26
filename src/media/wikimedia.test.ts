@@ -30,7 +30,7 @@ describeForEachParser('wikimediaMediaResolver', (parseHtml) => {
         '<iframe src="http://commons.wikimedia.org/wiki/File%3AFennec_Singing.ogg?embedplayer=yes"></iframe>'
       const expected: MediaResolverResult = {
         tag: 'audio',
-        src: 'http://commons.wikimedia.org/wiki/Special:FilePath/Fennec_Singing.ogg',
+        src: 'https://commons.wikimedia.org/wiki/Special:FilePath/Fennec_Singing.ogg',
         title: 'Fennec Singing',
       }
 

@@ -1,4 +1,5 @@
 import type { EmojiResolver } from '../types.js'
+import { text } from '../utils/dom.js'
 import {
   getFileStem,
   glyphFromCodepoints,
@@ -40,10 +41,10 @@ export const twemojiElementEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: `span[style*="${paintedPath}" i], i[style*="${paintedPath}" i]`,
   extract: (element) => {
-    const text = element.textContent?.trim()
+    const content = text(element)
 
-    if (text) {
-      return isEmojiShaped(text) ? { glyph: text } : undefined
+    if (content) {
+      return isEmojiShaped(content) ? { glyph: content } : undefined
     }
 
     const url = bgImage(element)

@@ -1,5 +1,5 @@
 import type { DomTransform } from '../../types.js'
-import { attr } from '../../utils/dom.js'
+import { attr, text } from '../../utils/dom.js'
 
 const secretRegex = /\?secret=(?<secret>[A-Za-z0-9]+)/gi
 
@@ -34,7 +34,7 @@ const findPrecedingBlockquote = (frame: Element): Element | undefined => {
 }
 
 const isEmptyWrapper = (element: Element): boolean => {
-  return !element.children.length && !element.textContent?.trim()
+  return !element.children.length && !text(element)
 }
 
 // WordPress writes a post embed as a blockquote, which a cite resolver converts, and a frame

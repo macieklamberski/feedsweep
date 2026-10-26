@@ -94,9 +94,8 @@ const findStatus = (element: Element): { status: Status; anchor?: Element } | un
 
   // The frame has to be the platform's own: `id` is an ordinary parameter name, so any other
   // iframe a publisher nested in the quote would otherwise name the tweet.
-  const frame = parseUrl(attr(find(element, 'iframe[src]'), 'src') ?? '', placeholderBaseUrl)
-  const framed =
-    frame && isTweetUrl(frame, tweetHosts) ? getQueryParam(frame.searchParams, 'id') : undefined
+  const frame = parseUrlOnHosts(attr(find(element, 'iframe[src]'), 'src'), tweetHosts, isTweetUrl)
+  const framed = getQueryParam(frame?.searchParams, 'id')
   const declared =
     attr(element, 'data-twitter-tweet-id') ??
     attr(element, 'data-tweet-id') ??

@@ -9,13 +9,13 @@ import { isUsableSrc } from '../../utils/urls.js'
 // OSYouTube its page with data-src.
 const placeholderSrcRegexes = [
   // Invision Community's blank page or spacer image.
-  /\/applications\/core\/interface\/(?:index\.html|js\/spacer\.png)(?:[?#]|$)/,
-  /\/complianz-gdpr(?:-premium)?\/assets\/video\//, // Complianz's placeholder video
+  /\/applications\/core\/interface\/(?:index\.html|js\/spacer\.png)(?:[?#]|$)/i,
+  /\/complianz-gdpr(?:-premium)?\/assets\/video\//i, // Complianz's placeholder video
   // Joomla OSYouTube's "Load after page load" page, which shows only "Loading...".
-  /(?:^|\/)plugins\/content\/osyoutube\/index\.html$/,
-  /^data:image\//, // bLazy's transparent gif
+  /(?:^|\/)plugins\/content\/osyoutube\/index\.html$/i,
+  /^data:image\//i, // bLazy's transparent gif
   // consentmanager's `blank` and WP Rocket's `about:blank`, once resolved against the page.
-  /(?:^|\/)(?:about:)?blank$/,
+  /(?:^|\/)(?:about:)?blank$/i,
 ]
 
 // An iframe whose src is blank or a placeholder page, the real url parked in a lazy attribute.

@@ -438,6 +438,19 @@ describeForEachParser('onePixelOutWidgetMediaResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should pair a mount whose id carries stray whitespace with its call', async () => {
+      const value = html`
+        <p id="audioplayer_1 ">[audio player]</p>
+        <script type="text/javascript">AudioPlayer.embed("audioplayer_1", { soundFile: "http://example.com/audio/files/interview.mp3" });</script>
+      `
+      const expected: MediaResolverResult = {
+        tag: 'audio',
+        src: 'http://example.com/audio/files/interview.mp3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should play the file the embed call names for the Joomla mount', async () => {
       const value = html`
         <p id="onepixeloutaudioplayer_6ac5b4354d58e">Audio clip: Adobe Flash Player (version 9 or above) is required to play this audio clip.</p>

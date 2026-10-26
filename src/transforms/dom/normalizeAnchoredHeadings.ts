@@ -5,8 +5,10 @@ import {
   isElement,
   isMediaElement,
   mediaSelector,
+  text,
 } from '../../utils/dom.js'
 import { isSamePage } from '../../utils/urls.js'
+import { createLink } from '../../utils/widgets.js'
 
 const supTags = new Set(['sup'])
 
@@ -49,7 +51,7 @@ const isGlyphMarker = (node: Node, fragment: string): boolean => {
     return false
   }
 
-  const trimmed = (node.textContent ?? '').trim()
+  const trimmed = text(node) ?? ''
 
   return trimmed === '' || permalinkLabelRegex.test(trimmed) || trimmed === `#${fragment}`
 }
@@ -75,7 +77,7 @@ export const normalizeAnchoredHeadings: DomTransform = ({ baseUrl, resolveUrlFn 
       for (const anchor of anchors) {
         const href = anchor.getAttribute('href')
         const hashIndex = href?.indexOf('#') ?? -1
-        const visible = (anchor.textContent ?? '').trim()
+        const visible = text(anchor) ?? ''
 
         // An anchor contributes a permalink in two shapes: a `#fragment` link, or a bare
         // in-page target (`<a name>` / empty `<a id>` with no href). The bare target is
@@ -153,7 +155,7 @@ export const normalizeAnchoredHeadings: DomTransform = ({ baseUrl, resolveUrlFn 
 
         // A generator-class anchor beside the title carries a label like "link", not heading
         // text. Any other qualifying anchor holds the title itself, so its text stays.
-        const wrapsHeading = (heading.textContent ?? '').trim() === visible
+        const wrapsHeading = (text(heading) ?? '') === visible
         const isLabelledMarker = hasKnownClass && !wrapsHeading
 
         if (!isSymbolOnly && !isLabelledMarker) {
@@ -195,9 +197,8 @@ export const normalizeAnchoredHeadings: DomTransform = ({ baseUrl, resolveUrlFn 
         heading.removeAttribute('id')
       }
 
-      const permalink = document.createElement('a')
+      const permalink = createLink(document, `#${permalinkFragment}`, '')
       permalink.setAttribute('id', permalinkFragment)
-      permalink.setAttribute('href', `#${permalinkFragment}`)
       heading.insertBefore(permalink, heading.firstChild)
     }
   }

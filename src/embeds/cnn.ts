@@ -9,7 +9,7 @@ const provider = 'cnn'
 // The path of the video's page, `{section}/{yyyy}/{mm}/{dd}/{slug}.cnn`. The suffix keeps the
 // other Turner properties on the same CDN out.
 // Every player since the Flash one carries it, and the other Turner properties use numeric ids.
-const videoIdRegex = /^(?:[^/]+\/)+\d{4}\/\d{2}\/\d{2}\/[^/]+\.cnn$/
+const videoIdRegex = /^(?:[^/]+\/)+\d{4}\/\d{2}\/\d{2}\/[^/]+\.cnn$/i
 
 // The three segments in front of the slug date the video. A path states a day and not a moment,
 // so `date` carries the calendar day alone, and a month or a day outside the calendar leaves it

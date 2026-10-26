@@ -1,4 +1,4 @@
-import { composeQuery, encodePathSegment, getQueryParam, isAnyOf } from 'trousse'
+import { composeQuery, encodePathSegment, getQueryParam, isAnyOf, isHostOf } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { isFileName } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -24,7 +24,7 @@ const sizes = {
 }
 
 const readVideoId = (url: URL): string | undefined => {
-  const pathRegex = url.hostname === 'v.qq.com' ? playerPathRegex : flashPathRegex
+  const pathRegex = isHostOf(url, 'v.qq.com') ? playerPathRegex : flashPathRegex
 
   if (!pathRegex.test(url.pathname)) {
     return

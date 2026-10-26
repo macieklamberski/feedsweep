@@ -569,7 +569,7 @@ describeForEachParser('arcgisWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'arcgis',
         id: '51f91333c1de45c6bfa8b0c83f9a434f',
-        src: 'https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=51f91333c1de45c6bfa8b0c83f9a434f&center=-36.817038734225186%2C-71.50051233783137&scale=14134452.869988834',
+        src: 'https://www.arcgis.com/apps/mapviewer/index.html?configurableview=true&webmap=51f91333c1de45c6bfa8b0c83f9a434f&center=-36.817038734225186,-71.50051233783137&scale=14134452.869988834',
         url: 'https://www.arcgis.com/apps/mapviewer/index.html?webmap=51f91333c1de45c6bfa8b0c83f9a434f',
         height: 500,
       }

@@ -4,11 +4,11 @@ import {
   getPathSegments,
   getQueryParam,
   isAnyOf,
-  parseUrl,
+  isHostOf,
 } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { digitsRegex, placeholderBaseUrl } from '../utils/urls.js'
+import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const foxnewsProvider = 'foxnews'
@@ -63,7 +63,7 @@ const composeEmbed = (brand: FoxBrand, id: string): EmbedResolverResult => {
 // or the embedding page's referrer. The ids of the retired root `embed.js` route are gone from
 // both the player and the page.
 export const foxnewsResolveEmbed: ResolveUrlEmbed = (url) => {
-  const brand = foxBrands.find((brand) => brand.playerHost === url.hostname)
+  const brand = foxBrands.find((brand) => isHostOf(url, brand.playerHost))
   const id = getQueryParam(url.searchParams, 'video_id') ?? getQueryParam(url.searchParams, 'id')
   const [route, page] = getPathSegments(url)
 
@@ -92,7 +92,7 @@ export const foxnewsResolveEmbed: ResolveUrlEmbed = (url) => {
 export const foxnewsScriptEmbedResolver = createMarkupEmbedResolver(
   playerHosts.map((host) => `script[src*="${host}/v/embed.js" i]`).join(', '),
   (element) => {
-    const url = parseUrl(attr(element, 'src') ?? '', placeholderBaseUrl)
+    const url = parseUrlOnHosts(attr(element, 'src'), playerHosts)
 
     if (!url) {
       return

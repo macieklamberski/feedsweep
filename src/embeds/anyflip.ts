@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf, isHostOf } from 'trousse'
+import { composeQuery, getPathSegments, isAnyOf, isHostOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { pickQueryParams } from '../utils/urls.js'
@@ -30,12 +30,15 @@ export const anyflipResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 
   const viewerUrl = `https://online.anyflip.com/${user}/${book}/`
-  const { p: page } = pickQueryParams(url.hash.slice(1), ['p'])
+  // The start page sits in the fragment, so its query is written after `#`.
+  const hashQuery = url.hash.slice(1)
+  const startPage = pickQueryParams(hashQuery, ['p'])
+  const fragment = composeQuery(startPage).replace('?', '#')
 
   return {
     provider,
     id: `${user}/${book}`,
-    src: page ? `${viewerUrl}index.html#p=${page}` : `${viewerUrl}index.html`,
+    src: `${viewerUrl}index.html${fragment}`,
     url: `https://anyflip.com/${user}/${book}`,
     // The cover the viewer's own `og:image` names, 403 on a book that does not exist.
     thumbnail: `${viewerUrl}files/shot.jpg`,

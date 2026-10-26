@@ -384,6 +384,26 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
     })
   })
 
+  describe('edge cases', () => {
+    it('should read the framed id from a frame the feed escaped twice', async () => {
+      const value = html`
+        <blockquote class="twitter-tweet">
+          <p>Text.</p>
+          <iframe src="https://platform.twitter.com/embed/Tweet.html?dnt=true&amp;amp;id=123456789012345"></iframe>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: statusId,
+        src: playerUrl,
+        url: standInUrl,
+        description: 'Text.',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
   // One block per shape the corpus survey found, so a shape nobody handles is visible here as
   // a missing block. Variants #1, #3 and #4 arrive in a form the resolver cannot read on its
   // own and are asserted after the pipeline instead, in the last group of this file.

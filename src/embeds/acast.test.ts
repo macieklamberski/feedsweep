@@ -81,6 +81,25 @@ describeForEachParser('acastEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should resolve the older player host spelled with a trailing dot', async () => {
+      const value = html`
+        <iframe
+          src="https://player.acast.com./5cd07163ad694b18367aeb03/episodes/homebrew-6?theme=default&cover=1&latest=1"
+          frameborder="0"
+          width="100%"
+          height="110px"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'acast',
+        id: '5cd07163ad694b18367aeb03/homebrew-6',
+        src: 'https://embed.acast.com/5cd07163ad694b18367aeb03/homebrew-6',
+        height: 190,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should keep its own height over the size an older snippet states', async () => {
       const value = html`
         <iframe

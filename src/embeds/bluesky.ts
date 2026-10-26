@@ -3,7 +3,12 @@ import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find, isBlockElement, isBr, isElement, jsonAttr } from '../utils/dom.js'
 import { readObjectHeight } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { atUsername, createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  atUsername,
+  createMarkupEmbedResolver,
+  createS9eEmbedResolver,
+  createUrlEmbedResolver,
+} from '../utils/widgets.js'
 
 const provider = 'bluesky'
 
@@ -262,20 +267,17 @@ export const blueskyIframeEmbedResolver = createUrlEmbedResolver(hosts, (url, el
 })
 
 // A forum's s9e MediaEmbed helper iframe on s9e.github.io, naming the post in its url fragment.
-export const blueskyS9eEmbedResolver = createMarkupEmbedResolver(
-  'iframe[data-s9e-mediaembed="bluesky"]',
-  (element) => {
-    // `…/bluesky.min.html#at://{authority}/app.bsky.feed.post/{rkey}#embed.bsky.app`: the
-    // helper page takes the AT URI first and its own provider marker second.
-    const post = extractBlueskyPost(attr(element, 'src')?.split('#')[1] ?? '')
+// `…/bluesky.min.html#at://{authority}/app.bsky.feed.post/{rkey}#embed.bsky.app`: the helper page
+// takes the AT URI first and its own provider marker second.
+export const blueskyS9eEmbedResolver = createS9eEmbedResolver('bluesky', (fragment) => {
+  const post = extractBlueskyPost(fragment)
 
-    if (!post) {
-      return
-    }
+  if (!post) {
+    return
+  }
 
-    return composeEmbedResult(post)
-  },
-)
+  return composeEmbedResult(post)
+})
 
 // A newsletter's <bluesky-post> custom element, a declarative shadow root no reader mounts.
 // Its `src` is an AT URI spelled with the author's handle. The blockquote inside holds the post.

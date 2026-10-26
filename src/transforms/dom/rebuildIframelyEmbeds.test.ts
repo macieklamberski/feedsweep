@@ -186,6 +186,15 @@ describeForEachParser('rebuildIframelyEmbeds', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should point a frame whose API route is in capitals at the video it names', async () => {
+      const value = html`
+        <iframe src="https://cdn.iframe.ly/API/IFRAME?url=https%3A%2F%2Fyoutu.be%2FNObkWjQHNm8&amp;key=57d2ec5998440ab74c7cf485bffd908c"></iframe>
+      `
+      const expected = '<iframe src="https://youtu.be/NObkWjQHNm8"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should point a frame on iframely.net at the TikTok video it names', async () => {
       const value = html`
         <iframe

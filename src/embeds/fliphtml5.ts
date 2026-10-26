@@ -1,4 +1,4 @@
-import { getPathSegments } from 'trousse'
+import { composeQuery, getPathSegments } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isFileName, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
@@ -25,12 +25,15 @@ export const fliphtml5ResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 
   const viewerUrl = `https://online.fliphtml5.com/${account}/${book}/`
-  const { p: page } = pickQueryParams(url.hash.slice(1), ['p'])
+  // The start page sits in the fragment, so its query is written after `#`.
+  const hashQuery = url.hash.slice(1)
+  const startPage = pickQueryParams(hashQuery, ['p'])
+  const fragment = composeQuery(startPage).replace('?', '#')
 
   return {
     provider,
     id: `${account}/${book}`,
-    src: page ? `${viewerUrl}#p=${page}` : viewerUrl,
+    src: `${viewerUrl}${fragment}`,
     url: viewerUrl,
     // The cover the viewer's own `og:image` names, 404 on a book that does not exist.
     thumbnail: `${viewerUrl}files/shot.jpg`,

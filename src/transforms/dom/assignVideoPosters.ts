@@ -3,7 +3,7 @@ import type { CleanUrlFn, DomTransform, TransformContext } from '../../types.js'
 import { attr, removeWithEmptyWrappers } from '../../utils/dom.js'
 import { buildMediaKey, enclosureMarker } from '../../utils/enclosures.js'
 import { findPosterEvidence, getVideoThumbnail } from '../../utils/images.js'
-import { prepareUrl } from '../../utils/urls.js'
+import { isUsableSrc, prepareUrl } from '../../utils/urls.js'
 import { updateEmbedPlaceholder } from '../../utils/widgets.js'
 
 // A player without a resolver, like JW Player, carries no data-embed-provider to match on.
@@ -75,10 +75,10 @@ const moveImageToVideoPoster = (
 
   if (url) {
     if (video.localName === 'video') {
-      if (overwrite || !video.getAttribute('poster')) {
+      if (overwrite || !isUsableSrc(video.getAttribute('poster'))) {
         video.setAttribute('poster', url)
       }
-    } else if (overwrite || !video.getAttribute('data-embed-thumbnail')) {
+    } else if (overwrite || !isUsableSrc(video.getAttribute('data-embed-thumbnail'))) {
       updateEmbedPlaceholder(video, { thumbnail: url })
     }
   }

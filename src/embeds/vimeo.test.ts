@@ -46,6 +46,12 @@ describe('extractVimeoId', () => {
     expect(extractVimeoId(new URL(value))).toBeUndefined()
   })
 
+  it('should extract the id from a player host written with a trailing dot', () => {
+    const value = 'https://player.vimeo.com./video/76979871'
+
+    expect(extractVimeoId(new URL(value))).toBe('76979871')
+  })
+
   // A showcase and an album are playlists, a channel and a group are listings, an event is a
   // livestream and an on-demand page is a store front, each in its own id space, so their numeric
   // segment names no video. Channel 927 and group 195 are both live and 927 is also somebody's
@@ -338,6 +344,19 @@ describe('vimeoResolveEmbed', () => {
       provider: 'vimeo',
       id: '39880751',
       src: 'https://player.vimeo.com/video/39880751#t=64',
+      url: 'https://vimeo.com/39880751',
+      ratio: '16/9',
+    }
+
+    expect(vimeoResolveEmbed(new URL(value))).toEqual(expected)
+  })
+
+  it('should write a clock start offset into the fragment unescaped', () => {
+    const value = 'https://player.vimeo.com/video/39880751#t=1:04'
+    const expected: EmbedResolverResult = {
+      provider: 'vimeo',
+      id: '39880751',
+      src: 'https://player.vimeo.com/video/39880751#t=1:04',
       url: 'https://vimeo.com/39880751',
       ratio: '16/9',
     }

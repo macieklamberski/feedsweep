@@ -65,7 +65,7 @@ export const pollmakerIframeEmbedResolver = createUrlEmbedResolver(hosts, pollma
 export const pollmakerFormEmbedResolver = createMarkupEmbedResolver(
   'div[id^="qp_main"]',
   (element) => {
-    const pollNumber = element.id.match(snippetIdRegex)?.groups?.number
+    const pollNumber = attr(element, 'id')?.match(snippetIdRegex)?.groups?.number
 
     if (!pollNumber) {
       return

@@ -2,7 +2,7 @@ import { encodePathSegment, getPathSegments, isAnyOf, isPlainObject } from 'trou
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { filterUrlQuery, parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'formmailer'
@@ -12,15 +12,13 @@ const provider = 'formmailer'
 const hosts = ['ssl.form-mailer.jp', 'pro.form-mailer.jp']
 
 // The form reads any field name off its query as a prefill, such as `タイトル[0]`, so the query
-// goes to the frame as the carrier sends it. `errorScroll` is the loader's own display setting.
+// goes to the frame as the carrier sends it.
 const composeEmbed = (form: URL, hash: string): EmbedResolverResult => {
-  const query = filterUrlQuery(form, (name) => !isAnyOf(name, 'errorScroll'))
-
   return {
     provider,
     id: hash,
-    src: `https://${form.host}/fms/${hash}${query}`,
-    url: `https://${form.host}/fms/${hash}`,
+    src: `https://${form.hostname}/fms/${hash}${form.search}`,
+    url: `https://${form.hostname}/fms/${hash}`,
   }
 }
 

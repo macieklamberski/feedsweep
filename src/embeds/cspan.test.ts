@@ -47,6 +47,32 @@ describe('cspanResolveEmbed', () => {
       expect(cspanResolveEmbed(new URL(value))).toEqual(expected)
     })
 
+    it('should write the start position as the publisher wrote it', () => {
+      const value = 'https://www.c-span.org/video/standalone/?c4509010&start=2:36'
+      const expected: EmbedResolverResult = {
+        provider: 'cspan',
+        id: 'c4509010',
+        src: 'https://www.c-span.org/video/standalone/?c4509010&start=2:36',
+        url: 'https://www.c-span.org/video/?c4509010',
+        ratio: '16/9',
+      }
+
+      expect(cspanResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
+    it('should escape an ampersand inside the start position', () => {
+      const value = 'https://www.c-span.org/video/standalone/?c4509010&start=120%26'
+      const expected: EmbedResolverResult = {
+        provider: 'cspan',
+        id: 'c4509010',
+        src: 'https://www.c-span.org/video/standalone/?c4509010&start=120%26',
+        url: 'https://www.c-span.org/video/?c4509010',
+        ratio: '16/9',
+      }
+
+      expect(cspanResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
     it('should drop a tracker beside the start position', () => {
       const value = 'https://www.c-span.org/video/standalone/?c4509010&utm_source=feed&start=120'
       const expected: EmbedResolverResult = {

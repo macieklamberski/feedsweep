@@ -338,6 +338,42 @@ describeForEachParser('assignVideoPosters', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should fill a blank poster with an image named after the video file', async () => {
+    const value = html`
+      <img src="https://example.org/uploads/com-sona-150x150.png">
+      <video poster="about:blank">
+        <source src="https://example.org/uploads/com-sona.mp4">
+      </video>
+    `
+    const expected = html`
+      <video poster="https://example.org/uploads/com-sona-150x150.png">
+        <source src="https://example.org/uploads/com-sona.mp4">
+      </video>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should fill a whitespace thumbnail on a feed-defined embed with an inline poster', async () => {
+    const value = html`
+      <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg">
+      <div
+        data-enclosure
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+        data-embed-thumbnail=" "
+      ></div>
+    `
+    const expected = html`
+      <div
+        data-enclosure=""
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+        data-embed-thumbnail="https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"
+      ></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should keep a gallery photo numbered after the video file', async () => {
     const value = html`
       <img src="https://example.org/files/image/Wilkowiecko300825_1.jpg">

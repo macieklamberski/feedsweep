@@ -71,7 +71,7 @@ describeForEachParser('ourworldindataEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should drop the stack mode and fold the slug case in the key only', async () => {
+    it('should keep the stack mode and fold the slug case in the key only', async () => {
       const value = html`
         <iframe
           src="https://ourworldindata.org/grapher/CO2-by-source?stackMode=absolute&amp;time=1900..2017"
@@ -81,9 +81,10 @@ describeForEachParser('ourworldindataEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'ourworldindata',
         id: 'grapher/co2-by-source',
-        src: 'https://ourworldindata.org/grapher/CO2-by-source?time=1900..2017',
-        url: 'https://ourworldindata.org/grapher/CO2-by-source?time=1900..2017',
-        thumbnail: 'https://ourworldindata.org/grapher/CO2-by-source.png?time=1900..2017',
+        src: 'https://ourworldindata.org/grapher/CO2-by-source?stackMode=absolute&time=1900..2017',
+        url: 'https://ourworldindata.org/grapher/CO2-by-source?stackMode=absolute&time=1900..2017',
+        thumbnail:
+          'https://ourworldindata.org/grapher/CO2-by-source.png?stackMode=absolute&time=1900..2017',
         height: 600,
       }
 
@@ -122,7 +123,7 @@ describeForEachParser('ourworldindataEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the view of an explorer, drop its display settings and state its height', async () => {
+    it('should keep the view and display settings of an explorer and state its height', async () => {
       const value = html`
         <iframe
           loading="lazy"
@@ -133,8 +134,8 @@ describeForEachParser('ourworldindataEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'ourworldindata',
         id: 'explorers/coronavirus-data-explorer',
-        src: 'https://ourworldindata.org/explorers/coronavirus-data-explorer?time=346..latest&Metric=Vaccinations&Interval=Cumulative&Relative+to+Population=true&Align+outbreaks=false&country=USA~ISR~GBR~ARE~OWID_WRL~EuropeanUnion~CHL~CHE',
-        url: 'https://ourworldindata.org/explorers/coronavirus-data-explorer?time=346..latest&Metric=Vaccinations&Interval=Cumulative&Relative+to+Population=true&Align+outbreaks=false&country=USA~ISR~GBR~ARE~OWID_WRL~EuropeanUnion~CHL~CHE',
+        src: 'https://ourworldindata.org/explorers/coronavirus-data-explorer?zoomToSelection=true&time=346..latest&pickerSort=desc&pickerMetric=population&Metric=Vaccinations&Interval=Cumulative&Relative+to+Population=true&Align+outbreaks=false&country=USA~ISR~GBR~ARE~OWID_WRL~EuropeanUnion~CHL~CHE&hideControls=true',
+        url: 'https://ourworldindata.org/explorers/coronavirus-data-explorer?zoomToSelection=true&time=346..latest&pickerSort=desc&pickerMetric=population&Metric=Vaccinations&Interval=Cumulative&Relative+to+Population=true&Align+outbreaks=false&country=USA~ISR~GBR~ARE~OWID_WRL~EuropeanUnion~CHL~CHE&hideControls=true',
         thumbnail: undefined,
         height: 696,
       }

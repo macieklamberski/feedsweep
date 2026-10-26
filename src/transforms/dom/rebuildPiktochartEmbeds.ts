@@ -1,7 +1,7 @@
 import { encodePathSegment, isAnyOf } from 'trousse'
 import { composePiktochartEmbedUrl } from '../../embeds/piktochart.js'
 import type { DomTransform } from '../../types.js'
-import { attr, isElement, isText } from '../../utils/dom.js'
+import { attr, isElement, isWhitespaceText, text } from '../../utils/dom.js'
 import { parseUrlOnHosts } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
 
@@ -15,7 +15,7 @@ const isLoadingGif = (element: Element): boolean => {
 }
 
 const isLoadingText = (element: Element): boolean => {
-  return element.children.length === 0 && loadingTextRegex.test(element.textContent?.trim() ?? '')
+  return element.children.length === 0 && loadingTextRegex.test(text(element) ?? '')
 }
 
 const removeLoaderChrome = (element: Element): void => {
@@ -26,7 +26,7 @@ const removeLoaderChrome = (element: Element): void => {
 
     let next = image.nextSibling
 
-    while (isText(next) && !next.textContent?.trim()) {
+    while (next && isWhitespaceText(next)) {
       next = next.nextSibling
     }
 

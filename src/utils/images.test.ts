@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { describeForEachParser } from '../tests.js'
+import { describeForEachParser, html } from '../tests.js'
 import {
   countSrcsetCandidates,
   findPosterEvidence,
@@ -7,6 +7,7 @@ import {
   getSizeKeywordRank,
   getUrlDimensions,
   getUrlSizeHint,
+  getVideoThumbnail,
   parseSrcset,
   pickLargerImageUrl,
   sizeKeywordLiterals,
@@ -866,5 +867,44 @@ describeForEachParser('findPosterEvidence', (parseHtml) => {
     const video = document.querySelector('video') as Element
 
     expect(findPosterEvidence('interview-1280.jpg', video)).toBeUndefined()
+  })
+})
+
+describeForEachParser('getVideoThumbnail', (parseHtml) => {
+  it('should read the poster', () => {
+    const value = html`
+      <video
+        src="https://example.com/media/interview.mp4"
+        poster="https://example.com/media/interview.jpg"
+      ></video>
+    `
+    const video = parseHtml(value).querySelector('video') as Element
+
+    expect(getVideoThumbnail(video)).toBe('https://example.com/media/interview.jpg')
+  })
+
+  it('should read the placeholder thumbnail when the poster is only whitespace', () => {
+    const value = html`
+      <video
+        src="https://example.com/media/interview.mp4"
+        poster=" "
+        data-embed-thumbnail="https://example.com/media/interview.jpg"
+      ></video>
+    `
+    const video = parseHtml(value).querySelector('video') as Element
+
+    expect(getVideoThumbnail(video)).toBe('https://example.com/media/interview.jpg')
+  })
+
+  it('should return undefined for an about:blank poster', () => {
+    const value = html`
+      <video
+        src="https://example.com/media/interview.mp4"
+        poster="about:blank"
+      ></video>
+    `
+    const video = parseHtml(value).querySelector('video') as Element
+
+    expect(getVideoThumbnail(video)).toBeUndefined()
   })
 })

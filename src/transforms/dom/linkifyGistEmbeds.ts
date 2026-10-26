@@ -1,8 +1,10 @@
 import { encodePathSegment } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr, isElement, isSkippable, isText } from '../../utils/dom.js'
-import { absoluteUrlRegex } from '../../utils/urls.js'
+import { absoluteUrlRegex, parseUrlOnHosts } from '../../utils/urls.js'
 import { createLink } from '../../utils/widgets.js'
+
+const hosts = ['gist.github.com']
 
 const gistScriptRegex = /gist\.github\.com\/(?:([^/?"]+)\/)?([^/?"#]+)\.js/i
 const jsonSuffixRegex = /\.json$/i
@@ -63,9 +65,10 @@ const readGistPath = (element: Element): string | undefined => {
     return encodeGistPath(gist)
   }
 
-  const match = element.getAttribute('src')?.match(gistScriptRegex)
+  const src = element.getAttribute('src')
+  const match = src?.match(gistScriptRegex)
 
-  if (!match) {
+  if (!parseUrlOnHosts(src, hosts) || !match) {
     return
   }
 

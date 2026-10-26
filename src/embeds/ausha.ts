@@ -1,4 +1,11 @@
-import { composeQuery, getPathSegments, getQueryParam, isAnyOf, trimObject } from 'trousse'
+import {
+  composeQuery,
+  getPathSegments,
+  getQueryParam,
+  isAnyOf,
+  isHostOf,
+  trimObject,
+} from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -19,10 +26,7 @@ export const aushaResolveEmbed: ResolveUrlEmbed = (url) => {
   const segments = getPathSegments(url)
 
   // Both hosts serve their player from the root, spelled either bare or as `index.html`.
-  if (
-    !playerHosts.includes(url.hostname) ||
-    (segments.length > 0 && !isAnyOf(segments[0], 'index.html'))
-  ) {
+  if (!isHostOf(url, playerHosts) || (segments.length > 0 && !isAnyOf(segments[0], 'index.html'))) {
     return
   }
 

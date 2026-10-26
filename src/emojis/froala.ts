@@ -1,4 +1,5 @@
 import type { EmojiResolver } from '../types.js'
+import { text } from '../utils/dom.js'
 import { getFileStem, glyphFromCodepoints, resolveEmojiImage } from '../utils/emojis.js'
 import { bgImage } from '../utils/styles.js'
 import { smiliesEmojiNames } from './smilies.js'
@@ -29,7 +30,7 @@ export const froalaElementEmojiResolver: EmojiResolver = {
   ].join(', '),
   extract: (element) => {
     // Without the class, a span holding text is a paragraph painted by accident.
-    if (!element.matches('[class~="fr-emoticon-img"]') && element.textContent?.trim()) {
+    if (!element.matches('[class~="fr-emoticon-img"]') && text(element)) {
       return
     }
 

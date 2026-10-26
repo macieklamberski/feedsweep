@@ -1,5 +1,5 @@
 import type { DomTransform } from '../../types.js'
-import { attr } from '../../utils/dom.js'
+import { attr, text } from '../../utils/dom.js'
 import { createIframe, isEmbedOrMediaResolver, isResolvedIframe } from '../../utils/widgets.js'
 
 const wrapperSelector = '.wp-block-embed__wrapper'
@@ -13,7 +13,7 @@ export const rebuildWordpressEmbeds: DomTransform = (context) => {
 
   return async (document) => {
     for (const wrapper of document.querySelectorAll(wrapperSelector)) {
-      const url = wrapper.textContent?.trim() ?? ''
+      const url = text(wrapper) ?? ''
 
       // Prose beside the url is the publisher's, not the block's.
       if (whitespaceRegex.test(url)) {

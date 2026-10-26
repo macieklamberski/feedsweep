@@ -2,8 +2,8 @@ import { getQueryParam, isAnyOf, isHostOrSubdomainOf, isHttpUrl, parseUrl } from
 import { hosts as jwplayerHosts } from '../../embeds/jwplayer.js'
 import { composeTwitterStatusUrl } from '../../embeds/twitter.js'
 import type { DomTransform } from '../../types.js'
-import { attr } from '../../utils/dom.js'
 import { digitsRegex, placeholderBaseUrl } from '../../utils/urls.js'
+import { readRepairedCarrierUrl } from '../../utils/widgets.js'
 
 const playerPath = '/res/scraper/embed/'
 const tweetPath = '/res/community/twitter_embed/'
@@ -41,8 +41,8 @@ const readTweetUrl = (query: URLSearchParams): string | undefined => {
   return composeTwitterStatusUrl(handle, id)
 }
 
-const readInnerUrl = (src: string | undefined): string | undefined => {
-  const wrapper = parseUrl(src ?? '', placeholderBaseUrl)
+const readInnerUrl = (src: string): string | undefined => {
+  const wrapper = parseUrl(src, placeholderBaseUrl)
 
   if (!wrapper) {
     return
@@ -63,7 +63,7 @@ const readInnerUrl = (src: string | undefined): string | undefined => {
 export const unwrapRebelmouseEmbedFrames: DomTransform = () => {
   return (document) => {
     for (const iframe of document.querySelectorAll('iframe[src*="/res/" i]')) {
-      const url = readInnerUrl(attr(iframe, 'src'))
+      const url = readInnerUrl(readRepairedCarrierUrl(iframe))
 
       if (!url) {
         continue

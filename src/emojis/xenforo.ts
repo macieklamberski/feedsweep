@@ -1,4 +1,4 @@
-import { toMap } from 'trousse'
+import { endsWithAnyOf, toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { type EmojiGlyph, rendersNothing, resolveEmojiImage } from '../utils/emojis.js'
@@ -32,7 +32,7 @@ export const xenforoEmojiResolver: EmojiResolver = {
   extract: (element) => {
     const src = element.getAttribute('src') ?? ''
     const shortname = attr(element, 'data-shortname')
-    const isBlank = src.endsWith(spacerPath)
+    const isBlank = endsWithAnyOf(src, [spacerPath])
     const isSprite = !!shortname && (isBlank || rendersNothing(src))
     // Some feeds drop the class, and the spacer alone still names the engine.
     const isStrong = isSprite || isBlank || element.matches(markerSelector)

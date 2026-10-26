@@ -1247,22 +1247,15 @@ describeForEachParser('blueskyS9eEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should read a helper page the forum serves from its own host', async () => {
+    it('should ignore a helper page naming a profile instead of a post', async () => {
       const value = html`
         <iframe
           data-s9e-mediaembed="bluesky"
-          src="https://forum.example.com/iframe/bluesky.min.html#at://did:plc:hhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mhq7aeuwbg42"
+          src="https://s9e.github.io/iframe/2/bluesky.min.html#at://did:plc:hhz4agnyzcrsvpnprxrbjrpa/app.bsky.actor.profile/self#embed.bsky.app"
         ></iframe>
       `
-      const expected: EmbedResolverResult = {
-        provider: 'bluesky',
-        id: 'did:plc:hhz4agnyzcrsvpnprxrbjrpa/3mhq7aeuwbg42',
-        src: 'https://embed.bsky.app/embed/did:plc:hhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mhq7aeuwbg42',
-        url: 'https://bsky.app/profile/did:plc:hhz4agnyzcrsvpnprxrbjrpa/post/3mhq7aeuwbg42',
-        date: '2026-03-23T13:49:11.249Z',
-      }
 
-      expect(await extract(value)).toEqual(expected)
+      expect(await extract(value)).toBeUndefined()
     })
   })
 
@@ -1272,6 +1265,17 @@ describeForEachParser('blueskyS9eEmbedResolver', (parseHtml) => {
         <iframe
           data-s9e-mediaembed="bluesky"
           src="https://s9e.github.io/iframe/2/bluesky.min.html"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should return nothing for a helper page served off the s9e host', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="bluesky"
+          src="https://forum.example.com/iframe/bluesky.min.html#at://did:plc:hhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mhq7aeuwbg42"
         ></iframe>
       `
 

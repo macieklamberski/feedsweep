@@ -81,6 +81,18 @@ describe('aushaResolveEmbed', () => {
 
       expect(aushaResolveEmbed(new URL(value))).toBeUndefined()
     })
+
+    it('should read a player host written with a trailing dot', () => {
+      const value = 'https://player.ausha.co./?podcastId=BGKwJUJG8D9m&v=3'
+      const expected: EmbedResolverResult = {
+        provider: 'ausha',
+        id: 'podcast/BGKwJUJG8D9m',
+        src: 'https://player.ausha.co/?podcastId=BGKwJUJG8D9m&v=3',
+        height: 220,
+      }
+
+      expect(aushaResolveEmbed(new URL(value))).toEqual(expected)
+    })
   })
 
   describe('what the frame names, when it names two things', () => {

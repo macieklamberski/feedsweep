@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf } from 'trousse'
 import type {
   EmbedRenderHint,
   EmbedResolverResult,
@@ -86,9 +86,13 @@ export const audioboomWidgetEmbedResolver = createMarkupEmbedResolver(
 // page in `mp3LinkURL` or the audio file in `mp3`.
 const audioboomFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
   // Another bucket, path-style or on its own subdomain of S3's host, is not Audioboo's.
-  const bucket = bucketHosts.includes(url.hostname) ? getPathSegments(url)[0] : url.hostname
+  const isPathStyle = isHostOf(url, bucketHosts)
 
-  if (!bucket || !flashHosts.includes(bucket)) {
+  if (isPathStyle && !flashHosts.includes(getPathSegments(url)[0])) {
+    return
+  }
+
+  if (!isPathStyle && !isHostOf(url, flashHosts)) {
     return
   }
 

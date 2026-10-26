@@ -117,6 +117,27 @@ describeForEachParser('unwrapRebelmouseEmbedFrames', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+
+    it('should read a tweet frame whose query a feed escaped twice', async () => {
+      const value = html`
+        <iframe
+          class="rm-shortcode"
+          src="https://www.example.com/res/community/twitter_embed/?iframe_id=twitter-embed-723349244531204096&amp;amp;screen_name=yeswecode&amp;amp;id=723349244531204096"
+          width="100%"
+          height="370"
+        ></iframe>
+      `
+      const expected = html`
+        <iframe
+          class="rm-shortcode"
+          src="https://x.com/yeswecode/status/723349244531204096"
+          width="100%"
+          height="370"
+        ></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 
   describe('sad paths', () => {

@@ -135,6 +135,30 @@ describeForEachParser('rebuildLyteEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should rebuild the feed thumbnail whose lyteCache.php query is glued onto its path', async () => {
+    const value = html`
+      <a href="https://example.com/2026/05/25/trainingstage/"><img
+          src="https://example.com/wp-content/plugins/wp-youtube-lyte/lyteCache.php&origThumbUrl=https%3A%2F%2Fi.ytimg.com%2Fvi%2FOEkcwVBWh-4%2Fhqdefault.jpg"
+          alt="YouTube Video"
+        ></a>
+    `
+    const expected = '<iframe src="https://www.youtube.com/embed/OEkcwVBWh-4"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should rebuild the feed thumbnail on the thumbnail host spelled with a trailing dot', async () => {
+    const value = html`
+      <a href="https://example.com/2026/05/25/trainingstage/"><img
+          src="https://i.ytimg.com./vi/OEkcwVBWh-4/hqdefault.jpg"
+          alt="YouTube Video"
+        ></a>
+    `
+    const expected = '<iframe src="https://www.youtube.com/embed/OEkcwVBWh-4"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should rebuild the feed thumbnail written without a label', async () => {
     const value = html`
       <p><a

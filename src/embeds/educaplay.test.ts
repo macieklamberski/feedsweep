@@ -120,6 +120,19 @@ describeForEachParser('educaplayEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should read a game on the bare domain', async () => {
+      const value = '<iframe src="https://educaplay.com/game/5225243-profissoes.html"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'educaplay',
+        id: '5225243',
+        src: 'https://www.educaplay.com/game/5225243-profissoes.html',
+        url: 'https://www.educaplay.com/learning-resources/5225243-profissoes.html',
+        height: 690,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -132,6 +145,13 @@ describeForEachParser('educaplayEmbedResolver', (parseHtml) => {
     it('should ignore a foreign host carrying the retired html5 path', async () => {
       const value =
         '<iframe src="https://evil.test/es/recursoseducativos/4582251/html5/el_universo.htm"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a subdomain page whose route is not a game', async () => {
+      const value =
+        '<iframe src="https://static.educaplay.com/assets/5225243-profissoes.html"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

@@ -1,6 +1,6 @@
 import { toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
-import { attr } from '../utils/dom.js'
+import { attr, text } from '../utils/dom.js'
 import { glyphFromShortcode, resolveEmojiElement } from '../utils/emojis.js'
 
 // The code Thunderbird and SeaMonkey's composer writes for each numbered smiley class.
@@ -33,10 +33,10 @@ export const mozillaEmojiResolver: EmojiResolver = {
   extract: (element) => {
     const code = smileyCodes.get(attr(element, 'class')?.match(classRegex)?.[1] ?? '')
     const title = attr(element, 'title')
-    const text = element.textContent?.trim()
+    const content = text(element)
 
     // Some copies keep the code as the span's text, which is fine to replace, and never prose.
-    if (text && text !== title && text !== code) {
+    if (content && content !== title && content !== code) {
       return
     }
 
