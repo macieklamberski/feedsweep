@@ -22,7 +22,7 @@ const playerRoutes = ['players', 'previews']
 export const extractJwplayerId = (link: URL): string | undefined => {
   const [route, lastSegment] = getPathSegments(link).slice(-2)
 
-  if (!lastSegment || !isAnyOf(route ?? '', playerRoutes)) {
+  if (!lastSegment || !isAnyOf(route, playerRoutes)) {
     return
   }
 

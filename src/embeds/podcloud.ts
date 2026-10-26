@@ -38,7 +38,7 @@ const composeEmbed = (
   // With a content option the page names another item, so the key is the option the player
   // queries by: `podcastItem(_id)` for a guid, `playlist(user_id, _id)` for a playlist, which
   // wins over a guid.
-  const option = options.find((value) => startsWithAnyOf(value, ['playlist:'])) ?? options[0]
+  const option = options.find((value) => startsWithAnyOf(value, 'playlist:')) ?? options[0]
 
   if (option) {
     return {

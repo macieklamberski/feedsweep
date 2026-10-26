@@ -32,7 +32,8 @@ const sizes = {
 // Composed from the id alone, with no key and no expiry. The static render answers 400 unless
 // both dimensions are stated, and 400 again above 650 by 450.
 const composeStatic = (um: string): string => {
-  const query = composeQuery({ um, width: '650', height: `${sizes.player.height}` })
+  const { height } = sizes.player
+  const query = composeQuery({ um, width: '650', height })
 
   return `https://api-maps.yandex.ru/services/constructor/1.0/static/${query}`
 }

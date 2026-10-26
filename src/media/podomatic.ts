@@ -20,7 +20,7 @@ export const podomaticFlashMediaResolver: MediaResolver = {
   extract: (element) => {
     const player = parseUrlOnHosts(readCarrierUrl(element), hosts)
 
-    if (!player || !startsWithAnyOf(player.pathname, [playerPath])) {
+    if (!player || !startsWithAnyOf(player.pathname, playerPath)) {
       return
     }
 

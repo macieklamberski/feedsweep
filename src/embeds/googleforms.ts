@@ -15,7 +15,7 @@ const shortLinkHosts = ['forms.gle']
 
 // A form reads every `entry.{question}` pair off its own query as a prefilled answer.
 const isPrefillParam = (name: string): boolean => {
-  return startsWithAnyOf(name, ['entry.'])
+  return startsWithAnyOf(name, 'entry.')
 }
 
 // A short code is resolved to a form id only by its redirect, so the short link is the frame.

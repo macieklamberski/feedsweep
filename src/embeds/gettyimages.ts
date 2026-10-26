@@ -25,7 +25,7 @@ type WidgetConfig = {
 const readSignedQuery = (url: URL): string => {
   const pairs = url.search.slice(1).split('&')
   const isSignaturePair = (pair: string) => {
-    return startsWithAnyOf(pair, ['sig='])
+    return startsWithAnyOf(pair, 'sig=')
   }
   const signedPairs = pairs.slice(0, pairs.findIndex(isSignaturePair) + 1)
 

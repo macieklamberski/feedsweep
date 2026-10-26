@@ -112,12 +112,9 @@ const resolveTarget = (url: URL, element?: Element): EmbedResolverResult | undef
 }
 
 const readPreviewVideoId = (thumbnail: string | undefined): string | undefined => {
-  const previewUrl = getQueryParam(
-    parseUrl(thumbnail ?? '', placeholderBaseUrl)?.searchParams,
-    'url',
-  )
+  const previewUrl = getQueryParam(parseUrl(thumbnail, placeholderBaseUrl)?.searchParams, 'url')
 
-  return parseUrl(previewUrl ?? '', placeholderBaseUrl)?.pathname.match(previewVideoIdRegex)?.[1]
+  return parseUrl(previewUrl, placeholderBaseUrl)?.pathname.match(previewVideoIdRegex)?.[1]
 }
 
 export const mailruResolveEmbed: ResolveUrlEmbed = (url, element) => {
