@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 import { parseHtml } from './parsers/linkedom.js'
-import { html, queryElement, selectParsers } from './tests.js'
+import { carrierUrl, html, queryElement, selectParsers } from './tests.js'
 
 describe('selectParsers', () => {
   it('should return every parser when no library is selected', () => {
@@ -34,6 +34,22 @@ describe('queryElement', () => {
     const throwing = () => queryElement(document, 'video')
 
     expect(throwing).toThrow('No element matches selector "video".')
+  })
+})
+
+describe('carrierUrl', () => {
+  it('should hand back the url the factory would give a reader', () => {
+    const value = 'https://platform.example/v/123&t=6s'
+
+    expect(carrierUrl(value, 'platform.example').search).toBe('?t=6s')
+  })
+
+  it('should throw for a fixture off the hosts', () => {
+    const throwing = () => carrierUrl('https://elsewhere.example/v/123', 'platform.example')
+
+    expect(throwing).toThrow(
+      'Not a carrier url on platform.example: https://elsewhere.example/v/123',
+    )
   })
 })
 

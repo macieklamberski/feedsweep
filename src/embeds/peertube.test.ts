@@ -154,6 +154,12 @@ describeForEachParser('peertubeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore a frame whose src does not parse', async () => {
+      const value = '<iframe src="https://[/w/4RnoEXF5EfXb8iZCjnJsx9"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a javascript url whose path reads as a watch page', async () => {
       const value = '<iframe src="javascript:/w/4RnoEXF5EfXb8iZCjnJsx9"></iframe>'
 
