@@ -361,6 +361,12 @@ describeForEachParser('flourishIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should return undefined for a template player, which embeds nothing', async () => {
+      const value = '<iframe src="https://flo.uri.sh/template/29132382/embed"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should return undefined for a foreign host carrying the path', async () => {
       const value = '<iframe src="https://evil.test/visualisation/29132382/embed"></iframe>'
 

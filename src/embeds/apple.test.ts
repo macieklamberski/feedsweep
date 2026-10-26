@@ -259,6 +259,12 @@ describeForEachParser('appleIframeEmbedResolver', (parseHtml) => {
     expect(await extract(value)).toBeUndefined()
   })
 
+  it('should ignore an apple iframe on a route that is no player', async () => {
+    const value = '<iframe src="https://music.apple.com/us/browse"></iframe>'
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
   describe('the Substack card the container carries', () => {
     it('should take an episode payload, reading its runtime as milliseconds', async () => {
       const episodeCardAttrs = jsonAttrValue({
