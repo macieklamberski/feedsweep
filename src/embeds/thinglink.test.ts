@@ -2,7 +2,11 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { thinglinkEmbedResolver, thinglinkResolveEmbed } from './thinglink.js'
+import {
+  thinglinkIframeEmbedResolver,
+  thinglinkImageEmbedResolver,
+  thinglinkResolveEmbed,
+} from './thinglink.js'
 
 // Every `data-embed-*` field the placeholder carries, for the shapes that only resolve once the
 // pipeline has repaired them and so cannot be asserted on the resolver alone.
@@ -224,8 +228,8 @@ describe('thinglinkResolveEmbed', () => {
   })
 })
 
-describeForEachParser('thinglinkEmbedResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, thinglinkEmbedResolver)
+describeForEachParser('thinglinkIframeEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, thinglinkIframeEmbedResolver)
 
   describe('happy paths', () => {
     it('should ignore the size the carrier states', async () => {
@@ -302,6 +306,70 @@ describeForEachParser('thinglinkEmbedResolver', (parseHtml) => {
   })
 })
 
+describeForEachParser('thinglinkImageEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, thinglinkImageEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should read the scene off the image path', async () => {
+      const value = html`
+        <img
+          style="max-width:100%"
+          src="https://cdn.thinglink.me/api/image/586514552254889988/1024/10/scaletowidth#tl-586514552254889988;1043138249'"
+          class="alwaysThinglink"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'thinglink',
+        id: '586514552254889988',
+        src: 'https://www.thinglink.com/card/586514552254889988',
+        url: 'https://www.thinglink.com/scene/586514552254889988',
+        thumbnail:
+          "https://cdn.thinglink.me/api/image/586514552254889988/1024/10/scaletowidth#tl-586514552254889988;1043138249'",
+        ratio: '3/2',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should leave the legacy image off the ThingLink image host, which names no scene', async () => {
+      const value = html`
+        <img
+          class="alwaysThinglink"
+          src="http://s2.thingpic.com/images/V2/3qMvasebEyafJ6vuinCY.jpeg#tl-269211195280457729"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore an image route that is not the scene render', async () => {
+      const value = html`
+        <img class="alwaysThinglink" src="https://cdn.thinglink.me/api/avatar/586514552254889988/1024" />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a scene render below a leading segment', async () => {
+      const value = html`
+        <img class="alwaysThinglink" src="https://cdn.thinglink.me/x/image/586514552254889988/1024" />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a scene id that is not a number', async () => {
+      const value = html`
+        <img class="alwaysThinglink" src="https://cdn.thinglink.me/api/image/a%2F..%2Fb/1024" />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
 describeForEachParser('thinglink shapes the pipeline repairs first', (parseHtml) => {
   const convert = (value: string): Promise<string> => {
     return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
@@ -334,26 +402,27 @@ describeForEachParser('thinglink shapes the pipeline repairs first', (parseHtml)
     expect(await placeholder(value)).toEqual(expected)
   })
 
-  it('should leave the embed.js script form to its own static image', async () => {
+  it('should claim the script embed and keep its image as the poster', async () => {
     const value = html`
       <img
+        decoding="async"
         class="alwaysThinglink"
-        src="//cdn.thinglink.me/api/image/1023339413708472321/1024/10/scaletowidth#tl-1023339413708472321;"
+        style="max-width: 100%;"
+        src="//cdn.thinglink.me/api/image/1138925775852929025/1024/10/scaletowidth#tl-1138925775852929025;'"
       />
-      <script
-        async
-        charset="utf-8"
-        src="//cdn.thinglink.me/jse/embed.js"
-      ></script>
+      <script async charset="utf-8" src="//cdn.thinglink.me/jse/embed.js"></script>
     `
-    const expected = html`
-      <img
-        class="alwaysThinglink"
-        src="https://cdn.thinglink.me/api/image/1023339413708472321/1024/10/scaletowidth#tl-1023339413708472321;"
-      />
-    `
+    const expected: Record<string, string> = {
+      provider: 'thinglink',
+      id: '1138925775852929025',
+      src: 'https://www.thinglink.com/card/1138925775852929025',
+      url: 'https://www.thinglink.com/scene/1138925775852929025',
+      thumbnail:
+        "https://cdn.thinglink.me/api/image/1138925775852929025/1024/10/scaletowidth#tl-1138925775852929025;'",
+      ratio: '3/2',
+    }
 
-    expect(await convert(value)).toEqualHtml(expected)
+    expect(await placeholder(value)).toEqual(expected)
   })
 
   it('should leave a scene named by a link in prose as a link', async () => {

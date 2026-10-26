@@ -6,6 +6,7 @@ import { readCarrierUrl } from '../utils/widgets.js'
 
 const hosts = ['podomatic.com']
 const playerPath = '/swf/joeplayer'
+const framePath = '/embed/frame/posting/'
 
 // Podomatic's Flash "joeplayer", whose `jsonLocation` flashvar names the episode by its timestamp
 // in `{sub}.podomatic.com/entry/embed_params/{timestamp}`. Flash no longer runs, so it renders
@@ -39,6 +40,28 @@ export const podomaticFlashMediaResolver: MediaResolver = {
     return {
       tag: 'audio',
       src: `https://${location.hostname}/enclosure/${encodePathSegment(timestamp)}.mp3`,
+    }
+  },
+}
+
+// Podomatic's retired episode frame, `{sub}.podomatic.com/embed/frame/posting/{timestamp}`, which
+// answers 404. The same timestamp names the episode's file on `/enclosure/{timestamp}.mp3`.
+export const podomaticIframeMediaResolver: MediaResolver = {
+  kind: 'media',
+  selector: hosts.map((host) => `iframe[src*="${host}${framePath}" i]`).join(', '),
+  extract: (element) => {
+    const frame = parseUrlOnHosts(readCarrierUrl(element), hosts)
+    const [route, kind, posting, timestamp] = frame ? getPathSegments(frame) : []
+    const isPosting =
+      isAnyOf(route, 'embed') && isAnyOf(kind, 'frame') && isAnyOf(posting, 'posting')
+
+    if (!frame || !isPosting || !timestamp) {
+      return
+    }
+
+    return {
+      tag: 'audio',
+      src: `https://${frame.hostname}/enclosure/${encodePathSegment(timestamp)}.mp3`,
     }
   },
 }

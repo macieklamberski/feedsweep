@@ -6,6 +6,73 @@ import { googledriveEmbedResolver, googledriveResolveEmbed } from './googledrive
 
 describe('googledriveResolveEmbed', () => {
   describe('happy paths', () => {
+    it('should frame a folder listing and link its page', () => {
+      const value =
+        'https://drive.google.com/embeddedfolderview?id=1rynR0Eiedseu3VZ-7fk1cX6pgRcLmJOE#grid'
+      const expected: EmbedResolverResult = {
+        provider: 'googledrive',
+        id: 'folders/1rynR0Eiedseu3VZ-7fk1cX6pgRcLmJOE',
+        src: 'https://drive.google.com/embeddedfolderview?id=1rynR0Eiedseu3VZ-7fk1cX6pgRcLmJOE',
+        url: 'https://drive.google.com/drive/folders/1rynR0Eiedseu3VZ-7fk1cX6pgRcLmJOE',
+        height: 600,
+      }
+
+      expect(googledriveResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
+    it('should repair a folder page onto its listing', () => {
+      const value =
+        'https://drive.google.com/drive/folders/1ueGbF6A5QtIqeuEZXvAJZe2UQt0O_eAH?usp=sharing'
+      const expected: EmbedResolverResult = {
+        provider: 'googledrive',
+        id: 'folders/1ueGbF6A5QtIqeuEZXvAJZe2UQt0O_eAH',
+        src: 'https://drive.google.com/embeddedfolderview?id=1ueGbF6A5QtIqeuEZXvAJZe2UQt0O_eAH',
+        url: 'https://drive.google.com/drive/folders/1ueGbF6A5QtIqeuEZXvAJZe2UQt0O_eAH',
+        height: 600,
+      }
+
+      expect(googledriveResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
+    it('should read the folder routes in upper case', () => {
+      const value = 'https://drive.google.com/DRIVE/FOLDERS/1ueGbF6A5QtIqeuEZXvAJZe2UQt0O_eAH'
+      const expected: EmbedResolverResult = {
+        provider: 'googledrive',
+        id: 'folders/1ueGbF6A5QtIqeuEZXvAJZe2UQt0O_eAH',
+        src: 'https://drive.google.com/embeddedfolderview?id=1ueGbF6A5QtIqeuEZXvAJZe2UQt0O_eAH',
+        url: 'https://drive.google.com/drive/folders/1ueGbF6A5QtIqeuEZXvAJZe2UQt0O_eAH',
+        height: 600,
+      }
+
+      expect(googledriveResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
+    it('should keep a folder resource key in src alone', () => {
+      const value =
+        'https://drive.google.com/embeddedfolderview?id=1ueGbF6A5QtIqeuEZXvAJZe2UQt0O_eAH&resourcekey=0-abc'
+      const expected: EmbedResolverResult = {
+        provider: 'googledrive',
+        id: 'folders/1ueGbF6A5QtIqeuEZXvAJZe2UQt0O_eAH',
+        src: 'https://drive.google.com/embeddedfolderview?id=1ueGbF6A5QtIqeuEZXvAJZe2UQt0O_eAH&resourcekey=0-abc',
+        height: 600,
+      }
+
+      expect(googledriveResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
+    it('should write a folder id that only an escape keeps in its slot', () => {
+      const value = 'https://drive.google.com/embeddedfolderview?id=a%26b%2Fc'
+      const expected: EmbedResolverResult = {
+        provider: 'googledrive',
+        id: 'folders/a&b/c',
+        src: 'https://drive.google.com/embeddedfolderview?id=a%26b/c',
+        url: 'https://drive.google.com/drive/folders/a&b%2Fc',
+        height: 600,
+      }
+
+      expect(googledriveResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
     it('should build the placeholder from the preview frame url', () => {
       const value = 'https://drive.google.com/file/d/1y5iOrW7Epj-cNdscnRAVDzUCKaMjjo6r/preview'
       const expected: EmbedResolverResult = {
@@ -78,15 +145,27 @@ describe('googledriveResolveEmbed', () => {
       expect(googledriveResolveEmbed(new URL(value))).toBeUndefined()
     })
 
-    it('should ignore a folder listing', () => {
-      const value =
-        'https://drive.google.com/embeddedfolderview?id=1UVR7LiwlrKoff6cJI32-H6zWrwyu4-4R'
+    it('should ignore a folder listing that names no folder', () => {
+      const value = 'https://drive.google.com/embeddedfolderview?usp=sharing'
 
       expect(googledriveResolveEmbed(new URL(value))).toBeUndefined()
     })
 
-    it('should ignore a folder page', () => {
-      const value = 'https://drive.google.com/drive/folders/1UVR7LiwlrKoff6cJI32-H6zWrwyu4-4R'
+    it('should ignore a folder listing below a leading segment', () => {
+      const value =
+        'https://drive.google.com/x/embeddedfolderview?id=1inhF0kfQE_Q4XytgjWg59zq6CXr4lHpS'
+
+      expect(googledriveResolveEmbed(new URL(value))).toBeUndefined()
+    })
+
+    it('should ignore a folder page with a trailing segment', () => {
+      const value = 'https://drive.google.com/drive/folders/1ueGbF6A5QtIqeuEZXvAJZe2UQt0O_eAH/x'
+
+      expect(googledriveResolveEmbed(new URL(value))).toBeUndefined()
+    })
+
+    it('should ignore a drive route that is not a folder', () => {
+      const value = 'https://drive.google.com/drive/shared/1ueGbF6A5QtIqeuEZXvAJZe2UQt0O_eAH'
 
       expect(googledriveResolveEmbed(new URL(value))).toBeUndefined()
     })
@@ -172,6 +251,32 @@ describeForEachParser('googledriveEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, googledriveEmbedResolver)
 
   describe('happy paths', () => {
+    it('should resolve the folder listing snippet', async () => {
+      const value = html`
+        <iframe
+          allowfullscreen="true"
+          class="folder_embed"
+          frameborder="0"
+          height="550"
+          loading="lazy"
+          mozallowfullscreen="true"
+          scrolling="no"
+          src="https://drive.google.com/embeddedfolderview?id=1inhF0kfQE_Q4XytgjWg59zq6CXr4lHpS"
+          webkitallowfullscreen="true"
+          width="100%"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'googledrive',
+        id: 'folders/1inhF0kfQE_Q4XytgjWg59zq6CXr4lHpS',
+        src: 'https://drive.google.com/embeddedfolderview?id=1inhF0kfQE_Q4XytgjWg59zq6CXr4lHpS',
+        url: 'https://drive.google.com/drive/folders/1inhF0kfQE_Q4XytgjWg59zq6CXr4lHpS',
+        height: 600,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should state the platform size over the box the carrier declares', async () => {
       const value = html`
         <iframe

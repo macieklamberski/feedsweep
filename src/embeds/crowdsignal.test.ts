@@ -7,6 +7,7 @@ import {
   crowdsignalIframeEmbedResolver,
   crowdsignalResolveEmbed,
   crowdsignalScriptEmbedResolver,
+  crowdsignalWidgetEmbedResolver,
 } from './crowdsignal.js'
 
 describe('crowdsignalResolveEmbed', () => {
@@ -690,5 +691,77 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('crowdsignalWidgetEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, crowdsignalWidgetEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should frame the survey the settings name', async () => {
+      const value = html`
+        <div
+          class="cs-embed pd-embed"
+          data-settings="{&quot;type&quot;:&quot;iframe&quot;,&quot;auto&quot;:true,&quot;domain&quot;:&quot;15866845.survey.fm/&quot;,&quot;id&quot;:&quot;policies-on-updating-wikipedia-articles&quot;,&quot;site&quot;:&quot;polldaddy.com&quot;}"
+        ></div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'crowdsignal',
+        id: '15866845.survey.fm/policies-on-updating-wikipedia-articles',
+        src: 'https://15866845.survey.fm/policies-on-updating-wikipedia-articles?iframe=1',
+        url: 'https://15866845.survey.fm/policies-on-updating-wikipedia-articles',
+        height: 500,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should write a slug that only an escape keeps in its slot', async () => {
+      const value = html`
+        <div
+          class="pd-embed"
+          data-settings='{"domain":"davidthobbs.survey.fm/","id":"a/b"}'
+        ></div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'crowdsignal',
+        id: 'davidthobbs.survey.fm/a/b',
+        src: 'https://davidthobbs.survey.fm/a%2Fb?iframe=1',
+        url: 'https://davidthobbs.survey.fm/a%2Fb',
+        height: 500,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore settings naming a domain off the survey host', async () => {
+      const value = html`
+        <div class="pd-embed" data-settings='{"domain":"evil.test/","id":"new-survey"}'></div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore settings naming no survey', async () => {
+      const value = html`
+        <div class="pd-embed" data-settings='{"domain":"davidthobbs.survey.fm/"}'></div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore settings naming no domain', async () => {
+      const value = html`<div class="pd-embed" data-settings='{"id":"new-survey"}'></div>`
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore settings that are not json', async () => {
+      const value = html`<div class="pd-embed" data-settings="davidthobbs.survey.fm"></div>`
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 })

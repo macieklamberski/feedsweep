@@ -8,7 +8,7 @@ import {
 } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { parseUrlOnHosts, pickQueryParams, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'googledrive'
@@ -21,6 +21,23 @@ const sizes = {
   // for a file over 100 MB is 252 tall.
   audio: { height: 252 },
   file: { ratio: '4/3' },
+  // A folder's listing fills its box and scrolls. 600 is what the folder snippet publishers paste
+  // writes beside `width:100%`.
+  folder: { height: 600 },
+}
+
+// `/embeddedfolderview?id={id}` frames a folder's listing, and `/drive/folders/{id}` is its page,
+// which refuses framing.
+const readFolderId = (segments: Array<string>, url: URL): string | undefined => {
+  const [route, kind, folderId] = segments
+
+  if (segments.length === 1 && isAnyOf(route, 'embeddedfolderview')) {
+    return getQueryParam(url.searchParams, 'id')
+  }
+
+  if (segments.length === 3 && isAnyOf(route, 'drive') && isAnyOf(kind, 'folders')) {
+    return decodeSegment(folderId)
+  }
 }
 
 // `/open?id={id}` redirects a file to its page and a folder to its listing, so only an audio
@@ -59,10 +76,26 @@ export const composeDriveThumbnail = (fileId: string): string => {
   return `https://drive.google.com/thumbnail${composeQuery({ id: decodeSegment(fileId) ?? fileId, sz: 'w640' })}`
 }
 
-// `/file/d/{id}/preview` frames the file and `/file/d/{id}/view` is its page. A folder on
-// `/drive/folders` or `/embeddedfolderview` is a listing, not a file, and stays unclaimed.
+// `/file/d/{id}/preview` frames the file and `/file/d/{id}/view` is its page.
 export const googledriveResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const segments = getPathSegmentsWithoutWorkspace(url)
+  const folderId = readFolderId(segments, url)
+
+  if (folderId) {
+    const access = pickQueryParams(url.search, accessParams)
+
+    return {
+      provider,
+      // Qualified because a file and a folder share one id grammar and open on different pages.
+      id: `folders/${folderId}`,
+      src: `https://drive.google.com/embeddedfolderview${composeQuery({ id: folderId, ...access })}`,
+      url: access.resourcekey
+        ? undefined
+        : `https://drive.google.com/drive/folders/${encodePathSegment(folderId)}`,
+      ...sizes.folder,
+    }
+  }
+
   const isAudio = attr(element, 'type')?.toLowerCase().startsWith('audio/')
   const fileId = readFileId(segments, url, isAudio)
 

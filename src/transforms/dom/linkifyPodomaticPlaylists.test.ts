@@ -100,6 +100,82 @@ describeForEachParser('linkifyPodomaticPlaylists', (parseHtml) => {
     })
   })
 
+  describe('the multiplayer and flashcatcher show players', () => {
+    it('should link the podcast the multiplayer names', async () => {
+      const value = html`
+        <embed
+          width="480"
+          height="360"
+          type="application/x-shockwave-flash"
+          src="http://lisboalowcost.podomatic.com/swf/joe_multiplayer_v13.swf"
+          wmode="transparent"
+          menu="false"
+          flashvars="jsonLocation=http%3A%2F%2Flisboalowcost.podomatic.com%2Fembed%2Fmulti%2F0%3Fcolor%3D43bee7%26autoPlay%3Dfalse%26facebook%3Dfalse%26height%3D360%26objembed%3D1%26width%3D480"
+          allowfullscreen="true"
+        >
+      `
+      const expected = html`
+        <a
+          href="https://www.podomatic.com/podcasts/lisboalowcost"
+        >https://www.podomatic.com/podcasts/lisboalowcost</a>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should link the podcast the flashcatcher names', async () => {
+      const value = html`
+        <embed
+          src="http://www.podOmatic.com/flash/flashcatcher.swf"
+          width="320"
+          height="315"
+          type="application/x-shockwave-flash"
+          flashvars="playlist_url=http://aom.podOmatic.com/xspf.xspf"
+        >
+      `
+      const expected = html`
+        <a
+          href="https://www.podomatic.com/podcasts/aom"
+        >https://www.podomatic.com/podcasts/aom</a>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should leave a multiplayer naming another route', async () => {
+      const value = html`
+        <embed
+          src="http://lisboalowcost.podomatic.com/swf/joe_multiplayer_v13.swf"
+          flashvars="jsonLocation=http%3A%2F%2Flisboalowcost.podomatic.com%2Fentry%2Fembed_params%2F2012-10-30T05_25_47-07_00"
+        >
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a flashcatcher naming another route', async () => {
+      const value = html`
+        <embed
+          src="http://www.podOmatic.com/flash/flashcatcher.swf"
+          flashvars="playlist_url=http://aom.podOmatic.com/zz.xspf"
+        >
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a flashcatcher reading another flashvar', async () => {
+      const value = html`
+        <embed
+          src="http://www.podOmatic.com/flash/flashcatcher.swf"
+          flashvars="file=http://aom.podOmatic.com/xspf.xspf"
+        >
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
   describe('sad paths', () => {
     it('should leave a player streaming one episode', async () => {
       const value = html`
@@ -185,7 +261,7 @@ describeForEachParser('linkifyPodomaticPlaylists', (parseHtml) => {
   })
 })
 
-describeForEachParser('podomatic jwplayer44 through the pipeline', (parseHtml) => {
+describeForEachParser('podomatic show players through the pipeline', (parseHtml) => {
   const convert = (value: string) => {
     return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
   }
@@ -201,6 +277,25 @@ describeForEachParser('podomatic jwplayer44 through the pipeline', (parseHtml) =
     const expected = html`
       <p>
         <a href="https://www.podomatic.com/podcasts/mrgranito">https://www.podomatic.com/podcasts/mrgranito</a>
+      </p>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should link the podcast a flashcatcher names', async () => {
+    const value = html`
+      <embed
+        type="application/x-shockwave-flash"
+        src="http://www.podOmatic.com/flash/flashcatcher.swf"
+        flashvars="playlist_url=http://tspanos.podOmatic.com/xspf.xspf"
+        height="315"
+        width="320"
+      >
+    `
+    const expected = html`
+      <p>
+        <a href="https://www.podomatic.com/podcasts/tspanos">https://www.podomatic.com/podcasts/tspanos</a>
       </p>
     `
 

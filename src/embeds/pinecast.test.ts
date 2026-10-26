@@ -94,8 +94,20 @@ describe('pinecastResolveEmbed', () => {
       expect(pinecastResolveEmbed(new URL(value))).toBeUndefined()
     })
 
-    it('should ignore the podcast playlist player', () => {
-      const value = 'https://pinecast.com/embed/player_playlist/testcast'
+    it('should ignore the playlist route naming no podcast', () => {
+      const value = 'https://pinecast.com/embed/player_playlist/'
+
+      expect(pinecastResolveEmbed(new URL(value))).toBeUndefined()
+    })
+
+    it('should ignore the playlist route below a leading segment', () => {
+      const value = 'https://pinecast.com/x/embed/player_playlist/untangling-ourselves'
+
+      expect(pinecastResolveEmbed(new URL(value))).toBeUndefined()
+    })
+
+    it('should ignore a segment after the playlist podcast', () => {
+      const value = 'https://pinecast.com/embed/player_playlist/untangling-ourselves/extra'
 
       expect(pinecastResolveEmbed(new URL(value))).toBeUndefined()
     })
@@ -106,6 +118,26 @@ describeForEachParser('pinecastEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, pinecastEmbedResolver)
 
   describe('happy paths', () => {
+    it('should frame the playlist player of a podcast and drop its colours', async () => {
+      const value = html`
+        <iframe
+          src="https://pinecast.com/embed/player_playlist/hallo-hvem-er-det?color.primary=%23f5f5f5&amp;color.secondary=%23ebebeb&amp;color.accent=%23f6ebd7"
+          border="0"
+          style="width:100%;border:0"
+          height="270"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'pinecast',
+        id: 'playlist/hallo-hvem-er-det',
+        src: 'https://pinecast.com/embed/player_playlist/hallo-hvem-er-det',
+        url: 'https://pnc.st/s/hallo-hvem-er-det',
+        height: 270,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should resolve the minimal player the publisher pasted', async () => {
       const value = html`
         <iframe

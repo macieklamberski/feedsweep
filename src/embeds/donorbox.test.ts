@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { donorboxEmbedResolver, donorboxResolveEmbed, readDonorboxHeight } from './donorbox.js'
+import {
+  donorboxIframeEmbedResolver,
+  donorboxResolveEmbed,
+  donorboxWidgetEmbedResolver,
+  readDonorboxHeight,
+} from './donorbox.js'
 
 describe('donorboxResolveEmbed', () => {
   describe('happy paths', () => {
@@ -82,8 +87,8 @@ describe('donorboxResolveEmbed', () => {
   })
 })
 
-describeForEachParser('donorboxEmbedResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, donorboxEmbedResolver)
+describeForEachParser('donorboxIframeEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, donorboxIframeEmbedResolver)
 
   describe('happy paths', () => {
     it('should state no height on a frame that states none, since the form posts its own', async () => {
@@ -163,6 +168,68 @@ describeForEachParser('donorboxEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
       const value = '<iframe src="https://evil.test/embed/donation-form-248"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
+describeForEachParser('donorboxWidgetEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, donorboxWidgetEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should frame the donation form the element names', async () => {
+      const value = html`
+        <dbox-widget
+          campaign="help-open-food-facts-stay-afloat"
+          type="donation_form"
+          enable-auto-scroll="true"
+        ></dbox-widget>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'donorbox',
+        id: 'help-open-food-facts-stay-afloat',
+        src: 'https://donorbox.org/embed/help-open-food-facts-stay-afloat',
+        url: 'https://donorbox.org/help-open-food-facts-stay-afloat',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should frame a donation form when the element states no type', async () => {
+      const value = html`<dbox-widget campaign="global-voices-2"></dbox-widget>`
+      const expected: EmbedResolverResult = {
+        provider: 'donorbox',
+        id: 'global-voices-2',
+        src: 'https://donorbox.org/embed/global-voices-2',
+        url: 'https://donorbox.org/global-voices-2',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should write a campaign that only an escape keeps in its slot', async () => {
+      const value = html`<dbox-widget campaign="a/b"></dbox-widget>`
+      const expected: EmbedResolverResult = {
+        provider: 'donorbox',
+        id: 'a%2Fb',
+        src: 'https://donorbox.org/embed/a%2Fb',
+        url: 'https://donorbox.org/a%2Fb',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore an element naming an empty campaign', async () => {
+      const value = html`<dbox-widget campaign="" type="donation_form"></dbox-widget>`
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should leave an event, whose ticket form refuses framing', async () => {
+      const value = html`<dbox-widget id="embed-widget" type="event" campaign="928531"></dbox-widget>`
 
       expect(await extract(value)).toBeUndefined()
     })

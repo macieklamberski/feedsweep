@@ -303,8 +303,8 @@ describe('stackblitzResolveEmbed', () => {
   })
 
   describe('shapes that name no project', () => {
-    it('should refuse a repository embed, which the oEmbed endpoint cannot look up', () => {
-      const value = 'https://stackblitz.com/github/okikio/astro-form-data/main?embed=1'
+    it('should ignore a repository route that names no repository', () => {
+      const value = 'https://stackblitz.com/github/transloadit?embed=1'
 
       expect(stackblitzResolveEmbed(new URL(value))).toBeUndefined()
     })
@@ -413,17 +413,56 @@ describeForEachParser('stackblitzIframeEmbedResolver', (parseHtml) => {
     })
   })
 
-  describe('shapes that name no project', () => {
-    it('should leave a repository embed to the generic fallback', async () => {
+  describe('repository embeds', () => {
+    it('should frame a repository folder and keep the file it opens', async () => {
       const value = html`
         <iframe
-          class="w-full"
-          src="https://stackblitz.com/github/okikio/astro-form-data/main?embed=1"
-          height="600"
+          style="width:100%;height:600px"
+          src="https://stackblitz.com/github/transloadit/uppy/tree/main/examples/react?embed=1&amp;view=editor&amp;showSidebar=1&amp;hideTerminal=1&amp;ctl=1&amp;file=src%2FApp.tsx"
         ></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'stackblitz',
+        id: 'github/transloadit/uppy/tree/main/examples/react',
+        src: 'https://stackblitz.com/github/transloadit/uppy/tree/main/examples/react?embed=1&file=src%2FApp.tsx',
+        url: 'https://stackblitz.com/github/transloadit/uppy/tree/main/examples/react',
+        height: 500,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should take the name out of the stated title of a repository embed', async () => {
+      const value = html`
+        <iframe
+          class="embed"
+          src="https://stackblitz.com/github/Vibrant-Colors/node-vibrant/tree/main/examples/js/simple?template=node&amp;ctl=1&amp;embed=1&amp;file=src%2Fmain.ts&amp;hideNavigation=1&amp;view=preview"
+          title="Node Vibrant Browser Demo"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'stackblitz',
+        id: 'github/Vibrant-Colors/node-vibrant/tree/main/examples/js/simple',
+        src: 'https://stackblitz.com/github/Vibrant-Colors/node-vibrant/tree/main/examples/js/simple?embed=1&file=src%2Fmain.ts',
+        url: 'https://stackblitz.com/github/Vibrant-Colors/node-vibrant/tree/main/examples/js/simple',
+        height: 500,
+        title: 'Node Vibrant Browser Demo',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should frame a bare repository', async () => {
+      const value = html`<iframe src="https://stackblitz.com/github/okikio/astro-form-data?embed=1"></iframe>`
+      const expected: EmbedResolverResult = {
+        provider: 'stackblitz',
+        id: 'github/okikio/astro-form-data',
+        src: 'https://stackblitz.com/github/okikio/astro-form-data?embed=1',
+        url: 'https://stackblitz.com/github/okikio/astro-form-data',
+        height: 500,
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })

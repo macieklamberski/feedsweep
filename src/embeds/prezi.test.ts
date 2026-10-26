@@ -2,7 +2,12 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { preziEmbedResolver, preziResolveEmbed } from './prezi.js'
+import {
+  preziDesignIframeEmbedResolver,
+  preziDesignWidgetEmbedResolver,
+  preziEmbedResolver,
+  preziResolveEmbed,
+} from './prezi.js'
 
 describe('preziResolveEmbed', () => {
   describe('happy paths', () => {
@@ -531,6 +536,125 @@ describeForEachParser('the Flash object other Flash readers could claim first', 
         data-embed-ratio="550/400"
         data-embed-src="https://prezi.com/p/hmql6k-ryv21/embed"
         data-embed-url="https://prezi.com/p/hmql6k-ryv21/"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('preziDesignWidgetEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, preziDesignWidgetEmbedResolver)
+
+  it('should frame the design the mount names', async () => {
+    const value = html`<div class="prezi-design-embed" data-project-id="9rZzVvgrtTrThSwtXks2"></div>`
+    const expected: EmbedResolverResult = {
+      provider: 'prezi',
+      id: 'design/9rZzVvgrtTrThSwtXks2',
+      src: 'https://prezi.com/i/embed/9rZzVvgrtTrThSwtXks2',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should ignore a mount naming an empty design', async () => {
+    const value = html`<div class="prezi-design-embed" data-project-id=""></div>`
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
+  it('should write a design id that only an escape keeps in its slot', async () => {
+    const value = html`<div class="prezi-design-embed" data-project-id="a/b"></div>`
+    const expected: EmbedResolverResult = {
+      provider: 'prezi',
+      id: 'design/a%2Fb',
+      src: 'https://prezi.com/i/embed/a%2Fb',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('preziDesignIframeEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, preziDesignIframeEmbedResolver)
+
+  it('should frame the design the loader frame names on its no-cookie host', async () => {
+    const value = html`
+      <iframe
+        src="https://prezi-nocookies.com/i/embed/9rZzVvgrtTrThSwtXks2?parent_url=https%3A%2F%2Fexample.com%2Fpost"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'prezi',
+      id: 'design/9rZzVvgrtTrThSwtXks2',
+      src: 'https://prezi.com/i/embed/9rZzVvgrtTrThSwtXks2',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should frame the design on the prezi host', async () => {
+    const value = html`<iframe src="https://prezi.com/i/embed/a0jnb2pMKl6yvxulej4j"></iframe>`
+    const expected: EmbedResolverResult = {
+      provider: 'prezi',
+      id: 'design/a0jnb2pMKl6yvxulej4j',
+      src: 'https://prezi.com/i/embed/a0jnb2pMKl6yvxulej4j',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should ignore the video embed route on the no-cookie host', async () => {
+    const value = html`<iframe src="https://prezi-nocookies.com/v/embed/9rZzVvgrtTrThSwtXks2"></iframe>`
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
+  it('should ignore a route that is not the design embed', async () => {
+    const value = html`<iframe src="https://prezi-nocookies.com/i/view/9rZzVvgrtTrThSwtXks2"></iframe>`
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
+  it('should ignore the design route naming no design', async () => {
+    const value = html`<iframe src="https://prezi-nocookies.com/i/embed/"></iframe>`
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
+  it('should ignore the design route below a leading segment', async () => {
+    const value = html`<iframe src="https://prezi-nocookies.com/x/i/embed/9rZzVvgrtTrThSwtXks2"></iframe>`
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
+  it('should ignore a foreign host carrying the design path', async () => {
+    const value = html`<iframe src="https://evil.test/i/embed/9rZzVvgrtTrThSwtXks2"></iframe>`
+
+    expect(await extract(value)).toBeUndefined()
+  })
+})
+
+describeForEachParser('prezi design through the pipeline', (parseHtml) => {
+  const convert = (value: string): Promise<string> => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should frame each design and drop the loader before it', async () => {
+    const value = html`
+      <script async src="https://e.prezicdn.net/v1/design.js"></script>
+      <div class="prezi-design-embed" data-project-id="9rZzVvgrtTrThSwtXks2"></div>
+    `
+    const expected = html`
+      <div
+        data-embed-id="design/9rZzVvgrtTrThSwtXks2"
+        data-embed-provider="prezi"
+        data-embed-ratio="16/9"
+        data-embed-src="https://prezi.com/i/embed/9rZzVvgrtTrThSwtXks2"
       ></div>
     `
 

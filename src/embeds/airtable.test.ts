@@ -58,6 +58,46 @@ describe('airtableResolveEmbed', () => {
       expect(airtableResolveEmbed(new URL(value))).toEqual(expected)
     })
 
+    it('should build the placeholder from an interface form', () => {
+      const value = 'https://airtable.com/embed/appomwbUakbe7zbhp/pagEufaCpgI8znFlq/form'
+      const expected: EmbedResolverResult = {
+        provider: 'airtable',
+        id: 'appomwbUakbe7zbhp/pagEufaCpgI8znFlq',
+        src: 'https://airtable.com/embed/appomwbUakbe7zbhp/pagEufaCpgI8znFlq/form',
+        url: 'https://airtable.com/appomwbUakbe7zbhp/pagEufaCpgI8znFlq/form',
+        height: 533,
+      }
+
+      expect(airtableResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
+    it('should drop the responsive layout of an interface form', () => {
+      const value =
+        'https://airtable.com/embed/appWPTGqZmUcs3NWu/pagZEn4i6lgq9wnwh/form?layout=responsive'
+      const expected: EmbedResolverResult = {
+        provider: 'airtable',
+        id: 'appWPTGqZmUcs3NWu/pagZEn4i6lgq9wnwh',
+        src: 'https://airtable.com/embed/appWPTGqZmUcs3NWu/pagZEn4i6lgq9wnwh/form',
+        url: 'https://airtable.com/appWPTGqZmUcs3NWu/pagZEn4i6lgq9wnwh/form',
+        height: 533,
+      }
+
+      expect(airtableResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
+    it('should read the form route in upper case and keep it as written', () => {
+      const value = 'https://airtable.com/embed/appomwbUakbe7zbhp/pagEufaCpgI8znFlq/FORM'
+      const expected: EmbedResolverResult = {
+        provider: 'airtable',
+        id: 'appomwbUakbe7zbhp/pagEufaCpgI8znFlq',
+        src: 'https://airtable.com/embed/appomwbUakbe7zbhp/pagEufaCpgI8znFlq/FORM',
+        url: 'https://airtable.com/appomwbUakbe7zbhp/pagEufaCpgI8znFlq/FORM',
+        height: 533,
+      }
+
+      expect(airtableResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
     it('should read the embed route in upper case and mint it in lowercase', () => {
       const value = 'https://airtable.com/EMBED/shrIBFxXbBGxNv8at'
       const expected: EmbedResolverResult = {
@@ -107,8 +147,32 @@ describe('airtableResolveEmbed', () => {
       expect(airtableResolveEmbed(new URL(value))).toBeUndefined()
     })
 
-    it('should ignore an interface form', () => {
-      const value = 'https://airtable.com/embed/appNrensvKp1phKGL/pag2pXXhhCSeiIsNS/form'
+    it('should ignore an interface form under a segment that is not a base', () => {
+      const value = 'https://airtable.com/embed/xppomwbUakbe7zbhp/pagEufaCpgI8znFlq/form'
+
+      expect(airtableResolveEmbed(new URL(value))).toBeUndefined()
+    })
+
+    it('should ignore a form under a page whose id holds the page prefix inside it', () => {
+      const value = 'https://airtable.com/embed/appomwbUakbe7zbhp/xpagEufaCpgI8znFlq/form'
+
+      expect(airtableResolveEmbed(new URL(value))).toBeUndefined()
+    })
+
+    it('should ignore a form under a shared view, which is not an interface page', () => {
+      const value = 'https://airtable.com/embed/appomwbUakbe7zbhp/shrEufaCpgI8znFlq/form'
+
+      expect(airtableResolveEmbed(new URL(value))).toBeUndefined()
+    })
+
+    it('should ignore an interface page with a view that is not a form', () => {
+      const value = 'https://airtable.com/embed/appomwbUakbe7zbhp/pagEufaCpgI8znFlq/grid'
+
+      expect(airtableResolveEmbed(new URL(value))).toBeUndefined()
+    })
+
+    it('should ignore an interface form with a trailing segment', () => {
+      const value = 'https://airtable.com/embed/appomwbUakbe7zbhp/pagEufaCpgI8znFlq/form/extra'
 
       expect(airtableResolveEmbed(new URL(value))).toBeUndefined()
     })
@@ -243,14 +307,12 @@ describeForEachParser('airtableEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-  })
-
-  describe('sad paths', () => {
-    it('should leave the interface form frame to the generic fallback', async () => {
+    it('should resolve the interface form frame', async () => {
       const value = html`
         <iframe
+          loading="lazy"
           class="airtable-embed"
-          src="https://airtable.com/embed/appNrensvKp1phKGL/pag2pXXhhCSeiIsNS/form"
+          src="https://airtable.com/embed/appomwbUakbe7zbhp/pagEufaCpgI8znFlq/form"
           frameborder="0"
           onmousewheel=""
           width="100%"
@@ -258,10 +320,19 @@ describeForEachParser('airtableEmbedResolver', (parseHtml) => {
           style="background: transparent; border: 1px solid #ccc;"
         ></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'airtable',
+        id: 'appomwbUakbe7zbhp/pagEufaCpgI8znFlq',
+        src: 'https://airtable.com/embed/appomwbUakbe7zbhp/pagEufaCpgI8znFlq/form',
+        url: 'https://airtable.com/appomwbUakbe7zbhp/pagEufaCpgI8znFlq/form',
+        height: 533,
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
+  })
 
+  describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
       const value = html`<iframe src="https://evil.test/embed/appmHSMnV4Q1S4cWh/shrMnUTYyzmsdX8JT"></iframe>`
 

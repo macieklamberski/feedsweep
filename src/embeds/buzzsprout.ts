@@ -20,6 +20,8 @@ const showScriptPathRegex = /^\/(\d+)\.js$/i
 // /{podcast}/{episode}-{slug} with or without episodes/, the slug dot-free to keep .mp3 out.
 // The episode audio is `buzzsprout.com/{podcast}/{episode}-{slug}.mp3` on the same host.
 const episodePagePathRegex = /^\/(\d+)\/(?:episodes\/)?(\d+)(?:-[^/.]*)?$/i
+// /{podcast}, the show player the show script writes as its iframe.
+const showPagePathRegex = /^\/(\d+)$/
 
 // Both heights are what Buzzsprout's own script writes onto the iframe it builds: 200 for the
 // small episode player, 375 for the large show player (read from the served script, 2026-08-15).
@@ -50,18 +52,22 @@ const composeEmbed = (
   }
 }
 
-// Buzzsprout's player iframe, whose title names the episode.
+// Buzzsprout's player iframe, of an episode or a show, whose title names what it plays.
 export const buzzsproutResolveEmbed: ResolveUrlEmbed = (url, element) => {
-  const match = url.pathname.match(episodePagePathRegex)
+  const title = attr(element, 'title')
+  const episode = url.pathname.match(episodePagePathRegex)
 
-  if (!match) {
-    return
+  if (episode?.[1] && episode[2]) {
+    return { ...composeEmbed(episode[1], episode[2]), title }
   }
 
-  const title = attr(element, 'title')
-  const result = composeEmbed(match[1], match[2])
+  const show = url.pathname.match(showPagePathRegex)
 
-  return title ? { ...result, title } : result
+  if (show?.[1]) {
+    const params = pickQueryParams(url.search, showPlayerParams)
+
+    return { ...composeEmbed(show[1], undefined, params), title }
+  }
 }
 
 export const buzzsproutIframeEmbedResolver: EmbedResolver = createUrlEmbedResolver(

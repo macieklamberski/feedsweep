@@ -624,14 +624,60 @@ describeForEachParser('pixivIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ignore the oEmbed frame of a novel', async () => {
+    it('should frame a novel on its own key and page', async () => {
       const value = html`
         <iframe
           width="600"
           height="315"
-          src="https://embed.pixiv.net/oembed_iframe.php?type=novel&amp;id=93349282"
+          src="https://embed.pixiv.net/oembed_iframe.php?type=novel&amp;id=21843457"
+          frameborder="0"
         ></iframe>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'pixiv',
+        id: 'novel/21843457',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=novel&id=21843457',
+        url: 'https://www.pixiv.net/novel/show.php?id=21843457',
+        width: 600,
+        height: 315,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should write a novel id that only an escape keeps in its slot', async () => {
+      const value =
+        '<iframe src="https://embed.pixiv.net/oembed_iframe.php?type=novel&amp;id=1%262"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'pixiv',
+        id: 'novel/1&2',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=novel&id=1%262',
+        url: 'https://www.pixiv.net/novel/show.php?id=1%262',
+        width: 600,
+        height: 315,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read a code frame as an illustration whatever type it names', async () => {
+      const value =
+        '<iframe src="https://embed.pixiv.net/code.php?type=novel&amp;id=21843457"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'pixiv',
+        id: '21843457',
+        src: 'https://embed.pixiv.net/oembed_iframe.php?type=illust&id=21843457',
+        url: 'https://www.pixiv.net/artworks/21843457',
+        width: 600,
+        height: 315,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should ignore an oEmbed frame of a type it does not know', async () => {
+      const value =
+        '<iframe src="https://embed.pixiv.net/oembed_iframe.php?type=zzqx&amp;id=21843457"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

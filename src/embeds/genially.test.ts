@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'bun:test'
+import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { extractGeniallyViewId, geniallyEmbedResolver, geniallyResolveEmbed } from './genially.js'
+import {
+  extractGeniallyViewId,
+  geniallyIframeEmbedResolver,
+  geniallyResolveEmbed,
+  geniallyWidgetEmbedResolver,
+} from './genially.js'
 
 const viewId = '60294f8b2ec856159ae0baa5'
 
@@ -131,8 +137,8 @@ describe('geniallyResolveEmbed', () => {
   })
 })
 
-describeForEachParser('geniallyEmbedResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, geniallyEmbedResolver)
+describeForEachParser('geniallyIframeEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, geniallyIframeEmbedResolver)
 
   describe('happy paths', () => {
     it('should claim a view iframe on the modern host', async () => {
@@ -244,5 +250,71 @@ describeForEachParser('geniallyEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+  })
+})
+
+describeForEachParser('geniallyWidgetEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, geniallyWidgetEmbedResolver)
+
+  it('should frame the view the mount names', async () => {
+    const value = html`
+      <div
+        id="5f577a3e08563f0d8a876510"
+        class="genially-embed"
+        style="margin: 0px auto; position: relative; height: auto; width: 100%;"
+      ></div>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'genially',
+      id: '5f577a3e08563f0d8a876510',
+      src: 'https://view.genially.com/5f577a3e08563f0d8a876510',
+      ratio: '16/9',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should ignore a mount whose id is not a view id', async () => {
+    const value = html`<div id="genially-1" class="genially-embed"></div>`
+
+    expect(await extract(value)).toBeUndefined()
+  })
+})
+
+describeForEachParser('genially script embed through the pipeline', (parseHtml) => {
+  const convert = (value: string): Promise<string> => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should frame the view and drop the loader video beside the mount', async () => {
+    const value = html`
+      <div class="container-wrapper-genially" style="position: relative; min-height: 400px; max-width: 100%;"><video class="loader-genially" autoplay="autoplay" loop="loop" playsinline="playsInline" muted="muted" style="position: absolute;top: 45%;left: 50%;transform: translate(-50%, -50%);width: 80px;height: 80px;margin-bottom: 10%"><source src="https://static.genial.ly/resources/panel-loader-low.mp4" type="video/mp4" />Your browser does not support the video tag.</video><div id="5f30aca85962040d95eaeecc" class="genially-embed" style="margin: 0px auto; position: relative; height: auto; width: 100%;"></div></div>
+    `
+    const expected = html`
+      <div
+        data-embed-id="5f30aca85962040d95eaeecc"
+        data-embed-provider="genially"
+        data-embed-ratio="16/9"
+        data-embed-src="https://view.genially.com/5f30aca85962040d95eaeecc"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should drop the loader image of an older snippet', async () => {
+    const value = html`
+      <div class="container-wrapper-genially" style="position: relative; min-height: 400px; max-width: 100%;"><img src="https://genially.blob.core.windows.net/genially/version3.0/loader.gif" class="loader-genially" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; margin-top: auto; margin-right: auto; margin-bottom: auto; margin-left: auto; z-index: 1;width: 80px; height: 80px;"/><div id="5e3569f66bbd27220c6058b1" class="genially-embed" style="margin: 0px auto; position: relative; height: auto; width: 100%;"></div></div>
+    `
+    const expected = html`
+      <div
+        data-embed-id="5e3569f66bbd27220c6058b1"
+        data-embed-provider="genially"
+        data-embed-ratio="16/9"
+        data-embed-src="https://view.genially.com/5e3569f66bbd27220c6058b1"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })

@@ -3,7 +3,12 @@ import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { readPixels } from '../utils/hints.js'
-import { threadsBlockquoteEmbedResolver, threadsRenderHint } from './threads.js'
+import {
+  threadsBlockquoteEmbedResolver,
+  threadsIframeEmbedResolver,
+  threadsRenderHint,
+  threadsS9eEmbedResolver,
+} from './threads.js'
 
 describeForEachParser('threadsBlockquoteEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, threadsBlockquoteEmbedResolver)
@@ -314,6 +319,117 @@ describeForEachParser('threadsBlockquoteEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toBeUndefined()
     })
+  })
+})
+
+describeForEachParser('threadsIframeEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, threadsIframeEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should read the frame embed.js writes, saved by a CMS', async () => {
+      const value = html`
+        <iframe
+          src="https://www.threads.com/@anmeweg/post/DJpElRmtnQN/embed/"
+          width="345"
+          height="280"
+          style="border: 0px; overflow: hidden; display: block; "
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'threads',
+        id: 'DJpElRmtnQN',
+        src: 'https://www.threads.com/@anmeweg/post/DJpElRmtnQN/embed/',
+        url: 'https://www.threads.com/@anmeweg/post/DJpElRmtnQN',
+        author: '@anmeweg',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should mint the threads.com frame from a short threads.net frame', async () => {
+      const value = html`
+        <iframe
+          src="https://www.threads.net/t/DESe-NpSEEw/embed"
+          width="350px"
+          height="700px"
+          style="border:none;"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'threads',
+        id: 'DESe-NpSEEw',
+        src: 'https://www.threads.com/t/DESe-NpSEEw/embed/',
+        url: 'https://www.threads.com/t/DESe-NpSEEw',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore the post page, which is not the frame', async () => {
+      const value = '<iframe src="https://www.threads.com/@anmeweg/post/DJpElRmtnQN"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a segment after the frame route', async () => {
+      const value =
+        '<iframe src="https://www.threads.com/@anmeweg/post/DJpElRmtnQN/embed/extra"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the frame route behind another segment', async () => {
+      const value =
+        '<iframe src="https://www.threads.com/x/@anmeweg/post/DJpElRmtnQN/embed/"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a foreign host carrying the same path', async () => {
+      const value = '<iframe src="https://evil.test/@anmeweg/post/DJpElRmtnQN/embed/"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
+describeForEachParser('threadsS9eEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, threadsS9eEmbedResolver)
+
+  it('should mint the frame the helper writes for the shortcode', async () => {
+    const value = html`
+      <iframe
+        data-s9e-mediaembed="threads"
+        allowfullscreen=""
+        loading="lazy"
+        scrolling="no"
+        src="https://s9e.github.io/iframe/2/threads.min.html#CuY2OYEAbJw"
+        style="border:0;height:300px;max-width:550px;width:100%"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'threads',
+      id: 'CuY2OYEAbJw',
+      src: 'https://www.threads.com/t/CuY2OYEAbJw/embed/',
+      url: 'https://www.threads.com/t/CuY2OYEAbJw',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should keep a shortcode that only an escape keeps in its slot', async () => {
+    const value =
+      '<iframe data-s9e-mediaembed="threads" src="https://s9e.github.io/iframe/2/threads.min.html#a/b"></iframe>'
+    const expected: EmbedResolverResult = {
+      provider: 'threads',
+      id: 'a%2Fb',
+      src: 'https://www.threads.com/t/a%2Fb/embed/',
+      url: 'https://www.threads.com/t/a%2Fb',
+    }
+
+    expect(await extract(value)).toEqual(expected)
   })
 })
 
