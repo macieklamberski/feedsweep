@@ -59,7 +59,7 @@ export const carrierUrl = (value: string, hosts: string | ReadonlyArray<string>)
   const url = parseUrlOnHosts(value, hosts)
 
   if (!url) {
-    throw new Error(`Not a carrier url on ${hosts}: ${value}`)
+    throw new Error(`Not a carrier url on ${hosts}: ${value}.`)
   }
 
   return url

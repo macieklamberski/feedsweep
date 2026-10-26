@@ -48,7 +48,7 @@ describe('carrierUrl', () => {
     const throwing = () => carrierUrl('https://elsewhere.example/v/123', 'platform.example')
 
     expect(throwing).toThrow(
-      'Not a carrier url on platform.example: https://elsewhere.example/v/123',
+      'Not a carrier url on platform.example: https://elsewhere.example/v/123.',
     )
   })
 })
