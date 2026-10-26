@@ -115,7 +115,8 @@ export const discourseCiteResolver: CiteResolver = {
     // The submitter and the item's time, from the stats paragraph the description skips. No
     // other engine's body carries either anchor, and the timestamp is the site's own
     // formatting ("8:09 AM - 28 Sep 2021"). The submitter's link names the username in `id`.
-    const hackernewsProfile = parseUrl(attr(find(body, 'a.author'), 'href'), placeholderBaseUrl)
+    const hackernewsAuthorHref = attr(find(body, 'a.author'), 'href')
+    const hackernewsProfile = parseUrl(hackernewsAuthorHref, placeholderBaseUrl)
     const hackernewsAuthor = getQueryParam(hackernewsProfile?.searchParams, 'id')
     const hackernewsDate = text(find(body, 'a.timestamp'))
 
