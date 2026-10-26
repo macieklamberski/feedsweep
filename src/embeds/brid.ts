@@ -23,7 +23,8 @@ export const bridEmbedResolver = createMarkupEmbedResolver('div.brid[id^="Brid_"
   const script = findConfigScript(element)
   const text = script?.textContent ?? ''
   // Read after the div's own id, so a script holding several configs yields the right one.
-  const config = text.slice(text.indexOf(attr(element, 'id') ?? ''))
+  const containerId = attr(element, 'id') ?? ''
+  const config = text.slice(text.indexOf(containerId))
   // Both go from the script into a path.
   const playerId = encodePathSegment(config.match(playerIdRegex)?.[1] ?? '')
   const videoId = encodePathSegment(config.match(videoIdRegex)?.[1] ?? '')

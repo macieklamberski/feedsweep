@@ -19,7 +19,9 @@ const playerPathRegex = /^\/v\/([^/]+)\/oembed\/?$/i
 // The player seeks to the `#t=` it reads from the hash. A WordPress auto-embed writes
 // `#?secret=` there.
 const readStartFragment = (parsed: URL): string => {
-  const query = composeQuery(pickQueryParams(parsed.hash.slice(1), ['t']))
+  const hashQuery = parsed.hash.slice(1)
+  const startTime = pickQueryParams(hashQuery, ['t'])
+  const query = composeQuery(startTime)
 
   return query.replace('?', '#')
 }

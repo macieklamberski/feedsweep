@@ -18,7 +18,7 @@ const episodeSections = ['shows', 'blogs', 'series']
 
 const channel9ResolveEmbed: ResolveUrlEmbed = (url) => {
   const segments = getPathSegments(url)
-  const section = segments.at(0)
+  const [section] = segments
   const route = segments.at(-1)
 
   if (!isAnyOf(route, 'player')) {

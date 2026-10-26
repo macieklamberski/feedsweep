@@ -43,7 +43,8 @@ export const linkifyUrls: DomTransform = (context) => {
 
       for (const link of links) {
         if (link.start > lastIndex) {
-          parts.push(document.createTextNode(text.slice(lastIndex, link.start)))
+          const before = text.slice(lastIndex, link.start)
+          parts.push(document.createTextNode(before))
         }
 
         // cleanAnchorUrls ran before these anchors existed, so this is their only cleaning pass.
@@ -55,7 +56,8 @@ export const linkifyUrls: DomTransform = (context) => {
       }
 
       if (lastIndex < text.length) {
-        parts.push(document.createTextNode(text.slice(lastIndex)))
+        const after = text.slice(lastIndex)
+        parts.push(document.createTextNode(after))
       }
 
       node.replaceWith(...parts)

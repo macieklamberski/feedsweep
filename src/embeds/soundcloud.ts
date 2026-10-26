@@ -115,7 +115,9 @@ const readPageKind = (segments: Array<string>): string | undefined => {
     return
   }
 
-  if (isAnyOf(segments[0], sitePathSegments)) {
+  const [user, trackOrCollection] = segments
+
+  if (isAnyOf(user, sitePathSegments)) {
     return
   }
 
@@ -123,12 +125,12 @@ const readPageKind = (segments: Array<string>): string | undefined => {
     return 'users'
   }
 
-  if (isAnyOf(segments[1], 'sets')) {
+  if (isAnyOf(trackOrCollection, 'sets')) {
     return 'playlists'
   }
 
   if (segments.length === 2) {
-    return isAnyOf(segments[1], userCollectionSegments) ? 'users' : 'tracks'
+    return isAnyOf(trackOrCollection, userCollectionSegments) ? 'users' : 'tracks'
   }
 }
 
@@ -283,7 +285,8 @@ const soundcloudResolveEmbed: ResolveUrlEmbed = (url, element) => {
   // takes `evil.test/soundcloud.com/b` for the track page, and two of those write the author,
   // the title and the url before the block is deleted.
   const sibling = element?.nextElementSibling
-  const anchors = Array.from(sibling?.querySelectorAll('a[href]') ?? []).filter((anchor) => {
+  const links = Array.from(sibling?.querySelectorAll('a[href]') ?? [])
+  const anchors = links.filter((anchor) => {
     const page = parseUrlOnHosts(attr(anchor, 'href'), hosts)
 
     return page && pageHostRegex.test(page.hostname)

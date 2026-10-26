@@ -45,7 +45,8 @@ export const rebuildEmbedlyEmbeds: DomTransform = () => (document) => {
 
       const poster = getQueryParam(params, 'image')
 
-      element.replaceWith(composeIframe(document, inner, isUsableUrl(poster) ? poster : undefined))
+      const iframe = composeIframe(document, inner, isUsableUrl(poster) ? poster : undefined)
+      element.replaceWith(iframe)
       continue
     }
 

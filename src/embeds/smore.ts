@@ -19,9 +19,10 @@ export const smoreEmbedResolver = createUrlEmbedResolver(
   [...legacyHosts, 'app.smore.com', 'secure.smore.com'],
   (url, element) => {
     const segments = getPathSegments(url)
+    const [route] = segments
     const isLegacy = isHostOf(url, legacyHosts)
 
-    if (!isLegacy && !isAnyOf(segments[0], 'n')) {
+    if (!isLegacy && !isAnyOf(route, 'n')) {
       return
     }
 

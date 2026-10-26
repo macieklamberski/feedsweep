@@ -190,7 +190,9 @@ export const parseFlashVars = (query: Nullish<string>): URLSearchParams => {
 
 // One named value out of that configuration, for a carrier that names a single thing.
 export const flashVar = (element: Nullish<Element>, name: string): string | undefined => {
-  return getQueryParam(parseFlashVars(flashVars(element)), name)
+  const params = parseFlashVars(flashVars(element))
+
+  return getQueryParam(params, name)
 }
 
 // Publishers spell a `<param>` name in every case, so `name` arrives lowercased.

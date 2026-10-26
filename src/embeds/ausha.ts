@@ -23,10 +23,10 @@ const sizes = {
 const playerHosts = ['player.ausha.co', 'widget.ausha.co']
 
 export const aushaResolveEmbed: ResolveUrlEmbed = (url) => {
-  const segments = getPathSegments(url)
+  const [page] = getPathSegments(url)
 
   // Both hosts serve their player from the root, spelled either bare or as `index.html`.
-  if (!isHostOf(url, playerHosts) || (segments.length > 0 && !isAnyOf(segments[0], 'index.html'))) {
+  if (!isHostOf(url, playerHosts) || (page && !isAnyOf(page, 'index.html'))) {
     return
   }
 

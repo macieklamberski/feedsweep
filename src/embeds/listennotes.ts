@@ -59,37 +59,38 @@ const composeSlugged = (slugged: Slugged): EmbedResolverResult | undefined => {
 
 export const listennotesResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const segments = getPathSegments(url)
+  const [locale = ''] = segments
 
-  if (localeRegex.test(segments[0] ?? '')) {
+  if (localeRegex.test(locale)) {
     segments.shift()
   }
 
-  const [route = '', first = '', second, third] = segments
+  const [route = '', slug = '', item, embed] = segments
   const title = attr(element, 'title')
   const episodeQuery = composeQuery(pickQueryParams(url.search, episodeParams))
 
-  if (!second) {
+  if (!item) {
     return
   }
 
   // The hex episode id this route takes 301s to the slugged player, which no offline map reaches.
-  if (isAnyOf(route, 'embedded') && isAnyOf(first, 'e')) {
+  if (isAnyOf(route, 'embedded') && isAnyOf(slug, 'e')) {
     return {
       provider,
-      id: `episode/${second}`,
-      src: `${listennotesOrigin}/embedded/e/${second}/${episodeQuery}`,
-      url: `${listennotesOrigin}/e/${second}/`,
+      id: `episode/${item}`,
+      src: `${listennotesOrigin}/embedded/e/${item}/${episodeQuery}`,
+      url: `${listennotesOrigin}/e/${item}/`,
       ...sizes.episode,
       title,
     }
   }
 
-  if (isAnyOf(route, 'podcasts') && isAnyOf(second, 'embed')) {
-    const path = `podcasts/${first}`
+  if (isAnyOf(route, 'podcasts') && isAnyOf(item, 'embed')) {
+    const path = `podcasts/${slug}`
 
     return composeSlugged({
       kind: 'podcast',
-      slug: first,
+      slug,
       playerPath: path,
       pagePath: path,
       size: sizes.podcast,
@@ -97,12 +98,12 @@ export const listennotesResolveEmbed: ResolveUrlEmbed = (url, element) => {
     })
   }
 
-  if (isAnyOf(route, 'podcasts') && isAnyOf(third, 'embed')) {
-    const path = `podcasts/${first}/${second}`
+  if (isAnyOf(route, 'podcasts') && isAnyOf(embed, 'embed')) {
+    const path = `podcasts/${slug}/${item}`
 
     return composeSlugged({
       kind: 'episode',
-      slug: second,
+      slug: item,
       playerPath: path,
       pagePath: path,
       size: sizes.episode,
@@ -112,12 +113,12 @@ export const listennotesResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 
   // `clips` 301s to `podcast-clips`, the route the embed dialog writes today.
-  if (isAnyOf(route, clipRouteWords) && isAnyOf(second, 'embed')) {
-    const path = `podcast-clips/${first}`
+  if (isAnyOf(route, clipRouteWords) && isAnyOf(item, 'embed')) {
+    const path = `podcast-clips/${slug}`
 
     return composeSlugged({
       kind: 'clip',
-      slug: first,
+      slug,
       playerPath: path,
       pagePath: path,
       size: sizes.clip,
@@ -127,12 +128,12 @@ export const listennotesResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
   // `listen/{slug}/{podcasts|episodes}/embed/` lists a playlist's podcasts or its episodes, and
   // the page for it lives under `playlists`.
-  if (isAnyOf(route, 'listen') && isAnyOf(third, 'embed')) {
+  if (isAnyOf(route, 'listen') && isAnyOf(embed, 'embed')) {
     return composeSlugged({
       kind: 'playlist',
-      slug: first,
-      playerPath: `listen/${first}/${second}`,
-      pagePath: `playlists/${first}/${second}`,
+      slug,
+      playerPath: `listen/${slug}/${item}`,
+      pagePath: `playlists/${slug}/${item}`,
       size: sizes.playlist,
       title,
     })

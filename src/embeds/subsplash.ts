@@ -36,13 +36,13 @@ export const subsplashResolveEmbed: ResolveUrlEmbed = (url) => {
   const segments = getPathSegments(url)
 
   if (segments.length === 6) {
-    const [user, org, media, embed, d, id] = segments
+    const [user, org, media, embed, idRoute, id] = segments
 
     if (
       !isAnyOf(user, 'u') ||
       !isAnyOf(media, 'media') ||
       !isAnyOf(embed, 'embed') ||
-      !isAnyOf(d, 'd')
+      !isAnyOf(idRoute, 'd')
     ) {
       return
     }

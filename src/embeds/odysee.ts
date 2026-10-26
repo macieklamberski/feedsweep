@@ -29,14 +29,14 @@ const readClaimPath = (parsed: URL): string | undefined => {
     return
   }
 
-  const [first, second] = segments
+  const [name, claimId] = segments
   // A leading `@` says the first segment is a channel and the second the claim inside it, so
   // the pair stays two claims even when neither carries an id. Only a bare first segment reads
   // as the legacy `{name}/{claim id}` spelling.
-  const isLegacyPair = segments.length === 2 && !first.includes(':') && !first.startsWith('@')
+  const isLegacyPair = segments.length === 2 && !name.includes(':') && !name.startsWith('@')
   // odysee.com spells its page path {name}:{claim id}, and the player answers that form for a
   // legacy pair too.
-  const claims = isLegacyPair ? [`${first}:${second}`] : segments
+  const claims = isLegacyPair ? [`${name}:${claimId}`] : segments
 
   if (
     claims.length === 0 ||

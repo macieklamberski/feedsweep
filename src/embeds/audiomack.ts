@@ -32,25 +32,32 @@ const audiomackEmbedParams = ['key']
 type Track = { artist: string; kind: string; slug: string; search: string }
 
 const readTrack = (url: URL): Track | undefined => {
-  const segments = getPathSegments(url)
-  const [route, second, third, fourth] = segments
+  const [route, ...trackSegments] = getPathSegments(url)
 
   // The retired players, `embed3/{artist}/{slug}` and its five siblings.
   const retired = retiredRoutes.get((route ?? '').toLowerCase())
 
-  if (retired && second && third) {
-    return { artist: second, kind: retired, slug: third, search: '' }
+  if (retired) {
+    const [artist, slug] = trackSegments
+
+    if (!artist || !slug) {
+      return
+    }
+
+    return { artist, kind: retired, slug, search: '' }
   }
 
-  if (!isAnyOf(route, 'embed') || !second || !third || !fourth) {
+  const [kindOrArtist, artistOrKind, slug] = trackSegments
+
+  if (!isAnyOf(route, 'embed') || !kindOrArtist || !artistOrKind || !slug) {
     return
   }
 
   // The current player spells the kind either side of the artist: `embed/song/{artist}/{slug}`
   // 301s to `embed/{artist}/song/{slug}`.
-  return audiomackHeights.has(second.toLowerCase())
-    ? { artist: third, kind: second, slug: fourth, search: url.search }
-    : { artist: second, kind: third, slug: fourth, search: url.search }
+  return audiomackHeights.has(kindOrArtist.toLowerCase())
+    ? { artist: artistOrKind, kind: kindOrArtist, slug, search: url.search }
+    : { artist: kindOrArtist, kind: artistOrKind, slug, search: url.search }
 }
 
 export const audiomackResolveEmbed: ResolveUrlEmbed = (url, element) => {

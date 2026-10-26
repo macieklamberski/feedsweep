@@ -45,8 +45,9 @@ const composeEmbed = (formId: string, carrier: URL): EmbedResolverResult => {
 // The form frame, which the platform serves at the bare id and at `/form/{id}` alike.
 export const jotformResolveEmbed: ResolveUrlEmbed = (url) => {
   const segments = getPathSegments(url)
-  const route = isAnyOf(segments[0], 'form') ? segments.slice(1) : segments
-  const formId = route[0]
+  const [formRoute] = segments
+  const route = isAnyOf(formRoute, 'form') ? segments.slice(1) : segments
+  const [formId] = route
 
   if (route.length !== 1 || !formId || !digitsRegex.test(formId)) {
     return

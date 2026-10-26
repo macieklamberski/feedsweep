@@ -14,23 +14,23 @@ const sizes = {
 const hosts = ['ganjingworld.com', 'ganjing.com']
 
 const readVideoId = (url: URL): string | undefined => {
-  const [first, second, third] = getPathSegments(url)
+  const [routeOrLocale, idOrRoute, localizedId] = getPathSegments(url)
 
   // The route word tells an embed from a channel, `/channel`, or a shared post, `/s`.
-  if (isAnyOf(first, 'embed')) {
-    return second
+  if (isAnyOf(routeOrLocale, 'embed')) {
+    return idOrRoute
   }
 
-  if (!isAnyOf(second, 'embed')) {
+  if (!isAnyOf(idOrRoute, 'embed')) {
     return
   }
 
   // The hyphen tells a locale from the route words that share its slot, such as `live`.
-  if (!hyphenatedLettersRegex.test(first ?? '')) {
+  if (!hyphenatedLettersRegex.test(routeOrLocale ?? '')) {
     return
   }
 
-  return third
+  return localizedId
 }
 
 // No thumbnail: the poster is a uuid on a separate cdn and nothing composes it from the video id.

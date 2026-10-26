@@ -78,16 +78,20 @@ const namedCollectionPaths = ['ondemand', 'channels']
 // An event names its videos under `/videos/`, but its bare and `/embed` forms are the common ones
 // and both would read as a video here.
 const readCollectionVideoId = (segments: Array<string>): string | undefined => {
-  if (isAnyOf(segments[0], showcasePaths)) {
-    return isAnyOf(segments[2], 'video') ? segments[3] : undefined
+  const [collection, , route, videoId] = segments
+
+  if (isAnyOf(collection, showcasePaths)) {
+    return isAnyOf(route, 'video') ? videoId : undefined
   }
 
-  if (isAnyOf(segments[0], 'groups')) {
-    return isAnyOf(segments[2], 'videos') ? segments[3] : undefined
+  if (isAnyOf(collection, 'groups')) {
+    return isAnyOf(route, 'videos') ? videoId : undefined
   }
 
-  if (isAnyOf(segments[0], namedCollectionPaths)) {
-    return segments.length === 3 ? segments[2] : undefined
+  if (isAnyOf(collection, namedCollectionPaths)) {
+    const [, , namedVideoId] = segments
+
+    return segments.length === 3 ? namedVideoId : undefined
   }
 }
 
@@ -108,13 +112,13 @@ const composeShowcaseEmbed = (showcaseId: string): EmbedResolverResult => {
 }
 
 const resolveShowcaseEmbed = (url: URL): EmbedResolverResult | undefined => {
-  const segments = getPathSegments(url)
+  const [collection, rawShowcaseId] = getPathSegments(url)
 
-  if (!isAnyOf(segments[0], showcasePaths)) {
+  if (!isAnyOf(collection, showcasePaths)) {
     return
   }
 
-  const showcaseId = keepIfMatches(segments[1], digitsRegex)
+  const showcaseId = keepIfMatches(rawShowcaseId, digitsRegex)
 
   return showcaseId ? composeShowcaseEmbed(showcaseId) : undefined
 }
@@ -128,24 +132,27 @@ const resolveEventEmbed = (
   url: URL,
   element: Element | undefined,
 ): EmbedResolverResult | undefined => {
-  const segments = getPathSegments(url)
+  const [route, rawEventId, ...rest] = getPathSegments(url)
 
-  if (!isAnyOf(segments[0], 'event')) {
+  if (!isAnyOf(route, 'event')) {
     return
   }
 
-  const eventId = keepIfMatches(segments[1], digitsRegex)
+  const eventId = keepIfMatches(rawEventId, digitsRegex)
 
   if (!eventId) {
     return
   }
 
-  const tail = isAnyOf(segments[2], 'embed') ? segments.slice(3) : segments.slice(2)
-  const hash = keepIfMatches(tail[0], hexRegex)
+  const [embedOrHash] = rest
+  const tail = isAnyOf(embedOrHash, 'embed') ? rest.slice(1) : rest
+  const [hashOrLayout] = tail
+  const hash = keepIfMatches(hashOrLayout, hexRegex)
   const layout = hash ? tail.slice(1) : tail
+  const [layoutName] = layout
 
   // A chat embed or any other route under the event is not its player.
-  if (layout.length > 1 || (layout[0] && !isAnyOf(layout[0], eventLayoutSegments))) {
+  if (layout.length > 1 || (layoutName && !isAnyOf(layoutName, eventLayoutSegments))) {
     return
   }
 
@@ -172,10 +179,11 @@ const readReference = (url: URL): VimeoReference | undefined => {
   }
 
   const segments = getPathSegments(url)
+  const [section] = segments
 
   // A `progressive_redirect` url is the video's own file. Its owner can limit the player to their
   // own site while the signed file plays anywhere.
-  if (isAnyOf(segments[0], 'progressive_redirect')) {
+  if (isAnyOf(section, 'progressive_redirect')) {
     return
   }
 
@@ -186,11 +194,11 @@ const readReference = (url: URL): VimeoReference | undefined => {
     return { id: clipId }
   }
 
-  if (isAnyOf(segments[0], sitePathSegments)) {
+  if (isAnyOf(section, sitePathSegments)) {
     return
   }
 
-  if (isAnyOf(segments[0], collectionPaths)) {
+  if (isAnyOf(section, collectionPaths)) {
     const id = keepIfMatches(readCollectionVideoId(segments), digitsRegex)
 
     return id ? { id } : undefined
@@ -198,7 +206,9 @@ const readReference = (url: URL): VimeoReference | undefined => {
 
   // A numeric video id matches the hash alphabet, so only a segment after an id counts as one.
   const hashIndex = segments.findIndex((segment, index) => {
-    return index > 0 && hexRegex.test(segment) && digitsRegex.test(segments[index - 1])
+    const previous = segments.slice(0, index).at(-1)
+
+    return previous !== undefined && hexRegex.test(segment) && digitsRegex.test(previous)
   })
   // The last numeric segment, which is the video in every remaining spelling: `/{id}`,
   // `/video/{id}` and the review pages.
@@ -213,9 +223,11 @@ const readReference = (url: URL): VimeoReference | undefined => {
   }
 
   if (hashIndex !== -1) {
+    const [hash] = segments.slice(hashIndex)
+
     return {
       id,
-      hash: segments[hashIndex],
+      hash,
     }
   }
 

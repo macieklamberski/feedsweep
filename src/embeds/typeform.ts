@@ -91,13 +91,13 @@ export const typeformWidgetEmbedResolver = createMarkupEmbedResolver(
 // `<user>.typeform.com/to/<id>` still serves the same form without redirecting, so both
 // reach here. The query is telemetry (`typeform-embed`, `typeform-medium`) and is dropped.
 export const typeformResolveEmbed: ResolveUrlEmbed = (url, element) => {
-  const segments = getPathSegments(url)
+  const [route, formId] = getPathSegments(url)
 
   // A form id in a url path is alphanumeric (`MTt3Pw7K`). The enclosure probe offers every file on
   // a Typeform host to this resolver, so the alphabet is what tells a form from a file such as
   // `/to/MTt3Pw7K.mp3`.
-  return isAnyOf(segments[0], 'to') && segments[1] && alphanumericRegex.test(segments[1])
-    ? composeEmbed(segments[1], attr(element, 'title'))
+  return isAnyOf(route, 'to') && formId && alphanumericRegex.test(formId)
+    ? composeEmbed(formId, attr(element, 'title'))
     : undefined
 }
 

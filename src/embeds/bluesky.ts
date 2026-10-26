@@ -84,6 +84,13 @@ const extractBlueskyPostFromUrl = (link: URL | undefined): BlueskyPost | undefin
   }
 }
 
+const extractBlueskyPostFromAnchor = (anchor: Nullish<Element>): BlueskyPost | undefined => {
+  const href = attr(anchor, 'href')
+  const link = parseUrlOnHosts(href, hosts)
+
+  return extractBlueskyPostFromUrl(link)
+}
+
 // The date a post was written at, read from its record key.
 const readTidDate = (rkey: string): string | undefined => {
   if (!tidRegex.test(rkey)) {
@@ -138,7 +145,7 @@ const findPostAnchor = (element: Element): Element | undefined => {
 
   // The last one: a media marker links the post too, and the date link is always later.
   for (const anchor of element.querySelectorAll('a[href]')) {
-    if (extractBlueskyPostFromUrl(parseUrlOnHosts(attr(anchor, 'href'), hosts))) {
+    if (extractBlueskyPostFromAnchor(anchor)) {
       found = anchor
     }
   }
@@ -181,9 +188,7 @@ const readPostText = (element: Element, postAnchor: Element | undefined): string
     // Bluesky writes `[image or embed]` where the blockquote cannot show the attachment, and
     // links it to the post exactly as the footer does. It is chrome, not the post's words.
     const isMediaMarker =
-      isElement(node) &&
-      node.localName === 'a' &&
-      Boolean(extractBlueskyPostFromUrl(parseUrlOnHosts(attr(node, 'href'), hosts)))
+      isElement(node) && node.localName === 'a' && Boolean(extractBlueskyPostFromAnchor(node))
 
     if (!isMediaMarker) {
       body += node.textContent ?? ''
@@ -199,7 +204,7 @@ const readQuotedPost = (
   const postAnchor = findPostAnchor(element)
 
   return {
-    post: extractBlueskyPostFromUrl(parseUrlOnHosts(attr(postAnchor, 'href'), hosts)),
+    post: extractBlueskyPostFromAnchor(postAnchor),
     fields: {
       description: readPostText(element, postAnchor),
       author: postAnchor && readAuthor(postAnchor),

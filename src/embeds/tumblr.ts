@@ -49,14 +49,16 @@ export const tumblrIframeEmbedResolver = createUrlEmbedResolver(hosts, readPostE
 export const tumblrPostEmbedResolver = createMarkupEmbedResolver(
   'div.tumblr-post[data-href]',
   (element) => {
-    const result = readPostEmbed(parseUrlOnHosts(attr(element, 'data-href'), hosts))
+    const frameUrl = parseUrlOnHosts(attr(element, 'data-href'), hosts)
+    const result = readPostEmbed(frameUrl)
 
     if (!result) {
       return
     }
 
     // The anchor under the div is the post page. Its text is that url again, never a title.
-    const postUrl = parseUrlOnHosts(attr(find(element, 'a'), 'href'), postHosts)
+    const href = attr(find(element, 'a'), 'href')
+    const postUrl = parseUrlOnHosts(href, postHosts)
 
     return { ...result, url: postUrl?.href }
   },

@@ -84,10 +84,12 @@ const parseTarget = (value: URL | undefined): CodepenTarget | undefined => {
 
   const allSegments = getPathSegments(parsed)
   // The 2.0 editor's pens sit one segment deeper, under `editor/`.
-  const isEditor = isAnyOf(allSegments[0], 'editor')
+  const [editorOrUser] = allSegments
+  const isEditor = isAnyOf(editorOrUser, 'editor')
   const segments = isEditor ? allSegments.slice(1) : allSegments
   // A team's pens sit one segment deeper, under `team/{name}/`.
-  const isTeam = isAnyOf(segments[0], 'team')
+  const [teamOrUser] = segments
+  const isTeam = isAnyOf(teamOrUser, 'team')
   const [rawUser, route, ...rest] = isTeam ? segments.slice(1) : segments
   const kind = getAnyOf(route, penKinds)
 
@@ -214,7 +216,9 @@ const readWidget = (element: Element): EmbedResolverResult | undefined => {
 
   // The loader follows the sentence's own link, whose text is the pen's name in an intact snippet.
   for (const anchor of element.querySelectorAll('a[href]')) {
-    const target = parseTarget(parseUrlOnHosts(attr(anchor, 'href'), hosts, isHostOf))
+    const href = attr(anchor, 'href')
+    const link = parseUrlOnHosts(href, hosts, isHostOf)
+    const target = parseTarget(link)
 
     if (target?.kind !== 'pen' || target.slug !== slug) {
       continue

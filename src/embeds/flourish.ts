@@ -68,17 +68,17 @@ export const flourishWidgetEmbedResolver = createMarkupEmbedResolver(
 // The WordPress oEmbed wrapper points at the same url with a `#?secret=` fragment appended.
 export const flourishResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const segments = getPathSegments(url)
-  const isPlayer = isAnyOf(segments[2], 'embed')
+  const [resource, id, route] = segments
+  const isPlayer = isAnyOf(route, 'embed')
   // The share page frames the same player inside the site's header, footer and cookie banner.
   // `flo.uri.sh` serves no page at that path, and the host serves its own files beside it.
-  const isSharePage =
-    segments.length === 2 && isHostOf(url, sharePageHosts) && !isFileName(segments[1])
+  const isSharePage = segments.length === 2 && isHostOf(url, sharePageHosts) && !isFileName(id)
 
   if (!isPlayer && !isSharePage) {
     return
   }
 
-  const embed = composeEmbed(segments[0], segments[1])
+  const embed = composeEmbed(resource, id)
 
   if (!embed) {
     return

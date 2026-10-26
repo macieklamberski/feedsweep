@@ -41,8 +41,9 @@ const appleHeights = toMap({
 
 export const appleResolveEmbed: ResolveUrlEmbed = (url) => {
   const segments = getPathSegments(url)
+  const [storefrontOrKind] = segments
   // Any first segment that is not a kind is the storefront.
-  const hasStorefront = !appleHeights.has(segments[0]?.toLowerCase() ?? '')
+  const hasStorefront = !appleHeights.has(storefrontOrKind?.toLowerCase() ?? '')
   const [rawKind, ...rest] = hasStorefront ? segments.slice(1) : segments
   const kind = rawKind?.toLowerCase()
   const pathId = rest[rest.length - 1]

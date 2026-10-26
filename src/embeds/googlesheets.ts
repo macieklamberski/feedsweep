@@ -37,7 +37,9 @@ const sizes = {
 // A frame can name the tab it opens on in the fragment, as `#gid={id}`.
 const readTabFragment = (url: URL): string => {
   const hash = url.hash
-  const query = composeQuery(pickQueryParams(hash.slice(1), ['gid']))
+  const fragment = hash.slice(1)
+  const tab = pickQueryParams(fragment, ['gid'])
+  const query = composeQuery(tab)
 
   return query.replace('?', '#')
 }
@@ -46,21 +48,24 @@ const readTabFragment = (url: URL): string => {
 // it by its Drive file id. An account index, `/u/{n}/`, only picks the sign-in and serves the
 // same sheet.
 export const googlesheetsResolveEmbed: ResolveUrlEmbed = (url, element) => {
-  const pathSegments = getPathSegments(url)
+  const [app, ...appSegments] = getPathSegments(url)
 
-  if (!isAnyOf(pathSegments[0], 'spreadsheets')) {
+  if (!isAnyOf(app, 'spreadsheets')) {
     return
   }
 
-  const segments = isAnyOf(pathSegments[1], 'u') ? pathSegments.slice(3) : pathSegments.slice(1)
+  const [accountRoute] = appSegments
+  const segments = isAnyOf(accountRoute, 'u') ? appSegments.slice(2) : appSegments
+  const [fileRoute, ...fileSegments] = segments
 
-  if (!isAnyOf(segments[0], 'd')) {
+  if (!isAnyOf(fileRoute, 'd')) {
     return
   }
 
-  const isPublished = isAnyOf(segments[1], 'e')
-  const sheetId = segments[isPublished ? 2 : 1]
-  const route = segments.slice(isPublished ? 3 : 2).join('/')
+  const [publishedRoute] = fileSegments
+  const isPublished = isAnyOf(publishedRoute, 'e')
+  const [sheetId, ...routeSegments] = isPublished ? fileSegments.slice(1) : fileSegments
+  const route = routeSegments.join('/')
   const isChart = isAnyOf(route, chartRoute)
   // A publish token answers 404 on `/edit` and `/preview`.
   const isShared = !isPublished && isAnyOf(route, sharedRoutes)

@@ -36,10 +36,10 @@ export const extractWistiaEmbed = (
   link: URL,
 ): { route: string; id: string; page?: string } | undefined => {
   const segments = getPathSegments(link)
-  const start = isAnyOf(segments[0], 'embed') ? 1 : 0
-  const named = segments[start] ?? ''
+  const [root] = segments
+  const [named = '', media] = isAnyOf(root, 'embed') ? segments.slice(1) : segments
   const route = playerRoutes.get(named.toLowerCase())
-  const id = segments[start + 1]?.replace(jsonpSuffixRegex, '')
+  const id = media?.replace(jsonpSuffixRegex, '')
 
   // A dot marks a file such as the media JSON, and no route serves a file as a player.
   if (!route || !id || id.includes('.')) {
@@ -47,7 +47,7 @@ export const extractWistiaEmbed = (
   }
 
   // Only the account host serves /medias/{id}: the player hosts 404 on it.
-  const host = isAnyOf(segments[0], 'medias') ? parseUrlOnHosts(link, hosts)?.hostname : undefined
+  const host = isAnyOf(root, 'medias') ? parseUrlOnHosts(link, hosts)?.hostname : undefined
 
   return { route, id, page: host ? `https://${host}/medias/${id}` : undefined }
 }

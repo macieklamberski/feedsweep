@@ -60,18 +60,18 @@ const parseTarget = (value: URL | undefined): CodesandboxTarget | undefined => {
     return
   }
 
-  const [first, second, third] = getPathSegments(parsed)
+  const [route, kindOrSlug, projectSlug] = getPathSegments(parsed)
   // `/embed/{slug}` is the embed renderer and `/s/{slug}` the legacy user url for the same sandbox.
   // `/p/sandbox/` and `/p/devbox/` are the DevBox-era routes, which take `?embed=1` on the page's
   // own address.
-  const isProject = isAnyOf(first, 'p') && isAnyOf(second, projectKinds)
-  const isPlayer = isAnyOf(first, playerRoutes)
+  const isProject = isAnyOf(route, 'p') && isAnyOf(kindOrSlug, projectKinds)
+  const isPlayer = isAnyOf(route, playerRoutes)
   let slug: string | undefined
 
   if (isProject) {
-    slug = third
+    slug = projectSlug
   } else if (isPlayer) {
-    slug = second
+    slug = kindOrSlug
   }
 
   // CodeSandbox serves files on its own host, so a file name is an enclosure.
@@ -88,7 +88,7 @@ const parseTarget = (value: URL | undefined): CodesandboxTarget | undefined => {
   // The file the editor opens on, spelled `file` on the DevBox-era routes and `module` on the
   // embed renderer. The rest of the query is the editor's look.
   if (isProject) {
-    const pagePath = `p/${second}/${slug}`
+    const pagePath = `p/${kindOrSlug}/${slug}`
     const file = getQueryParam(parsed.searchParams, 'file')
     const query = composeQuery(trimObject({ file, embed: '1' }, Boolean))
 

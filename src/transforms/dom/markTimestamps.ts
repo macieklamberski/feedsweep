@@ -165,7 +165,8 @@ export const markTimestamps: DomTransform = () => {
         const tokenStart = (match.index ?? 0) + match[0].length - token.length - head.length
 
         if (tokenStart > lastIndex) {
-          parts.push(document.createTextNode(text.slice(lastIndex, tokenStart)))
+          const before = text.slice(lastIndex, tokenStart)
+          parts.push(document.createTextNode(before))
         }
 
         const span = document.createElement('span')
@@ -180,7 +181,8 @@ export const markTimestamps: DomTransform = () => {
       }
 
       if (lastIndex < text.length) {
-        parts.push(document.createTextNode(text.slice(lastIndex)))
+        const after = text.slice(lastIndex)
+        parts.push(document.createTextNode(after))
       }
 
       node.replaceWith(...parts)

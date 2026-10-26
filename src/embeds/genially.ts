@@ -17,19 +17,19 @@ const sizes = {
 }
 
 export const extractGeniallyViewId = (link: URL): string | undefined => {
-  const segments = getPathSegments(link)
+  const [route, page, indexedId] = getPathSegments(link)
 
   // The retired `View/Index/{id}` route.
-  if (isAnyOf(segments[0], 'view') && isAnyOf(segments[1], 'index')) {
-    return keepIfMatches(segments[2], hexRegex)
+  if (isAnyOf(route, 'view') && isAnyOf(page, 'index')) {
+    return keepIfMatches(indexedId, hexRegex)
   }
 
   // The view host serves views alone, and answers 404 for a site page such as `/de`.
   if (parseUrl(link)?.hostname.startsWith('view.')) {
-    return keepIfMatches(segments[0], hexRegex)
+    return keepIfMatches(route, hexRegex)
   }
 
-  const viewId = isAnyOf(segments[0], 'view') ? segments[1] : segments[0]
+  const viewId = isAnyOf(route, 'view') ? page : route
 
   return keepIfMatches(viewId, safeViewIdRegex)
 }

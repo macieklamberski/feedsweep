@@ -28,13 +28,12 @@ export const extractPodbeanId = (url: URL): string | undefined => {
   }
 
   const segments = getPathSegments(url)
+  const [route, player, id] = segments
 
   // `/media/player/{id}` is the legacy form, `/player-v2/?i={id}` the current one.
   // /media/player/{id} 301s to /player-v2/?i={id}-pb for a real id and 404s an invented one, while
   // the v2 player answers 200 to any id.
-  if (isAnyOf(segments[0], 'media') && isAnyOf(segments[1], 'player')) {
-    const id = segments[2]
-
+  if (isAnyOf(route, 'media') && isAnyOf(player, 'player')) {
     if (segments.length !== 3 || !id || isAnyOf(id, legacyRouteWords)) {
       return
     }
@@ -43,7 +42,7 @@ export const extractPodbeanId = (url: URL): string | undefined => {
     return decodeSegment(id) ?? id
   }
 
-  if (isAnyOf(segments[0], 'player-v2')) {
+  if (isAnyOf(route, 'player-v2')) {
     return getQueryParam(url.searchParams, 'i')
   }
 }

@@ -475,7 +475,8 @@ const getVideoIds = (video: Element): Array<string> => {
   }
 
   for (const attribute of ['data-embed-src', 'data-embed-url', 'src']) {
-    const id = extractVideoId(parseUrlOnHosts(video.getAttribute(attribute), youtubeHosts))
+    const href = video.getAttribute(attribute)
+    const id = extractVideoId(parseUrlOnHosts(href, youtubeHosts))
 
     if (id) {
       ids.add(id)

@@ -12,7 +12,8 @@ export const rebuildVokiEmbeds: DomTransform = () => (document) => {
     const frames: Array<Element> = []
 
     for (const match of (script.textContent ?? '').matchAll(embedCallRegex)) {
-      frames.push(createIframe(document, composePlayerUrl(match[3], match[2])))
+      const playerUrl = composePlayerUrl(match[3], match[2])
+      frames.push(createIframe(document, playerUrl))
     }
 
     if (frames.length === 0) {

@@ -100,7 +100,8 @@ export const kalturaIframeEmbedResolver = createUrlEmbedResolver(hosts, kalturaR
 export const kalturaScriptEmbedResolver = createMarkupEmbedResolver(
   hosts.map((host) => `script[src*="${host}/p/" i]`).join(', '),
   (element) => {
-    const entry = readEntry(parseUrlOnHosts(attr(element, 'src'), hosts))
+    const scriptUrl = parseUrlOnHosts(attr(element, 'src'), hosts)
+    const entry = readEntry(scriptUrl)
 
     if (!entry || !isAnyOf(getQueryParam(entry.parsed.searchParams, 'autoembed'), 'true')) {
       return

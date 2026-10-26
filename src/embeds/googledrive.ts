@@ -26,15 +26,18 @@ const sizes = {
 // `/open?id={id}` redirects a file to its page and a folder to its listing, so only an audio
 // type says the id is a file.
 const readFileId = (segments: Array<string>, url: URL, isAudio?: boolean): string | undefined => {
-  if (isAnyOf(segments[0], 'file') && isAnyOf(segments[1], 'd')) {
-    return segments[2]
+  const [route, prefix, fileId] = segments
+
+  if (isAnyOf(route, 'file') && isAnyOf(prefix, 'd')) {
+    return fileId
   }
 
   // A query id comes out decoded, and it goes into a path beside a path id's raw spelling.
-  if (isAudio && segments.length === 1 && isAnyOf(segments[0], 'open')) {
-    return encodePathSegment(
-      getQueryParam(parseUrlOnHosts(url, 'drive.google.com')?.searchParams, 'id') ?? '',
-    )
+  if (isAudio && segments.length === 1 && isAnyOf(route, 'open')) {
+    const drive = parseUrlOnHosts(url, 'drive.google.com')
+    const queryId = getQueryParam(drive?.searchParams, 'id') ?? ''
+
+    return encodePathSegment(queryId)
   }
 }
 

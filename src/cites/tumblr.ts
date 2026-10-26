@@ -54,10 +54,9 @@ export const tumblrCiteResolver: CiteResolver = {
     // The anchor repeats the title when there is one and shows the link itself when there is
     // not, so it only works as a fallback once it is checked against the link.
     const anchorText = text(anchor)
+    const displayUrl = trim(data.display_url) ?? url
     const isLinkText =
-      !!url &&
-      !!anchorText &&
-      bareUrl(trim(data.display_url) ?? url).startsWith(bareUrl(anchorText))
+      !!url && !!anchorText && !!displayUrl && bareUrl(displayUrl).startsWith(bareUrl(anchorText))
 
     const posters = Array.isArray(data.poster) ? data.poster : []
 

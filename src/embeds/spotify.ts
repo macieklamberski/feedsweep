@@ -81,11 +81,14 @@ const readPathPair = (url: URL | undefined): [string, string] | undefined => {
   }
 
   const segments = getPathSegments(url)
-  const named = pathPrefixRegex.test(segments[0] ?? '') ? segments.slice(1) : segments
+  const [prefixOrType] = segments
+  const named = pathPrefixRegex.test(prefixOrType ?? '') ? segments.slice(1) : segments
+  const [userOrType] = named
   // The same ownership spelled as a path, `/embed/user/{handle}/playlist/{id}`.
-  const owned = isAnyOf(named[0], 'user') ? named.slice(2) : named
+  const owned = isAnyOf(userOrType, 'user') ? named.slice(2) : named
+  const [type, id] = owned
 
-  return owned[0] && owned[1] ? [owned[0], owned[1]] : undefined
+  return type && id ? [type, id] : undefined
 }
 
 // Spotify's player iframe, in the modern path form and the pre-2017 embed.spotify.com/?uri= form.

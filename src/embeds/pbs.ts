@@ -104,8 +104,10 @@ const readFlashCarrier = (url: URL, element?: Element): EmbedResolverResult | un
 
   const video = getQueryParam(params, 'video')
   // The viral player ignores a zero `start` or `end`, which every real Flash carrier writes.
-  const picked = Object.entries(pickQueryParams(flashVars(element) ?? '', playbackParams))
-  const query = composeQuery(Object.fromEntries(picked.filter(([, value]) => Number(value) !== 0)))
+  const flashQuery = flashVars(element) ?? ''
+  const playback = pickQueryParams(flashQuery, playbackParams)
+  const picked = Object.entries(playback).filter(([, value]) => Number(value) !== 0)
+  const query = composeQuery(Object.fromEntries(picked))
 
   // A station portal's url holds the numeric id or the partner slug after its route word.
   if (video && absoluteUrlRegex.test(video)) {

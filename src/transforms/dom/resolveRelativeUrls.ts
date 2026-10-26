@@ -39,7 +39,8 @@ const resolveAttribute = (
   const resolved = resolveOrKeepUrl(value, { baseUrl, resolveUrlFn })
 
   if (attribute === 'src' && hostPrefixedSrcTags.includes(element.localName)) {
-    element.setAttribute(attribute, collapseSlashRuns(stripSiteHostPrefix(resolved)))
+    const unprefixed = stripSiteHostPrefix(resolved)
+    element.setAttribute(attribute, collapseSlashRuns(unprefixed))
 
     return
   }

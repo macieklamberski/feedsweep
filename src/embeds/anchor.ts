@@ -24,14 +24,13 @@ export const extractAnchorEpisode = (link: URL): string | undefined => {
   const segments = getPathSegments(link)
   const marker = segments.findIndex((segment) => isAnyOf(segment, 'embed'))
 
-  if (marker < 1 || !isAnyOf(segments[marker + 1], 'episodes')) {
+  if (marker < 1) {
     return
   }
 
-  const show = segments[marker - 1]
-  const episode = segments[marker + 2]
+  const [show, , route, episode] = segments.slice(marker - 1)
 
-  if (!episode) {
+  if (!isAnyOf(route, 'episodes') || !episode) {
     return
   }
 

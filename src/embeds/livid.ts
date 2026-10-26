@@ -20,7 +20,8 @@ const iframeSrcRegex = /<iframe\s[^>]*?\bsrc="([^"]+)"/i
 
 export const lividResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const segments = getPathSegments(url)
-  const route = segments[0]?.toLowerCase()
+  const [routeSpelling, videoId] = segments
+  const route = routeSpelling?.toLowerCase()
 
   // MetaSlider's Livid slide writes its own translated player label as the iframe `title`.
   const isMetasliderSlide = Boolean(element?.closest('li.ms-livid'))
@@ -44,8 +45,6 @@ export const lividResolveEmbed: ResolveUrlEmbed = (url, element) => {
       title,
     }
   }
-
-  const videoId = segments[1]
 
   if (!route || !videoRoutes.has(route) || !videoId) {
     return

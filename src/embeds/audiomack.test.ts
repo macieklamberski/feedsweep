@@ -220,6 +220,12 @@ describe('audiomackResolveEmbed', () => {
       expect(audiomackResolveEmbed(new URL(value))).toEqual(expected)
     })
 
+    it('should return undefined for a retired player naming the artist but no track', () => {
+      const value = 'http://www.audiomack.com/embed3/hhs1987'
+
+      expect(audiomackResolveEmbed(new URL(value))).toBeUndefined()
+    })
+
     it('should read embed3-album as an album', () => {
       const value = 'http://www.audiomack.com/embed3-album/chuuwee/cool-world?c1=00ffff&bg=f2f2f2'
       const expected: EmbedResolverResult = {

@@ -39,11 +39,9 @@ const composeSource = (id: string, query: string): string => {
 }
 
 const readWidgetId = (url: URL): string | undefined => {
-  const segments = getPathSegments(url)
+  const [route, widgetType, widgetId] = getPathSegments(url)
 
-  return isAnyOf(segments[0], 'widget_code') && isAnyOf(segments[1], 'html_widget')
-    ? segments[2]
-    : undefined
+  return isAnyOf(route, 'widget_code') && isAnyOf(widgetType, 'html_widget') ? widgetId : undefined
 }
 
 // The Flash players sit on cache.reverbnation.com, which serves swf files and nothing else.

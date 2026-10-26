@@ -21,21 +21,21 @@ const sluggedUidRegex = /(?<uid>[0-9a-f]{32}|[0-9a-z]{26})$/i
 const hosts = ['sketchfab.com']
 
 const readModelUid = (parsed: URL): string | undefined => {
-  const [route, second, third] = getPathSegments(parsed)
+  const [route, modelId, view] = getPathSegments(parsed)
 
-  if (isAnyOf(route, 'models') && third === undefined) {
-    return keepIfMatches(second, safeUidRegex)
+  if (isAnyOf(route, 'models') && view === undefined) {
+    return keepIfMatches(modelId, safeUidRegex)
   }
 
   // The viewer is `/models/{uid}/embed`, which the retired `/embed/{uid}` and `/show/{uid}`
   // redirect to.
-  if ((isAnyOf(route, 'models') && isAnyOf(third, 'embed')) || isAnyOf(route, ['embed', 'show'])) {
+  if ((isAnyOf(route, 'models') && isAnyOf(view, 'embed')) || isAnyOf(route, ['embed', 'show'])) {
     // Older models carry a 26-character uid in letters of both cases, which the viewer still plays.
-    return keepIfMatches(second, alphanumericRegex)
+    return keepIfMatches(modelId, alphanumericRegex)
   }
 
   if (isAnyOf(route, '3d-models')) {
-    return second?.match(sluggedUidRegex)?.groups?.uid
+    return modelId?.match(sluggedUidRegex)?.groups?.uid
   }
 }
 

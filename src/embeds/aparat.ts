@@ -50,7 +50,8 @@ export const aparatScriptEmbedResolver = createMarkupEmbedResolver(
     // The selector guarantees the host substring is in the src, so only the host and the path
     // shape can reject here. The `data[rnddiv]` and `data[responsive]` query the facade carries
     // name the div the script would have written into, and say nothing about the video.
-    const videoHash = readVideoHash(parseUrlOnHosts(attr(element, 'src'), hosts), scriptPathRegex)
+    const script = parseUrlOnHosts(attr(element, 'src'), hosts)
+    const videoHash = readVideoHash(script, scriptPathRegex)
 
     return videoHash ? composeEmbed(videoHash) : undefined
   },

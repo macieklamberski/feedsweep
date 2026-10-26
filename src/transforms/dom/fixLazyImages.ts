@@ -17,7 +17,9 @@ const isPixelLength = (value: number | undefined): boolean => {
 // Only the pixel-sized declarations go, so every other rule stays as the source wrote it.
 const dropPixelStyleDimensions = (element: Element): void => {
   const pixelProperties = ['width', 'height'].filter((property) => {
-    return isPixelLength(coerceNumber(styles.pixels(element, property)))
+    const pixels = styles.pixels(element, property)
+
+    return isPixelLength(coerceNumber(pixels))
   })
 
   if (pixelProperties.length === 0) {

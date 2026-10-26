@@ -40,17 +40,22 @@ type NoteUrl = { noteId: string; kind: 'post' | 'player' }
 const readNoteUrl = (link: URL): NoteUrl | undefined => {
   const parsed = parseUrlOnHosts(link, hosts)
   const segments = parsed ? getPathSegments(parsed) : []
+  const [, userRoute, userNoteId] = segments
 
-  if (isAnyOf(segments[1], 'n') && segments[2]) {
-    return { noteId: segments[2], kind: 'post' }
+  if (isAnyOf(userRoute, 'n') && userNoteId) {
+    return { noteId: userNoteId, kind: 'post' }
   }
 
-  if (isAnyOf(segments[0], 'n') && segments.length === 2) {
-    return { noteId: segments[1], kind: 'post' }
+  const [publicationRoute, publicationNoteId] = segments
+
+  if (isAnyOf(publicationRoute, 'n') && segments.length === 2) {
+    return { noteId: publicationNoteId, kind: 'post' }
   }
 
-  if (isAnyOf(segments[0], 'embed') && isAnyOf(segments[1], 'notes') && segments.length === 3) {
-    return { noteId: segments[2], kind: 'player' }
+  const [playerRoute, notesRoute, playerNoteId] = segments
+
+  if (isAnyOf(playerRoute, 'embed') && isAnyOf(notesRoute, 'notes') && segments.length === 3) {
+    return { noteId: playerNoteId, kind: 'player' }
   }
 }
 
@@ -71,9 +76,13 @@ export const notecomIframeEmbedResolver = createUrlEmbedResolver(hosts, (url) =>
 const heightMessageRegex = /^height::.*::(\d+(?:\.\d+)?)$/
 
 export const readNotecomHeight = (data: unknown): number | undefined => {
-  return typeof data === 'string'
-    ? readPixels(Number(data.match(heightMessageRegex)?.[1]))
-    : undefined
+  if (typeof data !== 'string') {
+    return
+  }
+
+  const pixels = data.match(heightMessageRegex)?.[1]
+
+  return readPixels(Number(pixels))
 }
 
 export const notecomRenderHint: EmbedRenderHint = {

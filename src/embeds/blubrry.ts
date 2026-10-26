@@ -50,9 +50,10 @@ export type BlubrryPlayer =
 // an embed placeholder, and the raw file is only input for the enrichment hook.
 export const extractBlubrryEmbed = (url: URL): BlubrryPlayer | undefined => {
   const segments = getPathSegments(url)
+  const [idRoute, episodeId] = segments
 
-  if (isAnyOf(segments[0], 'id') && segments[1]) {
-    return { kind: 'episode', id: segments[1] }
+  if (isAnyOf(idRoute, 'id') && episodeId) {
+    return { kind: 'episode', id: episodeId }
   }
 
   const [keyword, route] = segments

@@ -150,23 +150,25 @@ export const imgurBlockquoteEmbedResolver = createMarkupEmbedResolver(
 
     // The fallback anchor carries the post's title when the author set one, and the dialog's
     // own label when they did not.
-    return composeEmbed(post, text(find(element, 'a')))
+    const fallback = find(element, 'a')
+
+    return composeEmbed(post, text(fallback))
   },
 )
 
 // The frame the embed script builds, kept by exports that stored the page after it rendered.
 // Its query (`pub`, `ref`, `context`, `analytics`, `w`) describes the embedding page.
 export const imgurResolveEmbed: ResolveUrlEmbed = (url) => {
-  const [route, second, third] = getPathSegments(url)
+  const [route, albumOrTag, taggedAlbum] = getPathSegments(url)
 
   // A tag sits between its route and the post, so a tagged url names the post one segment deeper
   // than an album route does.
   if (isAnyOf(route, tagRoutes)) {
-    return composeAlbumEmbed(third)
+    return composeAlbumEmbed(taggedAlbum)
   }
 
   if (isAnyOf(route, albumRoutes)) {
-    return composeAlbumEmbed(second)
+    return composeAlbumEmbed(albumOrTag)
   }
 
   if (!route || isAnyOf(route, sitePathSegments)) {

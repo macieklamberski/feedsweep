@@ -9,7 +9,8 @@ export const maxEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: 'img[src*="st.max.ru/emojis/" i]',
   extract: (element) => {
-    const stem = getFileStem(element.getAttribute('src') ?? '').replace(sizeSuffixRegex, '')
+    const src = element.getAttribute('src') ?? ''
+    const stem = getFileStem(src).replace(sizeSuffixRegex, '')
     const glyph = glyphFromCodepoints(stem.toLowerCase())
 
     return resolveEmojiImage(element, { isStrong: true, glyph })

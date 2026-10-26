@@ -13,8 +13,9 @@ const playerSize = { width: 640, height: 360 }
 export const rebuildWmakerEmbeds: DomTransform =
   ({ baseUrl }) =>
   (document) => {
-    const [element, ...others] = Array.from(document.querySelectorAll('object[data]')).filter(
-      (candidate) => isFlashPlayerUrl(attr(candidate, 'data')),
+    const objects = document.querySelectorAll('object[data]')
+    const [element, ...others] = Array.from(objects).filter((candidate) =>
+      isFlashPlayerUrl(attr(candidate, 'data')),
     )
 
     // The embed route addresses the article rather than the video and serves one video for it: an

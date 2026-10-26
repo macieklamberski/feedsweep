@@ -33,22 +33,26 @@ const isVideoId = (segment: string | undefined): segment is string => {
 
 // A playlist's player, `/video-playlists/embed/{id}`, and its watch page, `/w/p/{id}`.
 const readPlaylistId = (segments: Array<string>): string | undefined => {
-  if (isAnyOf(segments[0], 'w') && isAnyOf(segments[1], 'p')) {
-    return segments[2]
+  const [route, subroute, playlistId] = segments
+
+  if (isAnyOf(route, 'w') && isAnyOf(subroute, 'p')) {
+    return playlistId
   }
 
-  if (isAnyOf(segments[0], 'video-playlists') && isAnyOf(segments[1], 'embed')) {
-    return segments[2]
+  if (isAnyOf(route, 'video-playlists') && isAnyOf(subroute, 'embed')) {
+    return playlistId
   }
 }
 
 const readPathId = (segments: Array<string>): string | undefined => {
-  if (isAnyOf(segments[0], 'w')) {
-    return segments[1]
+  const [route, idOrRoute, routedId] = segments
+
+  if (isAnyOf(route, 'w')) {
+    return idOrRoute
   }
 
-  if (isAnyOf(segments[0], 'videos') && isAnyOf(segments[1], videoRoutes)) {
-    return segments[2]
+  if (isAnyOf(route, 'videos') && isAnyOf(idOrRoute, videoRoutes)) {
+    return routedId
   }
 }
 

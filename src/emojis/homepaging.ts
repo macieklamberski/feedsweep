@@ -8,7 +8,8 @@ export const homepagingEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: 'img[src*="/homepaging/wp-content/common/emoji/" i]',
   extract: (element) => {
-    const glyph = glyphFromGemojiName(getNameStem(element.getAttribute('src') ?? ''))
+    const stem = getNameStem(element.getAttribute('src') ?? '')
+    const glyph = glyphFromGemojiName(stem)
 
     return resolveEmojiImage(element, { isStrong: true, glyph })
   },

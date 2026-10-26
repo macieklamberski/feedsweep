@@ -82,10 +82,12 @@ const readStatusUrl = (parsed: URL | undefined): Status | undefined => {
 // answer. A skeleton blockquote that carries no text names the tweet in an attribute instead,
 // and a stored-after-render copy names it in the player it already built.
 const findStatus = (element: Element): { status: Status; anchor?: Element } | undefined => {
-  const anchors = Array.from(element.querySelectorAll('a[href]')).reverse()
+  const links = element.querySelectorAll('a[href]')
+  const anchors = Array.from(links).reverse()
 
   for (const anchor of anchors) {
-    const status = readStatusUrl(parseUrlOnHosts(attr(anchor, 'href'), tweetHosts, isTweetUrl))
+    const href = attr(anchor, 'href')
+    const status = readStatusUrl(parseUrlOnHosts(href, tweetHosts, isTweetUrl))
 
     if (status) {
       return { status, anchor }
@@ -94,7 +96,8 @@ const findStatus = (element: Element): { status: Status; anchor?: Element } | un
 
   // The frame has to be the platform's own: `id` is an ordinary parameter name, so any other
   // iframe a publisher nested in the quote would otherwise name the tweet.
-  const frame = parseUrlOnHosts(attr(find(element, 'iframe[src]'), 'src'), tweetHosts, isTweetUrl)
+  const frameSrc = attr(find(element, 'iframe[src]'), 'src')
+  const frame = parseUrlOnHosts(frameSrc, tweetHosts, isTweetUrl)
   const framed = getQueryParam(frame?.searchParams, 'id')
   const declared =
     attr(element, 'data-twitter-tweet-id') ??

@@ -60,8 +60,9 @@ const readFileEmbed = (url: URL): EmbedResolverResult | undefined => {
 
 const resolveEmbed: ResolveUrlEmbed = (url) => {
   const segments = getPathSegments(url)
+  const [route] = segments
 
-  if (segments.length === 1 && isAnyOf(segments[0], 'embed')) {
+  if (segments.length === 1 && isAnyOf(route, 'embed')) {
     // The wrapper frames whatever its `url` names, so a value off figma is refused and never minted.
     const wrapped = parseUrlOnHosts(getQueryParam(url.searchParams, 'url'), fileHosts, isHostOf)
 

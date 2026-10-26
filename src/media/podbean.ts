@@ -26,7 +26,13 @@ export const podbeanFlashMediaResolver: MediaResolver = {
 
     const player = parseUrlOnHosts(playerUrl, hosts)
 
-    if (!player || !isAnyOf(getPathSegments(player)[0], playerRoute)) {
+    if (!player) {
+      return
+    }
+
+    const [route] = getPathSegments(player)
+
+    if (!isAnyOf(route, playerRoute)) {
       return
     }
 

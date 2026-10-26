@@ -39,9 +39,10 @@ export const slideshareResolveEmbed: ResolveUrlEmbed = (url) => {
 
   // `/slideshow/embed_code/key/{key}` is the current form and `/slideshow/embed_code/{id}` the
   // one it replaced, which still serves by redirecting to the key form.
-  const isKeyed = isAnyOf(segments[marker + 1], 'key')
+  const [, keyOrId, key] = segments.slice(marker)
+  const isKeyed = isAnyOf(keyOrId, 'key')
   // Some feeds put `&doc=` where the `?` belonged, so the id is cut at the `&`: an id never holds one.
-  const deck = (isKeyed ? segments[marker + 2] : segments[marker + 1])?.split('&')[0]
+  const deck = (isKeyed ? key : keyOrId)?.split('&')[0]
 
   // SlideShare serves files on slidesharecdn.com, so a file name is an enclosure.
   if (!deck || isFileName(deck)) {
@@ -78,14 +79,15 @@ const findCaptionLinks = (caption: Nullish<Element>): CaptionLinks => {
 
     return segments.length > 1 && !segments.some((segment) => isAnyOf(segment, 'embed_code'))
   })
-  const account = readPageSegments(page)[0]
+  const [account] = readPageSegments(page)
   // A route word has the shape of a handle: the 2008 caption offers `slideshare.net/upload` one
   // anchor after the deck it names.
   const owner = account
     ? find(caption, captionLinkSelector, (anchor) => {
         const segments = readPageSegments(anchor)
+        const [handle] = segments
 
-        return segments.length === 1 && segments[0] === account
+        return segments.length === 1 && handle === account
       })
     : undefined
 
@@ -93,10 +95,12 @@ const findCaptionLinks = (caption: Nullish<Element>): CaptionLinks => {
 }
 
 const readCaption = ({ page, owner }: CaptionLinks): Partial<EmbedResolverResult> => {
+  const [account] = readPageSegments(owner)
+
   return {
     url: attr(page, 'href'),
     title: attr(page, 'title') ?? text(page),
-    author: readPageSegments(owner)[0],
+    author: account,
   }
 }
 
@@ -173,12 +177,17 @@ const readSplitCaption = (player: Element, slug: string): Partial<EmbedResolverR
 
   const before = listSiblings('previousElementSibling')
   const after = listSiblings('nextElementSibling')
-  const page = findAnchor(before, (anchor) => readPageSegments(anchor)[1] === slug)
-  const account = readPageSegments(page)[0]
+  const page = findAnchor(before, (anchor) => {
+    const [, pageSlug] = readPageSegments(anchor)
+
+    return pageSlug === slug
+  })
+  const [account] = readPageSegments(page)
   const owner = findAnchor([...before, ...after], (anchor) => {
     const segments = readPageSegments(anchor)
+    const [handle] = segments
 
-    return segments.length === 1 && segments[0] === account
+    return segments.length === 1 && handle === account
   })
 
   // A deck's link with no owner's line beside it is prose as often as a caption.

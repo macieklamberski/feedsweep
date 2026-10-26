@@ -39,7 +39,8 @@ const parseStyles = (style: string): Declarations => {
       return
     }
 
-    const property = clean(style.slice(declarationStart, colonIndex)).trim()
+    const statedProperty = clean(style.slice(declarationStart, colonIndex))
+    const property = statedProperty.trim()
     const statedValue = clean(style.slice(colonIndex + 1, declarationEnd))
     const value = statedValue.replace(importantRegex, '').trim()
 

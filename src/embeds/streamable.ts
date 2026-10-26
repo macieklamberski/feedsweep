@@ -44,11 +44,13 @@ export const streamableResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const segments = getPathSegments(url)
   const title = attr(element, 'title')
 
-  if (isAnyOf(segments[0], 'm') && segments.length === 2) {
+  const [route, clipSlug] = segments
+
+  if (isAnyOf(route, 'm') && segments.length === 2) {
     return {
       provider,
-      id: `m/${segments[1]}`,
-      src: `https://streamable.com/m/${segments[1]}`,
+      id: `m/${clipSlug}`,
+      src: `https://streamable.com/m/${clipSlug}`,
       ...sizes.player,
       title,
     }
@@ -80,7 +82,8 @@ export const streamableIframeEmbedResolver = createUrlEmbedResolver(hosts, strea
 export const streamableMlbEmbedResolver = createMarkupEmbedResolver(
   'div.mlb\\.com-embed, div.mlb-com-embed',
   (element) => {
-    const parsed = parseUrlOnHosts(attr(find(element, 'a[href]'), 'href'), 'www.mlb.com', isHostOf)
+    const href = attr(find(element, 'a[href]'), 'href')
+    const parsed = parseUrlOnHosts(href, 'www.mlb.com', isHostOf)
 
     if (!parsed) {
       return
@@ -89,11 +92,14 @@ export const streamableMlbEmbedResolver = createMarkupEmbedResolver(
     // The clip's page is `/video/{slug}`, or `/{team}/video/{slug}` on a club's site.
     const segments = getPathSegments(parsed)
 
-    if (segments.length > 3 || !isAnyOf(segments.at(-2), 'video')) {
+    const [route, slug] = segments.slice(-2)
+
+    // A lone segment has no route word before it.
+    if (segments.length < 2 || segments.length > 3 || !isAnyOf(route, 'video')) {
       return
     }
 
-    return streamableResolveEmbed(new URL(`https://streamable.com/m/${segments.at(-1)}`))
+    return streamableResolveEmbed(new URL(`https://streamable.com/m/${slug}`))
   },
 )
 
@@ -102,7 +108,8 @@ export const streamableMlbEmbedResolver = createMarkupEmbedResolver(
 export const streamableWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.streamable-embed',
   (element) => {
-    const url = parseUrlOnHosts(attr(find(element, 'a[href]'), 'href'), hosts, isHostOf)
+    const href = attr(find(element, 'a[href]'), 'href')
+    const url = parseUrlOnHosts(href, hosts, isHostOf)
 
     if (!url) {
       return

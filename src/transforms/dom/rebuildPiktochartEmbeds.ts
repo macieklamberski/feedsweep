@@ -62,6 +62,7 @@ export const rebuildPiktochartEmbeds: DomTransform = () => (document) => {
     removeLoaderChrome(element)
 
     element.before(...element.childNodes)
-    element.replaceWith(createIframe(document, composePiktochartEmbedUrl(uid)))
+    const embedUrl = composePiktochartEmbedUrl(uid)
+    element.replaceWith(createIframe(document, embedUrl))
   }
 }

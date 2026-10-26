@@ -21,7 +21,7 @@ const isPrefillParam = (name: string): boolean => {
 // A short code is resolved to a form id only by its redirect, so the short link is the frame.
 const composeShortLink = (url: URL, element?: Element): EmbedResolverResult | undefined => {
   const segments = getPathSegments(url)
-  const code = segments[0]
+  const [code] = segments
 
   if (segments.length !== 1) {
     return
@@ -45,18 +45,18 @@ export const googleformsResolveEmbed: ResolveUrlEmbed = (url, element) => {
     return composeShortLink(url, element)
   }
 
-  const segments = getPathSegmentsWithoutWorkspace(url)
-  const formSegments = isAnyOf(segments[1], 'u') ? segments.slice(3) : segments.slice(1)
+  const [app, accountOrRoute, ...rest] = getPathSegmentsWithoutWorkspace(url)
+  const formSegments = isAnyOf(accountOrRoute, 'u') ? rest.slice(1) : [accountOrRoute, ...rest]
+  const [formsRoute, publishedOrId] = formSegments
 
-  if (!isAnyOf(segments[0], 'forms') || !isAnyOf(formSegments[0], 'd')) {
+  if (!isAnyOf(app, 'forms') || !isAnyOf(formsRoute, 'd')) {
     return
   }
 
-  const isPublished = isAnyOf(formSegments[1], 'e')
-  const formId = formSegments[isPublished ? 2 : 1]
-  const routeIndex = isPublished ? 3 : 2
+  const isPublished = isAnyOf(publishedOrId, 'e')
+  const [formId, route, ...trailing] = formSegments.slice(isPublished ? 2 : 1)
 
-  if (!isAnyOf(formSegments[routeIndex], 'viewform') || formSegments.length > routeIndex + 1) {
+  if (!isAnyOf(route, 'viewform') || trailing.length > 0) {
     return
   }
 
