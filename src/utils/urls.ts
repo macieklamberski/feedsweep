@@ -26,7 +26,7 @@ export const placeholderBaseUrl = 'https://example.com'
 const urlShapeRegex = /[:/.]/
 const queryOrHashRegex = /[?#]/
 const pathSlashRunRegex = /^https?:\/\/[^/?#]+[^?#]*\/\//i
-const escapedAmpersandRegex = /&(?:amp;)+|&%23038;/g
+const escapedAmpersandRegex = /&(?:amp;)*%23038;|&(?:amp;)+/g
 
 // Protocol-relative `//host/path` is left unmatched, so it resolves to the base url's scheme.
 export const absoluteUrlRegex = /^[a-z][a-z0-9+.-]*:/i
