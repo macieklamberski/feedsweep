@@ -1,4 +1,10 @@
-import { decodeSegment, getPathSegments, isHostOrSubdomainOf, parseUrl } from 'trousse'
+import {
+  decodeSegment,
+  getPathSegments,
+  isHostOrSubdomainOf,
+  type Nullish,
+  parseUrl,
+} from 'trousse'
 import type {
   DomTransform,
   EmbedResolverResult,
@@ -101,7 +107,7 @@ const readImageCaption = (
   document: Document,
   context: TransformContext,
 ): string | undefined => {
-  const normalize = (value: string | null | undefined): string => {
+  const normalize = (value: Nullish<string>): string => {
     return (value ?? '').trim().toLowerCase().replace(/\s+/g, ' ')
   }
 

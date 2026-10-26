@@ -1,4 +1,4 @@
-import { encodePathSegment, getQueryParam, isHostOf } from 'trousse'
+import { encodePathSegment, getQueryParam, isHostOf, type Nullish } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -12,7 +12,7 @@ const flashPlayerPathRegex = /^\/blogvision\/([^/]+)$/i
 const playerPathRegex = /^\/([^/]+)\.html$/i
 
 // Every route names the trailer by the same `cmedia` id, in the path or in the query.
-const readCmedia = (parsed: URL): string | null | undefined => {
+const readCmedia = (parsed: URL): Nullish<string> => {
   if (isHostOf(parsed, 'player.allocine.fr')) {
     return parsed.pathname.match(playerPathRegex)?.[1]
   }

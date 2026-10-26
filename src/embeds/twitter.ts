@@ -4,6 +4,7 @@ import {
   isAnyOf,
   isHostOrSubdomainOf,
   isPlainObject,
+  type Nullish,
   parseUrl,
 } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
@@ -116,7 +117,7 @@ const readAuthor = (status: Status): string | undefined => {
 
 // A blockquote with no paragraph of its own keeps the tweet text in the byline's paragraph,
 // ahead of the line break before the byline.
-const readLeadText = (byline: Element | null | undefined): string | undefined => {
+const readLeadText = (byline: Nullish<Element>): string | undefined => {
   const parts: Array<string> = []
 
   for (const node of Array.from(byline?.childNodes ?? [])) {

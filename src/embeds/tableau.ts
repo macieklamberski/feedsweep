@@ -1,4 +1,4 @@
-import { decodeSegment, encodePathSegment } from 'trousse'
+import { decodeSegment, encodePathSegment, type Nullish } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, paramValue, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
@@ -123,7 +123,7 @@ export const tableauObjectEmbedResolver = createMarkupEmbedResolver(
 
 // The viz page on the author's profile, which refuses framing. Its hash names the workbook and
 // sheet the page shows.
-const readProfileView = (parsed: URL | undefined): RegExpMatchArray | null | undefined => {
+const readProfileView = (parsed: URL | undefined): Nullish<RegExpMatchArray> => {
   if (!parsed || !profilePathRegex.test(parsed.pathname)) {
     return
   }

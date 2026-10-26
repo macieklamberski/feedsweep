@@ -1,4 +1,4 @@
-import { getQueryParam, parseUrl } from 'trousse'
+import { getQueryParam, type Nullish, parseUrl } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr, jsonAttr } from '../../utils/dom.js'
 import { isUrlShaped, placeholderBaseUrl } from '../../utils/urls.js'
@@ -15,7 +15,7 @@ type EmbedlyPayload = {
   thumbnail_url?: string
 }
 
-const isUsableUrl = (value: string | null | undefined): value is string => {
+const isUsableUrl = (value: Nullish<string>): value is string => {
   return !!value && isUrlShaped(value)
 }
 

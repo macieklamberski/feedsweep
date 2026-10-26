@@ -5,6 +5,7 @@ import {
   escapeRegex,
   getPathSegments,
   isAnyOf,
+  type Nullish,
   normalizeUrl,
   parseUrl,
   resolveUrl,
@@ -34,7 +35,7 @@ export const countSrcsetCandidates = (srcset: string): number => {
 }
 
 // Seeded from the last entry: a density-only list states no width and ascends.
-export const widestSrcsetUrl = (srcset: string | null | undefined): string | undefined => {
+export const widestSrcsetUrl = (srcset: Nullish<string>): string | undefined => {
   const entries = srcset ? parseSrcset(srcset) : []
 
   if (entries.length === 0) {
@@ -310,7 +311,7 @@ const urlQueryHeightRegex = /[?&](?:h|height)=(\d{2,5})\b/i
 
 // A `data:` src is a lazy placeholder and carries no size.
 export const getUrlDimensions = (
-  src: string | null | undefined,
+  src: Nullish<string>,
 ): { width: number; height: number } | undefined => {
   if (!src || src.startsWith('data:')) {
     return
