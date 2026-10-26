@@ -20,7 +20,8 @@ export const dropboxEmojiResolver: EmojiResolver = {
 
     // Paper drops the joiner from a sequence's filename, as in `1f9d8-2640.png`, so only a single
     // codepoint names the picture.
-    const stem = getFileStem(element.getAttribute('src') ?? '').toLowerCase()
+    const src = element.getAttribute('src') ?? ''
+    const stem = getFileStem(src).toLowerCase()
     const glyph = stem.includes('-') ? undefined : glyphFromCodepoints(stem)
 
     return resolveEmojiImage(element, { isStrong: true, glyph })

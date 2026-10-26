@@ -19,10 +19,12 @@ const sizes = {
 // playlist player.
 const extractAcastEmbed = (url: URL): { show: string; episode?: string } | undefined => {
   const allSegments = getPathSegments(url)
-  const segments = allSegments[0] === '$' ? allSegments.slice(1) : allSegments
+  const [markerOrShow] = allSegments
+  const segments = markerOrShow === '$' ? allSegments.slice(1) : allSegments
+  const [show, episodeOrRoute, routedEpisode] = segments
   const isPlayerHost = isHostOf(url, 'player.acast.com')
-  const isEpisodesRoute = isPlayerHost && isAnyOf(segments[1], 'episodes')
-  const [show, episode] = isEpisodesRoute ? [segments[0], segments[2]] : segments
+  const isEpisodesRoute = isPlayerHost && isAnyOf(episodeOrRoute, 'episodes')
+  const episode = isEpisodesRoute ? routedEpisode : episodeOrRoute
 
   if (!show) {
     return

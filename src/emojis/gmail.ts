@@ -22,7 +22,8 @@ const getLegacyId = (element: Element): string | undefined => {
 
 const getGlyph = (element: Element): EmojiGlyph | undefined => {
   const code = attr(element, 'data-goomoji') ?? attr(element, 'goomoji')
-  const stem = getFileStem(element.getAttribute('src') ?? '').replace(notoFilePrefixRegex, '')
+  const fileStem = getFileStem(element.getAttribute('src') ?? '')
+  const stem = fileStem.replace(notoFilePrefixRegex, '')
 
   return glyphFromCodepoints((code ?? stem).toLowerCase())
 }

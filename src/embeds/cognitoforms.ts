@@ -72,7 +72,8 @@ export const cognitoformsIframeEmbedResolver = createUrlEmbedResolver(
 export const cognitoformsWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.cognito',
   (element) => {
-    const loader = parseUrlOnHosts(attr(find(element, 'script[src]'), 'src'), hosts)
+    const loaderSrc = attr(find(element, 'script[src]'), 'src')
+    const loader = parseUrlOnHosts(loaderSrc, hosts)
 
     if (!loader) {
       return

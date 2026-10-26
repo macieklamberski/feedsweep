@@ -92,21 +92,25 @@ const wrapperSelector = 'figure[data-provider="instagram"]'
 const readWrapperPost = (element: Element): Post | undefined => {
   const dataUrl = attr(element.closest(wrapperSelector), 'data-url')
 
-  return readPostUrl(parseUrlOnHosts(decodeSegment(dataUrl) ?? dataUrl, hosts))
+  const link = parseUrlOnHosts(decodeSegment(dataUrl) ?? dataUrl, hosts)
+
+  return readPostUrl(link)
 }
 
 // Where the post is named, in the order the shapes provide it: the attribute the dialog writes,
 // then any anchor in the quote, which the pre-2018 versions and every sanitized copy leave as
 // the only trace.
 const findPost = (element: Element): Post | undefined => {
-  const declared = readPostUrl(parseUrlOnHosts(attr(element, 'data-instgrm-permalink'), hosts))
+  const permalink = parseUrlOnHosts(attr(element, 'data-instgrm-permalink'), hosts)
+  const declared = readPostUrl(permalink)
 
   if (declared) {
     return declared
   }
 
   for (const anchor of element.querySelectorAll('a[href]')) {
-    const post = readPostUrl(parseUrlOnHosts(attr(anchor, 'href'), hosts))
+    const link = parseUrlOnHosts(attr(anchor, 'href'), hosts)
+    const post = readPostUrl(link)
 
     if (post) {
       return post

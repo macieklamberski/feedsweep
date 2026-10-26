@@ -118,7 +118,8 @@ export const yahooEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: selectors.join(', '),
   extract: (element) => {
-    const glyph = yahooEmoticons.get(getFileStem(element.getAttribute('src') ?? ''))
+    const stem = getFileStem(element.getAttribute('src') ?? '')
+    const glyph = yahooEmoticons.get(stem)
 
     return resolveEmojiImage(element, {
       isStrong: true,

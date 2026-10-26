@@ -50,7 +50,8 @@ export const vkEmojiResolver: EmojiResolver = {
     'img[class~="emoji_css" i]', // The older set's sprite
   ].join(', '),
   extract: (element) => {
-    const stem = getFileStem(element.getAttribute('src') ?? '').replace(retinaSuffixRegex, '')
+    const src = element.getAttribute('src') ?? ''
+    const stem = getFileStem(src).replace(retinaSuffixRegex, '')
     const glyph = element.matches(utf8Selector)
       ? glyphFromVkStem(stem)
       : glyphFromUtf16Hex(attr(element, 'emoji') ?? stem)

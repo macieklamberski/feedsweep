@@ -159,7 +159,8 @@ export const groupUrlAttributesByTag = <Attribute extends UrlAttribute>(
 
   for (const attribute of attributes) {
     if (attribute.tag) {
-      grouped.set(attribute.tag, [...(grouped.get(attribute.tag) ?? []), attribute])
+      const group = grouped.get(attribute.tag) ?? []
+      grouped.set(attribute.tag, [...group, attribute])
     }
   }
 
@@ -226,7 +227,8 @@ export const parseUrlOnHosts = (
     return isOnHost(url, hosts) ? url : undefined
   }
 
-  const carrier = parseCarrierUrl(collapseSlashRuns(foldEscapedAmpersands(url)))
+  const unescaped = foldEscapedAmpersands(url)
+  const carrier = parseCarrierUrl(collapseSlashRuns(unescaped))
 
   if (!carrier || !isOnHost(carrier, hosts)) {
     return

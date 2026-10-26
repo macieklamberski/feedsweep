@@ -45,7 +45,10 @@ const readEmbedId = (url: URL | undefined): string | undefined => {
 const readSharingId = (element: Element | undefined): string | undefined => {
   const code = flashVar(element, 'sharing.code')
 
-  return readEmbedId(parseUrlOnHosts(code?.match(sharingSrcRegex)?.[1], hosts, isHostOf))
+  const src = code?.match(sharingSrcRegex)?.[1]
+  const player = parseUrlOnHosts(src, hosts, isHostOf)
+
+  return readEmbedId(player)
 }
 
 const readCallbackId = (element: Element | undefined): string | undefined => {

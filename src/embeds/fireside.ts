@@ -25,11 +25,10 @@ type FiresidePlayer = { version: string; token: string }
 // `player.fireside.fm/{version}/{token}`. `fireside.fm/s/{token}/iframe` is the retired share
 // route, naming the same token and no version.
 export const extractFiresideToken = (link: URL): FiresidePlayer | undefined => {
-  const segments = getPathSegments(link)
-  const versioned = isAnyOf(segments[0], 'player') ? segments.slice(1) : segments
-  const [version, token] = isAnyOf(segments[0], 's')
-    ? [currentPlayerVersion, segments[1]]
-    : versioned
+  const [route, ...rest] = getPathSegments(link)
+  const [shareToken] = rest
+  const versioned = isAnyOf(route, 'player') ? rest : [route, ...rest]
+  const [version, token] = isAnyOf(route, 's') ? [currentPlayerVersion, shareToken] : versioned
 
   if (!version || !playerVersionRegex.test(version)) {
     return

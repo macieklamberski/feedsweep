@@ -33,22 +33,22 @@ const parseTarget = (value: URL | undefined): StackblitzTarget | undefined => {
     return
   }
 
-  const [first, second] = getPathSegments(parsed)
+  const [route, slug] = getPathSegments(parsed)
 
   // /github/{owner}/{repo} renders, but its id is a key the oEmbed endpoint answers 404 on.
-  if (!isAnyOf(first, ['edit', 'run']) || !second) {
+  if (!isAnyOf(route, ['edit', 'run']) || !slug) {
     return
   }
 
   // The enclosure probe offers every attachment on this host, and a file's name reads as a slug.
-  if (isFileName(second)) {
+  if (isFileName(slug)) {
     return
   }
 
   const options = filterUrlQuery(parsed, (name) => isAnyOf(name, stackblitzEmbedParams))
 
   // `embed=1` is what the share dialog writes, and it opens the embed view at any width.
-  return { id: second, query: `?embed=1${options.replace('?', '&')}` }
+  return { id: slug, query: `?embed=1${options.replace('?', '&')}` }
 }
 
 // StackBlitz's editor iframe, whose retired /run/{slug} route answers 404 while /edit/ serves.

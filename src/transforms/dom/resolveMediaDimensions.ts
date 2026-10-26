@@ -61,7 +61,9 @@ export const resolveMediaDimensions: DomTransform = () => {
       }
 
       if (!dimensions) {
-        dimensions = getUrlDimensions(widestSrcsetUrl(element.getAttribute('srcset')))
+        const srcsetUrl = widestSrcsetUrl(element.getAttribute('srcset'))
+
+        dimensions = getUrlDimensions(srcsetUrl)
       }
 
       if (

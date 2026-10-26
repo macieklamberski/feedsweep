@@ -19,16 +19,15 @@ const sizes = {
 type Player = { kind: string; id: string; src: string; size: { height: number } }
 
 const readPlayer = (url: URL): Player | undefined => {
-  const segments = getPathSegments(url)
+  const [route, player, kind, slug] = getPathSegments(url)
 
-  if (!isAnyOf(segments[0], 'embed')) {
+  if (!isAnyOf(route, 'embed')) {
     return
   }
 
   // `embed/html5/{episode|podcast}/{id}`. Any other kind answers 404.
-  if (isAnyOf(segments[1], 'html5') && segments[2]) {
-    const kind = segments[2]
-    const id = segments[3] ?? ''
+  if (isAnyOf(player, 'html5') && kind) {
+    const id = slug ?? ''
 
     return {
       kind,
@@ -40,8 +39,8 @@ const readPlayer = (url: URL): Player | undefined => {
 
   // embed/v2/podcast/{podcast}?episode_id={episode} is the snippet Podomatic hands out today, and
   // its episode_id is the id the html5 route takes in its path.
-  if (isAnyOf(segments[1], 'v2') && isAnyOf(segments[2], 'podcast')) {
-    const podcast = segments[3]
+  if (isAnyOf(player, 'v2') && isAnyOf(kind, 'podcast')) {
+    const podcast = slug
 
     if (!podcast) {
       return

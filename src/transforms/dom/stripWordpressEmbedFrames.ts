@@ -4,7 +4,8 @@ import { attr, text } from '../../utils/dom.js'
 const secretRegex = /\?secret=(?<secret>[A-Za-z0-9]+)/gi
 
 const readFrameSecrets = (frame: Element): Array<string> => {
-  const secrets = [...(attr(frame, 'src') ?? '').matchAll(secretRegex)].map((match) => {
+  const src = attr(frame, 'src') ?? ''
+  const secrets = Array.from(src.matchAll(secretRegex), (match) => {
     return match.groups?.secret ?? ''
   })
   const dataSecret = attr(frame, 'data-secret')

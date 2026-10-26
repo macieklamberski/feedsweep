@@ -79,8 +79,9 @@ export const nprResolveEmbed: ResolveUrlEmbed = (url) => {
 // The retired Flash player, `npr.org/v2/?i={storyId}&m={mediaId}&t={kind}`.
 export const nprFlashResolveEmbed: ResolveUrlEmbed = (url) => {
   const segments = getPathSegments(url)
+  const [route] = segments
 
-  if (segments.length !== 1 || !isAnyOf(segments[0], 'v2')) {
+  if (segments.length !== 1 || !isAnyOf(route, 'v2')) {
     return
   }
 

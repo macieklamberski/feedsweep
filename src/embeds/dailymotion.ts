@@ -62,21 +62,24 @@ const isRouteWord = (segment: string): boolean => {
   return isAnyOf(segment, pathWords) || isAnyOf(segment, nonVideoWords)
 }
 
-const skipRouteWords = (segments: Array<string>): number => {
-  let index = 0
+// The segments after the route words the path opens with.
+const skipRouteWords = (segments: Array<string>): Array<string> => {
+  let rest = segments
 
   // `/embed/{locale}/video/{id}` serves the player and redirects to
   // `geo.dailymotion.com/player.html?video={id}`. Two letters tell a locale from an account
   // handle, since account pages also open the path.
-  while (
-    index < segments.length &&
-    (isAnyOf(segments[index], pathWords) ||
-      (twoLettersRegex.test(segments[index]) && isRouteWord(segments[index + 1])))
-  ) {
-    index++
+  while (rest.length > 0) {
+    const [word, nextWord] = rest
+
+    if (!isAnyOf(word, pathWords) && !(twoLettersRegex.test(word) && isRouteWord(nextWord))) {
+      break
+    }
+
+    rest = rest.slice(1)
   }
 
-  return index
+  return rest
 }
 
 // Share urls append a `_title-slug` to the id and the platform strips it itself.
@@ -96,8 +99,9 @@ const playableWords = ['vids', 'playlist']
 // the path, `/videowall/playlist/{id}_{slug}&cols=4`. Every one of them now refuses framing.
 const readWidgetEntry = (url: URL): Array<string> => {
   const segments = getPathSegments(url)
+  const [route, widgetKind] = segments
 
-  if (isAnyOf(segments[0], 'widget') && isAnyOf(segments[1], 'jukebox')) {
+  if (isAnyOf(route, 'widget') && isAnyOf(widgetKind, 'jukebox')) {
     // A jukebox can list a user or a group beside a playlist, and only a video or a playlist maps
     // onto a player.
     const entries = getQueryParams(url.searchParams, 'list[]').map((entry) => {
@@ -107,7 +111,7 @@ const readWidgetEntry = (url: URL): Array<string> => {
     return entries.find(([kind]) => isAnyOf(kind, playableWords)) ?? []
   }
 
-  if (isAnyOf(segments[0], wallWords)) {
+  if (isAnyOf(route, wallWords)) {
     return segments.slice(1)
   }
 
@@ -118,9 +122,9 @@ const readWidgetEntry = (url: URL): Array<string> => {
 // found nothing: `/embed/video/{id}?playlist={id}` is a video playing inside one, not a playlist.
 const extractDailymotionPlaylistId = (url: URL): string | undefined => {
   const segments = getPathSegments(url)
-  const marker = skipRouteWords(segments)
+  const [route, playlistId] = skipRouteWords(segments)
 
-  const pathId = isAnyOf(segments[marker], 'playlist') ? segments[marker + 1] : undefined
+  const pathId = isAnyOf(route, 'playlist') ? playlistId : undefined
   // The path id is decoded here, like the query one, so the url and the player encode it once.
   const candidate = pathId
     ? (decodeSegment(pathId) ?? pathId)
@@ -134,14 +138,17 @@ const readPathId = (url: URL, segments: Array<string>): string | undefined => {
   // The short domain is a pure shortener with no routes of its own: every path it does not know
   // as a video goes to `/urlshortener?path=…`, so nothing there needs telling from an id.
   if (isHostOrSubdomainOf(url, 'dai.ly')) {
-    return segments[0] && (decodeSegment(segments[0]) ?? segments[0])
+    const [shortId] = segments
+
+    return shortId && (decodeSegment(shortId) ?? shortId)
   }
 
-  const index = skipRouteWords(segments)
+  const rest = skipRouteWords(segments)
+  const [pathId] = rest
 
   // A path opening with no route word names no video. Site pages would otherwise read as one:
   // `/about` is five legal id characters.
-  const candidate = index > 0 ? segments[index] : undefined
+  const candidate = rest.length < segments.length ? pathId : undefined
 
   if (!candidate || isAnyOf(candidate, nonVideoWords)) {
     return

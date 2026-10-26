@@ -16,8 +16,9 @@ const versionSuffixRegex = /@[^@/]*$/
 // or embed/{16 hex}[@{version}] for a notebook addressed by its id.
 const observableResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const segments = getPathSegments(url)
+  const [route, rawHandle, rawSlug] = segments
 
-  if (!isAnyOf(segments[0], 'embed')) {
+  if (!isAnyOf(route, 'embed')) {
     return
   }
 
@@ -28,10 +29,11 @@ const observableResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
   // `@{version}` pins one revision of a notebook rather than naming another one, and the document
   // endpoint takes the notebook alone, so the suffix stays out of the id.
-  // A notebook id is the only segment after `embed`, and `embed/d/{id}` answers 404.
+  // A notebook id is the only segment after `embed`, in the handle's slot, and `embed/d/{id}`
+  // answers 404.
   const notebookId =
     segments.length === 2
-      ? keepIfMatches(segments[1].replace(versionSuffixRegex, ''), hexRegex)
+      ? keepIfMatches(rawHandle.replace(versionSuffixRegex, ''), hexRegex)
       : undefined
 
   if (notebookId) {
@@ -43,8 +45,6 @@ const observableResolveEmbed: ResolveUrlEmbed = (url, element) => {
       title: attr(element, 'title'),
     }
   }
-
-  const [, rawHandle, rawSlug] = segments
 
   if (!rawHandle || !rawSlug) {
     return

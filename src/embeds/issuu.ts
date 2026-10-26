@@ -92,10 +92,15 @@ const readDocumentUrl = (parsed: URL | undefined): EmbedResolverResult | undefin
 export const issuuWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.issuuembed[data-configid], div.issuuembed[data-url]',
   (element) => {
-    return (
-      composeConfigEmbed(attr(element, 'data-configid')) ??
-      readDocumentUrl(parseUrlOnHosts(attr(element, 'data-url'), hosts))
-    )
+    const configEmbed = composeConfigEmbed(attr(element, 'data-configid'))
+
+    if (configEmbed) {
+      return configEmbed
+    }
+
+    const documentUrl = parseUrlOnHosts(attr(element, 'data-url'), hosts)
+
+    return readDocumentUrl(documentUrl)
   },
 )
 
@@ -126,7 +131,7 @@ const readFlashDocument = (parsed: URL, element?: Element): EmbedResolverResult 
 // The reader iframe, at `e.issuu.com/embed.html` or the document page pasted from the address bar,
 // and the retired Flash reader.
 const issuuResolveEmbed: ResolveUrlEmbed = (url, element) => {
-  const route = getPathSegments(url)[0] ?? ''
+  const [route = ''] = getPathSegments(url)
 
   if (isAnyOf(route, flashRoute)) {
     return readFlashDocument(url, element)

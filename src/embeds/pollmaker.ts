@@ -72,7 +72,8 @@ export const pollmakerFormEmbedResolver = createMarkupEmbedResolver(
     }
 
     const form = element.querySelector(`#qp_form${pollNumber}[action]`)
-    const pollId = readPollId(parseUrlOnHosts(attr(form, 'action'), hosts, isHostOf))
+    const actionUrl = parseUrlOnHosts(attr(form, 'action'), hosts, isHostOf)
+    const pollId = readPollId(actionUrl)
 
     if (!form || !pollId) {
       return

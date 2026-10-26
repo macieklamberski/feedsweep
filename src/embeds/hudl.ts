@@ -54,7 +54,8 @@ export const hudlIframeEmbedResolver = createUrlEmbedResolver(hosts, hudlResolve
 export const hudlWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.hudl-embed, div.hudl-highlights-embed',
   (element) => {
-    const url = parseUrlOnHosts(attr(find(element, 'a[href]'), 'href'), hosts)
+    const href = attr(find(element, 'a[href]'), 'href')
+    const url = parseUrlOnHosts(href, hosts)
 
     if (!url) {
       return

@@ -374,9 +374,8 @@ export const highlightCode: DomTransform = ({ highlightFn }) => {
     }
 
     // Pygments writes a stray empty <span> ahead of the <code>, as <pre><span></span><code>….
-    const presToWrap = Array.from(document.querySelectorAll('pre')).filter(
-      (pre) => !pre.querySelector('code'),
-    )
+    const pres = Array.from(document.querySelectorAll('pre'))
+    const presToWrap = pres.filter((pre) => !pre.querySelector('code'))
 
     for (const pre of presToWrap) {
       const code = document.createElement('code')

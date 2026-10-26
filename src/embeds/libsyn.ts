@@ -20,8 +20,9 @@ const sizes = {
 // `/embed/episode/id/{id}/height/{px}/theme/{name}/thumbnail/{yes|no}/…`.
 const readPathOption = (segments: Array<string>, name: string): string | undefined => {
   const index = segments.findIndex((segment) => isAnyOf(segment, name))
+  const [, value] = index >= 0 ? segments.slice(index) : []
 
-  return index >= 0 ? segments[index + 1] : undefined
+  return value
 }
 
 type LibsynEmbed = {
@@ -38,8 +39,9 @@ export const extractLibsynEmbed = (url: URL): LibsynEmbed | undefined => {
   }
 
   const segments = getPathSegments(url)
+  const [route, kind] = segments
 
-  if (!isAnyOf(segments[0], 'embed') || !isAnyOf(segments[1], embedKinds)) {
+  if (!isAnyOf(route, 'embed') || !isAnyOf(kind, embedKinds)) {
     return
   }
 
@@ -50,7 +52,7 @@ export const extractLibsynEmbed = (url: URL): LibsynEmbed | undefined => {
   }
 
   return {
-    kind: segments[1] as string,
+    kind: kind as string,
     id,
     // The player seeks to `time-start/{hh:mm:ss}` once loaded.
     start: readPathOption(segments, 'time-start'),

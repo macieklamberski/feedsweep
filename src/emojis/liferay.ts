@@ -27,7 +27,9 @@ export const liferayEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: 'img[alt="emoticon"][src*="/emoticons/" i]',
   extract: (element) => {
-    const stem = getFileStem(element.getAttribute('src') ?? '').toLowerCase()
+    const src = element.getAttribute('src') ?? ''
+    const stem = getFileStem(src).toLowerCase()
+
     // Every name here is drawn as Liferay's own face, so a known one is only marked.
     if (!liferayEmojiNames.has(stem)) {
       return

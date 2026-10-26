@@ -80,7 +80,8 @@ const resolveCoordinateMap = (
     return
   }
 
-  const position = composeQuery(pickQueryParams(query.toString(), positionParams))
+  const positionValues = pickQueryParams(query.toString(), positionParams)
+  const position = composeQuery(positionValues)
 
   return {
     provider,

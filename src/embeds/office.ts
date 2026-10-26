@@ -17,7 +17,8 @@ const sizes = {
 
 // A download endpoint or a directory ends on a segment that names no file.
 const readFileName = (documentUrl: string): string | undefined => {
-  const segment = getPathSegments(parseUrl(documentUrl, placeholderBaseUrl) ?? '').at(-1)
+  const parsed = parseUrl(documentUrl, placeholderBaseUrl)
+  const segment = getPathSegments(parsed ?? '').at(-1)
 
   if (!segment || !isFileName(segment)) {
     return

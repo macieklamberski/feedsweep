@@ -47,7 +47,8 @@ export const convertDatawrapperEmbeds: DomTransform = () => (document) => {
       continue
     }
 
-    iframe.replaceWith(buildChartImage(document, chartId, attr(iframe, 'title')))
+    const image = buildChartImage(document, chartId, attr(iframe, 'title'))
+    iframe.replaceWith(image)
   }
 
   // Script form: <div id="datawrapper-vis-<id>"> wrapping the embed.js loader and a
@@ -61,7 +62,8 @@ export const convertDatawrapperEmbeds: DomTransform = () => (document) => {
     }
 
     const fallback = wrapper.querySelector('img[src*="datawrapper.dwcdn.net/" i]')
-    wrapper.replaceWith(buildChartImage(document, chartId, attr(fallback, 'alt')))
+    const image = buildChartImage(document, chartId, attr(fallback, 'alt'))
+    wrapper.replaceWith(image)
   }
 
   // A `data-frame-src` chart embed (Texas Tribune / @newswire/frames) is already an <iframe> by

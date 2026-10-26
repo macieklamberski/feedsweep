@@ -18,8 +18,8 @@ const hosts = ['simplecast.com']
 export const extractSimplecastEpisode = (
   link: URL,
 ): { id: string; isCurrent: boolean } | undefined => {
-  const segments = getPathSegments(link)
-  const id = isAnyOf(segments[0], 'e') ? segments[1] : segments[0]
+  const [episode, legacyId] = getPathSegments(link)
+  const id = isAnyOf(episode, 'e') ? legacyId : episode
 
   if (!id) {
     return

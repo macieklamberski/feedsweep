@@ -107,12 +107,17 @@ const rebuildFeedThumbnails = (document: Document): void => {
 
     // The plugin links the thumbnail to the post. A thumbnail linked to the video itself is a
     // link the author wrote.
-    if (extractVideoId(parseUrlOnHosts(attr(thumbnail, 'href'), youtubeHosts)) === videoId) {
+    const href = attr(thumbnail, 'href')
+    const link = parseUrlOnHosts(href, youtubeHosts)
+
+    if (extractVideoId(link) === videoId) {
       continue
     }
 
     removeFeedLabel(thumbnail, videoId)
-    thumbnail.replaceWith(createIframe(document, composeEmbedUrl(videoId)))
+    const iframe = createIframe(document, composeEmbedUrl(videoId))
+
+    thumbnail.replaceWith(iframe)
   }
 }
 
@@ -131,7 +136,8 @@ export const rebuildLyteEmbeds: DomTransform = () => (document) => {
     }
 
     // The id comes out of its attribute decoded, and the video id in it goes into a path.
-    const segment = encodePathSegment(element.id.slice(element.id.indexOf('_') + 1))
+    const videoId = element.id.slice(element.id.indexOf('_') + 1)
+    const segment = encodePathSegment(videoId)
 
     if (!segment) {
       continue

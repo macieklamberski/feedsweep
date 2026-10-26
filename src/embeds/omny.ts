@@ -21,13 +21,13 @@ const sizes = {
 // White-label customers serve the same paths from their own domain, which host matching cannot
 // reach: those keep the generic placeholder.
 export const extractOmnyClip = (link: URL): string | undefined => {
-  const segments = getPathSegments(link)
+  const [route, ...rest] = getPathSegments(link)
 
-  if (!isAnyOf(segments[0], 'shows') || !isAnyOf(segments[segments.length - 1], 'embed')) {
+  if (!isAnyOf(route, 'shows') || !isAnyOf(rest.at(-1), 'embed')) {
     return
   }
 
-  const path = segments.slice(1, -1)
+  const path = rest.slice(0, -1)
 
   if (path.length < 2) {
     return

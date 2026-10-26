@@ -92,30 +92,32 @@ export const bbcResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 
   const segments = getPathSegments(url)
-  const [first, second, third, fourth, fifth] = segments
+  const [section, player] = segments
 
   // `/news/av/embed/{pid}/{article}` 301s to `/news/av-embeds/{article}/vpid/{pid}`, and the
   // player answers 404 when either the pid or the article is fabricated.
-  if (
-    isAnyOf(first, 'news') &&
-    isAnyOf(second, 'av') &&
-    isAnyOf(third, 'embed') &&
-    isPidSlot(fourth)
-  ) {
-    return isArticleId(fifth) ? composeNewsEmbed(fifth, fourth) : undefined
+  if (isAnyOf(section, 'news') && isAnyOf(player, 'av')) {
+    const [, , route, pid, article] = segments
+
+    if (!isAnyOf(route, 'embed') || !isPidSlot(pid)) {
+      return
+    }
+
+    return isArticleId(article) ? composeNewsEmbed(article, pid) : undefined
   }
 
-  if (
-    isAnyOf(first, 'news') &&
-    isAnyOf(second, 'av-embeds') &&
-    isArticleId(third) &&
-    isAnyOf(fourth, 'vpid')
-  ) {
-    return isPidSlot(fifth) ? composeNewsEmbed(third, fifth) : undefined
+  if (isAnyOf(section, 'news') && isAnyOf(player, 'av-embeds')) {
+    const [, , article, route, pid] = segments
+
+    if (!isArticleId(article) || !isAnyOf(route, 'vpid')) {
+      return
+    }
+
+    return isPidSlot(pid) ? composeNewsEmbed(article, pid) : undefined
   }
 
   // `/ws/av-embeds/articles/{article}/{pid}/{lang}/` is the same player app as the news one.
-  if (isAnyOf(first, 'ws') && isAnyOf(second, 'av-embeds')) {
+  if (isAnyOf(section, 'ws') && isAnyOf(player, 'av-embeds')) {
     const pid = segments.find(isPid)
 
     if (!pid) {
@@ -130,8 +132,12 @@ export const bbcResolveEmbed: ResolveUrlEmbed = (url, element) => {
     }
   }
 
-  if (isAnyOf(first, 'programmes') && isPidSlot(second) && isAnyOf(third, 'player')) {
-    return composeProgrammesEmbed(second)
+  if (isAnyOf(section, 'programmes')) {
+    const [, pid, route] = segments
+
+    if (isPidSlot(pid) && isAnyOf(route, 'player')) {
+      return composeProgrammesEmbed(pid)
+    }
   }
 }
 

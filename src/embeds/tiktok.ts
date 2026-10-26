@@ -59,7 +59,8 @@ const resolveClip = (element: Element): EmbedResolverResult | undefined => {
   let linked: Clip = {}
 
   for (const anchor of element.querySelectorAll('a[href]')) {
-    const clip = readWatchUrl(parseUrlOnHosts(attr(anchor, 'href'), hosts))
+    const href = attr(anchor, 'href')
+    const clip = readWatchUrl(parseUrlOnHosts(href, hosts))
 
     if (clip.videoId) {
       linked = clip
@@ -209,7 +210,8 @@ export const tiktokMetasliderEmbedResolver = createMarkupEmbedResolver(
     // The id comes out of its attribute decoded, and it goes into a path.
     const segment = encodePathSegment(videoId)
 
-    const { handle } = readWatchUrl(parseUrlOnHosts(attr(element, 'data-cite'), hosts))
+    const cite = attr(element, 'data-cite')
+    const { handle } = readWatchUrl(parseUrlOnHosts(cite, hosts))
     const watchPath = handle ? `@${handle}/video/${segment}` : undefined
 
     return {

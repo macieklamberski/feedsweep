@@ -25,13 +25,15 @@ export const extractTedTalk = (link: URL): string | undefined => {
     return
   }
 
-  const segments = getPathSegments(link)
+  const [route, slugOrLang, , localizedSlug] = getPathSegments(link)
 
-  if (!isAnyOf(segments[0], 'talks')) {
+  if (!isAnyOf(route, 'talks')) {
     return
   }
 
-  return (isAnyOf(segments[1], 'lang') ? segments[3] : segments[1])?.replace(htmlSuffixRegex, '')
+  const talkFile = isAnyOf(slugOrLang, 'lang') ? localizedSlug : slugOrLang
+
+  return talkFile?.replace(htmlSuffixRegex, '')
 }
 
 // The Flash player's url is the same file for every talk, and the player is dead, so these embeds

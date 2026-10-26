@@ -15,7 +15,9 @@ export const outlookEmojiResolver: EmojiResolver = {
   kind: 'emoji',
   selector: selectors.join(', '),
   extract: (element) => {
-    const stem = getNameStem(element.getAttribute('src') ?? '').replace(emojiPrefixRegex, '')
+    const src = element.getAttribute('src') ?? ''
+    const fileStem = getNameStem(src)
+    const stem = fileStem.replace(emojiPrefixRegex, '')
 
     return resolveEmojiImage(element, { isStrong: true, names: noEmojiNames, stem })
   },

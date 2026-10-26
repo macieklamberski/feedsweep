@@ -34,13 +34,14 @@ const readPageUsername = (anchor: Nullish<Element>): string | undefined => {
   }
 
   const segments = getPathSegments(page)
+  const [username] = segments
 
   // A page named by its numeric id, `profile.php?id={id}`, has no username.
-  if (segments.length !== 1 || isAnyOf(segments[0], 'profile.php')) {
+  if (segments.length !== 1 || isAnyOf(username, 'profile.php')) {
     return
   }
 
-  return segments[0]
+  return username
 }
 
 // The embed dialog ships the post text, the page and the date in a fallback `<blockquote cite>`
@@ -79,20 +80,18 @@ const readVideoId = (url: URL): string | undefined => {
     return
   }
 
-  const segments = getPathSegments(url)
+  const [route, reelIdOrSection, ...trailing] = getPathSegments(url)
 
   if (isWatchPage(url)) {
     return readDigits(getQueryParam(url.searchParams, 'v'))
   }
 
-  if (isAnyOf(segments[0], 'reel')) {
-    return readDigits(segments[1])
+  if (isAnyOf(route, 'reel')) {
+    return readDigits(reelIdOrSection)
   }
 
-  if (isAnyOf(segments[1], 'videos')) {
-    const trailing = segments.slice(2).reverse()
-
-    return trailing.find((segment) => digitsRegex.test(segment))
+  if (isAnyOf(reelIdOrSection, 'videos')) {
+    return trailing.reverse().find((segment) => digitsRegex.test(segment))
   }
 }
 

@@ -54,7 +54,7 @@ const parseTarget = (value: URL | undefined): RedditTarget | undefined => {
     return
   }
 
-  const [segment, name, comments, postId] = segments
+  const [segment, name, comments, postId, , commentId] = segments
   const scope = readScope(segment)
 
   if (!scope || !name) {
@@ -79,8 +79,6 @@ const parseTarget = (value: URL | undefined): RedditTarget | undefined => {
   // A sixth segment is the comment the widget quotes, sitting behind the title slug. Reddit
   // writes `/comment/{id}/` in place of that slug on its own permalinks and serves both, so
   // the canonical form is the one minted and the slug itself never travels.
-  const commentId = segments[5]
-
   if (commentId) {
     return { kind: 'comment', path: `${post}/comment/${commentId}`, publisher }
   }

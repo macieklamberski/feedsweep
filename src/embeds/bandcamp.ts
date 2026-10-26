@@ -90,9 +90,9 @@ const parseFallback = (element: Nullish<Element>): Element | undefined => {
   const holder = element.ownerDocument.createElement('div')
   holder.innerHTML = element.innerHTML
 
-  return Array.from(holder.querySelectorAll('a[href]')).find((anchor) =>
-    parseUrlOnHosts(attr(anchor, 'href'), hosts),
-  )
+  const anchors = Array.from(holder.querySelectorAll('a[href]'))
+
+  return anchors.find((anchor) => parseUrlOnHosts(attr(anchor, 'href'), hosts))
 }
 
 const bandcampResolveEmbed: ResolveUrlEmbed = (url, element) => {

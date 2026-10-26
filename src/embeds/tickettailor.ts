@@ -10,28 +10,30 @@ const provider = 'tickettailor'
 const hosts = ['tickettailor.com']
 
 const readKey = (segments: Array<string>): string | undefined => {
-  const [route, first, second, third, fourth, fifth] = segments
+  const [route, boxOffice, eventId] = segments
 
-  if (isAnyOf(route, 'all-tickets') && first) {
-    return first
+  if (isAnyOf(route, 'all-tickets') && boxOffice) {
+    return boxOffice
   }
 
-  if (isAnyOf(route, 'events') && first && second) {
-    return `${first}/${second}`
+  if (isAnyOf(route, 'events') && boxOffice && eventId) {
+    return `${boxOffice}/${eventId}`
   }
 
   // A checkout names the event by id beside a checksum it answers 404 without.
+  const [, session, idLabel, checkoutEventId, checksumLabel, checksum] = segments
+
   if (
     isAnyOf(route, 'checkout') &&
-    isAnyOf(first, 'new-session') &&
-    isAnyOf(second, 'id') &&
-    isAnyOf(fourth, 'chk')
+    isAnyOf(session, 'new-session') &&
+    isAnyOf(idLabel, 'id') &&
+    isAnyOf(checksumLabel, 'chk')
   ) {
-    if (!fifth) {
+    if (!checksum) {
       return
     }
 
-    return `checkout/${third}`
+    return `checkout/${checkoutEventId}`
   }
 }
 

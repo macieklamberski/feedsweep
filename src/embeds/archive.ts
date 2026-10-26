@@ -175,7 +175,9 @@ const configFileRegex = /\burl['"]?\s*:\s*['"]([^'"]+)['"]/g
 
 // The swf is the same for audio and video, so only the files the config names tell them apart.
 const namesAudioFile = (config: string): boolean => {
-  return Array.from(config.matchAll(configFileRegex), (match) => match[1]).some((file) => {
+  const files = Array.from(config.matchAll(configFileRegex), (match) => match[1])
+
+  return files.some((file) => {
     return audioFileRegex.test(file)
   })
 }

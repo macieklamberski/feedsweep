@@ -49,17 +49,17 @@ const composeVideoEmbed = (id: string): EmbedResolverResult => {
   }
 }
 
-const readFrameId = ([route, second, third]: Array<string>): string | undefined => {
+const readFrameId = ([route, idOrEmbed, embedOrId]: Array<string>): string | undefined => {
   if (isAnyOf(route, 'embed')) {
-    return second
+    return idOrEmbed
   }
 
-  if (isAnyOf(route, 'p') && isAnyOf(second, 'embed')) {
-    return third
+  if (isAnyOf(route, 'p') && isAnyOf(idOrEmbed, 'embed')) {
+    return embedOrId
   }
 
-  if (isAnyOf(route, 'p') && isAnyOf(third, 'embed')) {
-    return second
+  if (isAnyOf(route, 'p') && isAnyOf(embedOrId, 'embed')) {
+    return idOrEmbed
   }
 }
 
@@ -81,14 +81,14 @@ export const preziResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 
   const segments = getPathSegments(url)
-  const [route, second, third] = segments
+  const [route, idOrEmbed, embedOrId] = segments
 
-  if (isAnyOf(route, 'view') && isAnyOf(third, 'embed')) {
-    return composeEmbed(second, 'view')
+  if (isAnyOf(route, 'view') && isAnyOf(embedOrId, 'embed')) {
+    return composeEmbed(idOrEmbed, 'view')
   }
 
-  if (isAnyOf(route, 'v') && isAnyOf(second, 'embed') && third) {
-    return composeVideoEmbed(third)
+  if (isAnyOf(route, 'v') && isAnyOf(idOrEmbed, 'embed') && embedOrId) {
+    return composeVideoEmbed(embedOrId)
   }
 
   const id = readFrameId(segments)

@@ -11,7 +11,8 @@ export const rebuildEmbedPrivacyLinks: DomTransform = (context) => {
   return async (document) => {
     for (const wrapper of document.querySelectorAll('.embed-privacy-url')) {
       // The probe is a bare iframe onto the embedded url, so a resolver answers for it alone.
-      const probe = createIframe(document, attr(wrapper.querySelector('a'), 'href') ?? '')
+      const href = attr(wrapper.querySelector('a'), 'href') ?? ''
+      const probe = createIframe(document, href)
 
       if (await isResolvedIframe(probe, resolvers)) {
         wrapper.replaceWith(probe)

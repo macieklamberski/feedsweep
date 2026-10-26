@@ -892,7 +892,9 @@ const getGlyph = (src: string): string | undefined => {
   const path = src.split(queryOrHashRegex)[0]
   const stem = getFileStem(path)
   const isToned = toneRegex.test(stem)
-  const name = (isToned ? getFileStem(path.slice(0, path.lastIndexOf('/'))) : stem).toLowerCase()
+  const folder = path.slice(0, path.lastIndexOf('/'))
+  const shortcode = isToned ? getFileStem(folder) : stem
+  const name = shortcode.toLowerCase()
   const glyph = getNameGlyph(discourseAliases.get(name) ?? name)
 
   if (!glyph || !isToned) {
@@ -920,7 +922,10 @@ export const discourseEmojiResolver: EmojiResolver = {
 
     // gemoji's own images sit under `/images/emoji/unicode/` too, named by codepoint, which no
     // Discourse set writes. The generic `emoji` class resolver converts those.
-    if (!glyph && glyphFromCodepoints(getFileStem(src.split(queryOrHashRegex)[0]))) {
+    const path = src.split(queryOrHashRegex)[0]
+    const stem = getFileStem(path)
+
+    if (!glyph && glyphFromCodepoints(stem)) {
       return
     }
 

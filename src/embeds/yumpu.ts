@@ -56,10 +56,11 @@ const readHash = (segments: Array<string>): string | undefined => {
 
 const yumpuResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const segments = getPathSegments(url)
-  const isLocaleless = isAnyOf(segments[0], 'embed')
+  const [localeOrRoute] = segments
+  const isLocaleless = isAnyOf(localeOrRoute, 'embed')
   const hash = readHash(isLocaleless ? segments : segments.slice(1))
 
-  if (!isLocaleless && !lettersRegex.test(segments[0] ?? '')) {
+  if (!isLocaleless && !lettersRegex.test(localeOrRoute ?? '')) {
     return
   }
 

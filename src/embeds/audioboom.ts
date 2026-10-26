@@ -40,7 +40,13 @@ export const extractAudioboomPost = (link: URL): string | undefined => {
   const segments = getPathSegments(link)
   const marker = segments.findIndex((segment) => isAnyOf(segment, postIdMarkers))
 
-  return marker >= 0 ? segments[marker + 1]?.match(postIdRegex)?.[1] : undefined
+  if (marker < 0) {
+    return
+  }
+
+  const [, postSlug] = segments.slice(marker)
+
+  return postSlug?.match(postIdRegex)?.[1]
 }
 
 // Every carrier, the older compact player and the Flash player included, is minted onto v4.
@@ -87,8 +93,9 @@ export const audioboomWidgetEmbedResolver = createMarkupEmbedResolver(
 const audioboomFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
   // Another bucket, path-style or on its own subdomain of S3's host, is not Audioboo's.
   const isPathStyle = isHostOf(url, bucketHosts)
+  const [bucket] = getPathSegments(url)
 
-  if (isPathStyle && !flashHosts.includes(getPathSegments(url)[0])) {
+  if (isPathStyle && !flashHosts.includes(bucket)) {
     return
   }
 

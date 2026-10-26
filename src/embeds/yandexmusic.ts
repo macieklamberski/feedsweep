@@ -167,7 +167,9 @@ const readAnchorRoute = (anchor: Element): string => {
     return ''
   }
 
-  return getPathSegments(parsed)[0] ?? ''
+  const [route = ''] = getPathSegments(parsed)
+
+  return route
 }
 
 const readFallback = (element: Element | undefined): Partial<EmbedResolverResult> => {

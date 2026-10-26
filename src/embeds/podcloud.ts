@@ -77,11 +77,15 @@ export const podcloudResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const title = attr(element, 'title')
 
   if (isAnyOf(kind, 'player')) {
-    return composeEmbed(show, undefined, readContentOptions(segments.slice(3)), title)
+    const options = readContentOptions(segments.slice(3))
+
+    return composeEmbed(show, undefined, options, title)
   }
 
   if (isAnyOf(kind, 'episode') && isAnyOf(player, 'player')) {
-    return composeEmbed(show, episode, readContentOptions(segments.slice(5)), title)
+    const options = readContentOptions(segments.slice(5))
+
+    return composeEmbed(show, episode, options, title)
   }
 }
 

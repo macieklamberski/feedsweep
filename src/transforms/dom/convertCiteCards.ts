@@ -14,7 +14,9 @@ export const convertCiteCards: DomTransform = (context) => {
           continue
         }
 
-        element.replaceWith(createCitePlaceholder(document, prepareCiteMetadata(result, context)))
+        const metadata = prepareCiteMetadata(result, context)
+
+        element.replaceWith(createCitePlaceholder(document, metadata))
       }
     }
   }

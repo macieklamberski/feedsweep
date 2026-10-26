@@ -21,7 +21,9 @@ const deckParams = ['slide']
 // A share link can write its slide in the fragment, beside flags for the toolbar and where the
 // file was opened from. Only the slide the deck opens on is kept.
 const readDeckFragment = (parsed: URL): string => {
-  const query = composeQuery(pickQueryParams(parsed.hash.slice(1), ['slide']))
+  const fragment = parsed.hash.slice(1)
+  const slideParams = pickQueryParams(fragment, ['slide'])
+  const query = composeQuery(slideParams)
 
   return query.replace('?', '#')
 }
@@ -29,13 +31,13 @@ const readDeckFragment = (parsed: URL): string => {
 // `/presentation/d/e/{id}` names a deck published to the web and `/presentation/d/{id}` names it
 // by its Drive file id. The legacy `/presentation/embed?id={id}` 301s onto the second.
 export const googleslidesResolveEmbed: ResolveUrlEmbed = (url) => {
-  const segments = getPathSegmentsWithoutWorkspace(url)
+  const [app, route, ...deckSegments] = getPathSegmentsWithoutWorkspace(url)
 
-  if (!isAnyOf(segments[0], 'presentation')) {
+  if (!isAnyOf(app, 'presentation')) {
     return
   }
 
-  if (isAnyOf(segments[1], 'embed')) {
+  if (isAnyOf(route, 'embed')) {
     const fileId = getQueryParam(url.searchParams, 'id')
 
     if (!fileId) {
@@ -54,20 +56,19 @@ export const googleslidesResolveEmbed: ResolveUrlEmbed = (url) => {
     }
   }
 
-  if (!isAnyOf(segments[1], 'd')) {
+  if (!isAnyOf(route, 'd')) {
     return
   }
 
-  const isPublished = isAnyOf(segments[2], 'e')
-  const deckId = isPublished ? segments[3] : segments[2]
+  const [publishedRoute] = deckSegments
+  const isPublished = isAnyOf(publishedRoute, 'e')
+  const [deckId, pageRoute] = isPublished ? deckSegments.slice(1) : deckSegments
 
   if (!deckId) {
     return
   }
 
-  const route = segments[isPublished ? 4 : 3]
-
-  if (route !== undefined && !isAnyOf(route, deckRoutes)) {
+  if (pageRoute !== undefined && !isAnyOf(pageRoute, deckRoutes)) {
     return
   }
 

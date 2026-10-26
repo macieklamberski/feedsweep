@@ -86,18 +86,20 @@ const readPathId = (url: URL): string | undefined => {
   const segments = getPathSegments(url)
 
   if (isHostOrSubdomainOf(url, 'youtu.be')) {
-    return segments[0]
+    const [videoId] = segments
+
+    return videoId
   }
 
-  let index = 0
-
-  while (index < segments.length && isAnyOf(segments[index], pathWords)) {
-    index++
-  }
+  const [route] = segments
 
   // A path opening with no route word names no video: a bare vanity channel url would otherwise
   // read as one whenever the name happens to be eleven legal characters.
-  return index > 0 ? segments[index] : undefined
+  if (!isAnyOf(route, pathWords)) {
+    return
+  }
+
+  return segments.find((segment) => !isAnyOf(segment, pathWords))
 }
 
 export const extractVideoId = (url: URL | undefined): string | undefined => {
@@ -159,7 +161,11 @@ const readEmbedParams = (url: URL): Record<string, string> => {
 
   const offsetQueries = [url.search, url.hash.slice(1)]
   const start = offsetQueries
-    .map((query) => parseWatchOffset(getQueryParam(new URLSearchParams(query), 't') ?? ''))
+    .map((query) => {
+      const offset = getQueryParam(new URLSearchParams(query), 't') ?? ''
+
+      return parseWatchOffset(offset)
+    })
     .find(Boolean)
 
   if (start) {
@@ -249,14 +255,15 @@ const resolveCollectionEmbed = (
   const listType = getQueryParam(parsed.searchParams, 'listType')
   const list = getQueryParam(parsed.searchParams, 'list')
   const channel = getQueryParam(parsed.searchParams, 'channel')
+  const [, routeTarget] = segments
 
-  if (isAnyOf(segments[1], 'live_stream')) {
+  if (isAnyOf(routeTarget, 'live_stream')) {
     return channel ? composeChannelEmbed(channel) : undefined
   }
 
   // `/embed/videoseries?list=`, `/embed/playlist?list=` and the bare `/embed/?list=` some
   // WordPress plugins emit are the same playlist spelled three ways.
-  if (!isAnyOf(segments[1], ['videoseries', 'playlist']) && segments.length !== 1) {
+  if (!isAnyOf(routeTarget, ['videoseries', 'playlist']) && segments.length !== 1) {
     return
   }
 
@@ -271,20 +278,21 @@ const resolveCollectionEmbed = (
 
 const resolveTarget = (url: URL): EmbedResolverResult | undefined => {
   const segments = getPathSegments(url)
+  const [route, routeTarget] = segments
 
-  if (isAnyOf(segments[0], 'embed')) {
+  if (isAnyOf(route, 'embed')) {
     const embed = resolveCollectionEmbed(url, segments)
 
     // A `/embed/{id}` path names a video and falls through; the rest of the embed paths name
     // their content here or name nothing resolvable.
-    if (embed || segments.length === 1 || isAnyOf(segments[1], nonVideoIds)) {
+    if (embed || segments.length === 1 || isAnyOf(routeTarget, nonVideoIds)) {
       return embed
     }
   }
 
   // The playlist page refuses framing, so a frame of it shows nothing, and its `list` is the id
   // the playlist player takes.
-  if (isAnyOf(segments[0], 'playlist')) {
+  if (isAnyOf(route, 'playlist')) {
     const list = getQueryParam(url.searchParams, 'list')
 
     if (!list) {
@@ -297,8 +305,8 @@ const resolveTarget = (url: URL): EmbedResolverResult | undefined => {
   // The Flash player took its playlist on `/p/{id}`, the playlist the modern url spells as
   // `list=PL{id}`, and the swf it points at is dead, so the id is the only thing left to rebuild
   // from. The publisher's `?hl=` and `&fs=1` are player chrome and go with the rest of the query.
-  if (isAnyOf(segments[0], 'p')) {
-    const head = segments[1] ?? ''
+  if (isAnyOf(route, 'p')) {
+    const head = routeTarget ?? ''
     // The id moves from a path segment into the query, so it is decoded first.
     const list = decodeSegment(head) ?? head
 

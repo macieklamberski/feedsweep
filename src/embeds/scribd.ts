@@ -52,7 +52,8 @@ const composeEmbed = (document: string, search = ''): EmbedResolverResult => {
 const readDocumentId = (parsed: URL): string | undefined => {
   const segments = getPathSegments(parsed)
   // Feeds carry the same routes under `/mobile`, the mobile site's prefix.
-  const [marker, document] = isAnyOf(segments[0], 'mobile') ? segments.slice(1) : segments
+  const [mobileOrMarker] = segments
+  const [marker, document] = isAnyOf(mobileOrMarker, 'mobile') ? segments.slice(1) : segments
 
   if (!marker || !isAnyOf(marker, documentIdMarkers) || !document) {
     return

@@ -12,7 +12,9 @@ const sizes = {
 }
 
 export const extractBloggerToken = (url: URL): string | undefined => {
-  if (!isAnyOf(getPathSegments(url)[0], 'video.g')) {
+  const [route] = getPathSegments(url)
+
+  if (!isAnyOf(route, 'video.g')) {
     return
   }
 
