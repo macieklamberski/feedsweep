@@ -1,4 +1,11 @@
-import { composeQuery, decodeSegment, getPathSegments, getQueryParam, parseUrl } from 'trousse'
+import {
+  composeQuery,
+  decodeSegment,
+  getPathSegments,
+  getQueryParam,
+  isAnyOf,
+  parseUrl,
+} from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { isFileName, placeholderBaseUrl } from '../utils/urls.js'
@@ -17,7 +24,7 @@ const hosts = ['mixcloud.com']
 
 // An account's sections sit where a show slug does, and the widget answers {user}/uploads with the
 // same empty shell as a fabricated slug.
-const sectionSlugs = new Set([
+const sectionSlugs = [
   'activity',
   'community',
   'dashboard',
@@ -32,20 +39,12 @@ const sectionSlugs = new Set([
   'subscribe',
   'tracks',
   'uploads',
-])
+]
 
 // Site pages at the show shape: `genres/{x}` in any case, `categories/{x}` and `tag/{x}` that
 // redirect to it, and the widget's own url when a carrier loses its `feed` parameter. `media` and
 // `search` are real users with shows, so they stay off the list.
-const siteSegments = new Set([
-  'categories',
-  'discover',
-  'genres',
-  'live',
-  'tag',
-  'upload',
-  'widget',
-])
+const siteSegments = ['categories', 'discover', 'genres', 'live', 'tag', 'upload', 'widget']
 
 type Show = { key: string; path: string }
 
@@ -61,7 +60,7 @@ const readShow = (segments: Array<string>): Show | undefined => {
   const user = decodeSegment(rawUser) ?? rawUser
   const slug = decodeSegment(rawSlug) ?? rawSlug
 
-  if (siteSegments.has(user.toLowerCase()) || sectionSlugs.has(slug.toLowerCase())) {
+  if (isAnyOf(user, siteSegments) || isAnyOf(slug, sectionSlugs)) {
     return
   }
 

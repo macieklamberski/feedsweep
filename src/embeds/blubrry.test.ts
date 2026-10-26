@@ -668,6 +668,24 @@ describeForEachParser('blubrryPowerpressEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    // Constructed: no feed writes the value in capitals, and the case rule reads a parameter value
+    // that picks a kind in any case.
+    it('should read a video player value spelled in capitals', async () => {
+      const value = html`
+        <iframe
+          src="https://example.com/?powerpress_embed=61144-podcast&amp;powerpress_player=HTML5VIDEO"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'blubrry',
+        id: 'example.com/61144-podcast',
+        src: 'https://example.com/?powerpress_embed=61144-podcast&powerpress_player=HTML5VIDEO',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should trim a trailing space off the episode value', async () => {
       const value = '<iframe src="https://example.com/?powerpress_embed=1234-podcast%20"></iframe>'
       const expected: EmbedResolverResult = {
