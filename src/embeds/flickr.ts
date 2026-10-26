@@ -355,7 +355,7 @@ const resolveTarget = (url: URL, element: Nullish<Element>): EmbedResolverResult
   }
 
   const { width, height } = sizes.slideshow
-  const query = composeQuery({ width: String(width), height: String(height) })
+  const query = composeQuery({ width, height })
 
   return { ...result, src: `${result.src}${query}`, ...sizes.slideshow }
 }
