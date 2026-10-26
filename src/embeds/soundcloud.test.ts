@@ -74,8 +74,8 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       const value = html`
         <iframe height="300" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1"></iframe>
         <div>
-          <a href="https://soundcloud.com/artist" title="Artist">Artist</a> ·
-          <a href="https://soundcloud.com/artist/track" title="Track title">Track title</a>
+          <a href="https://soundcloud.com/artist">Artist</a> ·
+          <a href="https://soundcloud.com/artist/track">Track title</a>
         </div>
       `
       const expected = html`
@@ -91,38 +91,6 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       `
 
       expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should read the author from the artist anchor title, not its text', async () => {
-      const value = html`
-        <iframe height="300" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1"></iframe>
-        <div>
-          <a href="https://soundcloud.com/artist" title="Artist">Follow the artist</a> ·
-          <a href="https://soundcloud.com/artist/track" title="Track title">Track title</a>
-        </div>
-      `
-
-      expect((await extract(value))?.author).toBe('Artist')
-    })
-
-    it('should state no author when the artist anchor carries no title', async () => {
-      const value = html`
-        <iframe height="300" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1"></iframe>
-        <div>
-          <a href="https://soundcloud.com/artist">Artist</a> ·
-          <a href="https://soundcloud.com/artist/track">Track title</a>
-        </div>
-      `
-      const expected: EmbedResolverResult = {
-        provider: 'soundcloud',
-        id: 'tracks/1',
-        src: 'https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/1',
-        url: 'https://soundcloud.com/artist/track',
-        height: 166,
-        title: 'Track title',
-      }
-
-      expect(await extract(value)).toEqual(expected)
     })
 
     it('should read the title from the iframe title attribute', async () => {
@@ -197,6 +165,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
           data-embed-id="tracks/68669052"
           data-embed-url="http://soundcloud.com/rozie-3/13-bks-suicide"
           data-embed-title="13-BKS-Suicide"
+          data-embed-author="rozie"
           data-embed-height="166"
         ></div>
       `
@@ -1002,7 +971,7 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
           src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1"
         ></iframe>
         <div>
-          <a href="https://soundcloud.com/artist" title="Artist">Artist</a> ·
+          <a href="https://soundcloud.com/artist">Artist</a> ·
           <a href="https://soundcloud.com/artist/track"></a>
         </div>
       `

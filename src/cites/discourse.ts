@@ -1,7 +1,7 @@
-import { getQueryParam, isHostOrSubdomainOf, parseUrl } from 'trousse'
+import { isHostOrSubdomainOf, parseUrl } from 'trousse'
 import { parseMastodonStatus } from '../embeds/mastodon.js'
 import type { CiteResolver } from '../types.js'
-import { buildCite, readLinkHandle } from '../utils/cites.js'
+import { buildCite } from '../utils/cites.js'
 import { attr, find, isElement, text } from '../utils/dom.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
 
@@ -104,20 +104,17 @@ export const discourseCiteResolver: CiteResolver = {
       description = text(find(body, 'p', (paragraph) => !find(paragraph, 'a.author')))
     }
 
-    const githubAuthorAnchor =
-      find(element, '.github-info .user a') ?? find(element, '.github-info span a')
-    const githubAuthor = readLinkHandle(githubAuthorAnchor)
+    const githubAuthor =
+      text(element, '.github-info .user a') ?? text(element, '.github-info span a')
 
     // The Stack Exchange onebox writes "asked by <author> on <date>" as two anchors in its
-    // `.date` div. The author anchor links a numeric profile with no handle, so only the date is read.
+    // `.date` div.
     const dateAnchors = Array.from(body?.querySelectorAll('.date a') ?? [])
 
     // The submitter and the item's time, from the stats paragraph the description skips. No
     // other engine's body carries either anchor, and the timestamp is the site's own
-    // formatting ("8:09 AM - 28 Sep 2021"). The submitter's link names the username in `id`.
-    const hackernewsAuthorHref = attr(find(body, 'a.author'), 'href')
-    const hackernewsProfile = parseUrl(hackernewsAuthorHref, placeholderBaseUrl)
-    const hackernewsAuthor = getQueryParam(hackernewsProfile?.searchParams, 'id')
+    // formatting ("8:09 AM - 28 Sep 2021").
+    const hackernewsAuthor = text(find(body, 'a.author'))
     const hackernewsDate = text(find(body, 'a.timestamp'))
 
     return buildCite({
@@ -125,7 +122,7 @@ export const discourseCiteResolver: CiteResolver = {
       url,
       title: githubAuthor ? stripCommentPrefix(title, githubAuthor) : title,
       description,
-      author: githubAuthor ?? hackernewsAuthor,
+      author: githubAuthor ?? text(dateAnchors[0]) ?? hackernewsAuthor,
       publisher,
       date:
         date ??
