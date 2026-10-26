@@ -173,11 +173,11 @@ describe('wistiaResolveEmbed', () => {
     expect(wistiaResolveEmbed(new URL(value))).toEqual(expected)
   })
 
-  it('should fold case in the key alone for an account media page spelled in capitals', () => {
+  it('should keep an account media page spelled in capitals as written', () => {
     const value = 'https://acme.wistia.com/medias/2FG072PFTB'
     const expected: EmbedResolverResult = {
       provider: 'wistia',
-      id: '2fg072pftb',
+      id: '2FG072PFTB',
       src: 'https://fast.wistia.net/embed/iframe/2FG072PFTB',
       url: 'https://acme.wistia.com/medias/2FG072PFTB',
       ratio: '16/9',
