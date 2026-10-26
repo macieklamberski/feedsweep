@@ -610,6 +610,22 @@ describeForEachParser('brightcoveVideoJsEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+    it('should key a numeric video id of any length under its account', async () => {
+      const value = html`
+        <video-js
+          data-account="1234"
+          data-video-id="42"
+        ></video-js>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: '1234/42',
+        src: 'https://players.brightcove.net/1234/default_default/index.html?videoId=42',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -681,19 +697,6 @@ describeForEachParser('brightcoveVideoJsEmbedResolver', (parseHtml) => {
       }
 
       expect(await extract(value)).toEqual(expected)
-    })
-
-    // The carriers that name Brightcove take any id. This element names nothing, so
-    // the floor stands here and hand-numbered ids stay with whoever emitted them.
-    it('should return undefined for hand-numbered ids the other carriers would take', async () => {
-      const value = html`
-        <video-js
-          data-account="1234"
-          data-video-id="42"
-        ></video-js>
-      `
-
-      expect(await extract(value)).toBeUndefined()
     })
   })
 })

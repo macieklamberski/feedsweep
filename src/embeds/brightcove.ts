@@ -27,7 +27,7 @@ const sizes = {
 // A real Brightcove id runs to ten digits and more.
 const brightcoveIdRegex = /^\d{5,}$/
 // A reference id is free text the publisher chose, named by Brightcove's own `ref:` prefix.
-const brightcoveVideoIdRegex = /^(?:\d{5,}|ref:.+)$/
+const brightcoveVideoIdRegex = /^(?:\d+|ref:.+)$/
 const accountScriptSelector = 'script[src*="players.brightcove.net" i]'
 const accountScriptRegex = /players\.brightcove\.net\/(\d+)\//i
 
