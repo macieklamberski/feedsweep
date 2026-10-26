@@ -1246,6 +1246,17 @@ describeForEachParser('blueskyS9eEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should ignore a helper page naming a profile instead of a post', async () => {
+      const value = html`
+        <iframe
+          data-s9e-mediaembed="bluesky"
+          src="https://s9e.github.io/iframe/2/bluesky.min.html#at://did:plc:hhz4agnyzcrsvpnprxrbjrpa/app.bsky.actor.profile/self#embed.bsky.app"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 
   describe('guards', () => {

@@ -97,12 +97,8 @@ const rebuildFeedThumbnails = (document: Document): void => {
       continue
     }
 
-    const image = thumbnail.firstElementChild
-
-    if (!image) {
-      continue
-    }
-
+    // The selector matched an `img` child, and the link holds no other element.
+    const image = thumbnail.firstElementChild as Element
     const videoId = readThumbnailVideoId(image)
 
     if (!videoId) {
