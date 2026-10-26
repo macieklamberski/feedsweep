@@ -31,7 +31,9 @@ export const anyflipResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
   const viewerUrl = `https://online.anyflip.com/${user}/${book}/`
   // The start page sits in the fragment, so its query is written after `#`.
-  const fragment = composeQuery(pickQueryParams(url.hash.slice(1), ['p'])).replace('?', '#')
+  const hashQuery = url.hash.slice(1)
+  const startPage = pickQueryParams(hashQuery, ['p'])
+  const fragment = composeQuery(startPage).replace('?', '#')
 
   return {
     provider,
