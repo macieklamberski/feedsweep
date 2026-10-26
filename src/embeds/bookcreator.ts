@@ -29,9 +29,8 @@ const bookcreatorResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 
   const id = `${userId}/${bookId}`
-  // `nopreview` opens the book without the description card over it. The factory has already
-  // parsed the url on the reader host, so it parses here too.
-  const query = filterUrlQuery(new URL(url), (name) => isAnyOf(name, 'nopreview'))
+  // `nopreview` opens the book without the description card over it.
+  const query = filterUrlQuery(url, (name) => isAnyOf(name, 'nopreview'))
 
   return {
     provider,
