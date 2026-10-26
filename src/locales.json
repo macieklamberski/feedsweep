@@ -1,0 +1,6 @@
+{
+  "errors": {
+    "emojiNameNotLowerCase": "Emoji name \"{{name}}\" on {{table}} must be lower case",
+    "emojiNameConflict": "Emoji name \"{{name}}\" is {{firstGlyph}} and {{secondGlyph}} on different platforms"
+  }
+}
