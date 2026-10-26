@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, jsonAttrValue, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { appleEmbedResolver, appleResolveEmbed, appleToolsEmbedResolver } from './apple.js'
+import { appleIframeEmbedResolver, appleResolveEmbed, appleToolsEmbedResolver } from './apple.js'
 
 describe('appleResolveEmbed', () => {
   describe('happy paths', () => {
@@ -232,8 +232,8 @@ describe('appleResolveEmbed', () => {
   })
 })
 
-describeForEachParser('appleEmbedResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, appleEmbedResolver)
+describeForEachParser('appleIframeEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, appleIframeEmbedResolver)
 
   it('should resolve an apple music iframe', async () => {
     const value = html`
@@ -479,8 +479,8 @@ describeForEachParser('appleEmbedResolver', (parseHtml) => {
   })
 })
 
-describeForEachParser('appleEmbedResolver carrier title', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, appleEmbedResolver)
+describeForEachParser('appleIframeEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, appleIframeEmbedResolver)
 
   it('should drop the label the share dialog writes in place of the name', async () => {
     const value = html`

@@ -14,6 +14,10 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'vk'
 
+const sizes = {
+  player: { ratio: '16/9' },
+}
+
 const vkHosts = ['vk.com', 'vk.ru', 'vkontakte.ru', 'vkvideo.ru']
 
 // The page a player opens is spelled with the endpoint's own word, on the host vk.com redirects
@@ -75,11 +79,11 @@ export const vkResolveEmbed: ResolveUrlEmbed = (url) => {
     src,
     // Both ids come out of the query decoded, and they go into a path.
     url: `https://vkvideo.ru/${player.kind}${encodePathSegment(id)}`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 
-export const vkEmbedResolver = createUrlEmbedResolver(vkHosts, vkResolveEmbed)
+export const vkIframeEmbedResolver = createUrlEmbedResolver(vkHosts, vkResolveEmbed)
 
 // `hash` unlocks the post, and the widget answers "Error" without it. The playlist widget
 // ignores it, and its page answers the same shell for any playlist, so it gets no page url.

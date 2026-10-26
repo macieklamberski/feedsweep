@@ -4,6 +4,8 @@ import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'redcircle'
+
 // The loader is served from `api.podcache.net` and the player it builds from `redcircle.com`, on
 // the same path, so one reader covers both.
 const redcircleHosts = ['redcircle.com', 'api.podcache.net']
@@ -11,7 +13,7 @@ const redcircleHosts = ['redcircle.com', 'api.podcache.net']
 // Fluid in width and fixed in height, both taken from what the loader scripts set on the iframe
 // they build: 170 for an episode, and `height: 100%` under a `min-height: 320px` for a show,
 // which collapses to the minimum inside the `height: auto` mount the snippet ships.
-const playerHeights = { episode: 170, show: 320 }
+const sizes = { episode: { height: 170 }, show: { height: 320 } }
 
 // `embedded-show-webplayer` is the show player's real page: `embedded-show-player` answers 404.
 const routes = toMap<'episode' | 'show'>({
@@ -53,29 +55,28 @@ const readSubject = (
 }
 
 export const redcircleResolveEmbed: ResolveUrlEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, redcircleHosts)
-  const subject = parsed ? readSubject(getPathSegments(parsed)) : undefined
+  const subject = readSubject(getPathSegments(url))
 
-  if (!parsed || !subject) {
+  if (!subject) {
     return
   }
 
   if (subject.kind === 'show') {
     return {
-      provider: 'redcircle',
+      provider,
       id: `show/${subject.show}`,
       src: `https://redcircle.com/embedded-show-webplayer/${subject.show}`,
       url: `https://redcircle.com/shows/${subject.show}`,
-      height: playerHeights.show,
+      ...sizes.show,
     }
   }
 
   return {
-    provider: 'redcircle',
+    provider,
     id: `episode/${subject.show}/${subject.episode}`,
     src: `https://redcircle.com/embedded-player/sh/${subject.show}/ep/${subject.episode}`,
     url: `https://redcircle.com/shows/${subject.show}/episodes/${subject.episode}`,
-    height: playerHeights.episode,
+    ...sizes.episode,
   }
 }
 

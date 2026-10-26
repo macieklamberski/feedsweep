@@ -23,7 +23,12 @@ import {
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'vimeo'
-const playerRatio = '16/9'
+
+const sizes = {
+  video: { ratio: '16/9' },
+  showcase: { ratio: '16/9' },
+  event: { ratio: '16/9' },
+}
 
 export const vimeoHosts = ['vimeo.com']
 
@@ -97,7 +102,7 @@ const composeShowcaseEmbed = (showcaseId: string): EmbedResolverResult => {
     id: `showcase/${showcaseId}`,
     src: `https://vimeo.com/showcase/${showcaseId}/embed`,
     url: `https://vimeo.com/showcase/${showcaseId}`,
-    ratio: playerRatio,
+    ...sizes.showcase,
   }
 }
 
@@ -150,7 +155,7 @@ const resolveEventEmbed = (
     id: hash ? `event/${eventId}:${hash}` : `event/${eventId}`,
     src: `https://vimeo.com/event/${eventId}/embed${hash ? `/${hash}` : ''}`,
     url: `https://vimeo.com/event/${path}`,
-    ratio: playerRatio,
+    ...sizes.event,
     title: attr(element, 'title'),
   }
 }
@@ -292,7 +297,7 @@ export const vimeoResolveEmbed: ResolveUrlEmbed = (url, element) => {
     src: composeEmbedUrl(segment, params, readStart(url)),
     // Without the hash the page loses its title and its video, so it stays on the url too.
     url: `https://vimeo.com/${segment}${hash ? `/${encodePathSegment(hash)}` : ''}`,
-    ratio: playerRatio,
+    ...sizes.video,
     title,
     // TODO: no thumbnail. Vimeo posters are not derivable from the id and need an oEmbed lookup.
   }
@@ -311,7 +316,7 @@ export const readVimeoEmbedSrc = (link: string): string | undefined => {
 }
 
 // A Vimeo player iframe, a frame of a video, showcase or event page, or the Flash moogaloop player.
-export const vimeoEmbedResolver = createUrlEmbedResolver(vimeoHosts, vimeoResolveEmbed)
+export const vimeoIframeEmbedResolver = createUrlEmbedResolver(vimeoHosts, vimeoResolveEmbed)
 
 // MetaSlider Pro's Vimeo slide: an empty div that only the plugin's script builds into a player.
 export const vimeoMetasliderEmbedResolver = createMarkupEmbedResolver(

@@ -4,7 +4,6 @@ import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
   flourishIframeEmbedResolver,
-  flourishResolveEmbed,
   flourishWidgetEmbedResolver,
   readFlourishHeight,
 } from './flourish.js'
@@ -416,18 +415,17 @@ describeForEachParser('flourishIframeEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should ignore a foreign host carrying the path', async () => {
+      const value = html`<iframe src="https://evil.test/visualisation/29132382/embed"></iframe>`
+
+      expect(await extract(value)).toBeUndefined()
+    })
   })
 })
 
 // The resolver suite covers everything the carrier reaches. What is left here is the pair of
 // guards the factory's own host check gets to first, so only a direct call runs them.
-describe('flourishResolveEmbed', () => {
-  it('should ignore a foreign host carrying the path', () => {
-    const value = 'https://evil.test/visualisation/29132382/embed'
-
-    expect(flourishResolveEmbed(new URL(value))).toBeUndefined()
-  })
-})
 
 describe('readFlourishHeight', () => {
   // What a chart posts as it settles, once `auto=1` has switched the reporting on.

@@ -15,6 +15,8 @@ const offsiteIdRegex = /-(\d+)$/
 
 const idPrefix = 'mmvo'
 
+const sizes = { player: { ratio: '16/9' } }
+
 // nbcnews.com/id/{digits} is the retired Flash player's own page id, a space every video route
 // 404s on, so a bare number names a video only under one of these routes. Each route mints onto
 // its own host, as the prefix followed by the digits. The embedded-video routes answer their route
@@ -61,7 +63,7 @@ const nbcnewsResolveEmbed: ResolveUrlEmbed = (url) => {
     provider,
     id: hasKey ? `${idPrefix}${value}` : undefined,
     src: `${route.srcPrefix}${value}`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

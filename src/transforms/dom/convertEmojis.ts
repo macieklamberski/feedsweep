@@ -5,6 +5,7 @@ import {
   unwrapProxiedEmoji,
   withEmojiPresentation,
 } from '../../utils/emojis.js'
+import { createImage } from '../../utils/widgets.js'
 
 const wrapFallbackText = (document: Document, text: string): Element => {
   const span = document.createElement('span')
@@ -16,13 +17,7 @@ const wrapFallbackText = (document: Document, text: string): Element => {
 }
 
 const createEmojiImage = (document: Document, src: string, alt: string | undefined): Element => {
-  const image = document.createElement('img')
-
-  image.setAttribute('src', src)
-
-  if (alt) {
-    image.setAttribute('alt', alt)
-  }
+  const image = createImage(document, { src, alt })
 
   image.setAttribute(emojiImageAttribute, '')
 

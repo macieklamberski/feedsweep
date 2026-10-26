@@ -3,7 +3,8 @@ import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'channel9'
-const playerRatio = '16/9'
+
+const sizes = { player: { ratio: '16/9' } }
 
 const channel9Hosts = ['channel9.msdn.com']
 
@@ -34,7 +35,7 @@ const channel9ResolveEmbed: ResolveUrlEmbed = (url) => {
       provider,
       id: `${show}/${episode}`,
       src: `${embedUrl}${composeQuery({ show, ep: episode })}`,
-      ratio: playerRatio,
+      ...sizes.player,
     }
   }
 
@@ -46,7 +47,7 @@ const channel9ResolveEmbed: ResolveUrlEmbed = (url) => {
       provider,
       id: `events/${event}-${edition}/${session}`,
       src: `${embedUrl}${composeQuery({ ev: `${event}-${edition}`, session })}`,
-      ratio: playerRatio,
+      ...sizes.player,
     }
   }
 }

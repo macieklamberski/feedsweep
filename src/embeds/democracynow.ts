@@ -6,6 +6,8 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'democracynow'
 
+const sizes = { player: { ratio: '16/9' } }
+
 const democracynowHosts = ['democracynow.org']
 
 // The path after `/embed/` names the item, and each kind has its own page.
@@ -15,7 +17,7 @@ const composeEmbed = (path: string, page: string): EmbedResolverResult => {
     id: path,
     src: `https://www.democracynow.org/embed/${path}`,
     url: `https://www.democracynow.org/${page}`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

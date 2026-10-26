@@ -11,6 +11,8 @@ const officeHosts = ['view.officeapps.live.com']
 // and the viewer answers any casing.
 const viewerPathRegex = /^\/op\/(?:embed|view)\.aspx$/i
 
+const sizes = { player: { ratio: '8/5' } }
+
 // A download endpoint or a directory ends on a segment that names no file.
 const readFileName = (documentUrl: string): string | undefined => {
   const segment = getPathSegments(parseUrl(documentUrl, placeholderBaseUrl) ?? '').at(-1)
@@ -41,7 +43,7 @@ export const officeResolveEmbed: ResolveUrlEmbed = (url) => {
     provider,
     src: `https://view.officeapps.live.com/op/embed.aspx${composeQuery({ src: documentUrl })}`,
     url: documentUrl,
-    ratio: '8/5',
+    ...sizes.player,
     title: readFileName(documentUrl),
   }
 }

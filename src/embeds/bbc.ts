@@ -4,6 +4,17 @@ import { flashVar } from '../utils/dom.js'
 import { digitsRegex, flashFileRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'bbc'
+
+const sizes = {
+  // The news and World Service players render at 16:9 of their width. BBC's own embed code
+  // states a 400 by 500 box, which pads them with blank below.
+  news: { ratio: '16/9' },
+  // The programmes player is a 16:9 video above a panel of its title and links, which the box
+  // clips.
+  programmes: { ratio: '16/9' },
+}
+
 // `bbc.co.uk` 301s every player route onto `bbc.com`.
 const bbcHosts = ['bbc.com', 'bbc.co.uk']
 
@@ -13,12 +24,6 @@ const pidRegex = /^[a-z](?=[0-9a-z]*\d)[0-9a-z]{7}$/
 const pidCharactersRegex = /^[0-9a-z]+$/
 const playlistPathRegex = /\/playlist\/([^/.]+)/i
 const newsPagePathRegex = /^\/news\/[^/]*-(?<article>\d+)\/?$/i
-
-// The news and World Service players render at 16:9 of their width. BBC's own embed code states
-// a 400 by 500 box, which pads them with blank below.
-const newsPlayerRatio = '16/9'
-// The programmes player is a 16:9 video above a panel of its title and links, which the box clips.
-const programmesPlayerRatio = '16/9'
 
 const isPid = (segment: string | undefined): segment is string => {
   return segment !== undefined && pidRegex.test(segment)
@@ -34,20 +39,20 @@ const isArticleId = (segment: string | undefined): segment is string => {
 
 const composeNewsEmbed = (article: string, pid: string): EmbedResolverResult => {
   return {
-    provider: 'bbc',
+    provider,
     id: pid,
     src: `https://www.bbc.com/news/av-embeds/${article}/vpid/${pid}`,
-    ratio: newsPlayerRatio,
+    ...sizes.news,
   }
 }
 
 const composeProgrammesEmbed = (pid: string, url?: string): EmbedResolverResult => {
   return {
-    provider: 'bbc',
+    provider,
     id: pid,
     src: `https://www.bbc.co.uk/programmes/${pid}/player`,
     url,
-    ratio: programmesPlayerRatio,
+    ...sizes.programmes,
   }
 }
 
@@ -118,10 +123,10 @@ export const bbcResolveEmbed: ResolveUrlEmbed = (url, element) => {
     }
 
     return {
-      provider: 'bbc',
+      provider,
       id: pid,
       src: `https://www.bbc.com${url.pathname}`,
-      ratio: newsPlayerRatio,
+      ...sizes.news,
     }
   }
 

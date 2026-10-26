@@ -3,8 +3,8 @@ import { transformContent } from '../index.js'
 import { carrierUrl, describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
-  dailymotionEmbedResolver,
   dailymotionHosts,
+  dailymotionIframeEmbedResolver,
   dailymotionRenderHint,
   dailymotionResolveEmbed,
   dailymotionScriptEmbedResolver,
@@ -536,8 +536,8 @@ describe('readDailymotionEmbedSrc', () => {
   })
 })
 
-describeForEachParser('dailymotionEmbedResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, dailymotionEmbedResolver)
+describeForEachParser('dailymotionIframeEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, dailymotionIframeEmbedResolver)
 
   it('should resolve a dailymotion iframe', async () => {
     const value = '<iframe src="https://www.dailymotion.com/embed/video/x7tgad0"></iframe>'
@@ -991,8 +991,8 @@ describeForEachParser('dailymotion through the pipeline', (parseHtml) => {
   })
 })
 
-describeForEachParser('dailymotionEmbedResolver carrier title', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, dailymotionEmbedResolver)
+describeForEachParser('dailymotionIframeEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, dailymotionIframeEmbedResolver)
 
   it('should drop the label the snippet writes in place of the name', async () => {
     const value = html`

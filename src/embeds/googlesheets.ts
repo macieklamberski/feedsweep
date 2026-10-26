@@ -29,8 +29,10 @@ const chartParams = [
   'oid', // The chart
 ]
 
-const sheetHeight = 500
-const chartHeight = 371
+const sizes = {
+  sheet: { height: 500 },
+  chart: { height: 371 },
+}
 
 // A frame can name the tab it opens on in the fragment, as `#gid={id}`.
 const readTabFragment = (url: URL): string => {
@@ -78,7 +80,11 @@ export const googlesheetsResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const fragment = readTabFragment(url)
   // A chart draws at its own pixel size and never scales, and its carrier declares that size.
   const declaredHeight = element ? getElementDimensions(element).height : undefined
-  const height = isChart ? (declaredHeight ?? chartHeight) : sheetHeight
+  let size = isChart ? sizes.chart : sizes.sheet
+
+  if (isChart && declaredHeight !== undefined) {
+    size = { height: declaredHeight }
+  }
 
   return {
     provider,
@@ -86,7 +92,7 @@ export const googlesheetsResolveEmbed: ResolveUrlEmbed = (url, element) => {
     src: `https://docs.google.com/spreadsheets/d/${sheetPath}/${frameRoute}${query}${fragment}`,
     url: `https://docs.google.com/spreadsheets/d/${sheetPath}/${isShared ? 'edit' : 'pubhtml'}`,
     thumbnail: isShared ? composeDriveThumbnail(sheetId) : undefined,
-    height,
+    ...size,
     title: attr(element, 'title'),
   }
 }

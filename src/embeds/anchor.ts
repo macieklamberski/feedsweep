@@ -10,10 +10,12 @@ const provider = 'anchor'
 // spotify.com hosts but rejects these paths, so they fall through to here.
 const anchorHosts = ['anchor.fm', 'podcasters.spotify.com', 'creators.spotify.com']
 
-// Spotify's snippet writes 102, but the card is 100 and the two extra pixels render as white.
-// `anchor.fm` and `podcasters.spotify.com` both redirect to the `creators.spotify.com` player.
-// From 768 wide up the card is 161 tall, and the page fills any taller frame with white.
-const playerHeight = 100
+const sizes = {
+  // Spotify's snippet writes 102, but the card is 100 and the two extra pixels render as white.
+  // `anchor.fm` and `podcasters.spotify.com` both redirect to the `creators.spotify.com` player.
+  // From 768 wide up the card is 161 tall, and the page fills any taller frame with white.
+  player: { height: 100 },
+}
 
 // `anchor.fm/{show}/embed/episodes/{slug}`,
 // `podcasters.spotify.com/pod/show/{show}/embed/episodes/{slug}`,
@@ -76,7 +78,7 @@ export const anchorResolveEmbed: ResolveUrlEmbed = (url, element) => {
       provider,
       id: episode,
       src: `https://creators.spotify.com/pod/profile/${show}/embed/episodes/${slug}`,
-      height: playerHeight,
+      ...sizes.player,
       title: attr(element, 'title'),
     }
   }
@@ -91,7 +93,7 @@ export const anchorResolveEmbed: ResolveUrlEmbed = (url, element) => {
     provider,
     id: show,
     src: `https://creators.spotify.com/pod/profile/${show}/embed`,
-    height: playerHeight,
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }

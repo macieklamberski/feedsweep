@@ -2,6 +2,8 @@ import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, jsonAttr, text } from '../utils/dom.js'
 
+const provider = 'substack'
+
 type CrossPostAttrs = {
   title?: string
   url?: string
@@ -36,7 +38,7 @@ export const substackCrossPostCiteResolver: CiteResolver = {
     }
 
     return buildCite({
-      provider: 'substack',
+      provider,
       url: attrs.url,
       title: attrs.title,
       description: attrs.truncated_body_text,
@@ -60,7 +62,7 @@ export const substackOwnPostCiteResolver: CiteResolver = {
 
     if (!attrs) {
       return buildCite({
-        provider: 'substack',
+        provider,
         // The card's own anchor comes first. The byline anchor below it points at the
         // author's Substack profile, on custom domains too.
         url: attr(find(element, 'a[href]'), 'href'),
@@ -71,7 +73,7 @@ export const substackOwnPostCiteResolver: CiteResolver = {
     }
 
     return buildCite({
-      provider: 'substack',
+      provider,
       url: attrs.canonical_url,
       title: attrs.title,
       // `caption` is the linked post's excerpt, the only preview text the blob carries.
@@ -93,7 +95,7 @@ export const substackPostEmbedCiteResolver: CiteResolver = {
     const paragraphs = element.querySelectorAll('p')
 
     return buildCite({
-      provider: 'substack',
+      provider,
       // A host check would drop custom-domain publications, which still serve the /p/{slug} path.
       url: attr(find(element, 'a[data-post-link]'), 'href'),
       // Splitting on " by " to lift the author corrupts every title containing the word.
@@ -124,7 +126,7 @@ export const substackPublicationCiteResolver: CiteResolver = {
     const attrs = jsonAttr<PublicationAttrs>(element, 'data-attrs')
 
     return buildCite({
-      provider: 'substack',
+      provider,
       // On Substack's own site the blob omits base_url and the anchor carries the url.
       url: attrs?.base_url ?? attr(find(element, 'a.embedded-publication-link-part'), 'href'),
       title: attrs?.name ?? text(element, '.embedded-publication-name'),

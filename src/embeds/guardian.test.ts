@@ -2,8 +2,8 @@ import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
-  guardianEmbedResolver,
   guardianFlashEmbedResolver,
+  guardianIframeEmbedResolver,
   guardianResolveEmbed,
 } from './guardian.js'
 
@@ -173,8 +173,8 @@ describe('guardianResolveEmbed', () => {
   })
 })
 
-describeForEachParser('guardianEmbedResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, guardianEmbedResolver)
+describeForEachParser('guardianIframeEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, guardianIframeEmbedResolver)
 
   it('should state the platform size over the box the pasted player iframe states', async () => {
     const value = html`

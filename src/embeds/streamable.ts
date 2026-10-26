@@ -15,7 +15,9 @@ const embedRoutes = ['e', 'o']
 // The player loops unless `loop=0` turns it off, and seeks to `t`, in seconds, once loaded.
 const streamableEmbedParams = ['loop', 't']
 
-const playerRatio = '16/9'
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 // The server matches ids only as written. The share route `/s/{id}/{token}`
 // plays the id whatever the token holds.
@@ -39,13 +41,7 @@ const readVideoId = (segments: Array<string>): string | undefined => {
 // the watch page, and an MLB clip by its slug on `/m/{slug}`, which oEmbed does not answer for.
 // No thumbnail: the unsigned image sits on an east or a west CDN host the carrier does not name.
 export const streamableResolveEmbed: ResolveUrlEmbed = (url, element) => {
-  const parsed = parseUrlOnHosts(url, streamableHosts, isHostOf)
-
-  if (!parsed) {
-    return
-  }
-
-  const segments = getPathSegments(parsed)
+  const segments = getPathSegments(url)
   const title = attr(element, 'title')
 
   if (isAnyOf(segments[0], 'm') && segments.length === 2) {
@@ -53,7 +49,7 @@ export const streamableResolveEmbed: ResolveUrlEmbed = (url, element) => {
       provider,
       id: `m/${segments[1]}`,
       src: `https://streamable.com/m/${segments[1]}`,
-      ratio: playerRatio,
+      ...sizes.player,
       title,
     }
   }
@@ -69,7 +65,7 @@ export const streamableResolveEmbed: ResolveUrlEmbed = (url, element) => {
     id,
     src: `https://streamable.com/e/${id}${pickUrlParams(url, streamableEmbedParams)}`,
     url: `https://streamable.com/${id}`,
-    ratio: playerRatio,
+    ...sizes.player,
     title,
   }
 }
@@ -77,6 +73,7 @@ export const streamableResolveEmbed: ResolveUrlEmbed = (url, element) => {
 export const streamableIframeEmbedResolver = createUrlEmbedResolver(
   streamableHosts,
   streamableResolveEmbed,
+  { isOnHost: isHostOf },
 )
 
 // The SB Nation MLB snippet: a div holding a "View Link" anchor to the clip's page on mlb.com, which

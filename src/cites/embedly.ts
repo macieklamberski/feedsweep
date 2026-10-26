@@ -2,6 +2,8 @@ import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 
+const provider = 'embedly'
+
 // Embedly's blockquote card: a title link and a description that only platform.js hydrates.
 // The thumbnail and publisher exist only in the hydrated iframe.
 export const embedlyCiteResolver: CiteResolver = {
@@ -11,7 +13,7 @@ export const embedlyCiteResolver: CiteResolver = {
   selector: 'blockquote.embedly-card',
   extract: (element) => {
     return buildCite({
-      provider: 'embedly',
+      provider,
       url: attr(find(element, 'a'), 'href'),
       title: text(element, 'h4'),
       description: text(element, 'p'),

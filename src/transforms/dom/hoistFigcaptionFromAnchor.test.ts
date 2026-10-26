@@ -79,14 +79,14 @@ describeForEachParser('hoistFigcaptionFromAnchor', (parseHtml) => {
   })
 
   it('should hoist captions from multiple figures', async () => {
-    const value = [
-      '<figure><a href="a.jpg"><img src="a-s.jpg"><figcaption>one</figcaption></a></figure>',
-      '<figure><a href="b.jpg"><img src="b-s.jpg"><figcaption>two</figcaption></a></figure>',
-    ].join('')
-    const expected = [
-      '<figure><a href="a.jpg"><img src="a-s.jpg"></a><figcaption>one</figcaption></figure>',
-      '<figure><a href="b.jpg"><img src="b-s.jpg"></a><figcaption>two</figcaption></figure>',
-    ].join('')
+    const value = html`
+      <figure><a href="a.jpg"><img src="a-s.jpg"><figcaption>one</figcaption></a></figure>
+      <figure><a href="b.jpg"><img src="b-s.jpg"><figcaption>two</figcaption></a></figure>
+    `
+    const expected = html`
+      <figure><a href="a.jpg"><img src="a-s.jpg"></a><figcaption>one</figcaption></figure>
+      <figure><a href="b.jpg"><img src="b-s.jpg"></a><figcaption>two</figcaption></figure>
+    `
 
     expect(await transform(value)).toEqualHtml(expected)
   })

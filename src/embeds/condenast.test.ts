@@ -118,12 +118,6 @@ describe('condenastResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should return undefined for a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/script/video/5be1fd3d8c1abc6e6400000f.js'
-
-      expect(condenastResolveEmbed(new URL(value))).toBeUndefined()
-    })
-
     it('should return undefined for the player route below another segment', () => {
       const value = 'https://player.cnevids.com/x/iframe/video/5ce439aa34e7941264b4701c'
 

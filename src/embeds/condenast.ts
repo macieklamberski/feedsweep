@@ -13,18 +13,13 @@ const condenastHosts = ['player.cnevids.com', 'player-backend.cnevids.com']
 const videoPathRegex = /^\/(?:script|iframe|embed(?:js)?\/[^/]+)\/video\/([^/]+?)(?:\.js)?\/?$/i
 const legacyPathRegex = /^\/embed(?:js)?\/([^/]+)\/[^/]+\/?$/i
 
+const sizes = { player: { ratio: '16/9' } }
+
 // Condé Nast's video player, shared by The New Yorker, Vanity Fair, Wired and the other brands.
 // The script embed its share dialog writes names no frame url. `/iframe/video/{id}` is the frame
 // url the loader's grammar parses, and it plays the same video.
 export const condenastResolveEmbed: ResolveUrlEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, condenastHosts)
-
-  if (!parsed) {
-    return
-  }
-
-  const id =
-    parsed.pathname.match(videoPathRegex)?.[1] ?? parsed.pathname.match(legacyPathRegex)?.[1]
+  const id = url.pathname.match(videoPathRegex)?.[1] ?? url.pathname.match(legacyPathRegex)?.[1]
 
   if (!id) {
     return
@@ -34,7 +29,7 @@ export const condenastResolveEmbed: ResolveUrlEmbed = (url) => {
     provider,
     id,
     src: `https://player.cnevids.com/iframe/video/${id}`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

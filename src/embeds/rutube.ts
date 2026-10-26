@@ -6,6 +6,11 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'rutube'
 
+const sizes = {
+  // The player fills its box, and Rutube's snippet and oEmbed size it 720 by 405.
+  player: { ratio: '16/9' },
+}
+
 const rutubeHosts = ['rutube.ru']
 
 // The player reads its id off the last path segment, so `/play/embed/private/{id}` plays `{id}`.
@@ -29,8 +34,7 @@ const composeEmbed = (videoId: string, parsed: URL): EmbedResolverResult => {
     url: getQueryParam(parsed.searchParams, 'p')
       ? undefined
       : `https://rutube.ru/video/${segment}/`,
-    // The player fills its box, and Rutube's snippet and oEmbed size it 720 by 405.
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

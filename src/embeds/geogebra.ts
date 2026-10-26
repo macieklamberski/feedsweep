@@ -1,6 +1,5 @@
 import { getPathSegments, isAnyOf, isHostOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'geogebra'
@@ -8,6 +7,12 @@ const provider = 'geogebra'
 // Listed exactly, not by subdomain: tube.geogebra.org no longer resolves and its numeric ids
 // do not map onto the current materials.
 const geogebraHosts = ['geogebra.org', 'www.geogebra.org']
+
+const sizes = {
+  // The iframe lays the applet out at 800 by 600 when the path names no width and height, and
+  // scales it into the frame at its own ratio.
+  material: { ratio: '4/3' },
+}
 
 type Material = {
   id: string
@@ -67,27 +72,21 @@ const readMaterial = (segments: Array<string>): Material | undefined => {
 // pairs, and the material page `/m/{id}` and the Classic app `/classic/{id}` framed instead.
 // The ids are case-sensitive.
 export const geogebraResolveEmbed: ResolveUrlEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, geogebraHosts, isHostOf)
-
-  if (!parsed) {
-    return
-  }
-
-  const material = readMaterial(getPathSegments(parsed))
+  const material = readMaterial(getPathSegments(url))
 
   if (!material) {
     return
   }
 
-  // The iframe lays the applet out at 800 by 600 when the path names no width and height, and
-  // scales it into the frame at its own ratio.
   return {
     provider,
     id: material.id,
     src: `https://www.geogebra.org/material/iframe/id/${material.id}${material.layout}`,
     url: `https://www.geogebra.org/m/${material.id}`,
-    ratio: '4/3',
+    ...sizes.material,
   }
 }
 
-export const geogebraEmbedResolver = createUrlEmbedResolver(geogebraHosts, geogebraResolveEmbed)
+export const geogebraEmbedResolver = createUrlEmbedResolver(geogebraHosts, geogebraResolveEmbed, {
+  isOnHost: isHostOf,
+})

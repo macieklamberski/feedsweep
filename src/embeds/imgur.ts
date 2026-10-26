@@ -16,8 +16,6 @@ import {
 
 const provider = 'imgur'
 
-const imgurHosts = ['imgur.com']
-
 // Exact hosts on purpose: `i.imgur.com` is the CDN and names no post, and a `video/mp4` enclosure
 // there carries no extension, so the host is all that keeps it a playable file.
 // `s.imgur.com` is the embed script, and `i.stack.imgur.com` is not Imgur's content at all.
@@ -77,9 +75,11 @@ const galleryListingSegments = ['hot', 'new', 'top', 'trending']
 // tells the two apart.
 const albumPrefix = 'a/'
 
-// Imgur's embed script frames a post 500 tall until the post posts its height, which an album
-// never does.
-const albumHeight = 500
+const sizes = {
+  // Imgur's embed script frames a post 500 tall until the post posts its height, which an album
+  // never does.
+  album: { height: 500 },
+}
 
 // `imgur.com/{id}.gifv` redirects to the video on i.imgur.com, and no file list names `gifv`.
 const gifvFileRegex = /\.gifv$/i
@@ -114,10 +114,7 @@ const composeEmbed = (post: ImgurPost, title?: string): EmbedResolverResult => {
     id: path,
     src: `https://imgur.com/${path}/embed`,
     url: `https://imgur.com/${path}`,
-  }
-
-  if (post.isAlbum) {
-    result.height = albumHeight
+    ...(post.isAlbum && sizes.album),
   }
 
   // A single image has a thumbnail at a derivable url, the id plus a size suffix. An album does
@@ -160,13 +157,7 @@ export const imgurBlockquoteEmbedResolver = createMarkupEmbedResolver(
 // The frame the embed script builds, kept by exports that stored the page after it rendered.
 // Its query (`pub`, `ref`, `context`, `analytics`, `w`) describes the embedding page.
 export const imgurResolveEmbed: ResolveUrlEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, imgurPageHosts, isHostOf)
-
-  if (!parsed) {
-    return
-  }
-
-  const [route, second, third] = getPathSegments(parsed)
+  const [route, second, third] = getPathSegments(url)
 
   // A tag sits between its route and the post, so a tagged url names the post one segment deeper
   // than an album route does.
@@ -192,7 +183,9 @@ export const imgurResolveEmbed: ResolveUrlEmbed = (url) => {
   return post ? composeEmbed(post) : undefined
 }
 
-export const imgurIframeEmbedResolver = createUrlEmbedResolver(imgurHosts, imgurResolveEmbed)
+export const imgurIframeEmbedResolver = createUrlEmbedResolver(imgurPageHosts, imgurResolveEmbed, {
+  isOnHost: isHostOf,
+})
 
 const gifvPathRegex = /^\/(?<id>[a-zA-Z0-9]+)\.gifv$/i
 

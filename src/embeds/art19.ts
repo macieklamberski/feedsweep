@@ -4,6 +4,8 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'art19'
 
+const sizes = { episode: { height: 200 }, show: { height: 505 } }
+
 const art19Hosts = ['art19.com']
 
 // The server matches the route words and a slug show in their case only, and a uuid show and the
@@ -27,7 +29,7 @@ export const art19ResolveEmbed: ResolveUrlEmbed = (url, element) => {
       id: `${show}/${episode}`,
       src: `https://art19.com/shows/${show}/episodes/${episode}/embed`,
       url: `https://art19.com/shows/${show}/episodes/${episode}`,
-      height: 200,
+      ...sizes.episode,
       title: attr(element, 'title'),
     }
   }
@@ -37,7 +39,7 @@ export const art19ResolveEmbed: ResolveUrlEmbed = (url, element) => {
     id: show,
     src: `https://art19.com/shows/${show}/embed`,
     url: `https://art19.com/shows/${show}`,
-    height: 505,
+    ...sizes.show,
     title: attr(element, 'title'),
   }
 }

@@ -26,12 +26,12 @@ const constructorIdRegex = /^constructor:(.+)/i
 // as written.
 const positionParams = ['ll', 'z', 'l']
 
-const mapHeight = 400
+const sizes = { player: { height: 400 } }
 
 // Composed from the id alone, with no key and no expiry. The static render answers 400 unless
 // both dimensions are stated, and 400 again above 650 by 450.
 const composeStatic = (um: string): string => {
-  const query = composeQuery({ um, width: '650', height: `${mapHeight}` })
+  const query = composeQuery({ um, width: '650', height: `${sizes.player.height}` })
 
   return `https://api-maps.yandex.ru/services/constructor/1.0/static/${query}`
 }
@@ -61,7 +61,7 @@ const resolveConstructorMap = (
     id: um,
     src: composeWidget(host, um, position),
     thumbnail: composeStatic(um),
-    height: mapHeight,
+    ...sizes.player,
   }
 }
 
@@ -84,7 +84,7 @@ const resolveCoordinateMap = (
   return {
     provider,
     src: `https://${host}${widgetPath}${position}`,
-    height: mapHeight,
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }
@@ -118,7 +118,7 @@ export const yandexMapsIframeEmbedResolver = createUrlEmbedResolver(
         id: `-/${code}`,
         src: `https://${url.hostname}${widgetPath}-/${code}`,
         url: `https://${url.hostname}/maps/-/${code}`,
-        height: mapHeight,
+        ...sizes.player,
       }
     }
 

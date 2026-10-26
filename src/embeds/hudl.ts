@@ -9,6 +9,8 @@ const provider = 'hudl'
 // vcloud.hudl.com is the separate broadcast product.
 const hudlHosts = ['www.hudl.com']
 
+const sizes = { player: { ratio: '16/9' } }
+
 // The server matches the route words in any case and the ids only as written.
 const videoPathRegex = /^\/(?:embed\/)?video\/((?:[^/]+\/[^/]+\/)?[^/]+)\/?$/i
 const athletePathRegex = /^\/embed\/athlete\/([^/]+)\/highlights\/([^/]+)\/?$/i
@@ -25,7 +27,7 @@ export const hudlResolveEmbed: ResolveUrlEmbed = (url) => {
       id: `video/${video}`,
       src: `https://www.hudl.com/embed/video/${video}`,
       url: `https://www.hudl.com/video/${video}`,
-      ratio: '16/9',
+      ...sizes.player,
     }
   }
 
@@ -38,7 +40,7 @@ export const hudlResolveEmbed: ResolveUrlEmbed = (url) => {
       provider,
       id: `athlete/${athleteId}/${reel}`,
       src: `https://www.hudl.com/embed/athlete/${athleteId}/highlights/${reel}`,
-      ratio: '16/9',
+      ...sizes.player,
     }
   }
 }

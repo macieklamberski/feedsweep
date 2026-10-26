@@ -2,6 +2,8 @@ import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 
+const provider = 'swell'
+
 // The theme's stock caption label. Authors can replace it. When they have not, it says
 // nothing about the linked site, so an external card showing it yields no publisher.
 const defaultCaptionLabel = 'あわせて読みたい' // The theme's stock caption label, "read this too"
@@ -18,7 +20,7 @@ export const swellCiteResolver: CiteResolver = {
     const isExternal = element.matches('.-external')
 
     return buildCite({
-      provider: 'swell',
+      provider,
       url: attr(link, 'href'),
       title: text(link),
       description: text(element, '.p-blogCard__excerpt'),

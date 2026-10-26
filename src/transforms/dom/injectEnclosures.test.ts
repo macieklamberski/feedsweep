@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { acastEmbedResolver } from '../../embeds/acast.js'
 import { archiveIframeEmbedResolver } from '../../embeds/archive.js'
-import { blubrryEmbedResolver } from '../../embeds/blubrry.js'
+import { blubrryIframeEmbedResolver } from '../../embeds/blubrry.js'
 import { soundcloudEmbedResolver } from '../../embeds/soundcloud.js'
 import { youtubeIframeEmbedResolver } from '../../embeds/youtube.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
@@ -987,7 +987,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
         ...withEnclosures([
           { url: 'https://player.blubrry.com/id/12345678/', type: 'text/html', width: 320 },
         ]),
-        widgetResolvers: [blubrryEmbedResolver],
+        widgetResolvers: [blubrryIframeEmbedResolver],
       }
       const expected = html`
         <div

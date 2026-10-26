@@ -4,6 +4,8 @@ import { buildCite } from '../utils/cites.js'
 import { attr } from '../utils/dom.js'
 import { absoluteUrlRegex, parseUrlOnHosts } from '../utils/urls.js'
 
+const provider = 'nytimes'
+
 const cardHost = 'nytimes.com'
 const cardPath = '/svc/oembed/html/'
 const articleBaseUrl = 'https://www.nytimes.com'
@@ -30,7 +32,7 @@ export const nytimesCiteResolver: CiteResolver = {
     }
 
     return buildCite({
-      provider: 'nytimes',
+      provider,
       // The card answers 404 for any url outside nytimes.com (checked 2026-09-07), so a host check
       // here would turn a card the reader can still open into an empty frame.
       url,

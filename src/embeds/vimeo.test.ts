@@ -5,7 +5,7 @@ import type { EmbedResolverResult } from '../types.js'
 import {
   extractVimeoId,
   readVimeoEmbedSrc,
-  vimeoEmbedResolver,
+  vimeoIframeEmbedResolver,
   vimeoMetasliderEmbedResolver,
   vimeoResolveEmbed,
 } from './vimeo.js'
@@ -629,8 +629,8 @@ describe('vimeoResolveEmbed', () => {
   })
 })
 
-describeForEachParser('vimeoEmbedResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, vimeoEmbedResolver)
+describeForEachParser('vimeoIframeEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, vimeoIframeEmbedResolver)
 
   it('should resolve a vimeo iframe', async () => {
     const value = '<iframe src="https://player.vimeo.com/video/76979871"></iframe>'
@@ -885,8 +885,8 @@ describeForEachParser('vimeoEmbedResolver', (parseHtml) => {
   })
 })
 
-describeForEachParser('vimeoEmbedResolver carrier title', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, vimeoEmbedResolver)
+describeForEachParser('vimeoIframeEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, vimeoIframeEmbedResolver)
 
   it('should drop the label a Joomla plugin writes in place of the name', async () => {
     const value = html`

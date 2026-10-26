@@ -13,7 +13,7 @@ const movieFileRegex = /^\/video\/([^/]+)\.swf$/i
 // The Flash player's `viewkey`, `presentation/{id}/{title}`.
 const viewkeyRegex = /^[^/]+\/[^/]+\/(.+)/
 
-const deckRatio = '300/271'
+const sizes = { player: { ratio: '300/271' } }
 
 // The server ignores a segment after the id.
 const readEmbedId = (parsed: URL): string | undefined => {
@@ -47,13 +47,7 @@ const readFlashId = (parsed: URL): string | undefined => {
 // No `url` and no `thumbnail`: the deck page is `/{user}/{slug}`, and the slide images sit on a
 // numbered cdn host, neither of which the id composes.
 const slideserveResolveEmbed: ResolveUrlEmbed = (url, element) => {
-  const parsed = parseUrlOnHosts(url, slideserveHosts, isHostOf)
-
-  if (!parsed) {
-    return
-  }
-
-  const id = readEmbedId(parsed) ?? readFlashId(parsed)
+  const id = readEmbedId(url) ?? readFlashId(url)
 
   if (!id) {
     return
@@ -63,7 +57,7 @@ const slideserveResolveEmbed: ResolveUrlEmbed = (url, element) => {
     provider,
     id,
     src: `https://www.slideserve.com/embed/${id}`,
-    ratio: deckRatio,
+    ...sizes.player,
     title: flashVar(element, 'viewkey')?.match(viewkeyRegex)?.[1],
   }
 }
@@ -72,4 +66,5 @@ const slideserveResolveEmbed: ResolveUrlEmbed = (url, element) => {
 export const slideserveEmbedResolver = createUrlEmbedResolver(
   slideserveHosts,
   slideserveResolveEmbed,
+  { isOnHost: isHostOf },
 )

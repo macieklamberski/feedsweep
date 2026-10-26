@@ -12,6 +12,8 @@ const videaHosts = ['videa.hu']
 // in their case only, and answers 404 with a trailing slash.
 const playerPaths = ['/player', '/flvplayer.swf']
 
+const sizes = { player: { ratio: '16/9' } }
+
 // A Videa video player, the iframe or the retired Flash player in an `<embed>` or `<object>`.
 // The player reads the start position from `start`. The server answers an id in any case.
 export const videaResolveEmbed: ResolveUrlEmbed = (url, element) => {
@@ -31,7 +33,7 @@ export const videaResolveEmbed: ResolveUrlEmbed = (url, element) => {
     provider,
     id,
     src: `https://videa.hu/player${query}`,
-    ratio: '16/9',
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }

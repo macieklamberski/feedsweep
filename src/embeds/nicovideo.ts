@@ -6,6 +6,8 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'nicovideo'
 
+const sizes = { player: { ratio: '16/9' } }
+
 // lv names a live broadcast, which the video player answers 500 for and the live host serves as a
 // programme card even after the broadcast ends.
 const liveIdRegex = /^lv\d+$/
@@ -56,7 +58,7 @@ export const nicovideoResolveEmbed: ResolveUrlEmbed = (url) => {
       id: videoId,
       src: `https://live.nicovideo.jp/embed/${videoId}`,
       url: `https://live.nicovideo.jp/watch/${videoId}`,
-      ratio: '16/9',
+      ...sizes.player,
     }
   }
 
@@ -66,7 +68,7 @@ export const nicovideoResolveEmbed: ResolveUrlEmbed = (url) => {
     id: videoId,
     src: `https://embed.nicovideo.jp/watch/${videoId}${pickUrlParams(url, nicovideoEmbedParams)}`,
     url: `https://www.nicovideo.jp/watch/${videoId}`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

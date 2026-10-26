@@ -34,6 +34,9 @@ const tweetHosts = [
   'twittpr.com',
 ]
 
+// `platform.twitter.com` and `platform.x.com`, which serve the player, are subdomains of these.
+const frameHosts = ['twitter.com', 'x.com']
+
 // nitter as a whole host label only: a substring match claims theordinaryknitter.net.
 // Nitter is self-hosted, so its instances cannot be listed, and xcancel.com is one more under a
 // name of its own.
@@ -294,11 +297,7 @@ export const twitterResolveEmbed: ResolveUrlEmbed = (url) => {
 
 // A Twitter player iframe, or a frame of the status page, which refuses framing.
 // note.com puts `x.com/{handle}/status/{id}` in every one of its Twitter figures.
-// `platform.twitter.com` and `platform.x.com` are subdomains of these two hosts.
-export const twitterIframeEmbedResolver = createUrlEmbedResolver(
-  ['twitter.com', 'x.com'],
-  twitterResolveEmbed,
-)
+export const twitterIframeEmbedResolver = createUrlEmbedResolver(frameHosts, twitterResolveEmbed)
 
 // A forum's s9e MediaEmbed helper frame, naming the status id in its url fragment.
 export const twitterS9eEmbedResolver = createS9eEmbedResolver('twitter', (id) => {

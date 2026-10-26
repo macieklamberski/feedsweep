@@ -35,8 +35,11 @@ const anonymousUser = 'anon'
 // redirects its page to the real owner, so a route word there says nothing about who wrote it.
 const ownerlessUsers = new Set([anonymousUser, 'api', 'pen', 'project'])
 
-// CodePen's snippet ships `data-height="300"` and calls every attribute but slug and user optional.
-const defaultPenHeight = 300
+const sizes = {
+  // CodePen's snippet ships `data-height="300"` and calls every attribute but slug and user
+  // optional.
+  pen: { height: 300 },
+}
 
 type CodepenTarget = {
   kind: 'pen' | 'embed'
@@ -160,7 +163,7 @@ const composeEmbed = (
     // a blank white one for a pen moved to that editor.
     ...(!target.isEditor &&
       !uuidRegex.test(target.slug) && { thumbnail: composeThumbnail(target) }),
-    height: defaultPenHeight,
+    ...sizes.pen,
     ...(target.user && { author: `@${target.user}` }),
     ...extra,
   }
@@ -261,10 +264,7 @@ export const codepenResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // CodePen's player iframe, written by hand or left behind by a CMS that ran ei.js on export.
-export const codepenIframeEmbedResolver = createUrlEmbedResolver(
-  ['codepen.io'],
-  codepenResolveEmbed,
-)
+export const codepenIframeEmbedResolver = createUrlEmbedResolver(codepenHosts, codepenResolveEmbed)
 
 export const codepenFieldCleaners: Array<FieldCleaner> = [
   { provider, field: 'title', drop: /^codepen (?:embed|by)\b.*$/ },

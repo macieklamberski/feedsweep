@@ -67,9 +67,11 @@ const composeEmbedResult = (identifier: string, query = '', file = ''): EmbedRes
   }
 }
 
-// The modern audio player is a controls bar 30 tall at every width, and it fills any width.
-const audioPlayerHeight = 30
-const videoPlayerRatio = '16/9'
+const sizes = {
+  // The modern audio player is a controls bar 30 tall at every width, and it fills any width.
+  audio: { height: 30 },
+  video: { ratio: '16/9' },
+}
 
 // `embed/{identifier}` serves every kind of item, so the declared box or type only picks the kind.
 // Every item declared under 200 tall is audio, and the bar it gets is 30 tall whatever the box.
@@ -109,10 +111,10 @@ export const archiveResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
   // Height alone: a width beside it reads as a ratio, and the box grows while the bar stays 30.
   if (element && declaresAudioPlayer(element)) {
-    return { ...result, height: audioPlayerHeight }
+    return { ...result, ...sizes.audio }
   }
 
-  return { ...result, ratio: videoPlayerRatio }
+  return { ...result, ...sizes.video }
 }
 
 // The Internet Archive's player iframe, which renders on its own but names no poster or page link.
@@ -154,7 +156,7 @@ export const archiveAudioEmbedResolver = createMarkupEmbedResolver('audio', (ele
     return
   }
 
-  return { ...embed, height: audioPlayerHeight }
+  return { ...embed, ...sizes.audio }
 })
 
 const flowPlayerPathRegex = /^\/(?:flow|flv)\//i
@@ -191,7 +193,7 @@ const readXspfPlayer = (player: URL): EmbedResolverResult | undefined => {
   }
 
   // A query identifier comes out decoded, and it goes into a path.
-  return { ...composeEmbedResult(encodePathSegment(identifier)), height: audioPlayerHeight }
+  return { ...composeEmbedResult(encodePathSegment(identifier)), ...sizes.audio }
 }
 
 // The `soundFile` flashvar names one file of an item that can hold hundreds, so the file is kept.
@@ -203,7 +205,7 @@ const readItemPlayer = (element: Element | undefined): EmbedResolverResult | und
     return
   }
 
-  return { ...composeEmbedResult(identifier, '', file), height: audioPlayerHeight }
+  return { ...composeEmbedResult(identifier, '', file), ...sizes.audio }
 }
 
 const archiveFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
@@ -230,10 +232,10 @@ const archiveFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const result = composeEmbedResult(encodePathSegment(identifier))
 
   if (namesAudioFile(config)) {
-    return { ...result, height: audioPlayerHeight }
+    return { ...result, ...sizes.audio }
   }
 
-  return { ...result, ratio: videoPlayerRatio }
+  return { ...result, ...sizes.video }
 }
 
 // The archive's retired Flash players: Flowplayer, which names its item only in the Flash config,

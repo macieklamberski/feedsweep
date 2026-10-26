@@ -20,10 +20,10 @@ describeForEachParser('cleanAnchorUrls', (parseHtml) => {
   })
 
   it('should clean every anchor in the document', async () => {
-    const value = [
-      '<a href="https://example.com/a?utm_source=feed">first</a>',
-      '<a href="https://example.com/b?utm_medium=email">second</a>',
-    ].join('')
+    const value = html`
+      <a href="https://example.com/a?utm_source=feed">first</a>
+      <a href="https://example.com/b?utm_medium=email">second</a>
+    `
     const context = { ...baseContext, cleanUrlFn: stripQueryFn }
     const expected = html`
       <a href="https://example.com/a">first</a>

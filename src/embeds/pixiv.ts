@@ -18,9 +18,10 @@ const framePathRegex = /^\/(code|embed_mk2|fixed|oembed_iframe)\.php$/i
 // The loader draws nothing for a `data-size` outside its own table.
 const loaderSizes = ['small', 'medium', 'large']
 
-// The frame fills any box. This is the box pixiv's oEmbed snippet gives every kind of work.
-const frameWidth = 600
-const frameHeight = 315
+const sizes = {
+  // The frame fills any box. This is the box pixiv's oEmbed snippet gives every kind of work.
+  frame: { width: 600, height: 315 },
+}
 
 const readIllustId = (workId: string): string => {
   return workId.match(illustIdRegex)?.[1] ?? workId
@@ -60,8 +61,7 @@ const pixivResolveEmbed: ResolveUrlEmbed = (url) => {
     id: illustId,
     src: composeFrameUrl(illustId),
     url: page,
-    width: frameWidth,
-    height: frameHeight,
+    ...sizes.frame,
   }
 }
 
@@ -112,8 +112,7 @@ export const pixivScriptEmbedResolver = createMarkupEmbedResolver(
       id: illustId,
       src: composeFrameUrl(illustId),
       url: illustIdRegex.test(workId) ? `https://www.pixiv.net/artworks/${illustId}` : undefined,
-      width: frameWidth,
-      height: frameHeight,
+      ...sizes.frame,
       title: text(work),
     }
 

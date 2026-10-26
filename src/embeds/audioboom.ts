@@ -30,9 +30,11 @@ const mp3ExtensionRegex = /\.mp3(?=\?|$)/i
 // `/posts/{id}/embed[/v4]` is current. `/boos/{id}/embed` is the pre-rename spelling.
 const postIdMarkers = ['posts', 'boos']
 
-// `/embed/v4`, the current player, fills whatever frame it gets, so this is the smallest box it
-// accepts.
-const playerHeight = 300
+const sizes = {
+  // `/embed/v4`, the current player, fills whatever frame it gets, so this is the smallest box it
+  // accepts.
+  player: { height: 300 },
+}
 
 export const extractAudioboomPost = (link: URL): string | undefined => {
   const segments = getPathSegments(link)
@@ -47,7 +49,7 @@ const composeEmbed = (postId: string): EmbedResolverResult => {
     provider,
     id: postId,
     src: `https://embeds.audioboom.com/posts/${postId}/embed/v4`,
-    height: playerHeight,
+    ...sizes.player,
   }
 }
 

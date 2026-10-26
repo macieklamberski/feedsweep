@@ -10,8 +10,10 @@ const opendriveHosts = ['www.opendrive.com']
 // `listen` is the older route, and it 302s to `player` with the same id.
 const playerRoutes = ['player', 'listen']
 
-// The audio player is a controls bar 25 tall at every width.
-const playerHeight = 25
+const sizes = {
+  // The audio player is a controls bar 25 tall at every width.
+  player: { height: 25 },
+}
 
 // An OpenDrive file player, framed as `/player/{fileId}`.
 export const opendriveResolveEmbed: ResolveUrlEmbed = (url) => {
@@ -26,7 +28,7 @@ export const opendriveResolveEmbed: ResolveUrlEmbed = (url) => {
     id: fileId,
     src: `https://www.opendrive.com/player/${fileId}`,
     url: `https://od.lk/f/${fileId}`,
-    height: playerHeight,
+    ...sizes.player,
   }
 }
 

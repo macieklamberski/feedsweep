@@ -91,12 +91,6 @@ describe('zencastrResolveEmbed', () => {
 
     expect(zencastrResolveEmbed(new URL(value))).toEqual(expected)
   })
-
-  it('should return undefined for a lookalike host', () => {
-    const value = 'https://zencastr.com.evil.test/embed/cK98nMcr'
-
-    expect(zencastrResolveEmbed(new URL(value))).toBeUndefined()
-  })
 })
 
 describeForEachParser('zencastrBlockquoteEmbedResolver', (parseHtml) => {
@@ -175,6 +169,12 @@ describeForEachParser('zencastrIframeEmbedResolver', (parseHtml) => {
 
   it('should ignore a foreign host carrying the same path', async () => {
     const value = '<iframe src="https://evil.test/embed/cK98nMcr"></iframe>'
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
+  it('should ignore a lookalike host', async () => {
+    const value = '<iframe src="https://zencastr.com.evil.test/embed/cK98nMcr"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
   })

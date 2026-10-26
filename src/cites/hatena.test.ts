@@ -233,11 +233,11 @@ describeForEachParser('hatenaCiteResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should ignore a foreign host naming the card renderer in its path', async () => {
+    it('should ignore a foreign host naming the card renderer in its query', async () => {
       const value = html`
         <p>
           <iframe
-            src="https://evil.test/hatenablog-parts.com/embed?url=https%3A%2F%2Fexample.com%2Fvideo"
+            src="https://evil.test/embed?hatenablog-parts.com/embed&url=https%3A%2F%2Fexample.com%2Fvideo"
             title="A video"
           ></iframe>
         </p>

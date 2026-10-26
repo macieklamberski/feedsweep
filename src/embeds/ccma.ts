@@ -18,8 +18,10 @@ const evpPlayerPathRegex = /^\/ria\/players\//i
 const svpPlayerPathRegex = /^\/svp2\/svp2\.swf$/i
 const svpObjectIdRegex = /^SVP(\d+)IE$/i
 
-// The video and the audio player both draw a 16:9 box at every width.
-const playerRatio = '16/9'
+const sizes = {
+  // The video and the audio player both draw a 16:9 box at every width.
+  player: { ratio: '16/9' },
+}
 
 // The article page answers `x-frame-options: SAMEORIGIN`, so the embed route is the only target
 // a reader can frame. The Super3 frame redirects onto its own skin on the `sx3` route.
@@ -38,7 +40,7 @@ const composeResult = (
       ? `https://www.3cat.cat/video/embed/sx3/${videoId}/`
       : `https://www.3cat.cat/3cat/video/${videoId}/embed/`,
     url: `https://www.ccma.cat/video/${videoId}/`,
-    ratio: playerRatio,
+    ...sizes.player,
   }
 }
 
@@ -48,7 +50,7 @@ const composeAudioResult = (audioId: string): EmbedResolverResult => {
     provider,
     id: `audio/${audioId}`,
     src: `https://www.3cat.cat/3cat/audio/${audioId}/embed/`,
-    ratio: playerRatio,
+    ...sizes.player,
   }
 }
 

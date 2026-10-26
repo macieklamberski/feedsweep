@@ -10,8 +10,10 @@ const dailymailHosts = ['dailymail.co.uk', 'dailymail.com']
 // The server matches the path in its own case only.
 const playerPathRegex = /^\/embed\/video\/([^/]+)\.html$/i
 
-// A 16:9 video between a header and title bar above and a control bar and headline below.
-const playerRatio = '16/9'
+const sizes = {
+  // A 16:9 video between a header and title bar above and a control bar and headline below.
+  player: { ratio: '16/9' },
+}
 const chromeHeight = 234
 
 // MailOnline's video player, `/embed/video/{id}.html`.
@@ -27,7 +29,7 @@ export const dailymailResolveEmbed: ResolveUrlEmbed = (url, element) => {
     id,
     src: `https://${url.hostname}/embed/video/${id}.html`,
     url: `https://${url.hostname}/video/video-${id}.html`,
-    ratio: playerRatio,
+    ...sizes.player,
     ratioHeightOffset: chromeHeight,
     title: attr(element, 'title'),
   }

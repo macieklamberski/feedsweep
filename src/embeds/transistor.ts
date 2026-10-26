@@ -10,7 +10,7 @@ const transistorHosts = ['transistor.fm']
 
 // The episode player is fixed at 180, and Transistor's own oEmbed agrees. A `/latest` player holds
 // one episode and `/playlist` the whole show.
-const playerHeights = { e: 180, latest: 180, playlist: 390 }
+const sizes = { e: { height: 180 }, latest: { height: 180 }, playlist: { height: 390 } }
 
 // What a placeholder's id names, which has to address the endpoint on its own for enrichment.
 const subjectNames = { e: 'episode', latest: 'latest', playlist: 'playlist' }
@@ -20,7 +20,7 @@ const subjectNames = { e: 'episode', latest: 'latest', playlist: 'playlist' }
 const showModes = ['latest', 'playlist'] as const
 
 // `mode` is the show mode segment as the feed wrote it, for a show player only.
-type Subject = { kind: keyof typeof playerHeights; id: string; mode?: string }
+type Subject = { kind: keyof typeof sizes; id: string; mode?: string }
 
 export const extractTransistorEmbed = (link: URL): Subject | undefined => {
   const segments = getPathSegments(link)
@@ -64,7 +64,7 @@ export const transistorResolveEmbed: ResolveUrlEmbed = (url) => {
     // A show mode has no page: the embed slug is not the show's subdomain, which 404s.
     // `/s/{id}` is the same episode's share page, which answers under `frame-ancestors 'self'`.
     ...(embed.kind === 'e' && { url: `https://share.transistor.fm/s/${embed.id}` }),
-    height: playerHeights[embed.kind],
+    ...sizes[embed.kind],
   }
 }
 

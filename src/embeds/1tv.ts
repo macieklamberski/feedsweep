@@ -3,6 +3,10 @@ import type { ResolveUrlEmbed } from '../types.js'
 import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = '1tv'
+
+const sizes = { player: { ratio: '16/9' } }
+
 const channelOneHosts = ['1tv.ru']
 
 // The legacy routes the server redirects to the player, each against the type it names.
@@ -36,10 +40,10 @@ export const channelOneResolveEmbed: ResolveUrlEmbed = (url) => {
   const query = pickUrlParams(url, ['t'])
 
   return {
-    provider: '1tv',
+    provider,
     id: key,
     src: `https://www.1tv.ru/embed/${key}${query}`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

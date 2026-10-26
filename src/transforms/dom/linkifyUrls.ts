@@ -1,6 +1,7 @@
 import { find as linkifyFind } from 'linkifyjs'
 import type { DomTransform } from '../../types.js'
 import { collectTextNodes, rawTextElements } from '../../utils/dom.js'
+import { createLink } from '../../utils/widgets.js'
 
 const urlProtocolRegex = /^https?:\/\//i
 const linkifyIgnoreTags = new Set(['a', 'pre', 'code', 'kbd', 'samp', 'var', 'noscript'])
@@ -47,12 +48,9 @@ export const linkifyUrls: DomTransform = (context) => {
 
         // cleanAnchorUrls ran before these anchors existed, so this is their only cleaning pass.
         const cleaned = cleanUrlFn?.(link.href) ?? link.href
-        const anchor = document.createElement('a')
-        anchor.setAttribute('href', cleaned)
         // The text is the URL as written. Show the cleaned one instead when cleaning
         // changed it, so a visible URL never points somewhere else.
-        anchor.textContent = cleaned === link.href ? link.value : cleaned
-        parts.push(anchor)
+        parts.push(createLink(document, cleaned, cleaned === link.href ? link.value : cleaned))
         lastIndex = link.end
       }
 

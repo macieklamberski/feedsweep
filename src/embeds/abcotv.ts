@@ -4,6 +4,8 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'abcotv'
 
+const sizes = { player: { ratio: '16/9' } }
+
 // The eight ABC owned stations, on one site platform and one video id space.
 const abcotvHosts = [
   '6abc.com', // Philadelphia
@@ -40,7 +42,7 @@ export const abcotvResolveEmbed: ResolveUrlEmbed = (url) => {
     id: pid,
     src: `https://${host}/video/embed${composeQuery({ pid })}`,
     url: `https://${host}/videoClip/${encodePathSegment(pid)}/`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

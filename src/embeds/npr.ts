@@ -9,7 +9,11 @@ import {
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'npr'
+
 const nprHosts = ['www.npr.org']
+
+const sizes = { story: { height: 290 }, video: { ratio: '16/9' } }
 
 const composeEmbed = (storyId: string, mediaId: string): EmbedResolverResult | undefined => {
   if (!storyId || !mediaId) {
@@ -17,10 +21,10 @@ const composeEmbed = (storyId: string, mediaId: string): EmbedResolverResult | u
   }
 
   return {
-    provider: 'npr',
+    provider,
     id: `${storyId}/${mediaId}`,
     src: `https://www.npr.org/player/embed/${storyId}/${mediaId}`,
-    height: 290,
+    ...sizes.story,
   }
 }
 
@@ -31,10 +35,10 @@ const composeVideoEmbed = (storyId: string, mediaId: string): EmbedResolverResul
   }
 
   return {
-    provider: 'npr',
+    provider,
     id: `video/${storyId}/${mediaId}`,
     src: `https://www.npr.org/embedded-video${composeQuery({ storyId, mediaId })}`,
-    ratio: '16/9',
+    ...sizes.video,
   }
 }
 

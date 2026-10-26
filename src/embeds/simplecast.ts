@@ -4,12 +4,14 @@ import { attr } from '../utils/dom.js'
 import { hexRegex, uuidRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'simplecast'
+
+// The one height every iframe states.
+const sizes = { player: { height: 200 } }
+
 // `embed.simplecast.com/{hex}` and `simplecast.com/e/{numeric}` are legacy spellings of the
 // episode, and `play.simplecast.com/{uuid}` is the share host.
 const simplecastHosts = ['simplecast.com']
-
-// The one height every iframe states.
-const playerHeight = 200
 
 export const extractSimplecastEpisode = (
   link: URL,
@@ -41,13 +43,13 @@ export const simplecastResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const legacySource = `${url.origin}${url.pathname}`
 
   return {
-    provider: 'simplecast',
+    provider,
     id: episode.id,
     // Minting a legacy id onto the player host names no episode: the redirect assigns a new uuid.
     // `player.simplecast.com/{anything}` answers 200 with the same app shell, since the id is
     // resolved by javascript. Only the legacy host validates, answering 404 for an unknown id.
     src: episode.isCurrent ? `https://player.simplecast.com/${episode.id}` : legacySource,
-    height: playerHeight,
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }

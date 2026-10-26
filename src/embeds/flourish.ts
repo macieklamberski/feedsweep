@@ -5,9 +5,9 @@ import type {
   FieldCleaner,
   ResolveUrlEmbed,
 } from '../types.js'
-import { attr } from '../utils/dom.js'
+import { attr, find } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
+import { isFileName } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'flourish'
@@ -53,7 +53,7 @@ export const flourishWidgetEmbedResolver = createMarkupEmbedResolver(
     // The src is read unparsed, and both halves go into a path.
     const result = composeEmbed(encodePathSegment(match[1]), encodePathSegment(match[2]))
     // The div usually wraps a static thumbnail img, bare or inside a <noscript>.
-    const thumbnail = attr(element.querySelector('img'), 'src')
+    const thumbnail = attr(find(element, 'img'), 'src')
 
     if (result && thumbnail) {
       return { ...result, thumbnail }
@@ -67,18 +67,12 @@ export const flourishWidgetEmbedResolver = createMarkupEmbedResolver(
 // the chart's share page, framed whole.
 // The WordPress oEmbed wrapper points at the same url with a `#?secret=` fragment appended.
 export const flourishResolveEmbed: ResolveUrlEmbed = (url, element) => {
-  const parsed = parseUrlOnHosts(url, flourishHosts, isHostOf)
-
-  if (!parsed) {
-    return
-  }
-
-  const segments = getPathSegments(parsed)
+  const segments = getPathSegments(url)
   const isPlayer = isAnyOf(segments[2], 'embed')
   // The share page frames the same player inside the site's header, footer and cookie banner.
   // `flo.uri.sh` serves no page at that path, and the host serves its own files beside it.
   const isSharePage =
-    segments.length === 2 && isHostOf(parsed, sharePageHost) && !isFileName(segments[1])
+    segments.length === 2 && isHostOf(url, sharePageHost) && !isFileName(segments[1])
 
   if (!isPlayer && !isSharePage) {
     return
@@ -86,12 +80,20 @@ export const flourishResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
   const embed = composeEmbed(segments[0], segments[1])
 
-  return embed && { ...embed, title: attr(element, 'title') }
+  if (!embed) {
+    return
+  }
+
+  return {
+    ...embed,
+    title: attr(element, 'title'),
+  }
 }
 
 export const flourishIframeEmbedResolver = createUrlEmbedResolver(
   flourishHosts,
   flourishResolveEmbed,
+  { isOnHost: isHostOf },
 )
 
 // The chart posts its rendered height unasked, as a JSON string and not an object. The value

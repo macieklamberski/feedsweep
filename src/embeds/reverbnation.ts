@@ -5,6 +5,8 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'reverbnation'
 
+const sizes = { widget: { height: 265 } }
+
 const reverbnationHosts = ['reverbnation.com']
 
 // Every widget names what it plays as a kind and a number: `artist_1018382`, `Playlist_957851`,
@@ -71,7 +73,7 @@ export const reverbnationResolveEmbed: ResolveUrlEmbed = (url) => {
     provider,
     id,
     src: composeSource(id, widget ? filterUrlQuery(url, isWidgetParam) : ''),
-    height: 265,
+    ...sizes.widget,
   }
 }
 

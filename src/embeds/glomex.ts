@@ -3,6 +3,13 @@ import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'glomex'
+
+const sizes = {
+  // The player fills whatever box it is given, and the integration config defaults to 16:9.
+  player: { ratio: '16/9' },
+}
+
 const glomexHosts = ['player.glomex.com']
 const playerPathRegex = /^\/integration\/[^/]+\/(?:integration|iframe-player)\.html$/i
 
@@ -12,11 +19,10 @@ const composeEmbed = (integrationId: string, playlistId?: string): EmbedResolver
   const query = composeQuery(trimObject({ integrationId, playlistId }))
 
   return {
-    provider: 'glomex',
+    provider,
     id: playlistId ? `${integrationId}/${playlistId}` : integrationId,
     src: `https://player.glomex.com/integration/1/integration.html${query}`,
-    // The player fills whatever box it is given, and the integration config defaults to 16:9.
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

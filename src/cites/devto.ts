@@ -2,6 +2,8 @@ import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, keepIfMatches, text, textNode } from '../utils/dom.js'
 
+const provider = 'devto'
+
 // Forem renders the card date without a year when the post's year matched the embedding
 // article's save year ("Jul 25"), and the save year itself is unrecoverable later, so only
 // dates spelling a year ("Aug 21, 2025", "Nov 6 '22") are worth passing through.
@@ -17,7 +19,7 @@ export const devtoLinkCiteResolver: CiteResolver = {
     const favicon = find(element, 'img.c-embed__favicon')
 
     return buildCite({
-      provider: 'devto',
+      provider,
       url: attr(find(body, 'h2 a'), 'href') ?? attr(find(element, '.c-embed__cover a'), 'href'),
       title: text(body, 'h2'),
       description: text(body, 'p'),
@@ -38,7 +40,7 @@ export const devtoPostCiteResolver: CiteResolver = {
     const heading = find(element, '.crayons-story__title')
 
     return buildCite({
-      provider: 'devto',
+      provider,
       url:
         attr(find(element, 'a.crayons-story__hidden-navigation-link'), 'href') ??
         attr(find(heading, 'a'), 'href'),
@@ -71,7 +73,7 @@ export const devtoLegacyPostCiteResolver: CiteResolver = {
     const [author, date] = text(content, 'h3')?.split(authorSeparator) ?? []
 
     return buildCite({
-      provider: 'devto',
+      provider,
       url: attr(content?.closest('a'), 'href'),
       title: text(content, 'h2'),
       author,

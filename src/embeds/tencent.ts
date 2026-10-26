@@ -17,9 +17,11 @@ const tencentHosts = ['v.qq.com', 'static.video.qq.com', 'imgcache.qq.com']
 const playerPathRegex = /^\/(?:txp\/iframe\/player|iframe\/player|iframe\/preview)\.html$/i
 const flashPathRegex = /\/TPout\.swf$/i
 
-// The 640x498 and 500x375 boxes the older carriers state held the retired player's chrome.
-// The player is chromeless and fills its box, and Tencent's own snippet states no size at all.
-const playerRatio = '16/9'
+const sizes = {
+  // The 640x498 and 500x375 boxes the older carriers state held the retired player's chrome.
+  // The player is chromeless and fills its box, and Tencent's own snippet states no size at all.
+  player: { ratio: '16/9' },
+}
 
 const readVideoId = (url: URL): string | undefined => {
   const pathRegex = url.hostname === 'v.qq.com' ? playerPathRegex : flashPathRegex
@@ -58,7 +60,7 @@ const tencentResolveEmbed: ResolveUrlEmbed = (url) => {
     // png placeholder. `vv.video.qq.com/getinfo?vids={vid}&otype=json` answers key-free with the
     // title, the duration and the frame size.
     thumbnail: `https://puui.qpic.cn/qqvideo_ori/0/${segment}_496_280/0`,
-    ratio: playerRatio,
+    ...sizes.player,
   }
 }
 

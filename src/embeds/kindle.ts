@@ -8,6 +8,10 @@ import {
   readRepairedCarrierUrl,
 } from '../utils/widgets.js'
 
+const provider = 'kindle'
+
+const sizes = { card: { height: 550 } }
+
 // Each store serves the card on its own reader host, `{verb}.amazon.{store tld}`, such as
 // `read.amazon.co.uk`, `lesen.amazon.de` or `ler.amazon.com.br`.
 const readerHostRegex = /^[^.]+\.amazon\.(?:com|[a-z]{2}|com\.[a-z]{2}|co\.[a-z]{2})$/
@@ -32,12 +36,12 @@ export const kindleResolveEmbed: ResolveEmbed = (url, element) => {
   // The reader host picks the storefront: `read.amazon.com` answers "This book isn't available" for
   // a book sold only on another store, and each host's oEmbed answers for its own store only.
   return {
-    provider: 'kindle',
+    provider,
     id: `${parsed.hostname}/${asin}`,
     src: `https://${parsed.hostname}/kp/card${composeQuery({ asin })}`,
     // The ASIN comes out of the query decoded, and it goes into a path.
     thumbnail: `https://m.media-amazon.com/images/P/${encodePathSegment(asin)}.01._SCLZZZZZZZ_.jpg`,
-    height: 550,
+    ...sizes.card,
     // The oEmbed writes the book's name here, never a player label.
     title: attr(element, 'title'),
   }

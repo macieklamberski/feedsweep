@@ -12,8 +12,10 @@ const piktochartHosts = [
 // The uid is `{id}-{slug}`, and both halves select the item: a wrong slug answers 404.
 const embedPathRegex = /^\/embed\/([^/]+)\/?$/i
 
-// An infographic scales to the frame's width, so its height is the item's own length.
-const embedRatio = '1/2'
+const sizes = {
+  // An infographic scales to the frame's width, so its height is the item's own length.
+  player: { ratio: '1/2' },
+}
 
 export const composePiktochartEmbedUrl = (uid: string): string => {
   return `https://create.piktochart.com/embed/${uid}`
@@ -25,7 +27,7 @@ const composePiktochartEmbed = (uid: string, title: string | undefined): EmbedRe
     id: uid,
     src: composePiktochartEmbedUrl(uid),
     url: `https://create.piktochart.com/output/${uid}`,
-    ratio: embedRatio,
+    ...sizes.player,
     title,
   }
 }
@@ -40,6 +42,7 @@ const piktochartResolveEmbed: ResolveUrlEmbed = (url, element) => {
   return composePiktochartEmbed(uid, attr(element, 'title'))
 }
 
+// Piktochart's infographic iframe, `/embed/{uid}` on the current host or the retired one.
 export const piktochartIframeEmbedResolver = createUrlEmbedResolver(
   piktochartHosts,
   piktochartResolveEmbed,

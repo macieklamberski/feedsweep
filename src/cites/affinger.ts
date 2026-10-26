@@ -2,6 +2,8 @@ import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 
+const provider = 'affinger'
+
 // AFFINGER's card block: an anchor wrapping a card of divs the theme's stylesheet lays out.
 export const affingerCiteResolver: CiteResolver = {
   kind: 'cite',
@@ -10,7 +12,7 @@ export const affingerCiteResolver: CiteResolver = {
   selector: 'a:has(.st-cardbox), .st-cardbox:not(a .st-cardbox)',
   extract: (element) => {
     return buildCite({
-      provider: 'affinger',
+      provider,
       // Old-shortcode cards are unwrapped and carry none of the modern classes: the url sits on
       // the title anchor, the thumbnail under a class-less dt and the excerpt in a .smanone or
       // .smanone2 div.

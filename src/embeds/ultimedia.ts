@@ -5,6 +5,8 @@ import { createMarkupEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ultimedia'
 
+const sizes = { player: { ratio: '16/9' } }
+
 // The account key and the video id each sit directly after their own route word, on the generic
 // player route: another route word with the same segments answers a not-found page.
 const playerPathRegex = /^\/deliver\/generic\/iframe\/mdtk\/([^/]+)\/src\/([^/]+)(?:\/|$)/i
@@ -31,7 +33,7 @@ export const ultimediaEmbedResolver = createMarkupEmbedResolver(
       id: `${accountKey}/${videoId}`,
       // A path without `zone` loads zone 1, the placement the platform's oEmbed answer writes.
       src: `https://www.ultimedia.com/deliver/generic/iframe/mdtk/${accountKey}/src/${videoId}/`,
-      ratio: '16/9',
+      ...sizes.player,
     }
   },
 )

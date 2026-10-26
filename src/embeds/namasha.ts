@@ -5,6 +5,8 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'namasha'
 
+const sizes = { video: { ratio: '16/9' } }
+
 const namashaHosts = ['namasha.com']
 
 // The server answers the route word and the id in any case.
@@ -23,7 +25,7 @@ export const namashaResolveEmbed: ResolveUrlEmbed = (url, element) => {
     id,
     src: `https://www.namasha.com/embed/${id}${pickUrlParams(url, ['t'])}`,
     url: `https://www.namasha.com/v/${id}`,
-    ratio: '16/9',
+    ...sizes.video,
     title: attr(element, 'title'),
   }
 }

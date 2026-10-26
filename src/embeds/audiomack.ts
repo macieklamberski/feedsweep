@@ -4,6 +4,8 @@ import { attr } from '../utils/dom.js'
 import { pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'audiomack'
+
 const audiomackHost = 'audiomack.com'
 
 // A fixed height on a fluid width, which the kind sets. The embed opens behind a consent wall.
@@ -63,7 +65,7 @@ export const audiomackResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const params = pickQueryParams(search, audiomackEmbedParams)
 
   return {
-    provider: 'audiomack',
+    provider,
     // The whole path: the same artist and slug answer under song and under playlist alike.
     id: path,
     src: `https://audiomack.com/embed/${path}${composeQuery(params)}`,

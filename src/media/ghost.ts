@@ -1,5 +1,5 @@
 import type { MediaResolver, MediaResolverResult } from '../types.js'
-import { attr, getElementDimensions, text } from '../utils/dom.js'
+import { attr, find, getElementDimensions, text } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
 
 // Ghost's video and audio cards ship their media element without controls, so it never plays.
@@ -42,7 +42,7 @@ export const ghostMediaResolver: MediaResolver = {
       return result
     }
 
-    const source = attr(element.querySelector('audio[src]'), 'src')
+    const source = attr(find(element, 'audio[src]'), 'src')
 
     if (!source) {
       return

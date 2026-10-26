@@ -6,6 +6,8 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'documentcloud'
 
+const sizes = { document: { ratio: '17/22' } }
+
 const legacyHosts = ['www.documentcloud.org']
 
 const documentcloudHosts = ['embed.documentcloud.org', ...legacyHosts]
@@ -93,7 +95,7 @@ export const documentcloudEmbedResolver = createUrlEmbedResolver(documentcloudHo
     id,
     src: composeViewerUrl(id, slug),
     thumbnail: `https://s3.documentcloud.org/documents/${id}/pages/${slug}-p1-normal.gif`,
-    ratio: '17/22',
+    ...sizes.document,
   }
 })
 

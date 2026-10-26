@@ -3,6 +3,8 @@ import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
 
+const provider = 'tistory'
+
 // Tistory renders a pasted link as a card of the page's Open Graph tags frozen in at publish time.
 export const tistoryCiteResolver: CiteResolver = {
   kind: 'cite',
@@ -11,7 +13,7 @@ export const tistoryCiteResolver: CiteResolver = {
   selector: '[data-og-source-url]',
   extract: (element) => {
     return buildCite({
-      provider: 'tistory',
+      provider,
       // data-og-url is the canonical target, not the link the author added.
       // data-og-source-url is the link the author added and what the card's own anchor points at.
       url:

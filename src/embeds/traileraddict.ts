@@ -4,6 +4,10 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'traileraddict'
 
+const sizes = {
+  player: { ratio: '16/9' },
+}
+
 const traileraddictHosts = ['traileraddict.com']
 
 // The Flash player's two routes, which now 301 to the trailer's watch page.
@@ -20,7 +24,7 @@ const composeEmbed = (id: string): EmbedResolverResult => {
     id,
     src: `https://traileraddict.com/iframe.php${composeQuery({ id })}`,
     url: `https://traileraddict.com/watch/${encodePathSegment(id)}`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

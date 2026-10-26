@@ -13,11 +13,14 @@ import type {
   FieldCleaner,
   ResolveUrlEmbed,
 } from '../types.js'
-import { attr } from '../utils/dom.js'
+import { attr, find } from '../utils/dom.js'
 import { parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'youtube'
+
+// A Short gets the same landscape player as a film, so a carrier's portrait box never fills.
+const sizes = { player: { ratio: '16/9' } }
 
 const safeVideoIdRegex = /^[a-zA-Z0-9_-]{11}$/
 
@@ -187,9 +190,6 @@ export const readYoutubeEmbedSrc = (link: string): string | undefined => {
   return composeEmbedUrl(videoId, readEmbedParams(url))
 }
 
-// A Short gets the same landscape player as a film, so a carrier's portrait box never fills.
-const playerRatio = '16/9'
-
 // `PBS` is a legal playlist id, channel id and legacy username at once, so each key names its
 // route. A playlist resolves title and poster through YouTube's keyless oEmbed, a channel through
 // the Data API.
@@ -199,7 +199,7 @@ const composeListEmbed = (list: string): EmbedResolverResult => {
     id: `playlist/${list}`,
     src: composeEmbedUrl('videoseries', { list }),
     url: `https://www.youtube.com/playlist${composeQuery({ list })}`,
-    ratio: playerRatio,
+    ...sizes.player,
   }
 }
 
@@ -211,7 +211,7 @@ const composeUploadsEmbed = (user: string): EmbedResolverResult => {
     src: `https://www.youtube.com/embed${composeQuery({ listType: 'user_uploads', list: user })}`,
     // The username comes out of the query decoded, and it goes into a path.
     url: `https://www.youtube.com/user/${encodePathSegment(user)}`,
-    ratio: playerRatio,
+    ...sizes.player,
   }
 }
 
@@ -228,7 +228,7 @@ const composeVideoEmbed = (
     src: composeEmbedUrl(segment, params),
     url: `https://www.youtube.com/watch${composeQuery({ v: videoId })}`,
     thumbnail: composeThumbnailUrl(segment),
-    ratio: playerRatio,
+    ...sizes.player,
   }
 }
 
@@ -241,7 +241,7 @@ const composeChannelEmbed = (channel: string): EmbedResolverResult => {
     id: `channel/${channel}`,
     src: composeEmbedUrl('live_stream', { channel }),
     url: `https://www.youtube.com/channel/${segment}`,
-    ratio: playerRatio,
+    ...sizes.player,
   }
 }
 
@@ -320,7 +320,14 @@ const resolveTarget = (url: URL): EmbedResolverResult | undefined => {
 export const youtubeResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const target = resolveTarget(url)
 
-  return target && { ...target, title: attr(element, 'title') }
+  if (!target) {
+    return
+  }
+
+  return {
+    ...target,
+    title: attr(element, 'title'),
+  }
 }
 
 // FC2's blog player shell on static.fc2.com, a page that builds only the YouTube player its query
@@ -403,7 +410,7 @@ export const youtubeMetasliderEmbedResolver = createMarkupEmbedResolver(
     return {
       ...composeVideoEmbed(videoId, start ? { start } : undefined),
       // A lazy slide's poster carries the video's title as its `alt`.
-      title: attr(element.querySelector('img.msDefaultImage'), 'alt'),
+      title: attr(find(element, 'img.msDefaultImage'), 'alt'),
     }
   },
 )

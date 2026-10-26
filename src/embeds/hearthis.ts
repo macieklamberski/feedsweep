@@ -6,10 +6,12 @@ const provider = 'hearthis'
 
 const hearthisHosts = ['hearthis.at']
 
-// The track bar is a fixed height at any width. The set player fills its frame, and the embed
-// dialog writes it 350 tall.
-const trackHeight = 150
-const setHeight = 350
+const sizes = {
+  // The track bar is a fixed height at any width.
+  track: { height: 150 },
+  // The set player fills its frame, and the embed dialog writes it 350 tall.
+  set: { height: 350 },
+}
 
 export const hearthisResolveEmbed: ResolveUrlEmbed = (url) => {
   const [route, id, third, ...rest] = getPathSegments(url)
@@ -20,7 +22,7 @@ export const hearthisResolveEmbed: ResolveUrlEmbed = (url) => {
       provider,
       id: `track/${id}`,
       src: `https://app.hearthis.at/embed/${id}/`,
-      height: trackHeight,
+      ...sizes.track,
     }
   }
 
@@ -35,7 +37,7 @@ export const hearthisResolveEmbed: ResolveUrlEmbed = (url) => {
     provider,
     id: `set/${setId}`,
     src: `https://app.hearthis.at/set/${setId}/embed/`,
-    height: setHeight,
+    ...sizes.set,
   }
 }
 

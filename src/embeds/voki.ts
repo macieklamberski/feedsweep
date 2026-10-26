@@ -12,7 +12,7 @@ const pickupPathRegex = /^\/site\/pickup\/?$/i
 
 // The pickup page sizes the player to its window less 280 pixels of site chrome, so this frame
 // gives the scene the 267-pixel height of Voki's own default embed at any width.
-const pickupHeight = 547
+const sizes = { player: { height: 547 } }
 
 // Voki's share page, the one frameable player, which builds the HTML5 player for the scene.
 export const composePlayerUrl = (sc: string, chsm: string): string => {
@@ -27,7 +27,7 @@ const composeEmbed = (sc: string, chsm: string): EmbedResolverResult => {
     id: `${sc}/${chsm}`,
     src,
     url: src,
-    height: pickupHeight,
+    ...sizes.player,
   }
 }
 

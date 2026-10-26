@@ -642,17 +642,6 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     expect(await transform(value, customContext)).toEqualHtml(expected)
   })
 
-  it('should be idempotent', async () => {
-    const value = html`
-      <p>Text</p>
-      <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>
-    `
-    const once = await transform(value)
-    const twice = await transform(once)
-
-    expect(twice).toEqualHtml(once)
-  })
-
   describe('non-iframe carriers', () => {
     it('should replace an <object data> carrier with a placeholder', async () => {
       const value = '<object data="https://example.com/v/x"></object>'
@@ -1242,6 +1231,17 @@ describeForEachParser('convertWidgets', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
+  })
+
+  it('should be idempotent', async () => {
+    const value = html`
+      <p>Text</p>
+      <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>
+    `
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
   })
 })
 

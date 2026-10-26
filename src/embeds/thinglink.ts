@@ -3,7 +3,13 @@ import type { ResolveUrlEmbed } from '../types.js'
 import { digitsRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'thinglink'
+
 const thinglinkHost = 'thinglink.com'
+
+const sizes = {
+  scene: { ratio: '3/2' },
+}
 
 // The four viewer routes share one snowflake id space, so an id taken off any of them addresses
 // the same scene under `card`, the viewer ThingLink's oEmbed writes for every kind.
@@ -39,13 +45,13 @@ export const thinglinkResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 
   return {
-    provider: 'thinglink',
+    provider,
     id,
     src: `https://www.thinglink.com/card/${id}`,
     // ThingLink's oEmbed answers the `scene` page and refuses the `card` viewer.
     url: `https://www.thinglink.com/scene/${id}`,
     thumbnail: composePosterUrl(id),
-    ratio: '3/2',
+    ...sizes.scene,
   }
 }
 

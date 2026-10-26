@@ -8,7 +8,7 @@ const provider = 'ausha'
 const aushaHost = 'ausha.co'
 
 // The v3 player is a fixed height on a fluid width.
-const playerHeight = 220
+const sizes = { player: { height: 220 } }
 
 // The v2 widget takes the same ids as the v3 player, so both are minted as the v3 player.
 const playerHosts = ['player.ausha.co', 'widget.ausha.co']
@@ -49,7 +49,7 @@ export const aushaResolveEmbed: ResolveUrlEmbed = (url) => {
     // matching route for a show, so the kind says which of the two an enricher is holding.
     id: `${kind}/${id}`,
     src: `https://player.ausha.co/${query}`,
-    height: playerHeight,
+    ...sizes.player,
   }
 }
 

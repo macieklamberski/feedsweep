@@ -1,6 +1,6 @@
 import { encodePathSegment, getPathSegments, isAnyOf, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
-import { attr, findConfigScript } from '../utils/dom.js'
+import { attr, find, findConfigScript } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -10,6 +10,8 @@ const fileExtensionRegex = /\.[a-z]+$/i
 
 export const jwplayerHosts = ['jwplayer.com', 'jwplatform.com']
 const libraryHosts = ['jwplatform.com', 'jwpsrv.com']
+
+const sizes = { player: { ratio: '16/9' } }
 
 // `players` is the embed and `previews` its share page, and both serve the same player for the
 // same id, 404 for a fabricated one. `cdn.jwplayer.com/videos/{id}-1280.mp4` is an enclosure.
@@ -38,7 +40,7 @@ const composeJwplayerEmbed = (id: string, isPlaylist = false): EmbedResolverResu
     src: `https://cdn.jwplayer.com/players/${id}.html`,
     // A playlist id 404s on the poster endpoint, so the thumbnail is gated on the kind.
     ...(!isPlaylist && { thumbnail: `https://cdn.jwplayer.com/v2/media/${id}/poster.jpg` }),
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 
@@ -153,7 +155,7 @@ const findScript = (element: Element | undefined): Element | undefined => {
     return element
   }
 
-  return element?.querySelector('script') ?? undefined
+  return find(element, 'script')
 }
 
 // The jwppp plugin wraps its snippet in a schema.org VideoObject box. Its `data-video` often says
@@ -164,7 +166,7 @@ const readJwpppBox = (element: Element, mediaId: string): Partial<EmbedResolverR
   const box = parent?.localName === 'p' ? parent.parentElement : parent
 
   const readMeta = (name: string): string | undefined => {
-    return attr(box?.querySelector(`meta[itemprop="${name}"]`), 'content')
+    return attr(find(box, `meta[itemprop="${name}"]`), 'content')
   }
 
   if (!readMeta('contentUrl')?.endsWith(`/${mediaId}`)) {
@@ -180,7 +182,7 @@ const readJwpppBox = (element: Element, mediaId: string): Partial<EmbedResolverR
 export const jwplayerLibraryEmbedResolver = createMarkupEmbedResolver(
   'script[src*="jwplatform.com/libraries/" i], script[src*="jwpsrv.com/library/" i]',
   (element) => {
-    if (!parseUrlOnHosts(attr(element, 'src') ?? '', libraryHosts)) {
+    if (!parseUrlOnHosts(attr(element, 'src'), libraryHosts)) {
       return
     }
 

@@ -18,11 +18,15 @@ import type {
   ResolveUrlEmbed,
 } from '../types.js'
 import { attr, find } from '../utils/dom.js'
+import { parseUrlOnHosts, pickQueryParams, twoLettersRegex } from '../utils/urls.js'
+import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'dailymotion'
 
-import { parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+const sizes = {
+  video: { ratio: '16/9' },
+  playlist: { ratio: '16/9' },
+}
 
 // Listed one by one: `dailymotion.de` is third-party, and a tld pattern would trust it.
 // Each apex redirects to a language landing page, dropping the video.
@@ -37,11 +41,6 @@ export const dailymotionHosts = [
 
 // The Flash player shipped `/swf/{id}` and `/swf/video/{id}`, which stacks two route words.
 const pathWords = ['embed', 'video', 'swf']
-
-// `/embed/{locale}/video/{id}` serves the player and redirects to
-// `geo.dailymotion.com/player.html?video={id}`. Two letters tell a locale from an account handle,
-// since account pages also open the path.
-const localeRegex = /^[a-z]{2}$/i
 
 // Kinds Dailymotion's embed route serves besides a video: each reaches the player with an empty
 // `video=` or redirects to a page, so the segment names a listing or a landing page.
@@ -66,10 +65,13 @@ const isRouteWord = (segment: string): boolean => {
 const skipRouteWords = (segments: Array<string>): number => {
   let index = 0
 
+  // `/embed/{locale}/video/{id}` serves the player and redirects to
+  // `geo.dailymotion.com/player.html?video={id}`. Two letters tell a locale from an account
+  // handle, since account pages also open the path.
   while (
     index < segments.length &&
     (isAnyOf(segments[index], pathWords) ||
-      (localeRegex.test(segments[index]) && isRouteWord(segments[index + 1])))
+      (twoLettersRegex.test(segments[index]) && isRouteWord(segments[index + 1])))
   ) {
     index++
   }
@@ -212,7 +214,7 @@ export const dailymotionResolveEmbed: ResolveUrlEmbed = (url, element) => {
       src: composeEmbedUrl('video', videoId, readPlayerParams(url)),
       url: `https://www.dailymotion.com/video/${segment}`,
       thumbnail: `https://www.dailymotion.com/thumbnail/video/${segment}`,
-      ratio: '16/9',
+      ...sizes.video,
       title: attr(element, 'title'),
     }
   }
@@ -229,14 +231,14 @@ export const dailymotionResolveEmbed: ResolveUrlEmbed = (url, element) => {
       src: composeEmbedUrl('playlist', playlistId),
       // The `playlist` parameter comes out of the query decoded, and it goes into a path.
       url: `https://www.dailymotion.com/playlist/${encodePathSegment(playlistId)}`,
-      ratio: '16/9',
+      ...sizes.playlist,
       title: attr(element, 'title'),
     }
   }
 }
 
 // Dailymotion's player iframe for a video or a playlist, on its country hosts and dai.ly too.
-export const dailymotionEmbedResolver = createUrlEmbedResolver(
+export const dailymotionIframeEmbedResolver = createUrlEmbedResolver(
   dailymotionHosts,
   dailymotionResolveEmbed,
 )

@@ -3,10 +3,16 @@ import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-const widgets = ['card.html', 'video.html']
+const provider = 'kickstarter'
 
-// The card lays out its image, blurb and backer line in a fixed 420-pixel column at every width.
-const cardHeight = 420
+const sizes = {
+  // The card lays out its image, blurb and backer line in a fixed 420-pixel column at every
+  // width.
+  card: { height: 420 },
+  video: { ratio: '16/9' },
+}
+
+const widgets = ['card.html', 'video.html']
 
 // Kickstarter's project widgets, `/projects/{creator}/{slug}/widget/card.html` for the project
 // card and `/widget/video.html` for the pitch video.
@@ -23,12 +29,11 @@ export const kickstarterResolveEmbed: ResolveUrlEmbed = (url, element) => {
   // Kickstarter's oEmbed endpoint needs a creator segment but answers for any value, so the slug
   // alone keys the project, and an enricher writes it as `/projects/anon/{slug}`.
   return {
-    provider: 'kickstarter',
+    provider,
     id: slug,
     src: `https://www.kickstarter.com/projects/${project}/widget/${widget}`,
     url: `https://www.kickstarter.com/projects/${project}`,
-    height: widget === 'card.html' ? cardHeight : undefined,
-    ratio: widget === 'video.html' ? '16/9' : undefined,
+    ...(widget === 'card.html' ? sizes.card : sizes.video),
     title: attr(element, 'title'),
   }
 }

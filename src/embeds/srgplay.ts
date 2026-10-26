@@ -5,6 +5,12 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'srgplay'
 
+const sizes = {
+  // The player fills its frame, audio included, but never shrinks below 16:9 of its width, so a
+  // shorter frame crops its controls.
+  player: { ratio: '16/9' },
+}
+
 // SRG SSR's business units and the host each unit's player answers on. `tp.srgssr.ch/p/{unit}/
 // embed` 301s onto `www.{host}/play/embed`. SWI is left out: its player redirects to an article
 // whatever the urn, so a minted swissinfo.ch url plays nothing.
@@ -58,9 +64,7 @@ const composeEmbed = (urn: string | undefined, search: string): EmbedResolverRes
     id: urn,
     src: `https://www.${host}/play/embed${query}`,
     url: page,
-    // The player fills its frame, audio included, but never shrinks below 16:9 of its width, so a
-    // shorter frame crops its controls.
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

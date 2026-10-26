@@ -8,7 +8,11 @@ type Resource = {
   path: string
 }
 
+const provider = 'komoot'
+
 const komootHosts = ['komoot.com', 'komoot.de']
+
+const sizes = { player: { height: 440 } }
 
 // `share_token` is what opens a tour its owner has not made public.
 const accessParams = ['share_token']
@@ -46,10 +50,10 @@ export const komootResolveEmbed: ResolveUrlEmbed = (url) => {
 
   const params = pickQueryParams(url.search, accessParams)
   const result: EmbedResolverResult = {
-    provider: 'komoot',
+    provider,
     id: resource.id,
     src: `https://www.komoot.com/${resource.path}/embed${composeQuery(params)}`,
-    height: 440,
+    ...sizes.player,
   }
 
   // A share token grants access to a tour, so it stays in the src and is not copied into a url.

@@ -11,6 +11,10 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'kaltura'
 
+const sizes = {
+  player: { ratio: '16/9' },
+}
+
 const partnerPathRegex = /^\/p\/([^/]+)\//i
 
 const kalturaHost = 'kaltura.com'
@@ -72,7 +76,7 @@ const composeEmbed = ({ partner, entryId, parsed }: Entry): EmbedResolverResult 
     thumbnail: hasToken
       ? undefined
       : `https://${host}/p/${partner}/thumbnail/entry_id/${entrySegment}/width/640`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

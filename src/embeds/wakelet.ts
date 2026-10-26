@@ -5,8 +5,10 @@ const provider = 'wakelet'
 
 const wakeletHosts = ['embed.wakelet.com']
 
-// The height Wakelet's embed dialog writes, with resizing off. The collection scrolls inside it.
-const collectionHeight = 760
+const sizes = {
+  // The height Wakelet's embed dialog writes, with resizing off. The collection scrolls inside it.
+  collection: { height: 760 },
+}
 
 // `/wakes/{id}`, then an optional layout, `list` or `grid`. Wakelet answers 404 to any other
 // spelling, an uppercase route word included.
@@ -26,7 +28,7 @@ const wakeletResolveEmbed: ResolveUrlEmbed = (url) => {
     id,
     src: `https://embed.wakelet.com/wakes/${id}/list`,
     url: `https://wakelet.com/wake/${id}`,
-    height: collectionHeight,
+    ...sizes.collection,
   }
 }
 

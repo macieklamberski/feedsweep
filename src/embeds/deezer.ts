@@ -1,6 +1,7 @@
 import { encodePathSegment, getPathSegments, getQueryParam, isAnyOf, toMap } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
+import { twoLettersRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'deezer'
@@ -31,10 +32,6 @@ const pluginTypes = toMap({
   tracks: 'track',
 })
 
-// A locale in front of the route is the site's own prefix, not part of the route. Two letters tell
-// it from a route word such as `widget` or `plugins`, which opens the path in the same slot.
-const localeRegex = /^[a-z]{2}$/i
-
 // The Flash players, all three of which name a track through `idSong`, and the fourth which
 // names a playlist through `path`. Same id spaces as today's: `idSong=293366` is still a track
 // and `path=11969917` still a playlist.
@@ -44,7 +41,9 @@ type Resource = { type: string; id: string }
 
 const readResource = (url: URL): Resource | undefined => {
   const segments = getPathSegments(url)
-  const route = localeRegex.test(segments[0] ?? '') ? segments.slice(1) : segments
+  // A locale in front of the route is the site's own prefix, not part of the route. Two letters
+  // tell it from a route word such as `widget` or `plugins`, which opens the path in the same slot.
+  const route = twoLettersRegex.test(segments[0] ?? '') ? segments.slice(1) : segments
   // A query value comes out decoded, and the id goes into a path beside the raw path spellings.
   const query = (name: string) => encodePathSegment(getQueryParam(url.searchParams, name) ?? '')
 

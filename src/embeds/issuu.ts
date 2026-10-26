@@ -8,12 +8,11 @@ import {
   trimObject,
 } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveUrlEmbed } from '../types.js'
-
-const provider = 'issuu'
-
 import { attr, flashVars, parseFlashVars } from '../utils/dom.js'
 import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'issuu'
 
 const issuuHosts = ['issuu.com']
 
@@ -27,7 +26,7 @@ const flashRoute = 'webembed'
 // Only `embed.html` is minted: `anonymous-embed.html` answers 403 for every document.
 const embedPaths = ['embed.html', 'anonymous-embed.html']
 
-const documentRatio = '5/3'
+const sizes = { player: { ratio: '5/3' } }
 
 const composeConfigEmbed = (configId: string | undefined): EmbedResolverResult | undefined => {
   if (!configId) {
@@ -38,7 +37,7 @@ const composeConfigEmbed = (configId: string | undefined): EmbedResolverResult |
     provider,
     id: configId,
     src: `https://e.issuu.com/embed.html#${configId}`,
-    ratio: documentRatio,
+    ...sizes.player,
   }
 }
 
@@ -61,7 +60,7 @@ const composeDocumentEmbed = (
     src: `https://e.issuu.com/embed.html${query}`,
     // The iframe's `u` and `d` come out of the query decoded, and each goes into a path segment.
     url: `https://issuu.com/${encodePathSegment(publisher)}/docs/${encodePathSegment(documentName)}`,
-    ratio: documentRatio,
+    ...sizes.player,
   }
 }
 
@@ -137,8 +136,13 @@ const issuuResolveEmbed: ResolveUrlEmbed = (url, element) => {
   if (!isAnyOf(route, embedPaths)) {
     const embed = readDocumentUrl(url)
 
-    return embed && { ...embed, title }
+    if (!embed) {
+      return
+    }
+
+    return { ...embed, title }
   }
+
   // The two id spaces the carrier can name, in the order the reader states them: a config id
   // pair in the fragment, else the publisher and document names in the query.
   const embed =
@@ -149,7 +153,11 @@ const issuuResolveEmbed: ResolveUrlEmbed = (url, element) => {
       getQueryParam(url.searchParams, 'p'),
     )
 
-  return embed && { ...embed, title }
+  if (!embed) {
+    return
+  }
+
+  return { ...embed, title }
 }
 
 export const issuuIframeEmbedResolver = createUrlEmbedResolver(issuuHosts, issuuResolveEmbed)

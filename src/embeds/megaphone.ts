@@ -10,23 +10,25 @@ const megaphoneHosts = ['megaphone.fm']
 
 const legacyPlayerPathRegex = /^\/(?<id>[A-Z]+\d+)\/?$/
 
-const embedKinds = {
+const sizes = {
   // Both players are fixed in height whatever their width: the episode player draws 200 and the
   // playlist 481 at 640 wide and wider.
-  e: { kind: 'episode', height: 200 },
-  p: { kind: 'playlist', height: 482 },
+  episode: { height: 200 },
+  playlist: { height: 482 },
 }
+
+const embedKinds = { e: 'episode', p: 'playlist' }
 
 export const extractMegaphoneEmbed = (
   url: URL,
-): { param: string; kind: string; id: string; height: number } | undefined => {
+): { param: string; kind: string; id: string } | undefined => {
   // Megaphone serves the episode files from the same domain as the players.
   // Episode files carry the publisher's own ?e= and ?p=, so a claimed enclosure loses its audio.
   if (isFileName(url.pathname)) {
     return
   }
 
-  for (const [param, { kind, height }] of Object.entries(embedKinds)) {
+  for (const [param, kind] of Object.entries(embedKinds)) {
     const id = getQueryParam(url.searchParams, param)
 
     if (!id) {
@@ -38,7 +40,7 @@ export const extractMegaphoneEmbed = (
       continue
     }
 
-    return { param, kind, id, height }
+    return { param, kind, id }
   }
 
   // The legacy episode player names the episode in its path, `player.megaphone.fm/{id}`.
@@ -52,7 +54,7 @@ export const extractMegaphoneEmbed = (
     return
   }
 
-  return { param: 'e', ...embedKinds.e, id: legacyId }
+  return { param: 'e', kind: 'episode', id: legacyId }
 }
 
 // No metadata and no thumbnail without an api key, so the height is the substance here, and
@@ -71,7 +73,7 @@ export const megaphoneResolveEmbed: ResolveUrlEmbed = (url) => {
     provider,
     id: `${embed.kind}/${embed.id}`,
     src: `https://playlist.megaphone.fm/${query}`,
-    height: embed.height,
+    ...(embed.kind === 'playlist' ? sizes.playlist : sizes.episode),
   }
 }
 

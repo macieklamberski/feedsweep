@@ -5,6 +5,8 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'subsplash'
 
+const sizes = { player: { ratio: '16/9' } }
+
 const subsplashHosts = ['subsplash.com']
 
 const leadingPlusRegex = /^\+/
@@ -19,7 +21,7 @@ const composeEmbed = (id: string, src: string): EmbedResolverResult => {
     id: key,
     src,
     url: `https://subspla.sh/${key}`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

@@ -1,6 +1,6 @@
 import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
-import { createImage, createLinkedImage } from '../../utils/widgets.js'
+import { createImage, createLink, createLinkedImage } from '../../utils/widgets.js'
 
 // The two carrier classes the publicalbum plugin ships, the gallery player and the carousel.
 const widgetSelector = 'div.pa-gallery-player-widget, div.pa-carousel-widget'
@@ -17,10 +17,7 @@ const buildCaption = (document: Document, widget: Element, href?: string): Eleme
   const caption = document.createElement('figcaption')
 
   if (title && href) {
-    const link = document.createElement('a')
-    link.setAttribute('href', href)
-    link.textContent = title
-    caption.appendChild(link)
+    caption.appendChild(createLink(document, href, title))
   } else if (title) {
     caption.appendChild(document.createTextNode(title))
   }

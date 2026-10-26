@@ -126,11 +126,19 @@ const readSubstackPodcast = (element: Nullish<Element>): Partial<EmbedResolverRe
 }
 
 // Apple's music and podcast player iframe. Substack wraps it in a card carrying JSON metadata.
-export const appleEmbedResolver = createUrlEmbedResolver(appleHosts, (url, element) => {
+export const appleIframeEmbedResolver = createUrlEmbedResolver(appleHosts, (url, element) => {
   const result = appleResolveEmbed(url)
   const card = readSubstackPodcast(element)
 
-  return result && { ...result, ...card, title: card.title ?? attr(element, 'title') }
+  if (!result) {
+    return
+  }
+
+  return {
+    ...result,
+    ...card,
+    title: card.title ?? attr(element, 'title'),
+  }
 })
 
 // The retired Apple Music Marketing Tools host. Every id on it, real or not, redirects to the

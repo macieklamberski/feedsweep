@@ -38,6 +38,8 @@ const placeholderCaptions = [
 // A single token holding a digit, an underscore or a hyphen: an upload's file name.
 const fileNameRegex = /^[\w.-]*[\d_-][\w.-]*$/
 
+const whitespaceRunRegex = /\s+/g
+
 // The audio and video enclosure branches below produce the native element for a media result.
 const resolveEnclosure = (
   url: string,
@@ -108,7 +110,7 @@ const readImageCaption = (
   context: TransformContext,
 ): string | undefined => {
   const normalize = (value: Nullish<string>): string => {
-    return (value ?? '').trim().toLowerCase().replace(/\s+/g, ' ')
+    return (value ?? '').trim().toLowerCase().replace(whitespaceRunRegex, ' ')
   }
 
   const caption = enclosure.description?.trim()

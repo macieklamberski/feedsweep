@@ -4,7 +4,13 @@ import { attr } from '../utils/dom.js'
 import { alphanumericRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'typeform'
+
 const typeformHosts = ['typeform.com']
+
+const sizes = {
+  form: { height: 500 },
+}
 
 // The share panel writes the form's own title into an iframe-props string, `title=<the
 // title>,<other props>`, which is the only human-readable text the empty div carries.
@@ -17,11 +23,11 @@ const launcherAttributes = ['data-tf-popup', 'data-tf-slider', 'data-tf-popover'
 
 const composeEmbed = (id: string, title?: string): EmbedResolverResult => {
   const result: EmbedResolverResult = {
-    provider: 'typeform',
+    provider,
     id,
     src: `https://form.typeform.com/to/${encodePathSegment(id)}`,
     url: `https://form.typeform.com/to/${encodePathSegment(id)}`,
-    height: 500,
+    ...sizes.form,
   }
 
   return title ? { ...result, title } : result
@@ -37,7 +43,7 @@ const composeLiveEmbed = (
 ): EmbedResolverResult => {
   const region = attr(element, 'data-tf-region')
   const result: EmbedResolverResult = {
-    provider: 'typeform',
+    provider,
     id: region ? `${region}/${liveId}` : liveId,
   }
 
@@ -85,13 +91,7 @@ export const typeformWidgetEmbedResolver = createMarkupEmbedResolver(
 // `<user>.typeform.com/to/<id>` still serves the same form without redirecting, so both
 // reach here. The query is telemetry (`typeform-embed`, `typeform-medium`) and is dropped.
 export const typeformResolveEmbed: ResolveUrlEmbed = (url, element) => {
-  const parsed = parseUrlOnHosts(url, typeformHosts)
-
-  if (!parsed) {
-    return
-  }
-
-  const segments = getPathSegments(parsed)
+  const segments = getPathSegments(url)
 
   // A form id in a url path is alphanumeric (`MTt3Pw7K`). The enclosure probe offers every file on
   // a Typeform host to this resolver, so the alphabet is what tells a form from a file such as

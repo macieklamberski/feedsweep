@@ -4,12 +4,16 @@ import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'podetize'
+
 const podetizeHosts = ['player.podetize.com']
 
-// Fluid in width and fixed in height: every iframe the corpus carries states 200, which is
-// what Podetize's own snippet writes. The player card itself measured 218 tall at 520 wide in
-// Chrome (2026-09-06), so the snippet clips it slightly and is kept all the same.
-const playerHeight = 200
+const sizes = {
+  // Fluid in width and fixed in height: every iframe the corpus carries states 200, which is
+  // what Podetize's own snippet writes. The player card itself measured 218 tall at 520 wide in
+  // Chrome (2026-09-06), so the snippet clips it slightly and is kept all the same.
+  player: { height: 200 },
+}
 
 // The player answers 200 for any id and asks `feeds.podetize.com/ep/{id}/playerparams` for the
 // episode, which is where the id space shows: a real episode returns its params and an invented
@@ -18,10 +22,10 @@ const composeEmbed = (id: string, isEpisodeMode: boolean): EmbedResolverResult =
   const query = composeQuery(trimObject({ id, epmode: isEpisodeMode ? 'true' : undefined }))
 
   return {
-    provider: 'podetize',
+    provider,
     id,
     src: `https://player.podetize.com/${query}`,
-    height: playerHeight,
+    ...sizes.player,
   }
 }
 

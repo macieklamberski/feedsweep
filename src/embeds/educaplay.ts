@@ -18,7 +18,7 @@ const gamePathRegex = /^\/([^/]+)\/([^/-]+)-([^/]+)\.html$/i
 // The retired html5 player, `/{lang}/{resources}/{id}/html5/{slug}.htm`, which answers 404.
 const legacyPathRegex = /^\/[^/]+\/[^/]+\/([^/]+)\/html5\/([^/]+)\.htm$/i
 
-const gameHeight = 690
+const sizes = { player: { height: 690 } }
 
 const readGame = (pathname: string): { id: string; slug: string } | undefined => {
   const game = pathname.match(gamePathRegex)
@@ -58,7 +58,7 @@ const educaplayResolveEmbed: ResolveUrlEmbed = (url, element) => {
     id: game.id,
     src: `https://www.educaplay.com/game/${game.id}-${game.slug}.html`,
     url: `https://www.educaplay.com/learning-resources/${game.id}-${game.slug}.html`,
-    height: gameHeight,
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }

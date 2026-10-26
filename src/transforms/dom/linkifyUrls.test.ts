@@ -208,14 +208,6 @@ describeForEachParser('linkifyUrls', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
-  it('should be idempotent', async () => {
-    const value = '<p>Visit https://example.com for more</p>'
-    const once = await transform(value)
-    const twice = await transform(once)
-
-    expect(twice).toEqualHtml(once)
-  })
-
   describe('cleanUrlFn', () => {
     const withCleanUrlFn: TransformContext = {
       ...baseContext,
@@ -239,6 +231,14 @@ describeForEachParser('linkifyUrls', (parseHtml) => {
 
       expect(await transform(value, withCleanUrlFn)).toEqualHtml(expected)
     })
+  })
+
+  it('should be idempotent', async () => {
+    const value = '<p>Visit https://example.com for more</p>'
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
   })
 })
 

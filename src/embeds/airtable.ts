@@ -1,7 +1,6 @@
 import { getPathSegments, isAnyOf, isHostOf, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { readPixels } from '../utils/hints.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'airtable'
@@ -14,19 +13,15 @@ const airtableHosts = ['airtable.com']
 const shareIdRegex = /^shr/
 const baseIdRegex = /^app/
 
-// Airtable's snippet and oEmbed answer frame every view at 533.
-const viewHeight = 533
+const sizes = {
+  // Airtable's snippet and oEmbed answer frame every view at 533.
+  view: { height: 533 },
+}
 
 // Airtable's shared view frame, `/embed/{shr}` from older snippets and `/embed/{app}/{shr}` from
 // the current one. The bare form redirects to the base, which cannot be derived from the share.
 export const airtableResolveEmbed: ResolveUrlEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, airtableHosts, isHostOf)
-
-  if (!parsed) {
-    return
-  }
-
-  const [route, ...ids] = getPathSegments(parsed)
+  const [route, ...ids] = getPathSegments(url)
 
   if (!isAnyOf(route, 'embed') || ids.length > 2) {
     return
@@ -50,11 +45,13 @@ export const airtableResolveEmbed: ResolveUrlEmbed = (url) => {
     id,
     src: `https://airtable.com/embed/${id}`,
     url: `https://airtable.com/${id}`,
-    height: viewHeight,
+    ...sizes.view,
   }
 }
 
-export const airtableEmbedResolver = createUrlEmbedResolver(airtableHosts, airtableResolveEmbed)
+export const airtableEmbedResolver = createUrlEmbedResolver(airtableHosts, airtableResolveEmbed, {
+  isOnHost: isHostOf,
+})
 
 // A form view posts `{ key: 'airtableEmbedContentDidResize', height }` unasked. A grid, gallery
 // or calendar view posts no height and keeps the stated one.

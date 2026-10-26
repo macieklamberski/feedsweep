@@ -6,6 +6,8 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'pastebin'
 
+const sizes = { player: { height: 150 } }
+
 const pastebinHosts = ['pastebin.com']
 
 // Both carriers in both generations. The `.php?i={id}` spelling answers 404 for every id,
@@ -45,7 +47,7 @@ export const pastebinResolveEmbed: ResolveUrlEmbed = (url) => {
     id: pasteId,
     src: `https://pastebin.com/embed_iframe/${pasteId}`,
     url: `https://pastebin.com/${pasteId}`,
-    height: 150,
+    ...sizes.player,
   }
 }
 

@@ -85,12 +85,6 @@ describe('scratchResolveEmbed', () => {
       expect(scratchResolveEmbed(new URL(value))).toEqual(expected)
     })
 
-    it('should ignore a file host, which answers the player route with an image', () => {
-      const value = 'https://assets.scratch.mit.edu/projects/1308798589/embed'
-
-      expect(scratchResolveEmbed(new URL(value))).toBeUndefined()
-    })
-
     it('should ignore the project route below another segment', () => {
       const value = 'https://scratch.mit.edu/x/projects/1/embed'
 
@@ -176,6 +170,12 @@ describeForEachParser('scratchEmbedResolver', (parseHtml) => {
 
     it('should ignore a foreign host carrying the player route', async () => {
       const value = '<iframe src="https://evil.test/projects/1/embed"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a file host, which answers the player route with an image', async () => {
+      const value = html`<iframe src="https://assets.scratch.mit.edu/projects/1308798589/embed"></iframe>`
 
       expect(await extract(value)).toBeUndefined()
     })

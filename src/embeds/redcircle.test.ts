@@ -143,13 +143,6 @@ describe('redcircleResolveEmbed', () => {
 
       expect(redcircleResolveEmbed(new URL(value))).toBeUndefined()
     })
-
-    it('should return undefined for a lookalike host', () => {
-      const value =
-        'https://redcircle.com.evil.test/embedded-player/sh/638d4a39-ade6-47d8-9dd2-aa1cc5bef21a/ep/cb6cd735-0017-48dd-b387-ecc8a20818e5'
-
-      expect(redcircleResolveEmbed(new URL(value))).toBeUndefined()
-    })
   })
 })
 

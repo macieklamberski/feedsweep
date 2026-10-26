@@ -6,6 +6,8 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ted'
 
+const sizes = { player: { ratio: '16/9' } }
+
 const htmlSuffixRegex = /\.html$/i
 
 const tedHosts = ['ted.com']
@@ -88,7 +90,7 @@ export const tedResolveEmbed: ResolveUrlEmbed = (url, element) => {
     src: `https://embed.ted.com/embed/${talk.slug}`,
     url: `https://www.ted.com/talks/${talk.slug}`,
     thumbnail: talk.thumbnail,
-    ratio: '16/9',
+    ...sizes.player,
     title,
   }
 }

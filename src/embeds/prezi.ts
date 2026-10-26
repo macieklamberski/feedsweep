@@ -3,7 +3,11 @@ import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'prezi'
+
 const preziHosts = ['prezi.com']
+
+const sizes = { presentation: { ratio: '550/400' }, video: { ratio: '16/9' } }
 
 // The Flash snippet's one loader, with the presentation named in flashvars and repeated in the
 // element ids as `prezi_{id}` and `preziEmbed_{id}`.
@@ -24,21 +28,21 @@ const composePageUrl = (id: string): string => {
 
 const composeEmbed = (id: string, route = 'p'): EmbedResolverResult => {
   return {
-    provider: 'prezi',
+    provider,
     id,
     src: `https://prezi.com/${route}/${id}/embed`,
     url: composePageUrl(id),
-    ratio: '550/400',
+    ...sizes.presentation,
   }
 }
 
 const composeVideoEmbed = (id: string): EmbedResolverResult => {
   return {
-    provider: 'prezi',
+    provider,
     id,
     src: `https://prezi.com/v/embed/${id}/`,
     url: `https://prezi.com/v/view/${id}/`,
-    ratio: '16/9',
+    ...sizes.video,
   }
 }
 

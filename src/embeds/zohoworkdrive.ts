@@ -71,6 +71,8 @@ export const zohoworkdriveResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
+// Zoho WorkDrive's frame from the embed dialog, and a share link's frame, whose `/embed` suffix
+// only spins.
 export const zohoworkdriveEmbedResolver = createUrlEmbedResolver(
   zohoworkdriveHosts,
   zohoworkdriveResolveEmbed,

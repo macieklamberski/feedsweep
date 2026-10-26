@@ -14,9 +14,11 @@ const embedPathRegex = /^\/embed\/([^/]+)\/?$/i
 const flashPathRegex = /^\/player\.php\/sid\/([^/]+)\/v\.swf$/i
 const staticFlashPathRegex = /^\/v[\d.]+\/v\/swf\/\w*player\.swf$/i
 
-// The 510x498 and 480x400 boxes the carriers state held the retired player's chrome.
-// The modern player is chromeless and fills its box, and Youku's own watch page sizes it 16:9.
-const playerRatio = '16/9'
+const sizes = {
+  // The 510x498 and 480x400 boxes the carriers state held the retired player's chrome.
+  // The modern player is chromeless and fills its box, and Youku's own watch page sizes it 16:9.
+  player: { ratio: '16/9' },
+}
 
 const readVideoId = (url: URL): string | undefined => {
   if (url.hostname === 'static.youku.com') {
@@ -53,7 +55,7 @@ const youkuResolveEmbed: ResolveUrlEmbed = (url) => {
     id: videoId,
     src: `https://player.youku.com/embed/${videoId}`,
     url: `https://v.youku.com/v_show/id_${videoId}.html`,
-    ratio: playerRatio,
+    ...sizes.player,
   }
 }
 

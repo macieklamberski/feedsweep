@@ -4,12 +4,16 @@ import { attr } from '../utils/dom.js'
 import { filterUrlQuery, isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'stackblitz'
+
 // `blog.stackblitz.com` and `developer.stackblitz.com` are prose, and a project's running preview
 // lives on `*.stackblitz.io`, so only the bare host and its `www.` spelling name a project.
 const stackblitzHosts = ['stackblitz.com', 'www.stackblitz.com']
 
-// What the share dialog writes beside `width="100%"`.
-const defaultProjectHeight = 500
+const sizes = {
+  // What the share dialog writes beside `width="100%"`.
+  project: { height: 500 },
+}
 
 // The options that pick where the project opens and what it runs, looked up in any case as current
 // instances do: the open file, which may repeat once per tab, the path the preview loads, and the
@@ -59,16 +63,16 @@ export const stackblitzResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const project = `https://stackblitz.com/edit/${target.id}`
 
   return {
-    provider: 'stackblitz',
+    provider,
     id: target.id,
     src: `${project}${target.query}`,
     url: project,
-    height: defaultProjectHeight,
+    ...sizes.project,
     title,
   }
 }
 
 export const stackblitzIframeEmbedResolver = createUrlEmbedResolver(
-  ['stackblitz.com'],
+  stackblitzHosts,
   stackblitzResolveEmbed,
 )

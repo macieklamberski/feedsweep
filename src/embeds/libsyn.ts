@@ -1,11 +1,10 @@
 import { getPathSegments, isAnyOf } from 'trousse'
 import type { FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-
-const provider = 'libsyn'
-
 import { digitsRegex, isMediaFile } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
+
+const provider = 'libsyn'
 
 const libsynHosts = ['libsyn.com']
 
@@ -13,7 +12,7 @@ const libsynHosts = ['libsyn.com']
 const embedKinds = ['episode', 'destination']
 
 // The player renders this tall at any width, whatever height option its path names.
-const playerHeight = 128
+const sizes = { player: { height: 128 } }
 
 // Libsyn spells its player options as path segments, not a query string:
 // `/embed/episode/id/{id}/height/{px}/theme/{name}/thumbnail/{yes|no}/…`.
@@ -72,7 +71,7 @@ export const libsynResolveEmbed: ResolveUrlEmbed = (url, element) => {
     provider,
     id: `${embed.kind}/${embed.id}`,
     src: `https://play.libsyn.com/embed/${embed.kind}/id/${embed.id}/${start}`,
-    height: playerHeight,
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }

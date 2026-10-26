@@ -2,11 +2,15 @@ import { composeQuery, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
-const cnbcHosts = ['player.cnbc.com']
+const provider = 'cnbc'
 
-// The JW player runs in aspect mode with a 56.25% spacer and its title band inside the picture.
-// CNBC's own snippet states 560 by 349, which leaves 34 pixels blank at that width.
-const playerRatio = '16/9'
+const sizes = {
+  // The JW player runs in aspect mode with a 56.25% spacer and its title band inside the picture.
+  // CNBC's own snippet states 560 by 349, which leaves 34 pixels blank at that width.
+  player: { ratio: '16/9' },
+}
+
+const cnbcHosts = ['player.cnbc.com']
 
 // CNBC's player.cnbc.com clip iframe, pasted in a box taller than the 16:9 clip it fills.
 // It answers 200 for any guid, with a not-found page in the body for a fabricated one. The
@@ -26,12 +30,12 @@ export const cnbcResolveEmbed: ResolveUrlEmbed = (url) => {
   const query = composeQuery({ playertype: 'synd', byGuid: guid })
 
   return {
-    provider: 'cnbc',
+    provider,
     id: guid,
     // Any player name plays the guid, and `cnbc_global` is the one CNBC's share snippet writes.
     // Another account answers 404, so the account stays as written.
     src: `https://player.cnbc.com/p/${account}/cnbc_global${query}`,
-    ratio: playerRatio,
+    ...sizes.player,
   }
 }
 

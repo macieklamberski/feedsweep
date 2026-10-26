@@ -1,12 +1,13 @@
 import { composeQuery, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
 import type { FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
+import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'blogger'
 
-import { createUrlEmbedResolver } from '../utils/widgets.js'
-
 const bloggerHosts = ['blogger.com']
+
+const sizes = { player: { ratio: '16/9' } }
 
 export const extractBloggerToken = (url: URL): string | undefined => {
   if (!isAnyOf(getPathSegments(url)[0], 'video.g')) {
@@ -36,7 +37,7 @@ export const bloggerResolveEmbed: ResolveUrlEmbed = (url, element) => {
     provider,
     id: token,
     src: `https://www.blogger.com/video.g${composeQuery({ token })}`,
-    ratio: '16/9',
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }

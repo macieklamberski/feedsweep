@@ -2,6 +2,10 @@ import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'ispot'
+
+const sizes = { commercial: { ratio: '16/9' } }
+
 const ispotHosts = ['www.ispot.tv']
 
 // iSpot.tv's TV commercial player, `www.ispot.tv/share/{id}`. The id is case-sensitive: another
@@ -15,11 +19,11 @@ export const ispotResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 
   return {
-    provider: 'ispot',
+    provider,
     id,
     src: `https://www.ispot.tv/share/${id}`,
     thumbnail: `https://images-cdn.ispot.tv/ad/${id}/default-large.jpg`,
-    ratio: '16/9',
+    ...sizes.commercial,
   }
 }
 

@@ -194,18 +194,6 @@ describe('geogebraResolveEmbed', () => {
 
       expect(geogebraResolveEmbed(new URL(value))).toBeUndefined()
     })
-
-    it('should ignore the retired tube host', () => {
-      const value = 'https://tube.geogebra.org/material/iframe/id/381965/width/800/height/600'
-
-      expect(geogebraResolveEmbed(new URL(value))).toBeUndefined()
-    })
-
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/material/iframe/id/yqZMrWXI'
-
-      expect(geogebraResolveEmbed(new URL(value))).toBeUndefined()
-    })
   })
 
   describe('edge cases', () => {
@@ -334,6 +322,12 @@ describeForEachParser('geogebraEmbedResolver', (parseHtml) => {
     it('should ignore the retired tube host', async () => {
       const value =
         '<iframe src="https://tube.geogebra.org/material/iframe/id/381965/width/800/height/600"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a foreign host carrying the same path', async () => {
+      const value = html`<iframe src="https://evil.test/material/iframe/id/yqZMrWXI"></iframe>`
 
       expect(await extract(value)).toBeUndefined()
     })

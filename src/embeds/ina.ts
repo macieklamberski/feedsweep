@@ -6,6 +6,10 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 
 const provider = 'ina'
 
+const sizes = {
+  player: { ratio: '16/9' },
+}
+
 const inaHosts = ['ina.fr']
 
 // Each is followed by an archive id, a player id and a key.
@@ -31,7 +35,7 @@ const composeEmbed = (id: string, playerId: string, key: string): EmbedResolverR
     id,
     src: composePlayerUrl(id, playerId, key),
     url: `https://www.ina.fr/video/${id}`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 
@@ -47,7 +51,7 @@ export const inaResolveEmbed: ResolveUrlEmbed = (url) => {
   return composeEmbed(id, playerId, key)
 }
 
-export const inaEmbedResolver = createUrlEmbedResolver(inaHosts, inaResolveEmbed)
+export const inaIframeEmbedResolver = createUrlEmbedResolver(inaHosts, inaResolveEmbed)
 
 // INA's retired script loader, a carrier the iframe fallback cannot read.
 export const inaScriptEmbedResolver = createMarkupEmbedResolver(

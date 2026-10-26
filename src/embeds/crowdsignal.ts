@@ -12,8 +12,10 @@ const loaderPathRegex = /^\/p\/([^/]+)\.js$/i
 const retiredPollPathRegex = /^\/poll\/([^/]+)\/?$/i
 const flashPlayerPathRegex = /^\/poll\.swf$/i
 
-// A poll's height follows its answer count, and the frame posts none.
-const pollHeight = 533
+const sizes = {
+  // A poll's height follows its answer count, and the frame posts none.
+  player: { height: 533 },
+}
 
 const composeEmbed = (pollId: string): EmbedResolverResult => {
   // The Flash flashvar `p` comes out decoded, and it goes into a path.
@@ -24,7 +26,7 @@ const composeEmbed = (pollId: string): EmbedResolverResult => {
     id: pollId,
     src: `https://poll.fm/${segment}/embed`,
     url: `https://poll.fm/${segment}`,
-    height: pollHeight,
+    ...sizes.player,
   }
 }
 
@@ -77,7 +79,7 @@ export const crowdsignalScriptEmbedResolver = createMarkupEmbedResolver(
       `[data-embed-provider="${provider}"]`,
     )
     const hasPlaceholder = [...(placeholders ?? [])].some((placeholder) => {
-      return placeholder.getAttribute('data-embed-id') === pollId
+      return attr(placeholder, 'data-embed-id') === pollId
     })
 
     if (hasPlaceholder) {

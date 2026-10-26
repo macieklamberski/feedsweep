@@ -88,18 +88,6 @@ describe('strawpollResolveEmbed', () => {
 
       expect(strawpollResolveEmbed(new URL(value))).toBeUndefined()
     })
-
-    it('should ignore the embed route on the file subdomain', () => {
-      const value = 'https://cdn.strawpoll.com/embed/e7ZJaM1BPg3'
-
-      expect(strawpollResolveEmbed(new URL(value))).toBeUndefined()
-    })
-
-    it('should ignore a foreign host carrying the same path', () => {
-      const value = 'https://evil.test/embed/e7ZJaM1BPg3'
-
-      expect(strawpollResolveEmbed(new URL(value))).toBeUndefined()
-    })
   })
 
   describe('edge cases', () => {
@@ -163,6 +151,18 @@ describeForEachParser('strawpollIframeEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore a lookalike host', async () => {
       const value = '<iframe src="https://strawpoll.com.evil.test/embed/e7ZJaM1BPg3"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the embed route on the file subdomain', async () => {
+      const value = html`<iframe src="https://cdn.strawpoll.com/embed/e7ZJaM1BPg3"></iframe>`
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a foreign host carrying the same path', async () => {
+      const value = html`<iframe src="https://evil.test/embed/e7ZJaM1BPg3"></iframe>`
 
       expect(await extract(value)).toBeUndefined()
     })

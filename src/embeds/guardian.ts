@@ -4,6 +4,8 @@ import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'guardian'
+
 const guardianHosts = ['embed.theguardian.com']
 
 // `/embed/video/{section}/video/{yyyy}/{mon}/{dd}/{slug}`.
@@ -46,9 +48,11 @@ const readDate = (path: string): string | undefined => {
   return `${parts[1]}-${month}-${parts[3]}`
 }
 
-// Measured 2026-09-07 in a browser at 300, 600 and 900 pixels wide: the `<video>` is 169, 338
-// and 506 tall and is the whole page, so the height is 16:9 of the width with nothing around it.
-const playerRatio = '16/9'
+const sizes = {
+  // Measured 2026-09-07 in a browser at 300, 600 and 900 pixels wide: the `<video>` is 169, 338
+  // and 506 tall and is the whole page, so the height is 16:9 of the width with nothing around it.
+  player: { ratio: '16/9' },
+}
 
 export const guardianResolveEmbed: ResolveUrlEmbed = (url) => {
   const path = url.pathname.match(playerPathRegex)?.[1]
@@ -58,16 +62,21 @@ export const guardianResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 
   return {
-    provider: 'guardian',
+    provider,
     id: path,
     src: `https://embed.theguardian.com/embed/video/${path}`,
     url: `https://www.theguardian.com/${path}`,
-    ratio: playerRatio,
+    ...sizes.player,
     date: readDate(path),
   }
 }
 
-export const guardianEmbedResolver = createUrlEmbedResolver(guardianHosts, guardianResolveEmbed)
+// The Guardian's video player iframe, `embed.theguardian.com/embed/video/{path}`, whose path is the
+// video page's own.
+export const guardianIframeEmbedResolver = createUrlEmbedResolver(
+  guardianHosts,
+  guardianResolveEmbed,
+)
 
 const guardianFlashHosts = ['guardian.co.uk', 'theguardian.com']
 const flashPlayerPathRegex = /^\/video\/embed\/?$/i

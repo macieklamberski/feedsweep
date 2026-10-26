@@ -5,7 +5,7 @@ import type { EmbedResolverResult } from '../types.js'
 import {
   isVkReady,
   readVkHeight,
-  vkEmbedResolver,
+  vkIframeEmbedResolver,
   vkRenderHint,
   vkResolveEmbed,
   vkWidgetEmbedResolver,
@@ -198,8 +198,8 @@ describe('vkResolveEmbed', () => {
   })
 })
 
-describeForEachParser('vkEmbedResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, vkEmbedResolver)
+describeForEachParser('vkIframeEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, vkIframeEmbedResolver)
 
   describe('happy paths', () => {
     it('should mint the player on the vkvideo.ru host onto vk.ru', async () => {

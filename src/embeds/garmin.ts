@@ -3,6 +3,8 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'garmin'
 
+const sizes = { player: { height: 548 } }
+
 const garminHosts = ['connect.garmin.com']
 
 // The spellings publishers pasted. Garmin chains them onto `embed/activity/{id}`, which is what
@@ -23,7 +25,7 @@ export const garminResolveEmbed: ResolveUrlEmbed = (url) => {
     id: activityId,
     src: `https://connect.garmin.com/embed/activity/${activityId}`,
     url: `https://connect.garmin.com/app/activity/${activityId}`,
-    height: 548,
+    ...sizes.player,
   }
 }
 

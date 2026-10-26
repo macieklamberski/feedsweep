@@ -2,15 +2,19 @@ import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'imdb'
+
 const imdbHosts = ['imdb.com']
+
+const sizes = { player: { ratio: '16/9' } }
 
 const composeEmbed = (id: string): EmbedResolverResult => {
   return {
-    provider: 'imdb',
+    provider,
     id,
     src: `https://www.imdb.com/video/embed/${id}/`,
     url: `https://www.imdb.com/video/${id}/`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

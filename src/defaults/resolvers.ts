@@ -52,7 +52,7 @@ import {
 import { anchorEmbedResolver } from '../embeds/anchor.js'
 import { anyflipEmbedResolver } from '../embeds/anyflip.js'
 import { aparatIframeEmbedResolver, aparatScriptEmbedResolver } from '../embeds/aparat.js'
-import { appleEmbedResolver, appleToolsEmbedResolver } from '../embeds/apple.js'
+import { appleIframeEmbedResolver, appleToolsEmbedResolver } from '../embeds/apple.js'
 import { arcgisIframeEmbedResolver, arcgisWidgetEmbedResolver } from '../embeds/arcgis.js'
 import {
   archiveAudioEmbedResolver,
@@ -73,7 +73,7 @@ import { bandcampEmbedResolver } from '../embeds/bandcamp.js'
 import { bbcIframeEmbedResolver } from '../embeds/bbc.js'
 import { bitchuteEmbedResolver } from '../embeds/bitchute.js'
 import { bloggerEmbedResolver } from '../embeds/blogger.js'
-import { blubrryEmbedResolver, blubrryPowerpressEmbedResolver } from '../embeds/blubrry.js'
+import { blubrryIframeEmbedResolver, blubrryPowerpressEmbedResolver } from '../embeds/blubrry.js'
 import {
   blueskyBlockquoteEmbedResolver,
   blueskyIframeEmbedResolver,
@@ -128,7 +128,10 @@ import {
 } from '../embeds/crowdsignal.js'
 import { cspanEmbedResolver } from '../embeds/cspan.js'
 import { dailymailEmbedResolver } from '../embeds/dailymail.js'
-import { dailymotionEmbedResolver, dailymotionScriptEmbedResolver } from '../embeds/dailymotion.js'
+import {
+  dailymotionIframeEmbedResolver,
+  dailymotionScriptEmbedResolver,
+} from '../embeds/dailymotion.js'
 import { deezerEmbedResolver } from '../embeds/deezer.js'
 import {
   democracynowIframeEmbedResolver,
@@ -182,7 +185,7 @@ import { googledriveEmbedResolver } from '../embeds/googledrive.js'
 import { googleformsEmbedResolver } from '../embeds/googleforms.js'
 import { googlesheetsEmbedResolver } from '../embeds/googlesheets.js'
 import { googleslidesEmbedResolver } from '../embeds/googleslides.js'
-import { guardianEmbedResolver, guardianFlashEmbedResolver } from '../embeds/guardian.js'
+import { guardianFlashEmbedResolver, guardianIframeEmbedResolver } from '../embeds/guardian.js'
 import { hearthisEmbedResolver } from '../embeds/hearthis.js'
 import { helloassoEmbedResolver } from '../embeds/helloasso.js'
 import { heyzineEmbedResolver } from '../embeds/heyzine.js'
@@ -195,7 +198,7 @@ import {
   imgurIframeEmbedResolver,
   imgurS9eEmbedResolver,
 } from '../embeds/imgur.js'
-import { inaEmbedResolver, inaScriptEmbedResolver } from '../embeds/ina.js'
+import { inaIframeEmbedResolver, inaScriptEmbedResolver } from '../embeds/ina.js'
 import { indavideoEmbedResolver } from '../embeds/indavideo.js'
 import {
   infogramIframeEmbedResolver,
@@ -231,7 +234,7 @@ import { libsynEmbedResolver } from '../embeds/libsyn.js'
 import { linkedinEmbedResolver } from '../embeds/linkedin.js'
 import { listennotesEmbedResolver } from '../embeds/listennotes.js'
 import { lividIframeEmbedResolver, lividMetasliderEmbedResolver } from '../embeds/livid.js'
-import { mailruEmbedResolver, mailruWidgetEmbedResolver } from '../embeds/mailru.js'
+import { mailruIframeEmbedResolver, mailruWidgetEmbedResolver } from '../embeds/mailru.js'
 import { mastodonEmbedResolver } from '../embeds/mastodon.js'
 import { matterportEmbedResolver } from '../embeds/matterport.js'
 import { mediacccEmbedResolver } from '../embeds/mediaccc.js'
@@ -239,7 +242,7 @@ import { mediavineScriptEmbedResolver, mediavineWidgetEmbedResolver } from '../e
 import { megaphoneEmbedResolver } from '../embeds/megaphone.js'
 import { megatvEmbedResolver } from '../embeds/megatv.js'
 import { mixcloudEmbedResolver } from '../embeds/mixcloud.js'
-import { mrcvideoEmbedResolver, mrcvideoFlashEmbedResolver } from '../embeds/mrcvideo.js'
+import { mrcvideoFlashEmbedResolver, mrcvideoIframeEmbedResolver } from '../embeds/mrcvideo.js'
 import { namashaEmbedResolver } from '../embeds/namasha.js'
 import { nbcnewsEmbedResolver } from '../embeds/nbcnews.js'
 import { neteaseEmbedResolver } from '../embeds/netease.js'
@@ -274,7 +277,7 @@ import { podigeeIframeEmbedResolver, podigeeScriptEmbedResolver } from '../embed
 import { podomaticEmbedResolver } from '../embeds/podomatic.js'
 import { pollmakerFormEmbedResolver, pollmakerIframeEmbedResolver } from '../embeds/pollmaker.js'
 import { preziEmbedResolver } from '../embeds/prezi.js'
-import { puzzlemeEmbedResolver, puzzlemeWidgetEmbedResolver } from '../embeds/puzzleme.js'
+import { puzzlemeIframeEmbedResolver, puzzlemeWidgetEmbedResolver } from '../embeds/puzzleme.js'
 import { radioradicaleEmbedResolver } from '../embeds/radioradicale.js'
 import { redcircleIframeEmbedResolver, redcircleScriptEmbedResolver } from '../embeds/redcircle.js'
 import {
@@ -370,8 +373,8 @@ import {
   vidyardImageEmbedResolver,
   vidyardScriptEmbedResolver,
 } from '../embeds/vidyard.js'
-import { vimeoEmbedResolver, vimeoMetasliderEmbedResolver } from '../embeds/vimeo.js'
-import { vkEmbedResolver, vkWidgetEmbedResolver } from '../embeds/vk.js'
+import { vimeoIframeEmbedResolver, vimeoMetasliderEmbedResolver } from '../embeds/vimeo.js'
+import { vkIframeEmbedResolver, vkWidgetEmbedResolver } from '../embeds/vk.js'
 import { vokiFlashEmbedResolver, vokiIframeEmbedResolver } from '../embeds/voki.js'
 import { wakeletEmbedResolver } from '../embeds/wakelet.js'
 import { washingtonpostEmbedResolver } from '../embeds/washingtonpost.js'
@@ -542,7 +545,7 @@ const embedResolvers: Array<EmbedResolver> = [
   anyflipEmbedResolver,
   aparatIframeEmbedResolver,
   aparatScriptEmbedResolver,
-  appleEmbedResolver,
+  appleIframeEmbedResolver,
   appleToolsEmbedResolver,
   arcgisIframeEmbedResolver,
   arcgisWidgetEmbedResolver,
@@ -561,7 +564,7 @@ const embedResolvers: Array<EmbedResolver> = [
   bbcIframeEmbedResolver,
   bitchuteEmbedResolver,
   bloggerEmbedResolver,
-  blubrryEmbedResolver,
+  blubrryIframeEmbedResolver,
   blubrryPowerpressEmbedResolver,
   blueskyBlockquoteEmbedResolver,
   blueskyIframeEmbedResolver,
@@ -607,7 +610,7 @@ const embedResolvers: Array<EmbedResolver> = [
   crowdsignalScriptEmbedResolver,
   cspanEmbedResolver,
   dailymailEmbedResolver,
-  dailymotionEmbedResolver,
+  dailymotionIframeEmbedResolver,
   dailymotionScriptEmbedResolver,
   deezerEmbedResolver,
   democracynowIframeEmbedResolver,
@@ -655,7 +658,7 @@ const embedResolvers: Array<EmbedResolver> = [
   googleformsEmbedResolver,
   googlesheetsEmbedResolver,
   googleslidesEmbedResolver,
-  guardianEmbedResolver,
+  guardianIframeEmbedResolver,
   guardianFlashEmbedResolver,
   hearthisEmbedResolver,
   helloassoEmbedResolver,
@@ -668,7 +671,7 @@ const embedResolvers: Array<EmbedResolver> = [
   imgurGifvEmbedResolver,
   imgurIframeEmbedResolver,
   imgurS9eEmbedResolver,
-  inaEmbedResolver,
+  inaIframeEmbedResolver,
   inaScriptEmbedResolver,
   indavideoEmbedResolver,
   infogramIframeEmbedResolver,
@@ -704,9 +707,9 @@ const embedResolvers: Array<EmbedResolver> = [
   listennotesEmbedResolver,
   lividIframeEmbedResolver,
   lividMetasliderEmbedResolver,
-  // Ahead of mailruEmbedResolver, whose placeholders would hide the iframes a span is compared to.
+  // Ahead of mailruIframeEmbedResolver, whose placeholders would hide the iframes a span is compared to.
   mailruWidgetEmbedResolver,
-  mailruEmbedResolver,
+  mailruIframeEmbedResolver,
   matterportEmbedResolver,
   mediacccEmbedResolver,
   mediavineWidgetEmbedResolver,
@@ -714,7 +717,7 @@ const embedResolvers: Array<EmbedResolver> = [
   megaphoneEmbedResolver,
   megatvEmbedResolver,
   mixcloudEmbedResolver,
-  mrcvideoEmbedResolver,
+  mrcvideoIframeEmbedResolver,
   mrcvideoFlashEmbedResolver,
   namashaEmbedResolver,
   nbcnewsEmbedResolver,
@@ -755,7 +758,7 @@ const embedResolvers: Array<EmbedResolver> = [
   pollmakerIframeEmbedResolver,
   pollmakerFormEmbedResolver,
   preziEmbedResolver,
-  puzzlemeEmbedResolver,
+  puzzlemeIframeEmbedResolver,
   puzzlemeWidgetEmbedResolver,
   radioradicaleEmbedResolver,
   redcircleScriptEmbedResolver,
@@ -837,9 +840,9 @@ const embedResolvers: Array<EmbedResolver> = [
   vidyardIframeEmbedResolver,
   vidyardImageEmbedResolver,
   vidyardScriptEmbedResolver,
-  vimeoEmbedResolver,
+  vimeoIframeEmbedResolver,
   vimeoMetasliderEmbedResolver,
-  vkEmbedResolver,
+  vkIframeEmbedResolver,
   vkWidgetEmbedResolver,
   vokiFlashEmbedResolver,
   vokiIframeEmbedResolver,

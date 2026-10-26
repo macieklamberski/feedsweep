@@ -24,6 +24,8 @@ const htmlExtensionRegex = /\.html$/i
 // The viewer opens on the page a `#page/{n}` fragment names, framed or not.
 const pageFragmentRegex = /^#page\/[^/]+$/i
 
+const sizes = { player: { ratio: '490/600' } }
+
 const readFlipBook = (name: string): FlipBook | undefined => {
   const flipBookId = name.match(flipBookIdRegex)?.[1]
 
@@ -78,7 +80,7 @@ export const heyzineResolveEmbed: ResolveUrlEmbed = (url, element) => {
       id: flipBook.id,
       src,
       url: src,
-      ratio: '490/600',
+      ...sizes.player,
       title: attr(element, 'title'),
     }
   }
@@ -101,7 +103,7 @@ export const heyzineResolveEmbed: ResolveUrlEmbed = (url, element) => {
     id: flipBook.id,
     src,
     url: src,
-    ratio: '490/600',
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }

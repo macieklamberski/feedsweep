@@ -6,6 +6,8 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'mediaccc'
 
+const sizes = { player: { ratio: '16/9' } }
+
 // `app.media.ccc.de` serves the same player on the same paths.
 const mediacccHosts = ['media.ccc.de']
 
@@ -34,7 +36,7 @@ export const mediacccResolveEmbed: ResolveUrlEmbed = (url, element) => {
     id: slug,
     src: `https://media.ccc.de/v/${slug}/oembed${readStartFragment(url)}`,
     url: `https://media.ccc.de/v/${slug}`,
-    ratio: '16/9',
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }

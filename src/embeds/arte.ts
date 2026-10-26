@@ -8,6 +8,11 @@ const provider = 'arte'
 
 const arteHosts = ['arte.tv']
 
+const sizes = {
+  // The player fills whatever box it gets, and ARTE's own snippet sizes it `100%` both ways.
+  player: { ratio: '16/9' },
+}
+
 // The retired players, `player/v{3..7}/index.{php,html}`, and `player/index.*` they redirect to.
 const legacyPlayerPathRegex = /^\/player\/(?:v\d+\/)?index\.(?:php|html)$/i
 
@@ -25,9 +30,7 @@ const readProgram = (language: string | undefined, id: string | undefined): Prog
 // {lang}/{id}`, which names the program. Older `json_url`s pointed at ARTE Concert's own player
 // and at a `papi` guide feed, both gone with no program id to carry over.
 const readLegacyProgram = (parsed: URL): Program | undefined => {
-  const config = parseUrlOnHosts(getQueryParam(parsed.searchParams, 'json_url') ?? '', [
-    'api.arte.tv',
-  ])
+  const config = parseUrlOnHosts(getQueryParam(parsed.searchParams, 'json_url'), ['api.arte.tv'])
 
   if (!config) {
     return
@@ -51,8 +54,7 @@ const composeEmbed = ({ language, id }: Program): EmbedResolverResult => {
     id: `${language}/${id}`,
     src: `https://www.arte.tv/embeds/${language}/${id}`,
     url: `https://www.arte.tv/${language}/videos/${id}/`,
-    // The player fills whatever box it gets, and ARTE's own snippet sizes it `100%` both ways.
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

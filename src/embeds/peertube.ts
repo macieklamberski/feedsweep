@@ -21,9 +21,11 @@ const shortIdRegex = /^[1-9A-HJ-NP-Za-km-z]{22}$/
 // `/videos/watch/{id}` is the watch page PeerTube served before 4.0 and still answers on.
 const videoRoutes = ['embed', 'watch']
 
-// A vertical upload gets the same landscape player as any other: an instance's oEmbed answers
-// 560x315 for a video whose own aspectRatio is 0.5625, so a carrier's portrait box never fills.
-const playerRatio = '16/9'
+const sizes = {
+  // A vertical upload gets the same landscape player as any other: an instance's oEmbed answers
+  // 560x315 for a video whose own aspectRatio is 0.5625, so a carrier's portrait box never fills.
+  player: { ratio: '16/9' },
+}
 
 const isVideoId = (segment: string | undefined): segment is string => {
   return !!segment && (uuidRegex.test(segment) || shortIdRegex.test(segment))
@@ -103,7 +105,7 @@ export const peertubeEmbedResolver = createMarkupEmbedResolver(
         id: `playlist/${video.id}`,
         src: `${video.origin}/video-playlists/embed/${video.id}${pickUrlParams(url, peertubePlaylistParams)}`,
         url: `${video.origin}/w/p/${video.id}`,
-        ratio: playerRatio,
+        ...sizes.player,
         title: attr(element, 'title'),
       }
     }
@@ -116,7 +118,7 @@ export const peertubeEmbedResolver = createMarkupEmbedResolver(
       id: video.id,
       src: `${video.origin}/videos/embed/${video.id}${pickUrlParams(url, peertubeEmbedParams)}`,
       url: `${video.origin}/w/${video.id}`,
-      ratio: playerRatio,
+      ...sizes.player,
       title: attr(element, 'title'),
     }
   },

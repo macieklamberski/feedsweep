@@ -2,12 +2,19 @@ import { composeQuery, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
+const provider = 'megatv'
+
 const megatvHosts = ['megatv.com']
 
 // The 2020 is a fixed prefix the player plugin writes, not the year: a June 2026 article embeds
 // 20202420350 behind it, checked 2026-09-07.
 // Mega switched to it at post 151920 in October 2020, and earlier articles carry eight-digit ids.
 const prefixedPostIdRegex = /^2020(\d{6,})$/
+
+const sizes = {
+  // The player is Video.js in fluid mode, and the share dialog boxes it 560 by 315.
+  player: { ratio: '16/9' },
+}
 
 const megatvResolveEmbed: ResolveUrlEmbed = (url) => {
   if (!isAnyOf(getPathSegments(url).join('/'), 'embed')) {
@@ -28,12 +35,11 @@ const megatvResolveEmbed: ResolveUrlEmbed = (url) => {
   // It carries the poster, a WordPress upload not derivable from the id, in data-kwik_image beside
   // the title.
   return {
-    provider: 'megatv',
+    provider,
     id,
     src: `https://www.megatv.com/embed/${composeQuery({ p: id })}`,
     url: post ? `https://www.megatv.com/${composeQuery({ p: post })}` : undefined,
-    // The player is Video.js in fluid mode, and the share dialog boxes it 560 by 315.
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

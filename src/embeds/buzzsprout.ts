@@ -23,8 +23,10 @@ const episodePagePathRegex = /^\/(\d+)\/(?:episodes\/)?(\d+)(?:-[^/.]*)?$/i
 
 // Both heights are what Buzzsprout's own script writes onto the iframe it builds: 200 for the
 // small episode player, 375 for the large show player (read from the served script, 2026-08-15).
-const episodeHeight = 200
-const showHeight = 375
+const sizes = {
+  episode: { height: 200 },
+  show: { height: 375 },
+}
 
 // The tag filter picks which episodes the show player lists and plays.
 const showPlayerParams = ['tags']
@@ -44,7 +46,7 @@ const composeEmbed = (
     id: path,
     src: `https://www.buzzsprout.com/${path}${composeQuery({ iframe: 'true', ...params })}`,
     url: `https://www.buzzsprout.com/${pagePath}`,
-    height: episodeId ? episodeHeight : showHeight,
+    ...(episodeId ? sizes.episode : sizes.show),
   }
 }
 

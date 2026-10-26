@@ -5,6 +5,8 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'washingtonpost'
 
+const sizes = { player: { ratio: '16/9' } }
+
 const washingtonpostHosts = ['washingtonpost.com']
 
 const embedPathRegex = /^\/video\/c\/embed\/([^/]+)\/?$/i
@@ -25,7 +27,7 @@ export const washingtonpostResolveEmbed: ResolveUrlEmbed = (url) => {
     provider,
     id,
     src: `https://www.washingtonpost.com/video/c/embed/${id}`,
-    ratio: '16/9',
+    ...sizes.player,
   }
 }
 

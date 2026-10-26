@@ -32,6 +32,8 @@ const permalinkLabelRegex = /^[#¶§❡\u{1f517}​]+$/u
 const footnoteClassRegex = /footnote/i
 const bracketedNumberRegex = /^\[\d+\]$/
 const whitespaceRegex = /\s+/
+const slugSeparatorRegex = /[^\p{L}\p{N}]+/gu
+const edgeHyphensRegex = /^-+|-+$/g
 
 // Accordion, collapse and tab controls (WPBakery, jQuery UI, Bootstrap) wrap the heading in an
 // <a href="#panel"> whose fragment is the slugified title, so it slug-matches a permalink.
@@ -56,10 +58,7 @@ const isGlyphMarker = (node: Node, fragment: string): boolean => {
 // accented letters survive) to single hyphens, matching how generators slug a
 // heading into its fragment id.
 const slugify = (value: string): string => {
-  return value
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N}]+/gu, '-')
-    .replace(/^-+|-+$/g, '')
+  return value.toLowerCase().replace(slugSeparatorRegex, '-').replace(edgeHyphensRegex, '')
 }
 
 // A heading permalink shipped as a wrapping #fragment link, a stray glyph or a bare <a name>.

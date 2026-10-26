@@ -1,9 +1,13 @@
 import { decodeSegment, encodePathSegment } from 'trousse'
 import type { EmbedRenderHint } from '../types.js'
-import { findConfigScript } from '../utils/dom.js'
+import { attr, findConfigScript } from '../utils/dom.js'
 import { createMarkupEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'brid'
+
+const sizes = {
+  player: { ratio: '16/9' },
+}
 
 // The inline script's config comes in two spellings, `$bp("Brid_{n}", {...})` and
 // `_bp.push({"div": "Brid_{n}", "obj": {...}})`. `id` is the player, `video` the video, and the
@@ -19,7 +23,7 @@ export const bridEmbedResolver = createMarkupEmbedResolver('div.brid[id^="Brid_"
   const script = findConfigScript(element)
   const text = script?.textContent ?? ''
   // Read after the div's own id, so a script holding several configs yields the right one.
-  const config = text.slice(text.indexOf(element.id))
+  const config = text.slice(text.indexOf(attr(element, 'id') ?? ''))
   // Both go from the script into a path.
   const playerId = encodePathSegment(config.match(playerIdRegex)?.[1] ?? '')
   const videoId = encodePathSegment(config.match(videoIdRegex)?.[1] ?? '')
@@ -45,7 +49,7 @@ export const bridEmbedResolver = createMarkupEmbedResolver('div.brid[id^="Brid_"
     // It is the page the loader's own code opens as its iframe player. A retired player id falls
     // back to the partner's current one, and a retired partner does not.
     src: `https://services.brid.tv/services/iframe/video/${videoId}/${playerId}`,
-    ratio: '16/9',
+    ...sizes.player,
     title: decodeSegment(title) ?? title,
   }
 })

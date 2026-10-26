@@ -79,12 +79,6 @@ describe('formmailerResolveEmbed', () => {
 
       expect(formmailerResolveEmbed(new URL(value))).toBeUndefined()
     })
-
-    it('should ignore the form path on another host of the domain', () => {
-      const value = 'https://www.form-mailer.jp/fms/6662b06a268383'
-
-      expect(formmailerResolveEmbed(new URL(value))).toBeUndefined()
-    })
   })
 })
 
@@ -221,6 +215,12 @@ describeForEachParser('formmailerIframeEmbedResolver', (parseHtml) => {
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the same path', async () => {
       const value = '<iframe src="https://evil.test/fms/6662b06a268383"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the form path on another host of the domain', async () => {
+      const value = '<iframe src="https://www.form-mailer.jp/fms/6662b06a268383"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

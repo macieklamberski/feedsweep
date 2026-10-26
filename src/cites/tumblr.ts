@@ -3,6 +3,8 @@ import { buildCite, trim } from '../utils/cites.js'
 import { attr, find, jsonAttr, text } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
 
+const provider = 'tumblr'
+
 type TumblrLinkData = {
   type?: string
   url?: string
@@ -31,7 +33,7 @@ export const tumblrCiteResolver: CiteResolver = {
   extract: (element) => {
     if (element.matches('.npf-link-block')) {
       return buildCite({
-        provider: 'tumblr',
+        provider,
         url: attr(find(element, 'a'), 'href'),
         title: text(element, '.title'),
         description: text(element, '.description'),
@@ -60,7 +62,7 @@ export const tumblrCiteResolver: CiteResolver = {
     const posters = Array.isArray(data.poster) ? data.poster : []
 
     return buildCite({
-      provider: 'tumblr',
+      provider,
       url,
       // The anchor shows the link itself when there is no title, so without the check that link
       // text becomes the title.

@@ -1,6 +1,5 @@
 import { getPathSegments, isAnyOf, isHostOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'symbaloo'
@@ -8,19 +7,13 @@ const provider = 'symbaloo'
 // Exact: `cdn01.symbaloo.com` serves files, and `blog.symbaloo.com` answers its index to any path.
 const symbalooHosts = ['symbaloo.com', 'www.symbaloo.com', 'edu.symbaloo.com']
 
-const webmixHeight = 500
+const sizes = { player: { height: 500 } }
 
 // Symbaloo's embedded webmix, `/embed/{slug}` for a published webmix and `/embed/shared/{token}`
 // for one shared by link. The route words are read in any case. The slug is minted as written,
 // and Symbaloo answers it in any case.
 export const symbalooResolveEmbed: ResolveUrlEmbed = (url) => {
-  const parsed = parseUrlOnHosts(url, symbalooHosts, isHostOf)
-
-  if (!parsed) {
-    return
-  }
-
-  const [route, name, token, ...rest] = getPathSegments(parsed)
+  const [route, name, token, ...rest] = getPathSegments(url)
 
   if (!isAnyOf(route, 'embed') || !name || rest.length > 0) {
     return
@@ -36,7 +29,7 @@ export const symbalooResolveEmbed: ResolveUrlEmbed = (url) => {
     return {
       provider,
       src: `https://www.symbaloo.com/embed/shared/${token}`,
-      height: webmixHeight,
+      ...sizes.player,
     }
   }
 
@@ -45,8 +38,10 @@ export const symbalooResolveEmbed: ResolveUrlEmbed = (url) => {
     id: name,
     src: `https://www.symbaloo.com/embed/${name}`,
     url: `https://www.symbaloo.com/mix/${name}`,
-    height: webmixHeight,
+    ...sizes.player,
   }
 }
 
-export const symbalooEmbedResolver = createUrlEmbedResolver(symbalooHosts, symbalooResolveEmbed)
+export const symbalooEmbedResolver = createUrlEmbedResolver(symbalooHosts, symbalooResolveEmbed, {
+  isOnHost: isHostOf,
+})

@@ -6,6 +6,8 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'anyflip'
 
+const sizes = { player: { ratio: '550/350' } }
+
 const viewerHost = 'online.anyflip.com'
 // The viewer's S3 bucket, which also serves it path-style with the bucket as the first segment.
 const bucketHost = 's3.amazonaws.com'
@@ -35,7 +37,7 @@ export const anyflipResolveEmbed: ResolveUrlEmbed = (url, element) => {
     url: `https://anyflip.com/${user}/${book}`,
     // The cover the viewer's own `og:image` names, 403 on a book that does not exist.
     thumbnail: `${viewerUrl}files/shot.jpg`,
-    ratio: '550/350',
+    ...sizes.player,
     title: attr(element, 'title'),
   }
 }

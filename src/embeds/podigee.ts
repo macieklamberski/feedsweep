@@ -18,9 +18,11 @@ const showHostRegex = /^(?!www\.)[a-z0-9-]+\.podigee\.io$/i
 // names the player outright and needs no such guess.
 const safeEpisodeRegex = /^[a-z]?\d+-/
 
-// Fluid in width and fixed in height: 145 at 400 and 900 pixels wide (2026-09-05), matching
-// the 144.8 the player reports once rendered.
-const playerHeight = 145
+const sizes = {
+  // Fluid in width and fixed in height: 145 at 400 and 900 pixels wide (2026-09-05), matching
+  // the 144.8 the player reports once rendered.
+  player: { height: 145 },
+}
 
 // The show is the subdomain and the episode the first path segment, which together make a
 // stable id without parsing the query. The player url is the one Podigee's embed code writes.
@@ -34,7 +36,7 @@ const composeEmbed = (parsed: URL, episode?: string): EmbedResolverResult => {
     id: `${show}/${episode ?? 'embed'}`,
     src: `https://${parsed.hostname}/${path}?context=external`,
     url: `https://${parsed.hostname}/${episode ?? ''}`,
-    height: playerHeight,
+    ...sizes.player,
   }
 }
 

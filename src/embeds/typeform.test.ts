@@ -263,12 +263,6 @@ describe('typeformResolveEmbed', () => {
 
     expect(typeformResolveEmbed(new URL(value))).toBeUndefined()
   })
-
-  it('should ignore another host carrying the form path', () => {
-    const value = 'https://evil.test/to/MTt3Pw7K'
-
-    expect(typeformResolveEmbed(new URL(value))).toBeUndefined()
-  })
 })
 
 describeForEachParser('typeformIframeEmbedResolver', (parseHtml) => {

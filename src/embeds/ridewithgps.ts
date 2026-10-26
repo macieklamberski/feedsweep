@@ -24,7 +24,7 @@ const ridewithgpsHosts = ['ridewithgps.com']
 const embedParams = ['title', 'privacyCode']
 const privateParams = ['privacyCode']
 
-const mapHeight = 700
+const sizes = { map: { height: 700 } }
 
 // An event names its id in `eventId`, and Ride with GPS serves no static render under `/events`.
 const embedKinds = toMap<EmbedShape>({
@@ -61,7 +61,7 @@ const composeEmbed = (
     src,
     url: page,
     ...(shape.hasThumbnail ? { thumbnail: `${page}/thumb.png` } : undefined),
-    height: mapHeight,
+    ...sizes.map,
     title,
   }
 }
@@ -77,7 +77,7 @@ const composePrivateEmbed = (
     provider,
     id: `${kind}/${id}`,
     src,
-    height: mapHeight,
+    ...sizes.map,
     title,
   }
 }

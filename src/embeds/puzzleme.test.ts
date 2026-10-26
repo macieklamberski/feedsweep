@@ -2,10 +2,10 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { puzzlemeEmbedResolver, puzzlemeWidgetEmbedResolver } from './puzzleme.js'
+import { puzzlemeIframeEmbedResolver, puzzlemeWidgetEmbedResolver } from './puzzleme.js'
 
-describeForEachParser('puzzlemeEmbedResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, puzzlemeEmbedResolver)
+describeForEachParser('puzzlemeIframeEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, puzzlemeIframeEmbedResolver)
 
   describe('happy paths', () => {
     it('should rebuild the apex host player onto the puzzleme host', async () => {
