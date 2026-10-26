@@ -10,13 +10,12 @@ const sizes = {
   model: { ratio: '4/3' },
 }
 
-// A model uid is 32 hex characters, and it also ends the slugged page url
-// (`/3d-models/{slug}-{uid}`), which is how a pasted page link is read. The shape tells a uid from
-// the listing words that share the bare page route, such as `/models/popular`.
-const safeUidRegex = /^[0-9a-f]{32}$/i
-// The lengths tell the uid from the slug words before it. Older models end the slug in a
-// 26-character uid in letters of both cases.
-const sluggedUidRegex = /(?<uid>[0-9a-f]{32}|[0-9a-z]{26})$/i
+// A model uid is 32 hex characters, or 26 letters and digits of both cases on older models. The
+// shape tells a uid from the listing words that share the bare page route, such as
+// `/models/popular`, and from the slug words before it on the page url `/3d-models/{slug}-{uid}`.
+const uidPattern = '[0-9a-f]{32}|[0-9a-z]{26}'
+const uidRegex = new RegExp(`^(?:${uidPattern})$`, 'i')
+const sluggedUidRegex = new RegExp(`(?<uid>${uidPattern})$`, 'i')
 
 const hosts = ['sketchfab.com']
 
@@ -24,7 +23,7 @@ const readModelUid = (parsed: URL): string | undefined => {
   const [route, modelId, view] = getPathSegments(parsed)
 
   if (isAnyOf(route, 'models') && view === undefined) {
-    return keepIfMatches(modelId, safeUidRegex)
+    return keepIfMatches(modelId, uidRegex)
   }
 
   // The viewer is `/models/{uid}/embed`, which the retired `/embed/{uid}` and `/show/{uid}`
