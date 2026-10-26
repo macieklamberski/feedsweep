@@ -52,6 +52,19 @@ describe('foxnewsResolveEmbed', () => {
       expect(foxnewsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
+    it('should name the brand from a player host written with a trailing dot', () => {
+      const value = 'https://video.foxbusiness.com./v/video-embed.html?video_id=6355436296112'
+      const expected: EmbedResolverResult = {
+        provider: 'foxbusiness',
+        id: '6355436296112',
+        src: 'https://video.foxbusiness.com/v/video-embed.html?video_id=6355436296112',
+        url: 'https://www.foxbusiness.com/video/6355436296112',
+        ratio: '16/9',
+      }
+
+      expect(foxnewsResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
     it('should rebuild the video page onto the player', () => {
       const value = 'https://video.foxnews.com/v/5406119088001/'
       const expected: EmbedResolverResult = {
@@ -193,6 +206,23 @@ describeForEachParser('foxnewsScriptEmbedResolver', (parseHtml) => {
         <script
           type="text/javascript"
           src="https://video.foxbusiness.com/v/embed.js?id=6355436296112&#038;w=466&#038;h=263"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'foxbusiness',
+        id: '6355436296112',
+        src: 'https://video.foxbusiness.com/v/video-embed.html?video_id=6355436296112',
+        url: 'https://www.foxbusiness.com/video/6355436296112',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+    it('should read the id off a snippet whose query is glued on with a second question mark', async () => {
+      const value = html`
+        <script
+          type="text/javascript"
+          src="https://video.foxbusiness.com/v/embed.js?id=6355436296112?w=466&#038;h=263"
         ></script>
       `
       const expected: EmbedResolverResult = {

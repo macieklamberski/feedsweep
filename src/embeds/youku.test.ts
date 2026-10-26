@@ -217,6 +217,25 @@ describeForEachParser('youkuEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
+
+    it('should repair the qplayer swf on the static host spelled with a trailing dot', async () => {
+      const value = html`
+        <embed
+          src="http://static.youku.com./v1.0.0080/v/swf/qplayer.swf?VideoIDS=XMTE4Mzc2NTcy&embedid=-&showAd=0"
+          width="530"
+          height="440"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youku',
+        id: 'XMTE4Mzc2NTcy',
+        src: 'https://player.youku.com/embed/XMTE4Mzc2NTcy',
+        url: 'https://v.youku.com/v_show/id_XMTE4Mzc2NTcy.html',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 })
 

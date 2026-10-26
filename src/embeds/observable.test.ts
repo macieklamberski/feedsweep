@@ -188,7 +188,7 @@ describeForEachParser('observableEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the query in the src as published, trackers included', async () => {
+    it('should drop a tracker from the query and keep the cells as written', async () => {
       const value = html`
         <iframe
           width="75%"
@@ -200,7 +200,7 @@ describeForEachParser('observableEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'observable',
         id: '@d3/sortable-bar-chart',
-        src: 'https://observablehq.com/embed/@d3/sortable-bar-chart?cell=viewof+order&utm_source=feed&cell=chart&fbclid=IwAR0abc',
+        src: 'https://observablehq.com/embed/@d3/sortable-bar-chart?cell=viewof+order&cell=chart',
         url: 'https://observablehq.com/@d3/sortable-bar-chart',
       }
 

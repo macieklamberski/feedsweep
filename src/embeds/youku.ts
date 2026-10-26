@@ -1,4 +1,4 @@
-import { encodePathSegment, getQueryParam } from 'trousse'
+import { encodePathSegment, getQueryParam, isHostOf } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { isFileName } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -21,7 +21,7 @@ const sizes = {
 }
 
 const readVideoId = (url: URL): string | undefined => {
-  if (url.hostname === 'static.youku.com') {
+  if (isHostOf(url, 'static.youku.com')) {
     const videoIds = getQueryParam(url.searchParams, 'VideoIDS')
 
     // The query value comes out decoded, and it goes into the player path.

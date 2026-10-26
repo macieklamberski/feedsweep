@@ -29,6 +29,21 @@ describeForEachParser('tencentEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read the current player on its host written with a trailing dot', async () => {
+      const value =
+        '<iframe src="https://v.qq.com./txp/iframe/player.html?vid=v03604lrvan"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'tencent',
+        id: 'v03604lrvan',
+        src: 'https://v.qq.com/txp/iframe/player.html?vid=v03604lrvan',
+        url: 'https://v.qq.com/x/page/v03604lrvan.html',
+        thumbnail: 'https://puui.qpic.cn/qqvideo_ori/0/v03604lrvan_496_280/0',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should keep the ratio over the box the old player snippet declared', async () => {
       const value = html`
         <iframe

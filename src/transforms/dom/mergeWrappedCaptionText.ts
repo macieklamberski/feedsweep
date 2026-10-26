@@ -1,5 +1,5 @@
 import type { DomTransform } from '../../types.js'
-import { isBlockElement, mediaElements, placeholderSelectors } from '../../utils/dom.js'
+import { hasText, isBlockElement, mediaElements, placeholderSelectors } from '../../utils/dom.js'
 
 const nonTextSelector = [...mediaElements, ...placeholderSelectors, 'figure', 'figcaption'].join(
   ', ',
@@ -10,7 +10,7 @@ const isCaptionText = (element: Element): boolean => {
     return false
   }
 
-  return Boolean(element.textContent?.trim())
+  return hasText(element)
 }
 
 // Big Think puts the image description in divs beside a <figcaption> that holds only the credit,
@@ -38,7 +38,7 @@ export const mergeWrappedCaptionText: DomTransform = () => {
       // a paragraph first to keep the caption's parts uniformly block-separated.
       const hasBlockContent = Array.from(figcaption.children).some(isBlockElement)
 
-      if (!hasBlockContent && figcaption.textContent?.trim()) {
+      if (!hasBlockContent && hasText(figcaption)) {
         const paragraph = document.createElement('p')
 
         while (figcaption.firstChild) {

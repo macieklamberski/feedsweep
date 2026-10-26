@@ -139,6 +139,17 @@ describe('extractMegaphoneEmbed on the legacy episode player', () => {
     expect(extractMegaphoneEmbed(new URL(value))).toEqual(expected)
   })
 
+  it('should read the episode on the host spelled with a trailing dot', () => {
+    const value = 'https://player.megaphone.fm./VMP9785445903'
+    const expected = {
+      param: 'e',
+      kind: 'episode',
+      id: 'VMP9785445903',
+    }
+
+    expect(extractMegaphoneEmbed(new URL(value))).toEqual(expected)
+  })
+
   it('should ignore the same path on the current player host', () => {
     const value = 'https://playlist.megaphone.fm/VMP9785445903'
 

@@ -199,6 +199,29 @@ describeForEachParser('hatenaCiteResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read a self-served card whose iframe names a port the citation omits', async () => {
+      const value = html`
+        <p>
+          <iframe
+            src="http://nogutyo.hatenablog.com:8080/embed/2013/09/07/004036"
+            title="An entry"
+            class="embed-card embed-blogcard"
+          ></iframe>
+          <cite class="hatena-citation">
+            <a href="http://nogutyo.hatenablog.com/entry/2013/09/07/004036">nogutyo.hatenablog.com</a>
+          </cite>
+        </p>
+      `
+      const expected: CiteResolverResult = {
+        provider: 'hatena',
+        url: 'http://nogutyo.hatenablog.com/entry/2013/09/07/004036',
+        title: 'An entry',
+        publisher: 'nogutyo.hatenablog.com',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // The citation on its own is not enough: a foreign player beside one names a different host,
     // so the pair is what separates a blog citing itself from a player that happens to sit next
     // to a citation.

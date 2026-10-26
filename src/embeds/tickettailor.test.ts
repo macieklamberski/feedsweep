@@ -55,6 +55,25 @@ describeForEachParser('tickettailorScriptEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read the widget div whose class carries surrounding spaces', async () => {
+      const value = html`
+        <div class=" tt-widget ">
+          <script
+            src="https://cdn.tickettailor.com/js/widgets/min/widget.js"
+            data-url="https://www.tickettailor.com/events/aneti/2443115/select-date?ref=website_widget"
+          ></script>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tickettailor',
+        id: 'aneti/2443115',
+        src: 'https://www.tickettailor.com/events/aneti/2443115/select-date?widget=true',
+        url: 'https://www.tickettailor.com/events/aneti/2443115/select-date',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should build the checkout widget with no page url, since it needs its checksum', async () => {
       const value = html`
         <div class="tt-widget">

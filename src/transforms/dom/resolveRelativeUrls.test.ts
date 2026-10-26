@@ -86,6 +86,21 @@ describeForEachParser('resolveRelativeUrls', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should resolve a relative form action', async () => {
+    const value = '<form action="/search"><input name="q"></form>'
+    const expected = '<form action="https://example.com/search"><input name="q"></form>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should resolve a relative formaction on a button', async () => {
+    const value = '<form><button formaction="/subscribe">Subscribe</button></form>'
+    const expected =
+      '<form><button formaction="https://example.com/subscribe">Subscribe</button></form>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should resolve through the configured resolveUrlFn', async () => {
     const context: TransformContext = {
       ...baseContext,

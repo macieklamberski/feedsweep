@@ -1,6 +1,6 @@
 import { encodePathSegment, getPathSegments, isAnyOf, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
-import { attr, find, findConfigScript } from '../utils/dom.js'
+import { attr, find, findConfigScript, text } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -217,12 +217,12 @@ const mountIdRegex = /^jwplayer_(?<mediaId>[^_]+)_(?<playerId>[^_]+)(?:_\d+)?_di
 export const jwplayerMountEmbedResolver = createMarkupEmbedResolver(
   'div.jwplayer[id^="jwplayer_"]',
   (element) => {
-    if (element.textContent?.trim()) {
+    if (text(element)) {
       return
     }
 
     // The mount id comes out of its attribute decoded, and both ids in it go into a path.
-    const ids = element.id.match(mountIdRegex)?.groups
+    const ids = attr(element, 'id')?.match(mountIdRegex)?.groups
     const mediaId = encodePathSegment(ids?.mediaId ?? '')
 
     if (!mediaId) {

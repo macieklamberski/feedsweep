@@ -14,7 +14,7 @@ import {
 import { extractVideoId, hosts as youtubeHosts } from '../embeds/youtube.js'
 import type { CleanUrlFn } from '../types.js'
 import { pixelDimensionLimit } from './dom.js'
-import { isFileName, parseUrlOnHosts, placeholderBaseUrl } from './urls.js'
+import { isFileName, isUsableSrc, parseUrlOnHosts, placeholderBaseUrl } from './urls.js'
 
 // The parser reads a bare `225w` with no url as that candidate's url, and a proxy 404s on it.
 // Jetpack's feed export keeps only the first url, `…768w, 225w, 563w`, while the page has them all.
@@ -503,9 +503,18 @@ const getVideoFileStems = (video: Element): Array<string> => {
   return stems
 }
 
-// An empty `poster=""` names no picture.
 export const getVideoThumbnail = (video: Element): string | undefined => {
-  return video.getAttribute('poster') || video.getAttribute('data-embed-thumbnail') || undefined
+  const poster = video.getAttribute('poster')
+
+  if (isUsableSrc(poster)) {
+    return poster
+  }
+
+  const thumbnail = video.getAttribute('data-embed-thumbnail')
+
+  if (isUsableSrc(thumbnail)) {
+    return thumbnail
+  }
 }
 
 // Whether an image is a player's poster, from urls alone: the url names the player's id, it is

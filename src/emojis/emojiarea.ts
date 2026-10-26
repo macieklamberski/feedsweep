@@ -1,5 +1,5 @@
 import type { EmojiResolver } from '../types.js'
-import { attr } from '../utils/dom.js'
+import { attr, text } from '../utils/dom.js'
 import { resolveEmojiElement } from '../utils/emojis.js'
 import { glyphFromGemojiName } from '../utils/gemoji.js'
 
@@ -10,9 +10,9 @@ export const emojiareaEmojiResolver: EmojiResolver = {
   selector: 'span[class*="emoji-spritesheet-" i][title]',
   extract: (element) => {
     const name = attr(element, 'title')
-    const text = element.textContent?.trim()
+    const content = text(element)
 
-    if (text && text !== `:${name}:`) {
+    if (content && content !== `:${name}:`) {
       return
     }
 

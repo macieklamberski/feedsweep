@@ -12,7 +12,8 @@ const sizes = {
 }
 
 // Patronite's support widget, framed from `/widget/{slug}/{id}/{size}/{colors}`. The widget
-// renders by the numeric id alone, and the slug names the creator page.
+// renders by the numeric id alone, and the slug names the creator page. `small` is the only size
+// the route serves, and it answers 404 without both color segments.
 export const patroniteResolveEmbed: ResolveUrlEmbed = (url) => {
   const [route, slug, id] = getPathSegments(url)
 
@@ -23,7 +24,7 @@ export const patroniteResolveEmbed: ResolveUrlEmbed = (url) => {
   return {
     provider,
     id,
-    src: url.href,
+    src: `https://patronite.pl/widget/${slug}/${id}/small/light/colorful`,
     url: `https://patronite.pl/${slug}`,
     ...sizes.widget,
   }

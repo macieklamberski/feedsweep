@@ -1,5 +1,5 @@
 import type { EmojiResolver } from '../types.js'
-import { attr } from '../utils/dom.js'
+import { attr, text } from '../utils/dom.js'
 import {
   glyphFromShortcode,
   isEmojiShaped,
@@ -11,10 +11,11 @@ import { smiliesEmojiNames } from './smilies.js'
 
 const classSelector = 'img[class~="wp-smiley" i]'
 
-const hosts = [
-  's.w.org/images/core/emoji/', // WordPress core wp-emoji-release output.
-  'wp.com/wp-content/mu-plugins/wpcom-smileys/', // WordPress.com smileys, from s0, s1 and s2.
-]
+// WordPress core wp-emoji-release output.
+const coreEmojiPath = 's.w.org/images/core/emoji/'
+// WordPress.com smileys, from s0, s1 and s2.
+const wpcomSmileysPath = 'wp.com/wp-content/mu-plugins/wpcom-smileys/'
+const hosts = [coreEmojiPath, wpcomSmileysPath]
 
 // WordPress core's smilies and emoji, and the WordPress.com copies of them.
 export const wordpressEmojiResolver: EmojiResolver = {
@@ -35,7 +36,7 @@ export const wordpressEmojiResolver: EmojiResolver = {
     // Core writes the glyph into the alt of every emoji, and a smilie carries its typed code, so
     // the alt tells the emoji set from the smilies even behind a lazy placeholder.
     const alt = attr(element, 'alt')
-    const isEmojiSet = src.includes(hosts[0]) || (alt !== undefined && isEmojiShaped(alt))
+    const isEmojiSet = src.includes(coreEmojiPath) || (alt !== undefined && isEmojiShaped(alt))
 
     return resolveEmojiImage(element, { isStrong: true, names, keepsPictures: !isEmojiSet })
   },
@@ -48,14 +49,14 @@ export const wordpressElementEmojiResolver: EmojiResolver = {
   selector: 'span[class~="wp-smiley" i]',
   extract: (element) => {
     const title = attr(element, 'title')
-    const text = element.textContent?.trim() ?? ''
+    const code = text(element) ?? ''
 
     // A code or a word, never prose.
-    if (text.length > 20 || element.firstElementChild) {
+    if (code.length > 20 || element.firstElementChild) {
       return
     }
 
-    const glyph = glyphFromShortcode(title) ?? glyphFromShortcode(text)
+    const glyph = glyphFromShortcode(title) ?? glyphFromShortcode(code)
 
     return resolveEmojiElement(element, { glyph, shortcode: title })
   },

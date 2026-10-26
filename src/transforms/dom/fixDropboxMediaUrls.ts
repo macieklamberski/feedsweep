@@ -1,3 +1,4 @@
+import { composeQuery } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { parseUrlOnHosts } from '../../utils/urls.js'
 
@@ -17,7 +18,7 @@ export const fixDropboxMediaUrls: DomTransform = () => (document) => {
     }
 
     url.searchParams.delete('dl')
-    url.searchParams.set('raw', '1')
+    url.search = composeQuery({ ...Object.fromEntries(url.searchParams), raw: '1' })
 
     element.setAttribute('src', url.href)
   }

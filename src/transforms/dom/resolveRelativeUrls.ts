@@ -2,7 +2,12 @@ import { stringifySrcset } from 'srcset'
 import type { DomTransform, ResolveUrlFn } from '../../types.js'
 import { svgHrefAttribute } from '../../utils/dom.js'
 import { countSrcsetCandidates, parseSrcset } from '../../utils/images.js'
-import { absoluteUrlRegex, collapseSlashRuns, resolveOrKeepUrl } from '../../utils/urls.js'
+import {
+  absoluteUrlRegex,
+  collapseSlashRuns,
+  resolveOrKeepUrl,
+  urlAttributes,
+} from '../../utils/urls.js'
 import { paramObjectSelector } from '../../utils/widgets.js'
 
 const hostPrefixedUrlRegex =
@@ -69,7 +74,7 @@ const resolveSrcset = (
   element.setAttribute('srcset', stringifySrcset(resolved))
 }
 
-type UrlAttribute = {
+type RelativeAttribute = {
   selector: string
   // The name to read, or how to pick it where the element decides.
   attribute: string | ((element: Element) => string)
@@ -77,25 +82,36 @@ type UrlAttribute = {
   srcset?: boolean
 }
 
-// Narrowing [src] to a tag list leaves the script carriers widget resolvers read unresolved.
 // Absolutising a fragment-only href breaks in-article scrolling: a cite names no scroll target.
-const urlAttributes: Array<UrlAttribute> = [
+const hrefTags = ['a', 'area']
+
+// Every attribute the shared table names. A `src` row is read on any element below, and an href
+// keeps its fragment-only exclusion.
+const sharedAttributes: Array<RelativeAttribute> = urlAttributes
+  .filter(({ attribute }) => attribute !== 'src')
+  .map(({ tag, attribute }) => {
+    const exclusion = tag && hrefTags.includes(tag) ? `:not([${attribute}^="#"])` : ''
+
+    return { selector: `${tag ?? ''}[${attribute}]${exclusion}`, attribute }
+  })
+
+// What the shared table has no row for: a script's src read by the widget resolvers, a Flash
+// player url in a param, a quote's source, a srcset list and an SVG link spelled either way.
+const relativeAttributes: Array<RelativeAttribute> = [
   { selector: '[src]', attribute: 'src' },
-  { selector: 'a[href]:not([href^="#"]), area[href]:not([href^="#"])', attribute: 'href' },
-  { selector: 'video[poster]', attribute: 'poster' },
-  { selector: 'object[data]', attribute: 'data' },
   // The widget resolvers read the player such an object names here.
   { selector: `${paramObjectSelector} param[name="movie" i]`, attribute: 'value' },
   { selector: 'blockquote[cite], q[cite], ins[cite], del[cite]', attribute: 'cite' },
   { selector: 'image', attribute: svgHrefAttribute },
   { selector: 'img[srcset], source[srcset]', attribute: 'srcset', srcset: true },
+  ...sharedAttributes,
 ]
 
 // A relative or protocol-relative url points nowhere once the content leaves its page.
 export const resolveRelativeUrls: DomTransform = ({ baseUrl, resolveUrlFn }) => {
   // Bailing out without a baseUrl leaves protocol-relative urls without a scheme.
   return (document) => {
-    for (const { selector, attribute, srcset } of urlAttributes) {
+    for (const { selector, attribute, srcset } of relativeAttributes) {
       for (const element of document.querySelectorAll(selector)) {
         if (srcset) {
           resolveSrcset(element, baseUrl, resolveUrlFn)

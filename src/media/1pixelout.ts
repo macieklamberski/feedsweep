@@ -1,6 +1,6 @@
 import { getQueryParam, parseUrl } from 'trousse'
 import type { MediaResolver, MediaResolverResult } from '../types.js'
-import { flashVars, parseFlashVars } from '../utils/dom.js'
+import { attr, flashVars, parseFlashVars } from '../utils/dom.js'
 import { flashFileRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { readRepairedCarrierUrl } from '../utils/widgets.js'
 
@@ -87,10 +87,12 @@ export const onePixelOutWidgetMediaResolver: MediaResolver = {
       return
     }
 
+    const mountId = attr(element, 'id')
+
     // The call sits in a script beside the mount, or beside a wrapper around it.
     for (const script of element.ownerDocument.querySelectorAll('script')) {
       for (const [, id, options] of script.textContent?.matchAll(embedCallRegex) ?? []) {
-        if (id !== element.id) {
+        if (id !== mountId) {
           continue
         }
 

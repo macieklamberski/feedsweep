@@ -1,4 +1,11 @@
-import { encodePathSegment, getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
+import {
+  encodePathSegment,
+  getPathSegments,
+  getQueryParam,
+  isAnyOf,
+  isHostOf,
+  parseUrl,
+} from 'trousse'
 import {
   composeEmbedUrl,
   extractVideoId,
@@ -15,7 +22,7 @@ import {
   isWhitespaceText,
 } from '../../utils/dom.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../../utils/urls.js'
-import { createIframe } from '../../utils/widgets.js'
+import { createIframe, readRepairedCarrierUrl } from '../../utils/widgets.js'
 
 // In a feed the plugin writes no facade. It writes the thumbnail linked to the post, with
 // `alt="YouTube Video"`, then `<br /> <a href="https://youtu.be/{id}">Watch this video on
@@ -24,22 +31,14 @@ const feedThumbnailSelector = 'a:has(> img[alt="YouTube Video"])'
 
 // The thumbnail is `i.ytimg.com/vi/{id}/hqdefault.jpg`, or that url in the `origThumbUrl` param of
 // the plugin's own `lyteCache.php` when it serves thumbnails locally.
-const readThumbnailVideoId = (src: string): string | undefined => {
-  const url = parseUrl(src, placeholderBaseUrl)
+const readThumbnailVideoId = (image: Element): string | undefined => {
+  const src = parseUrl(readRepairedCarrierUrl(image), placeholderBaseUrl)
+  const cachedUrl = src?.pathname.toLowerCase().endsWith('/lytecache.php')
+    ? getQueryParam(src.searchParams, 'origThumbUrl')
+    : undefined
+  const url = parseUrlOnHosts(cachedUrl ?? src, 'i.ytimg.com', isHostOf)
 
   if (!url) {
-    return
-  }
-
-  const cachedUrl = url.pathname.toLowerCase().endsWith('/lytecache.php')
-    ? getQueryParam(url.searchParams, 'origThumbUrl')
-    : undefined
-
-  if (cachedUrl) {
-    return readThumbnailVideoId(cachedUrl)
-  }
-
-  if (url.hostname !== 'i.ytimg.com') {
     return
   }
 
@@ -98,7 +97,13 @@ const rebuildFeedThumbnails = (document: Document): void => {
       continue
     }
 
-    const videoId = readThumbnailVideoId(attr(thumbnail.firstElementChild, 'src') ?? '')
+    const image = thumbnail.firstElementChild
+
+    if (!image) {
+      continue
+    }
+
+    const videoId = readThumbnailVideoId(image)
 
     if (!videoId) {
       continue

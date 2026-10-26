@@ -1269,6 +1269,13 @@ describeForEachParser('text', (parseHtml) => {
   it('should return undefined for a nullish element', () => {
     expect(text(undefined)).toBeUndefined()
   })
+
+  it('should return the trimmed text of a text node', () => {
+    const document = parseHtml('<a href="#intro"> # </a>')
+    const anchor = queryElement(document, 'a')
+
+    expect(text(anchor.firstChild)).toBe('#')
+  })
 })
 
 describeForEachParser('textNode', (parseHtml) => {

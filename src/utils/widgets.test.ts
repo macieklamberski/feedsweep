@@ -622,7 +622,20 @@ describe('normalizeEmbedFields', () => {
       }
       const expected: Record<string, string | undefined> = {
         src: 'https://store.steampowered.com/widget/355060/',
-        params: 'l=german&t=A+game',
+        params: 'l=german&t=A%20game',
+      }
+
+      expect(normalizeEmbedFields(value)).toEqual(expected)
+    })
+
+    it('should keep the spelling of a url the params carry', () => {
+      const value = {
+        src: 'https://store.steampowered.com/widget/355060/',
+        params: { ref: 'https://example.com/games/@studio' },
+      }
+      const expected: Record<string, string | undefined> = {
+        src: 'https://store.steampowered.com/widget/355060/',
+        params: 'ref=https://example.com/games/@studio',
       }
 
       expect(normalizeEmbedFields(value)).toEqual(expected)

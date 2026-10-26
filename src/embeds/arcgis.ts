@@ -222,20 +222,26 @@ export const arcgisWidgetEmbedResolver = createMarkupEmbedResolver(
   'arcgis-embedded-map, arcgis-map[item-id]',
   (element) => {
     const itemId = attr(element, 'item-id')
-    const url = parseUrl(mapViewerPath, attr(element, 'portal-url') ?? defaultPortalUrl)
 
-    if (!itemId || !url) {
+    if (!itemId) {
       return
     }
 
-    url.searchParams.set('webmap', itemId)
+    const params: Record<string, string> = { webmap: itemId }
 
     for (const name of elementPositionAttributes) {
       const value = attr(element, name)
 
       if (value) {
-        url.searchParams.set(name, value)
+        params[name] = value
       }
+    }
+
+    const portalUrl = attr(element, 'portal-url') ?? defaultPortalUrl
+    const url = parseUrl(`${mapViewerPath}${composeQuery(params)}`, portalUrl)
+
+    if (!url) {
+      return
     }
 
     return arcgisResolveEmbed(url, element)

@@ -95,8 +95,8 @@ export const find = (
   }
 }
 
-export const text = (element: Nullish<Element>, selector?: string): string | undefined => {
-  const target = selector ? find(element, selector) : element
+export const text = (node: Nullish<Node>, selector?: string): string | undefined => {
+  const target = selector ? find(isElement(node) ? node : undefined, selector) : node
 
   return target?.textContent?.trim() || undefined
 }

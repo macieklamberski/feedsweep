@@ -1,6 +1,6 @@
 import { isAnyOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
-import { filterUrlQuery, isFileName } from '../utils/urls.js'
+import { isFileName } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ourworldindata'
@@ -9,34 +9,6 @@ const hosts = ['ourworldindata.org']
 
 // The site serves the route words in lowercase only, and answers 404 to `/GRAPHER/{slug}`.
 const chartPathRegex = /^\/(grapher|explorers)\/([^/]+)$/i
-
-// See: https://github.com/owid/owid-grapher/blob/master/packages/@ourworldindata/explorer/src/ExplorerConstants.ts.
-// An explorer and a multi-dimensional chart pick their view with params of their own, so only the
-// standard display params go.
-const displayParams = [
-  'endpointsOnly',
-  'facet',
-  'focus',
-  'globe',
-  'globeRotation',
-  'globeZoom',
-  'hideControls',
-  'mapSelect',
-  'overlay',
-  'peerCountries',
-  'pickerMetric',
-  'pickerSort',
-  'region',
-  'showNoDataArea',
-  'showSelectionOnlyInTable',
-  'stackMode',
-  'tableFilter',
-  'tableSearch',
-  'uniformYAxis',
-  'xScale',
-  'yScale',
-  'zoomToSelection',
-]
 
 // The embed dialog's snippet frames the page 600 pixels tall, and 696 for an explorer, whose
 // controls take the extra height. The chart fills whatever box it gets.
@@ -62,9 +34,9 @@ const ourworldindataResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 
   const isChart = isAnyOf(kind, 'grapher')
-  const query = filterUrlQuery(url, (name) => {
-    return !isAnyOf(name, displayParams)
-  })
+  // An explorer and a multi-dimensional chart pick their view with params of their own, so the
+  // query goes to the frame as the carrier sends it.
+  const query = url.search
   const src = `https://ourworldindata.org/${kind}/${slug}${query}`
 
   return {

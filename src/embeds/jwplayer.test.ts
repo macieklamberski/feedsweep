@@ -771,6 +771,24 @@ describeForEachParser('jwplayerMountEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read the ids out of a mount whose id ends in a space', async () => {
+      const value = html`
+        <div
+          class="jwplayer"
+          id="jwplayer_0DG8htfR_fuSXM6PS_20_div "
+        ></div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'jwplayer',
+        id: '0DG8htfR',
+        src: 'https://cdn.jwplayer.com/players/0DG8htfR-fuSXM6PS.html',
+        thumbnail: 'https://cdn.jwplayer.com/v2/media/0DG8htfR/poster.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should keep a mount media id holding a slash inside one path segment', async () => {
       const value = html`
         <div

@@ -82,6 +82,21 @@ describeForEachParser('xenforoEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should keep a 1.x sprite whose spacer path is spelled in another case', async () => {
+      const value = html`
+        <p>
+          <img
+            src="https://example.com/styles/default/XenForo/clear.png"
+            alt=":)"
+            title="Smile    :)"
+          >
+        </p>
+      `
+      const expected = '<p><span data-emoji="">:)</span></p>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should leave a clear.png outside a XenForo style untouched', async () => {
       const value = '<p><img src="https://example.com/images/clear.png" alt=":)"></p>'
 

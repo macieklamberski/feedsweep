@@ -26,6 +26,21 @@ describe('cnnResolveEmbed', () => {
       expect(cnnResolveEmbed(new URL(value))).toEqual(expected)
     })
 
+    it('should claim a video whose suffix is written in capitals', () => {
+      const value =
+        'https://fave.api.cnn.io/v1/fav/?video=arts/2018/07/09/spencer-tunick-nude-art-melbourne.CNN&customer=cnn&edition=international&env=prod'
+      const expected: EmbedResolverResult = {
+        provider: 'cnn',
+        id: 'arts/2018/07/09/spencer-tunick-nude-art-melbourne.CNN',
+        src: 'https://fave.api.cnn.io/v1/fav/?video=arts/2018/07/09/spencer-tunick-nude-art-melbourne.CNN&customer=cnn&edition=domestic&env=prod',
+        url: 'https://www.cnn.com/videos/arts/2018/07/09/spencer-tunick-nude-art-melbourne.CNN',
+        ratio: '16/9',
+        date: '2018-07-09',
+      }
+
+      expect(cnnResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
     it('should move the 2014 player onto the current one', () => {
       const value =
         'http://www.cnn.com/video/api/embed.html#/video/living/2014/01/11/ac-intv-fallon-neuroscientist-finds-psychopathy.cnn'

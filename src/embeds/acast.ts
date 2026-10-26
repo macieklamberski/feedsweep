@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
@@ -20,7 +20,7 @@ const sizes = {
 const extractAcastEmbed = (url: URL): { show: string; episode?: string } | undefined => {
   const allSegments = getPathSegments(url)
   const segments = allSegments[0] === '$' ? allSegments.slice(1) : allSegments
-  const isPlayerHost = url.hostname === 'player.acast.com'
+  const isPlayerHost = isHostOf(url, 'player.acast.com')
   const isEpisodesRoute = isPlayerHost && isAnyOf(segments[1], 'episodes')
   const [show, episode] = isEpisodesRoute ? [segments[0], segments[2]] : segments
 

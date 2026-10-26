@@ -5,7 +5,8 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'educaplay'
 
-const hosts = ['es.educaplay.com', 'fr.educaplay.com', 'www.educaplay.com']
+// Each language is its own subdomain, and the game route below keeps any other subdomain out.
+const hosts = ['educaplay.com']
 
 // The game route in each language Educaplay serves it in.
 const gameRouteWords = [

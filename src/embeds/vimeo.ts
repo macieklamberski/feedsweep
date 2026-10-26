@@ -4,6 +4,7 @@ import {
   getPathSegments,
   getQueryParam,
   isAnyOf,
+  isHostOf,
   trimObject,
 } from 'trousse'
 import type {
@@ -166,7 +167,7 @@ type VimeoReference = {
 }
 
 const readReference = (url: URL): VimeoReference | undefined => {
-  if (!pageHosts.includes(url.hostname)) {
+  if (!isHostOf(url, pageHosts)) {
     return
   }
 
@@ -256,7 +257,7 @@ export const composeEmbedUrl = (
   start?: string,
 ): string => {
   const query = composeQuery(params)
-  const fragment = start ? `#${new URLSearchParams({ t: start })}` : ''
+  const fragment = start ? composeQuery({ t: start }).replace('?', '#') : ''
 
   return `https://player.vimeo.com/video/${videoId}${query}${fragment}`
 }

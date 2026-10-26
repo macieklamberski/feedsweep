@@ -226,14 +226,25 @@ export const parseUrlOnHosts = (
     return isOnHost(url, hosts) ? url : undefined
   }
 
-  const folded = collapseSlashRuns(foldEscapedAmpersands(url))
-  const carrier = parseCarrierUrl(folded)
+  const carrier = parseCarrierUrl(collapseSlashRuns(foldEscapedAmpersands(url)))
 
   if (!carrier || !isOnHost(carrier, hosts)) {
     return
   }
 
-  return parseCarrierUrl(repairCarrierUrl(folded)) ?? carrier
+  return parseRepairedUrl(url)
+}
+
+// A carrier url on any host, read through the class repairs `parseUrlOnHosts` runs after its
+// host check: a pass that unwraps a proxy on whatever site hosts it has no host list to check.
+export const parseRepairedUrl = (url: Nullish<string>): URL | undefined => {
+  if (!url) {
+    return
+  }
+
+  const folded = collapseSlashRuns(foldEscapedAmpersands(url))
+
+  return parseCarrierUrl(repairCarrierUrl(folded)) ?? parseCarrierUrl(folded)
 }
 
 // The origin a url can be rebuilt on. A url with no host, such as `javascript:/@user/123`, has an

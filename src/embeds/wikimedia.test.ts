@@ -82,7 +82,28 @@ describeForEachParser('wikimediaEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should mint the https player for an http carrier', async () => {
+    it('should drop the port the carrier names from the player, its page and its poster', async () => {
+      const value = html`
+        <iframe
+          src="https://de.wikipedia.org:8443/wiki/Datei:Beispiel.webm?embedplayer=yes"
+          width="640"
+          height="360"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'wikimedia',
+        id: 'Beispiel.webm',
+        src: 'https://de.wikipedia.org/wiki/File:Beispiel.webm?embedplayer=yes',
+        url: 'https://de.wikipedia.org/wiki/File:Beispiel.webm',
+        thumbnail: 'https://de.wikipedia.org/wiki/Special:FilePath/Beispiel.webm?width=960',
+        ratio: '16/9',
+        title: 'Beispiel',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should mint the https player and poster for an http carrier', async () => {
       const value = html`
         <iframe
           frameborder="0"
@@ -97,7 +118,7 @@ describeForEachParser('wikimediaEmbedResolver', (parseHtml) => {
         src: 'https://commons.wikimedia.org/wiki/File:Wikipedians_speak_-_Konkani_Wikipedian_Frania_Pereira.webm?embedplayer=yes',
         url: 'https://commons.wikimedia.org/wiki/File:Wikipedians_speak_-_Konkani_Wikipedian_Frania_Pereira.webm',
         thumbnail:
-          'http://commons.wikimedia.org/wiki/Special:FilePath/Wikipedians_speak_-_Konkani_Wikipedian_Frania_Pereira.webm?width=960',
+          'https://commons.wikimedia.org/wiki/Special:FilePath/Wikipedians_speak_-_Konkani_Wikipedian_Frania_Pereira.webm?width=960',
         ratio: '16/9',
         title: 'Wikipedians speak - Konkani Wikipedian Frania Pereira',
       }

@@ -1,7 +1,10 @@
 import { encodePathSegment, type Nullish } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
+import { parseUrlOnHosts } from '../../utils/urls.js'
 import { createLinkedImage } from '../../utils/widgets.js'
+
+const hosts = ['datawrapper.dwcdn.net']
 
 const chartIdRegex = /datawrapper\.dwcdn\.net\/([^/?#]+)/i
 const visWrapperIdRegex = /^datawrapper-vis-(.+)$/
@@ -12,6 +15,10 @@ const resizeScriptRegex = /datawrapper-height|window\.datawrapper/
 
 // The url is read unparsed, and the chart id goes into a path.
 const getChartId = (url: Nullish<string>): string | undefined => {
+  if (!parseUrlOnHosts(url, hosts)) {
+    return
+  }
+
   return encodePathSegment(url?.match(chartIdRegex)?.[1] ?? '')
 }
 

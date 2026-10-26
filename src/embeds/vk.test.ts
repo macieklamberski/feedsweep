@@ -324,6 +324,23 @@ describeForEachParser('vkWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should match the call to a div whose id carries a trailing space', async () => {
+      const value = html`
+        <div id="vk_post_-211296925_60 "></div>
+        <script type="text/javascript">
+          VK.Widgets.Post("vk_post_-211296925_60", -211296925, 60, 'bVYhst3km4JT6iZGIjNrIdnZCDT1');
+        </script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'vk',
+        id: 'wall-211296925_60',
+        src: 'https://vk.ru/widget_post.php?owner_id=-211296925&post_id=60&hash=bVYhst3km4JT6iZGIjNrIdnZCDT1',
+        url: 'https://vk.ru/wall-211296925_60',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should read the call from a paragraph after the div', async () => {
       const value = html`
         <div id="vk_post_-62353676_2228"></div>

@@ -52,6 +52,20 @@ describe('fliphtml5ResolveEmbed', () => {
       expect(fliphtml5ResolveEmbed(new URL(value))).toEqual(expected)
     })
 
+    it('should escape an ampersand in the page so the fragment keeps one parameter', () => {
+      const value = 'https://online.fliphtml5.com/mnzqa/bbjl/#p=1%26lang%3Den'
+      const expected: EmbedResolverResult = {
+        provider: 'fliphtml5',
+        id: 'mnzqa/bbjl',
+        src: 'https://online.fliphtml5.com/mnzqa/bbjl/#p=1%26lang=en',
+        url: 'https://online.fliphtml5.com/mnzqa/bbjl/',
+        thumbnail: 'https://online.fliphtml5.com/mnzqa/bbjl/files/shot.jpg',
+        ratio: '4/3',
+      }
+
+      expect(fliphtml5ResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
     it('should drop a tracker from the query', () => {
       const value = 'https://online.fliphtml5.com/mzsro/jvuq/?utm_source=x&utm_medium=y#p=1'
       const expected: EmbedResolverResult = {

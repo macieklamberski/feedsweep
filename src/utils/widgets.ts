@@ -1,4 +1,4 @@
-import { isAnyOf, type MaybePromise, startsWithAnyOf, trimObject } from 'trousse'
+import { composeQuery, isAnyOf, type MaybePromise, startsWithAnyOf, trimObject } from 'trousse'
 import type {
   CiteResolverResult,
   EmbedResolver,
@@ -457,7 +457,7 @@ export const createPlaceholder = <Type extends object>(
 export const normalizeEmbedFields = (
   metadata: Partial<EmbedResolverResult>,
 ): Record<string, string | undefined> => {
-  const params = new URLSearchParams(metadata.params).toString()
+  const params = composeQuery(metadata.params).slice(1)
 
   return {
     src: metadata.src,

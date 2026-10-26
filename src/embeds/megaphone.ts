@@ -1,4 +1,4 @@
-import { composeQuery, getQueryParam } from 'trousse'
+import { composeQuery, getQueryParam, isHostOf } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { digitsRegex, isFileName, pickQueryParams } from '../utils/urls.js'
@@ -44,7 +44,7 @@ export const extractMegaphoneEmbed = (
   }
 
   // The legacy episode player names the episode in its path, `player.megaphone.fm/{id}`.
-  if (url.hostname !== 'player.megaphone.fm') {
+  if (!isHostOf(url, 'player.megaphone.fm')) {
     return
   }
 

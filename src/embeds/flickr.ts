@@ -1,4 +1,11 @@
-import { decodeSegment, encodePathSegment, getQueryParam, isHostOf, type Nullish } from 'trousse'
+import {
+  composeQuery,
+  decodeSegment,
+  encodePathSegment,
+  getQueryParam,
+  isHostOf,
+  type Nullish,
+} from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVar, flashVars, keepIfMatches, parseFlashVars } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
@@ -348,8 +355,9 @@ const resolveTarget = (url: URL, element: Nullish<Element>): EmbedResolverResult
   }
 
   const { width, height } = sizes.slideshow
+  const query = composeQuery({ width: String(width), height: String(height) })
 
-  return { ...result, src: `${result.src}?width=${width}&height=${height}`, ...sizes.slideshow }
+  return { ...result, src: `${result.src}${query}`, ...sizes.slideshow }
 }
 
 export const flickrResolveEmbed: ResolveUrlEmbed = (url, element) => {

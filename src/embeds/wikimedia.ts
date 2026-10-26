@@ -1,4 +1,4 @@
-import { decodeSegment, parseUrl } from 'trousse'
+import { composeQuery, decodeSegment, parseUrl } from 'trousse'
 import type { EmbedResolver, EmbedResolverResult } from '../types.js'
 import { attr } from '../utils/dom.js'
 import {
@@ -32,16 +32,21 @@ export const composeFileTitle = (fileName: string): string | undefined => {
 
 // `Special:FilePath/{name}` redirects to the file itself, keyed on the name alone, with no
 // signature and no expiry. The wiki that framed the file serves it whether or not the upload
-// lives on Commons, so the origin comes from the carrier rather than from a fixed host.
+// lives on Commons, so the host comes from the carrier rather than from a fixed host.
 export const composeFilePathUrl = (
   url: string,
   fileName: string,
   width?: number,
 ): string | undefined => {
-  const origin = readOrigin(parseUrl(url, placeholderBaseUrl))
-  const query = width ? `?width=${width}` : ''
+  const parsed = parseUrl(url, placeholderBaseUrl)
 
-  return origin && `${origin}/wiki/Special:FilePath/${fileName}${query}`
+  if (!parsed || !readOrigin(parsed)) {
+    return
+  }
+
+  const query = composeQuery(width ? { width: String(width) } : {})
+
+  return `https://${parsed.hostname}/wiki/Special:FilePath/${fileName}${query}`
 }
 
 // The file's description page on the wiki that framed it. `File:` is the namespace name every
@@ -53,7 +58,7 @@ const composeFilePageUrl = (url: string, fileName: string): string | undefined =
     return
   }
 
-  return `https://${parsed.host}/wiki/File:${fileName}`
+  return `https://${parsed.hostname}/wiki/File:${fileName}`
 }
 
 // The url Commons' "Embed this file" dialog writes. Without `embedplayer` the same address answers

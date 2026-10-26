@@ -273,6 +273,40 @@ describeForEachParser('audioboomFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it("should read the player path-style from S3's host written with a trailing dot", async () => {
+      const value = html`
+        <embed
+          src="https://s3.amazonaws.com./boos.audioboo.fm/swf/fullsize_player.swf"
+          flashvars="mp3LinkURL=https%3A%2F%2Faudioboo.fm%2Fboos%2F1920440-audio-interview-the-regeneration-of-tottenham"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'audioboom',
+        id: '1920440',
+        src: 'https://embeds.audioboom.com/posts/1920440/embed/v4',
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the player on its own host written with a trailing dot', async () => {
+      const value = html`
+        <embed
+          src="http://boos.audioboo.fm./swf/fullsize_player.swf"
+          flashvars="mp3LinkURL=https%3A%2F%2Faudioboo.fm%2Fboos%2F1920440-audio-interview-the-regeneration-of-tottenham"
+        >
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'audioboom',
+        id: '1920440',
+        src: 'https://embeds.audioboom.com/posts/1920440/embed/v4',
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should read the post off the audio file when the player names no page', async () => {
       const value = html`
         <object

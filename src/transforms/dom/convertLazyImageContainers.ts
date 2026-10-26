@@ -1,4 +1,5 @@
 import type { DomTransform } from '../../types.js'
+import { hasText } from '../../utils/dom.js'
 import { imageFileRegex } from '../../utils/urls.js'
 import { createImage } from '../../utils/widgets.js'
 
@@ -27,7 +28,7 @@ export const convertLazyImageContainers: DomTransform = (context) => {
       const image = createImage(document, { src })
 
       // A container with content, like a figure with its figcaption, keeps it beside the image.
-      if (element.children.length > 0 || element.textContent?.trim()) {
+      if (element.children.length > 0 || hasText(element)) {
         element.prepend(image)
         continue
       }

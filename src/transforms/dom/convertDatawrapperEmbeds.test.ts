@@ -273,6 +273,13 @@ describeForEachParser('convertDatawrapperEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should leave a foreign iframe naming a chart url in its query untouched', async () => {
+    const value =
+      '<iframe src="https://evil.test/frame?url=https://datawrapper.dwcdn.net/bdqZJ/2/"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should convert every iframe when a post packs several', async () => {
     const value = html`
       <iframe src="https://datawrapper.dwcdn.net/AAAAA/1/"></iframe>

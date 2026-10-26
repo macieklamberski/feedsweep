@@ -35,6 +35,17 @@ describeForEachParser('fixDropboxMediaUrls', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should write the rest of the query through the query composer', async () => {
+    const value = html`
+      <source src="https://www.dropbox.com/scl/fi/cw5wkz/Marcha.mp3?rlkey=ts97wmy3xk&amp;st=a+b&amp;dl=0">
+    `
+    const expected = html`
+      <source src="https://www.dropbox.com/scl/fi/cw5wkz/Marcha.mp3?rlkey=ts97wmy3xk&amp;st=a%20b&amp;raw=1">
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should repair a bare share url with no query at all', async () => {
     const value = '<video src="https://www.dropbox.com/s/4x6qs14/clip.mp4"></video>'
     const expected = '<video src="https://www.dropbox.com/s/4x6qs14/clip.mp4?raw=1"></video>'

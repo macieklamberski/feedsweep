@@ -61,8 +61,7 @@ const isInlineLoader = (element: Element): boolean => {
   }
 
   return (
-    isAnyOf(attr(element, 'type'), 'inline') ||
-    element.parentElement?.getAttribute('class') === 'tt-widget'
+    isAnyOf(attr(element, 'type'), 'inline') || attr(element.parentElement, 'class') === 'tt-widget'
   )
 }
 

@@ -640,6 +640,34 @@ describeForEachParser('blubrryPowerpressEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should read a frame whose episode parameter is spelled in capitals', async () => {
+      const value = '<iframe src="https://example.com/?POWERPRESS_EMBED=3443-podcast"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'blubrry',
+        id: 'example.com/3443-podcast',
+        src: 'https://example.com/?POWERPRESS_EMBED=3443-podcast',
+        height: 40,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the player of a video frame whose parameter is spelled in capitals', async () => {
+      const value = html`
+        <iframe
+          src="https://example.com/?powerpress_embed=61144-podcast&amp;POWERPRESS_PLAYER=html5video"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'blubrry',
+        id: 'example.com/61144-podcast',
+        src: 'https://example.com/?powerpress_embed=61144-podcast&POWERPRESS_PLAYER=html5video',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should trim a trailing space off the episode value', async () => {
       const value = '<iframe src="https://example.com/?powerpress_embed=1234-podcast%20"></iframe>'
       const expected: EmbedResolverResult = {

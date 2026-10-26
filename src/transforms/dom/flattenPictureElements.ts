@@ -1,6 +1,7 @@
 import { toMap } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { widestSrcsetUrl } from '../../utils/images.js'
+import { isUsableSrc } from '../../utils/urls.js'
 import { createImage } from '../../utils/widgets.js'
 
 // Prefer AVIF, then WebP. Other source types are not worth promoting over the
@@ -65,7 +66,7 @@ export const flattenPictureElements: DomTransform = () => {
 
         // Give a src-less img a fallback from its own srcset, for renderers
         // that need a plain src.
-        if (!existing.getAttribute('src')) {
+        if (!isUsableSrc(existing.getAttribute('src'))) {
           const ownUrl = widestSrcsetUrl(existing.getAttribute('srcset'))
 
           if (ownUrl) {

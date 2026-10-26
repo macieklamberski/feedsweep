@@ -1,6 +1,6 @@
 import { encodePathSegment, isHostOf, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
-import { attr } from '../utils/dom.js'
+import { attr, isWhitespaceText } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -45,7 +45,7 @@ const emptyMountTags = ['br', 'script']
 // A publisher pastes its own images and text inside the wrapper, which a placeholder would delete.
 const isEmptyMount = (element: Element): boolean => {
   for (const node of element.childNodes) {
-    if (node.nodeType === node.TEXT_NODE && !node.textContent?.trim()) {
+    if (isWhitespaceText(node)) {
       continue
     }
 
@@ -80,7 +80,7 @@ export const strawpollMountEmbedResolver = createMarkupEmbedResolver(
       `[data-embed-provider="${provider}"]`,
     )
     const hasPlaceholder = [...(placeholders ?? [])].some((placeholder) => {
-      return placeholder.getAttribute('data-embed-id') === pollId
+      return attr(placeholder, 'data-embed-id') === pollId
     })
 
     if (hasPlaceholder || !isEmptyMount(element)) {

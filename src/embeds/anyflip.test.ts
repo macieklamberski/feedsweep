@@ -76,6 +76,20 @@ describe('anyflipResolveEmbed', () => {
       expect(anyflipResolveEmbed(new URL(value))).toEqual(expected)
     })
 
+    it('should escape an ampersand in the page so the fragment keeps one parameter', () => {
+      const value = 'https://online.anyflip.com/zruyy/qaan/index.html#p=5%26lang%3Den'
+      const expected: EmbedResolverResult = {
+        provider: 'anyflip',
+        id: 'zruyy/qaan',
+        src: 'https://online.anyflip.com/zruyy/qaan/index.html#p=5%26lang=en',
+        url: 'https://anyflip.com/zruyy/qaan',
+        thumbnail: 'https://online.anyflip.com/zruyy/qaan/files/shot.jpg',
+        ratio: '550/350',
+      }
+
+      expect(anyflipResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
     it('should drop a tracker from the query', () => {
       const value = 'https://online.anyflip.com/zruyy/qaan/index.html?utm_source=x#p=5'
       const expected: EmbedResolverResult = {

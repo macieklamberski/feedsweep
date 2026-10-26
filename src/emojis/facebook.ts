@@ -1,6 +1,6 @@
 import { toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
-import { attr, isElement, isNonWhitespaceText, isWhitespaceText } from '../utils/dom.js'
+import { attr, isElement, isNonWhitespaceText, isWhitespaceText, text } from '../utils/dom.js'
 import {
   getFileStem,
   glyphFromCodepoints,
@@ -52,14 +52,14 @@ export const facebookElementEmojiResolver: EmojiResolver = {
       return
     }
 
-    const text = element.textContent?.trim()
+    const content = text(element)
 
-    if (text) {
-      if (!isEmojiShaped(text)) {
+    if (content) {
+      if (!isEmojiShaped(content)) {
         return
       }
 
-      return { glyph: text }
+      return { glyph: content }
     }
 
     const glyph = glyphFromCodepoints(getFileStem(url).toLowerCase())
@@ -125,9 +125,9 @@ export const facebookClassicEmojiResolver: EmojiResolver = {
 
     const title = attr(element, 'title')
     const code = classicCodes.get(name)
-    const text = element.textContent?.trim()
+    const content = text(element)
 
-    if (text && text !== title && text !== code) {
+    if (content && content !== title && content !== code) {
       return
     }
 
@@ -142,7 +142,7 @@ export const facebookClassicEmojiResolver: EmojiResolver = {
     }
 
     const fallback =
-      isElement(previous) && previous.matches(textClassSelector) ? previous.textContent?.trim() : ''
+      isElement(previous) && previous.matches(textClassSelector) ? text(previous) : undefined
 
     if (previous && fallback) {
       if (!glyph) {
@@ -170,7 +170,7 @@ export const facebookClassicEmojiResolver: EmojiResolver = {
     // A later paste puts the hidden code after the emoticon instead.
     const next = element.nextElementSibling
 
-    if (glyph && next?.matches(hiddenCodeSelector) && next.textContent?.trim() === code) {
+    if (glyph && next?.matches(hiddenCodeSelector) && text(next) === code) {
       next.remove()
     }
 
@@ -210,9 +210,9 @@ const isBareSprite = (sprite: Element): boolean => {
     }
   }
 
-  const text = sprite.textContent?.trim()
+  const content = text(sprite)
 
-  return !text || !!glyphFromShortcode(text)
+  return !content || !!glyphFromShortcode(content)
 }
 
 // A later chat markup of the classic emoticon: a span or `i` holding a painted sprite, its code at
@@ -228,7 +228,7 @@ export const facebookLabelEmojiResolver: EmojiResolver = {
       image?.matches('img') &&
       (!hidden || hidden.matches(hiddenTextSelector)) &&
       !rest.length &&
-      element.textContent?.trim() === (hidden?.textContent?.trim() ?? '')
+      text(element) === text(hidden)
 
     if (isImageWrapper) {
       const result = facebookEmojiResolver.extract(image)
@@ -263,8 +263,7 @@ export const facebookLabelEmojiResolver: EmojiResolver = {
 
     if (zeroSize) {
       const hiddenImage = zeroSize.querySelector('img')
-      const hiddenText =
-        zeroSize.textContent?.trim() || (hiddenImage ? attr(hiddenImage, 'alt') : undefined)
+      const hiddenText = text(zeroSize) ?? (hiddenImage ? attr(hiddenImage, 'alt') : undefined)
       const isCode = hiddenText === code || (!!glyph && glyphFromShortcode(hiddenText) === glyph)
       const isGlyph =
         !!glyph &&

@@ -1,5 +1,5 @@
 import type { EmojiResolver } from '../types.js'
-import { attr } from '../utils/dom.js'
+import { attr, text } from '../utils/dom.js'
 import {
   getFileStem,
   glyphFromCodepoints,
@@ -18,7 +18,7 @@ export const genericCharacterEmojiResolver: EmojiResolver = {
     const isSpan = element.tagName.toLowerCase() === 'span'
 
     // A span holding its glyph as text needs nothing, and an image with a src is a picture.
-    if (isSpan ? element.textContent?.trim() : attr(element, 'src')) {
+    if (isSpan ? text(element) : attr(element, 'src')) {
       return
     }
 
