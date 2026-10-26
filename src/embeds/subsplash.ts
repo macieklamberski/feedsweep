@@ -13,16 +13,14 @@ const hosts = ['subsplash.com']
 
 const leadingPlusRegex = /^\+/
 
-// A media item's short code names it on every org's path and on the `subspla.sh` share link,
-// whatever its case, so the key is the code alone.
+// A media item's short code names it on every org's path and on the `subspla.sh` share link, so
+// the key is the code alone.
 const composeEmbed = (id: string, src: string): EmbedResolverResult => {
-  const key = id.toLowerCase()
-
   return {
     provider,
-    id: key,
+    id,
     src,
-    url: `https://subspla.sh/${key}`,
+    url: `https://subspla.sh/${id}`,
     ...sizes.player,
   }
 }

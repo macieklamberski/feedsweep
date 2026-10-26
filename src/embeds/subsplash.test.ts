@@ -46,13 +46,13 @@ describe('subsplashResolveEmbed', () => {
       expect(subsplashResolveEmbed(new URL(value))).toEqual(expected)
     })
 
-    it('should fold the case of the short code in the key only', () => {
+    it('should keep the case of the short code in the key', () => {
       const value = 'https://subsplash.com/u/-677XD4/media/embed/d/9XVBXMG?'
       const expected: EmbedResolverResult = {
         provider: 'subsplash',
-        id: '9xvbxmg',
+        id: '9XVBXMG',
         src: 'https://subsplash.com/u/-677XD4/media/embed/d/9XVBXMG',
-        url: 'https://subspla.sh/9xvbxmg',
+        url: 'https://subspla.sh/9XVBXMG',
         ratio: '16/9',
       }
 
