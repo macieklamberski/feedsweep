@@ -69,15 +69,11 @@ export const wistiaResolveEmbed: ResolveUrlEmbed = (url, element) => {
     return
   }
 
-  // Every route serves one media under any case of its id, and the media JSON names it in
-  // lowercase, so the key folds case to keep one media on one key.
-  const key = embed.id.toLowerCase()
-
   // A media keeps the bare id it has always carried. The other two qualify it, because the three
   // share one id grammar and enrichment receives the provider and the id alone.
   return {
     provider,
-    id: embed.route === 'iframe' ? key : `${embed.route}/${key}`,
+    id: embed.route === 'iframe' ? embed.id : `${embed.route}/${embed.id}`,
     src: composeEmbedUrl(embed.route, embed.id),
     url: embed.page,
     ...sizes.player,
