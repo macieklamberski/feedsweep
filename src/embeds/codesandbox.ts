@@ -27,7 +27,7 @@ const hosts = ['codesandbox.io', 'www.codesandbox.io']
 // behind it.
 // `/embed/github/…` carries no hash and meets a Cloudflare challenge on every server-side
 // request.
-const reservedSlugSegments = new Set(['github', 'github.com', 'fork', 'new'])
+const reservedSlugSegments = ['github', 'github.com', 'fork', 'new']
 
 const projectKinds = ['sandbox', 'devbox']
 const playerRoutes = ['embed', 's']
@@ -75,7 +75,7 @@ const parseTarget = (value: URL | undefined): CodesandboxTarget | undefined => {
   }
 
   // CodeSandbox serves files on its own host, so a file name is an enclosure.
-  if (!slug || reservedSlugSegments.has(slug.toLowerCase()) || isFileName(slug)) {
+  if (!slug || isAnyOf(slug, reservedSlugSegments) || isFileName(slug)) {
     return
   }
 

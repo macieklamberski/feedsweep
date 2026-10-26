@@ -24,7 +24,7 @@ const leadingAtRegex = /^@/
 // Segments CodePen owns in the position a username sits in. `cpe` is the 2.0 editor's own path
 // and the prefill endpoint lives under it, so `cpe/embed/prefill` has the exact shape of a pen
 // url while naming no pen.
-const reservedOwnerSegments = new Set(['collection', 'cpe', 'spark'])
+const reservedOwnerSegments = ['collection', 'cpe', 'spark']
 
 // What CodePen's share dialog writes in place of an author who asked not to be named, and what
 // the resolver falls back to when the markup names nobody. The player ignores this segment, and
@@ -33,7 +33,7 @@ const anonymousUser = 'anon'
 
 // Handles that name nobody. CodePen serves a pen under any word in the username position and
 // redirects its page to the real owner, so a route word there says nothing about who wrote it.
-const ownerlessUsers = new Set([anonymousUser, 'api', 'pen', 'project'])
+const ownerlessUsers = [anonymousUser, 'api', 'pen', 'project']
 
 const sizes = {
   // CodePen's snippet ships `data-height="300"` and calls every attribute but slug and user
@@ -68,7 +68,7 @@ const readUser = (value: string | undefined): string | undefined => {
   // The share dialog writes the handle with its `@`, while the url path carries both spellings.
   const name = value?.trim().replace(leadingAtRegex, '')
 
-  if (!name || ownerlessUsers.has(name.toLowerCase())) {
+  if (!name || isAnyOf(name, ownerlessUsers)) {
     return
   }
 
@@ -93,7 +93,7 @@ const parseTarget = (value: URL | undefined): CodepenTarget | undefined => {
   const [rawUser, route, ...rest] = isTeam ? segments.slice(1) : segments
   const kind = getAnyOf(route, penKinds)
 
-  if (!rawUser || reservedOwnerSegments.has(rawUser.toLowerCase())) {
+  if (!rawUser || isAnyOf(rawUser, reservedOwnerSegments)) {
     return
   }
 

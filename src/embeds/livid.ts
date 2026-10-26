@@ -14,14 +14,13 @@ const hosts = ['livid.com']
 
 // `watch` is the video page and `embed` the player, both served in any case, and both take the
 // video id next.
-const videoRoutes = new Set(['watch', 'embed'])
+const videoRoutes = ['watch', 'embed']
 
 const iframeSrcRegex = /<iframe\s[^>]*?\bsrc="([^"]+)"/i
 
 export const lividResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const segments = getPathSegments(url)
-  const [routeSpelling, videoId] = segments
-  const route = routeSpelling?.toLowerCase()
+  const [route, videoId] = segments
 
   // MetaSlider's Livid slide writes its own translated player label as the iframe `title`.
   const isMetasliderSlide = Boolean(element?.closest('li.ms-livid'))
@@ -46,7 +45,7 @@ export const lividResolveEmbed: ResolveUrlEmbed = (url, element) => {
     }
   }
 
-  if (!route || !videoRoutes.has(route) || !videoId) {
+  if (!route || !isAnyOf(route, videoRoutes) || !videoId) {
     return
   }
 
