@@ -2,7 +2,7 @@ import { encodePathSegment, getPathSegments, isAnyOf, startsWithAnyOf } from 'tr
 import type { MediaResolver } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { readRepairedCarrierUrl } from '../utils/widgets.js'
+import { readCarrierUrl } from '../utils/widgets.js'
 
 const podomaticHost = 'podomatic.com'
 const playerPath = '/swf/joeplayer'
@@ -17,7 +17,7 @@ export const podomaticFlashMediaResolver: MediaResolver = {
     `object[data*="${podomaticHost}${playerPath}" i]`,
   ].join(', '),
   extract: (element) => {
-    const player = parseUrlOnHosts(readRepairedCarrierUrl(element), podomaticHost)
+    const player = parseUrlOnHosts(readCarrierUrl(element), podomaticHost)
 
     if (!player || !startsWithAnyOf(player.pathname, [playerPath])) {
       return

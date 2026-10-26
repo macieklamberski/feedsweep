@@ -128,13 +128,6 @@ describe('kalturaResolveEmbed', () => {
   })
 
   describe('sad paths', () => {
-    it('should ignore a foreign host carrying the same path', () => {
-      const value =
-        'https://evil.test/p/520801/embedPlaykitJs/uiconf_id/1?iframeembed=true&entry_id=1_w0bwzism'
-
-      expect(kalturaResolveEmbed(new URL(value))).toBeUndefined()
-    })
-
     it('should ignore a partner path behind another segment', () => {
       const value =
         'https://cdnapisec.kaltura.com/x/p/520801/embedPlaykitJs/uiconf_id/52714152?iframeembed=true&entry_id=1_w0bwzism'

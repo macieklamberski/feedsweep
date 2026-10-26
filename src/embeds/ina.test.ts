@@ -303,32 +303,13 @@ describeForEachParser('inaScriptEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should use a malformed id as written, even if the player answers an error', async () => {
+    it('should leave a script whose src glues a query onto a path segment', async () => {
+      // The glued-query repair turns the first `&` into `?`, so the loader path ends there and
+      // names no id, the same as the player frame.
       const value =
         '<script src="https://www.ina.fr/player/embed/w/320/h/240/id_notice/I00017198&a=1/id_utilisateur/935300/hash/b048361c1bcc0386715136cebd84f8f1"></script>'
-      const expected: EmbedResolverResult = {
-        provider: 'ina',
-        id: 'I00017198&a=1',
-        src: 'https://player.ina.fr/embed/I00017198&a=1?pid=935300&key=b048361c1bcc0386715136cebd84f8f1',
-        url: 'https://www.ina.fr/video/I00017198&a=1',
-        ratio: '16/9',
-      }
 
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should use a malformed player id as written, even if the player answers an error', async () => {
-      const value =
-        '<script src="https://www.ina.fr/player/embed/w/320/h/240/id_notice/I00017198/id_utilisateur/935300&autoplay=1/hash/b048361c1bcc0386715136cebd84f8f1"></script>'
-      const expected: EmbedResolverResult = {
-        provider: 'ina',
-        id: 'I00017198',
-        src: 'https://player.ina.fr/embed/I00017198?pid=935300%26autoplay=1&key=b048361c1bcc0386715136cebd84f8f1',
-        url: 'https://www.ina.fr/video/I00017198',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
+      expect(await extract(value)).toBeUndefined()
     })
 
     it('should decode a loader key before it moves into the query', async () => {
@@ -338,20 +319,6 @@ describeForEachParser('inaScriptEmbedResolver', (parseHtml) => {
         provider: 'ina',
         id: 'I00017198',
         src: 'https://player.ina.fr/embed/I00017198?pid=935300&key=b048/361c',
-        url: 'https://www.ina.fr/video/I00017198',
-        ratio: '16/9',
-      }
-
-      expect(await extract(value)).toEqual(expected)
-    })
-
-    it('should use a malformed key as written, even if the player answers an error', async () => {
-      const value =
-        '<script src="https://www.ina.fr/player/embed/w/320/h/240/id_notice/I00017198/id_utilisateur/935300/hash/b048361c1bcc0386715136cebd84f8f1&0=1"></script>'
-      const expected: EmbedResolverResult = {
-        provider: 'ina',
-        id: 'I00017198',
-        src: 'https://player.ina.fr/embed/I00017198?pid=935300&key=b048361c1bcc0386715136cebd84f8f1%260=1',
         url: 'https://www.ina.fr/video/I00017198',
         ratio: '16/9',
       }

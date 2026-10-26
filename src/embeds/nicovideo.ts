@@ -10,7 +10,7 @@ const provider = 'nicovideo'
 // programme card even after the broadcast ends.
 const liveIdRegex = /^lv\d+$/
 
-const nicovideoHosts = ['nicovideo.jp']
+export const nicovideoHosts = ['nicovideo.jp']
 
 // Seiga and manga write ext.{site}.nicovideo.jp/thumb/{kind}{digits}, and news writes
 // news.nicovideo.jp/watch/nw{digits}.
@@ -21,7 +21,7 @@ const videoIdMarkers = ['thumb_watch', 'thumb', 'watch', 'embed']
 // The video player starts at `from`, in seconds.
 const nicovideoEmbedParams = ['from']
 
-export const extractNicovideoId = (link: string | URL): string | undefined => {
+export const extractNicovideoId = (link: URL): string | undefined => {
   // The script selector matches on a substring, so any host can spell `nicovideo.jp/thumb_watch`
   // inside its own path and reach this. The path shape alone must not mint a nicovideo url.
   const parsed = parseUrlOnHosts(link, nicovideoHosts)

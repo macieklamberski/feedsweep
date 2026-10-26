@@ -126,15 +126,16 @@ describeForEachParser('rebuildLazyLoadForVideos', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should leave a vimeo facade whose href glues the query onto the id untouched', async () => {
+  it('should rebuild a vimeo facade whose href glues the hash onto the id', async () => {
     const value = html`
       <a
-        href="https://vimeo.com/76979871&amp;h=abcdef"
+        href="https://vimeo.com/76979871&amp;h=abc123def4"
         class="preview-lazyload preview-vimeo"
       ></a>
     `
+    const expected = '<iframe src="https://player.vimeo.com/video/76979871?h=abc123def4"></iframe>'
 
-    expect(await transform(value)).toEqualHtml(value)
+    expect(await transform(value)).toEqualHtml(expected)
   })
 
   it('should leave the facade untouched when its url does not parse', async () => {

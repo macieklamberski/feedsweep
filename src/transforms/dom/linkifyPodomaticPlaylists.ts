@@ -2,7 +2,7 @@ import { encodePathSegment, getSubdomain, isAnyOf, startsWithAnyOf } from 'trous
 import type { DomTransform } from '../../types.js'
 import { flashVar } from '../../utils/dom.js'
 import { parseUrlOnHosts } from '../../utils/urls.js'
-import { createLink, readRepairedCarrierUrl } from '../../utils/widgets.js'
+import { createLink, readCarrierUrl } from '../../utils/widgets.js'
 
 const podomaticHost = 'podomatic.com'
 const playerPath = '/swf/jwplayer'
@@ -32,7 +32,7 @@ const readSubdomain = (url: string | undefined): string | undefined => {
 // played only by a player keyed on a numeric podcast id, so the podcast's page is linked instead.
 export const linkifyPodomaticPlaylists: DomTransform = () => (document) => {
   for (const element of document.querySelectorAll(playerSelector)) {
-    const player = parseUrlOnHosts(readRepairedCarrierUrl(element), podomaticHost)
+    const player = parseUrlOnHosts(readCarrierUrl(element), podomaticHost)
 
     if (!player || !startsWithAnyOf(player.pathname, [playerPath])) {
       continue

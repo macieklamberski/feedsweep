@@ -42,9 +42,7 @@ const postPathRegex = /^\/(?:([A-Za-z0-9_.]+)\/)?(p|reel|reels|tv)\/([^/]+)/i
 
 type Post = { kind: string; shortcode: string }
 
-const readPostUrl = (value: string | URL | undefined): Post | undefined => {
-  const parsed = parseUrlOnHosts(value, instagramHosts)
-
+const readPostUrl = (parsed: URL | undefined): Post | undefined => {
   if (!parsed) {
     return
   }
@@ -93,21 +91,23 @@ const wrapperSelector = 'figure[data-provider="instagram"]'
 const readWrapperPost = (element: Element): Post | undefined => {
   const dataUrl = attr(element.closest(wrapperSelector), 'data-url')
 
-  return readPostUrl(decodeSegment(dataUrl) ?? dataUrl)
+  return readPostUrl(parseUrlOnHosts(decodeSegment(dataUrl) ?? dataUrl, instagramHosts))
 }
 
 // Where the post is named, in the order the shapes provide it: the attribute the dialog writes,
 // then any anchor in the quote, which the pre-2018 versions and every sanitized copy leave as
 // the only trace.
 const findPost = (element: Element): Post | undefined => {
-  const declared = readPostUrl(attr(element, 'data-instgrm-permalink'))
+  const declared = readPostUrl(
+    parseUrlOnHosts(attr(element, 'data-instgrm-permalink'), instagramHosts),
+  )
 
   if (declared) {
     return declared
   }
 
   for (const anchor of element.querySelectorAll('a[href]')) {
-    const post = readPostUrl(attr(anchor, 'href'))
+    const post = readPostUrl(parseUrlOnHosts(attr(anchor, 'href'), instagramHosts))
 
     if (post) {
       return post

@@ -7,6 +7,7 @@ import { parseHtml as parseWithLinkedom } from './parsers/linkedom.js'
 import { convertEmojis } from './transforms/dom/convertEmojis.js'
 import type { TransformContext } from './types.js'
 import { applyDomTransforms } from './utils/transforms.js'
+import { parseUrlOnHosts } from './utils/urls.js'
 import { cleanResultFields } from './utils/widgets.js'
 
 // Test adapters are synchronous, unlike the public `ParseHtmlFn` which allows a
@@ -54,6 +55,11 @@ type AnyResolver<Result> = {
 
 // Runs a resolver's extract on the element its selector claims in a fixture, then the field
 // cleaners the pipeline runs on every result, so a fixture asserts what a placeholder carries.
+// The url createUrlEmbedResolver hands a reader for a carrier src on the resolver's hosts.
+export const carrierUrl = (value: string, hosts: string | ReadonlyArray<string>): URL => {
+  return parseUrlOnHosts(value, hosts) as URL
+}
+
 export const resolverExtractor = <Result>(parseHtml: ParseHtml, resolver: AnyResolver<Result>) => {
   return async (value: string): Promise<Result | undefined> => {
     const element = parseHtml(value).querySelector(resolver.selector)

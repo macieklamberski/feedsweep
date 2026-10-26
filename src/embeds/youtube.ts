@@ -6,7 +6,6 @@ import {
   getQueryParam,
   isAnyOf,
   isHostOrSubdomainOf,
-  parseUrl,
 } from 'trousse'
 import type {
   EmbedRenderHint,
@@ -15,12 +14,7 @@ import type {
   ResolveUrlEmbed,
 } from '../types.js'
 import { attr } from '../utils/dom.js'
-import {
-  parseUrlOnHosts,
-  pickQueryParams,
-  placeholderBaseUrl,
-  repairCarrierUrl,
-} from '../utils/urls.js'
+import { parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'youtube'
@@ -60,7 +54,12 @@ const gridFragmentIdRegex = /^#p\/.+\/([0-9A-Za-z_-]{11})$/i
 
 // `youtube.googleapis.com/v/{id}` is the Flash player's other host, still shipped by Blogger
 // feeds of that era.
-const youtubeHosts = ['youtube.com', 'youtube-nocookie.com', 'youtu.be', 'youtube.googleapis.com']
+export const youtubeHosts = [
+  'youtube.com',
+  'youtube-nocookie.com',
+  'youtu.be',
+  'youtube.googleapis.com',
+]
 
 // A bare id, already separated from any url: the right shape, and not one of the embed path
 // words that share it.
@@ -101,20 +100,7 @@ const readPathId = (url: URL): string | undefined => {
   return index > 0 ? segments[index] : undefined
 }
 
-// The Flash player wrote `/v/{id}&hl=en_US&fs=1`, the query glued onto the id, and transforms
-// outside the resolver factory read urls here too.
-const parseYoutubeUrl = (link: string | URL): URL | undefined => {
-  // The url createUrlEmbedResolver hands its reader is already repaired and parsed.
-  if (link instanceof URL) {
-    return link
-  }
-
-  return parseUrl(repairCarrierUrl(link), placeholderBaseUrl)
-}
-
-export const extractVideoId = (link: string | URL): string | undefined => {
-  const url = parseYoutubeUrl(link)
-
+export const extractVideoId = (url: URL | undefined): string | undefined => {
   if (!url) {
     return
   }
@@ -164,15 +150,14 @@ const parseWatchOffset = (value: string): string | undefined => {
 
 // The player ignores `t`, so an offset moves over as `start` unless one is stated. Besides the
 // query, publishers write it in the fragment as `#t=220`.
-const readEmbedParams = (url: string | URL): Record<string, string> => {
-  const parsed = parseYoutubeUrl(url)
-  const params = pickQueryParams(parsed?.search ?? '', youtubeEmbedParams)
+const readEmbedParams = (url: URL): Record<string, string> => {
+  const params = pickQueryParams(url.search, youtubeEmbedParams)
 
-  if (!parsed || params.start) {
+  if (params.start) {
     return params
   }
 
-  const offsetQueries = [parsed.search, parsed.hash.slice(1)]
+  const offsetQueries = [url.search, url.hash.slice(1)]
   const start = offsetQueries
     .map((query) => parseWatchOffset(getQueryParam(new URLSearchParams(query), 't') ?? ''))
     .find(Boolean)
@@ -193,13 +178,13 @@ export const readYoutubeEmbedSrc = (link: string): string | undefined => {
     return
   }
 
-  const videoId = extractVideoId(url.href)
+  const videoId = extractVideoId(url)
 
   if (!videoId) {
     return
   }
 
-  return composeEmbedUrl(videoId, readEmbedParams(url.href))
+  return composeEmbedUrl(videoId, readEmbedParams(url))
 }
 
 // A Short gets the same landscape player as a film, so a carrier's portrait box never fills.

@@ -10,10 +10,10 @@ import {
   resolveUrl,
   toMap,
 } from 'trousse'
-import { extractVideoId } from '../embeds/youtube.js'
+import { extractVideoId, youtubeHosts } from '../embeds/youtube.js'
 import type { CleanUrlFn } from '../types.js'
 import { pixelDimensionLimit } from './dom.js'
-import { isFileName, placeholderBaseUrl } from './urls.js'
+import { isFileName, parseUrlOnHosts, placeholderBaseUrl } from './urls.js'
 
 // The parser reads a bare `225w` with no url as that candidate's url, and a proxy 404s on it.
 // Jetpack's feed export keeps only the first url, `…768w, 225w, 563w`, while the page has them all.
@@ -474,8 +474,7 @@ const getVideoIds = (video: Element): Array<string> => {
   }
 
   for (const attribute of ['data-embed-src', 'data-embed-url', 'src']) {
-    const value = video.getAttribute(attribute)
-    const id = value ? extractVideoId(value) : undefined
+    const id = extractVideoId(parseUrlOnHosts(video.getAttribute(attribute), youtubeHosts))
 
     if (id) {
       ids.add(id)

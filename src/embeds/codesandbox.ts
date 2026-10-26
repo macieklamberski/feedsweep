@@ -51,7 +51,7 @@ const readId = (slug: string): string => {
   return slug.slice(slug.lastIndexOf('-') + 1)
 }
 
-const parseTarget = (value: string | URL | undefined): CodesandboxTarget | undefined => {
+const parseTarget = (value: URL | undefined): CodesandboxTarget | undefined => {
   const parsed = parseUrlOnHosts(value, codesandboxHosts, isHostOf)
 
   if (!parsed) {

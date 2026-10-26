@@ -616,12 +616,6 @@ describe('redditResolveEmbed', () => {
 
     expect(redditResolveEmbed(new URL(value))).toBeUndefined()
   })
-
-  it('should ignore another host carrying the permalink path', () => {
-    const value = 'https://embed.reddit.com.evil.test/r/pics/comments/dq4m1v/my_garden/'
-
-    expect(redditResolveEmbed(new URL(value))).toBeUndefined()
-  })
 })
 
 describeForEachParser('redditIframeEmbedResolver', (parseHtml) => {

@@ -202,8 +202,15 @@ export const isUrlShaped = (value: string): boolean => {
   return urlShapeRegex.test(value)
 }
 
-// A host whose subdomains serve files or other sites takes `isHostOf`, which matches the listed
-// hosts alone.
+// Against a base, `https:/host/path` reads as a path on the base, and feeds write that slash. A
+// url with a scheme parses on its own, and only a protocol-relative or payload url takes the base.
+const parseCarrierUrl = (url: string): URL | undefined => {
+  return parseUrl(url) ?? parseUrl(url, placeholderBaseUrl)
+}
+
+// The one reading of every url a reader gets, whatever carried it. The host is checked on the url
+// as written, with `isHostOf` where a platform's subdomains serve other sites, and the glued-query
+// and whitespace repairs run after it, so a frame no resolver claims keeps `readCarrierUrl`'s url.
 export const parseUrlOnHosts = (
   url: string | URL | null | undefined,
   hosts: string | ReadonlyArray<string>,
@@ -213,15 +220,19 @@ export const parseUrlOnHosts = (
     return
   }
 
-  // A url already parsed, such as the one createUrlEmbedResolver hands a reader, is only checked.
-  const parsed =
-    url instanceof URL
-      ? url
-      : parseUrl(trimUrlValues(foldEscapedAmpersands(url)), placeholderBaseUrl)
-
-  if (parsed && isOnHost(parsed, hosts)) {
-    return parsed
+  // A reader re-checking the host of the url it was handed gets the same url back.
+  if (url instanceof URL) {
+    return isOnHost(url, hosts) ? url : undefined
   }
+
+  const folded = collapseSlashRuns(foldEscapedAmpersands(url))
+  const carrier = parseCarrierUrl(folded)
+
+  if (!carrier || !isOnHost(carrier, hosts)) {
+    return
+  }
+
+  return parseCarrierUrl(repairCarrierUrl(folded)) ?? carrier
 }
 
 // The origin a url can be rebuilt on. A url with no host, such as `javascript:/@user/123`, has an
@@ -287,8 +298,8 @@ export const dropUrlParams = (url: string, names: ReadonlyArray<string>): string
   return parsed.href
 }
 
-export const pickUrlParams = (url: string | URL, names: ReadonlyArray<string>): string => {
-  return composeQuery(pickQueryParams(parseUrl(url)?.search ?? '', names))
+export const pickUrlParams = (url: URL, names: ReadonlyArray<string>): string => {
+  return composeQuery(pickQueryParams(url.search, names))
 }
 
 // Overloaded so a definite URL returns a string, with no undefined fallback needed at the call

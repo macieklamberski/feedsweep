@@ -34,7 +34,7 @@ const composeEmbed = (
   }
 }
 
-const readPollId = (url: string | URL): string | undefined => {
+const readPollId = (url: URL | undefined): string | undefined => {
   const parsed = parseUrlOnHosts(url, pollmakerHosts, isHostOf)
 
   if (!parsed) {
@@ -73,7 +73,7 @@ export const pollmakerFormEmbedResolver = createMarkupEmbedResolver(
     }
 
     const form = element.querySelector(`#qp_form${pollNumber}[action]`)
-    const pollId = readPollId(attr(form, 'action') ?? '')
+    const pollId = readPollId(parseUrlOnHosts(attr(form, 'action'), pollmakerHosts, isHostOf))
 
     if (!form || !pollId) {
       return

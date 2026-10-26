@@ -66,9 +66,7 @@ const composeDocumentEmbed = (
 }
 
 // A reader url, `issuu.com/{publisher}/docs/{document}` with an optional page number after it.
-const readDocumentUrl = (url: string | URL): EmbedResolverResult | undefined => {
-  const parsed = parseUrlOnHosts(url, issuuHosts)
-
+const readDocumentUrl = (parsed: URL | undefined): EmbedResolverResult | undefined => {
   if (!parsed) {
     return
   }
@@ -95,7 +93,7 @@ export const issuuWidgetEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     return (
       composeConfigEmbed(attr(element, 'data-configid')) ??
-      readDocumentUrl(attr(element, 'data-url') ?? '')
+      readDocumentUrl(parseUrlOnHosts(attr(element, 'data-url'), issuuHosts))
     )
   },
 )

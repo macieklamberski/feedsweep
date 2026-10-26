@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
-import { describeForEachParser, html, resolverExtractor } from '../tests.js'
+import { carrierUrl, describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
   extractNicovideoId,
   isNicovideoReady,
+  nicovideoHosts,
   nicovideoIframeEmbedResolver,
   nicovideoResolveEmbed,
   nicovideoScriptEmbedResolver,
@@ -35,12 +36,20 @@ describe('extractNicovideoId', () => {
     const value = 'https://ext.nicovideo.jp/thumb_watch/sm9?w=490&h=307'
     const expected = 'sm9'
 
-    expect(extractNicovideoId(value)).toBe(expected)
+    expect(extractNicovideoId(carrierUrl(value, nicovideoHosts))).toBe(expected)
   })
 
   it('should read the other id prefixes', () => {
-    expect(extractNicovideoId('https://ext.nicovideo.jp/thumb_watch/nm12345')).toBe('nm12345')
-    expect(extractNicovideoId('https://ext.nicovideo.jp/thumb_watch/so67890')).toBe('so67890')
+    expect(
+      extractNicovideoId(
+        carrierUrl('https://ext.nicovideo.jp/thumb_watch/nm12345', nicovideoHosts),
+      ),
+    ).toBe('nm12345')
+    expect(
+      extractNicovideoId(
+        carrierUrl('https://ext.nicovideo.jp/thumb_watch/so67890', nicovideoHosts),
+      ),
+    ).toBe('so67890')
   })
 
   // A channel upload is addressed by a bare thread number, with no kind in front of it.
@@ -48,25 +57,25 @@ describe('extractNicovideoId', () => {
     const value = 'https://embed.nicovideo.jp/watch/1576909203/script?w=640&h=360'
     const expected = '1576909203'
 
-    expect(extractNicovideoId(value)).toBe(expected)
+    expect(extractNicovideoId(carrierUrl(value, nicovideoHosts))).toBe(expected)
   })
 
   it('should return undefined for a url that cannot be parsed', () => {
     const value = 'https://['
 
-    expect(extractNicovideoId(value)).toBeUndefined()
+    expect(extractNicovideoId(carrierUrl(value, nicovideoHosts))).toBeUndefined()
   })
 
   it('should return undefined for a nicovideo url naming no video', () => {
     const value = 'https://ext.nicovideo.jp/thumb_watch/'
 
-    expect(extractNicovideoId(value)).toBeUndefined()
+    expect(extractNicovideoId(carrierUrl(value, nicovideoHosts))).toBeUndefined()
   })
 
   it('should return undefined for a marker deeper in the path', () => {
     const value = 'https://www.nicovideo.jp/api/watch/v3_guest/sm9'
 
-    expect(extractNicovideoId(value)).toBeUndefined()
+    expect(extractNicovideoId(carrierUrl(value, nicovideoHosts))).toBeUndefined()
   })
 
   // Every spelling a broadcast arrives in, including the live host's own embed route.
@@ -77,7 +86,7 @@ describe('extractNicovideoId', () => {
   ]
 
   it.each(broadcastUrls)('should read the broadcast id from %s', (value) => {
-    expect(extractNicovideoId(value)).toBe('lv346883570')
+    expect(extractNicovideoId(carrierUrl(value, nicovideoHosts))).toBe('lv346883570')
   })
 
   // The illustration, manga and news sites sit on the same domain and write the same route words
@@ -95,7 +104,7 @@ describe('extractNicovideoId', () => {
   it.each(nonVideoCardUrls)(
     'should refuse the illustration, manga and news card at %s',
     (value) => {
-      expect(extractNicovideoId(value)).toBeUndefined()
+      expect(extractNicovideoId(carrierUrl(value, nicovideoHosts))).toBeUndefined()
     },
   )
 })

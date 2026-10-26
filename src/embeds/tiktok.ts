@@ -28,9 +28,7 @@ const profileHeight = 478
 
 type Clip = { handle?: string; videoId?: string }
 
-const readWatchUrl = (url: string | URL | undefined): Clip => {
-  const parsed = parseUrlOnHosts(url, tiktokHosts)
-
+const readWatchUrl = (parsed: URL | undefined): Clip => {
   if (!parsed) {
     return {}
   }
@@ -52,12 +50,12 @@ const readProfileHandle = (anchor: Element | undefined): string | undefined => {
 const resolveClip = (element: Element): EmbedResolverResult | undefined => {
   const declared = attr(element, 'data-video-id')
   const cite = attr(element, 'cite')
-  const cited = readWatchUrl(cite)
+  const cited = readWatchUrl(parseUrlOnHosts(cite, tiktokHosts))
 
   let linked: Clip = {}
 
   for (const anchor of element.querySelectorAll('a[href]')) {
-    const clip = readWatchUrl(attr(anchor, 'href'))
+    const clip = readWatchUrl(parseUrlOnHosts(attr(anchor, 'href'), tiktokHosts))
 
     if (clip.videoId) {
       linked = clip
@@ -207,7 +205,7 @@ export const tiktokMetasliderEmbedResolver = createMarkupEmbedResolver(
     // The id comes out of its attribute decoded, and it goes into a path.
     const segment = encodePathSegment(videoId)
 
-    const { handle } = readWatchUrl(attr(element, 'data-cite'))
+    const { handle } = readWatchUrl(parseUrlOnHosts(attr(element, 'data-cite'), tiktokHosts))
     const watchPath = handle ? `@${handle}/video/${segment}` : undefined
 
     return {
