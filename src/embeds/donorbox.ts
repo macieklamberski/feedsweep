@@ -53,9 +53,9 @@ export const donorboxWidgetEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    return donorboxResolveEmbed(
-      new URL(`https://donorbox.org/embed/${encodePathSegment(campaign)}`),
-    )
+    const form = new URL(`https://donorbox.org/embed/${encodePathSegment(campaign)}`)
+
+    return donorboxResolveEmbed(form)
   },
 )
 

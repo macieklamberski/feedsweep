@@ -39,14 +39,16 @@ const readPost = (url: URL | undefined): Post | undefined => {
 // Where the post is named: the attribute the dialog writes, then any anchor in the quote, which
 // a sanitized copy leaves as the only trace.
 const findPost = (element: Element): Post | undefined => {
-  const declared = readPost(parseUrlOnHosts(attr(element, 'data-text-post-permalink'), hosts))
+  const permalink = parseUrlOnHosts(attr(element, 'data-text-post-permalink'), hosts)
+  const declared = readPost(permalink)
 
   if (declared) {
     return declared
   }
 
   for (const anchor of element.querySelectorAll('a[href]')) {
-    const post = readPost(parseUrlOnHosts(attr(anchor, 'href'), hosts))
+    const href = parseUrlOnHosts(attr(anchor, 'href'), hosts)
+    const post = readPost(href)
 
     if (post) {
       return post
@@ -101,7 +103,9 @@ export const threadsIframeEmbedResolver = createUrlEmbedResolver(hosts, threadsR
 
 // A forum's s9e MediaEmbed helper frame, naming the post's shortcode in its url fragment.
 export const threadsS9eEmbedResolver = createS9eEmbedResolver('threads', (code) => {
-  return threadsResolveEmbed(new URL(`https://www.threads.com/t/${encodePathSegment(code)}/embed/`))
+  const frame = new URL(`https://www.threads.com/t/${encodePathSegment(code)}/embed/`)
+
+  return threadsResolveEmbed(frame)
 })
 
 export const threadsRenderHint: EmbedRenderHint = {
