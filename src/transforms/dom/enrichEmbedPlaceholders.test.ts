@@ -320,7 +320,7 @@ describeForEachParser('enrichEmbedPlaceholders', (parseHtml) => {
     expect(await transform(value, withFn(fn))).toEqualHtml(expected)
   })
 
-  it('should propagate an exception thrown by enrichEmbedFn', async () => {
+  it('should propagate an exception thrown by enrichEmbedFn', () => {
     const value = '<div data-embed-provider="youtube" data-embed-id="abc"></div>'
     const fn: EnrichEmbedFn = () => {
       throw new Error('boom')
@@ -328,7 +328,7 @@ describeForEachParser('enrichEmbedPlaceholders', (parseHtml) => {
 
     const throwing = () => transform(value, withFn(fn))
 
-    await expect(throwing()).rejects.toThrow('boom')
+    expect(throwing()).rejects.toThrow('boom')
   })
 
   // The answer is positional, so nothing found for a placeholder is an undefined in its slot.
