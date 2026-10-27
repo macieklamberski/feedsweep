@@ -704,7 +704,9 @@ describeForEachParser('buildMediaKey', (parseHtml) => {
     const value = getElement('<audio src="https://example.com/track.mp3&t=1"></audio>')
     const expected = 'https://example.com/track.mp3?t=1'
 
-    expect(buildMediaKey(value, { ...baseContext, cleanUrlFn: (url) => url })).toBe(expected)
+    const result = buildMediaKey(value, { ...baseContext, cleanUrlFn: (url) => url })
+
+    expect(result).toBe(expected)
   })
 
   it('should key an image rendition like the original image', () => {

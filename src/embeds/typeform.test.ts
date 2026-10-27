@@ -337,18 +337,18 @@ describeForEachParser('typeform through the pipeline', (parseHtml) => {
       ></div>
     `
 
-    expect(
-      await transformContent(value, {
-        parseHtmlFn: parseHtml,
-        baseUrl: 'https://example.com/post',
-        enrichEmbedFn: (embeds) => {
-          return embeds.map(() => ({
-            src: 'https://form.typeform.com/to/bd3tQuXe',
-            url: 'https://form.typeform.com/to/bd3tQuXe',
-          }))
-        },
-      }),
-    ).toEqualHtml(expected)
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enrichEmbedFn: (embeds) => {
+        return embeds.map(() => ({
+          src: 'https://form.typeform.com/to/bd3tQuXe',
+          url: 'https://form.typeform.com/to/bd3tQuXe',
+        }))
+      },
+    })
+
+    expect(result).toEqualHtml(expected)
   })
 
   it('should leave an audio enclosure on the typeform host playable', async () => {

@@ -534,9 +534,9 @@ describe('youtubeResolveEmbed', () => {
     ]
     const expected = ['playlist/PBS', 'user/PBS', 'channel/PBS']
 
-    expect(values.map((value) => youtubeResolveEmbed(carrierUrl(value, hosts))?.id)).toEqual(
-      expected,
-    )
+    const ids = values.map((value) => youtubeResolveEmbed(carrierUrl(value, hosts))?.id)
+
+    expect(ids).toEqual(expected)
   })
 
   it('should return undefined for a videoseries embed with no list', () => {

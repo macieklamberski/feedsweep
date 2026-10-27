@@ -1200,7 +1200,9 @@ describeForEachParser('walkElements', (parseHtml) => {
   it('should return false when the walk completes without stopping', () => {
     const document = parseHtml('<p>one</p>')
 
-    expect(walkElements(document, () => undefined)).toBe(false)
+    const result = walkElements(document, () => undefined)
+
+    expect(result).toBe(false)
   })
 
   it('should skip template subtrees, matching querySelectorAll traversal', () => {
@@ -1212,7 +1214,9 @@ describeForEachParser('walkElements', (parseHtml) => {
     })
 
     // Only the <p> outside the template is seen.
-    expect(visited.filter((name) => name === 'p')).toHaveLength(1)
+    const paragraphs = visited.filter((name) => name === 'p')
+
+    expect(paragraphs).toHaveLength(1)
     expect(document.querySelectorAll('.inside')).toHaveLength(0)
   })
 })
@@ -1237,7 +1241,9 @@ describeForEachParser('find', (parseHtml) => {
     const document = parseHtml('<div><p class="a">only</p></div>')
     const element = queryElement(document, 'div')
 
-    expect(find(element, '.a', () => false)).toBeUndefined()
+    const result = find(element, '.a', () => false)
+
+    expect(result).toBeUndefined()
   })
 
   it('should return undefined for a nullish element', () => {
@@ -1688,7 +1694,10 @@ describe('batchSelectors', () => {
     const batches = batchSelectors(value)
 
     expect(batches.length).toBeGreaterThan(1)
-    expect(Math.max(...batches.map((batch) => batch.length))).toBeLessThanOrEqual(2048)
+    const lengths = batches.map((batch) => batch.length)
+    const longest = Math.max(...lengths)
+
+    expect(longest).toBeLessThanOrEqual(2048)
     expect(batches.join(',').split(',')).toEqual(value)
   })
 

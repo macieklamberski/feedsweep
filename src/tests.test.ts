@@ -4,15 +4,21 @@ import { carrierUrl, html, queryElement, selectParsers } from './tests.js'
 
 describe('selectParsers', () => {
   it('should return every parser when no library is selected', () => {
-    expect(selectParsers(undefined).map(([name]) => name)).toEqual(['linkedom', 'jsdom'])
+    const names = selectParsers(undefined).map(([name]) => name)
+
+    expect(names).toEqual(['linkedom', 'jsdom'])
   })
 
   it('should narrow to the selected library', () => {
-    expect(selectParsers('jsdom').map(([name]) => name)).toEqual(['jsdom'])
+    const names = selectParsers('jsdom').map(([name]) => name)
+
+    expect(names).toEqual(['jsdom'])
   })
 
   it('should narrow to the linkedom library', () => {
-    expect(selectParsers('linkedom').map(([name]) => name)).toEqual(['linkedom'])
+    const names = selectParsers('linkedom').map(([name]) => name)
+
+    expect(names).toEqual(['linkedom'])
   })
 
   it('should throw on an unknown library', () => {

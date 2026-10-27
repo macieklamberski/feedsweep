@@ -20,10 +20,9 @@ describe('parseSrcset', () => {
     const value = 'https://example.com/a.jpg 768w, https://example.com/b.jpg 2x'
     const result = parseSrcset(value)
 
-    expect(result.map((candidate) => candidate.url)).toEqual([
-      'https://example.com/a.jpg',
-      'https://example.com/b.jpg',
-    ])
+    const urls = result.map((candidate) => candidate.url)
+
+    expect(urls).toEqual(['https://example.com/a.jpg', 'https://example.com/b.jpg'])
   })
 
   it('should drop descriptor-only candidates left by a url-less feed srcset', () => {
@@ -32,14 +31,18 @@ describe('parseSrcset', () => {
     const value = 'https://example.com/a.jpg 768w,  225w,  563w,  1152w'
     const result = parseSrcset(value)
 
-    expect(result.map((candidate) => candidate.url)).toEqual(['https://example.com/a.jpg'])
+    const urls = result.map((candidate) => candidate.url)
+
+    expect(urls).toEqual(['https://example.com/a.jpg'])
   })
 
   it('should not mistake a filename that merely ends in a descriptor for one', () => {
     const value = 'https://example.com/225w.jpg 768w'
     const result = parseSrcset(value)
 
-    expect(result.map((candidate) => candidate.url)).toEqual(['https://example.com/225w.jpg'])
+    const urls = result.map((candidate) => candidate.url)
+
+    expect(urls).toEqual(['https://example.com/225w.jpg'])
   })
 })
 
