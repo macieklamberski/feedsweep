@@ -121,8 +121,8 @@ describeForEachParser('Facebook', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
-  // A comment thread is not the article's content, so the resolver refuses it. Nothing else
-  // claims the element either, so it reaches the output as the custom element it arrived as.
+  // Facebook no longer serves a comment embed, so the resolver refuses it. Nothing else claims
+  // the element either, so it reaches the output as the custom element it arrived as.
   it('should leave an amp-facebook comment embed as markup', async () => {
     const value = html`
       <amp-facebook

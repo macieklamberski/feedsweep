@@ -171,6 +171,8 @@ export const facebookAmpEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     const embedAs = attr(element, 'data-embed-as')
 
+    // A comment embed quotes one comment, and Facebook no longer serves it: `comment_embed.php`
+    // answers 404 for every comment while `post.php` serves the same post, so no player exists.
     if (isAnyOf(embedAs, 'comment')) {
       return
     }
