@@ -1,4 +1,4 @@
-import { composeQuery, decodeSegment, getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -21,19 +21,15 @@ const playerPaths = [
 
 // The retired script loader names every part after a key, and carries the same three parts.
 const scriptPathRegex =
-  /^\/player\/embed\/w\/\d+\/h\/\d+\/id_notice\/([^/]+)\/id_utilisateur\/([^/]+)\/hash\/([^/]+)$/i
+  /^\/player\/embed\/w\/\d+\/h\/\d+\/id_notice\/([^/]+)\/id_utilisateur\/[^/]+\/hash\/[^/]+$/i
 
-// The `embed` routes redirect onto this form and append an autoplay flag, which would start the
-// player when the page loads.
-const composePlayerUrl = (id: string, playerId: string, key: string): string => {
-  return `https://player.ina.fr/embed/${id}${composeQuery({ pid: playerId, key })}`
-}
-
-const composeEmbed = (id: string, playerId: string, key: string): EmbedResolverResult => {
+// The `embed` routes redirect onto this form with the player id and key in the query, where the
+// player answers "Cette vidéo n'est plus disponible" for any item. Named by the id alone, it plays.
+const composeEmbed = (id: string): EmbedResolverResult => {
   return {
     provider,
     id,
-    src: composePlayerUrl(id, playerId, key),
+    src: `https://player.ina.fr/embed/${id}`,
     url: `https://www.ina.fr/video/${id}`,
     ...sizes.player,
   }
@@ -48,7 +44,7 @@ export const inaResolveEmbed: ResolveUrlEmbed = (url) => {
     return
   }
 
-  return composeEmbed(id, playerId, key)
+  return composeEmbed(id)
 }
 
 export const inaIframeEmbedResolver = createUrlEmbedResolver(hosts, inaResolveEmbed)
@@ -63,10 +59,7 @@ export const inaScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const [, id, playerId, key] = match
-
-    // The player id and the key move from path segments into the query, so they are decoded first.
-    return composeEmbed(id, decodeSegment(playerId) ?? playerId, decodeSegment(key) ?? key)
+    return composeEmbed(match[1])
   },
 )
 
