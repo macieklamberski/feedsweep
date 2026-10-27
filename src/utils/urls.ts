@@ -18,7 +18,7 @@ import type { AssetType, ResolveUrlFn, TransformContext, UrlRole } from '../type
 // Each helper names the slice of the context it actually reads, so a caller holding only a
 // cleaner can still reach the cleaning step, and a whole context satisfies either one.
 type ResolveContext = Pick<TransformContext, 'resolveUrlFn' | 'baseUrl'>
-type CleanContext = Pick<TransformContext, 'cleanUrlFn'>
+export type CleanContext = Pick<TransformContext, 'cleanUrlFn'>
 
 // A url read out of a query value or a JSON attribute often names no host of its own.
 export const placeholderBaseUrl = 'https://example.com'
@@ -26,6 +26,7 @@ export const placeholderBaseUrl = 'https://example.com'
 const urlShapeRegex = /[:/.]/
 const queryOrHashRegex = /[?#]/
 const pathSlashRunRegex = /^https?:\/\/[^/?#]+[^?#]*\/\//i
+const otherSchemeRegex = /^(?!https?:)[a-z][a-z\d+.-]*:/i
 const escapedAmpersandRegex = /&(?:amp;)*%23038;|&(?:amp;)+/g
 
 // Protocol-relative `//host/path` is left unmatched, so it resolves to the base url's scheme.
@@ -237,6 +238,24 @@ export const parseUrlOnHosts = (
   return parseRepairedUrl(url)
 }
 
+// The one repair chain, read through on every carrier and applied on every url handed to the
+// caller's cleaner: fold an escaped `&amp;`, collapse a run of slashes, fix a glued query and trim
+// whitespace in values. A `data:`, `mailto:` or `javascript:` value carries no query, so its
+// `&amp;` is content and the value stays as written. A repair that leaves the url unparseable is
+// dropped, and the folded url stands. A cleaner parses and re-serializes the url, which hides what
+// a repair looks for: a space where an `&` belongs is encoded to `%20`, so the value keeps the
+// rest of the query.
+export const repairUrl = (url: string): string => {
+  if (otherSchemeRegex.test(url)) {
+    return url
+  }
+
+  const folded = collapseSlashRuns(foldEscapedAmpersands(url))
+  const repaired = repairCarrierUrl(folded)
+
+  return parseCarrierUrl(repaired) ? repaired : folded
+}
+
 // A carrier url on any host, read through the class repairs `parseUrlOnHosts` runs after its
 // host check: a pass that unwraps a proxy on whatever site hosts it has no host list to check.
 export const parseRepairedUrl = (url: Nullish<string>): URL | undefined => {
@@ -244,9 +263,7 @@ export const parseRepairedUrl = (url: Nullish<string>): URL | undefined => {
     return
   }
 
-  const folded = collapseSlashRuns(foldEscapedAmpersands(url))
-
-  return parseCarrierUrl(repairCarrierUrl(folded)) ?? parseCarrierUrl(folded)
+  return parseCarrierUrl(repairUrl(url))
 }
 
 // The origin a url can be rebuilt on. A url with no host, such as `javascript:/@user/123`, has an
@@ -330,16 +347,22 @@ export const resolveOrDropUrl = (
 // Overloaded the same way and for the same reason as resolveOrKeepUrl: cleaning a definite url
 // answers with a definite one, so composing the two keeps whichever answer the resolve step gave.
 type CleanUrl = {
-  (url: string, context: CleanContext): string
-  (url: string | undefined, context: CleanContext): string | undefined
+  (url: string, context?: CleanContext): string
+  (url: string | undefined, context?: CleanContext): string | undefined
 }
 
-export const cleanUrl: CleanUrl = ((url, context: CleanContext) => {
+// Every url feedsweep hands to the caller's cleanUrlFn goes through here, repaired first. With no
+// cleaner the url stays as written, as a frame no resolver claims keeps its src.
+export const cleanUrl: CleanUrl = ((url, context?: CleanContext) => {
   if (!url) {
     return
   }
 
-  const cleaned = context.cleanUrlFn?.(url)
+  if (!context?.cleanUrlFn) {
+    return url
+  }
+
+  const cleaned = context.cleanUrlFn(repairUrl(url))
 
   // An empty cleaned url keeps the input url.
   if (!cleaned) {

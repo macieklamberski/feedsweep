@@ -26,6 +26,18 @@ describeForEachParser('linkifyUrls', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should repair a bare url before the cleaner and show the repaired one', async () => {
+    const value = '<p>See https://example.com/album/title&source=gmail now</p>'
+    const context = { ...baseContext, cleanUrlFn: (url: string) => url }
+    const expected = html`
+      <p>See
+        <a href="https://example.com/album/title?source=gmail">https://example.com/album/title?source=gmail</a>
+        now</p>
+    `
+
+    expect(await transform(value, context)).toEqualHtml(expected)
+  })
+
   it('should link URL with path and query', async () => {
     const value = '<p>See https://example.com/path?key=value&other=1#hash for details</p>'
     const expected = html`

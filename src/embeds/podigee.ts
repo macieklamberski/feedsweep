@@ -2,7 +2,7 @@ import { getPathSegments, isAnyOf, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest, readPixels } from '../utils/hints.js'
-import { placeholderBaseUrl, repairCarrierUrl } from '../utils/urls.js'
+import { placeholderBaseUrl, repairUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'podigee'
@@ -49,7 +49,7 @@ export const podigeeScriptEmbedResolver = createMarkupEmbedResolver(
     // The inline spellings, data-configuration="podigee" or "playerConfiguration", are not urls,
     // so they resolve against the placeholder host and fail the show host shape. The repair is
     // the one every carrier url gets: a glued query fixed and whitespace trimmed off each value.
-    const configuration = repairCarrierUrl(attr(element, 'data-configuration') ?? '')
+    const configuration = repairUrl(attr(element, 'data-configuration') ?? '')
     const parsed = parseUrl(configuration, placeholderBaseUrl)
 
     if (!parsed) {

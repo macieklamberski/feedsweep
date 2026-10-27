@@ -211,6 +211,21 @@ const renditionQueryCases: Array<[string, string]> = [
 ]
 
 describe('getImageFingerprint', () => {
+  it('should repair a query glued onto the path before the cleaner keys it', () => {
+    const context = { cleanUrlFn: (url: string) => url }
+    const glued = getImageFingerprint('https://example.com/photo.jpg&w=100', context)
+    const bare = getImageFingerprint('https://example.com/photo.jpg', context)
+
+    expect(glued).toBe(bare)
+  })
+
+  it('should key a glued query as written when there is no cleaner', () => {
+    const glued = getImageFingerprint('https://example.com/photo.jpg&w=100')
+    const bare = getImageFingerprint('https://example.com/photo.jpg')
+
+    expect(glued).not.toBe(bare)
+  })
+
   it('should drop the query so resize variants collapse', () => {
     const bare = getImageFingerprint('https://example.com/cover.jpg')
     const sized = getImageFingerprint('https://example.com/cover.jpg?w=300')
