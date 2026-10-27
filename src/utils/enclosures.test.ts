@@ -704,7 +704,7 @@ describeForEachParser('buildMediaKey', (parseHtml) => {
     const value = getElement('<audio src="https://example.com/track.mp3&t=1"></audio>')
     const expected = 'https://example.com/track.mp3?t=1'
 
-    expect(buildMediaKey(value, { cleanUrlFn: (url) => url })).toBe(expected)
+    expect(buildMediaKey(value, { ...baseContext, cleanUrlFn: (url) => url })).toBe(expected)
   })
 
   it('should key an image rendition like the original image', () => {
@@ -738,7 +738,9 @@ describeForEachParser('buildMediaKey', (parseHtml) => {
     const value = getElement('<video src="https://example.com/clip.mp4?utm_source=feed"></video>')
     const cleanUrlFn = (url: string) => url.split('?')[0]
 
-    expect(buildMediaKey(value, { cleanUrlFn })).toBe('https://example.com/clip.mp4')
+    expect(buildMediaKey(value, { ...baseContext, cleanUrlFn })).toBe(
+      'https://example.com/clip.mp4',
+    )
   })
 
   it('should return an empty key for an element without a url', () => {

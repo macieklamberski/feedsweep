@@ -2,7 +2,7 @@ import { parseUrl } from 'trousse'
 import type { Enclosure, TransformContext } from '../types.js'
 import { setInnerHtml } from './dom.js'
 import { getImageFingerprint, getSizeKeywordRank, getUrlSizeHint } from './images.js'
-import { absoluteUrlRegex, type CleanContext, cleanUrl, resolveOrKeepUrl } from './urls.js'
+import { absoluteUrlRegex, cleanUrl, resolveOrKeepUrl } from './urls.js'
 import { getEmbedSize } from './widgets.js'
 
 // Marks an injected element so a repeat run skips it and stripDuplicateEnclosures (an
@@ -18,7 +18,7 @@ const strippedJsonAmpersandRegex = /(?<=\?.*)u0026(?:amp)?/g
 // The image key drops a file's query, which is what tells podcast proxy episodes apart.
 // A podcast proxy's audio url is `…/play.mp3?url={episode}`, so its identity lives in the query.
 // Audio, video and embeds have no scaled variants.
-export const buildMediaKey = (element: Element, context?: CleanContext): string => {
+export const buildMediaKey = (element: Element, context?: TransformContext): string => {
   const src = element.getAttribute('src') ?? element.getAttribute('data-embed-src') ?? ''
 
   if (element.localName === 'img') {
@@ -78,7 +78,7 @@ const isPreferredVariant = (incoming: Enclosure, kept: Enclosure): boolean => {
 // with a ?w= query. An audio or video query string often carries identity, as on a podcast proxy.
 const dedupeImageEnclosures = (
   enclosures: ReadonlyArray<Enclosure>,
-  context: CleanContext,
+  context: TransformContext,
 ): Array<Enclosure> => {
   const indexByKey = new Map<string, number>()
   const result: Array<Enclosure> = []
@@ -177,7 +177,7 @@ const pickGroupRendition = (renditions: ReadonlyArray<Enclosure>): Enclosure | u
 // again, so it joins the group: it keeps its own position and takes the member's fields.
 const foldEqualMembers = (
   enclosures: ReadonlyArray<Enclosure>,
-  context: CleanContext,
+  context: TransformContext,
 ): Array<Enclosure> => {
   const members = new Map<string, Enclosure>()
 
@@ -229,7 +229,7 @@ const foldEqualMembers = (
 // a group pass through as they are.
 const collapseGroups = (
   enclosures: ReadonlyArray<Enclosure>,
-  context: CleanContext,
+  context: TransformContext,
 ): Array<Enclosure> => {
   const folded = foldEqualMembers(enclosures, context)
   const groups = new Map<number, Array<Enclosure>>()
@@ -342,7 +342,7 @@ const readEnclosure = (
 // param, like …/?media_url=<file>, and the param name varies by host.
 const mergePlayerEnclosures = (
   enclosures: ReadonlyArray<Enclosure>,
-  context: CleanContext,
+  context: TransformContext,
 ): Array<Enclosure> => {
   const result = [...enclosures]
   const removed = new Set<number>()

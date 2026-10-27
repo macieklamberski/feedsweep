@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 import type { Nullish } from 'trousse'
-import { describeForEachParser, html } from '../tests.js'
+import { baseContext, describeForEachParser, html } from '../tests.js'
 import {
   countSrcsetCandidates,
   findPosterEvidence,
@@ -212,7 +212,7 @@ const renditionQueryCases: Array<[string, string]> = [
 
 describe('getImageFingerprint', () => {
   it('should repair a query glued onto the path before the cleaner keys it', () => {
-    const context = { cleanUrlFn: (url: string) => url }
+    const context = { ...baseContext, cleanUrlFn: (url: string) => url }
     const glued = getImageFingerprint('https://example.com/photo.jpg&w=100', context)
     const bare = getImageFingerprint('https://example.com/photo.jpg', context)
 
