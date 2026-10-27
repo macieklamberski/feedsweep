@@ -342,12 +342,6 @@ export const getUrlSizeHint = (url: string): number => {
     return queryWidth
   }
 
-  const pairWidth = Number([...url.matchAll(urlPairRegex)].at(-1)?.[1])
-
-  if (pairWidth > 0) {
-    return pairWidth
-  }
-
   return 0
 }
 
