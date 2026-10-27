@@ -79,6 +79,31 @@ describeForEachParser('YouTube', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
+  // A Flash-era carrier from a real feed, with a bare flag glued onto the id with `&`. A change to
+  // the shared glued-query repair that stops reading `&feature` as glue loses this player.
+  it('should claim a Flash player with a flag glued onto the id', async () => {
+    const value = html`
+      <object
+        width="600"
+        height="400"
+        data="http://www.youtube.com/v/39GNVe7zmcA&amp;feature"
+        type="application/x-shockwave-flash"
+      ></object>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="youtube"
+        data-embed-id="39GNVe7zmcA"
+        data-embed-src="https://www.youtube.com/embed/39GNVe7zmcA"
+        data-embed-url="https://www.youtube.com/watch?v=39GNVe7zmcA"
+        data-embed-thumbnail="https://i.ytimg.com/vi/39GNVe7zmcA/hqdefault.jpg"
+        data-embed-ratio="16/9"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   // The snippet YouTube's own oEmbed returns, which is what a WordPress oEmbed cache stores and
   // republishes into the feed.
   it('should keep the start offset an oEmbed snippet states', async () => {

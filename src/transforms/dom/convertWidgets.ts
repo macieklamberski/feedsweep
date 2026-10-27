@@ -8,7 +8,7 @@ import type {
 import { attr, isElement, isNonWhitespaceText, playableElements } from '../../utils/dom.js'
 import {
   audioFileRegex,
-  cleanUrl,
+  cleanUnclaimedUrl,
   flashFileRegex,
   isMediaWikiFilePage,
   prepareUrl,
@@ -325,7 +325,7 @@ export const convertWidgets: DomTransform = (context) => {
       const resolved = resolveOrDropUrl(src, context)
       // This src is the publisher's own URL, not one minted from a parsed id, so it arrives
       // with whatever tracking params they pasted.
-      const cleaned = cleanUrl(resolved, context)
+      const cleaned = cleanUnclaimedUrl(resolved, context)
 
       if (!cleaned) {
         continue

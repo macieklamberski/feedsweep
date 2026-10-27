@@ -259,10 +259,11 @@ describe('repairUrl', () => {
     expect(repairUrl(valueUrl)).toBe(valueUrl)
   })
 
-  it('should keep a bare word after an ampersand as written when no pair follows', () => {
-    const valueUrl = 'https://example.com/resource/R&B'
+  it('should open the query at a bare word after a path ampersand', () => {
+    const valueUrl = 'https://example.com/v/abc123&feature'
+    const expectedUrl = 'https://example.com/v/abc123?feature'
 
-    expect(repairUrl(valueUrl)).toBe(valueUrl)
+    expect(repairUrl(valueUrl)).toBe(expectedUrl)
   })
 
   it('should keep an ampersand in a folder name before a file as written', () => {
