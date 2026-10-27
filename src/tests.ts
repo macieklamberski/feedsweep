@@ -211,10 +211,11 @@ const toEqualHtml = (received: unknown, expected: string) => {
 
   return {
     pass,
-    message: () =>
-      pass
+    message: () => {
+      return pass
         ? `expected HTML not to equal\n  received: ${normalizedReceived}\n  expected: ${normalizedExpected}`
-        : `expected HTML to equal\n  received: ${normalizedReceived}\n  expected: ${normalizedExpected}`,
+        : `expected HTML to equal\n  received: ${normalizedReceived}\n  expected: ${normalizedExpected}`
+    },
   }
 }
 
@@ -226,10 +227,11 @@ const toContainHtml = (received: unknown, substring: string) => {
 
   return {
     pass,
-    message: () =>
-      pass
+    message: () => {
+      return pass
         ? `expected HTML not to contain substring\n  received: ${normalizedReceived}\n  substring: ${substring}`
-        : `expected HTML to contain substring\n  received: ${normalizedReceived}\n  substring: ${substring}`,
+        : `expected HTML to contain substring\n  received: ${normalizedReceived}\n  substring: ${substring}`
+    },
   }
 }
 

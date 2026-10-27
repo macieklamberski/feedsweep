@@ -1361,19 +1361,21 @@ describeForEachParser('slideshareIframeEmbedResolver', (parseHtml) => {
 // read off the post, which is why this case runs whole: two decks, each with its own caption, in
 // the flat sequence Blogger writes.
 describeForEachParser('slideshare through the pipeline', (parseHtml) => {
-  const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) =>
-    transformContent(value, {
+  const convert = (value: string, enclosures?: Array<{ url: string; type: string }>) => {
+    return transformContent(value, {
       parseHtmlFn: parseHtml,
       baseUrl: 'https://example.com/post',
       enclosures,
     })
+  }
 
-  const placeholders = (value: string, parse: typeof parseHtml) =>
-    Array.from(parse(value).querySelectorAll('[data-embed-src]')).map((element) => ({
+  const placeholders = (value: string, parse: typeof parseHtml) => {
+    return Array.from(parse(value).querySelectorAll('[data-embed-src]')).map((element) => ({
       id: element.getAttribute('data-embed-id'),
       url: element.getAttribute('data-embed-url'),
       title: element.getAttribute('data-embed-title'),
     }))
+  }
 
   it('should caption each deck of a post from its own snippet', async () => {
     const value = html`

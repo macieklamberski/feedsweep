@@ -10,13 +10,12 @@ const playerSize = { width: 640, height: 360 }
 // WMaker's Flash player is dead and its .swf 404s, so today the item renders a click-to-load
 // placeholder addressing nothing. The modern player lives at {origin}/embed/{articleId}/ and the
 // article id is in the item's own permalink, which is what makes the repair computable offline.
-export const rebuildWmakerEmbeds: DomTransform =
-  ({ baseUrl }) =>
-  (document) => {
+export const rebuildWmakerEmbeds: DomTransform = ({ baseUrl }) => {
+  return (document) => {
     const objects = document.querySelectorAll('object[data]')
-    const [element, ...others] = Array.from(objects).filter((candidate) =>
-      isFlashPlayerUrl(attr(candidate, 'data')),
-    )
+    const [element, ...others] = Array.from(objects).filter((candidate) => {
+      return isFlashPlayerUrl(attr(candidate, 'data'))
+    })
 
     // The embed route addresses the article rather than the video and serves one video for it: an
     // article carrying four objects still answers with a single mp4, so minting per object would
@@ -37,3 +36,4 @@ export const rebuildWmakerEmbeds: DomTransform =
 
     element.replaceWith(iframe)
   }
+}

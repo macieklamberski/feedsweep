@@ -90,11 +90,11 @@ export const mergeConsecutiveOneLinerPres: DomTransform = ({ preservedPreClasses
       }
 
       const merged = run
-        .map((element) =>
-          contentElement(element)
+        .map((element) => {
+          return contentElement(element)
             .innerHTML.replace(surroundingNewlinesRegex, '')
-            .replace(trailingBrRegex, ''),
-        )
+            .replace(trailingBrRegex, '')
+        })
         .join('\n')
 
       setInnerHtml(contentElement(pre), merged)

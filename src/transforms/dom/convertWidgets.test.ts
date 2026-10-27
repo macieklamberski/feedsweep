@@ -272,11 +272,12 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     const asyncResolver: EmbedResolver = {
       kind: 'embed',
       selector: 'iframe[src*="example.com"]',
-      extract: (element) =>
-        Promise.resolve({
+      extract: (element) => {
+        return Promise.resolve({
           provider: 'async',
           src: element.getAttribute('src') ?? '',
-        }),
+        })
+      },
     }
     const customContext: TransformContext = {
       ...baseContext,
