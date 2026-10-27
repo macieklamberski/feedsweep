@@ -405,7 +405,7 @@ describeForEachParser('facebookAmpEmbedResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
-    // A comment thread is page chrome, not the article's content.
+    // Facebook no longer serves a comment embed, so there is no player to mint.
     it('should leave a comment embed unresolved', async () => {
       const value = html`
         <amp-facebook
