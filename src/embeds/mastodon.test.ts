@@ -520,11 +520,9 @@ describe('parseMastodonStatus', () => {
   })
 
   it('should reject the ActivityPub spelling followed by another segment', () => {
-    expect(
-      parseMastodonStatus(
-        'https://mastodon.social/users/Gargron/statuses/116535232552529093/activity',
-      ),
-    ).toBeUndefined()
+    const value = 'https://mastodon.social/users/Gargron/statuses/116535232552529093/activity'
+
+    expect(parseMastodonStatus(value)).toBeUndefined()
   })
 
   it('should reject a url whose scheme cannot host an embed', () => {

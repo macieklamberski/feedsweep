@@ -493,12 +493,12 @@ describeForEachParser('speakerdeck through the pipeline', (parseHtml) => {
       ></div>
     `
 
-    expect(
-      await transformContent(value, {
-        parseHtmlFn: parseHtml,
-        baseUrl: 'https://example.com/post',
-      }),
-    ).toEqualHtml(expected)
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+
+    expect(result).toEqualHtml(expected)
   })
 
   it('should leave a video enclosure on the speakerdeck host playable', async () => {
@@ -514,12 +514,12 @@ describeForEachParser('speakerdeck through the pipeline', (parseHtml) => {
       <p>Body</p>
     `
 
-    expect(
-      await transformContent('<p>Body</p>', {
-        parseHtmlFn: parseHtml,
-        baseUrl: 'https://example.com/post',
-        enclosures,
-      }),
-    ).toEqualHtml(expected)
+    const result = await transformContent('<p>Body</p>', {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
+
+    expect(result).toEqualHtml(expected)
   })
 })

@@ -350,9 +350,10 @@ describe('getImageFingerprint', () => {
 
   it('should keep the raw capture when the proxied source is malformed', () => {
     // `%E0%A4%A` is an incomplete percent-escape. Decoding throws and the raw value is kept.
-    expect(() =>
-      getImageFingerprint('https://images.weserv.nl/?url=https%3A%2F%2F%E0%A4%A'),
-    ).not.toThrow()
+    const throwing = () =>
+      getImageFingerprint('https://images.weserv.nl/?url=https%3A%2F%2F%E0%A4%A')
+
+    expect(throwing).not.toThrow()
   })
 
   it('should return the input unchanged when it is not a parseable URL', () => {

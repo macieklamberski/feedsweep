@@ -163,12 +163,9 @@ describeForEachParser('rebuildWmakerEmbeds', (parseHtml) => {
         <object data="https://www.chevenement.fr/v/00266a5a3ad268199c4be738478536b66d91a857"></object>
       `
 
-      expect(
-        await transformWith(
-          value,
-          'https://www.chevenement.fr/Halte-au-Hollande-bashing-_a1485.html',
-        ),
-      ).toEqualHtml(value)
+      const url = 'https://www.chevenement.fr/Halte-au-Hollande-bashing-_a1485.html'
+
+      expect(await transformWith(value, url)).toEqualHtml(value)
     })
   })
 

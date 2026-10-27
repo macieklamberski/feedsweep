@@ -646,12 +646,12 @@ describeForEachParser('rtve through the pipeline', (parseHtml) => {
       ></div>
     `
 
-    expect(
-      await transformContent(value, {
-        parseHtmlFn: parseHtml,
-        baseUrl: 'https://example.com/post',
-      }),
-    ).toEqualHtml(expected)
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+
+    expect(result).toEqualHtml(expected)
   })
 
   it('should turn an audio FLVPlayer nested in its object into one placeholder', async () => {
@@ -686,12 +686,12 @@ describeForEachParser('rtve through the pipeline', (parseHtml) => {
       ></div>
     `
 
-    expect(
-      await transformContent(value, {
-        parseHtmlFn: parseHtml,
-        baseUrl: 'https://example.com/post',
-      }),
-    ).toEqualHtml(expected)
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+
+    expect(result).toEqualHtml(expected)
   })
 
   it('should leave an audio enclosure on the rtve host playable', async () => {
@@ -707,12 +707,12 @@ describeForEachParser('rtve through the pipeline', (parseHtml) => {
       <p>Body</p>
     `
 
-    expect(
-      await transformContent('<p>Body</p>', {
-        parseHtmlFn: parseHtml,
-        baseUrl: 'https://example.com/post',
-        enclosures,
-      }),
-    ).toEqualHtml(expected)
+    const result = await transformContent('<p>Body</p>', {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
+
+    expect(result).toEqualHtml(expected)
   })
 })
