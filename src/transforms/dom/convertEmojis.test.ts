@@ -92,31 +92,31 @@ describeForEachParser('convertEmojis', (parseHtml) => {
       [
         '<img class="emojione" alt=":catjam:" src="https://files.mastodon.social/custom_emojis/images/000/224/097/d9c.gif">',
         '<img data-emoji="" class="emojione" alt=":catjam:" src="https://files.mastodon.social/custom_emojis/images/000/224/097/d9c.gif">',
-      ],
+      ], // Mastodon custom emoji
       [
         '<img alt="[微笑]" src="https://h5.sinaimg.cn/m/emoticon/icon/default/d_weixiao.png">',
         '<img data-emoji="" alt="[微笑]" src="https://h5.sinaimg.cn/m/emoticon/icon/default/d_weixiao.png">',
-      ],
+      ], // Weibo emoticon
       [
         '<img class="smilies" src="/images/smilies/x.gif" alt=":mrgreen:">',
         '<img data-emoji="" class="smilies" src="/images/smilies/x.gif" alt=":mrgreen:">',
-      ],
+      ], // phpBB smilie with no mapping
       [
         '<img data-emoticon="" src="/uploads/emoticons/yahoo.png" alt=":yahoo:">',
         '<img data-emoji="" data-emoticon="" src="/uploads/emoticons/yahoo.png" alt=":yahoo:">',
-      ],
+      ], // IPS emoticon with no mapping
       [
         '<img src="https://github.githubassets.com/images/icons/emoji/octocat.png" alt=":octocat:">',
         '<img data-emoji="" src="https://github.githubassets.com/images/icons/emoji/octocat.png" alt=":octocat:">',
-      ],
+      ], // GitHub custom emoji with no Unicode counterpart
       [
         '<img src="https://stat100.ameba.jp/blog/ucs/img/char/char3/004.png" alt="ウインク" width="24" height="24">',
         '<img data-emoji="" src="https://stat100.ameba.jp/blog/ucs/img/char/char3/004.png" alt="ウインク" width="24" height="24">',
-      ],
+      ], // Ameba built-in char image
       [
         '<img src="https://emoji.ameba.jp/img/user/sa/sayu74/118238.gif" alt="カナダ" border="0">',
         '<img data-emoji="" src="https://emoji.ameba.jp/img/user/sa/sayu74/118238.gif" alt="カナダ" border="0">',
-      ],
+      ], // Ameba author-uploaded emoji
     ]
 
     it.each(markedCases)('should mark %s', async (tag, marked) => {
@@ -129,8 +129,8 @@ describeForEachParser('convertEmojis', (parseHtml) => {
     // A smilie directory is matched loosely, so evidence that rests only on the path is not
     // enough to call something an emoji once it fails to resolve.
     const unmarkedCases: Array<string> = [
-      '<img src="https://example.com/images/smilies/banner.png" alt="Banner">',
-      '<img src="https://cdn.example.com/photo-1920.jpg" alt="A photograph">',
+      '<img src="https://example.com/images/smilies/banner.png" alt="Banner">', // banner in a smilies folder
+      '<img src="https://cdn.example.com/photo-1920.jpg" alt="A photograph">', // ordinary photograph
     ]
 
     it.each(unmarkedCases)('should not mark %s', async (tag) => {

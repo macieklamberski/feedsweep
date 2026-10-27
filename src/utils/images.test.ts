@@ -93,35 +93,35 @@ const imageProxyCases: Array<[string, string]> = [
   [
     'https://files.zhedge.com/cdn-cgi/image/width=1080/https://assets.zerohedge.com/s3fs/photo.jpg',
     'assets.zerohedge.com/s3fs/photo.jpg',
-  ],
+  ], // Cloudflare image
   [
     'https://assets.thelocal.com/cdn-cgi/plain/https://apiwp.thelocal.com/wp-content/uploads/photo.jpg',
     'apiwp.thelocal.com/wp-content/uploads/photo.jpg',
-  ],
+  ], // Cloudflare plain
   [
     'https://x.com.br/_next/image?url=https%3A%2F%2Fx.com.br%2Ffotos%2Fphoto.jpg&w=384',
     'x.com.br/fotos/photo.jpg',
-  ],
+  ], // Next.js image
   [
     'https://npr.brightspotcdn.com/dims4/default/f008/resize/300x169!/quality/90/?url=https%3A%2F%2Fmedia.npr.org%2Fphoto.jpg',
     'media.npr.org/photo.jpg',
-  ],
+  ], // Brightspot dims
   [
     'https://ik.imagekit.io/demo/tr:w-200/https://cdn.example.com/photo.jpg',
     'cdn.example.com/photo.jpg',
-  ],
+  ], // ImageKit
   [
     'https://media2.dev.to/dynamic/image/width=800/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fphoto.png',
     'dev-to-uploads.s3.amazonaws.com/photo.png',
-  ],
+  ], // dev.to
   [
     'https://s.yimg.com/ny/api/res/1.2/As60/YXBw/https://d29szjachogqwa.cloudfront.net/images/photo.jpg',
     'd29szjachogqwa.cloudfront.net/images/photo.jpg',
-  ],
+  ], // Yahoo image API
   [
     'https://images.podigee-cdn.net/0x,siN6/https://main.podigee-cdn.net/uploads/u17132/photo.jpg',
     'main.podigee-cdn.net/uploads/u17132/photo.jpg',
-  ],
+  ], // podigee
 ]
 
 const identityQueryCases: Array<[string, string]> = [

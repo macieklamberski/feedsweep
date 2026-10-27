@@ -354,9 +354,9 @@ describeForEachParser('spreakerAnchorEmbedResolver', (parseHtml) => {
   // one. `data-title` states it without parsing, and Spreaker's oEmbed states it for the rest.
   describe('the localized call to action', () => {
     const quotedTitleLabels: Array<string> = [
-      'Escucha"FREEROCK #433 270418 INCOGNITO" en Spreaker.',
-      'Listen to \u201C306. Italy Ancestry Research Tips\u201D on Spreaker.',
-      'Listen to "The "best" episode" on Spreaker.',
+      'Escucha"FREEROCK #433 270418 INCOGNITO" en Spreaker.', // Spanish, straight quotes
+      'Listen to \u201C306. Italy Ancestry Research Tips\u201D on Spreaker.', // English, curly quotes
+      'Listen to "The "best" episode" on Spreaker.', // a name quoting something itself
     ]
 
     it.each(quotedTitleLabels)('should state no title for %s', async (text) => {

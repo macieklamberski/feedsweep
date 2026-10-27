@@ -346,8 +346,8 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     })
 
     const largeCases: Array<[string, string]> = [
-      ['49', '49'],
-      ['259', '111'],
+      ['49', '49'], // 49 by 49
+      ['259', '111'], // 259 by 111
     ]
 
     it.each(largeCases)('should leave a %s by %s emoticon untouched', async (width, height) => {
@@ -441,22 +441,22 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     // parts are deliberate: MyBB's alt is an English name, vBulletin's is empty, FCKeditor
     // ships neither alt nor class, and IPB 2 puts the filename in the alt.
     const engineCases: Array<string> = [
-      'src="https://example.com/forum/Smileys/default/wink.gif" alt=";)" title="Wink" class="smiley"',
-      'src="https://example.com/images/smilies/angry.gif" alt="Angry" title="Angry" class="smilie smilie_26"',
-      'src="https://example.com/images/smilies/smile.gif" border="0" alt="" title="Smile" class="inlineimg"',
-      'src="https://example.com/lib/images/smileys/smile.svg" class="icon smiley" alt=":-)"',
-      'src="/ckeditor/plugins/smiley/images/regular_smile.gif" title="smiley" alt="smiley"',
-      'src="/editor/images/smiley/msn/wink_smile.gif"',
+      'src="https://example.com/forum/Smileys/default/wink.gif" alt=";)" title="Wink" class="smiley"', // SMF
+      'src="https://example.com/images/smilies/angry.gif" alt="Angry" title="Angry" class="smilie smilie_26"', // MyBB
+      'src="https://example.com/images/smilies/smile.gif" border="0" alt="" title="Smile" class="inlineimg"', // vBulletin
+      'src="https://example.com/lib/images/smileys/smile.svg" class="icon smiley" alt=":-)"', // DokuWiki
+      'src="/ckeditor/plugins/smiley/images/regular_smile.gif" title="smiley" alt="smiley"', // CKEditor
+      'src="/editor/images/smiley/msn/wink_smile.gif"', // FCKeditor
       // Both spellings ship in the wild, and the corrected one is the commoner of the two.
-      'src="/ckeditor/plugins/smiley/images/tongue_smile.png" alt="cheeky" title="cheeky"',
-      'src="/tinymce/plugins/emoticons/img/smiley-cool.gif" alt="cool"',
-      'src="/public/style_emoticons/default/smile.png" class="bbc_emoticon" alt=":)"',
-      'src="/style_emoticons/default/smile.gif" emoid=":)" alt="smile.gif"',
-      'src="/wp-content/forum-smileys/sf-wink.gif" width="15" class="sfimageleft" title="wink" alt="wink"',
+      'src="/ckeditor/plugins/smiley/images/tongue_smile.png" alt="cheeky" title="cheeky"', // CKEditor corrected tongue
+      'src="/tinymce/plugins/emoticons/img/smiley-cool.gif" alt="cool"', // TinyMCE 4
+      'src="/public/style_emoticons/default/smile.png" class="bbc_emoticon" alt=":)"', // Invision Power Board 3
+      'src="/style_emoticons/default/smile.gif" emoid=":)" alt="smile.gif"', // Invision Power Board 2
+      'src="/wp-content/forum-smileys/sf-wink.gif" width="15" class="sfimageleft" title="wink" alt="wink"', // Simple:Press
       // From the engines' own default sets, not from corpus tokens, so these cover boards the
       // corpus never sampled.
-      'class="smilies" src="/images/smilies/icon_e_sad.svg" alt="" title="Sad"',
-      'src="/Smileys/fugue/lipsrsealed.png" alt="" title="Lips sealed" class="smiley"',
+      'class="smilies" src="/images/smilies/icon_e_sad.svg" alt="" title="Sad"', // phpBB sad
+      'src="/Smileys/fugue/lipsrsealed.png" alt="" title="Lips sealed" class="smiley"', // SMF sealed lips
     ]
 
     it.each(engineCases)('should mark a smilie with %s', async (attributes) => {
@@ -667,7 +667,12 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
 
     // Hex-shaped is not emoji-shaped, and each of these is a filename that really occurs:
     // e107 ships dead.png, and boards number their uploads.
-    const hexShapedCases: Array<string> = ['2000', 'dead', 'face', 'ffffff']
+    const hexShapedCases: Array<string> = [
+      '2000', // a sequential id, which decodes to a space
+      'dead', // a lone surrogate
+      'face', // a CJK ideograph
+      'ffffff', // a stem too long to be a codepoint
+    ]
 
     it.each(hexShapedCases)('should not decode the %s stem', async (stem) => {
       const value = html`

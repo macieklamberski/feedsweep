@@ -87,14 +87,14 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
 
     // Each href's scheme as `new URL(href, 'https://a.test/').protocol` reads it in Bun.
     const hiddenSchemeHrefs: Array<string> = [
-      'java\nscript:alert(1)',
-      'java\rscript:alert(1)',
-      ' javascript:alert(1)',
-      'JAVA\tSCRIPT:alert(1)',
-      '\x1fVBScript:msgbox(1)',
-      'vb\nscript:msgbox(1)',
-      ' DATA:text/html,hello',
-      'da\tta:text/html,hello',
+      'java\nscript:alert(1)', // a newline inside javascript:
+      'java\rscript:alert(1)', // a carriage return inside javascript:
+      ' javascript:alert(1)', // a leading space before javascript:
+      'JAVA\tSCRIPT:alert(1)', // a tab inside uppercase JAVASCRIPT:
+      '\x1fVBScript:msgbox(1)', // a leading control before VBScript:
+      'vb\nscript:msgbox(1)', // a newline inside vbscript:
+      ' DATA:text/html,hello', // a leading space before uppercase DATA:text/html
+      'da\tta:text/html,hello', // a tab inside data:text/html
     ]
 
     it.each(hiddenSchemeHrefs)('should neutralize a link with %s', async (href) => {
@@ -106,10 +106,10 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
 
     // A browser resolves each of these as a relative path, not as a javascript: url.
     const relativeLookalikeHrefs: Array<string> = [
-      'java script:x',
-      'java script:x',
-      ' javascript:x',
-      'java\x01script:x',
+      'java script:x', // a space inside javascript:
+      'java script:x', // a no-break space inside javascript:
+      ' javascript:x', // a leading no-break space before javascript:
+      'java\x01script:x', // a control inside javascript:
     ]
 
     it.each(relativeLookalikeHrefs)('should leave a link with %s', async (href) => {

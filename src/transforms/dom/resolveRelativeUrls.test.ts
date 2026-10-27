@@ -10,41 +10,41 @@ const hostPrefixedSrcs: Array<[string, string]> = [
   [
     'https://karmelitanki.at.ua//www.youtube.com/embed/4_VzRdCCGXo',
     'https://www.youtube.com/embed/4_VzRdCCGXo',
-  ],
+  ], // at.ua
   [
     'http://www.auxerretv.com//www.dailymotion.com/embed/video/x152g3f',
     'http://www.dailymotion.com/embed/video/x152g3f',
-  ],
+  ], // auxerretv.com
   [
     'http://www.znamya.clan.su//www.youtube.com/embed/NHSO_XO4dtE',
     'http://www.youtube.com/embed/NHSO_XO4dtE',
-  ],
+  ], // clan.su
   [
     'http://bernikay.ppcp.de//www.youtube.com/v/Bpt56ZueM-M?version=3&hl=en_US&rel=0',
     'http://www.youtube.com/v/Bpt56ZueM-M?version=3&hl=en_US&rel=0',
-  ],
+  ], // ppcp.de
   [
     'https://smart-lab.ru//www.youtube.com/embed/3vqldCtBlqM?si=yzn8_ivf_5ebnKCn',
     'https://www.youtube.com/embed/3vqldCtBlqM?si=yzn8_ivf_5ebnKCn',
-  ],
-  ['https://tsubasa.ucoz.org//yandex.st/share/share.js', 'https://yandex.st/share/share.js'],
+  ], // smart-lab.ru
+  ['https://tsubasa.ucoz.org//yandex.st/share/share.js', 'https://yandex.st/share/share.js'], // ucoz.org
   [
     'https://stalker-living.ucoz.ru//www.youtube.com/embed/Pa1sl7mJtP8?rel=0',
     'https://www.youtube.com/embed/Pa1sl7mJtP8?rel=0',
-  ],
+  ], // ucoz.ru
   [
     'http://asabrownell834.wikidot.com//www.youtube.com/embed/0fxXu5p1wUE',
     'http://www.youtube.com/embed/0fxXu5p1wUE',
-  ],
+  ], // wikidot.com
 ]
 
 const hostPrefixedKeptCarriers: Array<string> = [
-  '<img src="https://example.com//www.youtube.com/embed/MLANv9VJ5Ws">',
-  '<a href="https://example.com//www.youtube.com/embed/MLANv9VJ5Ws">link</a>',
-  '<video src="https://example.com//cdn.example.org/clip.mp4"></video>',
-  '<video poster="https://example.com//cdn.example.org/poster.jpg"></video>',
-  '<object data="https://example.com//www.youtube.com/v/MLANv9VJ5Ws"></object>',
-  '<blockquote cite="https://example.com//www.example.org/post">quote</blockquote>',
+  '<img src="https://example.com//www.youtube.com/embed/MLANv9VJ5Ws">', // img src
+  '<a href="https://example.com//www.youtube.com/embed/MLANv9VJ5Ws">link</a>', // anchor href
+  '<video src="https://example.com//cdn.example.org/clip.mp4"></video>', // video src
+  '<video poster="https://example.com//cdn.example.org/poster.jpg"></video>', // video poster
+  '<object data="https://example.com//www.youtube.com/v/MLANv9VJ5Ws"></object>', // object data
+  '<blockquote cite="https://example.com//www.example.org/post">quote</blockquote>', // blockquote cite
 ]
 
 describeForEachParser('resolveRelativeUrls', (parseHtml) => {

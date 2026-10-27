@@ -654,8 +654,8 @@ describeForEachParser('facebookLabelEmojiResolver', (parseHtml) => {
     })
 
     const imageWrapperCases: Array<[string, string]> = [
-      [' title="heart emoticon"', '<3'],
-      ['', '❤'],
+      [' title="heart emoticon"', '<3'], // a label
+      ['', '❤'], // no label
     ]
 
     it.each(imageWrapperCases)(
