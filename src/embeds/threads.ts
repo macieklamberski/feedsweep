@@ -11,19 +11,19 @@ const hosts = ['threads.com', 'threads.net']
 
 // `/@{handle}/post/{code}` is the permalink the embed dialog writes, `/t/{code}` the short form.
 // The route words are case-sensitive on threads.com.
-const postPathRegex = /^\/(?:@([^/]+)\/post|t)\/([^/]+)/i
+const postPathRegex = /^\/(?:@(?<handle>[^/]+)\/post|t)\/(?<code>[^/]+)/i
 
 type Post = { path: string; code: string; handle?: string }
 
 const readPostUrl = (value: string | undefined): Post | undefined => {
   const parsed = parseUrlOnHosts(value, hosts)
-  const match = parsed?.pathname.match(postPathRegex)
+  const post = parsed?.pathname.match(postPathRegex)?.groups
 
-  if (!match) {
+  if (!post) {
     return
   }
 
-  const [, handle, code] = match
+  const { handle, code } = post
   const path = handle ? `/@${handle}/post/${code}` : `/t/${code}`
 
   return { path, code, handle }

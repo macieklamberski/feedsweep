@@ -14,7 +14,7 @@ const provider = 'buzzsprout'
 
 const hosts = ['buzzsprout.com']
 // /{podcast}/{episode}-{slug}.js, with or without episodes/.
-const episodeScriptPathRegex = /^\/(\d+)\/(?:episodes\/)?(\d+)(?:-[^/]*)?\.js$/i
+const episodeScriptPathRegex = /^\/(?<show>\d+)\/(?:episodes\/)?(?<episode>\d+)(?:-[^/]*)?\.js$/i
 // A script naming the podcast alone is the show player, which carries every episode.
 const showScriptPathRegex = /^\/(\d+)\.js$/i
 // /{podcast}/{episode}-{slug} with or without episodes/, the slug dot-free to keep .mp3 out.
@@ -82,10 +82,10 @@ export const buzzsproutScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const episode = url.pathname.match(episodeScriptPathRegex)
+    const script = url.pathname.match(episodeScriptPathRegex)?.groups
 
-    if (episode?.[1] && episode[2]) {
-      return composeEmbed(episode[1], episode[2])
+    if (script?.show && script.episode) {
+      return composeEmbed(script.show, script.episode)
     }
 
     const show = url.pathname.match(showScriptPathRegex)
