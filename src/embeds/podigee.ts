@@ -56,10 +56,6 @@ export const podigeeScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    if (showHostRegex.test(parsed.hostname) && isAnyOf(parsed.pathname, '/embed')) {
-      return composeEmbed(parsed)
-    }
-
     return podigeeResolveEmbed(parsed, element)
   },
 )
@@ -73,6 +69,11 @@ export const podigeeResolveEmbed: ResolveUrlEmbed = (url) => {
 
   if (!episode) {
     return
+  }
+
+  // A show's own `/embed` answers 302 to the player for a real show and 404 for an invented one.
+  if (isAnyOf(episode, 'embed') && !rest.length) {
+    return composeEmbed(url)
   }
 
   // With anything after `embed` the show serves its website page.
