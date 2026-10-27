@@ -88,7 +88,7 @@ describe('widestSrcsetUrl', () => {
   })
 })
 
-// Each case is [CDN label, wrapped input URL, expected inner-source key].
+// Each case is [wrapped input URL, expected inner-source key], with its CDN beside the row.
 const imageProxyCases: Array<[string, string]> = [
   [
     'https://files.zhedge.com/cdn-cgi/image/width=1080/https://assets.zerohedge.com/s3fs/photo.jpg',
