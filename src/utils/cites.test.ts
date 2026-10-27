@@ -101,10 +101,11 @@ describe('buildCite', () => {
     })
 
     it('should return undefined when the url or the title is blank', () => {
-      expect(buildCite({ provider: 'stub', url: '  ', title: 'Page title' })).toBeUndefined()
-      expect(
-        buildCite({ provider: 'stub', url: 'https://example.com', title: ' ' }),
-      ).toBeUndefined()
+      const url = { provider: 'stub', url: '  ', title: 'Page title' }
+      const title = { provider: 'stub', url: 'https://example.com', title: ' ' }
+
+      expect(buildCite(url)).toBeUndefined()
+      expect(buildCite(title)).toBeUndefined()
     })
   })
 })

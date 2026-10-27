@@ -428,9 +428,9 @@ describeForEachParser('YouTube', (parseHtml) => {
       <p>Body</p>
     `
 
-    expect(
-      await transformContent('<p>Body</p>', { parseHtmlFn: parseHtml, enclosures }),
-    ).toEqualHtml(expected)
+    const result = await transformContent('<p>Body</p>', { parseHtmlFn: parseHtml, enclosures })
+
+    expect(result).toEqualHtml(expected)
   })
   // MetaSlider Pro writes every slide but the first hidden, and its YouTube slide is an empty div
   // its script builds into a player. Without youtubeMetasliderEmbedResolver, stripEmptyTags deletes

@@ -121,12 +121,11 @@ describeForEachParser('rebuildWmakerEmbeds', (parseHtml) => {
     it('should take the origin from the permalink rather than from the path it sits on', async () => {
       const value =
         '<object data="https://www.ccmag.fr/v/751de3d3566cb8441f72eebcbc8b939bbdfaad79"></object>'
+      const permalink = 'https://www.ccmag.fr/section/Me-and-My-Captain_a391.html'
       const expected =
         '<iframe src="https://www.ccmag.fr/embed/391/" width="640" height="360"></iframe>'
 
-      expect(
-        await transformWith(value, 'https://www.ccmag.fr/section/Me-and-My-Captain_a391.html'),
-      ).toEqualHtml(expected)
+      expect(await transformWith(value, permalink)).toEqualHtml(expected)
     })
   })
 
