@@ -263,13 +263,14 @@ describeForEachParser('airtableEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a foreign host carrying the same path', async () => {
-      const value = html`<iframe src="https://evil.test/embed/appmHSMnV4Q1S4cWh/shrMnUTYyzmsdX8JT"></iframe>`
+      const value =
+        '<iframe src="https://evil.test/embed/appmHSMnV4Q1S4cWh/shrMnUTYyzmsdX8JT"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore the static subdomain, which serves files', async () => {
-      const value = html`<iframe src="https://static.airtable.com/embed/shrIBFxXbBGxNv8at"></iframe>`
+      const value = '<iframe src="https://static.airtable.com/embed/shrIBFxXbBGxNv8at"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

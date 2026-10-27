@@ -44,7 +44,7 @@ describeForEachParser('notecomIframeEmbedResolver', (parseHtml) => {
     // rather than the player, so this is the carrier the figure turns into. The post url names
     // the user, so it is stated outright instead of being rebuilt from the id.
     it('should mint the player from a post page url', async () => {
-      const value = html`<iframe src="https://note.com/katayuma/n/nf938ce640465"></iframe>`
+      const value = '<iframe src="https://note.com/katayuma/n/nf938ce640465"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'notecom',
         id: 'nf938ce640465',
@@ -58,7 +58,7 @@ describeForEachParser('notecomIframeEmbedResolver', (parseHtml) => {
     // A note under one of the platform's own publications, where the subdomain stands in for
     // the user segment. The player serves it like any other note.
     it('should mint the player from a publication post url', async () => {
-      const value = html`<iframe src="https://biz.note.com/n/n449782c9c270"></iframe>`
+      const value = '<iframe src="https://biz.note.com/n/n449782c9c270"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'notecom',
         id: 'n449782c9c270',
@@ -89,7 +89,7 @@ describeForEachParser('notecomIframeEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should use an id with a character before the n as written', async () => {
-      const value = html`<iframe src="https://note.com/embed/notes/xnf938ce640465"></iframe>`
+      const value = '<iframe src="https://note.com/embed/notes/xnf938ce640465"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'notecom',
         id: 'xnf938ce640465',
@@ -101,20 +101,20 @@ describeForEachParser('notecomIframeEmbedResolver', (parseHtml) => {
     })
 
     it('should state nothing for a foreign host carrying the path', async () => {
-      const value = html`<iframe src="https://evil.test/katayuma/n/nf938ce640465"></iframe>`
+      const value = '<iframe src="https://evil.test/katayuma/n/nf938ce640465"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     // The host alone, with no path to read an id out of.
     it('should state nothing for the note.com home page', async () => {
-      const value = html`<iframe src="https://note.com/"></iframe>`
+      const value = '<iframe src="https://note.com/"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should state nothing for another note.com page', async () => {
-      const value = html`<iframe src="https://note.com/katayuma"></iframe>`
+      const value = '<iframe src="https://note.com/katayuma"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -139,7 +139,7 @@ describeForEachParser('notecomIframeEmbedResolver', (parseHtml) => {
 
   describe('edge cases', () => {
     it('should use a malformed note id as written, even if the player answers an error', async () => {
-      const value = html`<iframe src="https://note.com/embed/notes/nf938ce640465z"></iframe>`
+      const value = '<iframe src="https://note.com/embed/notes/nf938ce640465z"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'notecom',
         id: 'nf938ce640465z',

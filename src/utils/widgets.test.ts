@@ -1253,13 +1253,13 @@ describeForEachParser('readCarrierSize', (parseHtml) => {
     // not tell them apart, and only the carrier itself ranks above the resolver.
     describe('the resolver outranks an ancestor', () => {
       it('should keep the resolver ratio when the carrier states nothing', () => {
-        const value = html`<div class="player"></div>`
+        const value = '<div class="player"></div>'
 
         expect(build(withRatio, value)).toEqual(withRatio)
       })
 
       it('should keep the resolver height when the carrier states nothing', () => {
-        const value = html`<div class="player"></div>`
+        const value = '<div class="player"></div>'
 
         expect(build(withHeight, value)).toEqual(withHeight)
       })
@@ -1362,7 +1362,7 @@ describeForEachParser('readCarrierSize', (parseHtml) => {
       })
 
       it('should state no size when there is no wrapper either', () => {
-        const value = html`<div class="player"></div>`
+        const value = '<div class="player"></div>'
 
         expect(build(base, value)).toEqual(base)
       })

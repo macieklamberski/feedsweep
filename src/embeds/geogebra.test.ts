@@ -327,7 +327,7 @@ describeForEachParser('geogebraEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a foreign host carrying the same path', async () => {
-      const value = html`<iframe src="https://evil.test/material/iframe/id/yqZMrWXI"></iframe>`
+      const value = '<iframe src="https://evil.test/material/iframe/id/yqZMrWXI"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

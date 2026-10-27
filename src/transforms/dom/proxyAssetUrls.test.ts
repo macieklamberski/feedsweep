@@ -458,7 +458,7 @@ describeForEachParser('proxyAssetUrls', (parseHtml) => {
   })
 
   it('should await an async assetProxyFn on a src attribute', async () => {
-    const value = html`<img src="https://cdn.example.com/photo.jpg">`
+    const value = '<img src="https://cdn.example.com/photo.jpg">'
     const expected = html`
       <img
         src="https://proxy.example.com/?type=image&url=https%3A%2F%2Fcdn.example.com%2Fphoto.jpg"

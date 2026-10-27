@@ -112,7 +112,7 @@ describeForEachParser('jotformScriptEmbedResolver', (parseHtml) => {
     })
 
     it('should mint the form from a loader on a regional host', async () => {
-      const value = html`<script src="https://form.jotformeu.com/jsform/32625826600350"></script>`
+      const value = '<script src="https://form.jotformeu.com/jsform/32625826600350"></script>'
       const expected: EmbedResolverResult = {
         provider: 'jotform',
         id: '32625826600350',
@@ -139,7 +139,7 @@ describeForEachParser('jotformScriptEmbedResolver', (parseHtml) => {
     })
 
     it('should mint the form from a loader on the PCI host', async () => {
-      const value = html`<script src="https://pci.jotform.com/jsform/253238206727155"></script>`
+      const value = '<script src="https://pci.jotform.com/jsform/253238206727155"></script>'
       const expected: EmbedResolverResult = {
         provider: 'jotform',
         id: '253238206727155',
@@ -164,13 +164,13 @@ describeForEachParser('jotformScriptEmbedResolver', (parseHtml) => {
     // The launcher carries its form id in an inline config beside this loader, and neither is
     // read.
     it('should ignore the launcher button loader', async () => {
-      const value = html`<script src="https://form.jotform.com/static/feedback2.js"></script>`
+      const value = '<script src="https://form.jotform.com/static/feedback2.js"></script>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should use a malformed form id as written, even if the player answers an error', async () => {
-      const value = html`<script src="https://form.jotform.com/jsform/my-form"></script>`
+      const value = '<script src="https://form.jotform.com/jsform/my-form"></script>'
       const expected: EmbedResolverResult = {
         provider: 'jotform',
         id: 'my-form',
@@ -183,7 +183,7 @@ describeForEachParser('jotformScriptEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a loader path below another route', async () => {
-      const value = html`<script src="https://form.jotform.com/x/jsform/260493476454061"></script>`
+      const value = '<script src="https://form.jotform.com/x/jsform/260493476454061"></script>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -203,7 +203,7 @@ describeForEachParser('jotformIframeEmbedResolver', (parseHtml) => {
 
   describe('happy paths', () => {
     it('should resolve a form frame', async () => {
-      const value = html`<iframe src="https://form.jotform.com/260493476454061"></iframe>`
+      const value = '<iframe src="https://form.jotform.com/260493476454061"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'jotform',
         id: '260493476454061',
@@ -216,7 +216,7 @@ describeForEachParser('jotformIframeEmbedResolver', (parseHtml) => {
     })
 
     it('should mint the form from a frame on the main site', async () => {
-      const value = html`<iframe src="https://www.jotform.com/form/260493476454061"></iframe>`
+      const value = '<iframe src="https://www.jotform.com/form/260493476454061"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'jotform',
         id: '260493476454061',
@@ -231,13 +231,13 @@ describeForEachParser('jotformIframeEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a form route on a foreign host', async () => {
-      const value = html`<iframe src="https://evil.test/260493476454061"></iframe>`
+      const value = '<iframe src="https://evil.test/260493476454061"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore a subdomain that serves uploads', async () => {
-      const value = html`<iframe src="https://files.jotform.com/260493476454061"></iframe>`
+      const value = '<iframe src="https://files.jotform.com/260493476454061"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -245,7 +245,7 @@ describeForEachParser('jotformIframeEmbedResolver', (parseHtml) => {
 
   describe('the regional and legacy hosts that serve the same form', () => {
     it('should mint the form from a frame on the Italian host', async () => {
-      const value = html`<iframe src="http://italian.jotform.com/form/91103559127"></iframe>`
+      const value = '<iframe src="http://italian.jotform.com/form/91103559127"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'jotform',
         id: '91103559127',
@@ -273,7 +273,7 @@ describeForEachParser('jotformIframeEmbedResolver', (parseHtml) => {
     })
 
     it('should mint the form from a frame on jotform.co', async () => {
-      const value = html`<iframe src="https://form.jotform.co/260493476454061"></iframe>`
+      const value = '<iframe src="https://form.jotform.co/260493476454061"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'jotform',
         id: '260493476454061',
@@ -286,7 +286,7 @@ describeForEachParser('jotformIframeEmbedResolver', (parseHtml) => {
     })
 
     it('should mint the form from a frame on jotform.me', async () => {
-      const value = html`<iframe src="https://form.jotform.me/260493476454061"></iframe>`
+      const value = '<iframe src="https://form.jotform.me/260493476454061"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'jotform',
         id: '260493476454061',
@@ -299,7 +299,7 @@ describeForEachParser('jotformIframeEmbedResolver', (parseHtml) => {
     })
 
     it('should mint the form from a frame on jotform.us', async () => {
-      const value = html`<iframe src="https://form.jotform.us/260493476454061"></iframe>`
+      const value = '<iframe src="https://form.jotform.us/260493476454061"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'jotform',
         id: '260493476454061',
@@ -312,7 +312,7 @@ describeForEachParser('jotformIframeEmbedResolver', (parseHtml) => {
     })
 
     it('should mint the form from a frame on jotformpro.com', async () => {
-      const value = html`<iframe src="https://form.jotformpro.com/260493476454061"></iframe>`
+      const value = '<iframe src="https://form.jotformpro.com/260493476454061"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'jotform',
         id: '260493476454061',
@@ -325,7 +325,7 @@ describeForEachParser('jotformIframeEmbedResolver', (parseHtml) => {
     })
 
     it('should mint the form from a frame on jotformz.com', async () => {
-      const value = html`<iframe src="https://form.jotformz.com/260493476454061"></iframe>`
+      const value = '<iframe src="https://form.jotformz.com/260493476454061"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'jotform',
         id: '260493476454061',

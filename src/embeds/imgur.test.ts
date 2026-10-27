@@ -503,11 +503,11 @@ describeForEachParser('imgurIframeEmbedResolver', (parseHtml) => {
   ]
 
   it.each(fileHostUrls)('should ignore %s, on a host that serves files', async (value) => {
-    expect(await extract(html`<iframe src="${value}"></iframe>`)).toBeUndefined()
+    expect(await extract(`<iframe src="${value}"></iframe>`)).toBeUndefined()
   })
 
   it('should ignore another host carrying the post path', async () => {
-    const value = html`<iframe src="https://imgur.com.evil.test/pVa2rXL/embed"></iframe>`
+    const value = '<iframe src="https://imgur.com.evil.test/pVa2rXL/embed"></iframe>'
 
     expect(await extract(value)).toBeUndefined()
   })

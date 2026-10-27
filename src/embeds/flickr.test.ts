@@ -696,7 +696,7 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
     })
 
     it('should map a framed photostream of an owner alias carrying a hyphen', async () => {
-      const value = html`<iframe src="https://www.flickr.com/photos/e-governance/show/"></iframe>`
+      const value = '<iframe src="https://www.flickr.com/photos/e-governance/show/"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams/e-governance',

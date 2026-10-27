@@ -423,7 +423,7 @@ describeForEachParser('flourishIframeEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a foreign host carrying the path', async () => {
-      const value = html`<iframe src="https://evil.test/visualisation/29132382/embed"></iframe>`
+      const value = '<iframe src="https://evil.test/visualisation/29132382/embed"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

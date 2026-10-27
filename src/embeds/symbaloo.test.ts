@@ -238,13 +238,13 @@ describeForEachParser('symbalooEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore the embed route on the blog subdomain', async () => {
-      const value = html`<iframe src="https://blog.symbaloo.com/embed/x"></iframe>`
+      const value = '<iframe src="https://blog.symbaloo.com/embed/x"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore a foreign host carrying the same path', async () => {
-      const value = html`<iframe src="https://evil.test/embed/tic-tacbasicos-edu"></iframe>`
+      const value = '<iframe src="https://evil.test/embed/tic-tacbasicos-edu"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

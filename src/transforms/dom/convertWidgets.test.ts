@@ -1610,7 +1610,12 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
 
     it('should still play a media file carrying a query string', async () => {
       const value = '<iframe src="https://cdn.example.com/clip.webm?token=abc"></iframe>'
-      const expected = html`<video src="https://cdn.example.com/clip.webm?token=abc" controls=""></video>`
+      const expected = html`
+        <video
+          src="https://cdn.example.com/clip.webm?token=abc"
+          controls=""
+        ></video>
+      `
 
       expect(await transform(value)).toEqualHtml(expected)
     })

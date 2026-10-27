@@ -8,7 +8,8 @@ describeForEachParser('brEmbedResolver', (parseHtml) => {
 
   describe('happy paths', () => {
     it('should build the placeholder from a bare media token', async () => {
-      const value = html`<iframe src="https://www.br.de/mediathek/embed/av:5dc03b7808e85c001af059a0"></iframe>`
+      const value =
+        '<iframe src="https://www.br.de/mediathek/embed/av:5dc03b7808e85c001af059a0"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'br',
         id: 'av:5dc03b7808e85c001af059a0',
@@ -58,37 +59,42 @@ describeForEachParser('brEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the embed path', async () => {
-      const value = html`<iframe src="https://evil.test/mediathek/embed/av:5dc03b7808e85c001af059a0"></iframe>`
+      const value =
+        '<iframe src="https://evil.test/mediathek/embed/av:5dc03b7808e85c001af059a0"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore a lookalike host that only ends in the br.de labels', async () => {
-      const value = html`<iframe src="https://br.de.evil.test/mediathek/embed/av:5dc03b7808e85c001af059a0"></iframe>`
+      const value =
+        '<iframe src="https://br.de.evil.test/mediathek/embed/av:5dc03b7808e85c001af059a0"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore an embed path carrying no media token', async () => {
-      const value = html`<iframe src="https://www.br.de/mediathek/embed/kampf-ums-wasserloch"></iframe>`
+      const value = '<iframe src="https://www.br.de/mediathek/embed/kampf-ums-wasserloch"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore a Mediathek page that is not the embed route', async () => {
-      const value = html`<iframe src="https://www.br.de/mediathek/video/av:5dc03b7808e85c001af059a0"></iframe>`
+      const value =
+        '<iframe src="https://www.br.de/mediathek/video/av:5dc03b7808e85c001af059a0"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore an embed route outside the Mediathek section', async () => {
-      const value = html`<iframe src="https://www.br.de/foo/embed/av:5dc03b7808e85c001af059a0"></iframe>`
+      const value =
+        '<iframe src="https://www.br.de/foo/embed/av:5dc03b7808e85c001af059a0"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should use a malformed token as written, even if the player answers an error', async () => {
-      const value = html`<iframe src="https://www.br.de/mediathek/embed/av:zz5dc03b7808e85c001af059"></iframe>`
+      const value =
+        '<iframe src="https://www.br.de/mediathek/embed/av:zz5dc03b7808e85c001af059"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'br',
         id: 'av:zz5dc03b7808e85c001af059',
@@ -100,7 +106,7 @@ describeForEachParser('brEmbedResolver', (parseHtml) => {
     })
 
     it('should keep a token carrying an encoded query separator inside the path', async () => {
-      const value = html`<iframe src="https://www.br.de/mediathek/embed/av:5dc0%3Fx"></iframe>`
+      const value = '<iframe src="https://www.br.de/mediathek/embed/av:5dc0%3Fx"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'br',
         id: 'av:5dc0?x',
@@ -112,13 +118,14 @@ describeForEachParser('brEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a token carrying an encoded path separator', async () => {
-      const value = html`<iframe src="https://www.br.de/mediathek/embed/av:5dc0%2Fabc"></iframe>`
+      const value = '<iframe src="https://www.br.de/mediathek/embed/av:5dc0%2Fabc"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore an uppercase token, which BR does not serve', async () => {
-      const value = html`<iframe src="https://www.br.de/mediathek/embed/AV:5DC03B7808E85C001AF059A0"></iframe>`
+      const value =
+        '<iframe src="https://www.br.de/mediathek/embed/AV:5DC03B7808E85C001AF059A0"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -126,7 +133,8 @@ describeForEachParser('brEmbedResolver', (parseHtml) => {
 
   describe('edge cases', () => {
     it('should take the token from the apex host serving the same route', async () => {
-      const value = html`<iframe src="https://br.de/mediathek/embed/av:5d2cb1e4ca9c9700134580d2"></iframe>`
+      const value =
+        '<iframe src="https://br.de/mediathek/embed/av:5d2cb1e4ca9c9700134580d2"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'br',
         id: 'av:5d2cb1e4ca9c9700134580d2',
@@ -138,7 +146,8 @@ describeForEachParser('brEmbedResolver', (parseHtml) => {
     })
 
     it('should read a token whose colon is percent-encoded', async () => {
-      const value = html`<iframe src="https://www.br.de/mediathek/embed/av%3A5dc03b7808e85c001af059a0"></iframe>`
+      const value =
+        '<iframe src="https://www.br.de/mediathek/embed/av%3A5dc03b7808e85c001af059a0"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'br',
         id: 'av:5dc03b7808e85c001af059a0',
@@ -150,7 +159,8 @@ describeForEachParser('brEmbedResolver', (parseHtml) => {
     })
 
     it('should drop a segment written after the token', async () => {
-      const value = html`<iframe src="https://www.br.de/mediathek/embed/av:6929a0fc6be9690008c09f76/extra"></iframe>`
+      const value =
+        '<iframe src="https://www.br.de/mediathek/embed/av:6929a0fc6be9690008c09f76/extra"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'br',
         id: 'av:6929a0fc6be9690008c09f76',

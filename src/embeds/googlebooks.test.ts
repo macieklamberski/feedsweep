@@ -115,7 +115,7 @@ describeForEachParser('googlebooksEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a frame naming no volume', async () => {
-      const value = html`<iframe src="https://books.google.com/books?output=embed"></iframe>`
+      const value = '<iframe src="https://books.google.com/books?output=embed"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

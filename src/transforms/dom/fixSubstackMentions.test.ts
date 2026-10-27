@@ -151,7 +151,7 @@ describeForEachParser('fixSubstackMentions', (parseHtml) => {
   it('should render a mention with a dangerous payload url as plain text end to end', async () => {
     const mention = makeMention({ name: 'Ana', id: 42, type: 'user', url: 'javascript:alert(1)' })
     const value = `<p>Thanks to ${mention} for the idea.</p>`
-    const expected = html`<p>Thanks to @Ana for the idea.</p>`
+    const expected = '<p>Thanks to @Ana for the idea.</p>'
     const result = await transformContent(value, {
       parseHtmlFn: parseHtml,
       baseUrl: 'https://example.com',

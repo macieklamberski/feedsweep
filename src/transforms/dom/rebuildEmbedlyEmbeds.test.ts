@@ -307,7 +307,7 @@ describeForEachParser('rebuildEmbedlyEmbeds', (parseHtml) => {
           data="${unsafeUrlPayload}"
         ></div>
       `
-      const expected = html`<iframe src="about:blank"></iframe>`
+      const expected = '<iframe src="about:blank"></iframe>'
 
       expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
     })
@@ -319,7 +319,7 @@ describeForEachParser('rebuildEmbedlyEmbeds', (parseHtml) => {
           src="javascript:alert(1)"
         ></div>
       `
-      const expected = html`<p>javascript:alert(1)</p>`
+      const expected = '<p>javascript:alert(1)</p>'
 
       expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
     })

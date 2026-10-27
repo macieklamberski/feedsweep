@@ -20,7 +20,7 @@ describeForEachParser('convertNoteEmbeds', (parseHtml) => {
           embedded-content-key="emb123"
         ></figure>
       `
-      const expected = html`<iframe src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"></iframe>`
+      const expected = '<iframe src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"></iframe>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -56,7 +56,7 @@ describeForEachParser('convertNoteEmbeds', (parseHtml) => {
           embedded-content-key="emb123"
         ></figure>
       `
-      const expected = html`<iframe src="//www.youtube.com/watch?v=dQw4w9WgXcQ"></iframe>`
+      const expected = '<iframe src="//www.youtube.com/watch?v=dQw4w9WgXcQ"></iframe>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -71,7 +71,7 @@ describeForEachParser('convertNoteEmbeds', (parseHtml) => {
           embedded-content-key="emb123"
         ></figure>
       `
-      const expected = html`<iframe src="https://note.com/info/n/ne5fc6bd602c8"></iframe>`
+      const expected = '<iframe src="https://note.com/info/n/ne5fc6bd602c8"></iframe>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -107,7 +107,7 @@ describeForEachParser('convertNoteEmbeds', (parseHtml) => {
           embedded-content-key="emb123"
         ></figure>
       `
-      const expected = html`<iframe src="https://vimeo.com/76979871"></iframe>`
+      const expected = '<iframe src="https://vimeo.com/76979871"></iframe>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -123,7 +123,7 @@ describeForEachParser('convertNoteEmbeds', (parseHtml) => {
           embedded-content-key="emb123"
         ></figure>
       `
-      const expected = html`<iframe src="https://codepen.io/oclockten/pen/zxqLGrz"></iframe>`
+      const expected = '<iframe src="https://codepen.io/oclockten/pen/zxqLGrz"></iframe>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -140,7 +140,7 @@ describeForEachParser('convertNoteEmbeds', (parseHtml) => {
           embedded-content-key="emb123"
         ></figure>
       `
-      const expected = html`<iframe src="https://adventar.org/calendars/11560"></iframe>`
+      const expected = '<iframe src="https://adventar.org/calendars/11560"></iframe>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -211,7 +211,7 @@ describeForEachParser('convertNoteEmbeds', (parseHtml) => {
     })
 
     it('should leave a figure without embedded-service untouched', async () => {
-      const value = html`<figure data-src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"></figure>`
+      const value = '<figure data-src="https://www.youtube.com/watch?v=dQw4w9WgXcQ"></figure>'
 
       expect(await transform(value)).toEqualHtml(value)
     })
@@ -255,7 +255,7 @@ describeForEachParser('convertNoteEmbeds', (parseHtml) => {
         embedded-content-key="emb123"
       ></figure>
     `
-    const expected = html`<iframe src="about:blank"></iframe>`
+    const expected = '<iframe src="about:blank"></iframe>'
     const result = await transformContent(value, {
       parseHtmlFn: parseHtml,
       baseUrl: 'https://note.com/user/n/n1234',
@@ -305,7 +305,7 @@ describeForEachParser('convertNoteEmbeds', (parseHtml) => {
         embedded-content-key="emb123"
       ></figure>
     `
-    const expected = html`<div data-embed-src="https://codepen.io/oclockten/pen/zxqLGrz"></div>`
+    const expected = '<div data-embed-src="https://codepen.io/oclockten/pen/zxqLGrz"></div>'
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toBe(expected)
   })

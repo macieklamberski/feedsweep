@@ -73,7 +73,7 @@ describeForEachParser('deviantartEmojiResolver', (parseHtml) => {
   })
 
   it('should mark an emoticon from the older deviantart.com host', async () => {
-    const value = html`<p><img src="https://e.deviantart.com/emoticons/g/glomp.gif"></p>`
+    const value = '<p><img src="https://e.deviantart.com/emoticons/g/glomp.gif"></p>'
     const expected = html`
       <p>
         <img

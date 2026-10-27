@@ -156,13 +156,13 @@ describeForEachParser('strawpollIframeEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore the embed route on the file subdomain', async () => {
-      const value = html`<iframe src="https://cdn.strawpoll.com/embed/e7ZJaM1BPg3"></iframe>`
+      const value = '<iframe src="https://cdn.strawpoll.com/embed/e7ZJaM1BPg3"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore a foreign host carrying the same path', async () => {
-      const value = html`<iframe src="https://evil.test/embed/e7ZJaM1BPg3"></iframe>`
+      const value = '<iframe src="https://evil.test/embed/e7ZJaM1BPg3"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

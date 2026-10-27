@@ -296,7 +296,7 @@ describeForEachParser('streamableIframeEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a file host of the platform', async () => {
-      const value = html`<iframe src="https://cdn-cf-east.streamable.com/qun2ij"></iframe>`
+      const value = '<iframe src="https://cdn-cf-east.streamable.com/qun2ij"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
