@@ -127,16 +127,20 @@ const readWidget = (element: Element): EmbedResolverResult | undefined => {
     const href = attr(anchor, 'href')
     const anchorTarget = parseTarget(parseUrlOnHosts(href, hosts))
 
-    target ??= anchorTarget
+    if (target === undefined) {
+      target = anchorTarget
+    }
 
     // A comment widget's first anchor reads "Comment" in the dialog's language, not the title.
     // A comment widget links the comment first and its discussion second, and only the second
     // carries the title.
-    if (anchorTarget?.kind === 'post') {
-      title ??= text(anchor)
+    if (anchorTarget?.kind === 'post' && title === undefined) {
+      title = text(anchor)
     }
 
-    author ??= parseAuthor(href)
+    if (author === undefined) {
+      author = parseAuthor(href)
+    }
   }
 
   if (!target) {

@@ -224,9 +224,17 @@ const readWidget = (element: Element): EmbedResolverResult | undefined => {
       continue
     }
 
-    user ??= target.user
-    ownerPath ??= target.ownerPath
-    linkedTitle ??= text(anchor)
+    if (user === undefined) {
+      user = target.user
+    }
+
+    if (ownerPath === undefined) {
+      ownerPath = target.ownerPath
+    }
+
+    if (linkedTitle === undefined) {
+      linkedTitle = text(anchor)
+    }
   }
 
   // After the link: `data-user` goes stale when a block is copied and the two disagree.
@@ -237,7 +245,9 @@ const readWidget = (element: Element): EmbedResolverResult | undefined => {
     user = encodePathSegment(declaredUser)
   }
 
-  ownerPath ??= user
+  if (ownerPath === undefined) {
+    ownerPath = user
+  }
 
   const title = attr(element, 'data-pen-title') ?? linkedTitle
   const isEditor = attr(element, 'data-version') === '2'

@@ -89,10 +89,8 @@ export const convertBreaksToParagraphs: DomTransform = () => {
             if (isBlockElement(child)) {
               current.hasBlock = true
             }
-          } else if (isText(child)) {
-            if (!current.hasContent && hasText(child)) {
-              current.hasContent = true
-            }
+          } else if (isText(child) && !current.hasContent && hasText(child)) {
+            current.hasContent = true
           }
 
           i++

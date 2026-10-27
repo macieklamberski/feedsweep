@@ -51,7 +51,6 @@ describe('extractLibsynEmbed', () => {
     const expected = {
       kind: 'episode',
       id: '5508311',
-      height: undefined,
     }
 
     expect(extractLibsynEmbed(new URL(value))).toEqual(expected)

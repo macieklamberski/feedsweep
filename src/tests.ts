@@ -53,6 +53,8 @@ type AnyResolver<Result> = {
   extract: (element: Element) => MaybePromise<Result | undefined>
 }
 
+type ExtractFixture<Result> = (value: string) => Promise<Result | undefined>
+
 // The url createUrlEmbedResolver hands a reader for a carrier src on the resolver's hosts. A
 // fixture off those hosts is a mistake in the test, so it fails here and not inside the reader.
 export const carrierUrl = (value: string, hosts: string | ReadonlyArray<string>): URL => {
@@ -67,8 +69,11 @@ export const carrierUrl = (value: string, hosts: string | ReadonlyArray<string>)
 
 // Runs a resolver's extract on the element its selector claims in a fixture, then the field
 // cleaners the pipeline runs on every result, so a fixture asserts what a placeholder carries.
-export const resolverExtractor = <Result>(parseHtml: ParseHtml, resolver: AnyResolver<Result>) => {
-  return async (value: string): Promise<Result | undefined> => {
+export const resolverExtractor = <Result>(
+  parseHtml: ParseHtml,
+  resolver: AnyResolver<Result>,
+): ExtractFixture<Result> => {
+  return async (value) => {
     const element = parseHtml(value).querySelector(resolver.selector)
 
     if (!element) {
@@ -85,16 +90,23 @@ export const resolverExtractor = <Result>(parseHtml: ParseHtml, resolver: AnyRes
   }
 }
 
+type TransformFixture = (value: string) => Promise<string>
+
+type EmojiConverters = {
+  transform: TransformFixture
+  transformKeeping: TransformFixture
+}
+
 // Runs markup through convertEmojis with the default resolvers, since which resolver claims an
 // image depends on the ones registered ahead of it.
-export const emojiConverters = (parseHtml: ParseHtml) => {
-  const transform = (value: string): Promise<string> => {
+export const emojiConverters = (parseHtml: ParseHtml): EmojiConverters => {
+  const transform: TransformFixture = (value) => {
     return applyDomTransforms(parseHtml(value), [convertEmojis(baseContext)])
   }
 
   // An emoji image that keeps its picture is also marked. The marker has its own tests in
   // convertEmojis, so it is dropped here to keep each case about the reason the image was kept.
-  const transformKeeping = async (value: string): Promise<string> => {
+  const transformKeeping: TransformFixture = async (value) => {
     return (await transform(value)).replaceAll(' data-emoji=""', '')
   }
 

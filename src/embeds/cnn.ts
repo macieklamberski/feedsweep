@@ -17,7 +17,7 @@ const videoIdRegex = /^(?:[^/]+\/)+\d{4}\/\d{2}\/\d{2}\/[^/]+\.cnn$/i
 const videoDateRegex = /\/(\d{4})\/(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])\/[^/]+$/
 
 const readDate = (id: string): string | undefined => {
-  const parts = id.match(videoDateRegex)
+  const parts = videoDateRegex.exec(id)
 
   return parts ? `${parts[1]}-${parts[2]}-${parts[3]}` : undefined
 }

@@ -1,4 +1,5 @@
 import { parseHTML } from 'linkedom'
+import { isAnyOf } from 'trousse'
 import { walkElements } from '../utils/dom.js'
 
 // https://github.com/WebReflection/linkedom/issues/235: attribute names stay cased, won't fix.
@@ -107,7 +108,7 @@ const expandSvgSelfClose = (html: string): string => {
     const expanded = svgBlock.replace(
       svgSelfCloseRegex,
       (tag, name: string, attributes: string) => {
-        if (voidElements.includes(name.toLowerCase())) {
+        if (isAnyOf(name, voidElements)) {
           return tag
         }
 

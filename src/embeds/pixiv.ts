@@ -24,7 +24,7 @@ const sizes = {
 }
 
 const readIllustId = (workId: string): string => {
-  return workId.match(illustIdRegex)?.[1] ?? workId
+  return illustIdRegex.exec(workId)?.[1] ?? workId
 }
 
 // See: https://embed.pixiv.net/oembed.php?url=https://www.pixiv.net/artworks/149288339.

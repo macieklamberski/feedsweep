@@ -1,4 +1,4 @@
-import { encodePathSegment } from 'trousse'
+import { encodePathSegment, isPresent } from 'trousse'
 import { composeEmbedUrl, readSrcMediaId } from '../../embeds/wistia.js'
 import type { DomTransform } from '../../types.js'
 import { attr, parseRatio } from '../../utils/dom.js'
@@ -65,7 +65,7 @@ export const rebuildWistiaEmbeds: DomTransform = () => (document) => {
     elements
       .filter((element) => element.localName !== 'script')
       .map((element) => readMediaId(element)?.toLowerCase())
-      .filter((mediaId): mediaId is string => mediaId !== undefined),
+      .filter(isPresent),
   )
 
   for (const element of elements) {

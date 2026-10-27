@@ -1,6 +1,7 @@
 import { composeQuery, isAnyOf, type MaybePromise, startsWithAnyOf, trimObject } from 'trousse'
 import type {
   CiteResolverResult,
+  DomTransform,
   EmbedResolver,
   EmbedResolverResult,
   FieldCleaner,
@@ -651,8 +652,8 @@ export const createPlaceholderEnricher = <TRef, TData>(
   readRef: (element: Element) => TRef,
   enrich: (refs: Array<TRef>) => MaybePromise<Array<TData | undefined>>,
   update: (element: Element, data: TData) => void,
-) => {
-  return async (document: Document): Promise<void> => {
+): ReturnType<DomTransform> => {
+  return async (document) => {
     const placeholders = document.querySelectorAll(selector)
     const count = placeholders.length
 

@@ -22,8 +22,8 @@ const isIgnorableNode = (node: Node): boolean => {
   )
 }
 
-const soleContentElement = (heading: Element): Element | null => {
-  let found: Element | null = null
+const soleContentElement = (heading: Element): Element | undefined => {
+  let found: Element | undefined
 
   for (const child of heading.childNodes) {
     if (isIgnorableNode(child)) {
@@ -31,7 +31,7 @@ const soleContentElement = (heading: Element): Element | null => {
     }
 
     if (found || !isElement(child)) {
-      return null
+      return
     }
 
     found = child

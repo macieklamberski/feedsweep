@@ -42,7 +42,7 @@ const composeNumeric = (videoId: string): EmbedResolverResult => {
 }
 
 const composeSubject = (subject: string): EmbedResolverResult | undefined => {
-  const match = subject.match(subjectRegex)
+  const match = subjectRegex.exec(subject)
 
   if (!match) {
     return

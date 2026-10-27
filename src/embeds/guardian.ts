@@ -33,7 +33,7 @@ const monthNumbers = toMap({
 })
 
 const readDate = (path: string): string | undefined => {
-  const parts = path.match(pathDateRegex)
+  const parts = pathDateRegex.exec(path)
 
   if (!parts) {
     return

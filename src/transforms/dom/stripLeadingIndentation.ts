@@ -36,7 +36,7 @@ export const stripLeadingIndentation: DomTransform = () => {
 
       // Consecutive entities parse to adjacent text nodes, so one node never holds the whole run.
       let combinedLeading = ''
-      const whitespaceNodes = []
+      const whitespaceNodes: Array<Text> = []
       let boundaryNode = null
       let boundaryLength = 0
 

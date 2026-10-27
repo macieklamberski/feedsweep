@@ -43,7 +43,7 @@ export const speakerdeckScriptEmbedResolver = createMarkupEmbedResolver(
   'script.speakerdeck-embed[data-id]',
   (element) => {
     const raw = attr(element, 'data-id') ?? ''
-    const inlineSlide = raw.match(slideSuffixRegex)?.[1]
+    const inlineSlide = slideSuffixRegex.exec(raw)?.[1]
     const deckId = raw.replace(slideSuffixRegex, '')
 
     if (!deckId) {

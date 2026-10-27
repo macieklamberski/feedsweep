@@ -18,7 +18,7 @@ const carriers = toMap<EmojiCarrier>({
 })
 
 const getGlyph = (src: string): EmojiGlyph | undefined => {
-  const [, letter, number] = getFileStem(src).match(carrierIconRegex) ?? []
+  const [, letter, number] = carrierIconRegex.exec(getFileStem(src)) ?? []
   const carrier = carriers.get(letter ?? '')
 
   if (!carrier) {
