@@ -630,6 +630,28 @@ describeForEachParser('blueskyBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should not read body text before the date link as the author', async () => {
+      const value = html`
+        <blockquote
+          class="bluesky-embed"
+          data-bluesky-uri="at://did:plc:kdrlfhxenchjqnbtqvxpwsnu/app.bsky.feed.post/3lhk2yq6xzc2f"
+        >
+          Post text written straight into the quote.
+          <a href="https://bsky.app/profile/did:plc:kdrlfhxenchjqnbtqvxpwsnu/post/3lhk2yq6xzc2f?ref_src=embed">2025-04-05T06:07:08.009Z</a>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bluesky',
+        id: 'did:plc:kdrlfhxenchjqnbtqvxpwsnu/3lhk2yq6xzc2f',
+        src: 'https://embed.bsky.app/embed/did:plc:kdrlfhxenchjqnbtqvxpwsnu/app.bsky.feed.post/3lhk2yq6xzc2f',
+        url: 'https://bsky.app/profile/did:plc:kdrlfhxenchjqnbtqvxpwsnu/post/3lhk2yq6xzc2f',
+        description: 'Post text written straight into the quote.',
+        date: '2025-02-06T21:51:09.191Z',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should not read a date from a record key one character short of a TID', async () => {
       const value = html`
         <blockquote

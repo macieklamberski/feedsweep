@@ -765,6 +765,12 @@ describe('readRedditHeight', () => {
   it('should read nothing out of the empty first resize', () => {
     expect(readRedditHeight({ type: 'resize.embed', data: 0 })).toBeUndefined()
   })
+
+  it('should read nothing from a message of another type', () => {
+    const value = { type: 'resize', data: 480 }
+
+    expect(readRedditHeight(value)).toBeUndefined()
+  })
 })
 
 describeForEachParser('redditIframeEmbedResolver carrier title', (parseHtml) => {

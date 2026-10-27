@@ -184,13 +184,7 @@ export const imgurResolveEmbed: ResolveUrlEmbed = (url) => {
     return
   }
 
-  const post = parsePost(route)
-
-  if (!post) {
-    return
-  }
-
-  return composeEmbed(post)
+  return composeEmbed({ id: encodePathSegment(route), isAlbum: false })
 }
 
 export const imgurIframeEmbedResolver = createUrlEmbedResolver(hosts, imgurResolveEmbed, {
