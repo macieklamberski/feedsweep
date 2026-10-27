@@ -39,8 +39,8 @@ export const stripDuplicateLeadingImages: DomTransform = (context) => (document)
     // Widening past the second image deletes a photo the author repeats beside its discussion.
     const firstSrc = images[0].getAttribute('src') ?? ''
     const secondSrc = images[1].getAttribute('src') ?? ''
-    const firstKey = getImageFingerprint(firstSrc, context.cleanUrlFn)
-    const secondKey = getImageFingerprint(secondSrc, context.cleanUrlFn)
+    const firstKey = getImageFingerprint(firstSrc, context)
+    const secondKey = getImageFingerprint(secondSrc, context)
 
     if (firstKey !== secondKey) {
       return

@@ -186,7 +186,7 @@ export const injectEnclosures: DomTransform = (context) => {
   }
 
   const feedImageFingerprints = new Set(
-    context.feedImageUrls?.map((url) => getImageFingerprint(url, context.cleanUrlFn)),
+    context.feedImageUrls?.map((url) => getImageFingerprint(url, context)),
   )
 
   return async (document) => {
@@ -279,7 +279,7 @@ export const injectEnclosures: DomTransform = (context) => {
       // fills the enclosure of a post with no cover with the publication logo.
       if (
         isHostOrSubdomainOf(embedSource, context.avatarImageHosts) ||
-        feedImageFingerprints.has(getImageFingerprint(embedSource, context.cleanUrlFn))
+        feedImageFingerprints.has(getImageFingerprint(embedSource, context))
       ) {
         continue
       }
@@ -288,7 +288,7 @@ export const injectEnclosures: DomTransform = (context) => {
       // Beside a player's thumbnail only the image tied to that player is its poster again, and a
       // featured photo still shows.
       const isThumbnail = thumbnailed.some((player) => {
-        return findPosterEvidence(mediaSource, player, context.cleanUrlFn)
+        return findPosterEvidence(mediaSource, player, context)
       })
 
       if (hasContentImage || isThumbnail) {
@@ -319,7 +319,7 @@ export const injectEnclosures: DomTransform = (context) => {
       const source = getInjectedSource(element)
 
       if (source) {
-        injectedSources.add(cleanUrl(source, { cleanUrlFn: context.cleanUrlFn }))
+        injectedSources.add(cleanUrl(source, context))
       }
     }
 
@@ -330,7 +330,7 @@ export const injectEnclosures: DomTransform = (context) => {
         return true
       }
 
-      const key = cleanUrl(source, { cleanUrlFn: context.cleanUrlFn })
+      const key = cleanUrl(source, context)
 
       if (injectedSources.has(key)) {
         return false

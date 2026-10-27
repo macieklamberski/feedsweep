@@ -31,7 +31,7 @@ import {
   foldEscapedAmpersands,
   parseUrlOnHosts,
   prepareUrl,
-  repairCarrierUrl,
+  repairUrl,
   resolveOrDropUrl,
   resolveOrKeepUrl,
 } from './urls.js'
@@ -116,7 +116,7 @@ export const readCarrierUrl = (element: Element): string => {
 // The carrier url a resolver reads, with the class repairs applied. A frame no resolver claims
 // keeps the url `readCarrierUrl` gives.
 export const readRepairedCarrierUrl = (element: Element): string => {
-  return repairCarrierUrl(readCarrierUrl(element))
+  return repairUrl(readCarrierUrl(element))
 }
 
 type ResolverOptions = {

@@ -1,11 +1,10 @@
 import type { DomTransform } from '../../types.js'
+import { cleanUrl } from '../../utils/urls.js'
 
 // Anchor hrefs as the publisher pasted them, redirect wrappers and tracking params included.
 export const cleanAnchorUrls: DomTransform = (context) => {
   return (document) => {
-    const cleanUrlFn = context.cleanUrlFn
-
-    if (!cleanUrlFn) {
+    if (!context.cleanUrlFn) {
       return
     }
 
@@ -18,7 +17,7 @@ export const cleanAnchorUrls: DomTransform = (context) => {
         continue
       }
 
-      const cleaned = cleanUrlFn(href)
+      const cleaned = cleanUrl(href, context)
 
       if (cleaned !== href) {
         anchor.setAttribute('href', cleaned)

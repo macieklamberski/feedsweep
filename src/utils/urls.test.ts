@@ -10,6 +10,7 @@ import {
   prepareUrl,
   readOrigin,
   repairCarrierUrl,
+  repairUrl,
   resolveOrDropUrl,
   resolveOrKeepUrl,
 } from './urls.js'
@@ -238,11 +239,52 @@ describe('resolveOrDropUrl', () => {
   })
 })
 
+describe('repairUrl', () => {
+  it('should fold, collapse, fix the glued query and trim values in one chain', () => {
+    const valueUrl = 'https://example.com//album/title&amp;source=gmail&ust= 1 '
+    const expectedUrl = 'https://example.com/album/title?source=gmail&ust=1'
+
+    expect(repairUrl(valueUrl)).toBe(expectedUrl)
+  })
+
+  it('should keep a url on another scheme as written, an escaped ampersand included', () => {
+    const valueUrl = 'mailto:x@example.com?subject=hi&amp;body=there'
+
+    expect(repairUrl(valueUrl)).toBe(valueUrl)
+  })
+
+  it('should keep an ampersand inside a slug as written', () => {
+    const valueUrl = 'https://example.com/company/pack-&-cool-ltd'
+
+    expect(repairUrl(valueUrl)).toBe(valueUrl)
+  })
+
+  it('should keep a bare word after an ampersand as written when no pair follows', () => {
+    const valueUrl = 'https://example.com/resource/R&B'
+
+    expect(repairUrl(valueUrl)).toBe(valueUrl)
+  })
+
+  it('should keep an ampersand in a folder name before a file as written', () => {
+    const valueUrl = 'https://example.com/x/a&b/img.jpg'
+
+    expect(repairUrl(valueUrl)).toBe(valueUrl)
+  })
+})
+
 describe('cleanUrl', () => {
   it('should return what the cleaner answers', () => {
     const valueUrl = 'https://example.com/post?utm_source=feed'
     const cleanUrlFn = (url: string) => url.split('?')[0] ?? url
     const expectedUrl = 'https://example.com/post'
+
+    expect(cleanUrl(valueUrl, { ...baseContext, cleanUrlFn })).toBe(expectedUrl)
+  })
+
+  it('should hand the cleaner the repaired url', () => {
+    const valueUrl = 'https://player.example.com/video/123?h=abc portrait=0&color=fff'
+    const cleanUrlFn = (url: string) => url
+    const expectedUrl = 'https://player.example.com/video/123?h=abc&portrait=0&color=fff'
 
     expect(cleanUrl(valueUrl, { ...baseContext, cleanUrlFn })).toBe(expectedUrl)
   })

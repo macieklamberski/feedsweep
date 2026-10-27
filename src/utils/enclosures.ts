@@ -1,8 +1,8 @@
 import { parseUrl } from 'trousse'
-import type { CleanUrlFn, Enclosure, TransformContext } from '../types.js'
+import type { Enclosure, TransformContext } from '../types.js'
 import { setInnerHtml } from './dom.js'
 import { getImageFingerprint, getSizeKeywordRank, getUrlSizeHint } from './images.js'
-import { absoluteUrlRegex, cleanUrl, resolveOrKeepUrl } from './urls.js'
+import { absoluteUrlRegex, type CleanContext, cleanUrl, resolveOrKeepUrl } from './urls.js'
 import { getEmbedSize } from './widgets.js'
 
 // Marks an injected element so a repeat run skips it and stripDuplicateEnclosures (an
@@ -18,14 +18,14 @@ const strippedJsonAmpersandRegex = /(?<=\?.*)u0026(?:amp)?/g
 // The image key drops a file's query, which is what tells podcast proxy episodes apart.
 // A podcast proxy's audio url is `…/play.mp3?url={episode}`, so its identity lives in the query.
 // Audio, video and embeds have no scaled variants.
-export const buildMediaKey = (element: Element, cleanUrlFn?: CleanUrlFn): string => {
+export const buildMediaKey = (element: Element, context?: CleanContext): string => {
   const src = element.getAttribute('src') ?? element.getAttribute('data-embed-src') ?? ''
 
   if (element.localName === 'img') {
-    return getImageFingerprint(src, cleanUrlFn)
+    return getImageFingerprint(src, context)
   }
 
-  return cleanUrlFn ? cleanUrlFn(src) : src
+  return cleanUrl(src, context) ?? src
 }
 
 // PeerTube ships an audio-only rendition as `type="audio/mp4"` under `medium="video"`, so the
@@ -78,7 +78,7 @@ const isPreferredVariant = (incoming: Enclosure, kept: Enclosure): boolean => {
 // with a ?w= query. An audio or video query string often carries identity, as on a podcast proxy.
 const dedupeImageEnclosures = (
   enclosures: ReadonlyArray<Enclosure>,
-  cleanUrlFn?: CleanUrlFn,
+  context: CleanContext,
 ): Array<Enclosure> => {
   const indexByKey = new Map<string, number>()
   const result: Array<Enclosure> = []
@@ -89,7 +89,7 @@ const dedupeImageEnclosures = (
       continue
     }
 
-    const key = getImageFingerprint(enclosure.url, cleanUrlFn)
+    const key = getImageFingerprint(enclosure.url, context)
     const existingIndex = indexByKey.get(key)
 
     if (existingIndex === undefined) {
@@ -177,13 +177,13 @@ const pickGroupRendition = (renditions: ReadonlyArray<Enclosure>): Enclosure | u
 // again, so it joins the group: it keeps its own position and takes the member's fields.
 const foldEqualMembers = (
   enclosures: ReadonlyArray<Enclosure>,
-  cleanUrlFn?: CleanUrlFn,
+  context: CleanContext,
 ): Array<Enclosure> => {
   const members = new Map<string, Enclosure>()
 
   for (const enclosure of enclosures) {
     if (enclosure.groupIndex !== undefined && typeof enclosure.url === 'string') {
-      members.set(cleanUrl(enclosure.url, { cleanUrlFn }), enclosure)
+      members.set(cleanUrl(enclosure.url, context), enclosure)
     }
   }
 
@@ -209,7 +209,7 @@ const foldEqualMembers = (
       continue
     }
 
-    const member = members.get(cleanUrl(enclosure.url, { cleanUrlFn }))
+    const member = members.get(cleanUrl(enclosure.url, context))
 
     if (!member) {
       folded.push(enclosure)
@@ -229,9 +229,9 @@ const foldEqualMembers = (
 // a group pass through as they are.
 const collapseGroups = (
   enclosures: ReadonlyArray<Enclosure>,
-  cleanUrlFn?: CleanUrlFn,
+  context: CleanContext,
 ): Array<Enclosure> => {
-  const folded = foldEqualMembers(enclosures, cleanUrlFn)
+  const folded = foldEqualMembers(enclosures, context)
   const groups = new Map<number, Array<Enclosure>>()
 
   for (const enclosure of folded) {
@@ -342,7 +342,7 @@ const readEnclosure = (
 // param, like …/?media_url=<file>, and the param name varies by host.
 const mergePlayerEnclosures = (
   enclosures: ReadonlyArray<Enclosure>,
-  cleanUrlFn?: CleanUrlFn,
+  context: CleanContext,
 ): Array<Enclosure> => {
   const result = [...enclosures]
   const removed = new Set<number>()
@@ -353,9 +353,7 @@ const mergePlayerEnclosures = (
         return false
       }
 
-      return (
-        typeof candidate.url === 'string' && cleanUrl(candidate.url, { cleanUrlFn }) === nestedUrl
-      )
+      return typeof candidate.url === 'string' && cleanUrl(candidate.url, context) === nestedUrl
     })
   }
 
@@ -367,7 +365,7 @@ const mergePlayerEnclosures = (
     }
 
     for (const nested of extractNestedUrls(player.url)) {
-      const fileIndex = findFileIndex(cleanUrl(nested, { cleanUrlFn }), playerIndex)
+      const fileIndex = findFileIndex(cleanUrl(nested, context), playerIndex)
 
       if (fileIndex === -1) {
         continue
@@ -394,8 +392,8 @@ export const prepareEnclosures = (
   context: TransformContext,
 ): Array<Enclosure> => {
   const resolved = enclosures.map((enclosure) => readEnclosure(enclosure, document, context))
-  const collapsed = collapseGroups(resolved, context.cleanUrlFn)
-  const deduped = dedupeImageEnclosures(collapsed, context.cleanUrlFn)
+  const collapsed = collapseGroups(resolved, context)
+  const deduped = dedupeImageEnclosures(collapsed, context)
 
-  return mergePlayerEnclosures(deduped, context.cleanUrlFn)
+  return mergePlayerEnclosures(deduped, context)
 }

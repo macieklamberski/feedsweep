@@ -1,9 +1,9 @@
 import { escapeRegex } from 'trousse'
-import type { CleanUrlFn, DomTransform, TransformContext } from '../../types.js'
+import type { DomTransform, TransformContext } from '../../types.js'
 import { attr, removeWithEmptyWrappers } from '../../utils/dom.js'
 import { buildMediaKey, enclosureMarker } from '../../utils/enclosures.js'
 import { findPosterEvidence, getVideoThumbnail } from '../../utils/images.js'
-import { isUsableSrc, prepareUrl } from '../../utils/urls.js'
+import { type CleanContext, isUsableSrc, prepareUrl } from '../../utils/urls.js'
 import { updateEmbedPlaceholder } from '../../utils/widgets.js'
 
 // A player without a resolver, like JW Player, carries no data-embed-provider to match on.
@@ -24,24 +24,24 @@ const videoHostRegex = new RegExp(videoHostFragments.map(escapeRegex).join('|'),
 
 const playerSelector = '[data-embed-src], iframe[src], video'
 
-const getFileKeys = (player: Element, cleanUrlFn?: CleanUrlFn): Array<string> => {
+const getFileKeys = (player: Element, context: CleanContext): Array<string> => {
   return [player, ...player.querySelectorAll('source')]
-    .map((file) => buildMediaKey(file, cleanUrlFn))
+    .map((file) => buildMediaKey(file, context))
     .filter(Boolean)
 }
 
 // An injected enclosure that repeats a body player: stripDuplicateEnclosures removes that copy
 // later, with any poster set on it.
-const findRepeats = (players: Array<Element>, cleanUrlFn?: CleanUrlFn): Set<Element> => {
+const findRepeats = (players: Array<Element>, context: CleanContext): Set<Element> => {
   const bodyKeys = new Set(
     players
       .filter((player) => !player.hasAttribute(enclosureMarker))
-      .flatMap((player) => getFileKeys(player, cleanUrlFn)),
+      .flatMap((player) => getFileKeys(player, context)),
   )
   const repeats = players.filter((player) => {
     return (
       player.hasAttribute(enclosureMarker) &&
-      getFileKeys(player, cleanUrlFn).some((key) => bodyKeys.has(key))
+      getFileKeys(player, context).some((key) => bodyKeys.has(key))
     )
   })
 
@@ -99,14 +99,14 @@ const moveImageToVideoPoster = (
 export const assignVideoPosters: DomTransform = (context) => (document) => {
   // (A) Any image, inline or an enclosure, that something static ties to a player.
   const players = [...document.querySelectorAll(playerSelector)]
-  const repeats = findRepeats(players, context.cleanUrlFn)
+  const repeats = findRepeats(players, context)
   const videos = players.filter((player) => !repeats.has(player))
 
   for (const image of videos.length ? document.querySelectorAll('img[src]') : []) {
     const src = image.getAttribute('src') ?? ''
 
     for (const video of videos) {
-      const evidence = findPosterEvidence(src, video, context.cleanUrlFn)
+      const evidence = findPosterEvidence(src, video, context)
 
       if (!evidence) {
         continue

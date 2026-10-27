@@ -19,6 +19,22 @@ describeForEachParser('cleanAnchorUrls', (parseHtml) => {
     expect(await transform(value, context)).toEqualHtml(expected)
   })
 
+  it('should repair a query glued onto the path before the cleaner reads it', async () => {
+    const value =
+      '<a href="https://example.bandcamp.com/album/title&source=gmail&ust=1781964728672000">link</a>'
+    const context = { ...baseContext, cleanUrlFn: (url: string) => url }
+    const expected =
+      '<a href="https://example.bandcamp.com/album/title?source=gmail&amp;ust=1781964728672000">link</a>'
+
+    expect(await transform(value, context)).toEqualHtml(expected)
+  })
+
+  it('should leave a broken href as written when there is no cleanUrlFn', async () => {
+    const value = '<a href="https://example.bandcamp.com/album/title&source=gmail">link</a>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should clean every anchor in the document', async () => {
     const value = html`
       <a href="https://example.com/a?utm_source=feed">first</a>

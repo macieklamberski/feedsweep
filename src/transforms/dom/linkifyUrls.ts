@@ -1,6 +1,7 @@
 import { find as linkifyFind } from 'linkifyjs'
 import type { DomTransform } from '../../types.js'
 import { collectTextNodes, rawTextElements } from '../../utils/dom.js'
+import { cleanUrl } from '../../utils/urls.js'
 import { createLink } from '../../utils/widgets.js'
 
 const urlProtocolRegex = /^https?:\/\//i
@@ -14,8 +15,6 @@ const shouldSkipElement = (element: Element): boolean => {
 
 // A bare url in running text, which the feed never wrapped in an anchor.
 export const linkifyUrls: DomTransform = (context) => {
-  const cleanUrlFn = context.cleanUrlFn
-
   return (document) => {
     // documentElement is only the first root-level element in a linkedom fragment.
     const textNodes = collectTextNodes(document, shouldSkipElement) as Array<ChildNode>
@@ -48,7 +47,7 @@ export const linkifyUrls: DomTransform = (context) => {
         }
 
         // cleanAnchorUrls ran before these anchors existed, so this is their only cleaning pass.
-        const cleaned = cleanUrlFn?.(link.href) ?? link.href
+        const cleaned = cleanUrl(link.href, context)
         // The text is the URL as written. Show the cleaned one instead when cleaning
         // changed it, so a visible URL never points somewhere else.
         parts.push(createLink(document, cleaned, cleaned === link.href ? link.value : cleaned))

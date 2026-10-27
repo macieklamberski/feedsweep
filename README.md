@@ -54,7 +54,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `demoteHeadings` | Shift headings down a level so they sit below the reader's page title |
 | `unwrapHeadingBold` | Unwrap redundant bold wrapping a whole heading |
 | `normalizeAnchoredHeadings` | Strip static-site-generator permalink anchors from headings (Sphinx/MkDocs, Docusaurus, AnchorJS, Zola) |
-| `cleanAnchorUrls` | Clean anchor hrefs (redirects, tracking params) via the `cleanUrlFn` option |
+| `cleanAnchorUrls` | Clean anchor hrefs (redirects, tracking params) via the `cleanUrlFn` option, after the shared url repair: an escaped `&amp;`, a run of slashes, a query glued onto the path and whitespace in values |
 | `stripDeadAnchors` | Unwrap links with empty, `#`, or `javascript:` hrefs |
 | `stripNonContentElements` | Strip non-content chrome — subscribe/share/related widgets, ads, author bios |
 | `convertUcozSpoilerButtons` | Replace a titled uCoz spoiler button with its title in bold |
