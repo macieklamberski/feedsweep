@@ -690,7 +690,7 @@ describe('getSizeKeywordRank', () => {
 
   it('should prefer the file name keyword over a directory one', () => {
     const value = 'https://cdn.example.com/photos/small/large.jpg'
-    const expected = getSizeKeywordRank('https://cdn.example.com/photos/123/large.jpg')
+    const expected = 5
 
     expect(getSizeKeywordRank(value)).toBe(expected)
   })

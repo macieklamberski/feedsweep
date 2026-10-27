@@ -1260,7 +1260,6 @@ describeForEachParser('convertWidgets', (parseHtml) => {
 })
 
 const uploadId = 'de58e4a3-5505-45a7-8abc-b46c5c0f6e7a'
-const uploadSrc = `https://api.substack.com/api/v1/video/upload/${uploadId}/src`
 
 // The two parsers order attributes differently and serialize `controls` with and without a
 // value, so a case that mints a media element compares through the normalizing matcher.
@@ -1275,14 +1274,16 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
 
   it('should replace a container with a video element carrying controls', async () => {
     const value = `<div class="native-video-embed" data-attrs='{"mediaUploadId":"${uploadId}"}'></div>`
-    const expected = `<video src="${uploadSrc}" controls></video>`
+    const expected =
+      '<video src="https://api.substack.com/api/v1/video/upload/de58e4a3-5505-45a7-8abc-b46c5c0f6e7a/src" controls></video>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })
 
   it('should replace an audio container with an audio element', async () => {
     const value = `<div class="native-audio-embed" data-attrs='{"mediaUploadId":"${uploadId}"}'></div>`
-    const expected = `<audio src="${uploadSrc}" controls></audio>`
+    const expected =
+      '<audio src="https://api.substack.com/api/v1/video/upload/de58e4a3-5505-45a7-8abc-b46c5c0f6e7a/src" controls></audio>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })
