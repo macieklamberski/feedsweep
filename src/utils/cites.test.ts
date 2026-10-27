@@ -73,7 +73,11 @@ describe('buildCite', () => {
     })
 
     it('should accept a null url or title from a raw DOM read', () => {
-      const value = { provider: 'stub', url: null, title: null }
+      const value = {
+        provider: 'stub',
+        url: null,
+        title: null,
+      }
 
       expect(buildCite(value)).toBeUndefined()
     })
@@ -81,13 +85,19 @@ describe('buildCite', () => {
 
   describe('sad paths', () => {
     it('should return undefined when the url is missing', () => {
-      const value = { provider: 'stub', title: 'Page title' }
+      const value = {
+        provider: 'stub',
+        title: 'Page title',
+      }
 
       expect(buildCite(value)).toBeUndefined()
     })
 
     it('should return undefined when the title is missing', () => {
-      const value = { provider: 'stub', url: 'https://example.com/post' }
+      const value = {
+        provider: 'stub',
+        url: 'https://example.com/post',
+      }
 
       expect(buildCite(value)).toBeUndefined()
     })
@@ -101,8 +111,16 @@ describe('buildCite', () => {
     })
 
     it('should return undefined when the url or the title is blank', () => {
-      const url = { provider: 'stub', url: '  ', title: 'Page title' }
-      const title = { provider: 'stub', url: 'https://example.com', title: ' ' }
+      const url = {
+        provider: 'stub',
+        url: '  ',
+        title: 'Page title',
+      }
+      const title = {
+        provider: 'stub',
+        url: 'https://example.com',
+        title: ' ',
+      }
 
       expect(buildCite(url)).toBeUndefined()
       expect(buildCite(title)).toBeUndefined()

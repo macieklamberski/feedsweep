@@ -335,7 +335,10 @@ describe('prepareUrl', () => {
 describe('pickQueryParams', () => {
   it('should keep only the named parameters', () => {
     const value = 'start=90&autoplay=1&list=PLabc'
-    const expected = { start: '90', list: 'PLabc' }
+    const expected = {
+      start: '90',
+      list: 'PLabc',
+    }
 
     expect(pickQueryParams(value, ['start', 'list'])).toEqual(expected)
   })

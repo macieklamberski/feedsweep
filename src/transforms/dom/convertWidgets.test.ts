@@ -272,11 +272,12 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     const asyncResolver: EmbedResolver = {
       kind: 'embed',
       selector: 'iframe[src*="example.com"]',
-      extract: (element) =>
-        Promise.resolve({
+      extract: (element) => {
+        return Promise.resolve({
           provider: 'async',
           src: element.getAttribute('src') ?? '',
-        }),
+        })
+      },
     }
     const customContext: TransformContext = {
       ...baseContext,
@@ -1737,7 +1738,10 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
 
     it('should resolve a relative parked url against the base url', async () => {
       const value = '<div data-video-src="/uploads/clip.mp4"></div>'
-      const context = { ...baseContext, baseUrl: 'https://forum.example/t/1' }
+      const context = {
+        ...baseContext,
+        baseUrl: 'https://forum.example/t/1',
+      }
       const expected = html`
         <div data-video-src="/uploads/clip.mp4">
           <video

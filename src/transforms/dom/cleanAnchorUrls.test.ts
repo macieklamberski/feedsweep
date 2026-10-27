@@ -13,7 +13,10 @@ describeForEachParser('cleanAnchorUrls', (parseHtml) => {
 
   it('should rewrite hrefs with the provided cleanUrlFn', async () => {
     const value = '<a href="https://example.com/page?utm_source=feed">link</a>'
-    const context = { ...baseContext, cleanUrlFn: stripQueryFn }
+    const context = {
+      ...baseContext,
+      cleanUrlFn: stripQueryFn,
+    }
     const expected = '<a href="https://example.com/page">link</a>'
 
     expect(await transform(value, context)).toEqualHtml(expected)
@@ -22,7 +25,10 @@ describeForEachParser('cleanAnchorUrls', (parseHtml) => {
   it('should repair a query glued onto the path before the cleaner reads it', async () => {
     const value =
       '<a href="https://example.bandcamp.com/album/title&source=gmail&ust=1781964728672000">link</a>'
-    const context = { ...baseContext, cleanUrlFn: (url: string) => url }
+    const context = {
+      ...baseContext,
+      cleanUrlFn: (url: string) => url,
+    }
     const expected =
       '<a href="https://example.bandcamp.com/album/title?source=gmail&amp;ust=1781964728672000">link</a>'
 
@@ -40,7 +46,10 @@ describeForEachParser('cleanAnchorUrls', (parseHtml) => {
       <a href="https://example.com/a?utm_source=feed">first</a>
       <a href="https://example.com/b?utm_medium=email">second</a>
     `
-    const context = { ...baseContext, cleanUrlFn: stripQueryFn }
+    const context = {
+      ...baseContext,
+      cleanUrlFn: stripQueryFn,
+    }
     const expected = html`
       <a href="https://example.com/a">first</a>
       <a href="https://example.com/b">second</a>
@@ -51,7 +60,10 @@ describeForEachParser('cleanAnchorUrls', (parseHtml) => {
 
   it('should leave hrefs untouched when cleanUrlFn returns the same value', async () => {
     const value = '<a href="https://example.com/page">link</a>'
-    const context = { ...baseContext, cleanUrlFn: stripQueryFn }
+    const context = {
+      ...baseContext,
+      cleanUrlFn: stripQueryFn,
+    }
 
     expect(await transform(value, context)).toEqualHtml(value)
   })
@@ -64,7 +76,10 @@ describeForEachParser('cleanAnchorUrls', (parseHtml) => {
 
   it('should ignore anchors without hrefs', async () => {
     const value = '<a id="top">anchor</a>'
-    const context = { ...baseContext, cleanUrlFn: stripQueryFn }
+    const context = {
+      ...baseContext,
+      cleanUrlFn: stripQueryFn,
+    }
 
     expect(await transform(value, context)).toEqualHtml(value)
   })
@@ -77,7 +92,10 @@ describeForEachParser('cleanAnchorUrls', (parseHtml) => {
 
   it('should be idempotent', async () => {
     const value = '<a href="https://example.com/page?utm_source=feed">link</a>'
-    const context = { ...baseContext, cleanUrlFn: stripQueryFn }
+    const context = {
+      ...baseContext,
+      cleanUrlFn: stripQueryFn,
+    }
     const once = await transform(value, context)
     const twice = await transform(once, context)
 

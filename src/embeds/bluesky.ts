@@ -26,7 +26,7 @@ const mediaHosts = ['bsky.app', 'bsky.social']
 // colon in the authority as a port and fails, so the URI is split by hand.
 const postCollection = 'app.bsky.feed.post'
 // at://{authority}/{collection}/{rkey}.
-const atUriRegex = /^at:\/\/([^/]+)\/([^/]+)\/([^/?#]+)/
+const atUriRegex = /^at:\/\/(?<authority>[^/]+)\/(?<collection>[^/]+)\/(?<rkey>[^/?#]+)/
 
 // Whitespace, an en dash, an em dash or a hyphen.
 const authorSeparatorRegex = /^[\s–—-]+/
@@ -53,14 +53,14 @@ type SubstackPostAttributes = {
 
 const extractBlueskyPost = (uri: string): BlueskyPost | undefined => {
   // Not `new URL`: it reads the colon in a DID authority as a port and fails.
-  const match = atUriRegex.exec(uri)
+  const post = atUriRegex.exec(uri)?.groups
 
-  if (!match || match[2] !== postCollection) {
+  if (!post || post.collection !== postCollection) {
     return
   }
 
   // The URI is never parsed as a url, so a space or a `?` in it survives.
-  return { authority: encodePathSegment(match[1]), rkey: encodePathSegment(match[3]) }
+  return { authority: encodePathSegment(post.authority), rkey: encodePathSegment(post.rkey) }
 }
 
 const extractBlueskyPostFromUrl = (link: URL | undefined): BlueskyPost | undefined => {

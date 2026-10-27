@@ -279,13 +279,19 @@ describeForEachParser('airtableEmbedResolver', (parseHtml) => {
 
 describe('readAirtableHeight', () => {
   it('should read the height a form view posts', () => {
-    const value = { key: 'airtableEmbedContentDidResize', height: 888 }
+    const value = {
+      key: 'airtableEmbedContentDidResize',
+      height: 888,
+    }
 
     expect(readAirtableHeight(value)).toBe(888)
   })
 
   it('should ignore another Airtable message', () => {
-    const value = { key: 'airtableUrlDidChange', height: 888 }
+    const value = {
+      key: 'airtableUrlDidChange',
+      height: 888,
+    }
 
     expect(readAirtableHeight(value)).toBeUndefined()
   })

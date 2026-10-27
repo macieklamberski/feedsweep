@@ -712,7 +712,11 @@ describe('normalizeEmbedFields', () => {
 
   describe('numeric coercion', () => {
     it('should stringify width, height and duration', () => {
-      const value = { width: 640, height: 360, duration: 125 }
+      const value = {
+        width: 640,
+        height: 360,
+        duration: 125,
+      }
       const expected: Record<string, string | undefined> = {
         width: '640',
         height: '360',
@@ -2391,7 +2395,10 @@ describe('prepareEmbedMetadata', () => {
       provider: 'example',
       url: 'https://blog.example.com/watch/abc',
     }
-    const context = { ...baseContext, cleanUrlFn: (url: string) => url.split('?')[0] ?? url }
+    const context = {
+      ...baseContext,
+      cleanUrlFn: (url: string) => url.split('?')[0] ?? url,
+    }
 
     expect(prepareEmbedMetadata(value, context)).toEqual(expected)
   })
@@ -2462,7 +2469,10 @@ describe('prepareEmbedMetadata', () => {
       provider: 'example',
       url: 'https://blog.example.com/watch/abc',
     }
-    const context = { ...baseContext, cleanUrlFn: () => '' }
+    const context = {
+      ...baseContext,
+      cleanUrlFn: () => '',
+    }
 
     expect(prepareEmbedMetadata(value, context)).toEqual(value)
   })
@@ -2476,7 +2486,10 @@ describe('prepareEmbedMetadata', () => {
       provider: 'example',
       date: '2026-03-03T00:00:00.000Z',
     }
-    const context = { ...baseContext, parseDateFn: () => '2026-03-03T00:00:00.000Z' }
+    const context = {
+      ...baseContext,
+      parseDateFn: () => '2026-03-03T00:00:00.000Z',
+    }
 
     expect(prepareEmbedMetadata(value, context)).toEqual(expected)
   })
@@ -2488,7 +2501,10 @@ describe('prepareEmbedMetadata', () => {
       provider: 'example',
       date: 'last Tuesday',
     }
-    const context = { ...baseContext, parseDateFn: () => undefined }
+    const context = {
+      ...baseContext,
+      parseDateFn: () => undefined,
+    }
 
     expect(prepareEmbedMetadata(value, context)).toEqual(value)
   })
@@ -2560,7 +2576,10 @@ describe('prepareCiteMetadata', () => {
       provider: 'example',
       url: 'https://blog.example.com/article',
     }
-    const context = { ...baseContext, cleanUrlFn: (url: string) => url.split('?')[0] ?? url }
+    const context = {
+      ...baseContext,
+      cleanUrlFn: (url: string) => url.split('?')[0] ?? url,
+    }
 
     expect(prepareCiteMetadata(value, context)).toEqual(expected)
   })
@@ -2604,7 +2623,10 @@ describe('prepareCiteMetadata', () => {
       provider: 'example',
       url: 'https://blog.example.com/article',
     }
-    const context = { ...baseContext, cleanUrlFn: () => '' }
+    const context = {
+      ...baseContext,
+      cleanUrlFn: () => '',
+    }
 
     expect(prepareCiteMetadata(value, context)).toEqual(value)
   })
@@ -2618,7 +2640,10 @@ describe('prepareCiteMetadata', () => {
       provider: 'example',
       date: '2026-03-03T00:00:00.000Z',
     }
-    const context = { ...baseContext, parseDateFn: () => '2026-03-03T00:00:00.000Z' }
+    const context = {
+      ...baseContext,
+      parseDateFn: () => '2026-03-03T00:00:00.000Z',
+    }
 
     expect(prepareCiteMetadata(value, context)).toEqual(expected)
   })
@@ -2628,7 +2653,10 @@ describe('prepareCiteMetadata', () => {
       provider: 'example',
       date: 'last Tuesday',
     }
-    const context = { ...baseContext, parseDateFn: () => undefined }
+    const context = {
+      ...baseContext,
+      parseDateFn: () => undefined,
+    }
 
     expect(prepareCiteMetadata(value, context)).toEqual(value)
   })

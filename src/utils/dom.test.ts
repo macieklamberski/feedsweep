@@ -1488,14 +1488,20 @@ describeForEachParser('flashVar', (parseHtml) => {
 
 describe('parseFlashVars', () => {
   it('should read every pair of the query', () => {
-    const expected = { config: '1', id: '2' }
+    const expected = {
+      config: '1',
+      id: '2',
+    }
 
     expect(Object.fromEntries(parseFlashVars('config=1&id=2'))).toEqual(expected)
   })
 
   it('should strip the whitespace around each value', () => {
     const value = parseFlashVars('id= 17216&file=https://example.com/episode.mp3 ')
-    const expected = { id: '17216', file: 'https://example.com/episode.mp3' }
+    const expected = {
+      id: '17216',
+      file: 'https://example.com/episode.mp3',
+    }
 
     expect(Object.fromEntries(value)).toEqual(expected)
   })

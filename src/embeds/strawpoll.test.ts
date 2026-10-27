@@ -331,13 +331,21 @@ describeForEachParser('strawpollMountEmbedResolver', (parseHtml) => {
 describe('readStrawpollHeight', () => {
   // What the poll posts on its own after rendering, at 640 wide.
   it('should read the height out of a resize message', () => {
-    const value = { type: 'strawpoll_resize', id: 'e7ZJaM1BPg3', value: 690 }
+    const value = {
+      type: 'strawpoll_resize',
+      id: 'e7ZJaM1BPg3',
+      value: 690,
+    }
 
     expect(readStrawpollHeight(value)).toBe(690)
   })
 
   it('should read nothing from the session token request', () => {
-    const value = { type: 'strawpoll_request_session_token', id: 'e7ZJaM1BPg3', value: 690 }
+    const value = {
+      type: 'strawpoll_request_session_token',
+      id: 'e7ZJaM1BPg3',
+      value: 690,
+    }
 
     expect(readStrawpollHeight(value)).toBeUndefined()
   })

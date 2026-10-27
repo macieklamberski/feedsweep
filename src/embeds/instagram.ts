@@ -39,7 +39,8 @@ const sitePathSegments = ['challenge', 'developer', 'share', 'stories']
 
 // The account names the poster, not the post, so it is matched and dropped.
 // `tv` is the retired IGTV route and `reels` the plural spelling of the reel.
-const postPathRegex = /^\/(?:([A-Za-z0-9_.]+)\/)?(p|reel|reels|tv)\/([^/]+)/i
+const postPathRegex =
+  /^\/(?:(?<handle>[A-Za-z0-9_.]+)\/)?(?<kind>p|reel|reels|tv)\/(?<shortcode>[^/]+)/i
 
 type Post = { kind: string; shortcode: string }
 
@@ -48,23 +49,23 @@ const readPostUrl = (parsed: URL | undefined): Post | undefined => {
     return
   }
 
-  const match = parsed.pathname.match(postPathRegex)
+  const post = parsed.pathname.match(postPathRegex)?.groups
 
-  if (!match) {
+  if (!post) {
     return
   }
 
-  if (match[1] && isAnyOf(match[1], sitePathSegments)) {
+  if (post.handle && isAnyOf(post.handle, sitePathSegments)) {
     return
   }
 
-  if (isAnyOf(match[3], nonShortcodeSegments)) {
+  if (isAnyOf(post.shortcode, nonShortcodeSegments)) {
     return
   }
 
-  const kind = match[2].toLowerCase()
+  const kind = post.kind.toLowerCase()
 
-  return { kind: kind === 'reels' ? 'reel' : kind, shortcode: match[3] }
+  return { kind: kind === 'reels' ? 'reel' : kind, shortcode: post.shortcode }
 }
 
 // The captioned frame renders the post's text under the picture, so which of the two a

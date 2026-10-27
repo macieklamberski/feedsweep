@@ -1010,7 +1010,10 @@ describeForEachParser('transformContent', (parseHtml) => {
   // the ordering: each heading carries junk beside the bold that an intermediate transform
   // removes, so with the unwrap placed early the bold only came off on a second run.
   it('should unwrap the heading bold once junk siblings are cleaned', async () => {
-    const options = { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' }
+    const options = {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    }
     const value = html`
       <h2>
         <a href="https://example.com/post#anchored">
@@ -1050,7 +1053,10 @@ describeForEachParser('transformContent', (parseHtml) => {
   // before wrapBareInlineInParagraphs and an embed one after it, so each meets a different
   // set of transforms on a re-run.
   it('should be idempotent for embed and cite placeholders', async () => {
-    const options = { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' }
+    const options = {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    }
     const value = html`
       <p>Intro</p>
       <iframe src="https://www.youtube.com/embed/abc123"></iframe>

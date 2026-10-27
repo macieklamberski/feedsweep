@@ -8,7 +8,8 @@ const provider = 'iheart'
 const hosts = ['iheart.com']
 
 // A route segment is the bare id or a slug hanging before it, `{slug}-{id}`.
-const episodePathRegex = /^\/podcast\/(?:[^/]*-)?(\d+)\/episode\/(?:[^/]*-)?(\d+)\/?$/i
+const episodePathRegex =
+  /^\/podcast\/(?:[^/]*-)?(?<showId>\d+)\/episode\/(?:[^/]*-)?(?<episodeId>\d+)\/?$/i
 const showPathRegex = /^\/podcast\/(?:[^/]*-)?(\d+)\/?$/i
 const stationPathRegex = /^\/(?<kind>live|artist)\/(?:[^/]*-)?(?<id>\d+)\/?$/i
 
@@ -24,14 +25,14 @@ const sizes = {
 // players, on www.iheart.com or beta.iheart.com.
 export const iheartResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const pathname = url.pathname
-  const episode = pathname.match(episodePathRegex)
+  const episode = pathname.match(episodePathRegex)?.groups
 
   if (episode) {
-    const page = `https://www.iheart.com/podcast/${episode[1]}/episode/${episode[2]}/`
+    const page = `https://www.iheart.com/podcast/${episode.showId}/episode/${episode.episodeId}/`
 
     return {
       provider,
-      id: `${episode[1]}/${episode[2]}`,
+      id: `${episode.showId}/${episode.episodeId}`,
       src: `${page}?embed=true`,
       url: page,
       ...sizes.episode,

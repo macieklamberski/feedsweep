@@ -241,25 +241,41 @@ describeForEachParser('formmailerIframeEmbedResolver', (parseHtml) => {
 
 describe('readFormmailerHeight', () => {
   it('should read the height out of the form message', () => {
-    const value = { app: 'formmailer', message: 'heightChanged', params: { height: 1443 } }
+    const value = {
+      app: 'formmailer',
+      message: 'heightChanged',
+      params: { height: 1443 },
+    }
 
     expect(readFormmailerHeight(value)).toBe(1443)
   })
 
   it('should ignore a message from another app', () => {
-    const value = { app: 'other', message: 'heightChanged', params: { height: 1443 } }
+    const value = {
+      app: 'other',
+      message: 'heightChanged',
+      params: { height: 1443 },
+    }
 
     expect(readFormmailerHeight(value)).toBeUndefined()
   })
 
   it('should ignore the error scroll message', () => {
-    const value = { app: 'formmailer', message: 'errorScroll', params: { height: 1443 } }
+    const value = {
+      app: 'formmailer',
+      message: 'errorScroll',
+      params: { height: 1443 },
+    }
 
     expect(readFormmailerHeight(value)).toBeUndefined()
   })
 
   it('should ignore a message with no params', () => {
-    const value = { app: 'formmailer', message: 'heightChanged', height: 1443 }
+    const value = {
+      app: 'formmailer',
+      message: 'heightChanged',
+      height: 1443,
+    }
 
     expect(readFormmailerHeight(value)).toBeUndefined()
   })

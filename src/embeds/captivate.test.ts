@@ -11,14 +11,20 @@ import {
 describe('extractCaptivateEmbed', () => {
   it('should read an episode player', () => {
     const value = 'https://player.captivate.fm/episode/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6/'
-    const expected = { kind: 'episode', id: 'db5bc483-785d-4c8c-9f7b-c0ff2fab72e6' }
+    const expected = {
+      kind: 'episode',
+      id: 'db5bc483-785d-4c8c-9f7b-c0ff2fab72e6',
+    }
 
     expect(extractCaptivateEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should read a show player', () => {
     const value = 'https://player.captivate.fm/show/7fa2e8ef-c3e0-4d27-aad0-35dad879c65c'
-    const expected = { kind: 'show', id: '7fa2e8ef-c3e0-4d27-aad0-35dad879c65c' }
+    const expected = {
+      kind: 'show',
+      id: '7fa2e8ef-c3e0-4d27-aad0-35dad879c65c',
+    }
 
     expect(extractCaptivateEmbed(new URL(value))).toEqual(expected)
   })
@@ -27,7 +33,10 @@ describe('extractCaptivateEmbed', () => {
   // player instead of falling through to a carrier that has lost its height.
   it('should read a kind the platform has not published yet', () => {
     const value = 'https://player.captivate.fm/clip/db5bc483-785d-4c8c-9f7b-c0ff2fab72e6'
-    const expected = { kind: 'clip', id: 'db5bc483-785d-4c8c-9f7b-c0ff2fab72e6' }
+    const expected = {
+      kind: 'clip',
+      id: 'db5bc483-785d-4c8c-9f7b-c0ff2fab72e6',
+    }
 
     expect(extractCaptivateEmbed(new URL(value))).toEqual(expected)
   })
