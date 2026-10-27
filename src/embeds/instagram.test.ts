@@ -1657,7 +1657,10 @@ describeForEachParser('instagramSubstackEmbedResolver', (parseHtml) => {
 
 describe('readInstagramHeight', () => {
   it('should read the height out of a measurement', () => {
-    const value = { details: { height: 1003 }, type: 'MEASURE' }
+    const value = {
+      details: { height: 1003 },
+      type: 'MEASURE',
+    }
 
     expect(readInstagramHeight(value)).toBe(1003)
   })

@@ -10,21 +10,30 @@ import { extractWistiaEmbed, wistiaEmbedResolver, wistiaResolveEmbed } from './w
 describe('extractWistiaEmbed', () => {
   it('should extract id from the player iframe url', () => {
     const value = 'https://fast.wistia.net/embed/iframe/2fg072pftb'
-    const expected = { route: 'iframe', id: '2fg072pftb' }
+    const expected = {
+      route: 'iframe',
+      id: '2fg072pftb',
+    }
 
     expect(extractWistiaEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should extract id from a player url carrying options', () => {
     const value = 'https://fast.wistia.net/embed/iframe/2fg072pftb?web_component=true&seo=false'
-    const expected = { route: 'iframe', id: '2fg072pftb' }
+    const expected = {
+      route: 'iframe',
+      id: '2fg072pftb',
+    }
 
     expect(extractWistiaEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should extract id from the script form jsonp url', () => {
     const value = 'https://fast.wistia.com/embed/medias/0inlutl9au.jsonp'
-    const expected = { route: 'iframe', id: '0inlutl9au' }
+    const expected = {
+      route: 'iframe',
+      id: '0inlutl9au',
+    }
 
     expect(extractWistiaEmbed(new URL(value))).toEqual(expected)
   })
@@ -55,14 +64,20 @@ describe('extractWistiaEmbed', () => {
 
   it('should read an id longer than the ten characters Wistia mints today', () => {
     const value = 'https://fast.wistia.net/embed/iframe/2fg072pftb9'
-    const expected = { route: 'iframe', id: '2fg072pftb9' }
+    const expected = {
+      route: 'iframe',
+      id: '2fg072pftb9',
+    }
 
     expect(extractWistiaEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should keep the case the carrier spells the id in', () => {
     const value = 'https://fast.wistia.net/embed/iframe/2FG072PFTB'
-    const expected = { route: 'iframe', id: '2FG072PFTB' }
+    const expected = {
+      route: 'iframe',
+      id: '2FG072PFTB',
+    }
 
     expect(extractWistiaEmbed(new URL(value))).toEqual(expected)
   })
@@ -76,7 +91,10 @@ describe('extractWistiaEmbed', () => {
   // A channel and a playlist are separate players, so the route travels with the id.
   it('should read a channel with its own route', () => {
     const value = 'https://fast.wistia.net/embed/channel/sapab9p6qd'
-    const expected = { route: 'channel', id: 'sapab9p6qd' }
+    const expected = {
+      route: 'channel',
+      id: 'sapab9p6qd',
+    }
 
     expect(extractWistiaEmbed(new URL(value))).toEqual(expected)
   })
@@ -85,14 +103,20 @@ describe('extractWistiaEmbed', () => {
   // for a public channel, so rebuilding it onto the public player repairs a login screen.
   it('should read a channel from its account page', () => {
     const value = 'https://home.wistia.com/channels/sapab9p6qd'
-    const expected = { route: 'channel', id: 'sapab9p6qd' }
+    const expected = {
+      route: 'channel',
+      id: 'sapab9p6qd',
+    }
 
     expect(extractWistiaEmbed(new URL(value))).toEqual(expected)
   })
 
   it('should use a malformed channel id as written, even if the player answers an error', () => {
     const value = 'https://home.wistia.com/channels/talking-too-loud'
-    const expected = { route: 'channel', id: 'talking-too-loud' }
+    const expected = {
+      route: 'channel',
+      id: 'talking-too-loud',
+    }
 
     expect(extractWistiaEmbed(new URL(value))).toEqual(expected)
   })
@@ -107,7 +131,10 @@ describe('extractWistiaEmbed', () => {
 
   it('should use a malformed media id as written, even if the player answers an error', () => {
     const value = 'https://fast.wistia.net/embed/iframe/2fg072pftb%2Fsapab9p6qd'
-    const expected = { route: 'iframe', id: '2fg072pftb%2Fsapab9p6qd' }
+    const expected = {
+      route: 'iframe',
+      id: '2fg072pftb%2Fsapab9p6qd',
+    }
 
     expect(extractWistiaEmbed(new URL(value))).toEqual(expected)
   })
@@ -126,7 +153,10 @@ describe('extractWistiaEmbed', () => {
 
   it('should read a playlist with its own route', () => {
     const value = 'https://fast.wistia.net/embed/playlists/aodt9etokc'
-    const expected = { route: 'playlists', id: 'aodt9etokc' }
+    const expected = {
+      route: 'playlists',
+      id: 'aodt9etokc',
+    }
 
     expect(extractWistiaEmbed(new URL(value))).toEqual(expected)
   })

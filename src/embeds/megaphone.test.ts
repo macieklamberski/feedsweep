@@ -84,7 +84,11 @@ describe('extractMegaphoneEmbed', () => {
     'should read an episode id with a long publisher prefix (%s)',
     (id) => {
       const value = `https://playlist.megaphone.fm/?e=${id}`
-      const expected = { param: 'e', kind: 'episode', id }
+      const expected = {
+        param: 'e',
+        kind: 'episode',
+        id,
+      }
 
       expect(extractMegaphoneEmbed(new URL(value))).toEqual(expected)
     },

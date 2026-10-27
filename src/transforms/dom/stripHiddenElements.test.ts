@@ -209,7 +209,10 @@ describeForEachParser('stripHiddenElements', (parseHtml) => {
 
     it('should remove a hidden slider when no revealable selectors are set', async () => {
       const value = '<ul class="bxslider-1" style="display:none"><li>Gone</li></ul>'
-      const context = { ...baseContext, revealableSelectors: [] }
+      const context = {
+        ...baseContext,
+        revealableSelectors: [],
+      }
 
       expect(await transform(value, context)).toEqualHtml('')
     })

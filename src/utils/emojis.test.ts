@@ -147,7 +147,11 @@ describe('resolveEmojiImage', () => {
 
   it('should convert a universal code alt when the set is declared not to keep pictures', () => {
     const image = getImage('<img src="https://example.com/smilies/grin.gif" alt=":)">')
-    const match = { isStrong: true, names: mixedNames, keepsPictures: false }
+    const match = {
+      isStrong: true,
+      names: mixedNames,
+      keepsPictures: false,
+    }
 
     expect(resolveEmojiImage(image, match)).toEqual({ glyph: '🙂' })
   })

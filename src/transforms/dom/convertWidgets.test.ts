@@ -1738,7 +1738,10 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
 
     it('should resolve a relative parked url against the base url', async () => {
       const value = '<div data-video-src="/uploads/clip.mp4"></div>'
-      const context = { ...baseContext, baseUrl: 'https://forum.example/t/1' }
+      const context = {
+        ...baseContext,
+        baseUrl: 'https://forum.example/t/1',
+      }
       const expected = html`
         <div data-video-src="/uploads/clip.mp4">
           <video

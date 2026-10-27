@@ -767,7 +767,10 @@ describe('readRedditHeight', () => {
   })
 
   it('should read nothing from a message of another type', () => {
-    const value = { type: 'resize', data: 480 }
+    const value = {
+      type: 'resize',
+      data: 480,
+    }
 
     expect(readRedditHeight(value)).toBeUndefined()
   })

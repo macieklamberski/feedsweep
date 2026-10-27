@@ -66,7 +66,10 @@ describe('readIframeResizeHeight', () => {
   })
 
   it('should read nothing from a resize message posted as an object', () => {
-    const value = { context: 'iframe.resize', height: 664 }
+    const value = {
+      context: 'iframe.resize',
+      height: 664,
+    }
 
     expect(readIframeResizeHeight(value)).toBeUndefined()
   })
