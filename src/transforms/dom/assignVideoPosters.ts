@@ -3,7 +3,7 @@ import type { DomTransform, TransformContext } from '../../types.js'
 import { attr, removeWithEmptyWrappers } from '../../utils/dom.js'
 import { buildMediaKey, enclosureMarker } from '../../utils/enclosures.js'
 import { findPosterEvidence, getVideoThumbnail } from '../../utils/images.js'
-import { type CleanContext, isUsableSrc, prepareUrl } from '../../utils/urls.js'
+import { isUsableSrc, prepareUrl } from '../../utils/urls.js'
 import { updateEmbedPlaceholder } from '../../utils/widgets.js'
 
 // A player without a resolver, like JW Player, carries no data-embed-provider to match on.
@@ -24,7 +24,7 @@ const videoHostRegex = new RegExp(videoHostFragments.map(escapeRegex).join('|'),
 
 const playerSelector = '[data-embed-src], iframe[src], video'
 
-const getFileKeys = (player: Element, context: CleanContext): Array<string> => {
+const getFileKeys = (player: Element, context: TransformContext): Array<string> => {
   return [player, ...player.querySelectorAll('source')]
     .map((file) => buildMediaKey(file, context))
     .filter(Boolean)
@@ -32,7 +32,7 @@ const getFileKeys = (player: Element, context: CleanContext): Array<string> => {
 
 // An injected enclosure that repeats a body player: stripDuplicateEnclosures removes that copy
 // later, with any poster set on it.
-const findRepeats = (players: Array<Element>, context: CleanContext): Set<Element> => {
+const findRepeats = (players: Array<Element>, context: TransformContext): Set<Element> => {
   const bodyKeys = new Set(
     players
       .filter((player) => !player.hasAttribute(enclosureMarker))

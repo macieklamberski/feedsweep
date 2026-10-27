@@ -15,11 +15,6 @@ import {
 } from 'trousse'
 import type { AssetType, ResolveUrlFn, TransformContext, UrlRole } from '../types.js'
 
-// Each helper names the slice of the context it actually reads, so a caller holding only a
-// cleaner can still reach the cleaning step, and a whole context satisfies either one.
-type ResolveContext = Pick<TransformContext, 'resolveUrlFn' | 'baseUrl'>
-export type CleanContext = Pick<TransformContext, 'cleanUrlFn'>
-
 // A url read out of a query value or a JSON attribute often names no host of its own.
 export const placeholderBaseUrl = 'https://example.com'
 
@@ -322,11 +317,11 @@ export const pickUrlParams = (url: URL, names: ReadonlyArray<string>): string =>
 // Overloaded so a definite URL returns a string, with no undefined fallback needed at the call
 // site. Only a possibly-undefined input widens the result.
 type ResolveOrKeepUrl = {
-  (url: string, context: ResolveContext): string
-  (url: string | undefined, context: ResolveContext): string | undefined
+  (url: string, context: TransformContext): string
+  (url: string | undefined, context: TransformContext): string | undefined
 }
 
-export const resolveOrKeepUrl: ResolveOrKeepUrl = ((url, context: ResolveContext) => {
+export const resolveOrKeepUrl: ResolveOrKeepUrl = ((url, context: TransformContext) => {
   if (!url || absoluteUrlRegex.test(url)) {
     return url || undefined
   }
@@ -337,7 +332,7 @@ export const resolveOrKeepUrl: ResolveOrKeepUrl = ((url, context: ResolveContext
 // Untrimmed, a whitespace-only url resolves to the base url itself.
 export const resolveOrDropUrl = (
   url: string | undefined,
-  context: ResolveContext,
+  context: TransformContext,
 ): string | undefined => {
   const trimmed = url?.trim()
 
@@ -347,13 +342,13 @@ export const resolveOrDropUrl = (
 // Overloaded the same way and for the same reason as resolveOrKeepUrl: cleaning a definite url
 // answers with a definite one, so composing the two keeps whichever answer the resolve step gave.
 type CleanUrl = {
-  (url: string, context?: CleanContext): string
-  (url: string | undefined, context?: CleanContext): string | undefined
+  (url: string, context?: TransformContext): string
+  (url: string | undefined, context?: TransformContext): string | undefined
 }
 
 // Every url feedsweep hands to the caller's cleanUrlFn goes through here, repaired first. With no
 // cleaner the url stays as written, as a frame no resolver claims keeps its src.
-export const cleanUrl: CleanUrl = ((url, context?: CleanContext) => {
+export const cleanUrl: CleanUrl = ((url, context?: TransformContext) => {
   if (!url) {
     return
   }
@@ -373,12 +368,12 @@ export const cleanUrl: CleanUrl = ((url, context?: CleanContext) => {
 }) as CleanUrl
 
 type PrepareUrl = {
-  (url: string, context: ResolveContext & CleanContext): string
-  (url: string | undefined, context: ResolveContext & CleanContext): string | undefined
+  (url: string, context: TransformContext): string
+  (url: string | undefined, context: TransformContext): string | undefined
 }
 
 // Every url a result hands on: resolved against the base, then through the caller's cleanUrlFn.
-export const prepareUrl: PrepareUrl = ((url, context: ResolveContext & CleanContext) => {
+export const prepareUrl: PrepareUrl = ((url, context: TransformContext) => {
   return cleanUrl(resolveOrKeepUrl(url, context), context)
 }) as PrepareUrl
 

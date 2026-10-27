@@ -1,5 +1,5 @@
 import { stringifySrcset } from 'srcset'
-import type { DomTransform, ResolveUrlFn } from '../../types.js'
+import type { DomTransform, TransformContext } from '../../types.js'
 import { svgHrefAttribute } from '../../utils/dom.js'
 import { countSrcsetCandidates, parseSrcset } from '../../utils/images.js'
 import {
@@ -24,19 +24,14 @@ const stripSiteHostPrefix = (url: string): string => {
 
 // An absolute value other than a player or script src is left byte-identical, and a relative one
 // with no `baseUrl` resolves to nothing and stays as written.
-const resolveAttribute = (
-  element: Element,
-  attribute: string,
-  baseUrl: string | undefined,
-  resolveUrlFn: ResolveUrlFn,
-): void => {
+const resolveAttribute = (element: Element, attribute: string, context: TransformContext): void => {
   const value = element.getAttribute(attribute)
 
   if (!value) {
     return
   }
 
-  const resolved = resolveOrKeepUrl(value, { baseUrl, resolveUrlFn })
+  const resolved = resolveOrKeepUrl(value, context)
 
   if (attribute === 'src' && hostPrefixedSrcTags.includes(element.localName)) {
     const unprefixed = stripSiteHostPrefix(resolved)
@@ -48,11 +43,7 @@ const resolveAttribute = (
   element.setAttribute(attribute, resolved)
 }
 
-const resolveSrcset = (
-  element: Element,
-  baseUrl: string | undefined,
-  resolveUrlFn: ResolveUrlFn,
-): void => {
+const resolveSrcset = (element: Element, context: TransformContext): void => {
   const srcset = element.getAttribute('srcset')
 
   if (!srcset) {
@@ -69,7 +60,7 @@ const resolveSrcset = (
 
   const resolved = entries.map((entry) => ({
     ...entry,
-    url: resolveUrlFn(entry.url, baseUrl) ?? entry.url,
+    url: context.resolveUrlFn(entry.url, context.baseUrl) ?? entry.url,
   }))
 
   element.setAttribute('srcset', stringifySrcset(resolved))
@@ -109,20 +100,20 @@ const relativeAttributes: Array<RelativeAttribute> = [
 ]
 
 // A relative or protocol-relative url points nowhere once the content leaves its page.
-export const resolveRelativeUrls: DomTransform = ({ baseUrl, resolveUrlFn }) => {
+export const resolveRelativeUrls: DomTransform = (context) => {
   // Bailing out without a baseUrl leaves protocol-relative urls without a scheme.
   return (document) => {
     for (const { selector, attribute, srcset } of relativeAttributes) {
       for (const element of document.querySelectorAll(selector)) {
         if (srcset) {
-          resolveSrcset(element, baseUrl, resolveUrlFn)
+          resolveSrcset(element, context)
 
           continue
         }
 
         const name = typeof attribute === 'string' ? attribute : attribute(element)
 
-        resolveAttribute(element, name, baseUrl, resolveUrlFn)
+        resolveAttribute(element, name, context)
       }
     }
   }
