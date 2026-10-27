@@ -48,7 +48,7 @@ const isTweetUrl = (url: URL, hosts: string | ReadonlyArray<string>): boolean =>
 
 // `/{handle}/status/{id}`, with the plural `statuses` form from the earliest era. The id is its
 // digit run: feeds cut the query into it, as in `{id}_src=twsrc%5Etfw`, and the tweet still plays.
-const statusPathRegex = /^\/([a-zA-Z0-9_]+)\/status(?:es)?\/(\d+)/i
+const statusPathRegex = /^\/(?<handle>[a-zA-Z0-9_]+)\/status(?:es)?\/(?<id>\d+)/i
 
 // The paths that name a status and carry no handle: the web client's permalink, the 2015-2017
 // video frames, and the card frame before them. The frames are dead, answering 404 or a stub
@@ -67,10 +67,10 @@ const readStatusUrl = (parsed: URL | undefined): Status | undefined => {
     return
   }
 
-  const match = parsed.pathname.match(statusPathRegex)
+  const status = parsed.pathname.match(statusPathRegex)?.groups
 
-  if (match) {
-    return { handle: match[1], id: match[2] }
+  if (status) {
+    return { handle: status.handle, id: status.id }
   }
 
   const handleless = parsed.pathname.match(handlelessPathRegex)

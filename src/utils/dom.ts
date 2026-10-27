@@ -512,7 +512,7 @@ export const getElementDimensions = (element: Element): { width?: number; height
 const maxWrapperAncestorDepth = 3
 const paddingPercentRegex = /^([\d.]+)%$/
 const whitespaceRegex = /\s+/
-const wpEmbedAspectRegex = /wp-embed-aspect-(\d+)-(\d+)/
+const wpEmbedAspectRegex = /wp-embed-aspect-(?<width>\d+)-(?<height>\d+)/
 
 // Some embed wrappers write the hack as `padding: 0 0 56.25%` or `padding: 56.25% 0 0 0`, where
 // only the three and four value forms give the top and the bottom values of their own.
@@ -550,13 +550,13 @@ const elementRatioSources: Array<(element: Element) => string | undefined> = [
   // WordPress responsive embeds carry the ratio as a class (`wp-embed-aspect-16-9`),
   // styled by an external stylesheet feedsweep never sees. The class itself encodes it.
   (element) => {
-    const match = wpEmbedAspectRegex.exec(element.getAttribute('class') ?? '')
+    const aspect = wpEmbedAspectRegex.exec(element.getAttribute('class') ?? '')?.groups
 
-    if (!match) {
+    if (!aspect) {
       return
     }
 
-    return parseRatio(`${match[1]}:${match[2]}`)
+    return parseRatio(`${aspect.width}:${aspect.height}`)
   },
 
   // The legacy inline padding hack (`padding-bottom:56.25%`): the percent is the
@@ -691,23 +691,23 @@ export const getStylePairRatio = (element: Element): string | undefined => {
 }
 
 const ratioRegexes = [
-  /^\s*(\d+(?:\.\d+)?)\s*:\s*(\d+(?:\.\d+)?)\s*$/, // 16:9, 690 : 362
-  /^\s*(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)\s*$/, // 100/56, 690 / 362
-  /^\s*([\d.]+)\s*$/, // 1.77777777777778, 1.5
+  /^\s*(?<width>\d+(?:\.\d+)?)\s*:\s*(?<height>\d+(?:\.\d+)?)\s*$/, // 16:9, 690 : 362
+  /^\s*(?<width>\d+(?:\.\d+)?)\s*\/\s*(?<height>\d+(?:\.\d+)?)\s*$/, // 100/56, 690 / 362
+  /^\s*(?<width>[\d.]+)\s*$/, // 1.77777777777778, 1.5
 ]
 
 // The one string-ratio grammar: a colon or slash width:height pair, or a bare decimal
 // (a pair with an implied height of 1), returned in the `W/H` spelling.
 export const parseRatio = (value: string): string | undefined => {
   for (const regex of ratioRegexes) {
-    const match = value.match(regex)
+    const ratio = value.match(regex)?.groups
 
-    if (!match) {
+    if (!ratio) {
       continue
     }
 
-    const width = Number(match[1])
-    const height = match[2] === undefined ? 1 : Number(match[2])
+    const width = Number(ratio.width)
+    const height = ratio.height === undefined ? 1 : Number(ratio.height)
 
     if (Number.isFinite(width) && width > 0 && height > 0) {
       return formatRatio(width, height)

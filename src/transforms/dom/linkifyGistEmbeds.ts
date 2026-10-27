@@ -6,7 +6,7 @@ import { createLink } from '../../utils/widgets.js'
 
 const hosts = ['gist.github.com']
 
-const gistScriptRegex = /gist\.github\.com\/(?:([^/?"]+)\/)?([^/?"#]+)\.js/i
+const gistScriptRegex = /gist\.github\.com\/(?:(?<user>[^/?"]+)\/)?(?<id>[^/?"#]+)\.js/i
 const jsonSuffixRegex = /\.json$/i
 const gistIdRegex = /^(?:\d+|[0-9a-f]{20}|[0-9a-f]{32})$/i
 const combiningMarkRegex = /[\u0300-\u036f]/g // Combining diacritical marks
@@ -66,13 +66,13 @@ const readGistPath = (element: Element): string | undefined => {
   }
 
   const src = element.getAttribute('src')
-  const match = src?.match(gistScriptRegex)
+  const script = src?.match(gistScriptRegex)?.groups
 
-  if (!parseUrlOnHosts(src, hosts) || !match) {
+  if (!parseUrlOnHosts(src, hosts) || !script) {
     return
   }
 
-  return match[1] ? `${match[1]}/${match[2]}` : match[2]
+  return script.user ? `${script.user}/${script.id}` : script.id
 }
 
 // GitHub's anchor for one file on the gist page, such as `#file-reduce-kt` for `reduce.kt`.

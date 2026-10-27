@@ -12,7 +12,7 @@ import {
 const provider = 'telegram'
 
 // A channel name and a message id, the pair the widget spells channel/111424.
-const postRegex = /^([A-Za-z0-9_]+)\/(\d+)$/
+const postRegex = /^(?<channel>[A-Za-z0-9_]+)\/(?<messageId>\d+)$/
 
 // The t.me routes that take a numeric second segment and name no post: `c/{id}` is a private
 // channel and `s/{channel}` the channel preview.
@@ -35,13 +35,13 @@ const composePost = (channel: string, messageId: string): EmbedResolverResult =>
 
 // A forum channel writes a third segment for the topic, and that shape is not read.
 const readPost = (value: string | undefined): EmbedResolverResult | undefined => {
-  const match = postRegex.exec(value ?? '')
+  const post = postRegex.exec(value ?? '')?.groups
 
-  if (!match?.[1] || !match[2] || isAnyOf(match[1], reservedRoutes)) {
+  if (!post?.channel || !post.messageId || isAnyOf(post.channel, reservedRoutes)) {
     return
   }
 
-  return composePost(match[1], match[2])
+  return composePost(post.channel, post.messageId)
 }
 
 // The attribute holds only the `{channel}/{id}` pair, so no route word can stand in either half.

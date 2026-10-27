@@ -15,7 +15,7 @@ const kinds: Array<Kind> = ['audio', 'video']
 
 // The asset is {id}_{locale}_{audios|videos}, in the swf query or path on v2 and the flashvars
 // on 4.x. The locale says nothing about the asset.
-const flashAssetRegex = /^([^_]+)_[^_]+_(audios|videos)$/i
+const flashAssetRegex = /^(?<id>[^_]+)_[^_]+_(?<kind>audios|videos)$/i
 
 const flashPlayerPathRegex = /^\/swf\/.*\.swf$/i
 const flashEmbedPathRegex = /^\/swf\/v2\/embed\/([^/]+)\/RTVEPlayer\.swf$/i
@@ -90,18 +90,18 @@ const rtveFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
     getQueryParam(url.searchParams, 'assetID') ??
     flashVar(element, 'assetID') ??
     url.pathname.match(flashEmbedPathRegex)?.[1]
-  const match = asset?.match(flashAssetRegex)
+  const parts = asset?.match(flashAssetRegex)?.groups
 
-  if (!match) {
+  if (!parts) {
     return
   }
 
   // The 4.x snippet writes the asset's page link as the object's fallback, named after it.
   const title = text(element?.closest('object'), ':scope > a')
 
-  const kind = isAnyOf(match[2], 'audios') ? 'audio' : 'video'
+  const kind = isAnyOf(parts.kind, 'audios') ? 'audio' : 'video'
 
-  return { ...composeEmbed(kind, encodePathSegment(match[1])), title }
+  return { ...composeEmbed(kind, encodePathSegment(parts.id)), title }
 }
 
 // RTVE's retired Flash player under /swf/, which names its asset as {id}_es_{audios|videos}.

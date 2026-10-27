@@ -14,7 +14,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const provider = 'bandcamp'
 
 // A release is either an album or a single track.
-const releaseRegex = /^(album|track)=([^/]+)$/i
+const releaseRegex = /^(?<kind>album|track)=(?<id>[^/]+)$/i
 // An exclusive embed names its tracks with a signature. One track is the track the player plays.
 const signedTrackRegex = /^tracks=([^/,]+)$/i
 // The track number an album player opens on: `album=2182110545/t=38/` plays track 38.
@@ -44,11 +44,11 @@ const readReleases = (url: URL): Array<[string, string]> => {
   }
 
   for (const segment of getPathSegments(url)) {
-    const match = releaseRegex.exec(segment)
+    const release = releaseRegex.exec(segment)?.groups
 
     // A path value is decoded, like a query one, so the player url encodes it once.
-    if (match) {
-      claim(match[1].toLowerCase(), decodeSegment(match[2]) ?? match[2])
+    if (release) {
+      claim(release.kind.toLowerCase(), decodeSegment(release.id) ?? release.id)
     }
 
     const signed = signedTrackRegex.exec(segment)

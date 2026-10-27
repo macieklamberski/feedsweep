@@ -19,7 +19,7 @@ const episodeScriptPathRegex = /^\/(\d+)\/(?:episodes\/)?(\d+)(?:-[^/]*)?\.js$/i
 const showScriptPathRegex = /^\/(\d+)\.js$/i
 // /{podcast}/{episode}-{slug} with or without episodes/, the slug dot-free to keep .mp3 out.
 // The episode audio is `buzzsprout.com/{podcast}/{episode}-{slug}.mp3` on the same host.
-const episodePagePathRegex = /^\/(\d+)\/(?:episodes\/)?(\d+)(?:-[^/.]*)?$/i
+const episodePagePathRegex = /^\/(?<show>\d+)\/(?:episodes\/)?(?<episode>\d+)(?:-[^/.]*)?$/i
 
 // Both heights are what Buzzsprout's own script writes onto the iframe it builds: 200 for the
 // small episode player, 375 for the large show player (read from the served script, 2026-08-15).
@@ -52,14 +52,14 @@ const composeEmbed = (
 
 // Buzzsprout's player iframe, whose title names the episode.
 export const buzzsproutResolveEmbed: ResolveUrlEmbed = (url, element) => {
-  const match = url.pathname.match(episodePagePathRegex)
+  const page = url.pathname.match(episodePagePathRegex)?.groups
 
-  if (!match) {
+  if (!page) {
     return
   }
 
   const title = attr(element, 'title')
-  const result = composeEmbed(match[1], match[2])
+  const result = composeEmbed(page.show, page.episode)
 
   return title ? { ...result, title } : result
 }

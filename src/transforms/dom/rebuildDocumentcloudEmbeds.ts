@@ -2,7 +2,7 @@ import { composeLoaderViewerUrl } from '../../embeds/documentcloud.js'
 import type { DomTransform } from '../../types.js'
 import { createIframe } from '../../utils/widgets.js'
 
-const loadCallRegex = /DV\.load\((['"])(.+?)\1/g
+const loadCallRegex = /DV\.load\((?<quote>['"])(?<id>.+?)\k<quote>/g
 
 // DocumentCloud's old viewer snippet: an inline `DV.load` call naming the document, which only
 // the loader script turns into a frame, so the feed shows nothing where the document was.
@@ -11,7 +11,7 @@ export const rebuildDocumentcloudEmbeds: DomTransform = () => (document) => {
     const frames: Array<Element> = []
 
     for (const match of (script.textContent ?? '').matchAll(loadCallRegex)) {
-      const url = composeLoaderViewerUrl(match[2])
+      const url = composeLoaderViewerUrl(match.groups?.id)
 
       if (url) {
         frames.push(createIframe(document, url))
