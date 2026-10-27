@@ -233,11 +233,11 @@ describeForEachParser('wrapOrphanFigcaptions through the pipeline', (parseHtml) 
       </figure>
     `
 
-    expect(
-      await transformContent(value, {
-        parseHtmlFn: parseHtml,
-        baseUrl: 'https://www.kolide.com/blog/post',
-      }),
-    ).toEqualHtml(expected)
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://www.kolide.com/blog/post',
+    })
+
+    expect(result).toEqualHtml(expected)
   })
 })

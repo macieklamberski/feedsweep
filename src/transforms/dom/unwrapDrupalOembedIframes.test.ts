@@ -246,11 +246,11 @@ describeForEachParser('unwrapDrupalOembedIframes through the pipeline', (parseHt
     `
     const expected = html`<iframe src="about:blank"></iframe>`
 
-    expect(
-      await transformContent(value, {
-        parseHtmlFn: parseHtml,
-        baseUrl: 'https://example.com/post',
-      }),
-    ).toEqualHtml(expected)
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+
+    expect(result).toEqualHtml(expected)
   })
 })

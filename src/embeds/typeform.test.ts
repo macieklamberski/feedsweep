@@ -318,12 +318,12 @@ describeForEachParser('typeform through the pipeline', (parseHtml) => {
       <p>After</p>
     `
 
-    expect(
-      await transformContent(value, {
-        parseHtmlFn: parseHtml,
-        baseUrl: 'https://example.com/post',
-      }),
-    ).toEqualHtml(expected)
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+
+    expect(result).toEqualHtml(expected)
   })
 
   it('should take the player from enrichment', async () => {
@@ -337,18 +337,18 @@ describeForEachParser('typeform through the pipeline', (parseHtml) => {
       ></div>
     `
 
-    expect(
-      await transformContent(value, {
-        parseHtmlFn: parseHtml,
-        baseUrl: 'https://example.com/post',
-        enrichEmbedFn: (embeds) => {
-          return embeds.map(() => ({
-            src: 'https://form.typeform.com/to/bd3tQuXe',
-            url: 'https://form.typeform.com/to/bd3tQuXe',
-          }))
-        },
-      }),
-    ).toEqualHtml(expected)
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enrichEmbedFn: (embeds) => {
+        return embeds.map(() => ({
+          src: 'https://form.typeform.com/to/bd3tQuXe',
+          url: 'https://form.typeform.com/to/bd3tQuXe',
+        }))
+      },
+    })
+
+    expect(result).toEqualHtml(expected)
   })
 
   it('should leave an audio enclosure on the typeform host playable', async () => {
@@ -359,13 +359,13 @@ describeForEachParser('typeform through the pipeline', (parseHtml) => {
       <p>Body</p>
     `
 
-    expect(
-      await transformContent('<p>Body</p>', {
-        parseHtmlFn: parseHtml,
-        baseUrl: 'https://example.com/post',
-        enclosures,
-      }),
-    ).toEqualHtml(expected)
+    const result = await transformContent('<p>Body</p>', {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
+
+    expect(result).toEqualHtml(expected)
   })
 })
 

@@ -255,12 +255,12 @@ describeForEachParser('tencent through the pipeline', (parseHtml) => {
       <p>Body</p>
     `
 
-    expect(
-      await transformContent('<p>Body</p>', {
-        parseHtmlFn: parseHtml,
-        baseUrl: 'https://example.com/post',
-        enclosures,
-      }),
-    ).toEqualHtml(expected)
+    const result = await transformContent('<p>Body</p>', {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      enclosures,
+    })
+
+    expect(result).toEqualHtml(expected)
   })
 })
