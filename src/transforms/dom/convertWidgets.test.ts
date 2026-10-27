@@ -674,6 +674,20 @@ describeForEachParser('convertWidgets', (parseHtml) => {
       expect(await transform(value, context)).toEqualHtml(expected)
     })
 
+    it('should hand the cleaner an unclaimed frame src as written', async () => {
+      const context: TransformContext = {
+        ...withNoResolvers,
+        cleanUrlFn: (url) => url,
+      }
+      const value =
+        '<iframe src="https://widget.example.com/embed/search=a&amp;sort=-created"></iframe>'
+      const expected = html`
+        <div data-embed-src="https://widget.example.com/embed/search=a&amp;sort=-created"></div>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
     it('should clean a non-iframe carrier src with the provided cleanUrlFn', async () => {
       const context: TransformContext = {
         ...withNoResolvers,

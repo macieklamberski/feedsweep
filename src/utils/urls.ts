@@ -346,18 +346,12 @@ type CleanUrl = {
   (url: string | undefined, context?: TransformContext): string | undefined
 }
 
-// Every url feedsweep hands to the caller's cleanUrlFn goes through here, repaired first. With no
-// cleaner the url stays as written, as a frame no resolver claims keeps its src.
-export const cleanUrl: CleanUrl = ((url, context?: TransformContext) => {
-  if (!url) {
-    return
-  }
-
+const applyCleaner = (url: string, isRepaired: boolean, context?: TransformContext): string => {
   if (!context?.cleanUrlFn) {
     return url
   }
 
-  const cleaned = context.cleanUrlFn(repairUrl(url))
+  const cleaned = context.cleanUrlFn(isRepaired ? repairUrl(url) : url)
 
   // An empty cleaned url keeps the input url.
   if (!cleaned) {
@@ -365,6 +359,28 @@ export const cleanUrl: CleanUrl = ((url, context?: TransformContext) => {
   }
 
   return cleaned
+}
+
+// Every url feedsweep hands to the caller's cleanUrlFn goes through here, repaired first. With no
+// cleaner the url stays as written, as a frame no resolver claims keeps its src.
+export const cleanUrl: CleanUrl = ((url, context?: TransformContext) => {
+  if (!url) {
+    return
+  }
+
+  return applyCleaner(url, true, context)
+}) as CleanUrl
+
+// The src of a frame no resolver claims reaches the cleaner as written. The repairs read a url's
+// grammar the way the platforms a resolver knows write it, and on a host nobody checked an `&` or
+// a `?` can be load-bearing: a stray `?` in a Google Docs url answers 200 as written and 400
+// repaired.
+export const cleanUnclaimedUrl: CleanUrl = ((url, context?: TransformContext) => {
+  if (!url) {
+    return
+  }
+
+  return applyCleaner(url, false, context)
 }) as CleanUrl
 
 type PrepareUrl = {
