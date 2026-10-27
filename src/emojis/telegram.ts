@@ -53,7 +53,11 @@ export const telegramElementEmojiResolver: EmojiResolver = {
     const content = text(element)
 
     if (content) {
-      return isEmojiShaped(content) ? { glyph: content } : undefined
+      if (!isEmojiShaped(content)) {
+        return
+      }
+
+      return { glyph: content }
     }
 
     const url = bgImage(element)

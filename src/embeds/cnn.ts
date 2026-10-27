@@ -19,7 +19,11 @@ const videoDateRegex = /\/(\d{4})\/(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])\/[^/]+
 const readDate = (id: string): string | undefined => {
   const parts = videoDateRegex.exec(id)
 
-  return parts ? `${parts[1]}-${parts[2]}-${parts[3]}` : undefined
+  if (!parts) {
+    return
+  }
+
+  return `${parts[1]}-${parts[2]}-${parts[3]}`
 }
 
 const hosts = ['cnn.com', 'cnn.io']
@@ -53,7 +57,11 @@ const videoPrefixRegex = /^\/?video\//i
 const resolveVideoId = (value: Nullish<string>): EmbedResolverResult | undefined => {
   const id = value?.replace(videoPrefixRegex, '')
 
-  return id && videoIdRegex.test(id) ? composeEmbed(id) : undefined
+  if (!id || !videoIdRegex.test(id)) {
+    return
+  }
+
+  return composeEmbed(id)
 }
 
 const resolveTarget = (url: URL): EmbedResolverResult | undefined => {

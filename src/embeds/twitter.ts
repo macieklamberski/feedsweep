@@ -75,7 +75,14 @@ const readStatusUrl = (parsed: URL | undefined): Status | undefined => {
 
   const handleless = parsed.pathname.match(handlelessPathRegex)
 
-  return handleless ? { handle: handleStandIn, id: handleless[1] } : undefined
+  if (!handleless) {
+    return
+  }
+
+  return {
+    handle: handleStandIn,
+    id: handleless[1],
+  }
 }
 
 // Where the tweet is named, in the order the shapes provide it. The dated anchor is the usual
@@ -107,7 +114,11 @@ const findStatus = (element: Element): { status: Status; anchor?: Element } | un
   // A status id is digits, the same alphabet the status path takes.
   const id = keepIfMatches(declared, digitsRegex)
 
-  return id ? { status: { handle: '', id } } : undefined
+  if (!id) {
+    return
+  }
+
+  return { status: { handle: '', id } }
 }
 
 // The handle in the status url. The byline and the dated anchor are display text the embed
@@ -227,7 +238,11 @@ const readPhotoUrl = (photos: SubstackTweetAttrs['photos']): string | undefined 
   const parsed = parseUrl(url, placeholderBaseUrl)
 
   // A query carries a signature or an expiry, and a stored url with one stops resolving.
-  return parsed?.search === '' ? url : undefined
+  if (parsed?.search !== '') {
+    return
+  }
+
+  return url
 }
 
 const readSubstackAuthor = (attrs: SubstackTweetAttrs): string | undefined => {
@@ -295,7 +310,11 @@ export const twitterResolveEmbed: ResolveUrlEmbed = (url) => {
 
   const status = readStatusUrl(url)
 
-  return status ? composeEmbed(status, { author: readAuthor(status) }) : undefined
+  if (!status) {
+    return
+  }
+
+  return composeEmbed(status, { author: readAuthor(status) })
 }
 
 // A Twitter player iframe, or a frame of the status page, which refuses framing.
@@ -319,7 +338,11 @@ export const readTwitterHeight = (data: unknown): number | undefined => {
       ? call.params[0]
       : undefined
 
-  return isPlainObject(params) ? readPixels(params.height) : undefined
+  if (!isPlainObject(params)) {
+    return
+  }
+
+  return readPixels(params.height)
 }
 
 export const twitterRenderHint: EmbedRenderHint = {

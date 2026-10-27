@@ -88,7 +88,11 @@ const readPathPair = (url: URL | undefined): [string, string] | undefined => {
   const owned = isAnyOf(userOrType, 'user') ? named.slice(2) : named
   const [type, id] = owned
 
-  return type && id ? [type, id] : undefined
+  if (!type || !id) {
+    return
+  }
+
+  return [type, id]
 }
 
 // Spotify's player iframe, in the modern path form and the pre-2017 embed.spotify.com/?uri= form.

@@ -34,7 +34,11 @@ const readVideoId = (url: URL, element?: Element): string | undefined => {
   const flashId = getQueryParam(url.searchParams, 'vID') ?? flashVar(element, 'vID')
 
   // The Flash id comes out of its query or flashvars decoded, and it goes into a path.
-  return flashId ? encodePathSegment(flashId) : undefined
+  if (!flashId) {
+    return
+  }
+
+  return encodePathSegment(flashId)
 }
 
 // An Indavideo player: the iframe on indavideo.hu or embed.indavideo.hu, or the retired Flash

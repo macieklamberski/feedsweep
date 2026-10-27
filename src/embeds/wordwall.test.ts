@@ -72,19 +72,22 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the wordwall path', async () => {
-      const value = html`<iframe src="https://evil.test/embed/d4e3c25ffe7545a19a8b0cd802f68f4d"></iframe>`
+      const value =
+        '<iframe src="https://evil.test/embed/d4e3c25ffe7545a19a8b0cd802f68f4d"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore the image cdn host carrying the player path', async () => {
-      const value = html`<iframe src="https://screens.cdn.wordwall.net/embed/play/65121/614/434"></iframe>`
+      const value =
+        '<iframe src="https://screens.cdn.wordwall.net/embed/play/65121/614/434"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should read the id before a query glued on with an ampersand', async () => {
-      const value = html`<iframe src="https://wordwall.net/embed/d4e3c25ffe7545a19a8b0cd802f68f4d&a=1"></iframe>`
+      const value =
+        '<iframe src="https://wordwall.net/embed/d4e3c25ffe7545a19a8b0cd802f68f4d&a=1"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'wordwall',
         id: 'd4e3c25ffe7545a19a8b0cd802f68f4d',
@@ -96,43 +99,48 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a locale carrying a query separator', async () => {
-      const value = html`<iframe src="https://wordwall.net/es&x=b/embed/d4e3c25ffe7545a19a8b0cd802f68f4d"></iframe>`
+      const value =
+        '<iframe src="https://wordwall.net/es&x=b/embed/d4e3c25ffe7545a19a8b0cd802f68f4d"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore a locale region carrying a query separator', async () => {
-      const value = html`<iframe src="https://wordwall.net/es-mx&x=b/embed/d4e3c25ffe7545a19a8b0cd802f68f4d"></iframe>`
+      const value =
+        '<iframe src="https://wordwall.net/es-mx&x=b/embed/d4e3c25ffe7545a19a8b0cd802f68f4d"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore a wordwall url outside the embed route', async () => {
-      const value = html`<iframe src="https://wordwall.net/play/d4e3c25ffe7545a19a8b0cd802f68f4d"></iframe>`
+      const value =
+        '<iframe src="https://wordwall.net/play/d4e3c25ffe7545a19a8b0cd802f68f4d"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore a numeric id under a locale prefix outside the embed route', async () => {
-      const value = html`<iframe src="https://wordwall.net/es/resource/3251143/english/what-are-they-doing-now"></iframe>`
+      const value =
+        '<iframe src="https://wordwall.net/es/resource/3251143/english/what-are-they-doing-now"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore a locale prefix that is not a language code', async () => {
-      const value = html`<iframe src="https://wordwall.net/e5s/embed/d4e3c25ffe7545a19a8b0cd802f68f4d"></iframe>`
+      const value =
+        '<iframe src="https://wordwall.net/e5s/embed/d4e3c25ffe7545a19a8b0cd802f68f4d"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore an id segment with a non-hex letter inside it', async () => {
-      const value = html`<iframe src="https://wordwall.net/embed/deadzone"></iframe>`
+      const value = '<iframe src="https://wordwall.net/embed/deadzone"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore an embed route naming no activity id', async () => {
-      const value = html`<iframe src="https://wordwall.net/embed/preview"></iframe>`
+      const value = '<iframe src="https://wordwall.net/embed/preview"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -153,7 +161,8 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
     })
 
     it('should state no size and no thumbnail of its own', async () => {
-      const value = html`<iframe src="https://wordwall.net/embed/d4e3c25ffe7545a19a8b0cd802f68f4d"></iframe>`
+      const value =
+        '<iframe src="https://wordwall.net/embed/d4e3c25ffe7545a19a8b0cd802f68f4d"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'wordwall',
         id: 'd4e3c25ffe7545a19a8b0cd802f68f4d',
@@ -165,7 +174,7 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
     })
 
     it('should mint the www spelling onto the bare page host', async () => {
-      const value = html`<iframe src="https://www.wordwall.net/embed/play/65121/614/434"></iframe>`
+      const value = '<iframe src="https://www.wordwall.net/embed/play/65121/614/434"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'wordwall',
         id: 'play/65121/614/434',
@@ -217,13 +226,13 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a play route missing its check number', async () => {
-      const value = html`<iframe src="https://wordwall.net/embed/play/65121/614"></iframe>`
+      const value = '<iframe src="https://wordwall.net/embed/play/65121/614"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should use a malformed check number as written, even if the player answers an error', async () => {
-      const value = html`<iframe src="https://wordwall.net/embed/play/65121/614/x434"></iframe>`
+      const value = '<iframe src="https://wordwall.net/embed/play/65121/614/x434"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'wordwall',
         id: 'play/65121/614/x434',
@@ -235,13 +244,13 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a play route outside the embed route', async () => {
-      const value = html`<iframe src="https://wordwall.net/de/play/65121/614/434"></iframe>`
+      const value = '<iframe src="https://wordwall.net/de/play/65121/614/434"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore a locale prefix, which the play route does not serve', async () => {
-      const value = html`<iframe src="https://wordwall.net/de/embed/play/65121/614/434"></iframe>`
+      const value = '<iframe src="https://wordwall.net/de/embed/play/65121/614/434"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

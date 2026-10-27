@@ -157,7 +157,8 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
     })
 
     it('should keep the privacy code of a private route in the src and mint no page or thumbnail', async () => {
-      const value = html`<iframe src="https://ridewithgps.com/embeds?type=route&id=34497677&privacyCode=Kq7WdN2hPzVmT4rY"></iframe>`
+      const value =
+        '<iframe src="https://ridewithgps.com/embeds?type=route&id=34497677&privacyCode=Kq7WdN2hPzVmT4rY"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'ridewithgps',
         id: 'route/34497677',
@@ -169,7 +170,8 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
     })
 
     it('should read the title of a private route and keep only its privacy code in the src', async () => {
-      const value = html`<iframe src="https://ridewithgps.com/embeds?type=route&id=34497677&title=Loop&privacyCode=Kq7WdN2hPzVmT4rY"></iframe>`
+      const value =
+        '<iframe src="https://ridewithgps.com/embeds?type=route&id=34497677&title=Loop&privacyCode=Kq7WdN2hPzVmT4rY"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'ridewithgps',
         id: 'route/34497677',

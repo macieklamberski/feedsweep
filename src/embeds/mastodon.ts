@@ -72,7 +72,11 @@ export const mastodonEmbedResolver = createMarkupEmbedResolver(
       .map((link) => (link ? parseMastodonStatus(link) : undefined))
       .find(Boolean)
 
-    return status ? composeEmbedResult(status) : undefined
+    if (!status) {
+      return
+    }
+
+    return composeEmbedResult(status)
   },
 )
 
@@ -80,7 +84,11 @@ export const mastodonEmbedResolver = createMarkupEmbedResolver(
 // loaded and it answers with the same type and the rendered height. The frame is served by the
 // publisher's instance, so it has no origin to name here and the reader matches the frame's own.
 export const readMastodonHeight = (data: unknown): number | undefined => {
-  return isPlainObject(data) && data.type === 'setHeight' ? readPixels(data.height) : undefined
+  if (!isPlainObject(data) || data.type !== 'setHeight') {
+    return
+  }
+
+  return readPixels(data.height)
 }
 
 export const mastodonRenderHint: EmbedRenderHint = {

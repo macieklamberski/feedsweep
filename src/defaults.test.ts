@@ -130,9 +130,9 @@ describe('defaultEmbedRenderHints', () => {
   it.each(defaultEmbedRenderHints)(
     'should give $provider something a reader can act on',
     (hint) => {
-      expect(
-        hint.params ?? hint.autoplayParams ?? hint.requestPlay ?? hint.readHeight,
-      ).toBeDefined()
+      const action = hint.params ?? hint.autoplayParams ?? hint.requestPlay ?? hint.readHeight
+
+      expect(action).toBeDefined()
     },
   )
 

@@ -349,9 +349,9 @@ describeForEachParser('wrapBareInlineInParagraphs', (parseHtml) => {
       marker?.replaceWith(block)
       const expected = '<plaintext>Inner text</plaintext>'
 
-      expect(
-        await applyDomTransforms(document, [wrapBareInlineInParagraphs(baseContext)]),
-      ).toEqualHtml(expected)
+      const result = await applyDomTransforms(document, [wrapBareInlineInParagraphs(baseContext)])
+
+      expect(result).toEqualHtml(expected)
     })
   })
 

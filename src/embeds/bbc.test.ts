@@ -130,6 +130,12 @@ describe('bbcResolveEmbed', () => {
       expect(bbcResolveEmbed(new URL(value))).toBeUndefined()
     })
 
+    it('should return undefined for a redirected news player naming no pid', () => {
+      const value = 'https://www.bbc.com/news/av-embeds/46292361/vpid/'
+
+      expect(bbcResolveEmbed(new URL(value))).toBeUndefined()
+    })
+
     it('should return undefined for a pid opening on a percent sign', () => {
       const value = 'https://www.bbc.com/news/av/embed/%06sf6tr/46292361'
 

@@ -91,7 +91,11 @@ const resolveTarget = (url: URL, element?: Element): EmbedResolverResult | undef
     )?.pathname
     const par = parPath?.match(flashParPathRegex)
 
-    return par ? composeSubject(`${par[1]}/${par[2]}`) : undefined
+    if (!par) {
+      return
+    }
+
+    return composeSubject(`${par[1]}/${par[2]}`)
   }
 
   const videoId = parsed.pathname.match(numericPathRegex)?.[1]
@@ -108,7 +112,11 @@ const resolveTarget = (url: URL, element?: Element): EmbedResolverResult | undef
 
   const modern = parsed.pathname.match(modernPathRegex)
 
-  return modern ? composeSubject(modern.slice(1).join('/')) : undefined
+  if (!modern) {
+    return
+  }
+
+  return composeSubject(modern.slice(1).join('/'))
 }
 
 const readPreviewVideoId = (thumbnail: string | undefined): string | undefined => {

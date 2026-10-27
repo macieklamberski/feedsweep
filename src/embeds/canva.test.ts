@@ -224,7 +224,8 @@ describeForEachParser('canvaIframeEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore the design route on a canva.com subdomain', async () => {
-      const value = html`<iframe src="https://document-export.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view?embed"></iframe>`
+      const value =
+        '<iframe src="https://document-export.canva.com/design/DAHLowacSd4/Iib_p9ZXNzXpiYJosyMbIw/view?embed"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

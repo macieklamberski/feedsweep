@@ -1145,25 +1145,25 @@ describeForEachParser('tiktokIframeEmbedResolver', (parseHtml) => {
     // The host is TikTok's and the resolver now reads more than the player path, so every
     // shape that is not a clip has to be refused by name rather than by the host gate.
     it('should return undefined for a profile page framed directly', async () => {
-      const value = html`<iframe src="https://www.tiktok.com/@user"></iframe>`
+      const value = '<iframe src="https://www.tiktok.com/@user"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should return undefined for a hashtag page', async () => {
-      const value = html`<iframe src="https://www.tiktok.com/tag/dance"></iframe>`
+      const value = '<iframe src="https://www.tiktok.com/tag/dance"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should return undefined for a search page', async () => {
-      const value = html`<iframe src="https://www.tiktok.com/search?q=dance"></iframe>`
+      const value = '<iframe src="https://www.tiktok.com/search?q=dance"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should return undefined for the site root', async () => {
-      const value = html`<iframe src="https://www.tiktok.com/"></iframe>`
+      const value = '<iframe src="https://www.tiktok.com/"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

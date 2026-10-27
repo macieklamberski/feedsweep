@@ -74,15 +74,15 @@ describe('airtableResolveEmbed', () => {
 
   describe('sad paths', () => {
     it('should ignore a route word that is not the embed route', () => {
-      expect(
-        airtableResolveEmbed(new URL('https://airtable.com/frame/shrIBFxXbBGxNv8at')),
-      ).toBeUndefined()
+      const value = 'https://airtable.com/frame/shrIBFxXbBGxNv8at'
+
+      expect(airtableResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the embed route below a leading segment', () => {
-      expect(
-        airtableResolveEmbed(new URL('https://airtable.com/x/embed/shrIBFxXbBGxNv8at')),
-      ).toBeUndefined()
+      const value = 'https://airtable.com/x/embed/shrIBFxXbBGxNv8at'
+
+      expect(airtableResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore the embed route naming no share', () => {
@@ -120,15 +120,15 @@ describe('airtableResolveEmbed', () => {
     })
 
     it('should ignore a bare base, which names no share', () => {
-      expect(
-        airtableResolveEmbed(new URL('https://airtable.com/embed/appmHSMnV4Q1S4cWh')),
-      ).toBeUndefined()
+      const value = 'https://airtable.com/embed/appmHSMnV4Q1S4cWh'
+
+      expect(airtableResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a share id in upper case, which the server answers 404', () => {
-      expect(
-        airtableResolveEmbed(new URL('https://airtable.com/embed/SHRIBFxXbBGxNv8at')),
-      ).toBeUndefined()
+      const value = 'https://airtable.com/embed/SHRIBFxXbBGxNv8at'
+
+      expect(airtableResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a share under a segment that is not a base', () => {
@@ -263,13 +263,14 @@ describeForEachParser('airtableEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a foreign host carrying the same path', async () => {
-      const value = html`<iframe src="https://evil.test/embed/appmHSMnV4Q1S4cWh/shrMnUTYyzmsdX8JT"></iframe>`
+      const value =
+        '<iframe src="https://evil.test/embed/appmHSMnV4Q1S4cWh/shrMnUTYyzmsdX8JT"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore the static subdomain, which serves files', async () => {
-      const value = html`<iframe src="https://static.airtable.com/embed/shrIBFxXbBGxNv8at"></iframe>`
+      const value = '<iframe src="https://static.airtable.com/embed/shrIBFxXbBGxNv8at"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

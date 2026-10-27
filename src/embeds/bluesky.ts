@@ -168,7 +168,11 @@ const readAuthor = (anchor: Element): string | undefined => {
   const author = label.replace(authorSeparatorRegex, '').trim()
 
   // Every footer names the handle, so a run with no `@` in it is body text.
-  return author.includes('@') ? author : undefined
+  if (!author.includes('@')) {
+    return
+  }
+
+  return author
 }
 
 const readPostText = (element: Element, postAnchor: Element | undefined): string | undefined => {

@@ -119,9 +119,9 @@ describe('codesandboxResolveEmbed', () => {
     })
 
     it('should ignore the running preview a sandbox serves on its own subdomain', () => {
-      expect(
-        codesandboxResolveEmbed(new URL('https://k3201jy9jo.sse.codesandbox.io/')),
-      ).toBeUndefined()
+      const value = 'https://k3201jy9jo.sse.codesandbox.io/'
+
+      expect(codesandboxResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should ignore a foreign host carrying the same path', () => {

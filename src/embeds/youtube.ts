@@ -258,7 +258,11 @@ const resolveCollectionEmbed = (
   const [, routeTarget] = segments
 
   if (isAnyOf(routeTarget, 'live_stream')) {
-    return channel ? composeChannelEmbed(channel) : undefined
+    if (!channel) {
+      return
+    }
+
+    return composeChannelEmbed(channel)
   }
 
   // `/embed/videoseries?list=`, `/embed/playlist?list=` and the bare `/embed/?list=` some
@@ -310,7 +314,11 @@ const resolveTarget = (url: URL): EmbedResolverResult | undefined => {
     // The id moves from a path segment into the query, so it is decoded first.
     const list = decodeSegment(head) ?? head
 
-    return list ? composeListEmbed(`PL${list}`) : undefined
+    if (!list) {
+      return
+    }
+
+    return composeListEmbed(`PL${list}`)
   }
 
   const videoId = extractVideoId(url)
@@ -375,7 +383,11 @@ export const youtubeAmpEmbedResolver = createMarkupEmbedResolver(
     if (!videoId) {
       const channel = attr(element, 'data-live-channelid')
 
-      return channel ? composeChannelEmbed(channel) : undefined
+      if (!channel) {
+        return
+      }
+
+      return composeChannelEmbed(channel)
     }
 
     // `videoseries` and `live_stream` are route words that sit where a video id does.

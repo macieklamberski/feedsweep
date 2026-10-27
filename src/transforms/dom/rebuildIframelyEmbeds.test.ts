@@ -240,14 +240,16 @@ describeForEachParser('rebuildIframelyEmbeds', (parseHtml) => {
 
     // Constructed: the iframe API path on a host Iframely does not serve it from.
     it('should keep a frame on another host carrying the iframe API path', async () => {
-      const value = html`<iframe src="https://evil.test/api/iframe?url=https%3A%2F%2Fyoutu.be%2FNObkWjQHNm8"></iframe>`
+      const value =
+        '<iframe src="https://evil.test/api/iframe?url=https%3A%2F%2Fyoutu.be%2FNObkWjQHNm8"></iframe>'
 
       expect(await transform(value)).toEqualHtml(value)
     })
 
     // Constructed: an iframe API frame naming no url.
     it('should keep a frame naming no url', async () => {
-      const value = html`<iframe src="https://cdn.iframe.ly/api/iframe?app=1&amp;key=57d2ec5998440ab74c7cf485bffd908c"></iframe>`
+      const value =
+        '<iframe src="https://cdn.iframe.ly/api/iframe?app=1&amp;key=57d2ec5998440ab74c7cf485bffd908c"></iframe>'
 
       expect(await transform(value)).toEqualHtml(value)
     })
@@ -307,7 +309,8 @@ describeForEachParser('rebuildIframelyEmbeds', (parseHtml) => {
     })
 
     it('should be idempotent on an iframe API frame', async () => {
-      const value = html`<iframe src="https://cdn.iframe.ly/api/iframe?url=https%3A%2F%2Fyoutu.be%2FNObkWjQHNm8%3Fsi%3DucUQoghAP7K-_bgE&amp;v=1&amp;app=1&amp;key=57d2ec5998440ab74c7cf485bffd908c"></iframe>`
+      const value =
+        '<iframe src="https://cdn.iframe.ly/api/iframe?url=https%3A%2F%2Fyoutu.be%2FNObkWjQHNm8%3Fsi%3DucUQoghAP7K-_bgE&amp;v=1&amp;app=1&amp;key=57d2ec5998440ab74c7cf485bffd908c"></iframe>'
       const once = await transform(value)
       const twice = await transform(once)
 
@@ -502,7 +505,8 @@ describeForEachParser('rebuildIframelyEmbeds through the pipeline', (parseHtml) 
         allow="encrypted-media *"
       ></iframe>
     `
-    const expected = html`<div data-embed-src="https://cdn.iframe.ly/api/iframe?url=https%3A%2F%2Fmassivesci.com%2Fvideos%2Fastronomy-einstein-eddington-eclipse-relativity%2F&amp;key=a91f6c63822d2172297a7435cae7a9eb&amp;app=1"></div>`
+    const expected =
+      '<div data-embed-src="https://cdn.iframe.ly/api/iframe?url=https%3A%2F%2Fmassivesci.com%2Fvideos%2Fastronomy-einstein-eddington-eclipse-relativity%2F&amp;key=a91f6c63822d2172297a7435cae7a9eb&amp;app=1"></div>'
 
     expect(await convert(value)).toEqualHtml(expected)
   })

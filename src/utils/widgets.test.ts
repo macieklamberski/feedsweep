@@ -454,7 +454,11 @@ describeForEachParser('readS9eFragment', (parseHtml) => {
   const read = (value: string) => {
     const element = parseHtml(value).querySelector('iframe')
 
-    return element ? readS9eFragment(element) : undefined
+    if (!element) {
+      return
+    }
+
+    return readS9eFragment(element)
   }
 
   it('should read the first fragment of a helper frame', () => {
@@ -577,7 +581,11 @@ describeForEachParser('findBareHandle', (parseHtml) => {
   const read = (value: string) => {
     const element = parseHtml(value).querySelector('blockquote')
 
-    return element ? findBareHandle(element) : undefined
+    if (!element) {
+      return
+    }
+
+    return findBareHandle(element)
   }
 
   it('should read the handle from a text node holding it', () => {
@@ -1028,7 +1036,11 @@ describeForEachParser('readCarrierSize', (parseHtml) => {
   ) => {
     const element = parseHtml(value).querySelector(resolver.selector)
 
-    return element ? resolver.extract(element) : undefined
+    if (!element) {
+      return
+    }
+
+    return resolver.extract(element)
   }
 
   describe('a resolver that leaves the option off', () => {
@@ -1241,13 +1253,13 @@ describeForEachParser('readCarrierSize', (parseHtml) => {
     // not tell them apart, and only the carrier itself ranks above the resolver.
     describe('the resolver outranks an ancestor', () => {
       it('should keep the resolver ratio when the carrier states nothing', () => {
-        const value = html`<div class="player"></div>`
+        const value = '<div class="player"></div>'
 
         expect(build(withRatio, value)).toEqual(withRatio)
       })
 
       it('should keep the resolver height when the carrier states nothing', () => {
-        const value = html`<div class="player"></div>`
+        const value = '<div class="player"></div>'
 
         expect(build(withHeight, value)).toEqual(withHeight)
       })
@@ -1350,7 +1362,7 @@ describeForEachParser('readCarrierSize', (parseHtml) => {
       })
 
       it('should state no size when there is no wrapper either', () => {
-        const value = html`<div class="player"></div>`
+        const value = '<div class="player"></div>'
 
         expect(build(base, value)).toEqual(base)
       })
@@ -1513,7 +1525,11 @@ describeForEachParser('getEmbedSize', (parseHtml) => {
   const build = (markup: string) => {
     const element = parseHtml(markup).querySelector('div.player')
 
-    return element ? getEmbedSize(element, 0) : undefined
+    if (!element) {
+      return
+    }
+
+    return getEmbedSize(element, 0)
   }
 
   it('should drop a zero width and keep the height the carrier states', () => {

@@ -114,7 +114,11 @@ const readFlashCarrier = (url: URL, element?: Element): EmbedResolverResult | un
     const [portalRoute = '', videoId] = getPathSegments(video)
     const route = flashPortalRoutes.get(portalRoute.toLowerCase())
 
-    return route ? composeEmbed(route, videoId, query) : undefined
+    if (!route) {
+      return
+    }
+
+    return composeEmbed(route, videoId, query)
   }
 
   // The flashvar comes out decoded, and it goes into a path beside the raw path spelling.

@@ -189,7 +189,7 @@ describeForEachParser('tenorIframeEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore the embed path on the host that serves the files', async () => {
-      const value = html`<iframe src="https://media.tenor.com/embed/16892698"></iframe>`
+      const value = '<iframe src="https://media.tenor.com/embed/16892698"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

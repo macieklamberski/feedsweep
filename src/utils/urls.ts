@@ -220,7 +220,11 @@ export const parseUrlOnHosts = (
 
   // A reader re-checking the host of the url it was handed gets the same url back.
   if (url instanceof URL) {
-    return isOnHost(url, hosts) ? url : undefined
+    if (!isOnHost(url, hosts)) {
+      return
+    }
+
+    return url
   }
 
   const unescaped = foldEscapedAmpersands(url)
@@ -336,7 +340,11 @@ export const resolveOrDropUrl = (
 ): string | undefined => {
   const trimmed = url?.trim()
 
-  return trimmed ? context.resolveUrlFn(trimmed, context.baseUrl) : undefined
+  if (!trimmed) {
+    return
+  }
+
+  return context.resolveUrlFn(trimmed, context.baseUrl)
 }
 
 // Overloaded the same way and for the same reason as resolveOrKeepUrl: cleaning a definite url

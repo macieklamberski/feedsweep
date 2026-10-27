@@ -96,9 +96,11 @@ export const typeformResolveEmbed: ResolveUrlEmbed = (url, element) => {
   // A form id in a url path is alphanumeric (`MTt3Pw7K`). The enclosure probe offers every file on
   // a Typeform host to this resolver, so the alphabet is what tells a form from a file such as
   // `/to/MTt3Pw7K.mp3`.
-  return isAnyOf(route, 'to') && formId && alphanumericRegex.test(formId)
-    ? composeEmbed(formId, attr(element, 'title'))
-    : undefined
+  if (!isAnyOf(route, 'to') || !formId || !alphanumericRegex.test(formId)) {
+    return
+  }
+
+  return composeEmbed(formId, attr(element, 'title'))
 }
 
 // A Typeform form iframe, on form.typeform.com or a per-account subdomain.

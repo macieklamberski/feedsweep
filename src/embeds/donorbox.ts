@@ -41,7 +41,11 @@ export const donorboxEmbedResolver = createUrlEmbedResolver(hosts, donorboxResol
 // The form posts its rendered height unasked, as `{ from: 'dbox', src, height }`, and answers a
 // posted `{ action: 'please-resize-me' }` with the same message.
 export const readDonorboxHeight = (data: unknown): number | undefined => {
-  return isPlainObject(data) && data.from === 'dbox' ? readPixels(data.height) : undefined
+  if (!isPlainObject(data) || data.from !== 'dbox') {
+    return
+  }
+
+  return readPixels(data.height)
 }
 
 export const donorboxRenderHint: EmbedRenderHint = {

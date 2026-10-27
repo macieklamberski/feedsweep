@@ -703,11 +703,9 @@ describeForEachParser('highlightCode', (parseHtml) => {
       '  -H "Authorization: Bearer TOKEN" \\',
       `  -d '{"title":"hi"}'</pre>`,
     ].join('\n')
-    const expected = [
-      '<pre data-language="bash" data-pre-language="bash" data-pre-label="Bash"><code class="hljs">curl -X POST https://api.example.com/posts \\',
-      '  -H <span class="hljs-string">"Authorization: Bearer TOKEN"</span> \\',
-      `  -d <span class="hljs-string">'{"title":"hi"}'</span></code></pre>`,
-    ].join('\n')
+    const expected = `<pre data-language="bash" data-pre-language="bash" data-pre-label="Bash"><code class="hljs">curl -X POST https://api.example.com/posts \\
+  -H <span class="hljs-string">"Authorization: Bearer TOKEN"</span> \\
+  -d <span class="hljs-string">'{"title":"hi"}'</span></code></pre>`
 
     expect(await transform(value)).toEqualHtml(expected)
   })
@@ -746,10 +744,8 @@ describeForEachParser('highlightCode', (parseHtml) => {
       '<div><code data-language="bash">curl -X POST https://api.example.com/posts \\',
       '  -H "Authorization: Bearer TOKEN"</code></div>',
     ].join('\n')
-    const expected = [
-      '<div><pre data-pre-language="bash" data-pre-label="Bash"><code data-language="bash" class="hljs">curl -X POST https://api.example.com/posts \\',
-      '  -H <span class="hljs-string">"Authorization: Bearer TOKEN"</span></code></pre></div>',
-    ].join('\n')
+    const expected = `<div><pre data-pre-language="bash" data-pre-label="Bash"><code data-language="bash" class="hljs">curl -X POST https://api.example.com/posts \\
+  -H <span class="hljs-string">"Authorization: Bearer TOKEN"</span></code></pre></div>`
 
     expect(await transform(value)).toEqualHtml(expected)
   })

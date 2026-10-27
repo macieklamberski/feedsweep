@@ -19,10 +19,18 @@ const readSceneId = (url: URL): string | undefined => {
   const [route = '', second, third] = getPathSegments(url)
 
   if (isAnyOf(route, 'view')) {
-    return isAnyOf(second, 'scene') ? third : undefined
+    if (!isAnyOf(second, 'scene')) {
+      return
+    }
+
+    return third
   }
 
-  return isAnyOf(route, cardRoutes) ? second : undefined
+  if (!isAnyOf(route, cardRoutes)) {
+    return
+  }
+
+  return second
 }
 
 // A scene at or above this id states no poster, since `cdn.thinglink.me` redirects most of them to

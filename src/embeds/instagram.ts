@@ -301,9 +301,11 @@ export const instagramS9eEmbedResolver = createS9eEmbedResolver('instagram', (sh
 // The player measures itself once mounted and reports it under a `MEASURE` type. `LOADING`
 // and `MOUNTED` come through the same channel without a size.
 export const readInstagramHeight = (data: unknown): number | undefined => {
-  return isPlainObject(data) && data.type === 'MEASURE' && isPlainObject(data.details)
-    ? readPixels(data.details.height)
-    : undefined
+  if (!isPlainObject(data) || data.type !== 'MEASURE' || !isPlainObject(data.details)) {
+    return
+  }
+
+  return readPixels(data.details.height)
 }
 
 export const instagramFieldCleaners: Array<FieldCleaner> = [

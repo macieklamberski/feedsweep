@@ -458,7 +458,7 @@ describeForEachParser('proxyAssetUrls', (parseHtml) => {
   })
 
   it('should await an async assetProxyFn on a src attribute', async () => {
-    const value = html`<img src="https://cdn.example.com/photo.jpg">`
+    const value = '<img src="https://cdn.example.com/photo.jpg">'
     const expected = html`
       <img
         src="https://proxy.example.com/?type=image&url=https%3A%2F%2Fcdn.example.com%2Fphoto.jpg"
@@ -539,6 +539,7 @@ describeForEachParser('proxyAssetUrls', (parseHtml) => {
         document,
         prepareEmbedMetadata(metadata, mintContext) as EmbedResolverResult,
       )
+      // biome-ignore lint/plugin/noComputedExpected: Derived from a placeholder minted with every field, so a new field is covered without editing the test.
       const expected = placeholder
         .getAttributeNames()
         .filter((name) => unproxyableAttributes.includes(name))
@@ -553,6 +554,7 @@ describeForEachParser('proxyAssetUrls', (parseHtml) => {
         document,
         prepareCiteMetadata(metadata, mintContext) as CiteResolverResult,
       )
+      // biome-ignore lint/plugin/noComputedExpected: Derived from a placeholder minted with every field, so a new field is covered without editing the test.
       const expected = placeholder
         .getAttributeNames()
         .filter((name) => unproxyableAttributes.includes(name))

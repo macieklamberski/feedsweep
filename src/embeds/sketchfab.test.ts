@@ -95,7 +95,7 @@ describeForEachParser('sketchfabEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a listing word on the unslugged page url', async () => {
-      const value = html`<iframe src="https://sketchfab.com/models/popular"></iframe>`
+      const value = '<iframe src="https://sketchfab.com/models/popular"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

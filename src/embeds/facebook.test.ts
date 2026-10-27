@@ -77,7 +77,12 @@ describeForEachParser('facebookWidgetEmbedResolver', (parseHtml) => {
     // Publishers paste a video url into the post div too. The post plugin refuses to frame some
     // of those ids and the video plugin plays them, so a video href takes the video plugin.
     it('should mint the video plugin url from an fb.watch short link', async () => {
-      const value = html`<div class="fb-post" data-href="https://fb.watch/abcDEF123/"></div>`
+      const value = html`
+        <div
+          class="fb-post"
+          data-href="https://fb.watch/abcDEF123/"
+        ></div>
+      `
       const expected: EmbedResolverResult = {
         provider: 'facebook',
         id: 'https://fb.watch/abcDEF123/',
@@ -90,7 +95,12 @@ describeForEachParser('facebookWidgetEmbedResolver', (parseHtml) => {
     })
 
     it('should mint the video plugin url from a video path', async () => {
-      const value = html`<div class="fb-post" data-href="https://www.facebook.com/PageName/videos/123/"></div>`
+      const value = html`
+        <div
+          class="fb-post"
+          data-href="https://www.facebook.com/PageName/videos/123/"
+        ></div>
+      `
       const expected: EmbedResolverResult = {
         provider: 'facebook',
         id: 'https://www.facebook.com/video.php?v=123',
@@ -104,7 +114,12 @@ describeForEachParser('facebookWidgetEmbedResolver', (parseHtml) => {
 
     // A page's vanity name may contain a route word, and only a whole label or segment counts.
     it('should mint the post plugin url for a page named after reels', async () => {
-      const value = html`<div class="fb-post" data-href="https://www.facebook.com/reel-big-fish/posts/123/"></div>`
+      const value = html`
+        <div
+          class="fb-post"
+          data-href="https://www.facebook.com/reel-big-fish/posts/123/"
+        ></div>
+      `
       const expected: EmbedResolverResult = {
         provider: 'facebook',
         id: 'https://www.facebook.com/reel-big-fish/posts/123/',
@@ -116,7 +131,12 @@ describeForEachParser('facebookWidgetEmbedResolver', (parseHtml) => {
     })
 
     it('should mint the post plugin url for a dotted page named after videos', async () => {
-      const value = html`<div class="fb-post" data-href="https://www.facebook.com/video.game.news/posts/123/"></div>`
+      const value = html`
+        <div
+          class="fb-post"
+          data-href="https://www.facebook.com/video.game.news/posts/123/"
+        ></div>
+      `
       const expected: EmbedResolverResult = {
         provider: 'facebook',
         id: 'https://www.facebook.com/video.game.news/posts/123/',

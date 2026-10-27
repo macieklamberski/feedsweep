@@ -175,7 +175,8 @@ describeForEachParser('scratchEmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a file host, which answers the player route with an image', async () => {
-      const value = html`<iframe src="https://assets.scratch.mit.edu/projects/1308798589/embed"></iframe>`
+      const value =
+        '<iframe src="https://assets.scratch.mit.edu/projects/1308798589/embed"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

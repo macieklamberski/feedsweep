@@ -514,9 +514,9 @@ describe('parseMastodonStatus', () => {
   })
 
   it('should reject the ActivityPub spelling under another path', () => {
-    expect(
-      parseMastodonStatus('https://mastodon.social/x/users/Gargron/statuses/116535232552529093'),
-    ).toBeUndefined()
+    const value = 'https://mastodon.social/x/users/Gargron/statuses/116535232552529093'
+
+    expect(parseMastodonStatus(value)).toBeUndefined()
   })
 
   it('should reject the ActivityPub spelling followed by another segment', () => {

@@ -40,12 +40,11 @@ describe('extractNicovideoId', () => {
   })
 
   it('should read the other id prefixes', () => {
-    expect(
-      extractNicovideoId(carrierUrl('https://ext.nicovideo.jp/thumb_watch/nm12345', hosts)),
-    ).toBe('nm12345')
-    expect(
-      extractNicovideoId(carrierUrl('https://ext.nicovideo.jp/thumb_watch/so67890', hosts)),
-    ).toBe('so67890')
+    const nmUrl = 'https://ext.nicovideo.jp/thumb_watch/nm12345'
+    const soUrl = 'https://ext.nicovideo.jp/thumb_watch/so67890'
+
+    expect(extractNicovideoId(carrierUrl(nmUrl, hosts))).toBe('nm12345')
+    expect(extractNicovideoId(carrierUrl(soUrl, hosts))).toBe('so67890')
   })
 
   // A channel upload is addressed by a bare thread number, with no kind in front of it.

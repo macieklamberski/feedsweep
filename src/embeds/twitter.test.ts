@@ -1419,7 +1419,7 @@ describeForEachParser('twitterIframeEmbedResolver', (parseHtml) => {
     ]
 
     it.each(playerUrls)('should mint the player from %s', async (url) => {
-      const value = html`<iframe src="${url}"></iframe>`
+      const value = `<iframe src="${url}"></iframe>`
       const expected: EmbedResolverResult = {
         provider: 'twitter',
         id: statusId,
@@ -1431,7 +1431,7 @@ describeForEachParser('twitterIframeEmbedResolver', (parseHtml) => {
     })
 
     it('should read the id up to its last digit on an internal path', async () => {
-      const value = html`<iframe src="https://x.com/i/web/status/${statusId}abc"></iframe>`
+      const value = `<iframe src="https://x.com/i/web/status/${statusId}abc"></iframe>`
       const expected: EmbedResolverResult = {
         provider: 'twitter',
         id: statusId,
@@ -1448,7 +1448,7 @@ describeForEachParser('twitterIframeEmbedResolver', (parseHtml) => {
   // placeholder pointing at nothing a reader can load.
   describe('the status page a wrapper frames instead of the player', () => {
     it('should mint the player from a framed status page', async () => {
-      const value = html`<iframe src="${statusUrl}"></iframe>`
+      const value = `<iframe src="${statusUrl}"></iframe>`
       const expected: EmbedResolverResult = {
         provider: 'twitter',
         id: statusId,
@@ -1461,7 +1461,7 @@ describeForEachParser('twitterIframeEmbedResolver', (parseHtml) => {
     })
 
     it('should mint the same player from the twitter.com spelling', async () => {
-      const value = html`<iframe src="https://twitter.com/user/status/${statusId}"></iframe>`
+      const value = `<iframe src="https://twitter.com/user/status/${statusId}"></iframe>`
       const expected: EmbedResolverResult = {
         provider: 'twitter',
         id: statusId,
@@ -1477,8 +1477,8 @@ describeForEachParser('twitterIframeEmbedResolver', (parseHtml) => {
     // to agree on it. Both results are stated whole: the page names its handle in the url and the
     // author, and the player has only the `i` stand-in.
     it('should give a page carrier the id its player carrier states', async () => {
-      const playerValue = html`<iframe src="${playerUrl}"></iframe>`
-      const pageValue = html`<iframe src="${statusUrl}"></iframe>`
+      const playerValue = `<iframe src="${playerUrl}"></iframe>`
+      const pageValue = `<iframe src="${statusUrl}"></iframe>`
       const expectedPlayer: EmbedResolverResult = {
         provider: 'twitter',
         id: statusId,
@@ -1502,25 +1502,25 @@ describeForEachParser('twitterIframeEmbedResolver', (parseHtml) => {
   // that is not a status has to be refused by name rather than by the host gate.
   describe('shapes on the host that are not a tweet', () => {
     it('should return undefined for a bare profile', async () => {
-      const value = html`<iframe src="https://x.com/user"></iframe>`
+      const value = '<iframe src="https://x.com/user"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should return undefined for a search page', async () => {
-      const value = html`<iframe src="https://x.com/search?q=feeds"></iframe>`
+      const value = '<iframe src="https://x.com/search?q=feeds"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should return undefined for a hashtag page', async () => {
-      const value = html`<iframe src="https://x.com/hashtag/feeds"></iframe>`
+      const value = '<iframe src="https://x.com/hashtag/feeds"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should return undefined for the site root', async () => {
-      const value = html`<iframe src="https://x.com/"></iframe>`
+      const value = '<iframe src="https://x.com/"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })

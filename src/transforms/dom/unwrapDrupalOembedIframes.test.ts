@@ -244,7 +244,7 @@ describeForEachParser('unwrapDrupalOembedIframes through the pipeline', (parseHt
     const value = html`
       <iframe src="https://www.example.com/media/oembed?url=javascript%3Aalert(1)&amp;hash=abc"></iframe>
     `
-    const expected = html`<iframe src="about:blank"></iframe>`
+    const expected = '<iframe src="about:blank"></iframe>'
 
     const result = await transformContent(value, {
       parseHtmlFn: parseHtml,

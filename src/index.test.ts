@@ -169,14 +169,12 @@ describeForEachParser('transformContent', (parseHtml) => {
       '&lt;li&gt;&lt;strong&gt;first&lt;/strong&gt; item&lt;/li&gt;',
       '&lt;/ul&gt;',
     ].join('\n')
-    const expected = [
-      '<p>A <a href="https://example.com/about">now page</a>',
-      ': what has my attention.</p>',
-      '<h2><a href="#building" id="building"></a>Building</h2>',
-      '<ul>',
-      '<li><strong>first</strong> item</li>',
-      '</ul>',
-    ].join('\n')
+    const expected = `<p>A <a href="https://example.com/about">now page</a>
+: what has my attention.</p>
+<h2><a href="#building" id="building"></a>Building</h2>
+<ul>
+<li><strong>first</strong> item</li>
+</ul>`
     const result = await transformContent(value, {
       parseHtmlFn: parseHtml,
       baseUrl: 'https://example.com',

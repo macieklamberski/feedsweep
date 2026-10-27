@@ -29,7 +29,8 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
     })
 
     it('should mint a blog episode onto the same show query', async () => {
-      const value = html`<iframe src="https://channel9.msdn.com/Blogs/one-dev-minute/what-is-mlops--one-dev-question/player"></iframe>`
+      const value =
+        '<iframe src="https://channel9.msdn.com/Blogs/one-dev-minute/what-is-mlops--one-dev-question/player"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'channel9',
         id: 'one-dev-minute/what-is-mlops--one-dev-question',
@@ -61,7 +62,8 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
     })
 
     it('should mint an event session onto the event query', async () => {
-      const value = html`<iframe src="https://channel9.msdn.com/Events/Build/2017/T6064/player"></iframe>`
+      const value =
+        '<iframe src="https://channel9.msdn.com/Events/Build/2017/T6064/player"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'channel9',
         id: 'events/build-2017/t6064',
@@ -75,25 +77,28 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
 
   describe('sad paths', () => {
     it('should ignore a foreign host carrying the player path', async () => {
-      const value = html`<iframe src="https://evil.test/Shows/Azure-Friday/An-Episode/player"></iframe>`
+      const value = '<iframe src="https://evil.test/Shows/Azure-Friday/An-Episode/player"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore a lookalike host', async () => {
-      const value = html`<iframe src="https://channel9.msdn.com.evil.test/Shows/Azure-Friday/An-Episode/player"></iframe>`
+      const value =
+        '<iframe src="https://channel9.msdn.com.evil.test/Shows/Azure-Friday/An-Episode/player"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore a section outside the retired route words', async () => {
-      const value = html`<iframe src="https://channel9.msdn.com/Feeds/Azure-Friday/An-Episode/player"></iframe>`
+      const value =
+        '<iframe src="https://channel9.msdn.com/Feeds/Azure-Friday/An-Episode/player"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should leave a posts episode unresolved', async () => {
-      const value = html`<iframe src="https://channel9.msdn.com/posts/Erik-Meijer/Going-Deep-with-Erik/player"></iframe>`
+      const value =
+        '<iframe src="https://channel9.msdn.com/posts/Erik-Meijer/Going-Deep-with-Erik/player"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -105,13 +110,15 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
     })
 
     it('should ignore a show episode with a segment before the player route', async () => {
-      const value = html`<iframe src="https://channel9.msdn.com/Shows/Azure-Friday/An-Episode/extra/player"></iframe>`
+      const value =
+        '<iframe src="https://channel9.msdn.com/Shows/Azure-Friday/An-Episode/extra/player"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
 
     it('should ignore an episode page that is not the player route', async () => {
-      const value = html`<iframe src="https://channel9.msdn.com/Shows/Azure-Friday/An-Episode/discussion"></iframe>`
+      const value =
+        '<iframe src="https://channel9.msdn.com/Shows/Azure-Friday/An-Episode/discussion"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -119,7 +126,8 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
 
   describe('edge cases', () => {
     it('should lowercase the two names and compose each as one parameter', async () => {
-      const value = html`<iframe src="https://channel9.msdn.com/Shows/Going+Deep/Inside-Windows-8/player"></iframe>`
+      const value =
+        '<iframe src="https://channel9.msdn.com/Shows/Going+Deep/Inside-Windows-8/player"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'channel9',
         id: 'going+deep/inside-windows-8',
@@ -131,7 +139,8 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
     })
 
     it('should read the section whatever case the publisher wrote it in', async () => {
-      const value = html`<iframe src="https://channel9.msdn.com/SHOWS/Azure-Friday/An-Episode/PLAYER"></iframe>`
+      const value =
+        '<iframe src="https://channel9.msdn.com/SHOWS/Azure-Friday/An-Episode/PLAYER"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'channel9',
         id: 'azure-friday/an-episode',
@@ -143,7 +152,8 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
     })
 
     it('should read a player route with a trailing slash', async () => {
-      const value = html`<iframe src="https://channel9.msdn.com/Shows/Azure-Friday/An-Episode/player/"></iframe>`
+      const value =
+        '<iframe src="https://channel9.msdn.com/Shows/Azure-Friday/An-Episode/player/"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'channel9',
         id: 'azure-friday/an-episode',
@@ -155,7 +165,8 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
     })
 
     it('should read a player route with a format query', async () => {
-      const value = html`<iframe src="https://channel9.msdn.com/Shows/Azure-Friday/An-Episode/player?format=html5"></iframe>`
+      const value =
+        '<iframe src="https://channel9.msdn.com/Shows/Azure-Friday/An-Episode/player?format=html5"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'channel9',
         id: 'azure-friday/an-episode',
@@ -167,7 +178,8 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
     })
 
     it('should keep a show name carrying an ampersand as one parameter', async () => {
-      const value = html`<iframe src="https://channel9.msdn.com/Shows/Azure%26Friends/An-Episode/player"></iframe>`
+      const value =
+        '<iframe src="https://channel9.msdn.com/Shows/Azure%26Friends/An-Episode/player"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'channel9',
         id: 'azure&friends/an-episode',
@@ -179,7 +191,8 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
     })
 
     it('should keep an event session carrying a separator as one parameter', async () => {
-      const value = html`<iframe src="https://channel9.msdn.com/Events/Build/2017/T6064%26ev%3Dstolen/player"></iframe>`
+      const value =
+        '<iframe src="https://channel9.msdn.com/Events/Build/2017/T6064%26ev%3Dstolen/player"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'channel9',
         id: 'events/build-2017/t6064&ev=stolen',
@@ -193,7 +206,8 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
 
   describe('the Events route', () => {
     it('should leave the event shape unresolved under another section', async () => {
-      const value = html`<iframe src="https://channel9.msdn.com/Shows/Build/2017/T6064/player"></iframe>`
+      const value =
+        '<iframe src="https://channel9.msdn.com/Shows/Build/2017/T6064/player"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -225,7 +239,8 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
     })
 
     it('should leave an event with a segment before the player route unresolved', async () => {
-      const value = html`<iframe src="https://channel9.msdn.com/Events/Build/2017/T6064/extra/player"></iframe>`
+      const value =
+        '<iframe src="https://channel9.msdn.com/Events/Build/2017/T6064/extra/player"></iframe>'
 
       expect(await extract(value)).toBeUndefined()
     })
@@ -238,7 +253,7 @@ describeForEachParser('channel9 shapes the pipeline resolves first', (parseHtml)
   }
 
   it('should resolve a protocol-relative player url', async () => {
-    const value = html`<iframe src="//channel9.msdn.com/Shows/Azure-Friday/An-Episode/player"></iframe>`
+    const value = '<iframe src="//channel9.msdn.com/Shows/Azure-Friday/An-Episode/player"></iframe>'
     const expected = html`
       <div
         data-embed-src="https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=azure-friday&ep=an-episode"

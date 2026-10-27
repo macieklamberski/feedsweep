@@ -16,6 +16,14 @@ describeForEachParser('whatsappEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(`<p>Hi ${glyph}</p>`)
   })
 
+  it('should keep the emoji a painted span holds as typed', async () => {
+    const value =
+      '<p>Hi <span style="background-image: url(https://web.whatsapp.com/emoji/v1/15/1/2/single/w/40/01f600.png)">😀</span></p>'
+    const expected = '<p>Hi 😀</p>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should leave a painted span holding prose untouched', async () => {
     const value =
       '<p><span style="background-image: url(https://web.whatsapp.com/emoji/v1/15/1/2/single/w/40/01f600.png)">Hello</span></p>'
