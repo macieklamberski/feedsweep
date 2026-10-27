@@ -14,7 +14,7 @@ const hasDirectText = (element: Element): boolean => {
 // Styling wrappers some highlighters put around the <code> inside a <pre>: WordPress's
 // Highlighting Code Block emits <pre><span><code>. Anything else (a link, a figure) may
 // carry meaning of its own and stays.
-const styleWrapperTags = new Set(['span', 'div'])
+const styleWrapperTags = ['span', 'div']
 
 // A <code> in a <code>, or a span between <pre> and <code>: shrunk text or broken scrolling.
 // Readers size code with a relative font-size and scroll it through a `pre > code` selector.
@@ -55,7 +55,7 @@ export const unwrapNestedCodeWrappers: DomTransform = () => {
 
       while (
         wrapper?.parentElement &&
-        styleWrapperTags.has(wrapper.localName) &&
+        styleWrapperTags.includes(wrapper.localName) &&
         wrapper.childElementCount === 1 &&
         !hasDirectText(wrapper)
       ) {

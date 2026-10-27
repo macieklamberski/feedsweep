@@ -204,7 +204,7 @@ export const removeDeclarations = (element: Element, properties: Array<string>):
     return !properties.includes(property)
   })
 
-  if (kept.join('').trim() === '') {
+  if (!kept.join('').trim()) {
     element.removeAttribute('style')
     return
   }

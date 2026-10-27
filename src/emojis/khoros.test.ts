@@ -77,13 +77,9 @@ describeForEachParser('khorosImageEmojiResolver', (parseHtml) => {
     // The set also draws each expression on a cat, a man, a woman and a robot. Unicode's cat
     // faces cover the three smiles but not a winking or tongue-out one, so swapping those would
     // change the expression.
-    const keptCases: Array<[string, string]> = [
-      ['cat', '16x16_cat-wink'],
-      ['woman', '16x16_woman-happy'],
-      ['robot', '16x16_robot-lol'],
-    ]
+    const keptCases: Array<string> = ['16x16_cat-wink', '16x16_woman-happy', '16x16_robot-lol']
 
-    it.each(keptCases)('should leave the %s variant with its picture', async (_species, name) => {
+    it.each(keptCases)('should leave the %s variant with its picture', async (name) => {
       const value = `<p><img class="emoticon" src="https://example.com/i/smilies/${name}.png" alt="Wink"></p>`
 
       expect(await transformKeeping(value)).toEqualHtml(value)

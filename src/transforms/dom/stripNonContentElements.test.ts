@@ -298,19 +298,16 @@ const flagCounterImageUrls = [
 
 // Zeno.FM's snippet links to the Zeno home page under each of its names, whatever text the
 // publisher gave the link.
-const zenoHomeLinks: Array<[string, string, string]> = [
+const zenoHomeLinks: Array<[string, string]> = [
   [
-    'www.zeno.fm with no trailing slash',
     '<iframe src="//www.zeno.fm/player/straighttalkradio" width="575" height="240" frameborder="0" scrolling="no"></iframe><a href="https://www.zeno.fm" target="_blank" style="display: block; font-size: 0.9em; line-height: 10px;">Omnicast Media Station - Listen Live</a>',
     '<iframe src="//www.zeno.fm/player/straighttalkradio" width="575" height="240" frameborder="0" scrolling="no"></iframe>',
   ],
   [
-    'www.zeno.fm',
     '<iframe frameborder="0" height="290" scrolling="no" src="//www.zeno.fm/player/Ranchos-de-Coahuila-online" width="768"></iframe><a href="https://www.zeno.fm/" style="display: block; font-size: 0.9em; line-height: 10px;" target="_blank">A Zeno Media Station</a>',
     '<iframe frameborder="0" height="290" scrolling="no" src="//www.zeno.fm/player/Ranchos-de-Coahuila-online" width="768"></iframe>',
   ],
   [
-    'zenomedia.com',
     '<iframe frameborder="0" height="240" scrolling="no" src="//www.zeno.fm/player/sure-fm-master-input-station" width="575"></iframe><a href="https://www.zenomedia.com/" style="display: block; font-size: 0.9em; line-height: 10px;" target="_blank">...</a>',
     '<iframe frameborder="0" height="240" scrolling="no" src="//www.zeno.fm/player/sure-fm-master-input-station" width="575"></iframe>',
   ],
@@ -426,8 +423,8 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
     })
 
     it.each(zenoHomeLinks)(
-      'should strip the Zeno.FM link to %s after the player',
-      async (_name, value, expected) => {
+      'should strip the Zeno.FM home link after the player in %s',
+      async (value, expected) => {
         expect(await transform(value)).toEqualHtml(expected)
       },
     )

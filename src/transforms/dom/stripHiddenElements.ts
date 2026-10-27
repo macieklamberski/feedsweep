@@ -39,8 +39,8 @@ const isRevealable = (
   return (
     isAnyOf(attr(element, 'hidden'), 'until-found') ||
     element.matches('audio, video, [role="tabpanel"]') ||
-    (revealableSelector !== '' && element.matches(revealableSelector)) ||
-    (element.id !== '' && referencedIds.has(element.id))
+    (!!revealableSelector && element.matches(revealableSelector)) ||
+    (!!element.id && referencedIds.has(element.id))
   )
 }
 

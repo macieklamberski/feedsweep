@@ -28,17 +28,14 @@ describeForEachParser('twemojiEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    const pathCases: Array<[string, string]> = [
-      [
-        'jsDelivr fork',
-        'https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/72x72/1f602.png',
-      ],
-      ['cdnjs', 'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f602.png'],
-      ['Forumotion', 'https://illiweb.com/fa/twemoji/16x16/1f602.png'],
-      ['Twitter', 'https://abs-0.twimg.com/emoji/v2/72x72/1f602.png'],
+    const pathCases: Array<string> = [
+      'https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/72x72/1f602.png',
+      'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f602.png',
+      'https://illiweb.com/fa/twemoji/16x16/1f602.png',
+      'https://abs-0.twimg.com/emoji/v2/72x72/1f602.png',
     ]
 
-    it.each(pathCases)('should replace a %s emoji from its filename', async (_host, source) => {
+    it.each(pathCases)('should replace an emoji from its filename in %s', async (source) => {
       const value = `<p><img src="${source}" alt=""></p>`
 
       expect(await transform(value)).toEqualHtml('<p>😂</p>')

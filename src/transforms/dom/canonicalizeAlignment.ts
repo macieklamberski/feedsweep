@@ -5,16 +5,16 @@ import * as styles from '../../utils/styles.js'
 type Direction = 'center' | 'left' | 'right'
 
 // No <picture>: flattenPictureElements dissolves it, so a hook set there is lost.
-const mediaTags = new Set(['img', 'video', 'audio', 'iframe'])
+const mediaTags = ['img', 'video', 'audio', 'iframe']
 
 // Structural media wrappers, always treated as part of the media (no media-primary
 // gate): the responsive <picture>, the semantic <figure>, the click-through <a>.
-const structuralWrapperTags = new Set(['picture', 'figure', 'a'])
+const structuralWrapperTags = ['picture', 'figure', 'a']
 
 // Generic block wrappers that count only when they wrap media and nothing else (a
 // "media-primary" wrapper), e.g. classic-editor <p style="text-align:center"><img></p>.
 // Inline text-align mostly sits on text, so only the media-primary slice is in scope.
-const genericWrapperTags = new Set(['div', 'p', 'center'])
+const genericWrapperTags = ['div', 'p', 'center']
 
 // WordPress block/editor classes: the dominant explicit media-alignment signal.
 // `alignnone` is an explicit "no alignment" that terminates resolution without a hook.
@@ -137,7 +137,7 @@ const isMediaPrimary = (wrapper: Element, inner: Element): boolean => {
       continue
     }
 
-    if (isElement(node) && mediaTags.has(node.localName)) {
+    if (isElement(node) && mediaTags.includes(node.localName)) {
       hasContent = true
       continue
     }
@@ -173,12 +173,12 @@ const resolve = (media: Element): Resolution | undefined => {
 
     const parent: Element | null = node.parentElement
 
-    if (parent && structuralWrapperTags.has(parent.localName)) {
+    if (parent && structuralWrapperTags.includes(parent.localName)) {
       if (parent.localName === 'figure') {
         target = parent
       }
     } else if (
-      !(parent && genericWrapperTags.has(parent.localName) && isMediaPrimary(parent, node))
+      !(parent && genericWrapperTags.includes(parent.localName) && isMediaPrimary(parent, node))
     ) {
       return
     }

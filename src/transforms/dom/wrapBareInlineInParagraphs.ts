@@ -53,12 +53,12 @@ const isMediaBoundary = (node: Node): boolean => {
 
 // Wrappers unwrapWrappers later dissolves into a flow root. Their inline content
 // would otherwise become bare text, so even a single full-container run is wrapped.
-const dissolvingTags = new Set(['div', 'article', 'section', 'main', 'header', 'footer'])
+const dissolvingTags = ['div', 'article', 'section', 'main', 'header', 'footer']
 
 // Persistent containers whose single-run inline content still needs paragraphs:
 // body as the root flow, figure so its bare text (often a caption div dissolved
 // by unwrapWrappers) gets an element to carry caption spacing and styling.
-const alwaysWrapTags = new Set(['body', 'figure'])
+const alwaysWrapTags = ['body', 'figure']
 
 // Bare inline runs beside block siblings in a container, which render with no paragraph spacing,
 // and every run in a wrapper unwrapWrappers dissolves, whose text would otherwise land bare.
@@ -84,8 +84,8 @@ export const wrapBareInlineInParagraphs: DomTransform = () => {
       // when content is split by a block sibling. A plain single-run cell or item
       // is left as-is.
       const shouldWrap =
-        alwaysWrapTags.has(container.localName) ||
-        dissolvingTags.has(container.localName) ||
+        alwaysWrapTags.includes(container.localName) ||
+        dissolvingTags.includes(container.localName) ||
         hasBlockChild
 
       if (!shouldWrap) {

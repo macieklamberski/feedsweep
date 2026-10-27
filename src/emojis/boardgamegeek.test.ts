@@ -72,13 +72,9 @@ describeForEachParser('boardgamegeekEmojiResolver', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  const unknownCases: Array<[string, string]> = [
-    ['die', 'd10-1.gif'],
-    ['star', 'star_yellow.gif'],
-    ['tile', 'tiles/F.gif'],
-  ]
+  const unknownCases: Array<string> = ['d10-1.gif', 'star_yellow.gif', 'tiles/F.gif']
 
-  it.each(unknownCases)('should leave a %s image untouched', async (_name, file) => {
+  it.each(unknownCases)('should leave the %s image untouched', async (file) => {
     const value = html`
       <p>
         <img

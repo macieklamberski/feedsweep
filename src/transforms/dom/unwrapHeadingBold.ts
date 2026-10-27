@@ -9,7 +9,7 @@ import {
   mediaSelector,
 } from '../../utils/dom.js'
 
-const boldTags = new Set(['b', 'strong'])
+const boldTags = ['b', 'strong']
 
 // A whitespace-only anchor beside the bold is gone by stripEmptyTags, so it must not block this.
 const isIgnorableNode = (node: Node): boolean => {
@@ -48,7 +48,7 @@ export const unwrapHeadingBold: DomTransform = () => {
     for (const heading of headings) {
       let bold = soleContentElement(heading)
 
-      while (bold && boldTags.has(bold.localName)) {
+      while (bold && boldTags.includes(bold.localName)) {
         while (bold.firstChild) {
           heading.insertBefore(bold.firstChild, bold)
         }

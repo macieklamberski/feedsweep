@@ -9,7 +9,7 @@ import {
 } from '../../utils/dom.js'
 import { digitsRegex } from '../../utils/urls.js'
 
-const timestampIgnoreTags = new Set(['a', 'pre', 'code', 'kbd', 'samp', 'var', 'noscript'])
+const timestampIgnoreTags = ['a', 'pre', 'code', 'kbd', 'samp', 'var', 'noscript']
 const tableCellTags = ['td', 'th']
 
 // MM:SS or HH:MM:SS, with the seconds always two digits.
@@ -59,7 +59,7 @@ const shouldSkipElement = (element: Element): boolean => {
   const tag = element.tagName.toLowerCase()
 
   return (
-    timestampIgnoreTags.has(tag) ||
+    timestampIgnoreTags.includes(tag) ||
     rawTextElements.includes(tag) ||
     element.hasAttribute('data-timestamp')
   )

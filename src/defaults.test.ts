@@ -119,8 +119,6 @@ describe('defaults', () => {
   })
 })
 
-const named = defaultEmbedRenderHints.map((hint) => [hint.provider, hint] as const)
-
 describe('defaultEmbedRenderHints', () => {
   it('should name each provider once', () => {
     const providers = defaultEmbedRenderHints.map((hint) => hint.provider)
@@ -129,15 +127,20 @@ describe('defaultEmbedRenderHints', () => {
   })
 
   // A hint with nothing in it would register a provider and change nothing for a reader.
-  it.each(named)('should give %s something a reader can act on', (_, hint) => {
-    expect(hint.params ?? hint.autoplayParams ?? hint.requestPlay ?? hint.readHeight).toBeDefined()
-  })
+  it.each(defaultEmbedRenderHints)(
+    'should give $provider something a reader can act on',
+    (hint) => {
+      expect(
+        hint.params ?? hint.autoplayParams ?? hint.requestPlay ?? hint.readHeight,
+      ).toBeDefined()
+    },
+  )
 
   // A reader compares `event.origin` with it by equality, so a path or a trailing slash
   // would never match.
-  it.each(named.filter(([, hint]) => hint.origin))(
-    'should state the %s origin as a bare origin',
-    (_, hint) => {
+  it.each(defaultEmbedRenderHints.filter((hint) => hint.origin))(
+    'should state the $provider origin as a bare origin',
+    (hint) => {
       const origin = hint.origin ?? ''
 
       expect(new URL(origin).origin).toBe(origin)
@@ -145,35 +148,34 @@ describe('defaultEmbedRenderHints', () => {
   )
 
   // A ready signal is only worth reading for a request that waits on it.
-  it.each(named.filter(([, hint]) => hint.isReady))(
-    'should have a %s play request to send once ready',
-    (_, hint) => {
+  it.each(defaultEmbedRenderHints.filter((hint) => hint.isReady))(
+    'should have a $provider play request to send once ready',
+    (hint) => {
       expect(hint.requestPlay).toBeDefined()
     },
   )
 
-  it.each(named.filter(([, hint]) => hint.requestHeight !== undefined))(
-    'should read the answer to the %s height request',
-    (_, hint) => {
+  it.each(defaultEmbedRenderHints.filter((hint) => hint.requestHeight !== undefined))(
+    'should read the answer to the $provider height request',
+    (hint) => {
       expect(hint.readHeight).toBeDefined()
     },
   )
 })
 
-const namedCleaners = defaultFieldCleaners.map((cleaner) => {
-  return [`${cleaner.provider} ${cleaner.field}`, cleaner] as const
-})
-
 describe('defaultFieldCleaners', () => {
-  it.each(namedCleaners)('should give the %s entry a pattern to apply', (_, cleaner) => {
-    expect(cleaner.drop ?? cleaner.strip).toBeDefined()
-  })
+  it.each(defaultFieldCleaners)(
+    'should give the $provider $field entry a pattern to apply',
+    (cleaner) => {
+      expect(cleaner.drop ?? cleaner.strip).toBeDefined()
+    },
+  )
 
   // A drop is a verdict on the whole value. Unanchored, `^kaltura player` would also drop a
   // video named after the player, and no fixture would notice.
-  it.each(namedCleaners.filter(([, cleaner]) => cleaner.drop instanceof RegExp))(
-    'should anchor the %s drop at both ends',
-    (_, cleaner) => {
+  it.each(defaultFieldCleaners.filter((cleaner) => cleaner.drop instanceof RegExp))(
+    'should anchor the $provider $field drop at both ends',
+    (cleaner) => {
       const source = cleaner.drop instanceof RegExp ? cleaner.drop.source : ''
 
       expect(source.startsWith('^')).toBe(true)
@@ -182,9 +184,9 @@ describe('defaultFieldCleaners', () => {
   )
 
   // The value is lowercased before a regex sees it, so an uppercase letter in one never matches.
-  it.each(namedCleaners.filter(([, cleaner]) => cleaner.drop instanceof RegExp))(
-    'should write the %s drop in lowercase',
-    (_, cleaner) => {
+  it.each(defaultFieldCleaners.filter((cleaner) => cleaner.drop instanceof RegExp))(
+    'should write the $provider $field drop in lowercase',
+    (cleaner) => {
       const source = cleaner.drop instanceof RegExp ? cleaner.drop.source : ''
 
       expect(source).toBe(source.toLowerCase())

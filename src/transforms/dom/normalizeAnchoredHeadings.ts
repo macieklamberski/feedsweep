@@ -1,3 +1,4 @@
+import { isAnyOf } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import {
   hasAncestorWithTagName,
@@ -15,7 +16,7 @@ const supTags = new Set(['sup'])
 // Anchor class tokens that static-site generators attach to heading permalinks
 // (Sphinx/MkDocs, markdown-it-anchor, Docusaurus, AnchorJS, Zola). Presence of
 // any of these marks the anchor as a permalink on its own.
-const permalinkClasses = new Set([
+const permalinkClasses = [
   'headerlink', // Sphinx / Python-Markdown / MkDocs
   'header-anchor', // markdown-it-anchor (VuePress / VitePress / Eleventy)
   'heading-anchor', // Various themes
@@ -27,7 +28,7 @@ const permalinkClasses = new Set([
   'o-heading-link', // Eleventy themes
   'wiki-anchor', // Redmine
   'permalink', // Generic permalink markup
-])
+]
 
 // Hash, pilcrow, section sign, fleuron, link emoji or zero-width space.
 const permalinkLabelRegex = /^[#¶§❡\u{1f517}​]+$/u
@@ -53,7 +54,7 @@ const isGlyphMarker = (node: Node, fragment: string): boolean => {
 
   const trimmed = text(node) ?? ''
 
-  return trimmed === '' || permalinkLabelRegex.test(trimmed) || trimmed === `#${fragment}`
+  return !trimmed || permalinkLabelRegex.test(trimmed) || trimmed === `#${fragment}`
 }
 
 // Lowercases and collapses runs of non-alphanumerics (Unicode-aware, so CJK and
@@ -83,9 +84,7 @@ export const normalizeAnchoredHeadings: DomTransform = ({ baseUrl, resolveUrlFn 
         // in-page target (`<a name>` / empty `<a id>` with no href). The bare target is
         // taken only when empty, so a named anchor wrapping real heading text is untouched.
         const isBareTarget =
-          href === null &&
-          visible === '' &&
-          (anchor.hasAttribute('name') || anchor.hasAttribute('id'))
+          href === null && !visible && (anchor.hasAttribute('name') || anchor.hasAttribute('id'))
 
         let fragment: string
 
@@ -97,7 +96,7 @@ export const normalizeAnchoredHeadings: DomTransform = ({ baseUrl, resolveUrlFn 
           continue
         }
 
-        if (fragment === '') {
+        if (!fragment) {
           continue
         }
 
@@ -129,7 +128,7 @@ export const normalizeAnchoredHeadings: DomTransform = ({ baseUrl, resolveUrlFn 
         const isSymbolOnly = isGlyphMarker(anchor, fragment)
         const hasKnownClass = className
           .split(whitespaceRegex)
-          .some((token) => permalinkClasses.has(token.toLowerCase()))
+          .some((token) => isAnyOf(token, permalinkClasses))
 
         // Symbol-only and generator-class anchors are self-evident permalinks. A
         // plain text link qualifies only when it points back at its own heading
@@ -137,7 +136,7 @@ export const normalizeAnchoredHeadings: DomTransform = ({ baseUrl, resolveUrlFn 
         const fragmentSlug = slugify(fragment)
         const slugMatch =
           (headingId !== null && slugify(headingId) === fragmentSlug) ||
-          (headingSlug !== '' && headingSlug === fragmentSlug)
+          (headingSlug && headingSlug === fragmentSlug)
         const qualifies =
           isSymbolOnly ||
           hasKnownClass ||

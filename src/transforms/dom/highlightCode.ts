@@ -29,7 +29,7 @@ const brushRegex = /brush:\s*([\w#+-]+)/
 const crayonRegex = /\blang[:_]([\w#+-]+)/
 const whitespaceRegex = /\s+/
 // Pandoc emits class="sourceCode LANG". These tokens are structural, not the language.
-const pandocStructuralClasses = new Set(['sourceCode', 'numberLines'])
+const pandocStructuralClasses = ['sourceCode', 'numberLines']
 // Jekyll/Rouge and similar wrap the block, putting the language-* class on an
 // ancestor div, not on the pre/code. Look at most this many levels up.
 const maxLanguageAncestorDepth = 3
@@ -85,7 +85,7 @@ export const detectLanguage = (pre: Element | null, code: Element | null): strin
     const tokens = element?.className.split(whitespaceRegex) ?? []
 
     if (tokens.includes('sourceCode')) {
-      const language = tokens.find((token) => token && !pandocStructuralClasses.has(token))
+      const language = tokens.find((token) => token && !pandocStructuralClasses.includes(token))
 
       if (language) {
         return language
@@ -179,7 +179,7 @@ const labelForLanguage = (language: string): string => {
 
 // Block-level elements that some highlighters and editors use to lay out one
 // code line each, with no newline character between them.
-const blockLineWrappers = new Set(['div', 'p', 'li', 'tr'])
+const blockLineWrappers = ['div', 'p', 'li', 'tr']
 
 const getCodeBlockText = (target: Element): string => {
   let text = ''
@@ -204,7 +204,12 @@ const getCodeBlockText = (target: Element): string => {
       continue
     }
 
-    if (node !== target && blockLineWrappers.has(node.localName) && text && !text.endsWith('\n')) {
+    if (
+      node !== target &&
+      blockLineWrappers.includes(node.localName) &&
+      text &&
+      !text.endsWith('\n')
+    ) {
       text += '\n'
     }
 
@@ -295,12 +300,14 @@ const stripCodeGutters = (document: Document): void => {
 
 // Tags whose presence means this transform has work to do. Gutter spans are only stripped
 // inside these, so a gutter class outside any code block is not a signal.
-const highlightSignalTags = new Set(['pre', 'code', 'table'])
+const highlightSignalTags = ['pre', 'code', 'table']
 
 // A code block ships unhighlighted, its language named only by a class, attribute or wrapper.
 export const highlightCode: DomTransform = ({ highlightFn }) => {
   return async (document) => {
-    const hasWork = walkElements(document, (element) => highlightSignalTags.has(element.localName))
+    const hasWork = walkElements(document, (element) =>
+      highlightSignalTags.includes(element.localName),
+    )
 
     if (!hasWork) {
       return

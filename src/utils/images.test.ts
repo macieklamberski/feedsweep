@@ -89,44 +89,36 @@ describe('widestSrcsetUrl', () => {
 })
 
 // Each case is [CDN label, wrapped input URL, expected inner-source key].
-const imageProxyCases: Array<[string, string, string]> = [
+const imageProxyCases: Array<[string, string]> = [
   [
-    'Cloudflare image',
     'https://files.zhedge.com/cdn-cgi/image/width=1080/https://assets.zerohedge.com/s3fs/photo.jpg',
     'assets.zerohedge.com/s3fs/photo.jpg',
   ],
   [
-    'Cloudflare plain',
     'https://assets.thelocal.com/cdn-cgi/plain/https://apiwp.thelocal.com/wp-content/uploads/photo.jpg',
     'apiwp.thelocal.com/wp-content/uploads/photo.jpg',
   ],
   [
-    'Next.js image',
     'https://x.com.br/_next/image?url=https%3A%2F%2Fx.com.br%2Ffotos%2Fphoto.jpg&w=384',
     'x.com.br/fotos/photo.jpg',
   ],
   [
-    'Brightspot dims',
     'https://npr.brightspotcdn.com/dims4/default/f008/resize/300x169!/quality/90/?url=https%3A%2F%2Fmedia.npr.org%2Fphoto.jpg',
     'media.npr.org/photo.jpg',
   ],
   [
-    'ImageKit',
     'https://ik.imagekit.io/demo/tr:w-200/https://cdn.example.com/photo.jpg',
     'cdn.example.com/photo.jpg',
   ],
   [
-    'dev.to',
     'https://media2.dev.to/dynamic/image/width=800/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fphoto.png',
     'dev-to-uploads.s3.amazonaws.com/photo.png',
   ],
   [
-    'Yahoo image API',
     'https://s.yimg.com/ny/api/res/1.2/As60/YXBw/https://d29szjachogqwa.cloudfront.net/images/photo.jpg',
     'd29szjachogqwa.cloudfront.net/images/photo.jpg',
   ],
   [
-    'podigee',
     'https://images.podigee-cdn.net/0x,siN6/https://main.podigee-cdn.net/uploads/u17132/photo.jpg',
     'main.podigee-cdn.net/uploads/u17132/photo.jpg',
   ],
@@ -396,8 +388,8 @@ describe('getImageFingerprint', () => {
   })
 
   it.each(imageProxyCases)(
-    'should unwrap the %s image proxy to its inner source',
-    (_name, url, expected) => {
+    'should unwrap the image proxy in %s to its inner source',
+    (url, expected) => {
       expect(getImageFingerprint(url)).toBe(expected)
     },
   )

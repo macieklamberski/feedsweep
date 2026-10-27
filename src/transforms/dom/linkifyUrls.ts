@@ -4,12 +4,12 @@ import { collectTextNodes, rawTextElements } from '../../utils/dom.js'
 import { createLink } from '../../utils/widgets.js'
 
 const urlProtocolRegex = /^https?:\/\//i
-const linkifyIgnoreTags = new Set(['a', 'pre', 'code', 'kbd', 'samp', 'var', 'noscript'])
+const linkifyIgnoreTags = ['a', 'pre', 'code', 'kbd', 'samp', 'var', 'noscript']
 
 const shouldSkipElement = (element: Element): boolean => {
   const tag = element.tagName.toLowerCase()
 
-  return linkifyIgnoreTags.has(tag) || rawTextElements.includes(tag)
+  return linkifyIgnoreTags.includes(tag) || rawTextElements.includes(tag)
 }
 
 // A bare url in running text, which the feed never wrapped in an anchor.

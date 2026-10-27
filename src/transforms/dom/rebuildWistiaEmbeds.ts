@@ -31,7 +31,7 @@ const wistiaSelector = [
 
 // Both carry the media id in the src path, which the platform module reads: the selector matches
 // them on a substring, so nothing before `readSrcMediaId` has looked at the host.
-const srcCarrierTags = new Set(['script', 'iframe'])
+const srcCarrierTags = ['script', 'iframe']
 
 // A src path is already a segment. An attribute comes out decoded, and its id goes into a path.
 const readMediaId = (element: Element): string | undefined => {
@@ -39,7 +39,7 @@ const readMediaId = (element: Element): string | undefined => {
     return encodePathSegment(attr(element, 'media-id') ?? '')
   }
 
-  if (srcCarrierTags.has(element.localName)) {
+  if (srcCarrierTags.includes(element.localName)) {
     return readSrcMediaId(attr(element, 'src'))
   }
 

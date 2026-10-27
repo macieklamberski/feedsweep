@@ -676,24 +676,24 @@ describeForEachParser('highlightCode', (parseHtml) => {
 
   // Each row states only that the alias resolves to a registered language: the highlighted
   // markup of fourteen languages would bury the alias, which is the whole point of the table.
-  const aliasFixtures: Array<[string, string]> = [
-    ['markup', '<pre><code class="language-markup"><div>hi</div></code></pre>'],
-    ['mysql', '<pre><code class="language-mysql">SELECT 1</code></pre>'],
-    ['python3', '<pre><code class="language-python3">def f():\n    return 1</code></pre>'],
-    ['objective-c', '<pre><code class="language-objective-c">int x = 1;</code></pre>'],
-    ['shell-session', '<pre><code class="language-shell-session">$ ls -la</code></pre>'],
-    ['emacs-lisp', '<pre><code class="language-emacs-lisp">(defun foo () 1)</code></pre>'],
-    ['clike', '<pre><code class="language-clike">int x = 1;</code></pre>'],
-    ['racket', '<pre><code class="language-racket">(define x 1)</code></pre>'],
-    ['jsonc', '<pre><code class="language-jsonc">{"a": 1}</code></pre>'],
-    ['vb', '<pre><code class="language-vb">Dim x = 1</code></pre>'],
-    ['fish', '<pre><code class="language-fish">echo hi</code></pre>'],
-    ['psql', '<pre><code class="language-psql">SELECT 1</code></pre>'],
-    ['asm', '<pre><code class="language-asm">mov eax, 1</code></pre>'],
-    ['arduino', '<pre><code class="language-arduino">void setup() {}</code></pre>'],
+  const aliasFixtures: Array<string> = [
+    '<pre><code class="language-markup"><div>hi</div></code></pre>',
+    '<pre><code class="language-mysql">SELECT 1</code></pre>',
+    '<pre><code class="language-python3">def f():\n    return 1</code></pre>',
+    '<pre><code class="language-objective-c">int x = 1;</code></pre>',
+    '<pre><code class="language-shell-session">$ ls -la</code></pre>',
+    '<pre><code class="language-emacs-lisp">(defun foo () 1)</code></pre>',
+    '<pre><code class="language-clike">int x = 1;</code></pre>',
+    '<pre><code class="language-racket">(define x 1)</code></pre>',
+    '<pre><code class="language-jsonc">{"a": 1}</code></pre>',
+    '<pre><code class="language-vb">Dim x = 1</code></pre>',
+    '<pre><code class="language-fish">echo hi</code></pre>',
+    '<pre><code class="language-psql">SELECT 1</code></pre>',
+    '<pre><code class="language-asm">mov eax, 1</code></pre>',
+    '<pre><code class="language-arduino">void setup() {}</code></pre>',
   ]
 
-  it.each(aliasFixtures)('should highlight registered alias %s', async (_alias, value) => {
+  it.each(aliasFixtures)('should highlight a registered alias in %s', async (value) => {
     expect(await transform(value)).toContain('hljs')
   })
 
