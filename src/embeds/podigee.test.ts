@@ -243,6 +243,19 @@ describe('podigeeResolveEmbed', () => {
 
   // With anything after `embed` the show serves its website page rather than the player, and the
   // leading segment here is unnumbered, so there is nothing to mint from either.
+  it('should mint the show-level player, which plays the latest episode', () => {
+    const value = 'https://theshow.podigee.io/embed?context=external'
+    const expected: EmbedResolverResult = {
+      provider: 'podigee',
+      id: 'theshow/embed',
+      src: 'https://theshow.podigee.io/embed?context=external',
+      url: 'https://theshow.podigee.io/',
+      height: 145,
+    }
+
+    expect(podigeeResolveEmbed(new URL(value))).toEqual(expected)
+  })
+
   it('should return undefined when embed is not the last segment', () => {
     const value = 'https://cloudonaut.podigee.io/an-episode/embed/extra'
 
@@ -314,6 +327,23 @@ describeForEachParser('podigee through the pipeline', (parseHtml) => {
         data-embed-provider="podigee"
         data-embed-src="https://cloudonaut.podigee.io/72-an-episode/embed?context=external"
         data-embed-url="https://cloudonaut.podigee.io/72-an-episode"
+        data-embed-height="145"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should claim a lazy show-level player that names its url in data-src', async () => {
+    const value =
+      '<iframe class="lazyload" data-src="https://alleineistschwer.podigee.io/embed?context=external"></iframe>'
+
+    const expected = html`
+      <div
+        data-embed-id="alleineistschwer/embed"
+        data-embed-provider="podigee"
+        data-embed-src="https://alleineistschwer.podigee.io/embed?context=external"
+        data-embed-url="https://alleineistschwer.podigee.io/"
         data-embed-height="145"
       ></div>
     `
