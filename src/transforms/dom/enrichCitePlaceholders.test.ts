@@ -156,7 +156,11 @@ describeForEachParser('enrichCitePlaceholders', (parseHtml) => {
       return [{ date: 'January 13th, 2023' }]
     }
     const parseDateFn = (raw: string) => {
-      return raw === 'January 13th, 2023' ? '2023-01-13' : undefined
+      if (raw !== 'January 13th, 2023') {
+        return
+      }
+
+      return '2023-01-13'
     }
     const expected = html`
       <div

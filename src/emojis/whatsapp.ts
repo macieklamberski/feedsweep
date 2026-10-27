@@ -22,7 +22,11 @@ export const whatsappEmojiResolver: EmojiResolver = {
     const typed = text(element)
 
     if (typed) {
-      return isEmojiShaped(typed) ? { glyph: typed } : undefined
+      if (!isEmojiShaped(typed)) {
+        return
+      }
+
+      return { glyph: typed }
     }
 
     const url = bgImage(element)

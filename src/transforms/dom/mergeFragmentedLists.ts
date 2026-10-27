@@ -76,7 +76,11 @@ const nextMergeableSibling = (from: Element, localName: string): Element | undef
 
   while (sibling) {
     if (isElement(sibling)) {
-      return sibling.localName === localName ? sibling : undefined
+      if (sibling.localName !== localName) {
+        return
+      }
+
+      return sibling
     }
 
     if (isText(sibling)) {

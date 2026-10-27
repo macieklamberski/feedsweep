@@ -85,7 +85,16 @@ describeForEachParser('convertCiteCards', (parseHtml) => {
         selector: '.a',
         extract: (element) => {
           const url = element.getAttribute('data-url')
-          return url ? { provider: 'a', url, title: 'A' } : undefined
+
+          if (!url) {
+            return
+          }
+
+          return {
+            provider: 'a',
+            url,
+            title: 'A',
+          }
         },
       }
       const resolverB: CiteResolver = {
@@ -93,7 +102,16 @@ describeForEachParser('convertCiteCards', (parseHtml) => {
         selector: '.b',
         extract: (element) => {
           const url = element.getAttribute('data-url')
-          return url ? { provider: 'b', url, title: 'B' } : undefined
+
+          if (!url) {
+            return
+          }
+
+          return {
+            provider: 'b',
+            url,
+            title: 'B',
+          }
         },
       }
       const value = html`
@@ -281,7 +299,11 @@ describeForEachParser('convertCiteCards', (parseHtml) => {
 
     it('should write the normalized date when the hook parses it', async () => {
       const parseDateFn = (raw: string) => {
-        return raw === '2018.10.14' ? '2018-10-14' : undefined
+        if (raw !== '2018.10.14') {
+          return
+        }
+
+        return '2018-10-14'
       }
       const context: TransformContext = { ...baseContext, parseDateFn }
 

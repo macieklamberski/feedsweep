@@ -103,7 +103,11 @@ export const bbcResolveEmbed: ResolveUrlEmbed = (url, element) => {
       return
     }
 
-    return isArticleId(article) ? composeNewsEmbed(article, pid) : undefined
+    if (!isArticleId(article)) {
+      return
+    }
+
+    return composeNewsEmbed(article, pid)
   }
 
   if (isAnyOf(section, 'news') && isAnyOf(player, 'av-embeds')) {
@@ -113,7 +117,11 @@ export const bbcResolveEmbed: ResolveUrlEmbed = (url, element) => {
       return
     }
 
-    return isPidSlot(pid) ? composeNewsEmbed(article, pid) : undefined
+    if (!isPidSlot(pid)) {
+      return
+    }
+
+    return composeNewsEmbed(article, pid)
   }
 
   // `/ws/av-embeds/articles/{article}/{pid}/{lang}/` is the same player app as the news one.

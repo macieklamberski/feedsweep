@@ -454,7 +454,11 @@ describeForEachParser('readS9eFragment', (parseHtml) => {
   const read = (value: string) => {
     const element = parseHtml(value).querySelector('iframe')
 
-    return element ? readS9eFragment(element) : undefined
+    if (!element) {
+      return
+    }
+
+    return readS9eFragment(element)
   }
 
   it('should read the first fragment of a helper frame', () => {
@@ -577,7 +581,11 @@ describeForEachParser('findBareHandle', (parseHtml) => {
   const read = (value: string) => {
     const element = parseHtml(value).querySelector('blockquote')
 
-    return element ? findBareHandle(element) : undefined
+    if (!element) {
+      return
+    }
+
+    return findBareHandle(element)
   }
 
   it('should read the handle from a text node holding it', () => {
@@ -1028,7 +1036,11 @@ describeForEachParser('readCarrierSize', (parseHtml) => {
   ) => {
     const element = parseHtml(value).querySelector(resolver.selector)
 
-    return element ? resolver.extract(element) : undefined
+    if (!element) {
+      return
+    }
+
+    return resolver.extract(element)
   }
 
   describe('a resolver that leaves the option off', () => {
@@ -1513,7 +1525,11 @@ describeForEachParser('getEmbedSize', (parseHtml) => {
   const build = (markup: string) => {
     const element = parseHtml(markup).querySelector('div.player')
 
-    return element ? getEmbedSize(element, 0) : undefined
+    if (!element) {
+      return
+    }
+
+    return getEmbedSize(element, 0)
   }
 
   it('should drop a zero width and keep the height the carrier states', () => {

@@ -81,17 +81,29 @@ const readCollectionVideoId = (segments: Array<string>): string | undefined => {
   const [collection, , route, videoId] = segments
 
   if (isAnyOf(collection, showcasePaths)) {
-    return isAnyOf(route, 'video') ? videoId : undefined
+    if (!isAnyOf(route, 'video')) {
+      return
+    }
+
+    return videoId
   }
 
   if (isAnyOf(collection, 'groups')) {
-    return isAnyOf(route, 'videos') ? videoId : undefined
+    if (!isAnyOf(route, 'videos')) {
+      return
+    }
+
+    return videoId
   }
 
   if (isAnyOf(collection, namedCollectionPaths)) {
     const [, , namedVideoId] = segments
 
-    return segments.length === 3 ? namedVideoId : undefined
+    if (segments.length !== 3) {
+      return
+    }
+
+    return namedVideoId
   }
 }
 
@@ -120,7 +132,11 @@ const resolveShowcaseEmbed = (url: URL): EmbedResolverResult | undefined => {
 
   const showcaseId = keepIfMatches(rawShowcaseId, digitsRegex)
 
-  return showcaseId ? composeShowcaseEmbed(showcaseId) : undefined
+  if (!showcaseId) {
+    return
+  }
+
+  return composeShowcaseEmbed(showcaseId)
 }
 
 // `/embed/interaction` is the event player with Vimeo's interaction panel beside it.
@@ -201,7 +217,11 @@ const readReference = (url: URL): VimeoReference | undefined => {
   if (isAnyOf(section, collectionPaths)) {
     const id = keepIfMatches(readCollectionVideoId(segments), digitsRegex)
 
-    return id ? { id } : undefined
+    if (!id) {
+      return
+    }
+
+    return { id }
   }
 
   // A numeric video id matches the hash alphabet, so only a segment after an id counts as one.

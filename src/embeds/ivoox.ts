@@ -48,7 +48,15 @@ export const extractIvooxSubject = (url: URL): IvooxSubject | undefined => {
   // episode's own page for a legacy id and 404s for a fabricated one.
   const legacy = url.pathname.match(legacyPlayerRegex)
 
-  return legacy?.[1] ? { kind: 'episode', id: legacy[1], page: '1' } : undefined
+  if (!legacy?.[1]) {
+    return
+  }
+
+  return {
+    kind: 'episode',
+    id: legacy[1],
+    page: '1',
+  }
 }
 
 // iVoox's player iframes, whose legacy `playerivoox_` generation now answers 404 for every id.

@@ -78,7 +78,11 @@ const readDashboardId = (url: URL): string | undefined => {
   if (isAnyOf(url.pathname, dashboardShellPaths)) {
     const fragmentId = url.hash.match(dashboardFragmentRegex)?.[1]
 
-    return fragmentId ? encodePathSegment(fragmentId) : undefined
+    if (!fragmentId) {
+      return
+    }
+
+    return encodePathSegment(fragmentId)
   }
 
   return url.pathname.match(dashboardPathRegex)?.[1]

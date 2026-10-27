@@ -188,7 +188,11 @@ export const readDailymotionEmbedSrc = (link: string): string | undefined => {
   const url = parseUrlOnHosts(link, hosts)
   const videoId = url && extractDailymotionId(url)
 
-  return videoId ? composeEmbedUrl('video', videoId) : undefined
+  if (!videoId) {
+    return
+  }
+
+  return composeEmbedUrl('video', videoId)
 }
 
 // Where playback starts, whether it loops, and the playlist the video sits in. The rest of the

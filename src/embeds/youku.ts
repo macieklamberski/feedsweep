@@ -25,9 +25,11 @@ const readVideoId = (url: URL): string | undefined => {
     const videoIds = getQueryParam(url.searchParams, 'VideoIDS')
 
     // The query value comes out decoded, and it goes into the player path.
-    return staticFlashPathRegex.test(url.pathname) && videoIds
-      ? encodePathSegment(videoIds)
-      : undefined
+    if (!staticFlashPathRegex.test(url.pathname) || !videoIds) {
+      return
+    }
+
+    return encodePathSegment(videoIds)
   }
 
   const videoId = url.pathname.match(embedPathRegex)?.[1] ?? url.pathname.match(flashPathRegex)?.[1]
