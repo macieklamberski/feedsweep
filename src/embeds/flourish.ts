@@ -22,7 +22,7 @@ const nonEmbeddableResource = 'template'
 
 // The div names its chart by a relative `{resource}/{id}` path, at most with a cache-busting
 // query. A full URL or any other shape is dropped.
-const widgetSrcRegex = /^(?<kind>[^/]+)\/(?<id>[^/?]+)(?:\?.*)?$/
+const widgetSrcRegex = /^([^/]+)\/([^/?]+)(?:\?.*)?$/
 
 // `visualisation` and `story` are the two kinds feeds carry. The endpoint answers 403 for a wrong
 // kind, an unknown kind or a fabricated id.
@@ -44,14 +44,14 @@ const composeEmbed = (resource: string, id: string): EmbedResolverResult | undef
 export const flourishWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.flourish-embed[data-src]',
   (element) => {
-    const widget = attr(element, 'data-src')?.match(widgetSrcRegex)?.groups
+    const match = attr(element, 'data-src')?.match(widgetSrcRegex)
 
-    if (!widget) {
+    if (!match) {
       return
     }
 
     // The src is read unparsed, and both halves go into a path.
-    const result = composeEmbed(encodePathSegment(widget.kind), encodePathSegment(widget.id))
+    const result = composeEmbed(encodePathSegment(match[1]), encodePathSegment(match[2]))
     // The div usually wraps a static thumbnail img, bare or inside a <noscript>.
     const thumbnail = attr(find(element, 'img'), 'src')
 

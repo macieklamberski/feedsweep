@@ -18,7 +18,7 @@ const timestampToken = '(?:\\d{1,2}:)?\\d{1,2}:\\d{2}'
 // The token at a line start after optional whitespace, or at a line end before it.
 // An incidental "12:30" in the middle of prose is not a marker.
 const lineBoundaryTimestampRegex = new RegExp(
-  `(?:^|\\n)[ \\t]*(?<leading>${timestampToken})|(?<trailing>${timestampToken})(?=[ \\t]*(?:\\n|$))`,
+  `(?:^|\\n)[ \\t]*(${timestampToken})|(${timestampToken})(?=[ \\t]*(?:\\n|$))`,
   'g',
 )
 
@@ -149,7 +149,7 @@ export const markTimestamps: DomTransform = () => {
       let lastIndex = 0
 
       for (const match of line.matchAll(lineBoundaryTimestampRegex)) {
-        const token = match.groups?.leading ?? match.groups?.trailing
+        const token = match[1] ?? match[2]
 
         if (!token) {
           continue

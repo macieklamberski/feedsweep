@@ -8,7 +8,7 @@ import { readRepairedCarrierUrl } from '../utils/widgets.js'
 const weeblyHosts = ['weebly.com']
 
 const httpUrlRegex = /^https?:\/\//i
-const embedCallRegex = /AudioPlayer\.embed\(\s*["'](?<id>[^"']+)["']\s*,\s*\{(?<options>[^}]*)\}/g
+const embedCallRegex = /AudioPlayer\.embed\(\s*["']([^"']+)["']\s*,\s*\{([^}]*)\}/g
 const soundFileOptionRegex = /\bsoundFile\s*:\s*(["'])(.*?)\1/i
 const titlesOptionRegex = /\btitles\s*:\s*(["'])(.*?)\1/i
 
@@ -91,13 +91,7 @@ export const onePixelOutWidgetMediaResolver: MediaResolver = {
 
     // The call sits in a script beside the mount, or beside a wrapper around it.
     for (const script of element.ownerDocument.querySelectorAll('script')) {
-      for (const match of script.textContent?.matchAll(embedCallRegex) ?? []) {
-        if (!match.groups) {
-          continue
-        }
-
-        const { id, options } = match.groups
-
+      for (const [, id, options] of script.textContent?.matchAll(embedCallRegex) ?? []) {
         if (id !== mountId) {
           continue
         }

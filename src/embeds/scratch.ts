@@ -11,8 +11,7 @@ const hosts = [
 ]
 
 // The current spelling and the legacy one, which redirects to it.
-const projectEmbedRegex =
-  /^\/projects\/(?:(?<slashedId>[^/]+)\/embed|embed\/(?<embedId>[^/]+))\/?$/i
+const projectEmbedRegex = /^\/projects\/(?:([^/]+)\/embed|embed\/([^/]+))\/?$/i
 
 // The box the share snippet writes.
 const sizes = {
@@ -21,8 +20,8 @@ const sizes = {
 
 // Scratch's project player.
 export const scratchResolveEmbed: ResolveUrlEmbed = (url) => {
-  const project = url.pathname.match(projectEmbedRegex)?.groups
-  const projectId = project?.slashedId ?? project?.embedId
+  const match = url.pathname.match(projectEmbedRegex)
+  const projectId = match?.[1] ?? match?.[2]
 
   if (!projectId) {
     return

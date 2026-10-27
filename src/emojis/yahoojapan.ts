@@ -10,7 +10,7 @@ const selectors = [
 
 // Mail's older set names each file by the carrier's letter and its own number for the emoji, like
 // `ew_icon_a257` for au's 257, beside Yahoo's own drawings like `ew_icon_exclamation`.
-const carrierIconRegex = /^ew_icon_(?<letter>[ads])(?<number>\d+)$/
+const carrierIconRegex = /^ew_icon_([ads])(\d+)$/
 const carriers = toMap<EmojiCarrier>({
   a: 'au',
   d: 'docomo',
@@ -18,14 +18,14 @@ const carriers = toMap<EmojiCarrier>({
 })
 
 const getGlyph = (src: string): EmojiGlyph | undefined => {
-  const icon = carrierIconRegex.exec(getFileStem(src))?.groups
-  const carrier = carriers.get(icon?.letter ?? '')
+  const [, letter, number] = carrierIconRegex.exec(getFileStem(src)) ?? []
+  const carrier = carriers.get(letter ?? '')
 
   if (!carrier) {
     return
   }
 
-  return glyphFromCarrierEmoji(carrier, Number(icon?.number))
+  return glyphFromCarrierEmoji(carrier, Number(number))
 }
 
 // Yahoo Japan's emoticons and Mail emoji, as blogs and mail pasted them straight from its image

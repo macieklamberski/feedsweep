@@ -35,13 +35,12 @@ const staticImageHosts = [
 ]
 
 const viewPathRegex = /^\/views\/([^/]+)\/([^/]+)$/i
-const viewNameRegex = /^(?<workbook>[^/]+)\/(?<sheet>[^/]+)$/
+const viewNameRegex = /^([^/]+)\/([^/]+)$/
 const profilePathRegex = /^\/profile\/[^/]+$/i
 const vizHomeHashRegex = /^#!\/vizhome\/([^/?]+)\/([^/?]+)(?:\?|$)/i
 // `/static/images/{first two letters}/{workbook}/{sheet}/{file}`. A shared viz has no workbook
 // and writes `/static/images/{first two letters}/{key}/{file}`.
-const staticImagePathRegex =
-  /^\/static\/images\/[^/]+\/(?<workbook>[^/]+)\/(?<sheet>[^/]+)\/[^/]+$/i
+const staticImagePathRegex = /^\/static\/images\/[^/]+\/([^/]+)\/([^/]+)\/[^/]+$/i
 // Blogger escapes the `<noscript>` content to text and doubles the `&` of each `&#47;` it holds.
 const escapedSlashRegex = /&(?:amp;)*#47;/g
 const imageUrlRegex = /https?:\/\/[^\s"'<>]+/
@@ -75,15 +74,15 @@ const composeNamedEmbed = (
 // The snippet's image of the viz, written from the same workbook and sheet as the viz. Its
 // public.tableau.com copy is a blank 1x1 png for most workbooks that still exist.
 const readStaticImage = (url: string | undefined): View | undefined => {
-  const image = parseUrlOnHosts(url, staticImageHosts)?.pathname.match(staticImagePathRegex)?.groups
+  const match = parseUrlOnHosts(url, staticImageHosts)?.pathname.match(staticImagePathRegex)
 
-  if (!image) {
+  if (!match) {
     return
   }
 
   return {
-    workbook: image.workbook,
-    sheet: image.sheet,
+    workbook: match[1],
+    sheet: match[2],
   }
 }
 
@@ -112,13 +111,13 @@ export const tableauObjectEmbedResolver = createMarkupEmbedResolver(
   (element) => {
     // `viz_v1.js` decodes `host_url` before it builds the frame url on it.
     const hostUrl = decodeSegment(paramValue(element, 'host_url'))
-    const view = paramValue(element, 'name')?.match(viewNameRegex)?.groups
+    const match = paramValue(element, 'name')?.match(viewNameRegex)
 
-    if (!parseUrlOnHosts(hostUrl, hosts) || !view) {
+    if (!parseUrlOnHosts(hostUrl, hosts) || !match) {
       return
     }
 
-    return composeNamedEmbed(view.workbook, view.sheet, undefined)
+    return composeNamedEmbed(match[1], match[2], undefined)
   },
 )
 

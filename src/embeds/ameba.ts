@@ -14,8 +14,7 @@ const sizes = {
 const hosts = ['static.blog-video.jp']
 const amebloHosts = ['ameblo.jp']
 
-const reblogCardPathRegex =
-  /^\/s\/embed\/reblog-card\/(?<blogId>[^/]+)\/entry-(?<entryId>[^/]+)\.html$/i
+const reblogCardPathRegex = /^\/s\/embed\/reblog-card\/([^/]+)\/entry-([^/]+)\.html$/i
 const imagePagePathRegex = /^\/p\/embed\/([^/]+\/image-[^/]+)\.html$/i
 
 // Ameba's movie player, `static.blog-video.jp/?v={id}`, for a video uploaded into a blog post.
@@ -53,9 +52,9 @@ const readReblogCardId = (
 // a blogger gets when reblogging another Ameba post. Only the blog and the entry together name
 // the reblogged post, so the id carries the pair and composes the post's own page from it.
 export const amebaReblogCardEmbedResolver = createUrlEmbedResolver(amebloHosts, (url, element) => {
-  const card = reblogCardPathRegex.exec(url.pathname)?.groups
+  const match = reblogCardPathRegex.exec(url.pathname)
 
-  if (!card) {
+  if (!match) {
     return
   }
 
@@ -64,7 +63,7 @@ export const amebaReblogCardEmbedResolver = createUrlEmbedResolver(amebloHosts, 
   // A stated pair comes out of its attributes decoded, and both halves go into a path.
   const id =
     readReblogCardId(encodePathSegment(blogId ?? ''), encodePathSegment(entryId ?? '')) ??
-    readReblogCardId(card.blogId, card.entryId)
+    readReblogCardId(match[1], match[2])
 
   if (!id) {
     return

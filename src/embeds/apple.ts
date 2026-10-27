@@ -146,19 +146,19 @@ export const appleIframeEmbedResolver = createUrlEmbedResolver(hosts, (url, elem
 // same marketing page, so the frame shows no player for anybody.
 const toolsHosts = ['tools.applemusic.com']
 
-const toolsPathRegex = /^\/embed\/v1\/(?<kind>[a-z]+)\/(?<pathId>[^/]+)$/i
+const toolsPathRegex = /^\/embed\/v1\/([a-z]+)\/([^/]+)$/i
 
 // The same album, playlist or song as the modern player, reached through the retired tool's url.
 // The tool wrote the storefront as `country`. A missing `country` drops the segment, and Apple
 // serves a storefront-less url from the US store.
 export const appleToolsEmbedResolver = createUrlEmbedResolver(toolsHosts, (url) => {
-  const tool = url.pathname.match(toolsPathRegex)?.groups
+  const match = url.pathname.match(toolsPathRegex)
 
-  if (!tool) {
+  if (!match) {
     return
   }
 
-  const { kind, pathId } = tool
+  const [, kind, pathId] = match
 
   const country = getQueryParam(url.searchParams, 'country')?.toLowerCase()
   const storefront = country ? encodePathSegment(country) : undefined

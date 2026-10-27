@@ -20,7 +20,7 @@ const playerPathRegex = /^\/(?:embed(?:\/v2)?|player\/v1)\/(\d+)\/?$/i
 
 // A watch url names the clip's owner and the clip: `/@handle/video/{id}`. Sanitized copies
 // sometimes keep only the `/video/{id}` half, so the handle is optional.
-const watchPathRegex = /^(?:\/@(?<handle>[^/]+))?\/video\/(?<videoId>\d+)\/?$/i
+const watchPathRegex = /^(?:\/@([^/]+))?\/video\/(\d+)\/?$/i
 
 const sizes = {
   // Not a 9/16 ratio: the frame stays 738 tall at any width, and the ratio asks 1778 at 1000.
@@ -37,9 +37,9 @@ const readWatchUrl = (parsed: URL | undefined): Clip => {
     return {}
   }
 
-  const clip = parsed.pathname.match(watchPathRegex)?.groups
+  const [, handle, videoId] = parsed.pathname.match(watchPathRegex) ?? []
 
-  return { handle: clip?.handle, videoId: clip?.videoId }
+  return { handle, videoId }
 }
 
 // A profile url and nothing else: `/@handle`, with no video segment after it.

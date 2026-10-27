@@ -164,7 +164,7 @@ const xspfPlayerPathRegex = /^\/audio\/xspf_player\.swf$/i
 // The WordPress audio player swf, uploaded into an item of its own or beside the files it plays.
 const itemPlayerPathRegex = /^\/download\/.+\/player\.swf$/i
 // `archive.org/download/{identifier}/{file}`, or `/{n}/items/{identifier}/{file}` on a storage host.
-const itemFilePathRegex = /^\/+(?:download|\d+\/items)\/(?<identifier>[^/]+)\/(?<file>.+)/i
+const itemFilePathRegex = /^\/+(?:download|\d+\/items)\/([^/]+)\/(.+)/i
 // The segment after `archive.org/download/` on any subdomain.
 // Both dialects write the file as `archive.org/download/{identifier}/{file}`, on the playlist
 // entry for a video and on the clip's `baseUrl` for audio.
@@ -198,13 +198,13 @@ const readXspfPlayer = (player: URL): EmbedResolverResult | undefined => {
 // The `soundFile` flashvar names one file of an item that can hold hundreds, so the file is kept.
 const readItemPlayer = (element: Element | undefined): EmbedResolverResult | undefined => {
   const soundFile = parseUrlOnHosts(flashVar(element, 'soundFile'), hosts)
-  const item = soundFile?.pathname.match(itemFilePathRegex)?.groups
+  const [, identifier, file] = soundFile?.pathname.match(itemFilePathRegex) ?? []
 
-  if (!item?.identifier) {
+  if (!identifier) {
     return
   }
 
-  return { ...composeEmbedResult(item.identifier, '', item.file), ...sizes.audio }
+  return { ...composeEmbedResult(identifier, '', file), ...sizes.audio }
 }
 
 const archiveFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {

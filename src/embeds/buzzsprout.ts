@@ -14,12 +14,12 @@ const provider = 'buzzsprout'
 
 const hosts = ['buzzsprout.com']
 // /{podcast}/{episode}-{slug}.js, with or without episodes/.
-const episodeScriptPathRegex = /^\/(?<show>\d+)\/(?:episodes\/)?(?<episode>\d+)(?:-[^/]*)?\.js$/i
+const episodeScriptPathRegex = /^\/(\d+)\/(?:episodes\/)?(\d+)(?:-[^/]*)?\.js$/i
 // A script naming the podcast alone is the show player, which carries every episode.
 const showScriptPathRegex = /^\/(\d+)\.js$/i
 // /{podcast}/{episode}-{slug} with or without episodes/, the slug dot-free to keep .mp3 out.
 // The episode audio is `buzzsprout.com/{podcast}/{episode}-{slug}.mp3` on the same host.
-const episodePagePathRegex = /^\/(?<show>\d+)\/(?:episodes\/)?(?<episode>\d+)(?:-[^/.]*)?$/i
+const episodePagePathRegex = /^\/(\d+)\/(?:episodes\/)?(\d+)(?:-[^/.]*)?$/i
 
 // Both heights are what Buzzsprout's own script writes onto the iframe it builds: 200 for the
 // small episode player, 375 for the large show player (read from the served script, 2026-08-15).
@@ -52,14 +52,14 @@ const composeEmbed = (
 
 // Buzzsprout's player iframe, whose title names the episode.
 export const buzzsproutResolveEmbed: ResolveUrlEmbed = (url, element) => {
-  const page = url.pathname.match(episodePagePathRegex)?.groups
+  const match = url.pathname.match(episodePagePathRegex)
 
-  if (!page) {
+  if (!match) {
     return
   }
 
   const title = attr(element, 'title')
-  const result = composeEmbed(page.show, page.episode)
+  const result = composeEmbed(match[1], match[2])
 
   return title ? { ...result, title } : result
 }
@@ -82,10 +82,10 @@ export const buzzsproutScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const script = url.pathname.match(episodeScriptPathRegex)?.groups
+    const episode = url.pathname.match(episodeScriptPathRegex)
 
-    if (script?.show && script.episode) {
-      return composeEmbed(script.show, script.episode)
+    if (episode?.[1] && episode[2]) {
+      return composeEmbed(episode[1], episode[2])
     }
 
     const show = url.pathname.match(showScriptPathRegex)
