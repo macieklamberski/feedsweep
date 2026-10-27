@@ -27,7 +27,7 @@ const tagAttributes = groupUrlAttributesByTag(proxyableAttributes)
 // srcset is not a url but a list of them, so it is not a table row: it is rewritten whole and
 // only when the proxy changed a candidate. Both tags carrying one already carry a `src` row, so
 // the selectors above reach them.
-const srcsetTags = new Set(['img', 'source'])
+const srcsetTags = ['img', 'source']
 
 // A `fromParent` row takes its kind from the element above: a <source> or <track> is a video
 // track inside a <video>, an audio one inside an <audio>, and an image anywhere else.
@@ -138,7 +138,7 @@ export const proxyAssetUrls: DomTransform = ({ assetProxyFn }) => {
         await proxyAttribute(element, spelling, assetTypeOf(element, asset), assetProxyFn)
       }
 
-      if (srcsetTags.has(name)) {
+      if (srcsetTags.includes(name)) {
         await proxySrcset(element, 'image', assetProxyFn)
       }
 

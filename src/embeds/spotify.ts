@@ -45,7 +45,7 @@ const imageHosts = ['scdn.co']
 
 // The act under the title is the publisher Spotify's own show page prints: the show's own, and
 // for an episode the publisher of the show it ran in.
-const publisherTypes = new Set(['show', 'episode'])
+const publisherTypes = ['show', 'episode']
 
 // Substack renders the player inside its own iframe and hangs the item's card on the same
 // element as JSON.
@@ -56,7 +56,7 @@ const readSubstackItem = (element: Element, type: string): Partial<EmbedResolver
     return {}
   }
 
-  const isPublisherType = publisherTypes.has(type)
+  const isPublisherType = publisherTypes.includes(type)
   const act =
     type === 'playlist' ? attributes.subtitle?.replace(ownerPrefixRegex, '') : attributes.subtitle
 

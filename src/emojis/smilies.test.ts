@@ -345,12 +345,12 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    const largeCases: Array<[string, string, string]> = [
-      ['49 by 49', '49', '49'],
-      ['259 by 111', '259', '111'],
+    const largeCases: Array<[string, string]> = [
+      ['49', '49'], // 49 by 49
+      ['259', '111'], // 259 by 111
     ]
 
-    it.each(largeCases)('should leave a %s emoticon untouched', async (_size, width, height) => {
+    it.each(largeCases)('should leave a %s by %s emoticon untouched', async (width, height) => {
       const value = html`
         <p>
           <img
@@ -440,56 +440,26 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
     // Each entry is markup as the engine actually emits it into feed content, so the awkward
     // parts are deliberate: MyBB's alt is an English name, vBulletin's is empty, FCKeditor
     // ships neither alt nor class, and IPB 2 puts the filename in the alt.
-    const engineCases: Array<[string, string]> = [
-      [
-        'SMF',
-        'src="https://example.com/forum/Smileys/default/wink.gif" alt=";)" title="Wink" class="smiley"',
-      ],
-      [
-        'MyBB',
-        'src="https://example.com/images/smilies/angry.gif" alt="Angry" title="Angry" class="smilie smilie_26"',
-      ],
-      [
-        'vBulletin',
-        'src="https://example.com/images/smilies/smile.gif" border="0" alt="" title="Smile" class="inlineimg"',
-      ],
-      [
-        'DokuWiki',
-        'src="https://example.com/lib/images/smileys/smile.svg" class="icon smiley" alt=":-)"',
-      ],
-      [
-        'CKEditor',
-        'src="/ckeditor/plugins/smiley/images/regular_smile.gif" title="smiley" alt="smiley"',
-      ],
-      ['FCKeditor', 'src="/editor/images/smiley/msn/wink_smile.gif"'],
+    const engineCases: Array<string> = [
+      'src="https://example.com/forum/Smileys/default/wink.gif" alt=";)" title="Wink" class="smiley"', // SMF
+      'src="https://example.com/images/smilies/angry.gif" alt="Angry" title="Angry" class="smilie smilie_26"', // MyBB
+      'src="https://example.com/images/smilies/smile.gif" border="0" alt="" title="Smile" class="inlineimg"', // vBulletin
+      'src="https://example.com/lib/images/smileys/smile.svg" class="icon smiley" alt=":-)"', // DokuWiki
+      'src="/ckeditor/plugins/smiley/images/regular_smile.gif" title="smiley" alt="smiley"', // CKEditor
+      'src="/editor/images/smiley/msn/wink_smile.gif"', // FCKeditor
       // Both spellings ship in the wild, and the corrected one is the commoner of the two.
-      [
-        'CKEditor corrected tongue',
-        'src="/ckeditor/plugins/smiley/images/tongue_smile.png" alt="cheeky" title="cheeky"',
-      ],
-      ['TinyMCE 4', 'src="/tinymce/plugins/emoticons/img/smiley-cool.gif" alt="cool"'],
-      [
-        'Invision Power Board 3',
-        'src="/public/style_emoticons/default/smile.png" class="bbc_emoticon" alt=":)"',
-      ],
-      [
-        'Invision Power Board 2',
-        'src="/style_emoticons/default/smile.gif" emoid=":)" alt="smile.gif"',
-      ],
-      [
-        'Simple:Press',
-        'src="/wp-content/forum-smileys/sf-wink.gif" width="15" class="sfimageleft" title="wink" alt="wink"',
-      ],
+      'src="/ckeditor/plugins/smiley/images/tongue_smile.png" alt="cheeky" title="cheeky"', // CKEditor corrected tongue
+      'src="/tinymce/plugins/emoticons/img/smiley-cool.gif" alt="cool"', // TinyMCE 4
+      'src="/public/style_emoticons/default/smile.png" class="bbc_emoticon" alt=":)"', // Invision Power Board 3
+      'src="/style_emoticons/default/smile.gif" emoid=":)" alt="smile.gif"', // Invision Power Board 2
+      'src="/wp-content/forum-smileys/sf-wink.gif" width="15" class="sfimageleft" title="wink" alt="wink"', // Simple:Press
       // From the engines' own default sets, not from corpus tokens, so these cover boards the
       // corpus never sampled.
-      ['phpBB sad', 'class="smilies" src="/images/smilies/icon_e_sad.svg" alt="" title="Sad"'],
-      [
-        'SMF sealed lips',
-        'src="/Smileys/fugue/lipsrsealed.png" alt="" title="Lips sealed" class="smiley"',
-      ],
+      'class="smilies" src="/images/smilies/icon_e_sad.svg" alt="" title="Sad"', // phpBB sad
+      'src="/Smileys/fugue/lipsrsealed.png" alt="" title="Lips sealed" class="smiley"', // SMF sealed lips
     ]
 
-    it.each(engineCases)('should mark a %s smilie', async (_engine, attributes) => {
+    it.each(engineCases)('should mark a smilie with %s', async (attributes) => {
       const value = `<p><img ${attributes}></p>`
       const expected = `<p><img data-emoji="" ${attributes}></p>`
 
@@ -697,14 +667,14 @@ describeForEachParser('smiliesEmojiResolver', (parseHtml) => {
 
     // Hex-shaped is not emoji-shaped, and each of these is a filename that really occurs:
     // e107 ships dead.png, and boards number their uploads.
-    const hexShapedCases: Array<[string, string]> = [
-      ['a sequential id, which decodes to a space', '2000'],
-      ['a lone surrogate', 'dead'],
-      ['a CJK ideograph', 'face'],
-      ['a stem too long to be a codepoint', 'ffffff'],
+    const hexShapedCases: Array<string> = [
+      '2000', // a sequential id, which decodes to a space
+      'dead', // a lone surrogate
+      'face', // a CJK ideograph
+      'ffffff', // a stem too long to be a codepoint
     ]
 
-    it.each(hexShapedCases)('should not decode %s', async (_reason, stem) => {
+    it.each(hexShapedCases)('should not decode the %s stem', async (stem) => {
       const value = html`
         <p>
           <img class="smiley" src="https://example.com/images/smilies/${stem}.png" alt="">

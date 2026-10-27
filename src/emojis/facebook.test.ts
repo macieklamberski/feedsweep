@@ -653,14 +653,14 @@ describeForEachParser('facebookLabelEmojiResolver', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
-    const imageWrapperCases: Array<[string, string, string]> = [
-      ['a label', ' title="heart emoticon"', '<3'],
-      ['no label', '', '❤'],
+    const imageWrapperCases: Array<[string, string]> = [
+      [' title="heart emoticon"', '<3'], // a label
+      ['', '❤'], // no label
     ]
 
     it.each(imageWrapperCases)(
-      'should replace a wrapper with %s around an image and its hidden text',
-      async (_, title, hiddenText) => {
+      'should replace a wrapper with title %p around an image and its hidden text',
+      async (title, hiddenText) => {
         const value = html`
           <p>
             <span class="_47e3 _5mfr"${title}>

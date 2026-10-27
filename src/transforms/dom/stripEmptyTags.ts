@@ -3,7 +3,7 @@ import { isBlockElement, isElement, isGeneratedWrapper, isText } from '../../uti
 
 // Structural cells and definition terms whose slot must survive even when empty,
 // so table columns and definition-list pairs stay aligned. Never dropped or collapsed.
-const structuralTags = new Set(['td', 'th', 'tr', 'dt', 'dd'])
+const structuralTags = ['td', 'th', 'tr', 'dt', 'dd']
 
 const preserveWhenEmpty = new Set([
   // Elements whose emptiness is meaningful (carry semantics via src etc.).
@@ -62,7 +62,7 @@ export const stripEmptyTags: DomTransform = () => {
         continue
       }
 
-      if (structuralTags.has(tagName)) {
+      if (structuralTags.includes(tagName)) {
         continue
       }
 
@@ -94,7 +94,7 @@ export const stripEmptyTags: DomTransform = () => {
         element.remove()
       } else {
         const whitespace = element.textContent ?? ''
-        element.replaceWith(whitespace === '' ? ' ' : whitespace)
+        element.replaceWith(whitespace || ' ')
       }
     }
   }

@@ -109,12 +109,12 @@ describeForEachParser('yahooEmojiResolver', (parseHtml) => {
   })
 
   describe('marked sets', () => {
-    const markedCases: Array<[string, string]> = [
-      ['Mail', 'https://s.yimg.com/ok/u/assets/img/emoticons/emo3.gif'],
-      ['Messenger on the forum host', 'https://s.yimg.com/pu/emoticon/v2/4.gif'],
+    const markedCases: Array<string> = [
+      'https://s.yimg.com/ok/u/assets/img/emoticons/emo3.gif', // Mail
+      'https://s.yimg.com/pu/emoticon/v2/4.gif', // Messenger on the forum host
     ]
 
-    it.each(markedCases)('should mark the %s emoticon', async (_set, src) => {
+    it.each(markedCases)('should mark the %s emoticon', async (src) => {
       const value = html`
         <p>
           <img

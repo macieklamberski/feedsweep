@@ -66,7 +66,7 @@ const neutralizeSrcset = (element: Element, isSafeUrlFn: IsSafeUrlFn | undefined
 const genericAttributes = urlAttributes.filter(({ tag }) => !tag)
 const tagAttributes = groupUrlAttributesByTag(urlAttributes)
 // srcset holds a list of urls, so it has no table row: its unsafe candidates are dropped.
-const srcsetTags = new Set(['img', 'source'])
+const srcsetTags = ['img', 'source']
 
 // A javascript:, vbscript: or data:text/html url on any attribute a browser would follow.
 export const neutralizeUnsafeUrls: DomTransform = ({ isSafeUrlFn }) => {
@@ -90,7 +90,7 @@ export const neutralizeUnsafeUrls: DomTransform = ({ isSafeUrlFn }) => {
         neutralizeAttribute(element, spelling, role, isSafeUrlFn)
       }
 
-      if (srcsetTags.has(name)) {
+      if (srcsetTags.includes(name)) {
         neutralizeSrcset(element, isSafeUrlFn)
       }
     })

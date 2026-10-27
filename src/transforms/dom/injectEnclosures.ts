@@ -203,7 +203,7 @@ export const injectEnclosures: DomTransform = (context) => {
       // doesn't honor the required-`url` type, so guard before any URL handling.
       const embedSource = enclosure.playerUrl ?? enclosure.url
 
-      if (typeof embedSource !== 'string' || embedSource === '') {
+      if (typeof embedSource !== 'string' || !embedSource) {
         continue
       }
 

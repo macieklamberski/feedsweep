@@ -291,15 +291,7 @@ export const removeWithEmptyWrappers = (element: Element): void => {
 
 // Embedded media that readers render on its own line, so it breaks the flow like
 // a block does even though HTML defaults it to inline.
-export const mediaElements = new Set([
-  'audio',
-  'embed',
-  'iframe',
-  'img',
-  'object',
-  'picture',
-  'video',
-])
+export const mediaElements = ['audio', 'embed', 'iframe', 'img', 'object', 'picture', 'video']
 
 export const mediaSelector = [...mediaElements].join(', ')
 
@@ -310,7 +302,7 @@ export const processContainersSelector =
   'body, div, blockquote, td, li, article, section, main, header, footer, aside'
 
 export const isMediaElement = (node: Node): boolean => {
-  return isElement(node) && mediaElements.has(node.localName)
+  return isElement(node) && mediaElements.includes(node.localName)
 }
 
 // No img or picture here: a poster beside a parked media url would otherwise count as a player.

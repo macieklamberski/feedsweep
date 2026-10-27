@@ -144,7 +144,7 @@ export const html = (strings: TemplateStringsArray, ...values: Array<unknown>): 
   const lines = joined
     .split('\n')
     .map((line) => line.trim())
-    .filter((line) => line !== '')
+    .filter((line) => line)
 
   let result = ''
 
@@ -152,7 +152,7 @@ export const html = (strings: TemplateStringsArray, ...values: Array<unknown>): 
     const isTagBoundary = result.endsWith('>') && line.startsWith('<')
     const isClosingBracket = line.startsWith('>')
 
-    if (result === '' || isTagBoundary || isClosingBracket) {
+    if (!result || isTagBoundary || isClosingBracket) {
       result += line
     } else {
       result += ` ${line}`

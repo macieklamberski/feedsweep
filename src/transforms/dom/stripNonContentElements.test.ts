@@ -288,8 +288,6 @@ const specimens: Record<string, string | [string, string]> = {
     '<amp-consent id="consent" layout="nodisplay"><script type="application/json">{"consentInstanceId":"abc","promptUI":"consent-ui"}</script><div id="consent-ui"><p>We use cookies to personalise content and ads.</p><button on="tap:consent.accept">Accept</button></div></amp-consent>',
 }
 
-const specimenEntries = Object.entries(specimens)
-
 const flagCounterImageUrls = [
   'http://flagcounter.com/count/t5KP/bg=B3B3B3/txt=000000/border=CCCCCC/columns=5/maxflags=248/viewers=0/labels=1/',
   'http://s01.flagcounter.com/mini/ezoj/bg_FFFFFF/txt_000000/border_CCCCCC/flags_1.jfif',
@@ -298,22 +296,19 @@ const flagCounterImageUrls = [
 
 // Zeno.FM's snippet links to the Zeno home page under each of its names, whatever text the
 // publisher gave the link.
-const zenoHomeLinks: Array<[string, string, string]> = [
+const zenoHomeLinks: Array<[string, string]> = [
   [
-    'www.zeno.fm with no trailing slash',
     '<iframe src="//www.zeno.fm/player/straighttalkradio" width="575" height="240" frameborder="0" scrolling="no"></iframe><a href="https://www.zeno.fm" target="_blank" style="display: block; font-size: 0.9em; line-height: 10px;">Omnicast Media Station - Listen Live</a>',
     '<iframe src="//www.zeno.fm/player/straighttalkradio" width="575" height="240" frameborder="0" scrolling="no"></iframe>',
-  ],
+  ], // www.zeno.fm with no trailing slash
   [
-    'www.zeno.fm',
     '<iframe frameborder="0" height="290" scrolling="no" src="//www.zeno.fm/player/Ranchos-de-Coahuila-online" width="768"></iframe><a href="https://www.zeno.fm/" style="display: block; font-size: 0.9em; line-height: 10px;" target="_blank">A Zeno Media Station</a>',
     '<iframe frameborder="0" height="290" scrolling="no" src="//www.zeno.fm/player/Ranchos-de-Coahuila-online" width="768"></iframe>',
-  ],
+  ], // www.zeno.fm
   [
-    'zenomedia.com',
     '<iframe frameborder="0" height="240" scrolling="no" src="//www.zeno.fm/player/sure-fm-master-input-station" width="575"></iframe><a href="https://www.zenomedia.com/" style="display: block; font-size: 0.9em; line-height: 10px;" target="_blank">...</a>',
     '<iframe frameborder="0" height="240" scrolling="no" src="//www.zeno.fm/player/sure-fm-master-input-station" width="575"></iframe>',
-  ],
+  ], // zenomedia.com
 ]
 
 const eventbriteComFrames = [
@@ -345,7 +340,7 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
       expect(specimenSelectors).toEqual(defaultSelectors)
     })
 
-    it.each(specimenEntries)('should strip %s', async (_selector, specimen) => {
+    it.each(Object.entries(specimens))('should strip %s', async (_selector, specimen) => {
       const [value, expected] = Array.isArray(specimen) ? specimen : [specimen, '']
 
       expect(await transform(`<p>Before</p>${value}<p>After</p>`)).toEqualHtml(
@@ -426,8 +421,8 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
     })
 
     it.each(zenoHomeLinks)(
-      'should strip the Zeno.FM link to %s after the player',
-      async (_name, value, expected) => {
+      'should strip the Zeno.FM home link after the player in %s',
+      async (value, expected) => {
         expect(await transform(value)).toEqualHtml(expected)
       },
     )
