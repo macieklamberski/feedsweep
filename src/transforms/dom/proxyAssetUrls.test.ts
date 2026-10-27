@@ -539,6 +539,7 @@ describeForEachParser('proxyAssetUrls', (parseHtml) => {
         document,
         prepareEmbedMetadata(metadata, mintContext) as EmbedResolverResult,
       )
+      // biome-ignore lint/plugin/noComputedExpected: Derived from a placeholder minted with every field, so a new field is covered without editing the test.
       const expected = placeholder
         .getAttributeNames()
         .filter((name) => unproxyableAttributes.includes(name))
@@ -553,6 +554,7 @@ describeForEachParser('proxyAssetUrls', (parseHtml) => {
         document,
         prepareCiteMetadata(metadata, mintContext) as CiteResolverResult,
       )
+      // biome-ignore lint/plugin/noComputedExpected: Derived from a placeholder minted with every field, so a new field is covered without editing the test.
       const expected = placeholder
         .getAttributeNames()
         .filter((name) => unproxyableAttributes.includes(name))
