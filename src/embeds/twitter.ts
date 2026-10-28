@@ -203,6 +203,22 @@ export const twitterAmpEmbedResolver = createMarkupEmbedResolver(
   extractTweet,
 )
 
+// Embetty's embetty-tweet names the tweet in `status` and renders nothing until its script
+// fetches the tweet from embetty's own server.
+// See: https://github.com/heiseonline/embetty/blob/master/embetty/src/embed/tweet.ts.
+export const twitterEmbettyEmbedResolver = createMarkupEmbedResolver(
+  'embetty-tweet[status]',
+  (element) => {
+    const id = keepIfMatches(attr(element, 'status'), digitsRegex)
+
+    if (!id) {
+      return
+    }
+
+    return composeEmbed({ handle: '', id }, {})
+  },
+)
+
 // The 2018 `TwitterToDOM` payload names its fields `html` and `author_name`, where the later ones
 // write `full_text` and `name`.
 type SubstackTweetAttrs = {

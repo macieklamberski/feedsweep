@@ -6,6 +6,7 @@ import {
   readTwitterHeight,
   twitterAmpEmbedResolver,
   twitterBlockquoteEmbedResolver,
+  twitterEmbettyEmbedResolver,
   twitterIframeEmbedResolver,
   twitterResolveEmbed,
   twitterS9eEmbedResolver,
@@ -1015,6 +1016,34 @@ describeForEachParser('twitterAmpEmbedResolver', (parseHtml) => {
     }
 
     expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('twitterEmbettyEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, twitterEmbettyEmbedResolver)
+
+  it('should build the player from the status id', async () => {
+    const value = '<embetty-tweet status="1196161740582588416"></embetty-tweet>'
+    const expected: EmbedResolverResult = {
+      provider: 'twitter',
+      id: '1196161740582588416',
+      src: 'https://platform.twitter.com/embed/Tweet.html?id=1196161740582588416',
+      url: 'https://x.com/i/status/1196161740582588416',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should not claim a status that is not a tweet id', async () => {
+    const value = '<embetty-tweet status="../1196161740582588416"></embetty-tweet>'
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
+  it('should not claim an empty status', async () => {
+    const value = '<embetty-tweet status=""></embetty-tweet>'
+
+    expect(await extract(value)).toBeUndefined()
   })
 })
 

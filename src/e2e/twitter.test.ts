@@ -5,7 +5,8 @@ import { describeForEachParser, html, jsonAttrValue } from '../tests.js'
 describeForEachParser('Twitter', (parseHtml) => {
   // twitterBlockquoteEmbedResolver claims the blockquote the embed dialog writes, including the
   // twitter-video spelling of it, twitterAmpEmbedResolver the amp-twitter component,
-  // twitterSubstackEmbedResolver the div Substack's editor stores a pasted tweet in, and
+  // twitterEmbettyEmbedResolver the embetty-tweet component, twitterSubstackEmbedResolver the div
+  // Substack's editor stores a pasted tweet in, and
   // twitterIframeEmbedResolver the player frame and the status page a wrapper frames instead of
   // it. The host eras (twitter.com, x.com, mobile.twitter.com) and the proxy front-ends are read
   // off the anchor inside the resolver, and no pass before it touches them, so they stay pinned
@@ -119,6 +120,20 @@ describeForEachParser('Twitter', (parseHtml) => {
         data-embed-id="123456789012345"
         data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=123456789012345"
         data-embed-url="https://x.com/i/status/123456789012345"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  it('should convert an embetty-tweet component that carries no text', async () => {
+    const value = '<embetty-tweet status="1196161740582588416"></embetty-tweet>'
+    const expected = html`
+      <div
+        data-embed-provider="twitter"
+        data-embed-id="1196161740582588416"
+        data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=1196161740582588416"
+        data-embed-url="https://x.com/i/status/1196161740582588416"
       ></div>
     `
 
