@@ -1,6 +1,7 @@
 import type { TransformContext } from '../types.js'
 import {
   defaultDeferredIframeSources,
+  defaultLazyAltAttributes,
   defaultLazyIframeAttributes,
   defaultLazySrcAttributes,
   defaultLazySrcsetAttributes,
@@ -22,6 +23,7 @@ export const defaultContext: TransformContext = {
   mediaSrcAttributes: defaultMediaSrcAttributes,
   lazySrcAttributes: defaultLazySrcAttributes,
   lazySrcsetAttributes: defaultLazySrcsetAttributes,
+  lazyAltAttributes: defaultLazyAltAttributes,
   lazyIframeAttributes: defaultLazyIframeAttributes,
   deferredIframeSources: defaultDeferredIframeSources,
   trackingHosts: defaultTrackingHosts,

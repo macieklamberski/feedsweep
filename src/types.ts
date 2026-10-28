@@ -220,6 +220,7 @@ export type TransformContext = {
   mediaSrcAttributes: Array<string>
   lazySrcAttributes: Array<string>
   lazySrcsetAttributes: Array<string>
+  lazyAltAttributes: Array<string>
   lazyIframeAttributes: Array<string>
   deferredIframeSources: Array<DeferredIframeSource>
   trackingHosts: Array<string>

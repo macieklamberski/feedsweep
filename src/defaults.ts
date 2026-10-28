@@ -1,5 +1,6 @@
 export {
   defaultDeferredIframeSources,
+  defaultLazyAltAttributes,
   defaultLazyIframeAttributes,
   defaultLazySrcAttributes,
   defaultLazySrcsetAttributes,
