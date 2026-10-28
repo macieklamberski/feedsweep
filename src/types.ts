@@ -220,7 +220,7 @@ export type TransformContext = {
   feedImageUrls?: Array<string>
   enclosures?: Array<Enclosure>
   widgetResolvers: Array<WidgetResolver>
-  /** A bare string is deprecated, and is read as `{ attribute }`. */
+  // A bare string is deprecated, and is read as `{ attribute }`.
   mediaSrcAttributes: Array<ScopedAttribute | string>
   lazySrcAttributes: Array<string>
   lazySrcsetAttributes: Array<string>
