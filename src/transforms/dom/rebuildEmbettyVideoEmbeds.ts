@@ -42,6 +42,12 @@ export const rebuildEmbettyVideoEmbeds: DomTransform = () => (document) => {
 
     const src = compose(id, attr(element, 'start-at'))
     const iframe = createIframe(document, src)
+    // Embetty shows the publisher's `poster-image` over the platform's own thumbnail.
+    const poster = attr(element, 'poster-image')
+
+    if (poster) {
+      iframe.setAttribute('data-thumbnail', poster)
+    }
 
     element.replaceWith(iframe)
   }
