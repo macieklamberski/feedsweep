@@ -1,6 +1,7 @@
 import { toMap } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import {
+  attr,
   hasAncestorWithTagName,
   isElement,
   isText,
@@ -166,6 +167,10 @@ export const detectLanguage = (pre: Element | null, code: Element | null): strin
       return language
     }
   }
+
+  // Read after every class pass: Tistory's own page highlights by the class, and the class and
+  // data-ke-language disagree on pasted blocks.
+  return attr(pre, 'data-ke-language')
 }
 
 // highlight.js maps plaintext, text and txt to a Plain text grammar that only escapes the text.

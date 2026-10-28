@@ -181,6 +181,27 @@ describeForEachParser('transformContent', (parseHtml) => {
     expect(result).toMatch(lineBreakAfterBraceRegex)
   })
 
+  it('should label a Tistory code block with its data-ke-language language', async () => {
+    const value = html`
+      <pre
+        id="code_1654877706972"
+        data-ke-language="bash"
+        data-ke-type="codeblock"
+      ><code>npm install</code></pre>
+    `
+    const expected = html`
+      <pre
+        id="code_1654877706972"
+        data-ke-language="bash"
+        data-ke-type="codeblock"
+        data-pre-language="bash"
+        data-pre-label="Bash"
+      ><code class="hljs">npm install</code></pre>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   it('should decode a multi-line double-escaped description in full', async () => {
     // A double-escaping feed generator ships whole HTML as entity text spread across
     // lines. paragraphizePlainText must pass it through so decodeDoubleEncodedTags gets

@@ -66,6 +66,33 @@ describe('detectLanguage', () => {
     })
   })
 
+  describe('Tistory data-ke-language', () => {
+    it('should detect language from data-ke-language on a pre with no class', () => {
+      const { pre, code } = createElement(html`
+        <pre
+          id="code_1654877706972"
+          data-ke-language="bash"
+          data-ke-type="codeblock"
+        ><code>npm install</code></pre>
+      `)
+
+      expect(detectLanguage(pre, code)).toBe('bash')
+    })
+
+    it('should detect a two-letter language the bare class pass skips', () => {
+      const { pre, code } = createElement(html`
+        <pre
+          id="code_1720771446049"
+          class="go"
+          data-ke-language="go"
+          data-ke-type="codeblock"
+        ><code>go env</code></pre>
+      `)
+
+      expect(detectLanguage(pre, code)).toBe('go')
+    })
+  })
+
   describe('EnlighterJS data-enlighter-language', () => {
     it('should detect language from data-enlighter-language', () => {
       const { pre, code } = createElement(
@@ -452,6 +479,19 @@ describe('detectLanguage', () => {
       )
 
       expect(detectLanguage(pre, code)).toBe('js')
+    })
+
+    it('should prefer a bare language-name class over data-ke-language', () => {
+      const { pre, code } = createElement(html`
+        <pre
+          id="code_1689986008917"
+          class="arduino"
+          data-ke-language="bash"
+          data-ke-type="codeblock"
+        ><code>sudo nano /data/crowdsec/config/config.yaml</code></pre>
+      `)
+
+      expect(detectLanguage(pre, code)).toBe('arduino')
     })
   })
 
@@ -1023,6 +1063,29 @@ describeForEachParser('highlightCode', (parseHtml) => {
       const value = '<pre><code class="language-text">just some plain text</code></pre>'
 
       expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should highlight a Tistory block via data-ke-language', async () => {
+      const value = html`
+        <pre
+          id="code_1720771446049"
+          class="go"
+          data-ke-language="go"
+          data-ke-type="codeblock"
+        ><code>go env</code></pre>
+      `
+      const expected = html`
+        <pre
+          id="code_1720771446049"
+          class="go"
+          data-ke-language="go"
+          data-ke-type="codeblock"
+          data-pre-language="go"
+          data-pre-label="Go"
+        ><code class="hljs"><span class="hljs-keyword">go</span> env</code></pre>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
     })
   })
 
