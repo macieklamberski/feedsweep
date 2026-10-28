@@ -179,6 +179,15 @@ export const defaultNonContentSelectors = [
   '.akst_link',
   'a.akst_share_link', // The same link written without its wrapper.
 
+  // WordPress.com feed buttons, the comment count and share images its feeds wrote under each
+  // post, most of them linked to the same path. The images now answer with an HTML page, so they
+  // render broken. The link goes only around its button image, since feeds also write a post's
+  // category links onto that path with the category name as their text.
+  'a[href*="feeds.wordpress.com/1.0/" i]:has(img[src*="feeds.wordpress.com/1.0/" i])',
+  // The same images outside such a link: the category and tag images, and buttons whose anchor
+  // lost its href.
+  'img[src*="feeds.wordpress.com/1.0/" i]',
+
   // Hatena Bookmark's add button. A bookmark comment carries an author's real text on a
   // blockquote of its own, so neither entry is widened to the class prefix.
   'a.hatena-bookmark-button',
