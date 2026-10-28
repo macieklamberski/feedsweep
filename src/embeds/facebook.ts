@@ -204,11 +204,14 @@ const isWatchPage = (url: URL): boolean => {
   return watchPathRegex.test(url.pathname) && Boolean(getQueryParam(url.searchParams, 'v'))
 }
 
+// The watch page plays a video named by its id alone.
+export const composeWatchUrl = (videoId: string): string => {
+  return `https://www.facebook.com/watch/${composeQuery({ v: videoId })}`
+}
+
 // A legacy player names only the video id, which the watch page plays.
 const composeWatchEmbed = (videoId: string): EmbedResolverResult => {
-  const watchUrl = `https://www.facebook.com/watch/${composeQuery({ v: videoId })}`
-
-  return composePluginEmbed('video', watchUrl, {})
+  return composePluginEmbed('video', composeWatchUrl(videoId), {})
 }
 
 // A post has no name: its words go to `description`, and the frame titles itself

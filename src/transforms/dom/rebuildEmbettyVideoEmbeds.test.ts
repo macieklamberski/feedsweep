@@ -59,20 +59,21 @@ describeForEachParser('rebuildEmbettyVideoEmbeds', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(expected)
     })
-  })
 
-  describe('sad paths', () => {
-    it('should leave a facebook type alone', async () => {
+    it('should rebuild a facebook watch url from a facebook type', async () => {
       const value = html`
         <embetty-video
           type="facebook"
           video-id="10153231379946729"
         ></embetty-video>
       `
+      const expected = '<iframe src="https://www.facebook.com/watch/?v=10153231379946729"></iframe>'
 
-      expect(await transform(value)).toEqualHtml(value)
+      expect(await transform(value)).toEqualHtml(expected)
     })
+  })
 
+  describe('sad paths', () => {
     it('should leave an empty video-id alone', async () => {
       const value = html`
         <embetty-video
@@ -113,6 +114,19 @@ describeForEachParser('rebuildEmbettyVideoEmbeds', (parseHtml) => {
         ></embetty-video>
       `
       const expected = '<iframe src="https://www.youtube.com/embed/4BVmeh0pNnQ?start=0"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should drop a facebook start-at, which its player takes no start from', async () => {
+      const value = html`
+        <embetty-video
+          type="facebook"
+          video-id="10153231379946729"
+          start-at="90"
+        ></embetty-video>
+      `
+      const expected = '<iframe src="https://www.facebook.com/watch/?v=10153231379946729"></iframe>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -183,6 +197,31 @@ describeForEachParser('rebuildEmbettyVideoEmbeds', (parseHtml) => {
           data-embed-ratio="16/9"
           data-embed-provider="vimeo"
           data-embed-id="232524527"
+        >
+        </div>
+      `
+      const result = await transformContent(value, {
+        parseHtmlFn: parseHtml,
+        baseUrl: 'https://example.com',
+      })
+
+      expect(result).toEqualHtml(expected)
+    })
+
+    it('should produce a facebook placeholder end to end', async () => {
+      const value = html`
+        <embetty-video
+          type="facebook"
+          video-id="10153231379946729"
+        ></embetty-video>
+      `
+      const expected = html`
+        <div
+          data-embed-ratio="16/9"
+          data-embed-url="https://www.facebook.com/watch/?v=10153231379946729"
+          data-embed-id="https://www.facebook.com/video.php?v=10153231379946729"
+          data-embed-provider="facebook"
+          data-embed-src="https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=10153231379946729"
         >
         </div>
       `
