@@ -134,6 +134,39 @@ describeForEachParser('linkifyUrls', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should end a url at a shortcode closer glued to it', async () => {
+    const value = '<p>[embed]https://www.youtube.com/watch?v=E8jsVZIIdxQ[/embed]</p>'
+    const expected = html`
+      <p>[embed]<a
+        href="https://www.youtube.com/watch?v=E8jsVZIIdxQ"
+      >https://www.youtube.com/watch?v=E8jsVZIIdxQ</a>[/embed]</p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should end a url at a bbcode closer glued to it', async () => {
+    const value = '<p>[img]https://example.com/uploads/2026-04-23/18/Athna14fbbf07f6.jpeg[/img]</p>'
+    const expected = html`
+      <p>[img]<a
+        href="https://example.com/uploads/2026-04-23/18/Athna14fbbf07f6.jpeg"
+      >https://example.com/uploads/2026-04-23/18/Athna14fbbf07f6.jpeg</a>[/img]</p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a query array bracket inside the url', async () => {
+    const value = '<p>See http://example.com/index.php?id=126&tx_ttnews[tt_news]=1464 now</p>'
+    const expected = html`
+      <p>See <a
+        href="http://example.com/index.php?id=126&tx_ttnews[tt_news]=1464"
+      >http://example.com/index.php?id=126&amp;tx_ttnews[tt_news]=1464</a> now</p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should not link protocol-less URL', async () => {
     const value = '<p>Visit example.com for more</p>'
 
