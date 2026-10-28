@@ -300,6 +300,90 @@ describeForEachParser('stripDuplicateEnclosures', (parseHtml) => {
     })
   })
 
+  describe('equivalent spellings', () => {
+    it('should remove a marked audio that differs from a content audio only by scheme', async () => {
+      const value = html`
+        <audio
+          src="http://archive.org/download/Episode14LegoArt/Episode%2014%20Lego%20Art.mp3"
+          controls
+          data-enclosure=""
+        ></audio>
+        <audio
+          class="wp-audio-shortcode"
+          id="audio-87-2"
+          preload="none"
+          controls="controls"
+        >
+          <source
+            type="audio/mpeg"
+            src="https://archive.org/download/Episode14LegoArt/Episode%2014%20Lego%20Art.mp3?_=2"
+          >
+        </audio>
+      `
+      const expected = html`
+        <audio
+          class="wp-audio-shortcode"
+          id="audio-87-2"
+          preload="none"
+          controls="controls"
+        >
+          <source
+            type="audio/mpeg"
+            src="https://archive.org/download/Episode14LegoArt/Episode%2014%20Lego%20Art.mp3?_=2"
+          >
+        </audio>
+      `
+      const context: TransformContext = {
+        ...baseContext,
+        cleanUrlFn: (url) => url.split('?')[0],
+      }
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should remove a marked video that differs from a content video only by a media fragment', async () => {
+      const value = html`
+        <video
+          src="https://www.example.org/wp-content/uploads/2025/05/Station-Platform-Heating-1.3x.mp4"
+          controls
+          data-enclosure=""
+        ></video>
+        <video controls preload="none">
+          <source
+            src="https://www.example.org/wp-content/uploads/2025/05/Station-Platform-Heating-1.3x.mp4#t=5"
+            type="video/mp4"
+          >
+        </video>
+      `
+      const expected = html`
+        <video controls preload="none">
+          <source
+            src="https://www.example.org/wp-content/uploads/2025/05/Station-Platform-Heating-1.3x.mp4#t=5"
+            type="video/mp4"
+          >
+        </video>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep a marked embed placeholder naming another playlist by its query', async () => {
+      const value = html`
+        <div
+          data-embed-src="https://www.youtube.com/embed/videoseries?list=OLAK5uy_nsps_H4gEjwaNQ0rbSQjemMeFLqxFAQ4s"
+          data-enclosure=""
+        ></div>
+        <div data-embed-src="https://www.youtube.com/embed/videoseries?list=OLAK5uy_m7PeZhZWRDY_-s1WhTtUasNNSFYyWVEAQ"></div>
+      `
+      const expected = html`
+        <div data-embed-src="https://www.youtube.com/embed/videoseries?list=OLAK5uy_nsps_H4gEjwaNQ0rbSQjemMeFLqxFAQ4s"></div>
+        <div data-embed-src="https://www.youtube.com/embed/videoseries?list=OLAK5uy_m7PeZhZWRDY_-s1WhTtUasNNSFYyWVEAQ"></div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
   describe('non-image enclosures', () => {
     it('should remove a marked audio that exactly matches a content audio', async () => {
       const value = html`

@@ -339,6 +339,38 @@ describeForEachParser('transformContent', (parseHtml) => {
     expect(result).toEqualHtml(expected)
   })
 
+  it('should strip an enclosure that repeats a body video with a media fragment', async () => {
+    const value = html`
+      <video controls preload="none">
+        <source
+          src="https://www.example.org/wp-content/uploads/2025/05/Station-Platform-Heating-1.3x.mp4#t=5"
+          type="video/mp4"
+        >
+      </video>
+    `
+    const enclosures = [
+      {
+        url: 'https://www.example.org/wp-content/uploads/2025/05/Station-Platform-Heating-1.3x.mp4',
+        type: 'video/mp4',
+      },
+    ]
+    const expected = html`
+      <video controls preload="none">
+        <source
+          src="https://www.example.org/wp-content/uploads/2025/05/Station-Platform-Heating-1.3x.mp4#t=5"
+          type="video/mp4"
+        >
+      </video>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      enclosures,
+      heuristics: true,
+    })
+
+    expect(result).toEqualHtml(expected)
+  })
+
   it('should not inject an image enclosure when the content already has an image', async () => {
     // The enclosure is a WordPress-sized copy of the inline content image. Because the
     // content already carries an image, injectEnclosures skips it in both modes, so the
