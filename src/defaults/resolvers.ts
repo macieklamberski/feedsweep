@@ -390,6 +390,7 @@ import { youkuEmbedResolver } from '../embeds/youku.js'
 import {
   youtubeAmpEmbedResolver,
   youtubeFc2EmbedResolver,
+  youtubeFrontendEmbedResolver,
   youtubeIframeEmbedResolver,
   youtubeMetasliderEmbedResolver,
 } from '../embeds/youtube.js'
@@ -858,6 +859,7 @@ const embedResolvers: Array<EmbedResolver> = [
   youtubeAmpEmbedResolver,
   youtubeFc2EmbedResolver,
   youtubeMetasliderEmbedResolver,
+  youtubeFrontendEmbedResolver,
   yumpuEmbedResolver,
   zencastrBlockquoteEmbedResolver,
   zencastrIframeEmbedResolver,

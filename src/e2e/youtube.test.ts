@@ -32,6 +32,30 @@ describeForEachParser('YouTube', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
+  it('should rebuild an Invidious share snippet onto the YouTube player', async () => {
+    const value = html`
+      <iframe
+        id="ivplayer"
+        width="640"
+        height="360"
+        src="https://invidious.kavin.rocks/embed/zz5KauCbjPI"
+        style="border:none;"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://i.ytimg.com/vi/zz5KauCbjPI/hqdefault.jpg"
+        data-embed-url="https://www.youtube.com/watch?v=zz5KauCbjPI"
+        data-embed-id="zz5KauCbjPI"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/zz5KauCbjPI"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   it('should resolve a carrier uCoz wrote behind the site host', async () => {
     const value = html`
       <iframe
