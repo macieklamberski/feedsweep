@@ -49,6 +49,7 @@ import { rebuildElementorVideoEmbeds } from '../transforms/dom/rebuildElementorV
 import { rebuildEmbedlyEmbeds } from '../transforms/dom/rebuildEmbedlyEmbeds.js'
 import { rebuildEmbedPlusEmbeds } from '../transforms/dom/rebuildEmbedPlusEmbeds.js'
 import { rebuildEmbedPrivacyLinks } from '../transforms/dom/rebuildEmbedPrivacyLinks.js'
+import { rebuildEmbettyVideoEmbeds } from '../transforms/dom/rebuildEmbettyVideoEmbeds.js'
 import { rebuildExternalVideoEmbeds } from '../transforms/dom/rebuildExternalVideoEmbeds.js'
 import { rebuildGettyImagesEmbeds } from '../transforms/dom/rebuildGettyImagesEmbeds.js'
 import { rebuildGofundmeEmbeds } from '../transforms/dom/rebuildGofundmeEmbeds.js'
@@ -160,6 +161,7 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // convertWidgets, which claims the frame this rebuilds.
   rebuildWordpressEmbeds,
   rebuildLiteVideoEmbeds,
+  rebuildEmbettyVideoEmbeds,
   rebuildLyteEmbeds,
   rebuildRocketYoutubePreviews,
   rebuildVideoJsEmbeds,
