@@ -13,6 +13,7 @@ export {
   defaultNonContentSelectors,
   defaultPreservedPreClasses,
   defaultRevealableSelectors,
+  defaultShareIntentSelectors,
 } from './defaults/selectors.js'
 export {
   defaultAllDomTransforms,

@@ -13,6 +13,7 @@ import {
   defaultNonContentSelectors,
   defaultPreservedPreClasses,
   defaultRevealableSelectors,
+  defaultShareIntentSelectors,
 } from './selectors.js'
 import { defaultHighlightFn, defaultResolveUrlFn } from './transforms.js'
 
@@ -28,6 +29,7 @@ export const defaultContext: TransformContext = {
   emojiResolvers: defaultEmojiResolvers,
   avatarImageHosts: defaultAvatarImageHosts,
   nonContentSelectors: defaultNonContentSelectors,
+  shareIntentSelectors: defaultShareIntentSelectors,
   preservedPreClasses: defaultPreservedPreClasses,
   revealableSelectors: defaultRevealableSelectors,
   fieldCleaners: defaultFieldCleaners,
