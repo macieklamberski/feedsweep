@@ -60,14 +60,15 @@ describeForEachParser('rebuildEmbettyVideoEmbeds', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should rebuild a facebook watch url from a facebook type', async () => {
+    it('should rebuild a facebook video plugin from a facebook type', async () => {
       const value = html`
         <embetty-video
           type="facebook"
           video-id="10153231379946729"
         ></embetty-video>
       `
-      const expected = '<iframe src="https://www.facebook.com/watch/?v=10153231379946729"></iframe>'
+      const expected =
+        '<iframe src="https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=10153231379946729"></iframe>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -126,7 +127,8 @@ describeForEachParser('rebuildEmbettyVideoEmbeds', (parseHtml) => {
           start-at="90"
         ></embetty-video>
       `
-      const expected = '<iframe src="https://www.facebook.com/watch/?v=10153231379946729"></iframe>'
+      const expected =
+        '<iframe src="https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=10153231379946729"></iframe>'
 
       expect(await transform(value)).toEqualHtml(expected)
     })

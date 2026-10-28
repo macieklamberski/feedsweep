@@ -95,6 +95,10 @@ const readVideoId = (url: URL): string | undefined => {
   }
 }
 
+const composePluginUrl = (plugin: string, href: string, t?: string): string => {
+  return `https://www.facebook.com/plugins/${plugin}.php${composeQuery(trimObject({ href, t }))}`
+}
+
 // Every carrier resolves to a plugin url built around the page it names, which is the only form
 // Facebook frames. The page is also the canonical url, so a caller that knows a better id than
 // the href states it in `extra`. `t`, where a video starts, is kept as the carrier wrote it.
@@ -112,12 +116,11 @@ const composePluginEmbed = (
   // A video enriches from its id: Facebook's video oEmbed takes `video.php?v={id}`, and the
   // watch url stays the `url`, since `video.php` sends an anonymous visitor to the login page.
   const videoKey = videoId && `https://www.facebook.com/video.php${composeQuery({ v: videoId })}`
-  const query = composeQuery(trimObject({ href: absoluteHref, t }))
 
   return {
     provider,
     id: videoKey ?? absoluteHref,
-    src: `https://www.facebook.com/plugins/${plugin}.php${query}`,
+    src: composePluginUrl(plugin, absoluteHref, t),
     url: href,
     ratio: plugin === 'video' ? '16/9' : undefined,
     ...extra,
@@ -205,8 +208,12 @@ const isWatchPage = (url: URL): boolean => {
 }
 
 // The watch page plays a video named by its id alone.
-export const composeWatchUrl = (videoId: string): string => {
+const composeWatchUrl = (videoId: string): string => {
   return `https://www.facebook.com/watch/${composeQuery({ v: videoId })}`
+}
+
+export const composeEmbedUrl = (videoId: string): string => {
+  return composePluginUrl('video', composeWatchUrl(videoId))
 }
 
 // A legacy player names only the video id, which the watch page plays.

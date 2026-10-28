@@ -1,5 +1,5 @@
 import { encodePathSegment, toMap } from 'trousse'
-import { composeWatchUrl } from '../../embeds/facebook.js'
+import { composeEmbedUrl as composeFacebookUrl } from '../../embeds/facebook.js'
 import { composeEmbedUrl as composeVimeoUrl } from '../../embeds/vimeo.js'
 import { composeEmbedUrl as composeYoutubeUrl } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
@@ -13,7 +13,7 @@ type ComposeUrl = (id: string, start: string | undefined) => string
 // See: https://github.com/heiseonline/embetty/tree/master/embetty/src/embed/video/type.
 const composers = toMap<ComposeUrl>({
   facebook: (id) => {
-    return composeWatchUrl(id)
+    return composeFacebookUrl(id)
   },
   youtube: (id, start) => {
     const segment = encodePathSegment(id)
