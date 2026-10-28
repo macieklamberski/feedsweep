@@ -12,6 +12,7 @@ export const defaultTrackingHosts = [
   'convertkit-mail.com', // Newsletter platform.
   'beehiiv.com', // Newsletter platform.
   'googlesyndication.com', // Google AdSense ad pixels.
+  'googleadservices.com', // AdSense for Feeds ad images and Google Ads conversion pixels.
   'googletagmanager.com', // Google Tag Manager.
   'amazon-adsystem.com', // Amazon ad serving pixels.
   'taboola.com', // Content-recommendation widget pixels.
