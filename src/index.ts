@@ -65,6 +65,7 @@ export { canonicalizeAlignment } from './transforms/dom/canonicalizeAlignment.js
 export { cleanAnchorUrls } from './transforms/dom/cleanAnchorUrls.js'
 export { convertAmpNativeElements } from './transforms/dom/convertAmpNativeElements.js'
 export { convertAsciinemaEmbeds } from './transforms/dom/convertAsciinemaEmbeds.js'
+export { convertBloggerCaptionTables } from './transforms/dom/convertBloggerCaptionTables.js'
 export { convertBreaksToParagraphs } from './transforms/dom/convertBreaksToParagraphs.js'
 export { convertCiteCards } from './transforms/dom/convertCiteCards.js'
 export { convertDatawrapperEmbeds } from './transforms/dom/convertDatawrapperEmbeds.js'

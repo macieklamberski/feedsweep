@@ -5,6 +5,7 @@ import { canonicalizeAlignment } from '../transforms/dom/canonicalizeAlignment.j
 import { cleanAnchorUrls } from '../transforms/dom/cleanAnchorUrls.js'
 import { convertAmpNativeElements } from '../transforms/dom/convertAmpNativeElements.js'
 import { convertAsciinemaEmbeds } from '../transforms/dom/convertAsciinemaEmbeds.js'
+import { convertBloggerCaptionTables } from '../transforms/dom/convertBloggerCaptionTables.js'
 import { convertBreaksToParagraphs } from '../transforms/dom/convertBreaksToParagraphs.js'
 import { convertCiteCards } from '../transforms/dom/convertCiteCards.js'
 import { convertDatawrapperEmbeds } from '../transforms/dom/convertDatawrapperEmbeds.js'
@@ -205,6 +206,10 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // cluster, so wrapBareInlineInParagraphs later sees block boundaries and keeps the
   // caption, images, and PREV/NEXT nav apart instead of gluing them into one paragraph.
   wrapCargoGalleryImages,
+
+  // Runs before wrapTablesForScroll, which wraps the caption table as a data table, and before
+  // canonicalizeAlignment, so alignment set on the link around the image lands on the figure.
+  convertBloggerCaptionTables,
 
   // Converts AMP custom elements into their native HTML equivalents so the image/embed
   // transforms below can dimension, placeholder, and proxy them. Runs in this normalize

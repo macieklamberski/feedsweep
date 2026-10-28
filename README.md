@@ -66,6 +66,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `wrapBareInlineInParagraphs` | Wrap loose inline content in `<p>` blocks |
 | `hoistBlocksFromParagraphs` | Hoist block elements out of enclosing paragraphs, keeping only halves that still render |
 | `wrapCargoGalleryImages` | Wrap Cargo portfolio captions and images in `<figure>` blocks so they stay apart |
+| `convertBloggerCaptionTables` | Convert a Blogger caption table (`table.tr-caption-container`) into a `<figure>` with the image and its `<figcaption>` |
 | `injectEnclosures` | Inject feed enclosures as native media or embed placeholders, collapsing a media group to one rendition and merging a player page entry with its media file; an image enclosure injects only when the content has no image of its own, captioned with its description; anything else becomes a `data-file-*` placeholder, after the content |
 | `surfaceParkedMarkup` | Dissolve a container holding an embed encoded in an attribute, a lazy loader's `div.load-later` or a Borlabs Cookie content blocker, into the markup it holds |
 | `rebuildPublicalbumGalleries` | Rebuild a Publicalbum Google Photos album widget into its photos as linked images under a captioned `<figure>` |
