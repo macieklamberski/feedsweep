@@ -1,5 +1,5 @@
 import { encodePathSegment, isAnyOf } from 'trousse'
-import { composePiktochartEmbedUrl } from '../../embeds/piktochart.js'
+import { composeEmbedUrl } from '../../embeds/piktochart.js'
 import type { DomTransform } from '../../types.js'
 import { attr, isElement, isWhitespaceText, text } from '../../utils/dom.js'
 import { parseUrlOnHosts } from '../../utils/urls.js'
@@ -62,7 +62,7 @@ export const rebuildPiktochartEmbeds: DomTransform = () => (document) => {
     removeLoaderChrome(element)
 
     element.before(...element.childNodes)
-    const embedUrl = composePiktochartEmbedUrl(uid)
+    const embedUrl = composeEmbedUrl(uid)
     element.replaceWith(createIframe(document, embedUrl))
   }
 }
