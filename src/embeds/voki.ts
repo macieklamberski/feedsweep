@@ -17,12 +17,12 @@ const sizes = {
 }
 
 // Voki's share page, the one frameable player, which builds the HTML5 player for the scene.
-export const composePlayerUrl = (sc: string, chsm: string): string => {
+export const composeEmbedUrl = (sc: string, chsm: string): string => {
   return `https://www.voki.com/site/pickup${composeQuery({ scid: sc, chsm })}`
 }
 
 const composeEmbed = (sc: string, chsm: string): EmbedResolverResult => {
-  const src = composePlayerUrl(sc, chsm)
+  const src = composeEmbedUrl(sc, chsm)
 
   return {
     provider,
