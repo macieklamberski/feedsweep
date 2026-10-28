@@ -197,6 +197,14 @@ export const defaultNonContentSelectors = [
   '.crp_related', // Contextual Related Posts WordPress plugin.
   '.zergnet-widget', // ZergNet content-recommendation widget.
 
+  // Zemanta's related-articles block, in its thumbnail layouts. Editors carry the block's classes
+  // onto what the publisher types next: the title class onto paragraphs, the item class onto
+  // citations in the text-only list. The title entry stays above the list entry, since a title
+  // whose list is gone no longer matches.
+  '.zemanta-related-title:not(:has(a)):has(+ ul.zemanta-article-ul-image)',
+  'ul.zemanta-article-ul-image',
+  'fieldset.zemanta-related:has(> legend):not(:has(ul))',
+
   // Author bio blocks.
   '.wp-block-post-author', // WordPress Gutenberg author bio block.
   '.saboxplugin-wrap', // Simple Author Box WordPress plugin.
