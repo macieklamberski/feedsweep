@@ -179,6 +179,10 @@ const specimens: Record<string, string | [string, string]> = {
     '<iframe data-gapiattached="true" frameborder="0" id="I2_1468640673809" marginheight="0" marginwidth="0" name="I2_1468640673809" scrolling="no" src="https://www.youtube.com/subscribe_embed?usegapi=1&amp;channelid=UCZUsI_y_Lyxni9pqSOBb_xw&amp;layout=default&amp;count=default&amp;origin=https%3A%2F%2Fexample.com&amp;gsrc=3p"></iframe>',
   'iframe[src*="youtube.com/subscribe_widget" i]':
     '<iframe id="fr" src="https://www.youtube.com/subscribe_widget?p=_YVgU7I2NTwgDISHtjk_vA" style="overflow: hidden; height: 105px; border: 0; width: 100%;" scrolling="no" frameborder="0"></iframe>',
+  '.container-wrapper-genially > .loader-genially': [
+    '<div class="container-wrapper-genially"><video class="loader-genially" autoplay="autoplay" loop="loop" playsinline="playsInline" muted="muted"><source src="https://static.genial.ly/resources/panel-loader-low.mp4" type="video/mp4" /></video><div id="5f30aca85962040d95eaeecc" class="genially-embed"></div></div>',
+    '<div class="container-wrapper-genially"><div id="5f30aca85962040d95eaeecc" class="genially-embed"></div></div>',
+  ],
   'img[src*="w.sharethis.com/" i]':
     '<img src="https://w.sharethis.com/images/facebook_32.png" alt="Share on Facebook">',
   'a:has(> img[src*="tweetmeme.com/imagebutton.gif" i])':

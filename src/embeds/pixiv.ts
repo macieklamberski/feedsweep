@@ -50,9 +50,20 @@ const pixivResolveEmbed: ResolveUrlEmbed = (url) => {
 
   const illustId = readIllustId(workId)
   const page = illustIdRegex.test(workId) ? `https://www.pixiv.net/artworks/${illustId}` : undefined
+  const type = getQueryParam(url.searchParams, 'type')
 
   // `type` picks the id space, and a novel's number reads the same as an illustration's.
-  if (route === 'oembed_iframe' && !isAnyOf(getQueryParam(url.searchParams, 'type'), 'illust')) {
+  if (route === 'oembed_iframe' && isAnyOf(type, 'novel')) {
+    return {
+      provider,
+      id: `novel/${workId}`,
+      src: `https://embed.pixiv.net/oembed_iframe.php${composeQuery({ type: 'novel', id: workId })}`,
+      url: `https://www.pixiv.net/novel/show.php${composeQuery({ id: workId })}`,
+      ...sizes.frame,
+    }
+  }
+
+  if (route === 'oembed_iframe' && !isAnyOf(type, 'illust')) {
     return
   }
 

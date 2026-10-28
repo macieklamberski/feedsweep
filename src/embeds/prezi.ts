@@ -1,15 +1,22 @@
 import { encodePathSegment, getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { createUrlEmbedResolver } from '../utils/widgets.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
+import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'prezi'
 
 const hosts = ['prezi.com']
+const designHosts = [
+  'prezi.com',
+  'prezi-nocookies.com', // The host Prezi Design's loader frames the design on
+]
 
 const sizes = {
   presentation: { ratio: '550/400' },
   video: { ratio: '16/9' },
+  // A design draws at its own page shape, which its height tracks at any width.
+  design: { ratio: '16/9' },
 }
 
 // The Flash snippet's one loader, with the presentation named in flashvars and repeated in the
@@ -101,3 +108,54 @@ export const preziResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 export const preziEmbedResolver = createUrlEmbedResolver(hosts, preziResolveEmbed)
+
+const composeDesignEmbed = (id: string): EmbedResolverResult => {
+  return {
+    provider,
+    // Qualified because a design id and a share token share one 20-character grammar.
+    id: `design/${id}`,
+    // `prezi.com/i/{id}/` answers 404 for a real design, so no page url goes beside it.
+    src: `https://prezi.com/i/embed/${id}`,
+    ...sizes.design,
+  }
+}
+
+// The frame Prezi Design's loader writes, `prezi-nocookies.com/i/embed/{id}`, or the same route on
+// `prezi.com`.
+const preziDesignResolveEmbed: ResolveUrlEmbed = (url) => {
+  const [route, embed, id] = getPathSegments(url)
+
+  if (!isAnyOf(route, 'i') || !isAnyOf(embed, 'embed') || !id) {
+    return
+  }
+
+  return composeDesignEmbed(id)
+}
+
+export const preziDesignIframeEmbedResolver = createUrlEmbedResolver(
+  designHosts,
+  preziDesignResolveEmbed,
+)
+
+// Prezi Design's embed: a `div.prezi-design-embed` naming the design in `data-project-id`, which
+// `e.prezicdn.net/v1/design.js` fills with the design's frame.
+export const preziDesignWidgetEmbedResolver = createMarkupEmbedResolver(
+  'div.prezi-design-embed[data-project-id]',
+  (element) => {
+    const id = attr(element, 'data-project-id')
+
+    if (!id) {
+      return
+    }
+
+    // The loader sits right before the mount in the snippet, and renders nothing in a reader.
+    const loader = element.previousElementSibling
+
+    if (loader?.localName === 'script' && parseUrlOnHosts(attr(loader, 'src'), 'e.prezicdn.net')) {
+      loader.remove()
+    }
+
+    // The id comes out of its attribute decoded, and it goes into a path.
+    return composeDesignEmbed(encodePathSegment(id))
+  },
+)

@@ -167,6 +167,7 @@ export const defaultNonContentSelectors = [
   'iframe[src*="tunein.com/embed/follow/" i]', // TuneIn follow button for a station or a show.
   'iframe[src*="youtube.com/subscribe_embed" i]', // YouTube subscribe button, as its loader writes it.
   'iframe[src*="youtube.com/subscribe_widget" i]', // YouTube subscribe button, its retired route.
+  '.container-wrapper-genially > .loader-genially', // Genially's loading animation, which embed.js removes.
   'img[src*="w.sharethis.com/" i]', // ShareThis chicklet icons, the button row's pre-widget form.
 
   // TweetMeme retweet button, whose api.tweetmeme.com host no longer resolves. Publishers link

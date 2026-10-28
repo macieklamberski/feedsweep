@@ -10,7 +10,10 @@ const provider = 'googlesheets'
 // The publish routes, each minted as the carrier names it. A sheet that is published but not
 // shared answers 401 on `/edit` and `/preview`.
 const sheetRoutes = ['pubhtml', 'pubhtml/sheet']
-const chartRoute = 'pubchart'
+const chartRoutes = [
+  'pubchart',
+  'gviz/chartiframe', // The Visualization API's frame of the same chart
+]
 // Frames a sheet shared by link, by its file id. A sheet that is shared but not published
 // answers 401 on `pubhtml`. An `/edit` carrier is a pasted share link that draws the editor's
 // chrome, so it is framed on `/preview` too, as is a bare `/spreadsheets/d/{id}`, which redirects
@@ -66,10 +69,10 @@ export const googlesheetsResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const isPublished = isAnyOf(publishedRoute, 'e')
   const [sheetId, ...routeSegments] = isPublished ? fileSegments.slice(1) : fileSegments
   const route = routeSegments.join('/')
-  const isChart = isAnyOf(route, chartRoute)
+  const isChart = isAnyOf(route, chartRoutes)
   // A publish token answers 404 on `/edit` and `/preview`.
   const isShared = !isPublished && isAnyOf(route, sharedRoutes)
-  const publishRoute = isChart ? chartRoute : getAnyOf(route, sheetRoutes)
+  const publishRoute = getAnyOf(route, isChart ? chartRoutes : sheetRoutes)
 
   if (!sheetId) {
     return

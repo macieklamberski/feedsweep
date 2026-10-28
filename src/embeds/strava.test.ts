@@ -111,11 +111,82 @@ describeForEachParser('stravaPlaceholderEmbedResolver', (parseHtml) => {
 })
 
 describe('stravaResolveEmbed', () => {
+  describe('the widgets the apex serves', () => {
+    it('should frame a segment leaderboard on the apex', () => {
+      const value = 'http://www.strava.com/segments/5096399/embed'
+      const expected: EmbedResolverResult = {
+        provider: 'strava',
+        id: 'segment/5096399',
+        src: 'https://www.strava.com/segments/5096399/embed',
+        url: 'https://www.strava.com/segments/5096399',
+        height: 381,
+      }
+
+      expect(stravaResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
+    it('should read the segment route words in upper case and keep them as written', () => {
+      const value = 'https://www.strava.com/SEGMENTS/5096399/EMBED'
+      const expected: EmbedResolverResult = {
+        provider: 'strava',
+        id: 'segment/5096399',
+        src: 'https://www.strava.com/SEGMENTS/5096399/EMBED',
+        url: 'https://www.strava.com/SEGMENTS/5096399',
+        height: 381,
+      }
+
+      expect(stravaResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
+    it('should frame an athlete widget with its token and no page', () => {
+      const value =
+        'https://www.strava.com/athletes/6960345/latest-rides/100b02c43baa972479f6c0fe3e7b8b5a89929428'
+      const expected: EmbedResolverResult = {
+        provider: 'strava',
+        id: 'athlete/6960345',
+        src: 'https://www.strava.com/athletes/6960345/latest-rides/100b02c43baa972479f6c0fe3e7b8b5a89929428',
+        height: 454,
+      }
+
+      expect(stravaResolveEmbed(new URL(value))).toEqual(expected)
+    })
+  })
+
   describe('sad paths', () => {
-    // The athlete and club widgets answer on the apex and render as they stand, so they are
-    // left to the generic placeholder.
-    it('should ignore the athlete latest-rides widget', () => {
-      const value = 'https://www.strava.com/athletes/6960345/latest-rides/100b02c4aa5c99ec4b7a1d1'
+    it('should ignore an athlete widget with no token', () => {
+      const value = 'https://www.strava.com/athletes/6960345/latest-rides'
+
+      expect(stravaResolveEmbed(new URL(value))).toBeUndefined()
+    })
+
+    it('should ignore an athlete widget with a segment after its token', () => {
+      const value =
+        'https://www.strava.com/athletes/6960345/latest-rides/100b02c43baa972479f6c0fe3e7b8b5a89929428/x'
+
+      expect(stravaResolveEmbed(new URL(value))).toBeUndefined()
+    })
+
+    it('should ignore an athlete page that is not a widget', () => {
+      const value =
+        'https://www.strava.com/athletes/6960345/follows/100b02c43baa972479f6c0fe3e7b8b5a8'
+
+      expect(stravaResolveEmbed(new URL(value))).toBeUndefined()
+    })
+
+    it('should ignore a segment page that is not the embed', () => {
+      const value = 'https://www.strava.com/segments/5096399'
+
+      expect(stravaResolveEmbed(new URL(value))).toBeUndefined()
+    })
+
+    it('should ignore a segment embed with a segment after it', () => {
+      const value = 'https://www.strava.com/segments/5096399/embed/x'
+
+      expect(stravaResolveEmbed(new URL(value))).toBeUndefined()
+    })
+
+    it('should ignore a segment route that is not the embed', () => {
+      const value = 'https://www.strava.com/segments/5096399/leaderboard'
 
       expect(stravaResolveEmbed(new URL(value))).toBeUndefined()
     })
@@ -173,6 +244,49 @@ describeForEachParser('stravaIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, stravaIframeEmbedResolver)
 
   describe('happy paths', () => {
+    it('should resolve the athlete widget frame', async () => {
+      const value = html`
+        <iframe
+          scrolling="no"
+          src="https://www.strava.com/athletes/6960345/latest-rides/100b02c43baa972479f6c0fe3e7b8b5a89929428"
+          width="300"
+          allowtransparency="true"
+          frameborder="0"
+          height="454"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'strava',
+        id: 'athlete/6960345',
+        src: 'https://www.strava.com/athletes/6960345/latest-rides/100b02c43baa972479f6c0fe3e7b8b5a89929428',
+        height: 454,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should resolve the segment leaderboard frame', async () => {
+      const value = html`
+        <iframe
+          allowtransparency="true"
+          frameborder="0"
+          height="405"
+          scrolling="no"
+          src="http://www.strava.com/segments/5096399/embed"
+          width="590"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'strava',
+        id: 'segment/5096399',
+        src: 'https://www.strava.com/segments/5096399/embed',
+        url: 'https://www.strava.com/segments/5096399',
+        height: 381,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should resolve the activity player frame', async () => {
       const value = html`
         <iframe

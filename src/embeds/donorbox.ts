@@ -1,5 +1,6 @@
 import {
   composeQuery,
+  encodePathSegment,
   getPathSegments,
   getQueryParam,
   isAnyOf,
@@ -7,8 +8,9 @@ import {
   trimObject,
 } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
+import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { createUrlEmbedResolver } from '../utils/widgets.js'
+import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'donorbox'
 
@@ -36,7 +38,26 @@ export const donorboxResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 // Donorbox's donation form iframe, sized by a loader script that feeds strip.
-export const donorboxEmbedResolver = createUrlEmbedResolver(hosts, donorboxResolveEmbed)
+export const donorboxIframeEmbedResolver = createUrlEmbedResolver(hosts, donorboxResolveEmbed)
+
+// The `dbox-widget` element `donorbox.org/widgets.js` defines, which renders nothing without it.
+// Its donation form is the campaign `/embed/{slug}` frames. An event names its ticket form, which
+// Donorbox serves only on routes that refuse framing.
+export const donorboxWidgetEmbedResolver = createMarkupEmbedResolver(
+  'dbox-widget[campaign]',
+  (element) => {
+    const campaign = attr(element, 'campaign')
+    const type = attr(element, 'type')
+
+    if (!campaign || (type && !isAnyOf(type, 'donation_form'))) {
+      return
+    }
+
+    const form = new URL(`https://donorbox.org/embed/${encodePathSegment(campaign)}`)
+
+    return donorboxResolveEmbed(form)
+  },
+)
 
 // The form posts its rendered height unasked, as `{ from: 'dbox', src, height }`, and answers a
 // posted `{ action: 'please-resize-me' }` with the same message.

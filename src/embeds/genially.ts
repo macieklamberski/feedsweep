@@ -2,7 +2,7 @@ import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 import { hexRegex } from '../utils/urls.js'
-import { createUrlEmbedResolver } from '../utils/widgets.js'
+import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'genially'
 
@@ -58,4 +58,24 @@ export const geniallyResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
-export const geniallyEmbedResolver = createUrlEmbedResolver(hosts, geniallyResolveEmbed)
+export const geniallyIframeEmbedResolver = createUrlEmbedResolver(hosts, geniallyResolveEmbed)
+
+// Genially's script embed: a `div.genially-embed` whose id is the view id, which `embed.js` fills
+// with the view's frame.
+export const geniallyWidgetEmbedResolver = createMarkupEmbedResolver(
+  'div.genially-embed[id]',
+  (element) => {
+    const viewId = keepIfMatches(attr(element, 'id'), hexRegex)
+
+    if (!viewId) {
+      return
+    }
+
+    return {
+      provider,
+      id: viewId,
+      src: `https://view.genially.com/${viewId}`,
+      ...sizes.player,
+    }
+  },
+)

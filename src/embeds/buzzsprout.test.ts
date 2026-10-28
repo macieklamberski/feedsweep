@@ -23,8 +23,33 @@ describe('buzzsproutResolveEmbed', () => {
     expect(buzzsproutResolveEmbed(new URL(value))).toEqual(expected)
   })
 
-  it('should return undefined for a show-level url', () => {
+  it('should mint the show player for a show page framed without its player flag', () => {
     const value = 'https://www.buzzsprout.com/1735722'
+    const expected: EmbedResolverResult = {
+      provider: 'buzzsprout',
+      id: '1735722',
+      src: 'https://www.buzzsprout.com/1735722?iframe=true',
+      url: 'https://www.buzzsprout.com/1735722',
+      height: 375,
+    }
+
+    expect(buzzsproutResolveEmbed(new URL(value))).toEqual(expected)
+  })
+
+  it('should return undefined for a show path under another segment', () => {
+    const value = 'https://www.buzzsprout.com/x/1735722?iframe=true'
+
+    expect(buzzsproutResolveEmbed(new URL(value))).toBeUndefined()
+  })
+
+  it('should return undefined for a show path that is not a number', () => {
+    const value = 'https://www.buzzsprout.com/help?iframe=true'
+
+    expect(buzzsproutResolveEmbed(new URL(value))).toBeUndefined()
+  })
+
+  it('should return undefined for a show path with a segment after it', () => {
+    const value = 'https://www.buzzsprout.com/1735722/podcast?iframe=true'
 
     expect(buzzsproutResolveEmbed(new URL(value))).toBeUndefined()
   })
@@ -190,6 +215,57 @@ describeForEachParser('buzzsproutIframeEmbedResolver', (parseHtml) => {
       url: 'https://www.buzzsprout.com/1735722/episodes/8166676',
       height: 200,
       title: 'How Producers Keep Live Events on Track',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('buzzsproutIframeEmbedResolver, show player', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, buzzsproutIframeEmbedResolver)
+
+  it('should resolve the iframe the show script writes', async () => {
+    const value = html`
+      <iframe
+        id="player_iframe"
+        src="https://www.buzzsprout.com/2435915?client_source=large_player&iframe=true&referrer=https%3A%2F%2Fwww.buzzsprout.com%2F2435915%2Fpodcast%2Fembed"
+        loading="lazy"
+        width="100%"
+        height="375"
+        frameborder="0"
+        scrolling="no"
+        title="Dermatologist Debriefs"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'buzzsprout',
+      id: '2435915',
+      src: 'https://www.buzzsprout.com/2435915?iframe=true',
+      url: 'https://www.buzzsprout.com/2435915',
+      height: 375,
+      title: 'Dermatologist Debriefs',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should keep the tag filter of a show iframe and drop the rest', async () => {
+    const value = html`
+      <iframe
+        class="buzz"
+        scrolling="no"
+        src="https://www.buzzsprout.com/1742444?artist=Gailey+Road+Productions&amp;client_source=large_player&amp;iframe=true&amp;tags=LB"
+        title="Gailey Road Productions podcast"
+        loading="lazy"
+      ></iframe>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'buzzsprout',
+      id: '1742444',
+      src: 'https://www.buzzsprout.com/1742444?iframe=true&tags=LB',
+      url: 'https://www.buzzsprout.com/1742444',
+      height: 375,
+      title: 'Gailey Road Productions podcast',
     }
 
     expect(await extract(value)).toEqual(expected)

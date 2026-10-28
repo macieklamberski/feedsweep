@@ -10,6 +10,9 @@ const provider = 'strava'
 const sizes = {
   activity: { ratio: '300/472' },
   route: { ratio: '300/531' },
+  // The segment leaderboard and the athlete widget, each a fixed height at every width.
+  segment: { height: 381 },
+  rides: { height: 454 },
 }
 
 // The page each player kind embeds, and its size.
@@ -60,12 +63,37 @@ export const stravaPlaceholderEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-// The player frame `embed.js` writes, `strava-embeds.com/{kind}/{id}`, and the retired apex
-// embed. The id survives the move to the current host and the apex token does not, so it is
-// dropped.
+// The player frame `embed.js` writes, `strava-embeds.com/{kind}/{id}`, the retired apex embed,
+// and the segment and athlete widgets the apex still serves. The id survives the move to the
+// current host and the apex token does not, so it is dropped.
 export const stravaResolveEmbed: ResolveUrlEmbed = (url) => {
-  const [route, id, embed] = getPathSegments(url)
+  const segments = getPathSegments(url)
+  const [route, id, embed, token] = segments
   const retiredKind = retiredEmbedKinds.get(route?.toLowerCase() ?? '')
+
+  // A segment's leaderboard, which serves on the apex alone: `strava-embeds.com` answers 404.
+  if (isAnyOf(route, 'segments') && id && isAnyOf(embed, 'embed') && segments.length === 3) {
+    return {
+      provider,
+      id: `segment/${id}`,
+      src: `https://www.strava.com/${route}/${id}/${embed}`,
+      url: `https://www.strava.com/${route}/${id}`,
+      ...sizes.segment,
+    }
+  }
+
+  // An athlete's latest activities, which serves on the apex alone. The token is the widget's
+  // only address, so no page url goes beside it.
+  const isRides = isAnyOf(route, 'athletes') && isAnyOf(embed, 'latest-rides')
+
+  if (isRides && id && token && segments.length === 4) {
+    return {
+      provider,
+      id: `athlete/${id}`,
+      src: `https://www.strava.com/${route}/${id}/${embed}/${token}`,
+      ...sizes.rides,
+    }
+  }
 
   if (retiredKind && isAnyOf(embed, 'embed')) {
     return composeEmbed(retiredKind, id)

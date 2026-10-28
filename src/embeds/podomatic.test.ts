@@ -185,8 +185,8 @@ describe('podomaticResolveEmbed', () => {
     })
 
     // The posting frame 404s for a real entry as for a fabricated one, and it names the entry by
-    // account and timestamp, not by the numeric id the html5 player takes.
-    it('should leave the dead posting frame alone', () => {
+    // account and timestamp, which the media resolver plays from the episode's enclosure.
+    it('should leave the dead posting frame to the media resolver', () => {
       const value =
         'http://rebelliondogs12stepradio.podomatic.com/embed/frame/posting/2016-07-08T15_06_10-07_00?json_url=http%3A%2F%2Frebelliondogs12stepradio.podomatic.com%2Fentry%2Fembed_params%2F2016-07-08T15_06_10-07_00%3Fcolor%3D43bee7%26autoPlay%3Dfalse%26facebook%3Dtrue%26height%3D85%26minicast%3Dfalse%26objembed%3D0%26width%3D440&notb=1'
 

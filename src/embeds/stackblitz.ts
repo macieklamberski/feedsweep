@@ -23,19 +23,22 @@ const stackblitzEmbedParams = ['file', 'initialpath', 'startScript']
 
 type StackblitzTarget = {
   id: string
+  project: string
   query: string
 }
 
-const parseTarget = (value: URL | undefined): StackblitzTarget | undefined => {
-  const parsed = parseUrlOnHosts(value, hosts, isHostOf)
+// A project's path: `edit/{slug}`, whose retired `run/{slug}` spelling answers 404 while `edit`
+// serves, or a GitHub repository's `github/{owner}/{repo}` with any ref and folder after it.
+const readProject = (parsed: URL): Omit<StackblitzTarget, 'query'> | undefined => {
+  const segments = getPathSegments(parsed)
+  const [route, slug, repo] = segments
 
-  if (!parsed) {
-    return
+  if (isAnyOf(route, 'github') && slug && repo) {
+    const path = segments.join('/')
+
+    return { id: path, project: `https://stackblitz.com/${path}` }
   }
 
-  const [route, slug] = getPathSegments(parsed)
-
-  // /github/{owner}/{repo} renders, but its id is a key the oEmbed endpoint answers 404 on.
   if (!isAnyOf(route, ['edit', 'run']) || !slug) {
     return
   }
@@ -45,13 +48,29 @@ const parseTarget = (value: URL | undefined): StackblitzTarget | undefined => {
     return
   }
 
+  return { id: slug, project: `https://stackblitz.com/edit/${slug}` }
+}
+
+const parseTarget = (value: URL | undefined): StackblitzTarget | undefined => {
+  const parsed = parseUrlOnHosts(value, hosts, isHostOf)
+
+  if (!parsed) {
+    return
+  }
+
+  const project = readProject(parsed)
+
+  if (!project) {
+    return
+  }
+
   const options = filterUrlQuery(parsed, (name) => isAnyOf(name, stackblitzEmbedParams))
 
   // `embed=1` is what the share dialog writes, and it opens the embed view at any width.
-  return { id: slug, query: `?embed=1${options.replace('?', '&')}` }
+  return { ...project, query: `?embed=1${options.replace('?', '&')}` }
 }
 
-// StackBlitz's editor iframe, whose retired /run/{slug} route answers 404 while /edit/ serves.
+// StackBlitz's editor iframe, for a project or a GitHub repository.
 export const stackblitzResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const target = parseTarget(url)
 
@@ -59,16 +78,13 @@ export const stackblitzResolveEmbed: ResolveUrlEmbed = (url, element) => {
     return
   }
 
-  const title = attr(element, 'title')
-  const project = `https://stackblitz.com/edit/${target.id}`
-
   return {
     provider,
     id: target.id,
-    src: `${project}${target.query}`,
-    url: project,
+    src: `${target.project}${target.query}`,
+    url: target.project,
     ...sizes.project,
-    title,
+    title: attr(element, 'title'),
   }
 }
 

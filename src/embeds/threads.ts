@@ -1,8 +1,15 @@
-import type { EmbedRenderHint } from '../types.js'
+import { encodePathSegment } from 'trousse'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { atUsername, createMarkupEmbedResolver, findBareHandle } from '../utils/widgets.js'
+import {
+  atUsername,
+  createMarkupEmbedResolver,
+  createS9eEmbedResolver,
+  createUrlEmbedResolver,
+  findBareHandle,
+} from '../utils/widgets.js'
 
 const provider = 'threads'
 
@@ -12,12 +19,12 @@ const hosts = ['threads.com', 'threads.net']
 // `/@{handle}/post/{code}` is the permalink the embed dialog writes, `/t/{code}` the short form.
 // The route words are case-sensitive on threads.com.
 const postPathRegex = /^\/(?:@([^/]+)\/post|t)\/([^/]+)/i
+const framePathRegex = /^\/(?:@[^/]+\/post|t)\/[^/]+\/embed\/?$/i
 
 type Post = { path: string; code: string; handle?: string }
 
-const readPostUrl = (value: string | undefined): Post | undefined => {
-  const parsed = parseUrlOnHosts(value, hosts)
-  const match = parsed?.pathname.match(postPathRegex)
+const readPost = (url: URL | undefined): Post | undefined => {
+  const match = url?.pathname.match(postPathRegex)
 
   if (!match) {
     return
@@ -32,18 +39,31 @@ const readPostUrl = (value: string | undefined): Post | undefined => {
 // Where the post is named: the attribute the dialog writes, then any anchor in the quote, which
 // a sanitized copy leaves as the only trace.
 const findPost = (element: Element): Post | undefined => {
-  const declared = readPostUrl(attr(element, 'data-text-post-permalink'))
+  const permalink = parseUrlOnHosts(attr(element, 'data-text-post-permalink'), hosts)
+  const declared = readPost(permalink)
 
   if (declared) {
     return declared
   }
 
   for (const anchor of element.querySelectorAll('a[href]')) {
-    const post = readPostUrl(attr(anchor, 'href'))
+    const href = parseUrlOnHosts(attr(anchor, 'href'), hosts)
+    const post = readPost(href)
 
     if (post) {
       return post
     }
+  }
+}
+
+const composePost = (post: Post, handle?: string): EmbedResolverResult => {
+  return {
+    provider,
+    // The frame plays the post for any handle in its path, so the shortcode alone names it.
+    id: post.code,
+    src: `https://www.threads.com${post.path}/embed/`,
+    url: `https://www.threads.com${post.path}`,
+    author: handle ? atUsername(handle) : undefined,
   }
 }
 
@@ -60,18 +80,33 @@ export const threadsBlockquoteEmbedResolver = createMarkupEmbedResolver(
 
     // A `/t/` permalink names no account, so the handle comes from the dialog's "Post by @handle"
     // line.
-    const handle = post.handle ?? findBareHandle(element)
-
-    return {
-      provider,
-      // The frame plays the post for any handle in its path, so the shortcode alone names it.
-      id: post.code,
-      src: `https://www.threads.com${post.path}/embed/`,
-      url: `https://www.threads.com${post.path}`,
-      author: handle ? atUsername(handle) : undefined,
-    }
+    return composePost(post, post.handle ?? findBareHandle(element))
   },
 )
+
+// The frame `embed.js` writes, `{permalink}/embed/`, saved into the feed by a CMS that ran it.
+export const threadsResolveEmbed: ResolveUrlEmbed = (url) => {
+  if (!framePathRegex.test(url.pathname)) {
+    return
+  }
+
+  const post = readPost(url)
+
+  if (!post) {
+    return
+  }
+
+  return composePost(post, post.handle)
+}
+
+export const threadsIframeEmbedResolver = createUrlEmbedResolver(hosts, threadsResolveEmbed)
+
+// A forum's s9e MediaEmbed helper frame, naming the post's shortcode in its url fragment.
+export const threadsS9eEmbedResolver = createS9eEmbedResolver('threads', (code) => {
+  const frame = new URL(`https://www.threads.com/t/${encodePathSegment(code)}/embed/`)
+
+  return threadsResolveEmbed(frame)
+})
 
 export const threadsRenderHint: EmbedRenderHint = {
   provider,

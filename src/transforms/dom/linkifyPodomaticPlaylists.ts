@@ -1,17 +1,23 @@
-import { encodePathSegment, getSubdomain, isAnyOf, startsWithAnyOf } from 'trousse'
+import { encodePathSegment, getSubdomain, startsWithAnyOf } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { flashVar } from '../../utils/dom.js'
 import { parseUrlOnHosts } from '../../utils/urls.js'
 import { createLink, readCarrierUrl } from '../../utils/widgets.js'
 
 const podomaticHost = 'podomatic.com'
-const playerPath = '/swf/jwplayer'
-const playlistPath = '/mrss_stream.xml'
 
-const playerSelector = [
-  `embed[src*="${podomaticHost}${playerPath}" i]`,
-  `object[data*="${podomaticHost}${playerPath}" i]`,
-].join(', ')
+// Each Flash show player, and the flashvar naming its podcast's whole playlist.
+const players = [
+  { path: '/swf/jwplayer', flashVar: 'file', playlistRegex: /^\/mrss_stream\.xml$/i },
+  { path: '/swf/joe_multiplayer', flashVar: 'jsonLocation', playlistRegex: /^\/embed\/multi\//i },
+  { path: '/flash/flashcatcher', flashVar: 'playlist_url', playlistRegex: /^\/xspf\.xspf$/i },
+]
+
+const playerSelector = players
+  .flatMap(({ path }) => {
+    return [`embed[src*="${podomaticHost}${path}" i]`, `object[data*="${podomaticHost}${path}" i]`]
+  })
+  .join(', ')
 
 const readSubdomain = (url: string | undefined): string | undefined => {
   if (!url) {
@@ -27,24 +33,28 @@ const readSubdomain = (url: string | undefined): string | undefined => {
   return sub
 }
 
-// Podomatic's Flash JW Player set to a podcast's whole feed, `file={sub}.podomatic.com/
-// mrss_stream.xml`. Flash no longer runs, so it renders nothing, and the playlist's episodes are
-// played only by a player keyed on a numeric podcast id, so the podcast's page is linked instead.
+// Podomatic's Flash show players, each naming a podcast's whole playlist: the JW Player's
+// `file={sub}.podomatic.com/mrss_stream.xml`, the multiplayer's `jsonLocation` on
+// `{sub}.podomatic.com/embed/multi/` and the flashcatcher's `playlist_url={sub}.podomatic.com/
+// xspf.xspf`. Flash no longer runs, so they render nothing, and the playlist's episodes are played
+// only by a player keyed on a numeric podcast id, so the podcast's page is linked instead.
 export const linkifyPodomaticPlaylists: DomTransform = () => (document) => {
   for (const element of document.querySelectorAll(playerSelector)) {
-    const player = parseUrlOnHosts(readCarrierUrl(element), podomaticHost)
+    const pathname = parseUrlOnHosts(readCarrierUrl(element), podomaticHost)?.pathname
+    const player = players.find(({ path }) => startsWithAnyOf(pathname, path))
 
-    if (!player || !startsWithAnyOf(player.pathname, playerPath)) {
+    if (!player) {
       continue
     }
 
-    const file = flashVar(element, 'file')
+    const playlist = flashVar(element, player.flashVar)
+    const playlistPath = parseUrlOnHosts(playlist, podomaticHost)?.pathname
 
-    if (!isAnyOf(parseUrlOnHosts(file, podomaticHost)?.pathname, playlistPath)) {
+    if (!playlistPath || !player.playlistRegex.test(playlistPath)) {
       continue
     }
 
-    const sub = readSubdomain(file) ?? readSubdomain(flashVar(element, 'viral.link'))
+    const sub = readSubdomain(playlist) ?? readSubdomain(flashVar(element, 'viral.link'))
 
     if (!sub) {
       continue

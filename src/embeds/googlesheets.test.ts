@@ -230,6 +230,20 @@ describe('googlesheetsResolveEmbed', () => {
       expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
+    it('should keep the chart the visualization api frame names', () => {
+      const value =
+        'https://docs.google.com/spreadsheets/d/1CtPkK9IBPC6zoNezA2qO7TALen9wH-a2ZCpCO_VQcPc/gviz/chartiframe?oid=819666174'
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1CtPkK9IBPC6zoNezA2qO7TALen9wH-a2ZCpCO_VQcPc',
+        src: 'https://docs.google.com/spreadsheets/d/1CtPkK9IBPC6zoNezA2qO7TALen9wH-a2ZCpCO_VQcPc/gviz/chartiframe?oid=819666174',
+        url: 'https://docs.google.com/spreadsheets/d/1CtPkK9IBPC6zoNezA2qO7TALen9wH-a2ZCpCO_VQcPc/pubhtml',
+        height: 371,
+      }
+
+      expect(googlesheetsResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
     it('should drop the image format of a chart published by its token', () => {
       const value =
         'https://docs.google.com/spreadsheets/d/e/2PACX-1vTer4F1dwvz5S6cFf_pr768UANwA6btXwwKCOCHteBJn5GOXkiXGj0wjHiVlU6xos8MWd56Y_pLsmAL/pubchart?oid=1703615479&format=image'
@@ -260,9 +274,9 @@ describe('googlesheetsResolveEmbed', () => {
       expect(googlesheetsResolveEmbed(new URL(value))).toBeUndefined()
     })
 
-    it('should ignore a chart drawn by the visualization api', () => {
+    it('should ignore a visualization api route that is not the chart frame', () => {
       const value =
-        'https://docs.google.com/spreadsheets/d/1MtX643H0wJWuvAETl1UJTBxaMO8DN5niRRvfYRydDVs/gviz/chartiframe?oid=1063393785'
+        'https://docs.google.com/spreadsheets/d/1CtPkK9IBPC6zoNezA2qO7TALen9wH-a2ZCpCO_VQcPc/gviz/tq?oid=819666174'
 
       expect(googlesheetsResolveEmbed(new URL(value))).toBeUndefined()
     })
@@ -794,6 +808,28 @@ describeForEachParser('googlesheetsEmbedResolver', (parseHtml) => {
         src: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSHamMZQILw9-FEtIhdiHMdroSgPzLv737UcgduKHdRrsEt8eXa395_MshIm5waDHMg5Aoc6Ty_14vH/pubchart?oid=992755193',
         url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSHamMZQILw9-FEtIhdiHMdroSgPzLv737UcgduKHdRrsEt8eXa395_MshIm5waDHMg5Aoc6Ty_14vH/pubhtml',
         height: 600,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should resolve the visualization api chart frame', async () => {
+      const value = html`
+        <iframe
+          frameborder="0"
+          height="371"
+          scrolling="no"
+          seamless=""
+          src="//docs.google.com/spreadsheets/d/1CtPkK9IBPC6zoNezA2qO7TALen9wH-a2ZCpCO_VQcPc/gviz/chartiframe?oid=358903565"
+          width="700"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'googlesheets',
+        id: '1CtPkK9IBPC6zoNezA2qO7TALen9wH-a2ZCpCO_VQcPc',
+        src: 'https://docs.google.com/spreadsheets/d/1CtPkK9IBPC6zoNezA2qO7TALen9wH-a2ZCpCO_VQcPc/gviz/chartiframe?oid=358903565',
+        url: 'https://docs.google.com/spreadsheets/d/1CtPkK9IBPC6zoNezA2qO7TALen9wH-a2ZCpCO_VQcPc/pubhtml',
+        height: 371,
       }
 
       expect(await extract(value)).toEqual(expected)

@@ -1,6 +1,6 @@
 import { encodePathSegment } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
-import { attr, flashVar } from '../utils/dom.js'
+import { attr, flashVar, jsonAttr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -15,7 +15,11 @@ const flashPlayerPathRegex = /^\/poll\.swf$/i
 const sizes = {
   // A poll's height follows its answer count, and the frame posts none.
   player: { height: 533 },
+  // The height `survey.js` gives its frame when the settings state none.
+  survey: { height: 500 },
 }
+
+type SurveySettings = { domain?: unknown; id?: unknown }
 
 const composeEmbed = (pollId: string): EmbedResolverResult => {
   // The Flash flashvar `p` comes out decoded, and it goes into a path.
@@ -114,4 +118,30 @@ const crowdsignalFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
 export const crowdsignalFlashEmbedResolver = createUrlEmbedResolver(
   ['www.polldaddy.com'],
   crowdsignalFlashResolveEmbed,
+)
+
+// Crowdsignal's survey embed: a `div.pd-embed` whose `data-settings` name the survey's domain and
+// slug, which `survey.js` turns into a frame of `{domain}{slug}`.
+export const crowdsignalWidgetEmbedResolver = createMarkupEmbedResolver(
+  'div.pd-embed[data-settings]',
+  (element) => {
+    const settings = jsonAttr<SurveySettings>(element, 'data-settings')
+    const domain = typeof settings?.domain === 'string' ? settings.domain : undefined
+    const slug = typeof settings?.id === 'string' ? settings.id : undefined
+    const survey = parseUrlOnHosts(domain ? `https://${domain}` : undefined, 'survey.fm')
+
+    if (!survey || !slug) {
+      return
+    }
+
+    const page = `https://${survey.hostname}/${encodePathSegment(slug)}`
+
+    return {
+      provider,
+      id: `${survey.hostname}/${slug}`,
+      src: `${page}?iframe=1`,
+      url: page,
+      ...sizes.survey,
+    }
+  },
 )

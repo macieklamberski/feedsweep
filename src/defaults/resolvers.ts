@@ -125,6 +125,7 @@ import {
   crowdsignalFlashEmbedResolver,
   crowdsignalIframeEmbedResolver,
   crowdsignalScriptEmbedResolver,
+  crowdsignalWidgetEmbedResolver,
 } from '../embeds/crowdsignal.js'
 import { cspanEmbedResolver } from '../embeds/cspan.js'
 import { dailymailEmbedResolver } from '../embeds/dailymail.js'
@@ -138,7 +139,7 @@ import {
   democracynowScriptEmbedResolver,
 } from '../embeds/democracynow.js'
 import { documentcloudEmbedResolver } from '../embeds/documentcloud.js'
-import { donorboxEmbedResolver } from '../embeds/donorbox.js'
+import { donorboxIframeEmbedResolver, donorboxWidgetEmbedResolver } from '../embeds/donorbox.js'
 import { dvidsEmbedResolver } from '../embeds/dvids.js'
 import { dzenEmbedResolver } from '../embeds/dzen.js'
 import { educaplayEmbedResolver } from '../embeds/educaplay.js'
@@ -175,7 +176,7 @@ import {
 import { foxnewsIframeEmbedResolver, foxnewsScriptEmbedResolver } from '../embeds/foxnews.js'
 import { ganjingworldEmbedResolver } from '../embeds/ganjingworld.js'
 import { garminEmbedResolver } from '../embeds/garmin.js'
-import { geniallyEmbedResolver } from '../embeds/genially.js'
+import { geniallyIframeEmbedResolver, geniallyWidgetEmbedResolver } from '../embeds/genially.js'
 import { geogebraEmbedResolver } from '../embeds/geogebra.js'
 import { gettyImagesEmbedResolver } from '../embeds/gettyimages.js'
 import { glomexElementEmbedResolver, glomexIframeEmbedResolver } from '../embeds/glomex.js'
@@ -276,7 +277,11 @@ import { podetizeIframeEmbedResolver, podetizeScriptEmbedResolver } from '../emb
 import { podigeeIframeEmbedResolver, podigeeScriptEmbedResolver } from '../embeds/podigee.js'
 import { podomaticEmbedResolver } from '../embeds/podomatic.js'
 import { pollmakerFormEmbedResolver, pollmakerIframeEmbedResolver } from '../embeds/pollmaker.js'
-import { preziEmbedResolver } from '../embeds/prezi.js'
+import {
+  preziDesignIframeEmbedResolver,
+  preziDesignWidgetEmbedResolver,
+  preziEmbedResolver,
+} from '../embeds/prezi.js'
 import { puzzlemeIframeEmbedResolver, puzzlemeWidgetEmbedResolver } from '../embeds/puzzleme.js'
 import { radioradicaleEmbedResolver } from '../embeds/radioradicale.js'
 import { redcircleIframeEmbedResolver, redcircleScriptEmbedResolver } from '../embeds/redcircle.js'
@@ -335,8 +340,12 @@ import {
 } from '../embeds/telegram.js'
 import { tencentEmbedResolver } from '../embeds/tencent.js'
 import { tenorIframeEmbedResolver, tenorWidgetEmbedResolver } from '../embeds/tenor.js'
-import { thinglinkEmbedResolver } from '../embeds/thinglink.js'
-import { threadsBlockquoteEmbedResolver } from '../embeds/threads.js'
+import { thinglinkIframeEmbedResolver, thinglinkImageEmbedResolver } from '../embeds/thinglink.js'
+import {
+  threadsBlockquoteEmbedResolver,
+  threadsIframeEmbedResolver,
+  threadsS9eEmbedResolver,
+} from '../embeds/threads.js'
 import { tickettailorScriptEmbedResolver } from '../embeds/tickettailor.js'
 import {
   tiktokBlockquoteEmbedResolver,
@@ -510,7 +519,7 @@ import { metasliderMediaResolver } from '../media/metaslider.js'
 import { odeoMediaResolver } from '../media/odeo.js'
 import { podbeanFlashMediaResolver } from '../media/podbean.js'
 import { podloveMediaResolver } from '../media/podlove.js'
-import { podomaticFlashMediaResolver } from '../media/podomatic.js'
+import { podomaticFlashMediaResolver, podomaticIframeMediaResolver } from '../media/podomatic.js'
 import { substackMediaResolver } from '../media/substack.js'
 import { tumblrMediaResolver } from '../media/tumblr.js'
 import { wechatMediaResolver } from '../media/wechat.js'
@@ -608,6 +617,7 @@ const embedResolvers: Array<EmbedResolver> = [
   crowdsignalFlashEmbedResolver,
   crowdsignalIframeEmbedResolver,
   crowdsignalScriptEmbedResolver,
+  crowdsignalWidgetEmbedResolver,
   cspanEmbedResolver,
   dailymailEmbedResolver,
   dailymotionIframeEmbedResolver,
@@ -616,7 +626,8 @@ const embedResolvers: Array<EmbedResolver> = [
   democracynowIframeEmbedResolver,
   democracynowScriptEmbedResolver,
   documentcloudEmbedResolver,
-  donorboxEmbedResolver,
+  donorboxIframeEmbedResolver,
+  donorboxWidgetEmbedResolver,
   dvidsEmbedResolver,
   dzenEmbedResolver,
   educaplayEmbedResolver,
@@ -647,7 +658,8 @@ const embedResolvers: Array<EmbedResolver> = [
   foxnewsIframeEmbedResolver,
   ganjingworldEmbedResolver,
   garminEmbedResolver,
-  geniallyEmbedResolver,
+  geniallyIframeEmbedResolver,
+  geniallyWidgetEmbedResolver,
   geogebraEmbedResolver,
   gettyImagesEmbedResolver,
   glomexIframeEmbedResolver,
@@ -757,6 +769,8 @@ const embedResolvers: Array<EmbedResolver> = [
   podomaticEmbedResolver,
   pollmakerIframeEmbedResolver,
   pollmakerFormEmbedResolver,
+  preziDesignIframeEmbedResolver,
+  preziDesignWidgetEmbedResolver,
   preziEmbedResolver,
   puzzlemeIframeEmbedResolver,
   puzzlemeWidgetEmbedResolver,
@@ -812,8 +826,11 @@ const embedResolvers: Array<EmbedResolver> = [
   tencentEmbedResolver,
   tenorIframeEmbedResolver,
   tenorWidgetEmbedResolver,
-  thinglinkEmbedResolver,
+  thinglinkIframeEmbedResolver,
+  thinglinkImageEmbedResolver,
   threadsBlockquoteEmbedResolver,
+  threadsIframeEmbedResolver,
+  threadsS9eEmbedResolver,
   tickettailorScriptEmbedResolver,
   tiktokBlockquoteEmbedResolver,
   tiktokIframeEmbedResolver,
@@ -887,6 +904,7 @@ const mediaResolvers: Array<MediaResolver> = [
   podbeanFlashMediaResolver,
   podloveMediaResolver,
   podomaticFlashMediaResolver,
+  podomaticIframeMediaResolver,
   substackMediaResolver,
   tumblrMediaResolver,
   wechatMediaResolver,
