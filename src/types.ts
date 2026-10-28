@@ -264,6 +264,7 @@ export type TransformContentOptions = {
   stringTransforms?: Array<StringTransform>
   domTransforms?: Array<DomTransform>
   // Opt into the "best judgement" heuristic transforms (video-poster assignment, duplicate
-  // enclosures and duplicate leading images). Ignored when `domTransforms` is set explicitly.
+  // enclosures, duplicate leading images and Medium's syndication footer). Ignored when
+  // `domTransforms` is set explicitly.
   heuristics?: boolean
 }

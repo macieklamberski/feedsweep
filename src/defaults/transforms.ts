@@ -83,6 +83,7 @@ import { stripHiddenElements } from '../transforms/dom/stripHiddenElements.js'
 import { stripInterBlockBreaks } from '../transforms/dom/stripInterBlockBreaks.js'
 import { stripLeadingIndentation } from '../transforms/dom/stripLeadingIndentation.js'
 import { stripMarkdownEscapeBackslashes } from '../transforms/dom/stripMarkdownEscapeBackslashes.js'
+import { stripMediumSyndicationFooters } from '../transforms/dom/stripMediumSyndicationFooters.js'
 import { stripNonContentElements } from '../transforms/dom/stripNonContentElements.js'
 import { stripWordBreaks } from '../transforms/dom/stripWordBreaks.js'
 import { stripWordpressEmbedFrames } from '../transforms/dom/stripWordpressEmbedFrames.js'
@@ -404,6 +405,7 @@ export const heuristicDomTransforms: Array<DomTransform> = [
   // An image enclosure is injected only into a body with no image of its own, so no injected
   // image repeats a content image for either pass to remove.
   stripDuplicateLeadingImages,
+  stripMediumSyndicationFooters,
 ]
 
 // The standard pipeline with the heuristic transforms spliced in right after
