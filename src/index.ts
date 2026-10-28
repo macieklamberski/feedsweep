@@ -195,6 +195,7 @@ export type {
   ResolveEmbed,
   ResolveUrlFn,
   StringTransform,
+  TrackingUrl,
   TransformContentOptions,
   TransformContext,
   UrlRole,
