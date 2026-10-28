@@ -386,6 +386,53 @@ describeForEachParser('transformContent', (parseHtml) => {
     expect(heuristic).toBe(value)
   })
 
+  it('should strip an enclosure behind a measurement prefix that matchUrlFn unwraps', async () => {
+    const value = html`
+      <figure class="wp-block-audio">
+        <audio controls src="https://example.com/wp-content/uploads/2021/05/TEAS9.mp3"></audio>
+      </figure>
+    `
+    const enclosures = [
+      {
+        url: 'https://media.blubrry.com/ms_all_de_la_innovacin/example.com/wp-content/uploads/2021/05/TEAS9.mp3',
+        type: 'audio/mpeg',
+      },
+    ]
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      enclosures,
+      heuristics: true,
+      matchUrlFn: (url) => url.replace('media.blubrry.com/ms_all_de_la_innovacin/', ''),
+    })
+
+    expect(result).toEqualHtml(value)
+  })
+
+  it('should keep the url an enclosure carries when only matchUrlFn unwraps it', async () => {
+    const value = '<p>Content</p>'
+    const enclosures = [
+      {
+        url: 'https://media.blubrry.com/ms_all_de_la_innovacin/example.com/wp-content/uploads/2021/05/TEAS9.mp3',
+        type: 'audio/mpeg',
+      },
+    ]
+    const expected = html`
+      <audio
+        src="https://media.blubrry.com/ms_all_de_la_innovacin/example.com/wp-content/uploads/2021/05/TEAS9.mp3"
+        controls
+      ></audio>
+      <p>Content</p>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      enclosures,
+      heuristics: true,
+      matchUrlFn: (url) => url.replace('media.blubrry.com/ms_all_de_la_innovacin/', ''),
+    })
+
+    expect(result).toEqualHtml(expected)
+  })
+
   it('should remove paragraphs left empty after boundary br stripping', async () => {
     const value = html`
       <p>Hello</p>
