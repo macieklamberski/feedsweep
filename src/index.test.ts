@@ -140,6 +140,31 @@ describeForEachParser('transformContent', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
+  it('should label a Medium code block with its data-code-block-lang language', async () => {
+    const value = html`
+      <pre
+        class="graf graf--pre graf--preV2"
+        data-code-block-lang="bash"
+        data-code-block-mode="2"
+        name="a82b"
+        spellcheck="false"
+      ><span class="pre--content">yum add @langchain/google</span></pre>
+    `
+    const expected = html`
+      <pre
+        class="graf graf--pre graf--preV2"
+        data-code-block-lang="bash"
+        data-code-block-mode="2"
+        name="a82b"
+        spellcheck="false"
+        data-pre-language="bash"
+        data-pre-label="Bash"
+      ><code class="hljs">yum add @langchain/google</code></pre>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   it('should keep <br>-delimited code lines multi-line and not merge adjacent blocks', async () => {
     // Prism/Eleventy feeds separate code lines with <br> inside <pre>, not \n.
     // replacePreLineBreaks must run before highlightCode so the lines survive

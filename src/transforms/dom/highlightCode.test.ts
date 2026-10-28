@@ -84,6 +84,20 @@ describe('detectLanguage', () => {
     })
   })
 
+  describe('Medium data-code-block-lang', () => {
+    it('should detect language from data-code-block-lang', () => {
+      const { pre, code } = createElement(html`
+        <pre
+          class="graf graf--pre graf--preV2"
+          data-code-block-lang="bash"
+          data-code-block-mode="2"
+        ><span class="pre--content">yum add @langchain/google</span></pre>
+      `)
+
+      expect(detectLanguage(pre, code)).toBe('bash')
+    })
+  })
+
   describe('Pandoc sourceCode', () => {
     it('should detect Pandoc sourceCode language', () => {
       const { pre, code } = createElement(
@@ -873,6 +887,31 @@ describeForEachParser('highlightCode', (parseHtml) => {
       '<pre class="EnlighterJSRAW" data-enlighter-language="python">def f():\n    return 1</pre>'
     const expected =
       '<pre class="EnlighterJSRAW" data-enlighter-language="python" data-pre-language="python" data-pre-label="Python"><code class="hljs"><span class="hljs-keyword">def</span> <span class="hljs-title function_">f</span>():\n    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span></code></pre>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should highlight a Medium block via data-code-block-lang', async () => {
+    const value = html`
+      <pre
+        class="graf graf--pre graf--preV2"
+        data-code-block-lang="bash"
+        data-code-block-mode="2"
+        name="a82b"
+        spellcheck="false"
+      ><span class="pre--content">yum add @langchain/google</span></pre>
+    `
+    const expected = html`
+      <pre
+        class="graf graf--pre graf--preV2"
+        data-code-block-lang="bash"
+        data-code-block-mode="2"
+        name="a82b"
+        spellcheck="false"
+        data-pre-language="bash"
+        data-pre-label="Bash"
+      ><code class="hljs">yum add @langchain/google</code></pre>
+    `
 
     expect(await transform(value)).toEqualHtml(expected)
   })
