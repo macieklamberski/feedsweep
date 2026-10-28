@@ -122,6 +122,20 @@ const specimens: Record<string, string | [string, string]> = {
   '.feedflare': '<div class="feedflare"><a href="/ff">Share</a></div>',
   '.addtoany_share_save_container':
     '<div class="addtoany_share_save_container"><a class="a2a_button_facebook" href="#">Share</a></div>',
+  'table[class*="email-ufi-2-"]': html`
+    <table class="email-ufi-2-bottom" role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tbody>
+        <tr height="16"><td height="16">&nbsp;</td></tr>
+        <tr>
+          <td>
+            <a class="email-button-outline" href="https://example.com/app-link/post?submitLike=true"><img class="icon" src="https://example.com/icon/LucideHeart" width="18" height="18" alt=""><span class="email-button-text">Like</span></a>
+            <a class="email-button-outline" href="https://example.com/app-link/post?comments=true&amp;action=post-comment"><img class="icon" src="https://example.com/icon/LucideComments" width="18" height="18" alt=""><span class="email-button-text">Comment</span></a>
+            <a class="email-button-outline" href="https://example.com/redirect/2/restack"><img class="icon" src="https://example.com/icon/notes__NoteRestackIcon" width="18" height="18" alt=""><span class="email-button-text">Restack</span></a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  `,
   'iframe[src*="platform.twitter.com/widgets/" i]':
     '<iframe id="twitter-widget-0" scrolling="no" frameborder="0" allowtransparency="true" src="https://platform.twitter.com/widgets/tweet_button.1397165098.html#_=1400000000000&amp;count=horizontal&amp;id=twitter-widget-0&amp;lang=en&amp;original_referer=https%3A%2F%2Fexample.com%2Fpost&amp;size=m&amp;text=A%20post&amp;url=https%3A%2F%2Fexample.com%2Fpost" class="twitter-share-button twitter-share-button-rendered twitter-tweet-button" style="position: static; visibility: visible; width: 107px; height: 20px;" title="Twitter Tweet Button"></iframe>',
   'iframe:is([src*="facebook.com/plugins/like.php" i], [src*="facebook.com/v" i][src*="/plugins/like.php" i])':
@@ -1028,6 +1042,29 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
 
       expect(await transform(value)).toEqualHtml(value)
     })
+
+    it('should strip the Substack email action row under a webmail class prefix', async () => {
+      const value = html`
+        <p>Before</p>
+        <table class="yiv3760304754email-ufi-2-top" role="presentation">
+          <tbody>
+            <tr>
+              <td>
+                <a class="yiv3760304754email-icon-button" href="https://example.com/redirect/2/restack"><img class="yiv3760304754icon" src="https://example.com/icon/NoteForwardIcon" width="18" height="18" alt=""></a>
+                <a class="yiv3760304754email-button-outline" href="https://example.com/app-link/post"><span class="yiv3760304754email-button-text">READ IN APP</span></a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p>After</p>
+      `
+      const expected = html`
+        <p>Before</p>
+        <p>After</p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 
   it('should be idempotent', async () => {
@@ -1049,6 +1086,33 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
 })
 
 describeForEachParser('stripNonContentElements through the pipeline', (parseHtml) => {
+  it('should strip the Substack email action row and the wrapper it leaves empty', async () => {
+    const value = html`
+      <div class="email-body-container">
+        <table class="email-ufi-2-top" role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tbody>
+            <tr height="16"><td height="16">&nbsp;</td></tr>
+            <tr>
+              <td><a class="email-icon-button" href="https://example.com/redirect/2/restack"><img class="icon" src="https://example.com/icon/NoteForwardIcon" width="18" height="18" alt=""></a></td>
+              <td align="right"><a class="email-button-outline" href="https://example.com/app-link/post"><span class="email-button-text">READ IN APP</span></a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="post typography" dir="auto">
+        <div class="body markup" dir="auto">
+          <p>The rosters are as follows.</p>
+        </div>
+      </div>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+
+    expect(result).toEqualHtml('<p dir="auto">The rosters are as follows.</p>')
+  })
+
   it('should let a strip selector remove a parked chrome frame', async () => {
     const value = html`
       <iframe

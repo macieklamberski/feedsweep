@@ -93,6 +93,11 @@ export const defaultNonContentSelectors = [
   // for the variant that carries an image or text and survives as a "Share" button.
   'a.addtoany_share_save',
 
+  // Substack's email action rows, the like, comment, restack and share bar above and below a
+  // post sent as mail. Webmail clients prefix the class when a forwarded mail is republished,
+  // as in `yiv5222271817email-ufi-2-top` and `x_email-ufi-2-top`.
+  'table[class*="email-ufi-2-"]',
+
   // Survives as a live "Tweet" link in the output, usually with no other non-content selector
   // matching anywhere.
   'a.twitter-share-button',
