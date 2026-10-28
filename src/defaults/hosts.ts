@@ -73,6 +73,7 @@ export const defaultTrackingUrls: Array<TrackingUrl> = [
   { host: 'googleadservices.com' }, // AdSense for Feeds ad images and Google Ads conversion pixels.
   { host: 'googletagmanager.com' }, // Google Tag Manager.
   { host: 'amazon-adsystem.com' }, // Amazon ad serving pixels.
+  { host: 'facebook.com', path: /^\/tr(\/|$)/i }, // Meta Pixel images. The host also serves logos and photos.
   { host: 'taboola.com' }, // Content-recommendation widget pixels.
   { host: 'outbrain.com' }, // Content-recommendation widget pixels.
   { host: 'scorecardresearch.com' }, // Comscore audience-measurement pixels.
@@ -89,6 +90,7 @@ export const defaultTrackingUrls: Array<TrackingUrl> = [
   { host: 'counter.blakedrumm.com' }, // Page-view counter badges (/count/tag.svg).
   { host: 'rt.prnewswire.com' }, // PR Newswire release tracking (rt.gif).
   { host: 'reports.newsvoir.com' }, // Newsvoir release pixels. Not the bare host: www serves release photos.
+  { host: 'emailwire.com', path: /^\/tracker\//i }, // EmailWire release pixels (/tracker/track.php). The host serves release images under /files.
   { host: 'assoc-amazon.com' }, // Amazon Associates link pixels (/e/ir?).
   { host: 'assoc-amazon.jp' }, // Amazon Associates link pixels (JP).
   { host: 'assoc-amazon.co.uk' }, // Amazon Associates link pixels (UK).

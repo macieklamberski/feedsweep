@@ -7,6 +7,8 @@ import { removeTrackingPixels } from './removeTrackingPixels.js'
 
 const pxPathRegex = /^\/px(\/|$)/
 
+const hostTrackingUrls = defaultTrackingUrls.filter((entry) => !entry.path)
+
 describeForEachParser('removeTrackingPixels', (parseHtml) => {
   const transform = (value: string, context: TransformContext = baseContext) => {
     return applyDomTransforms(parseHtml(value), [removeTrackingPixels(context)])
@@ -230,7 +232,7 @@ describeForEachParser('removeTrackingPixels', (parseHtml) => {
   describe('host-based detection', () => {
     // Iterates the real default list, so every entry is exercised and a new entry
     // is covered automatically.
-    it.each(defaultTrackingUrls)('should remove images from $host', async ({ host }) => {
+    it.each(hostTrackingUrls)('should remove images from $host', async ({ host }) => {
       const value = `<img src="https://${host}/t.gif?id=abc">`
 
       expect(await transform(value)).toEqualHtml('')
@@ -386,6 +388,63 @@ describeForEachParser('removeTrackingPixels', (parseHtml) => {
       `
 
       expect(await transform(value, context)).toEqualHtml('<p>Text</p>')
+    })
+  })
+
+  describe('Meta Pixel image', () => {
+    it('should remove the image', async () => {
+      const value =
+        '<img src="https://www.facebook.com/tr?id=1845363462352797&ev=PageView&noscript=1">'
+
+      expect(await transform(value)).toEqualHtml('')
+    })
+
+    it('should remove the image whose path ends in a slash', async () => {
+      const value = html`
+        <img
+          border="0"
+          src="https://www.facebook.com/tr/?ev=6021483112529&amp;if=false&amp;ts=1453362988164&amp;v=2.0"
+        >
+      `
+
+      expect(await transform(value)).toEqualHtml('')
+    })
+
+    it('should remove the image on the mobile subdomain', async () => {
+      const value = '<img src="https://m.facebook.com/tr?id=1845363462352797&ev=PageView">'
+
+      expect(await transform(value)).toEqualHtml('')
+    })
+
+    it('should keep an unsized logo elsewhere on facebook.com', async () => {
+      const value = '<img src="http://www.facebook.com/images/fb_logo_small.png" alt="Facebook">'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep an image on a page path that starts with tr', async () => {
+      const value = '<img src="https://www.facebook.com/treatibles/photos/1.jpg" alt="Treats">'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
+  describe('EmailWire release pixel', () => {
+    it('should remove the image', async () => {
+      const value = html`
+        <img
+          src="https://www.emailwire.com/tracker/track.php?ID=39021"
+          border="0"
+        >
+      `
+
+      expect(await transform(value)).toEqualHtml('')
+    })
+
+    it('should keep an unsized release image', async () => {
+      const value = '<img src="https://www.emailwire.com/files/39021/product.jpg" alt="Product">'
+
+      expect(await transform(value)).toEqualHtml(value)
     })
   })
 
