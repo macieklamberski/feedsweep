@@ -1,4 +1,4 @@
-import { parseUrl } from 'trousse'
+import { type NormalizeOptions, normalizeUrl, parseUrl } from 'trousse'
 import type { Enclosure, TransformContext } from '../types.js'
 import { setInnerHtml } from './dom.js'
 import { getImageFingerprint, getSizeKeywordRank, getUrlSizeHint } from './images.js'
@@ -15,10 +15,23 @@ const kindTypePrefixes = ['audio/', 'video/', 'image/'] as const
 // anywhere after the `?`. A file name can carry the text `u0026` as written.
 const strippedJsonAmpersandRegex = /(?<=\?.*)u0026(?:amp)?/g
 
+// A media fragment such as `#t=30` names the same file, so the hash goes with the other spellings.
+const mediaKeyOptions: NormalizeOptions = {
+  stripScheme: true,
+  stripAuthentication: true,
+  stripWww: true,
+  stripTrailingSlash: true,
+  stripHash: true,
+  sortQueryParams: true,
+  stripEmptyQuery: true,
+  normalizeEncoding: true,
+  normalizeUnicode: true,
+}
+
 // The image key drops a file's query, which is what tells podcast proxy episodes apart.
 // A podcast proxy's audio url is `…/play.mp3?url={episode}`, so its identity lives in the query.
 // Audio, video and embeds have no scaled variants.
-export const buildMediaKey = (element: Element, context?: TransformContext): string => {
+const readMediaKey = (element: Element, context?: TransformContext): string => {
   const src = element.getAttribute('src') ?? element.getAttribute('data-embed-src') ?? ''
   // The key is only compared, so the caller's matchUrlFn stands in for cleanUrlFn here. A
   // measurement prefix such as `media.blubrry.com/{show}/{file}` names the body's bare file.
@@ -31,6 +44,13 @@ export const buildMediaKey = (element: Element, context?: TransformContext): str
   }
 
   return cleanUrl(src, matchContext) ?? src
+}
+
+// One file written over `http` and `https` is one key, and the output keeps what the feed wrote.
+// An image fingerprint is already folded and carries no scheme. Only a host with a port parses,
+// as a scheme, and that only sorts its query.
+export const buildMediaKey = (element: Element, context?: TransformContext): string => {
+  return normalizeUrl(readMediaKey(element, context), mediaKeyOptions)
 }
 
 // PeerTube ships an audio-only rendition as `type="audio/mp4"` under `medium="video"`, so the
