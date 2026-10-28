@@ -74,6 +74,39 @@ describeForEachParser('rebuildEmbettyVideoEmbeds', (parseHtml) => {
     })
   })
 
+  describe('poster-image', () => {
+    it('should carry the poster onto the iframe as its thumbnail', async () => {
+      const value = html`
+        <embetty-video
+          type="vimeo"
+          video-id="232524527"
+          poster-image="https://example.com/poster.jpg"
+        ></embetty-video>
+      `
+      const expected = html`
+        <iframe
+          src="https://player.vimeo.com/video/232524527"
+          data-thumbnail="https://example.com/poster.jpg"
+        ></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should carry no thumbnail from an empty poster-image', async () => {
+      const value = html`
+        <embetty-video
+          type="vimeo"
+          video-id="232524527"
+          poster-image=""
+        ></embetty-video>
+      `
+      const expected = '<iframe src="https://player.vimeo.com/video/232524527"></iframe>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
   describe('sad paths', () => {
     it('should leave an empty video-id alone', async () => {
       const value = html`
@@ -230,6 +263,33 @@ describeForEachParser('rebuildEmbettyVideoEmbeds', (parseHtml) => {
       const result = await transformContent(value, {
         parseHtmlFn: parseHtml,
         baseUrl: 'https://example.com',
+      })
+
+      expect(result).toEqualHtml(expected)
+    })
+
+    it('should put the poster over the youtube thumbnail end to end', async () => {
+      const value = html`
+        <embetty-video
+          type="youtube"
+          video-id="4BVmeh0pNnQ"
+          poster-image="/images/poster.jpg"
+        ></embetty-video>
+      `
+      const expected = html`
+        <div
+          data-embed-ratio="16/9"
+          data-embed-thumbnail="https://example.com/images/poster.jpg"
+          data-embed-url="https://www.youtube.com/watch?v=4BVmeh0pNnQ"
+          data-embed-id="4BVmeh0pNnQ"
+          data-embed-provider="youtube"
+          data-embed-src="https://www.youtube.com/embed/4BVmeh0pNnQ"
+        >
+        </div>
+      `
+      const result = await transformContent(value, {
+        parseHtmlFn: parseHtml,
+        baseUrl: 'https://example.com/post',
       })
 
       expect(result).toEqualHtml(expected)
