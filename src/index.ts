@@ -194,6 +194,7 @@ export type {
   ParseHtmlFn,
   ResolveEmbed,
   ResolveUrlFn,
+  ScopedAttribute,
   StringTransform,
   TransformContentOptions,
   TransformContext,

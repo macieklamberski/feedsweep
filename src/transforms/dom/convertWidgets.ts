@@ -3,9 +3,16 @@ import type {
   DomTransform,
   EmbedResolverResult,
   MediaResolverResult,
+  ScopedAttribute,
   WidgetResolver,
 } from '../../types.js'
-import { attr, isElement, isNonWhitespaceText, playableElements } from '../../utils/dom.js'
+import {
+  attr,
+  isElement,
+  isInScope,
+  isNonWhitespaceText,
+  playableElements,
+} from '../../utils/dom.js'
 import {
   audioFileRegex,
   cleanUnclaimedUrl,
@@ -51,10 +58,14 @@ const getMediaTag = (url: string): MediaResolverResult['tag'] | undefined => {
 // several WordPress audio players park the media url in an attribute for JS to build the player.
 const findParkedMedia = (
   element: Element,
-  attributes: Array<string>,
+  entries: Array<ScopedAttribute>,
 ): MediaResolverResult | undefined => {
-  for (const attribute of attributes) {
-    const value = attr(element, attribute)
+  for (const entry of entries) {
+    if (!isInScope(element, entry)) {
+      continue
+    }
+
+    const value = attr(element, entry.attribute)
 
     if (!value) {
       continue
@@ -182,6 +193,9 @@ const captionMedia = (
 export const convertWidgets: DomTransform = (context) => {
   const { widgetResolvers, mediaSrcAttributes } = context
   const embedOrMediaResolvers = widgetResolvers.filter(isEmbedOrMediaResolver)
+  const mediaSrcEntries = mediaSrcAttributes.map((entry) => {
+    return typeof entry === 'string' ? { attribute: entry } : entry
+  })
 
   return async (document) => {
     const queried = new Map<string, Array<Element>>()
@@ -201,7 +215,7 @@ export const convertWidgets: DomTransform = (context) => {
 
     // Runs before the tiers below, which replace the iframes the playable guard relies on.
     for (const element of document.querySelectorAll('div, figure, span, li')) {
-      const parked = findParkedMedia(element, mediaSrcAttributes)
+      const parked = findParkedMedia(element, mediaSrcEntries)
 
       if (!parked) {
         continue

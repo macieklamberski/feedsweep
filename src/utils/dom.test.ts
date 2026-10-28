@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, queryElement } from '../tests.js'
+import type { ScopedAttribute } from '../types.js'
 import {
   attr,
   batchSelectors,
@@ -16,6 +17,7 @@ import {
   hasZeroOpacity,
   isElementHidden,
   isEmptyElement,
+  isInScope,
   isPercentageSized,
   keepIfMatches,
   paramValue,
@@ -1350,6 +1352,43 @@ describeForEachParser('attr', (parseHtml) => {
 
   it('should return undefined for a nullish element', () => {
     expect(attr(undefined, 'href')).toBeUndefined()
+  })
+})
+
+describeForEachParser('isInScope', (parseHtml) => {
+  it('should match any element when the entry names no selector', () => {
+    const document = parseHtml('<section data-track-url="https://example.com/a.mp3"></section>')
+    const element = queryElement(document, 'section')
+    const value: ScopedAttribute = { attribute: 'data-track-url' }
+
+    expect(isInScope(element, value)).toBe(true)
+  })
+
+  it('should match an element the selector matches', () => {
+    const document = parseHtml(html`
+      <div
+        class="track"
+        data-track-url="https://example.com/a.mp3"
+      ></div>
+    `)
+    const element = queryElement(document, 'div')
+    const value: ScopedAttribute = {
+      attribute: 'data-track-url',
+      selector: '.track',
+    }
+
+    expect(isInScope(element, value)).toBe(true)
+  })
+
+  it('should not match an element outside the selector', () => {
+    const document = parseHtml('<div data-track-url="https://example.com/a.mp3"></div>')
+    const element = queryElement(document, 'div')
+    const value: ScopedAttribute = {
+      attribute: 'data-track-url',
+      selector: '.track',
+    }
+
+    expect(isInScope(element, value)).toBe(false)
   })
 })
 
