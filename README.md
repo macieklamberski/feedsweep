@@ -142,6 +142,27 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `unwrapCdataMarkers` | Unwrap a whole-value `<![CDATA[ … ]]>` marker so content isn't dropped |
 | `stripControlChars` | Strip rendering-hostile control characters before parsing |
 
+Every embed in the output is an empty `<div>` carrying `data-embed-*` attributes, and a reader builds the player from them. Each one appears only when its value is known, and an `enrichEmbedFn` can fill or replace any of them later.
+
+| Attribute | What it holds |
+|---|---|
+| `data-embed-src` | The player url to load in a frame |
+| `data-embed-params` | Per-embed settings a reader may override, as a query string |
+| `data-embed-provider` | The platform, such as `youtube` or `mastodon` |
+| `data-embed-id` | The item's key on that platform, which `enrichEmbedFn` receives |
+| `data-embed-url` | The item's page, the link a reader can open |
+| `data-embed-thumbnail` | A preview image url |
+| `data-embed-width`, `data-embed-height` | The player's measured size in pixels |
+| `data-embed-ratio` | The player's aspect ratio, when only the shape is known |
+| `data-embed-ratio-height-offset` | Pixels a fixed panel adds below a ratio-sized player |
+| `data-embed-title` | The item's title |
+| `data-embed-description` | The item's text, such as a post's body |
+| `data-embed-author` | Who made it, a name or a handle with the platform's own sigil |
+| `data-embed-avatar` | The author's image url |
+| `data-embed-publisher` | The site or instance that published it |
+| `data-embed-date` | When it was published, as the source wrote it |
+| `data-embed-duration` | Its length in seconds |
+
 An embed placeholder states how big it is in one of two ways, never both. Where something really measured the player, it carries `data-embed-width` and `data-embed-height` in pixels, or just one of them where that is all the platform states (a podcast player 200 pixels tall has no width worth naming). Where nothing measured it and only the shape is known, from a responsive wrapper or the platform's own ratio attribute, it carries `data-embed-ratio` instead: a CSS aspect-ratio value written from the numbers the source stated, such as `16/9`, `800/600` or `1.7777777777777777/1`, and ready to assign to `style.aspectRatio` as it stands. Nothing is reduced or rounded, so the value traces back to what the markup said. A player that adds a fixed panel below its video, such as a tracklist or a toolbar, also carries `data-embed-ratio-height-offset`: the pixels to add to the ratio's height, so a reader can size it as `padding-bottom: calc(100% * 9 / 16 + 175px)`. It appears only beside `data-embed-ratio`.
 
 A placeholder can lack `data-embed-src` when only a fetch can find the player, such as a Typeform live embed, whose id Typeform's api maps to the form. It still carries `data-embed-provider` and `data-embed-id`, so an `enrichEmbedFn` can fill the player in, and a reader shows nothing for it until then.
