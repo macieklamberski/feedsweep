@@ -181,6 +181,14 @@ const specimens: Record<string, string | [string, string]> = {
     '<iframe id="fr" src="https://www.youtube.com/subscribe_widget?p=_YVgU7I2NTwgDISHtjk_vA" style="overflow: hidden; height: 105px; border: 0; width: 100%;" scrolling="no" frameborder="0"></iframe>',
   'img[src*="w.sharethis.com/" i]':
     '<img src="https://w.sharethis.com/images/facebook_32.png" alt="Share on Facebook">',
+  'a:has(> img[src*="tweetmeme.com/imagebutton.gif" i])':
+    '<a rel="nofollow" target="_blank" href="http://api.tweetmeme.com/share?url=http%3A%2F%2Fexample.com%2F2010%2F09%2Fa-post%2F"><img src="http://api.tweetmeme.com/imagebutton.gif?url=http%3A%2F%2Fexample.com%2F2010%2F09%2Fa-post%2F" height="61" width="51"></a>',
+  'iframe[src*="tweetmeme.com/button.js" i]':
+    '<iframe frameborder="0" height="61" scrolling="no" src="http://api.tweetmeme.com/button.js?url=http://example.com/2012/01/a-post.html" width="50"></iframe>',
+  '.akst_link':
+    '<p class="akst_link"><a href="https://example.com/?p=14&amp;akst_action=share-this" title="E-mail this, post to del.icio.us, etc." id="akst_link_14" class="akst_share_link" rel="nofollow">Share This</a></p>',
+  'a.akst_share_link':
+    '<a id="akst_link_2977" class="akst_share_link" title="E-mail this, post to del.icio.us, etc." href="https://example.com/?p=2977&amp;akst_action=share-this" rel="nofollow">Comparte Esto</a>',
   'a.hatena-bookmark-button':
     '<a href="https://example.com/entry/https://example.com/a" class="hatena-bookmark-button" data-hatena-bookmark-layout="basic-label-counter" title="Add to Hatena Bookmark"><img src="https://example.com/entry-button/button-only@2x.png" alt="Add to Hatena Bookmark" width="20" height="20"></a>',
   'iframe.hatena-bookmark-button-frame':
@@ -684,6 +692,33 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
         '<iframe src="https://radioplayer.link/iframe/index.php?stream=http://stream.zeno.fm/qe66dtnrxd0uv" width="660" height="400"></iframe><a href="https://www.zeno.fm">Listen on Zeno.FM</a>'
 
       expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a prose link to TweetMeme', async () => {
+      const value = html`
+        <p>Since Twitter introduced the new Tweet button, the <a href="http://help.tweetmeme.com/2009/04/06/tweetmeme-button/">original TweetMeme button</a> started to behave strangely.</p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep the post inside an unclosed TweetMeme wrapper', async () => {
+      const value = html`
+        <div class="tweetmeme_button">
+          <i><iframe src="http://api.tweetmeme.com/button.js?url=http://example.com/2011/08/a-post.html"></iframe></i>
+          <br>
+          Getting a pair of crutches, post-injury is something a lot of people look forward to.
+        </div>
+      `
+      const expected = html`
+        <div class="tweetmeme_button">
+          <i></i>
+          <br>
+          Getting a pair of crutches, post-injury is something a lot of people look forward to.
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
     })
 
     it('should keep a prose link to a Goodreads giveaway', async () => {

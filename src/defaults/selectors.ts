@@ -169,6 +169,16 @@ export const defaultNonContentSelectors = [
   'iframe[src*="youtube.com/subscribe_widget" i]', // YouTube subscribe button, its retired route.
   'img[src*="w.sharethis.com/" i]', // ShareThis chicklet icons, the button row's pre-widget form.
 
+  // TweetMeme retweet button, whose api.tweetmeme.com host no longer resolves. Publishers link
+  // to tweetmeme.com in prose, so the anchor is matched by the button image it holds. The
+  // plugin's `div.tweetmeme_button` is left alone: an unclosed one holds the whole post.
+  'a:has(> img[src*="tweetmeme.com/imagebutton.gif" i])',
+  'iframe[src*="tweetmeme.com/button.js" i]', // The same button as a counter frame.
+
+  // Alex King's Share This WordPress plugin: a link to the plugin's own share page.
+  '.akst_link',
+  'a.akst_share_link', // The same link written without its wrapper.
+
   // Hatena Bookmark's add button. A bookmark comment carries an author's real text on a
   // blockquote of its own, so neither entry is widened to the class prefix.
   'a.hatena-bookmark-button',
