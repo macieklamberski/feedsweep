@@ -238,6 +238,7 @@ export type TransformContext = {
   fieldCleaners: Array<FieldCleaner>
   resolveUrlFn: ResolveUrlFn
   cleanUrlFn?: CleanUrlFn
+  matchUrlFn?: CleanUrlFn
   assetProxyFn?: AssetProxyFn
   isSafeUrlFn?: IsSafeUrlFn
   enrichEmbedFn?: EnrichEmbedFn
@@ -261,6 +262,9 @@ export type TransformContentOptions = {
   enclosures?: Array<Enclosure>
   resolveUrlFn?: ResolveUrlFn
   cleanUrlFn?: CleanUrlFn
+  // Cleans a url only to compare two media files, as the heuristic duplicate checks do. Defaults to
+  // cleanUrlFn. The output keeps the url cleanUrlFn gives.
+  matchUrlFn?: CleanUrlFn
   assetProxyFn?: AssetProxyFn
   isSafeUrlFn?: IsSafeUrlFn
   enrichEmbedFn?: EnrichEmbedFn
