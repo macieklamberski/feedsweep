@@ -24,7 +24,12 @@ const languageRegex = /(?:language|lang)-(\S+)/
 // data-language/-lang cover most editors and renderers. data-enlighter-language is
 // EnlighterJS (WordPress). EnlighterJS's "generic" value maps to no grammar, so such
 // a block stays plain, which is the intent (it means "no specific language").
-const languageAttributes = ['data-language', 'data-lang', 'data-enlighter-language']
+const languageAttributes = [
+  'data-language',
+  'data-lang',
+  'data-enlighter-language',
+  'data-code-block-lang', // Medium
+]
 const brushRegex = /brush:\s*([\w#+-]+)/
 const crayonRegex = /\blang[:_]([\w#+-]+)/
 const whitespaceRegex = /\s+/
@@ -68,8 +73,7 @@ export const detectLanguage = (pre: Element | null, code: Element | null): strin
     }
   }
 
-  // Check data-language / data-lang (and EnlighterJS's data-enlighter-language) on
-  // <pre>, then <code>.
+  // Check the language attributes on <pre>, then <code>.
   for (const element of [pre, code]) {
     for (const attribute of languageAttributes) {
       const value = element?.getAttribute(attribute)
