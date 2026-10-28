@@ -267,6 +267,30 @@ describeForEachParser('removeTrackingPixels', (parseHtml) => {
       expect(await transform(value)).toEqualHtml('')
     })
 
+    it('should remove an unsized AdSense for Feeds image ad', async () => {
+      const value = html`
+        <img
+          usemap="#google_ad_map_517_74ab9b1e764918ae"
+          border="0"
+          src="http://imageads.googleadservices.com/pagead/ads?format=468x30_aff_img&amp;client=&amp;channel=&amp;output=png&amp;cuid=517&amp;url=http%3A%2F%2Fexample.com%2Fblog%2F2011%2F03%2F09%2Fpython-bindings%2F"
+        >
+      `
+
+      expect(await transform(value)).toEqualHtml('')
+    })
+
+    it('should remove a FeedBurner AdSense for Feeds image from its click anchor', async () => {
+      const value = html`
+        <a href="http://feedads.googleadservices.com/~a/kQrgB9LhQ-dEE2vToFFWEbAVOus/a">
+          <img src="http://feedads.googleadservices.com/~a/kQrgB9LhQ-dEE2vToFFWEbAVOus/i" border="0" ismap="true">
+        </a>
+      `
+      const expected =
+        '<a href="http://feedads.googleadservices.com/~a/kQrgB9LhQ-dEE2vToFFWEbAVOus/a"></a>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should keep a content-sized image on a tracking-host subdomain', async () => {
       const value = html`
         <img src="https://media.beehiiv.com/cdn-cgi/image/fit=scale-down/uploads/photo.png" width="1200" height="800">
