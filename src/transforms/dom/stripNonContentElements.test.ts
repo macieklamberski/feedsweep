@@ -202,6 +202,14 @@ const specimens: Record<string, string | [string, string]> = {
   '.jp-relatedposts':
     '<div id="jp-relatedposts" class="jp-relatedposts"><h3 class="jp-relatedposts-headline">Related</h3></div>',
   '.crp_related': '<div class="crp_related"><ul><li><a href="/a">A</a></li></ul></div>',
+  '.zemanta-related-title:not(:has(a)):has(+ ul.zemanta-article-ul-image)': [
+    '<h6 class="zemanta-related-title" style="font-size: 1em;">Related articles</h6><ul class="zemanta-article-ul zemanta-article-ul-image"><li class="zemanta-article-ul-li-image zemanta-article-ul-li"><a href="https://example.com/2012/04/11/mulberry-sorbet/"><img src="https://example.com/84023970.jpg" width="100"></a><a href="https://example.com/2012/04/11/mulberry-sorbet/">Mulberry Sorbet</a></li></ul>',
+    '',
+  ],
+  'ul.zemanta-article-ul-image':
+    '<ul class="zemanta-article-ul zemanta-article-ul-image" style="margin-left: 0px;"><li class="zemanta-article-ul-li-image zemanta-article-ul-li" style="overflow: hidden; list-style: none outside none; margin-top: 10px;"><a href="https://example.com/2012/06/28/quick-and-messy-svn-merge-branch-to-trunk/" target="_blank"><img src="https://example.com/noimg_19_80_80.jpg" alt=""></a><a style="display: block;" href="https://example.com/2012/06/28/quick-and-messy-svn-merge-branch-to-trunk/" target="_blank">Quick (and messy) svn merge branch to trunk</a><span style="display: block; font-size: 12px; margin: 10px 0px;">(example.com)</span></li></ul>',
+  'fieldset.zemanta-related:has(> legend):not(:has(ul))':
+    '<fieldset class="zemanta-related"><legend class="zemanta-related-title">Related articles</legend> <a href="https://example.com/2013/05/the-legal-ethics-of-podcasting.html" target="_blank"><img alt="" src="https://example.com/166601935_80_80.jpg"></a><p><a href="https://example.com/2013/05/the-legal-ethics-of-podcasting.html" target="_blank">The Legal Ethics of Podcasting</a></p></fieldset>',
   '.zergnet-widget':
     '<div class="zergnet-widget widget-loaded"><div class="zerglayoutcl"><div class="zergrow"><div class="zergentity"><a href="https://example.com/story">A story you might like</a></div></div></div></div>',
   '.wp-block-post-author':
@@ -953,6 +961,69 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
           <select id="edit-guest-1-entree" name="guest_1_entree"><option>Lemon Herb Chicken (gluten free)</option><option>Honey Miso Glazed Salmon (gluten free)</option></select>
           <input type="submit" value="Register">
         </form>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a paragraph that carries the Zemanta title class above other titles', async () => {
+      const value = html`
+        <h4 class="zemanta-related-title"><span style="font-weight: normal;">I have also referenced Sonrisas Spanish School in other posts below: </span></h4>
+        <h4 class="zemanta-related-title"><span style="font-weight: normal;">I first posted about starting with Sonrisas <a href="https://example.com/2011/11/sonrisas.html">here</a>.</span></h4>
+        <h4 class="zemanta-related-title"><span style="font-weight: normal;">and...</span></h4>
+        <ul class="zemanta-article-ul zemanta-article-ul-image"><li class="zemanta-article-ul-li-image zemanta-article-ul-li"><a href="https://example.com/2012/08/teaching-colors-in-spanish.html"><img src="https://example.com/168914536_80_80.jpg"></a><a href="https://example.com/2012/08/teaching-colors-in-spanish.html">Teaching colors in Spanish</a></li></ul>
+      `
+      const expected = html`
+        <h4 class="zemanta-related-title"><span style="font-weight: normal;">I have also referenced Sonrisas Spanish School in other posts below: </span></h4>
+        <h4 class="zemanta-related-title"><span style="font-weight: normal;">I first posted about starting with Sonrisas <a href="https://example.com/2011/11/sonrisas.html">here</a>.</span></h4>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep a paragraph that carries the Zemanta title class away from its list', async () => {
+      const value = html`
+        <h6 class="zemanta-related-title" style="font-size:1em;"><span style="font-weight:normal;">This paper is subject to copyright; the copyright owner must be acknowledged in any reference to the material.</span></h6>
+        <p>The next part of the series follows next week.</p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a Zemanta title that holds a link of its own', async () => {
+      const value = html`
+        <h4 class="zemanta-related-title"><span style="color: #3d85c6;"><a href="https://example.com/2013/12/31/return-to-paradise">https://example.com/2013/12/31/return-to-paradise</a></span></h4>
+        <ul class="zemanta-article-ul zemanta-article-ul-image"><li class="zemanta-article-ul-li-image zemanta-article-ul-li"><a href="https://example.com/2013/12/31/return-to-paradise/">Return to Paradise</a></li></ul>
+      `
+      const expected = html`
+        <h4 class="zemanta-related-title"><span style="color: #3d85c6;"><a href="https://example.com/2013/12/31/return-to-paradise">https://example.com/2013/12/31/return-to-paradise</a></span></h4>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep the text-only Zemanta list, where publishers add their own citations', async () => {
+      const value = html`
+        <h6 class="zemanta-related-title" style="font-size: 1em;">Related articles</h6>
+        <ul class="zemanta-article-ul">
+          <li class="zemanta-article-ul-li">Abrantes, R. (2011). <a href="https://example.com/p1J7GF-8Y">Mission SMAF—Bringing Scientific Precision into Animal Training.</a></li>
+        </ul>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a Zemanta fieldset that holds the text-only list', async () => {
+      const value = html`
+        <fieldset class="zemanta-related"><legend class="zemanta-related-title">Related articles by Zemanta</legend><ul class="zemanta-article-ul"><li class="zemanta-article-ul-li">A talk on <a href="https://example.com/2009/02/thinking-visually.html">Thinking Visually </a></li></ul></fieldset>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep a Zemanta fieldset that holds no legend', async () => {
+      const value = html`
+        <fieldset class="zemanta-related"><span style="font-size:85%;"><span style="font-weight: bold;">JOB DESCRIPTION</span><br><br>• Deep knowledge of social media tools and technologies<br>• Relationship Building Skills<br></span></fieldset>
       `
 
       expect(await transform(value)).toEqualHtml(value)
