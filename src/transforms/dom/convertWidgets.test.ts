@@ -1754,6 +1754,62 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
       expect(await transform(value, context)).toEqualHtml(expected)
     })
 
+    it('should convert a Squarespace audio block linking an external file', async () => {
+      const value = html`
+        <div
+          class="sqs-audio-embed"
+          data-design-style="classic"
+          data-url="http://www.example.com/pts/redirect.mp3/storage/Curtain%20Call%20-%20Episode%205.mp3"
+          data-asset-url=""
+          data-author="Dale Campbell"
+        >
+          <span class="audio-author">Dale Campbell</span>
+          <span class="audio-title">Curtain Call!: Episode #5</span>
+        </div>
+      `
+      const expected = html`
+        <div
+          class="sqs-audio-embed"
+          data-design-style="classic"
+          data-url="http://www.example.com/pts/redirect.mp3/storage/Curtain%20Call%20-%20Episode%205.mp3"
+          data-asset-url=""
+          data-author="Dale Campbell"
+        ><audio
+            src="http://www.example.com/pts/redirect.mp3/storage/Curtain%20Call%20-%20Episode%205.mp3"
+            controls
+          ></audio>
+          <span class="audio-author">Dale Campbell</span>
+          <span class="audio-title">Curtain Call!: Episode #5</span>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should skip a Squarespace audio block linking a page', async () => {
+      const value = html`
+        <div
+          class="sqs-audio-embed"
+          data-url="https://soundcloud.example/user-363957584/session-08-song-backstory"
+          data-asset-url=""
+        ></div>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    // SoundCite plays a clip of the file inside a sentence, from its own start and end.
+    it('should skip a data-url outside a Squarespace audio block', async () => {
+      const value = html`
+        <span
+          class="soundcite"
+          data-url="http://www.example.com/wp-content/uploads/2022/02/3121-Mission-Hill-Dr-8.m4a"
+        >the bells</span>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it('should skip a streaming manifest', async () => {
       const value = '<div data-video-src="https://x.example/index.m3u8"></div>'
 

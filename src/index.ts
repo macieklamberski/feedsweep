@@ -189,6 +189,7 @@ export type {
   IsSafeUrlFn,
   MediaResolver,
   MediaResolverResult,
+  MediaSrcAttribute,
   ParseDateFn,
   ParseHtmlFn,
   ResolveEmbed,

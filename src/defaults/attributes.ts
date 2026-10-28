@@ -1,8 +1,8 @@
-import type { DeferredIframeSource } from '../types.js'
+import type { DeferredIframeSource, MediaSrcAttribute } from '../types.js'
 
 // Attributes that park a media file URL on a container which then builds the player with JS,
 // so the media never appears for a reader. The shapes were verified in live markup 2026-08-01.
-export const defaultMediaSrcAttributes = [
+export const defaultMediaSrcAttributes: Array<MediaSrcAttribute> = [
   'data-src', // Drupal audiofield (`.audiofield-wordpress-player`) and assorted themes.
   'data-video-src', // Discourse video placeholders, Discourse 3.2+: every forum on that version emits it.
   'data-mp4', // Beaver Builder row background video (`.fl-bg-video`).
@@ -10,6 +10,7 @@ export const defaultMediaSrcAttributes = [
   'data-audiopath', // Sonaar MP3 Audio Player, ~100k WordPress installs.
   'data-qtmplayer-file', // QTM Player.
   'data-asset-url', // Squarespace audio block, Squarespace-hosted.
+  { selector: '.sqs-audio-embed', attribute: 'data-url' }, // Squarespace audio block, external.
   'data-nectar-video-src', // Salient theme.
   'data-videolazy-id', // Tilda, page markup only.
   'data-mp4video', // Tilda Zero Block, page markup only.

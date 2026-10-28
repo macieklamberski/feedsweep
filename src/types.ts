@@ -113,6 +113,10 @@ export type DeferredIframeSource = {
   attribute: string
 }
 
+// An attribute parking a media url, read on every container, or with a selector only on the
+// containers it matches, for a name other widgets also write.
+export type MediaSrcAttribute = string | { selector: string; attribute: string }
+
 // The relationship a citation expresses toward the linked work. Sparse: only sources that
 // carry a real relationship set it (today only microformats h-cite, via its `u-*-of` class).
 // Every platform card leaves it unset, meaning a plain link preview with no relationship.
@@ -217,7 +221,7 @@ export type TransformContext = {
   feedImageUrls?: Array<string>
   enclosures?: Array<Enclosure>
   widgetResolvers: Array<WidgetResolver>
-  mediaSrcAttributes: Array<string>
+  mediaSrcAttributes: Array<MediaSrcAttribute>
   lazySrcAttributes: Array<string>
   lazySrcsetAttributes: Array<string>
   lazyIframeAttributes: Array<string>

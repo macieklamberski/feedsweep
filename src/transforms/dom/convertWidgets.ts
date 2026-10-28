@@ -3,6 +3,7 @@ import type {
   DomTransform,
   EmbedResolverResult,
   MediaResolverResult,
+  MediaSrcAttribute,
   WidgetResolver,
 } from '../../types.js'
 import { attr, isElement, isNonWhitespaceText, playableElements } from '../../utils/dom.js'
@@ -51,10 +52,14 @@ const getMediaTag = (url: string): MediaResolverResult['tag'] | undefined => {
 // several WordPress audio players park the media url in an attribute for JS to build the player.
 const findParkedMedia = (
   element: Element,
-  attributes: Array<string>,
+  attributes: Array<MediaSrcAttribute>,
 ): MediaResolverResult | undefined => {
-  for (const attribute of attributes) {
-    const value = attr(element, attribute)
+  for (const entry of attributes) {
+    if (typeof entry !== 'string' && !element.matches(entry.selector)) {
+      continue
+    }
+
+    const value = attr(element, typeof entry === 'string' ? entry : entry.attribute)
 
     if (!value) {
       continue
