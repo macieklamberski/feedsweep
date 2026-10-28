@@ -60,6 +60,11 @@ export const defaultLazySrcsetAttributes = [
   'data-flickity-lazyload-srcset', // Flickity carousel.
 ]
 
+// Attributes that park an image's alt text on a <picture> whose loader script appends the <img>.
+export const defaultLazyAltAttributes = [
+  'data-alt', // lozad.
+]
+
 // Attributes that hold a lazy/consent-gated iframe src (the real embed URL) when the
 // `src` itself is empty or `about:blank`.
 export const defaultLazyIframeAttributes = [
