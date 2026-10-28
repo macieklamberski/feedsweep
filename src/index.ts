@@ -109,6 +109,7 @@ export { rebuildElementorVideoEmbeds } from './transforms/dom/rebuildElementorVi
 export { rebuildEmbedlyEmbeds } from './transforms/dom/rebuildEmbedlyEmbeds.js'
 export { rebuildEmbedPlusEmbeds } from './transforms/dom/rebuildEmbedPlusEmbeds.js'
 export { rebuildEmbedPrivacyLinks } from './transforms/dom/rebuildEmbedPrivacyLinks.js'
+export { rebuildEmbettyVideoEmbeds } from './transforms/dom/rebuildEmbettyVideoEmbeds.js'
 export { rebuildExternalVideoEmbeds } from './transforms/dom/rebuildExternalVideoEmbeds.js'
 export { rebuildGettyImagesEmbeds } from './transforms/dom/rebuildGettyImagesEmbeds.js'
 export { rebuildGofundmeEmbeds } from './transforms/dom/rebuildGofundmeEmbeds.js'
