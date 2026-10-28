@@ -2169,6 +2169,30 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should frame the element when the post frames another player with no id', async () => {
+    const value = html`
+      <audio
+        controls
+        src="https://on.soundcloud.com/x3NpZ7LmQaB2"
+      ></audio>
+      <iframe src="https://w.soundcloud.com/player/?url=https%3A//on.soundcloud.com/Vb8TkR2yHs41"></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-height="166"
+        data-embed-provider="soundcloud"
+        data-embed-src="https://w.soundcloud.com/player/?url=https://on.soundcloud.com/x3NpZ7LmQaB2"
+      ></div>
+      <div
+        data-embed-height="166"
+        data-embed-provider="soundcloud"
+        data-embed-src="https://w.soundcloud.com/player/?url=https://on.soundcloud.com/Vb8TkR2yHs41"
+      ></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should leave a resolver its companion markup while checking the post for the same item', async () => {
     const value = html`
       <video

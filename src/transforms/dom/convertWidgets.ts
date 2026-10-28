@@ -1,10 +1,5 @@
 import { isSoundcloudStream } from '../../embeds/soundcloud.js'
-import type {
-  DomTransform,
-  EmbedResolverResult,
-  MediaResolverResult,
-  WidgetResolver,
-} from '../../types.js'
+import type { DomTransform, MediaResolverResult, WidgetResolver } from '../../types.js'
 import { attr, isElement, isNonWhitespaceText, playableElements } from '../../utils/dom.js'
 import {
   audioFileRegex,
@@ -28,6 +23,7 @@ import {
   prepareEmbedMetadata,
   prepareMediaMetadata,
   readCarrierUrl,
+  readPlayer,
   resolveEmbedProbe,
 } from '../../utils/widgets.js'
 
@@ -71,7 +67,6 @@ const findParkedMedia = (
 type PageMedia = {
   media: Element
   frame: Element
-  embed: EmbedResolverResult
 }
 
 // A WordPress video shortcode or a hand-written <video> or <audio> can name a platform's page,
@@ -102,13 +97,11 @@ const readPageMedia = async (
     const frame = createIframe(document, url)
     frame.setAttribute('type', `${media.localName}/*`)
 
-    const embed = await resolveEmbedProbe(frame, resolvers)
-
-    if (!embed) {
+    if (!(await resolveEmbedProbe(frame, resolvers))) {
       return
     }
 
-    found.push({ media, frame, embed })
+    found.push({ media, frame })
   }
 
   // A resolver that claims the element itself reads it in the tiers below. The copy keeps a
@@ -233,20 +226,22 @@ export const convertWidgets: DomTransform = (context) => {
     }
 
     // A post that also frames the same video or file already plays it, so the dead element goes.
-    const framedKeys = new Set<string>()
+    const framedPlayers: Array<string> = []
 
     if (pageMedia.length) {
       for (const frame of document.querySelectorAll(embedCarrierSelector)) {
-        const embed = await resolveEmbedProbe(frame.cloneNode(true) as Element, widgetResolvers)
+        const player = await readPlayer(frame, widgetResolvers)
 
-        if (embed) {
-          framedKeys.add(`${embed.provider}/${embed.id}`)
+        if (player) {
+          framedPlayers.push(player)
         }
       }
     }
 
-    for (const { media, frame, embed } of pageMedia) {
-      if (framedKeys.has(`${embed.provider}/${embed.id}`)) {
+    for (const { media, frame } of pageMedia) {
+      const player = await readPlayer(frame, widgetResolvers)
+
+      if (player && framedPlayers.includes(player)) {
         media.remove()
         continue
       }

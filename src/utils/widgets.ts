@@ -330,6 +330,21 @@ export const resolveEmbedProbe = async (
   }
 }
 
+// The player a frame names, as the resolvers read it. A player with no id names no one item.
+// The copy keeps a resolver from removing companion markup while it is asked.
+export const readPlayer = async (
+  frame: Element,
+  resolvers: ReadonlyArray<WidgetResolver>,
+): Promise<string | undefined> => {
+  const embed = await resolveEmbedProbe(frame.cloneNode(true) as Element, resolvers)
+
+  if (!embed?.id) {
+    return
+  }
+
+  return `${embed.provider}/${embed.id}`
+}
+
 // Not used by the injectEnclosures probe: anything set here would change what every resolver sees.
 export const createIframe = (document: Document, src: string): HTMLElement => {
   const iframe = document.createElement('iframe')
