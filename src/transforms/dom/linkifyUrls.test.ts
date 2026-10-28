@@ -223,6 +223,81 @@ describeForEachParser('linkifyUrls', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should end a url at the closer of a bbcode url tag', async () => {
+    const value = html`
+      <p>Please [url=https://example.com/channel/UCOmwH7xVAhD-OOAqFWyTYTA?sub_confirmation=1]subscribe[/url]</p>
+    `
+    const expected = html`
+      <p>Please [url=<a
+        href="https://example.com/channel/UCOmwH7xVAhD-OOAqFWyTYTA?sub_confirmation=1"
+      >https://example.com/channel/UCOmwH7xVAhD-OOAqFWyTYTA?sub_confirmation=1</a>]subscribe[/url]</p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should end a url at the closer of a markdown link text', async () => {
+    const value = '<p>From [https://example.com/releases](https://example.com/releases)</p>'
+    const expected = html`
+      <p>From [<a href="https://example.com/releases">https://example.com/releases</a>](<a
+        href="https://example.com/releases"
+      >https://example.com/releases</a>)</p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should end a url at the closer of a bracketed url glued to a word', async () => {
+    const value = '<p>on Instagram [https://example.com/shambonez/?hl=en]and</p>'
+    const expected = html`
+      <p>on Instagram [<a
+        href="https://example.com/shambonez/?hl=en"
+      >https://example.com/shambonez/?hl=en</a>]and</p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a bracket pair opened inside the url', async () => {
+    const value = html`
+      <p>2019: https://example.com/pressemitteilung?tx_ttnews[tt_news]=37983&cHash=91bc3a6dc5c6b9304555ab08df7da545</p>
+    `
+    const expected = html`
+      <p>2019: <a
+        href="https://example.com/pressemitteilung?tx_ttnews[tt_news]=37983&amp;cHash=91bc3a6dc5c6b9304555ab08df7da545"
+      >https://example.com/pressemitteilung?tx_ttnews[tt_news]=37983&amp;cHash=91bc3a6dc5c6b9304555ab08df7da545</a></p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep a bracket no earlier bracket opens', async () => {
+    const value = '<p>See https://example.com/groups/?__tn__=-]K-R now</p>'
+    const expected = html`
+      <p>See <a href="https://example.com/groups/?__tn__=-]K-R">https://example.com/groups/?__tn__=-]K-R</a> now</p>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should scan a long run of bracketed urls in linear time', async () => {
+    const value = `<p>${'[https://example.com/a]b '.repeat(16000)}</p>`
+    const start = performance.now()
+
+    await transform(value)
+
+    expect(performance.now() - start).toBeLessThan(1000)
+  })
+
+  it('should scan a long run of closers in linear time', async () => {
+    const value = `<p>https://example.com/a ${']'.repeat(200000)}</p>`
+    const start = performance.now()
+
+    await transform(value)
+
+    expect(performance.now() - start).toBeLessThan(1000)
+  })
+
   describe('cleanUrlFn', () => {
     const withCleanUrlFn: TransformContext = {
       ...baseContext,

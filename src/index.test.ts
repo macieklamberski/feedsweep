@@ -856,6 +856,17 @@ describeForEachParser('transformContent', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toBe(expected)
   })
 
+  it('should end a linkified url at the closer of a bbcode url tag', async () => {
+    const value = '<p>Please [url=https://example.com/channel/UCOmwH7xVAhD]subscribe[/url]</p>'
+    const expected = html`
+      <p>Please [url=<a
+        href="https://example.com/channel/UCOmwH7xVAhD"
+      >https://example.com/channel/UCOmwH7xVAhD</a>]subscribe[/url]</p>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   // A widget resolver reads the anchors of a noscript fallback, so links minted out of its
   // escaped text would give it urls as the title and the author.
   it('should not linkify the escaped text of a noscript fallback', async () => {

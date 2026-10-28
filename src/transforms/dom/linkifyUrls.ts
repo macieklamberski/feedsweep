@@ -1,4 +1,4 @@
-import { find as linkifyFind } from 'linkifyjs'
+import { find } from 'linkifyjs'
 import type { DomTransform } from '../../types.js'
 import { collectTextNodes, rawTextElements } from '../../utils/dom.js'
 import { cleanUrl } from '../../utils/urls.js'
@@ -11,6 +11,42 @@ const shouldSkipElement = (element: Element): boolean => {
   const tag = element.tagName.toLowerCase()
 
   return linkifyIgnoreTags.includes(tag) || rawTextElements.includes(tag)
+}
+
+// linkifyjs keeps a `]` inside a url when more text follows it, as in `[url=X]label` or
+// `[X](X)`. A `]` whose `[` opens before a url's `://` ends that url, while a pair inside the
+// url, as in `?tx_ttnews[tt_news]=`, stays. A space in its place keeps every offset.
+const linkifyFind = (text: string): ReturnType<typeof find> => {
+  const characters = text.split('')
+  // The count of `://` seen when each still open `[` was read.
+  const openers: Array<number> = []
+  let schemeCount = 0
+
+  for (let index = 0; index < text.length; index++) {
+    const character = text[index]
+
+    if (character === ':' && text.startsWith('//', index + 1)) {
+      schemeCount++
+      continue
+    }
+
+    if (character === '[') {
+      openers.push(schemeCount)
+      continue
+    }
+
+    if (character !== ']') {
+      continue
+    }
+
+    const opened = openers.pop()
+
+    if (opened !== undefined && opened < schemeCount) {
+      characters[index] = ' '
+    }
+  }
+
+  return find(characters.join(''))
 }
 
 // A bare url in running text, which the feed never wrapped in an anchor.
