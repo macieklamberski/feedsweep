@@ -16,7 +16,11 @@ const isTrackingUrl = (src: string, entries: ReadonlyArray<TrackingUrl>): boolea
   }
 
   return entries.some((entry) => {
-    return isHostOrSubdomainOf(url, entry.host) && (!entry.path || entry.path.test(url.pathname))
+    // search ignores lastIndex, so a global or sticky path regex matches every image alike.
+    return (
+      isHostOrSubdomainOf(url, entry.host) &&
+      (!entry.path || url.pathname.search(entry.path) !== -1)
+    )
   })
 }
 

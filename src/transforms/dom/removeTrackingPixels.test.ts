@@ -6,6 +6,7 @@ import { applyDomTransforms } from '../../utils/transforms.js'
 import { removeTrackingPixels } from './removeTrackingPixels.js'
 
 const pxPathRegex = /^\/px(\/|$)/
+const pxGlobalPathRegex = /^\/px(\/|$)/g
 
 const hostTrackingUrls = defaultTrackingUrls.filter((entry) => !entry.path)
 
@@ -350,6 +351,21 @@ describeForEachParser('removeTrackingPixels', (parseHtml) => {
       const value = '<img src="https://example.com/img/a.jpg">'
 
       expect(await transform(value, pathContext)).toEqualHtml(value)
+    })
+
+    it('should remove every matching image when the path regex is global', async () => {
+      const context: TransformContext = {
+        ...baseContext,
+        trackingUrls: [{ host: 'example.com', path: pxGlobalPathRegex }],
+      }
+      const value = html`
+        <p>Text</p>
+        <img src="https://example.com/px?id=1">
+        <img src="https://example.com/px?id=2">
+        <img src="https://example.com/px?id=3">
+      `
+
+      expect(await transform(value, context)).toEqualHtml('<p>Text</p>')
     })
 
     it('should keep a content-sized image whose path matches', async () => {
