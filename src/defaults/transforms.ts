@@ -64,6 +64,7 @@ import { rebuildPublicalbumGalleries } from '../transforms/dom/rebuildPublicalbu
 import { rebuildRocketYoutubePreviews } from '../transforms/dom/rebuildRocketYoutubePreviews.js'
 import { rebuildVideoJsEmbeds } from '../transforms/dom/rebuildVideoJsEmbeds.js'
 import { rebuildVokiEmbeds } from '../transforms/dom/rebuildVokiEmbeds.js'
+import { rebuildWechatMusicCards } from '../transforms/dom/rebuildWechatMusicCards.js'
 import { rebuildWistiaEmbeds } from '../transforms/dom/rebuildWistiaEmbeds.js'
 import { rebuildWmakerEmbeds } from '../transforms/dom/rebuildWmakerEmbeds.js'
 import { rebuildWordpressEmbeds } from '../transforms/dom/rebuildWordpressEmbeds.js'
@@ -230,6 +231,9 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
 
   // Runs before stripEmptyTags, which deletes the emptied snippet div, and before convertWidgets.
   rebuildPiktochartEmbeds,
+
+  // Runs before stripEmptyTags, which deletes the empty card element and the song it names.
+  rebuildWechatMusicCards,
 
   // Converts Datawrapper chart embeds (iframe, script/noscript, and link forms) into a
   // linked static <img> of the chart's published PNG render. Runs in this normalize

@@ -97,6 +97,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `rebuildDeferredIframes` | Rebuild a real `<iframe>` from a URL parked in a `<div>` attribute (Pym.js `data-pym-src`, @newswire/frames `data-frame-src`) |
 | `rebuildGofundmeEmbeds` | Rebuild a real `<iframe>` from a GoFundMe campaign widget's empty `div.gfm-embed[data-url]` |
 | `rebuildPiktochartEmbeds` | Rebuild a real `<iframe>` from a Piktochart script snippet's `div.piktowrapper-embed`, keeping any prose the publisher wrote inside it |
+| `rebuildWechatMusicCards` | Rebuild a WeChat article's `mp-common-clmusic` music card into a `<figure>` of its cover, captioned with the song and singer |
 | `linkifyGistEmbeds` | Replace a GitHub Gist script embed, an `<amp-gist>` or a gist loader's unfilled mount with a link to the gist |
 | `linkifyPodomaticPlaylists` | Replace a Podomatic Flash player set to a podcast's whole feed with a link to the podcast's page |
 | `linkifyPaypalDonateForms` | Replace a PayPal donate button form with its button image linked to PayPal's donate page |
