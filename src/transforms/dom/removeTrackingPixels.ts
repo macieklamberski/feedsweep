@@ -65,8 +65,7 @@ const hasContentImageSignal = (
 
 // A tracking pixel: a hidden or pixel-sized <img> whose only job is to fire a request.
 export const removeTrackingPixels: DomTransform = (context) => {
-  const hostEntries = (context.trackingHosts ?? []).map((host) => ({ host }))
-  const entries: Array<TrackingUrl> = [...hostEntries, ...(context.trackingUrls ?? [])]
+  const entries = context.trackingUrls
 
   return (document) => {
     const images = document.querySelectorAll('img')
