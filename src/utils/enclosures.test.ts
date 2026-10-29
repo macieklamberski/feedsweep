@@ -763,6 +763,17 @@ describeForEachParser('buildMediaKey', (parseHtml) => {
     expect(buildMediaKey(value1)).toBe(buildMediaKey(value2))
   })
 
+  it('should key two embeds that differ only by their hash apart', () => {
+    const value1 = getElement(
+      '<div data-embed-src="https://e.issuu.com/embed.html#111111/222222"></div>',
+    )
+    const value2 = getElement(
+      '<div data-embed-src="https://e.issuu.com/embed.html#333333/444444"></div>',
+    )
+
+    expect(buildMediaKey(value1)).not.toBe(buildMediaKey(value2))
+  })
+
   it('should key a media file the same with and without www', () => {
     const value1 = getElement(
       '<audio src="http://www.example.org/wp-content/uploads/2018/07/%D8%A7%D9%85%DB%8C%D9%86-%D8%AD%DB%8C%D8%A7%DB%8C%DB%8C.mp3"></audio>',
