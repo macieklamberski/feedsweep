@@ -1,19 +1,20 @@
-import type { DeferredIframeSource } from '../types.js'
+import type { ScopedAttribute } from '../types.js'
 
 // Attributes that park a media file URL on a container which then builds the player with JS,
 // so the media never appears for a reader. The shapes were verified in live markup 2026-08-01.
-export const defaultMediaSrcAttributes = [
-  'data-src', // Drupal audiofield (`.audiofield-wordpress-player`) and assorted themes.
-  'data-video-src', // Discourse video placeholders, Discourse 3.2+: every forum on that version emits it.
-  'data-mp4', // Beaver Builder row background video (`.fl-bg-video`).
-  'data-webm', // The same widget's second source.
-  'data-audiopath', // Sonaar MP3 Audio Player, ~100k WordPress installs.
-  'data-qtmplayer-file', // QTM Player.
-  'data-asset-url', // Squarespace audio block, Squarespace-hosted.
-  'data-nectar-video-src', // Salient theme.
-  'data-videolazy-id', // Tilda, page markup only.
-  'data-mp4video', // Tilda Zero Block, page markup only.
-  'data-pswp-video-src', // PhotoSwipe video support.
+export const defaultMediaSrcAttributes: Array<ScopedAttribute> = [
+  { attribute: 'data-src' }, // Drupal audiofield (`.audiofield-wordpress-player`) and assorted themes.
+  { attribute: 'data-video-src' }, // Discourse video placeholders, Discourse 3.2+: every forum on that version emits it.
+  { attribute: 'data-mp4' }, // Beaver Builder row background video (`.fl-bg-video`).
+  { attribute: 'data-webm' }, // The same widget's second source.
+  { attribute: 'data-audiopath' }, // Sonaar MP3 Audio Player, ~100k WordPress installs.
+  { attribute: 'data-qtmplayer-file' }, // QTM Player.
+  { attribute: 'data-asset-url' }, // Squarespace audio block, Squarespace-hosted.
+  { attribute: 'data-url', selector: '.sqs-audio-embed' }, // Squarespace audio block, external.
+  { attribute: 'data-nectar-video-src' }, // Salient theme.
+  { attribute: 'data-videolazy-id' }, // Tilda, page markup only.
+  { attribute: 'data-mp4video' }, // Tilda Zero Block, page markup only.
+  { attribute: 'data-pswp-video-src' }, // PhotoSwipe video support.
 ]
 
 export const defaultLazySrcAttributes = [
@@ -58,6 +59,11 @@ export const defaultLazySrcsetAttributes = [
   'data-nectar-img-srcset', // Salient theme (Nectar).
   'nitro-lazy-srcset', // NitroPack. Non-`data-*` prefix.
   'data-flickity-lazyload-srcset', // Flickity carousel.
+]
+
+// Attributes that park an image's alt text on a <picture> whose loader script appends the <img>.
+export const defaultLazyAltAttributes = [
+  'data-alt', // lozad.
 ]
 
 // Attributes that hold a lazy/consent-gated iframe src (the real embed URL) when the
@@ -121,7 +127,7 @@ export const defaultLazyIframeAttributes = [
   'data-wp-video-popup-url', // WP Video Popup: the lightbox iframe ships with an empty src.
 ]
 
-export const defaultDeferredIframeSources: Array<DeferredIframeSource> = [
+export const defaultDeferredIframeSources: Array<ScopedAttribute> = [
   // Pym.js (NPR): the established responsive-embed convention; skip already-initialized nodes.
   { selector: '[data-pym-src]:not([data-pym-auto-initialized])', attribute: 'data-pym-src' },
 
@@ -173,5 +179,11 @@ export const defaultDeferredIframeSources: Array<DeferredIframeSource> = [
     attribute: 'data-src',
   },
   { selector: '.embed-lazy-video[data-embed]', attribute: 'data-embed' }, // LMPixels themes
+  // mihdan's Lite YouTube Embed shares the lite-youtube tag but parks the whole player url,
+  // YouTube or Rutube, in `player-src`.
+  {
+    selector: 'lite-youtube[player-src]:not(:has(iframe, embed, object, video, audio))',
+    attribute: 'player-src',
+  },
   { selector: '.ut-load-video[data-video]', attribute: 'data-video' }, // United Themes
 ]

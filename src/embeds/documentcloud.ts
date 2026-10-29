@@ -31,7 +31,7 @@ const composeViewerUrl = (id: string, slug: string): string => {
 // The loader.js still served on s3.documentcloud.org frames that id and slug, read from the last
 // two path segments with the slug cut at its first dot.
 // See: https://s3.documentcloud.org/viewer/loader.js.
-export const composeLoaderViewerUrl = (url: string | undefined): string | undefined => {
+export const composeEmbedUrl = (url: string | undefined): string | undefined => {
   const parsed = parseUrlOnHosts(url, legacyHosts)
   const [route, document = ''] = parsed ? getPathSegments(parsed).slice(-2) : []
   const hyphen = document.indexOf('-')
