@@ -111,6 +111,14 @@ describeForEachParser('assignVideoPosters', (parseHtml) => {
     'https://videopress.com/embed/gRb7trlt',
     'https://players.brightcove.net/6178286496001/default_default/index.html?videoId=6278923408001',
     'https://streamable.com/e/qun2ij',
+    'https://rutube.ru/play/embed/f71daf234032934e3416a900ff90a9fc',
+    'https://vk.ru/video_ext.php?oid=-43425075&id=456239028',
+    'https://www.nbcnews.com/news/embedded-video/mmvo265959493641',
+    'https://www.today.com/today/embedded-video/mmvo265460805743',
+    'https://www.youtube.com/embed/videoseries?list=PLIoqMTM7qDWolqxEiNIX4rVLa8lAqT10_',
+    'https://www.youtube.com/embed?listType=user_uploads&list=praeventionstag',
+    'https://vimeo.com/showcase/9876543/embed',
+    'https://vimeo.com/event/1234567/embed',
   ]
 
   it.each(videoHostSrcs)('should move an image enclosure onto a player on %s', async (src) => {
@@ -161,6 +169,57 @@ describeForEachParser('assignVideoPosters', (parseHtml) => {
     const value = html`
       <img src="https://example.com/poster.png" data-enclosure="">
       <p>Just text.</p>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave a frame that names a video host only in its query', async () => {
+    const value = html`
+      <img src="https://example.com/files/news/infobrief.jpg" data-enclosure="">
+      <div data-embed-src="https://example.com/cookiebar/block/de/6?redirect=https%3A%2F%2Fwww.youtube.com%2Fembed%2FSeDnERmDjms"></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave a self-hosted player whose path names a video vendor', async () => {
+    const value = html`
+      <img src="https://example.com/site/artic/imag/foto_1.jpg" data-enclosure="">
+      <div data-embed-src="https://example.com/noticias/js-local/jwplayer7/7.8.2/embed/?src=multimedia_audio1.mp3"></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should move an image enclosure onto a VideoPress player as its resolver mints it', async () => {
+    const value = html`
+      <img src="https://media.beehiiv.com/uploads/poster.png" data-enclosure="">
+      <div data-embed-src="https://video.wordpress.com/embed/gRb7trlt"></div>
+    `
+    const expected = html`
+      <div
+        data-embed-src="https://video.wordpress.com/embed/gRb7trlt"
+        data-embed-thumbnail="https://media.beehiiv.com/uploads/poster.png"
+      ></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a YouTube live chat frame that is not a player', async () => {
+    const value = html`
+      <img src="https://media.beehiiv.com/uploads/poster.png" data-enclosure="">
+      <div data-embed-src="https://www.youtube.com/live_chat?v=SeDnERmDjms&embed_domain=example.com"></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave a VK widget that is not a player', async () => {
+    const value = html`
+      <img src="https://media.beehiiv.com/uploads/poster.png" data-enclosure="">
+      <div data-embed-src="https://vk.ru/widget_post.php?owner_id=-1&post_id=2"></div>
     `
 
     expect(await transform(value)).toEqualHtml(value)

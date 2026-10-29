@@ -113,8 +113,8 @@ export type ScopedAttribute = {
   selector?: string
 }
 
-// A host whose images are tracking, optionally narrowed to the paths `path` matches.
-export type TrackingUrl = {
+// A host and its subdomains, optionally narrowed to the paths `path` matches.
+export type UrlPattern = {
   host: string
   path?: RegExp
 }
@@ -229,7 +229,7 @@ export type TransformContext = {
   lazyAltAttributes: Array<string>
   lazyIframeAttributes: Array<string>
   deferredIframeSources: Array<ScopedAttribute>
-  trackingUrls: Array<TrackingUrl>
+  trackingUrls: Array<UrlPattern>
   emojiResolvers: Array<EmojiResolver>
   avatarImageHosts: Array<string>
   nonContentSelectors: Array<string>

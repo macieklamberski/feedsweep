@@ -13,10 +13,28 @@ import {
   trimUrlValues,
   videoExtensions,
 } from 'trousse'
-import type { AssetType, ResolveUrlFn, TransformContext, UrlRole } from '../types.js'
+import type { AssetType, ResolveUrlFn, TransformContext, UrlPattern, UrlRole } from '../types.js'
 
 // A url read out of a query value or a JSON attribute often names no host of its own.
 export const placeholderBaseUrl = 'https://example.com'
+
+// Whether a url sits on one of the patterns' hosts, on a path its pattern allows. The host is
+// parsed, so a host named in another url's query or path never matches.
+export const matchesUrlPattern = (src: string, patterns: ReadonlyArray<UrlPattern>): boolean => {
+  const url = parseUrl(src, placeholderBaseUrl)
+
+  if (!url) {
+    return false
+  }
+
+  return patterns.some((pattern) => {
+    // search ignores lastIndex, so a global or sticky path regex matches every url alike.
+    return (
+      isHostOrSubdomainOf(url, pattern.host) &&
+      (!pattern.path || url.pathname.search(pattern.path) !== -1)
+    )
+  })
+}
 
 const urlShapeRegex = /[:/.]/
 const queryOrHashRegex = /[?#]/

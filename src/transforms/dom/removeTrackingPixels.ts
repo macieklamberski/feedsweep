@@ -1,28 +1,11 @@
-import { isHostOrSubdomainOf, parseUrl } from 'trousse'
-import type { DomTransform, TrackingUrl } from '../../types.js'
+import type { DomTransform } from '../../types.js'
 import {
   getElementDimensions,
   hasZeroOpacity,
   isElementHidden,
   pixelDimensionLimit,
 } from '../../utils/dom.js'
-import { placeholderBaseUrl } from '../../utils/urls.js'
-
-const isTrackingUrl = (src: string, entries: ReadonlyArray<TrackingUrl>): boolean => {
-  const url = parseUrl(src, placeholderBaseUrl)
-
-  if (!url) {
-    return false
-  }
-
-  return entries.some((entry) => {
-    // search ignores lastIndex, so a global or sticky path regex matches every image alike.
-    return (
-      isHostOrSubdomainOf(url, entry.host) &&
-      (!entry.path || url.pathname.search(entry.path) !== -1)
-    )
-  })
-}
+import { matchesUrlPattern } from '../../utils/urls.js'
 
 const isPixelDimension = (value: number | undefined): boolean => {
   return value !== undefined && value <= pixelDimensionLimit
@@ -90,7 +73,7 @@ export const removeTrackingPixels: DomTransform = (context) => {
       if (!isContentSized(dimensions)) {
         const src = image.getAttribute('src')
 
-        if (src && isTrackingUrl(src, entries)) {
+        if (src && matchesUrlPattern(src, entries)) {
           image.remove()
         }
       }
