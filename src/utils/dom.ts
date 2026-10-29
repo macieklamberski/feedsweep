@@ -1,4 +1,5 @@
 import { coerceNumber, getQueryParam, isAnyOf, type Nullish, startsWithAnyOf } from 'trousse'
+import type { ScopedAttribute } from '../types.js'
 import * as styles from './styles.js'
 import { foldEscapedAmpersands, isUrlShaped } from './urls.js'
 
@@ -141,6 +142,15 @@ export const findConfigScript = (element: Element): Element | undefined => {
 
 export const attr = (element: Nullish<Element>, name: string): string | undefined => {
   return element?.getAttribute(name)?.trim() || undefined
+}
+
+// Whether a scoped attribute entry reads this element: any element when it names no selector.
+export const isInScope = (element: Element, entry: ScopedAttribute): boolean => {
+  if (!entry.selector) {
+    return true
+  }
+
+  return element.matches(entry.selector)
 }
 
 // Keeps a value read out of an attribute or a url when its shape tells it apart, such as an id

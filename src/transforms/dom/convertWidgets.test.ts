@@ -1736,6 +1736,39 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should read a scoped entry on an element its selector matches', async () => {
+      const value = html`
+        <div
+          class="track-block"
+          data-track-url="https://cdn.example.com/ep.mp3"
+        ></div>
+      `
+      const context: TransformContext = {
+        ...baseContext,
+        mediaSrcAttributes: [{ attribute: 'data-track-url', selector: '.track-block' }],
+      }
+      const expected = html`
+        <div class="track-block" data-track-url="https://cdn.example.com/ep.mp3">
+          <audio
+            src="https://cdn.example.com/ep.mp3"
+            controls
+          ></audio>
+        </div>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should leave a scoped entry unread outside its selector', async () => {
+      const value = '<div data-track-url="https://cdn.example.com/ep.mp3"></div>'
+      const context: TransformContext = {
+        ...baseContext,
+        mediaSrcAttributes: [{ attribute: 'data-track-url', selector: '.track-block' }],
+      }
+
+      expect(await transform(value, context)).toEqualHtml(value)
+    })
+
     it('should resolve a relative parked url against the base url', async () => {
       const value = '<div data-video-src="/uploads/clip.mp4"></div>'
       const context = {
