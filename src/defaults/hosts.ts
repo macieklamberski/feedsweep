@@ -21,6 +21,7 @@ export const defaultTrackingUrls: Array<TrackingUrl> = [
   { host: 'amazon-adsystem.com' }, // Amazon ad serving pixels.
   { host: 'taboola.com' }, // Content-recommendation widget pixels.
   { host: 'outbrain.com' }, // Content-recommendation widget pixels.
+  { host: 'linkwithin.com' }, // LinkWithin related-posts widget pixels (/pixel.png).
   { host: 'scorecardresearch.com' }, // Comscore audience-measurement pixels.
   { host: 'quantserve.com' }, // Quantcast measurement pixels.
   { host: 'chartbeat.com' }, // Chartbeat analytics pixels.
@@ -30,6 +31,7 @@ export const defaultTrackingUrls: Array<TrackingUrl> = [
   { host: 'follow.it' }, // follow.it RSS view pixels (api.follow.it/track-rss-*).
   { host: 'pheedo.com' }, // Pheedo feed-ad tracker (/feeds/tracker.php).
   { host: 'statcounter.com' }, // StatCounter analytics pixels (c.statcounter.com/counter.php).
+  { host: 'mc.yandex.ru' }, // Yandex Metrica pixels (/watch/<id>), hidden off-screen, not sized.
   { host: 'gigya.com' }, // Gigya/SAP Wildfire IMP pixels (counters.gigya.com).
   { host: 'counter.theconversation.com' }, // The Conversation article counters (/content/<id>/count.gif).
   { host: 'counter.blakedrumm.com' }, // Page-view counter badges (/count/tag.svg).
@@ -42,6 +44,7 @@ export const defaultTrackingUrls: Array<TrackingUrl> = [
   { host: 'assoc-amazon.fr' }, // Amazon Associates link pixels (FR).
   { host: 'linksynergy.com' }, // Rakuten Advertising (LinkSynergy) affiliate pixels.
   { host: 'pxf.io' }, // Impact Radius affiliate pixels.
+  { host: 'ti.tradetracker.net' }, // TradeTracker affiliate impression pixels. Its sized banners stay.
   { host: 'valuecommerce.com' }, // ValueCommerce (JP) affiliate impression pixels.
   { host: 'a8.net' }, // A8.net (JP) affiliate pixels.
   { host: 'moshimo.com' }, // Moshimo Affiliate (JP) impression pixels.
