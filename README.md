@@ -78,7 +78,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `rebuildEmbedPlusEmbeds` | Rebuild a real `<iframe>` from an "Embed Plus for YouTube" facade (`.epyt-facade[data-facadesrc]`) |
 | `rebuildIframelyEmbeds` | Rebuild an Iframely anchor facade (an empty `a[data-iframely-url]`) into the destination's frame or a plain link, and point an Iframely frame at the player of the url it proxies |
 | `rebuildWordpressEmbeds` | Rebuild a WordPress embed block that holds only its source url into the platform's frame, when a resolver claims the url |
-| `rebuildLiteVideoEmbeds` | Rebuild a real `<iframe>` from a `lite-youtube` / `lite-vimeo` web component's `videoid`, carrying over `start` and `videotitle` |
+| `rebuildLiteVideoEmbeds` | Rebuild a real `<iframe>` from a `lite-youtube` / `lite-vimeo` web component's `videoid`, `playlistid` or `player-src`, carrying over its start, title and poster |
 | `rebuildEmbettyVideoEmbeds` | Rebuild a real `<iframe>` from an `embetty-video` web component's `type` and `video-id`, carrying over `start-at` and `poster-image` |
 | `rebuildLyteEmbeds` | Rebuild a real `<iframe>` from a WP YouTube Lyte facade (`WYL_`/`lyte_` id) or the thumbnail it writes into feeds |
 | `rebuildRocketYoutubePreviews` | Rebuild a real `<iframe>` from a WP Rocket YouTube preview facade (`.rll-youtube-player[data-id]`), carrying over `data-query` |
