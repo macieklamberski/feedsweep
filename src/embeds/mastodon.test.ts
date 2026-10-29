@@ -4,6 +4,7 @@ import type { EmbedResolverResult } from '../types.js'
 import {
   type MastodonStatus,
   mastodonEmbedResolver,
+  mastodonEmbettyEmbedResolver,
   parseMastodonStatus,
   readMastodonHeight,
 } from './mastodon.js'
@@ -541,5 +542,39 @@ describe('readMastodonHeight', () => {
 
   it('should read nothing out of another message', () => {
     expect(readMastodonHeight({ type: 'ready' })).toBeUndefined()
+  })
+})
+
+describeForEachParser('mastodonEmbettyEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, mastodonEmbettyEmbedResolver)
+
+  it('should build the player from the status url', async () => {
+    const value = html`
+      <embetty-mastodon status="https://social.heise.de/@heiseonline/110372412617177781"></embetty-mastodon>
+    `
+    const expected: EmbedResolverResult = {
+      provider: 'mastodon',
+      id: 'social.heise.de/110372412617177781',
+      src: 'https://social.heise.de/@heiseonline/110372412617177781/embed',
+      url: 'https://social.heise.de/@heiseonline/110372412617177781',
+      author: '@heiseonline@social.heise.de',
+      publisher: 'social.heise.de',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should not claim a status url that names no post', async () => {
+    const value = html`
+      <embetty-mastodon status="https://social.heise.de/@heiseonline"></embetty-mastodon>
+    `
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
+  it('should not claim an empty status', async () => {
+    const value = '<embetty-mastodon status=""></embetty-mastodon>'
+
+    expect(await extract(value)).toBeUndefined()
   })
 })

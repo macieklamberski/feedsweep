@@ -1,5 +1,6 @@
-import { toMap } from 'trousse'
+import { isPresent, toMap } from 'trousse'
 import type { DomTransform } from '../../types.js'
+import { getLazyValue } from '../../utils/dom.js'
 import { widestSrcsetUrl } from '../../utils/images.js'
 import { isUsableSrc } from '../../utils/urls.js'
 import { createImage } from '../../utils/widgets.js'
@@ -47,7 +48,7 @@ const firstSourceWithSrcset = (picture: Element): Element | undefined => {
 }
 
 // A <picture> whose AVIF or WebP lives only in a <source>, sometimes with no <img> fallback.
-export const flattenPictureElements: DomTransform = () => {
+export const flattenPictureElements: DomTransform = (context) => {
   return (document) => {
     const pictures = document.querySelectorAll('picture')
 
@@ -93,7 +94,9 @@ export const flattenPictureElements: DomTransform = () => {
         continue
       }
 
-      picture.replaceWith(createImage(document, { src: url, srcset }))
+      const alt = getLazyValue(picture, context.lazyAltAttributes, isPresent)
+
+      picture.replaceWith(createImage(document, { src: url, srcset, alt }))
     }
   }
 }

@@ -1,12 +1,13 @@
 import { expect, it } from 'bun:test'
 import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
+import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { rebuildDeferredIframes } from './rebuildDeferredIframes.js'
 
 describeForEachParser('rebuildDeferredIframes', (parseHtml) => {
-  const transform = (value: string) => {
-    return applyDomTransforms(parseHtml(value), [rebuildDeferredIframes(baseContext)])
+  const transform = (value: string, context: TransformContext = baseContext) => {
+    return applyDomTransforms(parseHtml(value), [rebuildDeferredIframes(context)])
   }
 
   it('should rebuild an iframe from a Pym.js data-pym-src div', async () => {
@@ -163,6 +164,17 @@ describeForEachParser('rebuildDeferredIframes', (parseHtml) => {
     `
 
     expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should rebuild an iframe from a source with no selector on any element', async () => {
+    const value = '<section data-player-url="https://player.example.com/1"></section>'
+    const context: TransformContext = {
+      ...baseContext,
+      deferredIframeSources: [{ attribute: 'data-player-url' }],
+    }
+    const expected = '<iframe src="https://player.example.com/1"></iframe>'
+
+    expect(await transform(value, context)).toEqualHtml(expected)
   })
 
   it('should be idempotent', async () => {
@@ -498,6 +510,52 @@ describeForEachParser('video blocks rebuildDeferredIframes hands to the resolver
         data-embed-src="https://player.vimeo.com/video/474971009"
         data-embed-url="https://vimeo.com/474971009"
         data-embed-ratio="16/9"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should resolve a mihdan Lite YouTube Embed player', async () => {
+    const value = html`
+      <lite-youtube class="lite-youtube_16x9" video-id="dmDh6zgnB6w" player-src="https://www.youtube-nocookie.com/embed/dmDh6zgnB6w?autoplay=1&#038;feature=oembed">
+        <lite-youtube__button class="lite-youtube__button lty-playbtn"></lite-youtube__button>
+        <lite-youtube__preview class="lite-youtube__preview">
+          <img data-src="https://i.ytimg.com/vi/dmDh6zgnB6w/maxresdefault.jpg" width="1280" height="720" class="lite-youtube__image lite-youtube_lazy mihdan-lozad" alt="">
+        </lite-youtube__preview>
+      </lite-youtube>
+    `
+    const expected = html`
+      <div
+        data-embed-url="https://www.youtube.com/watch?v=dmDh6zgnB6w"
+        data-embed-thumbnail="https://i.ytimg.com/vi/dmDh6zgnB6w/hqdefault.jpg"
+        data-embed-src="https://www.youtube.com/embed/dmDh6zgnB6w"
+        data-embed-ratio="16/9"
+        data-embed-provider="youtube"
+        data-embed-id="dmDh6zgnB6w"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should resolve a mihdan Lite YouTube Embed Rutube player', async () => {
+    const value = html`
+      <lite-youtube class="lite-youtube_16x9" video-id="8c50f13ca83955b4a234839c2085de0f" player-src="https://rutube.ru/play/embed/8c50f13ca83955b4a234839c2085de0f">
+        <lite-youtube__button class="lite-youtube__button lty-playbtn"></lite-youtube__button>
+        <lite-youtube__preview class="lite-youtube__preview">
+          <img src="https://pic.rtbcdn.ru/video/2026-03-30/71/b1/71b1db2d97121c53dd31483954af4074.jpg" width="1280" height="720" class="lite-youtube__image" alt="Как живут и о чём мечтают в детском хосписе?">
+        </lite-youtube__preview>
+        <lite-youtube__name class="lite-youtube__name">Как живут и о чём мечтают в детском хосписе?</lite-youtube__name>
+      </lite-youtube>
+    `
+    const expected = html`
+      <div
+        data-embed-url="https://rutube.ru/video/8c50f13ca83955b4a234839c2085de0f/"
+        data-embed-src="https://rutube.ru/play/embed/8c50f13ca83955b4a234839c2085de0f"
+        data-embed-ratio="16/9"
+        data-embed-provider="rutube"
+        data-embed-id="8c50f13ca83955b4a234839c2085de0f"
       ></div>
     `
 

@@ -26,14 +26,17 @@ import {
   textNode,
 } from './dom.js'
 import {
+  audioFileRegex,
   cleanUrl,
   collapseSlashRuns,
   foldEscapedAmpersands,
+  isMediaWikiFilePage,
   parseUrlOnHosts,
   prepareUrl,
   repairUrl,
   resolveOrDropUrl,
   resolveOrKeepUrl,
+  videoFileRegex,
 } from './urls.js'
 
 const parseOrKeepDate = (
@@ -309,6 +312,20 @@ export const isResolvedIframe = async (
 
 export const isMediaResult = (result: WidgetResolverResult): result is MediaResolverResult => {
   return 'tag' in result
+}
+
+export const getMediaTag = (url: string): MediaResolverResult['tag'] | undefined => {
+  if (isMediaWikiFilePage(url)) {
+    return
+  }
+
+  if (videoFileRegex.test(url)) {
+    return 'video'
+  }
+
+  if (audioFileRegex.test(url)) {
+    return 'audio'
+  }
 }
 
 // The player a url-keyed resolver makes of a probe frame. A media result is skipped: it names a

@@ -7,6 +7,7 @@ import {
   isAnyOf,
   isHostOrSubdomainOf,
   type Nullish,
+  parseUrl,
 } from 'trousse'
 import type {
   EmbedRenderHint,
@@ -17,7 +18,11 @@ import type {
 import { attr, find } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
 import { parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  createMarkupEmbedResolver,
+  createUrlEmbedResolver,
+  readRepairedCarrierUrl,
+} from '../utils/widgets.js'
 
 const provider = 'youtube'
 
@@ -397,6 +402,55 @@ export const youtubeFc2EmbedResolver = createUrlEmbedResolver(
 
 // A YouTube player iframe, a frame of a watch, shorts or playlist page, or the Flash player.
 export const youtubeIframeEmbedResolver = createUrlEmbedResolver(hosts, youtubeResolveEmbed)
+
+// Invidious and Piped instances run on any host and serve YouTube's own `/embed` route for the
+// same ids. An instance host opens on its software's name, and Invidious's share snippet names
+// its frame `ivplayer` on any host.
+const frontendLabels = ['invidious', 'piped']
+
+// Invidious instances whose host carries neither name.
+const instanceHosts = ['invidio.us', 'yewtu.be', 'inv.nadeko.net', 'inv.riverside.rocks']
+
+// Both front ends read the start from `t` before `start`, and Invidious from `time_continue`
+// between them, each as seconds or as `1m30s`.
+const frontendOffsetParams = ['t', 'time_continue']
+
+const isFrontendFrame = (url: URL, element: Element): boolean => {
+  const [label] = url.hostname.split('.')
+
+  return (
+    frontendLabels.includes(label) ||
+    isHostOrSubdomainOf(url, instanceHosts) ||
+    isAnyOf(attr(element, 'id'), 'ivplayer')
+  )
+}
+
+// An Invidious or Piped frame: the instance's player for a YouTube id, mostly on instances that
+// are gone.
+export const youtubeFrontendEmbedResolver = createMarkupEmbedResolver(
+  'iframe[src*="/embed/" i]',
+  (element) => {
+    const url = parseUrl(readRepairedCarrierUrl(element))
+
+    if (!url || !isFrontendFrame(url, element)) {
+      return
+    }
+
+    const params = pickQueryParams(url.search, youtubeEmbedParams)
+    const offset = frontendOffsetParams
+      .map((name) => getQueryParam(url.searchParams, name))
+      .find(Boolean)
+    const start = parseWatchOffset(offset ?? '')
+
+    if (start) {
+      params.start = start
+    }
+
+    const youtubeUrl = new URL(`${url.pathname}${composeQuery(params)}`, 'https://www.youtube.com')
+
+    return youtubeResolveEmbed(youtubeUrl, element)
+  },
+)
 
 // AMP's amp-youtube names the video in data-videoid and renders nothing without the AMP runtime.
 export const youtubeAmpEmbedResolver = createMarkupEmbedResolver(

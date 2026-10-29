@@ -106,6 +106,20 @@ describeForEachParser('transformContent', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toBe(expected)
   })
 
+  it('should remove a lazy Meta Pixel image', async () => {
+    const value = html`
+      <p>Rehab Near Me: Troy<br>518-805-0816</p>
+      <img
+        class="lazy"
+        src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201%201%22%3E%3C%2Fsvg%3E"
+        data-src="https://www.facebook.com/tr?id=1845363462352797&amp;ev=PageView&amp;noscript=1"
+      >
+    `
+    const expected = '<p>Rehab Near Me: Troy<br>518-805-0816</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   it('should remove a 0x0 tracking pixel', async () => {
     // resolveMediaDimensions drops any width/height that is not a positive integer, so it used
     // to delete the zeros before removeTrackingPixels could read them. The pixel pass keys on
@@ -636,6 +650,69 @@ describeForEachParser('transformContent', (parseHtml) => {
           height="768"
         >
       </p>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/',
+    })
+
+    expect(result).toEqualHtml(expected)
+  })
+
+  it('should carry the alt of a lozad picture onto the image built for it', async () => {
+    const value = html`
+      <picture
+        class="lozad image picture-inbody "
+        title="Sustituir la articulación trapecio-metacarpiana por una prótesis Touch dual mobility es una de las soluciones"
+        data-iesrc="https://example.org/clip/6fb20c6b-b045-452e-a021-2273694fc512_16-9-aspect-ratio_75p_0.jpg"
+        data-alt="Sustituir la articulación trapecio-metacarpiana por una prótesis Touch dual mobility es una de las soluciones"
+        data-loaded="true"
+      >
+        <source
+          srcset="https://example.org/clip/6fb20c6b-b045-452e-a021-2273694fc512_16-9-aspect-ratio_default_0.jpg"
+          media="(max-width:  767px)"
+        >
+        <source
+          srcset="https://example.org/clip/6fb20c6b-b045-452e-a021-2273694fc512_16-9-aspect-ratio_75p_0.jpg"
+          media="(max-width: 1201px)"
+        >
+        <source
+          srcset="https://example.org/clip/6fb20c6b-b045-452e-a021-2273694fc512_16-9-aspect-ratio_default_0.jpg"
+          media="(max-width:  100vw)"
+        >
+      </picture>
+    `
+    const expected = html`
+      <img
+        src="https://example.org/clip/6fb20c6b-b045-452e-a021-2273694fc512_16-9-aspect-ratio_default_0.jpg"
+        srcset="https://example.org/clip/6fb20c6b-b045-452e-a021-2273694fc512_16-9-aspect-ratio_default_0.jpg"
+        alt="Sustituir la articulación trapecio-metacarpiana por una prótesis Touch dual mobility es una de las soluciones"
+      >
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/',
+    })
+
+    expect(result).toEqualHtml(expected)
+  })
+
+  it('should build no alt for a lozad picture whose data-alt is empty', async () => {
+    const value = html`
+      <picture class="media-block__img lozad lazy-loaded" data-alt="" data-loaded="true">
+        <source srcset="https://example.net/is/image/SIEPDC/ghost-of-yotei-commerce-background-desktop-01-en-17apr25?$4000px$" media="(min-width: 3000px)">
+        <source srcset="https://example.net/is/image/SIEPDC/ghost-of-yotei-commerce-background-desktop-01-en-17apr25?$3200px$" media="(min-width: 1920px)">
+        <source srcset="https://example.net/is/image/SIEPDC/ghost-of-yotei-commerce-background-desktop-01-en-17apr25?$2400px$" media="(min-width: 1367px)">
+        <source srcset="https://example.net/is/image/SIEPDC/ghost-of-yotei-commerce-background-desktop-01-en-17apr25?$1600px$" media="(min-width: 1024px)">
+        <source srcset="https://example.net/is/image/SIEPDC/ghost-of-yotei-commerce-background-desktop-01-en-17apr25?$1200px$" media="(min-width: 768px)">
+        <source srcset="https://example.net/is/image/SIEPDC/ghost-of-yotei-commerce-background-mobile-01-en-17apr25?$800px$" media="(min-width: 320px)">
+      </picture>
+    `
+    const expected = html`
+      <img
+        src="https://example.net/is/image/SIEPDC/ghost-of-yotei-commerce-background-desktop-01-en-17apr25?$4000px$"
+        srcset="https://example.net/is/image/SIEPDC/ghost-of-yotei-commerce-background-desktop-01-en-17apr25?$4000px$"
+      >
     `
     const result = await transformContent(value, {
       parseHtmlFn: parseHtml,

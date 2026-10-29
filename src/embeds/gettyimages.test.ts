@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { composeWidgetEmbedUrl, gettyImagesEmbedResolver, readWidgetConfig } from './gettyimages.js'
+import { composeEmbedUrl, gettyImagesEmbedResolver, readWidgetConfig } from './gettyimages.js'
 
 // The config is a JavaScript object literal rather than JSON, so it is read key by key. No
 // element is involved, so there is no parser to vary.
@@ -81,7 +81,7 @@ describe('readWidgetConfig', () => {
   })
 })
 
-describe('composeWidgetEmbedUrl', () => {
+describe('composeEmbedUrl', () => {
   describe('happy paths', () => {
     it('should build the player url the pre-hydrated iframe carries', () => {
       const value = {
@@ -93,7 +93,7 @@ describe('composeWidgetEmbedUrl', () => {
       const expected =
         'https://embed.gettyimages.com/embed/491183014?et=iPo3qjCKSVJU-bRwLBwNoQ&tld=com&sig=OOM9B40x='
 
-      expect(composeWidgetEmbedUrl(value)).toBe(expected)
+      expect(composeEmbedUrl(value)).toBe(expected)
     })
 
     it('should leave the domain out when the config has none, which the signature does not cover', () => {
@@ -105,7 +105,7 @@ describe('composeWidgetEmbedUrl', () => {
       const expected =
         'https://embed.gettyimages.com/embed/52941277?et=O4y9JTw-Sfx-xS1g8rcemg&sig=fm662LcjhNR8CxuM7wLJezgkjAkdEGOGXPDPYc-P3nk='
 
-      expect(composeWidgetEmbedUrl(value)).toBe(expected)
+      expect(composeEmbedUrl(value)).toBe(expected)
     })
   })
 })
