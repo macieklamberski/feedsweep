@@ -87,6 +87,81 @@ describeForEachParser('rebuildLiteVideoEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should carry a vimeo start in the player form as written', async () => {
+    const value = html`
+      <lite-vimeo
+        videoid="364402896"
+        start="5m30s"
+      ></lite-vimeo>
+    `
+    const expected = '<iframe src="https://player.vimeo.com/video/364402896#t=5m30s"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should carry a vimeo start in seconds with its unit as written', async () => {
+    const value = html`
+      <lite-vimeo
+        videoid="364402896"
+        start="63s"
+      ></lite-vimeo>
+    `
+    const expected = '<iframe src="https://player.vimeo.com/video/364402896#t=63s"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should carry the videohash of an unlisted vimeo video into h', async () => {
+    const value = html`
+      <lite-vimeo
+        videoid="364402896"
+        videohash="2e5fd2d6a1"
+      ></lite-vimeo>
+    `
+    const expected = '<iframe src="https://player.vimeo.com/video/364402896?h=2e5fd2d6a1"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should carry the videohash alongside the start', async () => {
+    const value = html`
+      <lite-vimeo
+        videoid="364402896"
+        videohash="2e5fd2d6a1"
+        start="90"
+      ></lite-vimeo>
+    `
+    const expected = html`
+      <iframe src="https://player.vimeo.com/video/364402896?h=2e5fd2d6a1#t=90s"></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should produce a vimeo placeholder for an unlisted video end to end', async () => {
+    const value = html`
+      <lite-vimeo
+        videoid="364402896"
+        videohash="2e5fd2d6a1"
+      ></lite-vimeo>
+    `
+    const expected = html`
+      <div
+        data-embed-url="https://vimeo.com/364402896/2e5fd2d6a1"
+        data-embed-src="https://player.vimeo.com/video/364402896?h=2e5fd2d6a1"
+        data-embed-ratio="16/9"
+        data-embed-provider="vimeo"
+        data-embed-id="364402896:2e5fd2d6a1"
+      ></div>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com',
+    })
+
+    expect(result).toEqualHtml(expected)
+  })
+
   it('should carry the videoStartAt of lite-youtube into the start param', async () => {
     const value = html`
       <lite-youtube
