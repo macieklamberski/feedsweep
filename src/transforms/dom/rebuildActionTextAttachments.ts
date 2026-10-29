@@ -1,6 +1,6 @@
-import { coerceNumber, isNonEmptyString, parseUrl } from 'trousse'
+import { coerceNumber, decodeSegment, isNonEmptyString, parseUrl } from 'trousse'
 import type { DomTransform } from '../../types.js'
-import { attr, hasText } from '../../utils/dom.js'
+import { attr } from '../../utils/dom.js'
 import { placeholderBaseUrl } from '../../utils/urls.js'
 import {
   createCaptionedFigure,
@@ -16,12 +16,12 @@ const blobIdRegex =
   /\/rails\/active_storage\/(?:blobs|representations)\/(?:redirect\/|proxy\/)?([^/]+)\//i
 
 // What names an upload: its signed blob id and its file name. Rails has signed one blob in two
-// formats, `{"data":…}` and the older `{"message":…}`, and a feed can mix them, so the file name
-// matches a copy the id does not.
+// formats, `{"data":…}` and the older `{"message":…}`, and a feed can mix them, so the file
+// name matches a copy the id does not.
 const readUploadKeys = (link: string | undefined): Array<string> => {
   const path = parseUrl(link ?? '', placeholderBaseUrl)?.pathname ?? ''
   const blobId = blobIdRegex.exec(path)?.[1]
-  const fileName = decodeURIComponent(path.split('/').pop() ?? '')
+  const fileName = decodeSegment(path.split('/').at(-1))
 
   return [blobId, fileName].filter(isNonEmptyString)
 }
@@ -32,33 +32,17 @@ const mediaKinds = ['image', 'video', 'audio'] as const
 type MediaKind = (typeof mediaKinds)[number]
 
 const readMediaKind = (attachment: Element): MediaKind | undefined => {
-  const [kind] = (attr(attachment, 'content-type') ?? '').split('/')
+  const [kind] = (attr(attachment, 'content-type') ?? '').toLowerCase().split('/')
 
   return mediaKinds.find((mediaKind) => mediaKind === kind)
 }
 
-// Whether nothing but whitespace and line breaks follows the node inside its parent.
-const isLastContent = (node: Node): boolean => {
-  for (let next = node.nextSibling; next; next = next.nextSibling) {
-    if (next.nodeName === 'BR') {
-      continue
-    }
-
-    if (next.nodeType === 1 || hasText(next)) {
-      return false
-    }
-  }
-
-  return true
-}
-
-// Rails writes the stored element and the figure it renders side by side. The element closes its
-// paragraph, after the text or on its own, and a figure cannot sit inside a paragraph, so the
-// figure follows the paragraph.
+// Rails writes the stored element and the figure it renders side by side. A figure cannot sit
+// inside a paragraph, so for an element in one the figure follows the paragraph, and otherwise
+// the element itself.
 const findRenderedFigure = (attachment: Element): Element | undefined => {
   const parent = attachment.parentElement
-  const closesParagraph = parent?.localName === 'p' && isLastContent(attachment)
-  const next = closesParagraph ? parent.nextElementSibling : attachment.nextElementSibling
+  const next = parent?.localName === 'p' ? parent.nextElementSibling : attachment.nextElementSibling
 
   if (!next?.matches('figure.attachment')) {
     return
@@ -138,7 +122,7 @@ export const rebuildActionTextAttachments: DomTransform = () => (document) => {
     }
 
     const media = buildMedia(document, attachment, url, kind)
-    const caption = attr(attachment, 'caption')?.trim()
+    const caption = attr(attachment, 'caption')
     const replacement = caption && kind ? createCaptionedFigure(document, media, caption) : media
 
     attachment.replaceWith(replacement)

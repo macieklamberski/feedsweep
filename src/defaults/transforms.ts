@@ -132,8 +132,9 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // `display:none` when no revealableSelectors entry names it, with every photo url inside it.
   rebuildPublicalbumGalleries,
 
-  // Runs before the image passes, so a rebuilt image is dimensioned and proxied like any other,
-  // and before the pass that flattens a file card's divs, which it replaces whole.
+  // Runs before resolveMediaDimensions and proxyAssetUrls, so a rebuilt image is dimensioned and
+  // proxied, before wrapBareInlineInParagraphs and unwrapWrappers flatten a file card, and before
+  // stripEmptyTags, after which an empty attachment no longer pairs with its rendered figure.
   rebuildActionTextAttachments,
   stripHiddenElements,
 
