@@ -14,8 +14,9 @@ const hosts = [
 // `/play` is the full-window page around the same player, addressed by the same pair.
 const playerPathRegex = /^\/(?:embed|play)\/([^/]+)\/([^/]+)$/i
 
-// The start position, and the token pair a library with embed authentication needs.
-const playbackParams = ['t', 'token', 'expires']
+// The start position, whether the video replays when it ends, and the token pair a library with
+// embed authentication needs.
+const playbackParams = ['t', 'loop', 'token', 'expires']
 
 const sizes = {
   player: { ratio: '16/9' },

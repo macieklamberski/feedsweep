@@ -29,6 +29,27 @@ describe('aushaResolveEmbed', () => {
 
       expect(aushaResolveEmbed(new URL(value))).toEqual(expected)
     })
+
+    it('should keep the episode list the player turns off, with its start', () => {
+      const value =
+        'https://player.ausha.co/?showId=9oK8Ju8EAMWy&color=%233a7bc7&display=vertical&multishow=true&playlist=false&dark=false&t=0&podcastId=4y88vuz5r2y6&v=3&playerId=ausha-N6Rt'
+      const expected: EmbedResolverResult = {
+        provider: 'ausha',
+        id: 'podcast/4y88vuz5r2y6',
+        src: 'https://player.ausha.co/?podcastId=4y88vuz5r2y6&v=3&t=0&playlist=false',
+        height: 220,
+      }
+
+      expect(aushaResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
+    it('should carry the v2 widget episode list onto the player as written', () => {
+      const value =
+        'https://widget.ausha.co/index.html?chanId=omwDTzazNWjb&showId=b3mafJQmmY9o&color=%2372238e&display=horizontal&v=2&height=400px&playlist=1&multishow=1&autonext=1&podcastId=KyAaYSrg2Oky'
+      const expected = 'https://player.ausha.co/?podcastId=KyAaYSrg2Oky&v=3&playlist=1'
+
+      expect(aushaResolveEmbed(new URL(value))?.src).toBe(expected)
+    })
   })
 
   describe('sad paths', () => {
@@ -221,7 +242,7 @@ describeForEachParser('aushaEmbedResolver', (parseHtml) => {
   // What Ausha's share dialog writes: the look the publisher picked, the start and the frame id
   // its loader script resizes.
   describe('the query the share dialog wrote', () => {
-    it('should keep the start and drop the look', async () => {
+    it('should keep the start and the episode list setting, and drop the look', async () => {
       const value = html`
         <iframe
           src="https://player.ausha.co/?showId=b7XnHvGNO9OB&amp;color=%233a7bc7&amp;display=vertical&amp;multishow=false&amp;playlist=false&amp;dark=false&amp;t=0&amp;podcastId=dBDjWc7Y6Pny&amp;v=3&amp;playerId=ausha-Lfpz"
@@ -235,7 +256,7 @@ describeForEachParser('aushaEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'ausha',
         id: 'podcast/dBDjWc7Y6Pny',
-        src: 'https://player.ausha.co/?podcastId=dBDjWc7Y6Pny&v=3&t=0',
+        src: 'https://player.ausha.co/?podcastId=dBDjWc7Y6Pny&v=3&t=0&playlist=false',
         height: 220,
       }
 

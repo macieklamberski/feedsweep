@@ -44,9 +44,11 @@ export const aushaResolveEmbed: ResolveUrlEmbed = (url) => {
 
   const [kind, id] = named
 
-  // The spelling Ausha's share dialog writes, with the start position the frame names.
+  // The spelling Ausha's share dialog writes, with the start position the frame names and whether
+  // the player lists the show's episodes under the one playing.
   const start = getQueryParam(url.searchParams, 't')
-  const query = composeQuery(trimObject({ [`${kind}Id`]: id, v: '3', t: start }, Boolean))
+  const playlist = getQueryParam(url.searchParams, 'playlist')
+  const query = composeQuery(trimObject({ [`${kind}Id`]: id, v: '3', t: start, playlist }, Boolean))
 
   return {
     provider,

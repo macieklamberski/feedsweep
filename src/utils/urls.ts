@@ -314,6 +314,22 @@ export const pickQueryParams = (
   return picked
 }
 
+// The same pick for a fragment written as a query, `#t=30`, where several players read their
+// start. A query glued after it, `#t=98?wmode=opaque`, holds pairs of its own, so its `?`
+// separates them the way `fixMalformedQuery` reads a second `?` inside a query.
+export const pickFragmentParams = (
+  url: URL,
+  names: ReadonlyArray<string>,
+): Record<string, string> => {
+  return pickQueryParams(url.hash.slice(1).replaceAll('?', '&'), names)
+}
+
+// The fragment a player url carries over for a player that reads its start from there, built the
+// way `pickUrlParams` builds the query.
+export const pickUrlFragment = (url: URL, names: ReadonlyArray<string>): string => {
+  return composeQuery(pickFragmentParams(url, names)).replace('?', '#')
+}
+
 // The publisher's query with only the parameters a player reads left in it. Each pair stays as
 // written, so a repeated name and a bracketed one such as `pwc[size]` reach the player unchanged.
 export const filterUrlQuery = (url: URL, isKept: (name: string) => boolean): string => {

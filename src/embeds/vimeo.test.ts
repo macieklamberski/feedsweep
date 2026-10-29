@@ -351,6 +351,20 @@ describe('vimeoResolveEmbed', () => {
     expect(vimeoResolveEmbed(new URL(value))).toEqual(expected)
   })
 
+  it('should end the fragment start offset at a query glued after it', () => {
+    const value =
+      'https://player.vimeo.com/video/1183093083#t=4m16s?title=0&byline=0&portrait=0&badge=0&autopause=0&player_id=0&app_id=58479'
+    const expected: EmbedResolverResult = {
+      provider: 'vimeo',
+      id: '1183093083',
+      src: 'https://player.vimeo.com/video/1183093083#t=4m16s',
+      url: 'https://vimeo.com/1183093083',
+      ratio: '16/9',
+    }
+
+    expect(vimeoResolveEmbed(new URL(value))).toEqual(expected)
+  })
+
   it('should write a clock start offset into the fragment unescaped', () => {
     const value = 'https://player.vimeo.com/video/39880751#t=1:04'
     const expected: EmbedResolverResult = {

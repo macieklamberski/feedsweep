@@ -94,6 +94,28 @@ describe('spreakerResolveEmbed', () => {
     expect(spreakerResolveEmbed(new URL(value))).toEqual(expected)
   })
 
+  it('should keep the episode list a show player asks for', () => {
+    const value =
+      'https://widget.spreaker.com/player?show_id=3670839&theme=light&autoplay=false&playlist=show'
+    const expected: EmbedResolverResult = {
+      provider: 'spreaker',
+      id: 'show/3670839',
+      src: 'https://widget.spreaker.com/player?show_id=3670839&playlist=show',
+      url: 'https://www.spreaker.com/show/3670839',
+      height: 200,
+    }
+
+    expect(spreakerResolveEmbed(new URL(value))).toEqual(expected)
+  })
+
+  it('should keep an episode list turned off', () => {
+    const value =
+      'https://widget.spreaker.com/player?episode_id=72762230&theme=light&playlist=false&playlist-continuous=false&chapters-image=true'
+    const expected = 'https://widget.spreaker.com/player?episode_id=72762230&playlist=false'
+
+    expect(spreakerResolveEmbed(new URL(value))?.src).toBe(expected)
+  })
+
   it('should refuse a non-digit episode id without falling back to the show', () => {
     const value = 'https://widget.spreaker.com/player?episode_id=abc&show_id=1433865'
 

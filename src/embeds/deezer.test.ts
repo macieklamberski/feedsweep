@@ -120,6 +120,14 @@ describe('deezerResolveEmbed', () => {
       expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
+    it('should keep the tracklist the widget frame writes', () => {
+      const value =
+        'https://widget.deezer.com/widget/light/playlist/15502385361?app_id=457142&autoplay=false&radius=true&tracklist=false'
+      const expected = 'https://widget.deezer.com/widget/dark/playlist/15502385361?tracklist=false'
+
+      expect(deezerResolveEmbed(new URL(value))?.src).toBe(expected)
+    })
+
     it('should take a podcast episode', () => {
       const value = 'https://widget.deezer.com/widget/dark/episode/494190077'
       const expected: EmbedResolverResult = {
@@ -135,18 +143,26 @@ describe('deezerResolveEmbed', () => {
   })
 
   describe('Variant #2: the classic plugin player, which redirects to the widget', () => {
-    it('should move an album onto the widget', () => {
+    it('should move an album onto the widget, its hidden list carried as the tracklist', () => {
       const value =
         'https://www.deezer.com/plugins/player?format=classic&autoplay=false&playlist=false&width=635&height=80&color=1990DB&layout=dark&size=medium&type=album&id=75337&app_id=1'
       const expected: EmbedResolverResult = {
         provider: 'deezer',
         id: 'album/75337',
-        src: 'https://widget.deezer.com/widget/dark/album/75337',
+        src: 'https://widget.deezer.com/widget/dark/album/75337?tracklist=false',
         url: 'https://www.deezer.com/album/75337',
         height: 300,
       }
 
       expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
+    it('should carry a shown list over as the tracklist, as written', () => {
+      const value =
+        'http://www.deezer.com/plugins/player?autoplay=false&playlist=true&width=600&height=400&cover=true&type=album&id=211189&title=&app_id=undefined'
+      const expected = 'https://widget.deezer.com/widget/dark/album/211189?tracklist=true'
+
+      expect(deezerResolveEmbed(new URL(value))?.src).toBe(expected)
     })
 
     it('should mint the share dialog theme over a plugin player layout', () => {

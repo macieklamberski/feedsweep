@@ -387,6 +387,27 @@ describe('youtubeResolveEmbed', () => {
     expect(youtubeResolveEmbed(carrierUrl(value, hosts))).toEqual(expected)
   })
 
+  it('should read a fragment offset with a query glued after it', () => {
+    const value = 'https://www.youtube.com/embed/0813gcZ1Uw8#t=98?wmode=opaque'
+    const expected: EmbedResolverResult = {
+      provider: 'youtube',
+      id: '0813gcZ1Uw8',
+      src: 'https://www.youtube.com/embed/0813gcZ1Uw8?start=98',
+      url: 'https://www.youtube.com/watch?v=0813gcZ1Uw8',
+      thumbnail: 'https://i.ytimg.com/vi/0813gcZ1Uw8/hqdefault.jpg',
+      ratio: '16/9',
+    }
+
+    expect(youtubeResolveEmbed(carrierUrl(value, hosts))).toEqual(expected)
+  })
+
+  it('should read a fragment offset with a space before the glued query', () => {
+    const value = 'https://www.youtube.com/embed/JOKhbv58_Ss#t=35m58s ?wmode=opaque'
+    const expected = 'https://www.youtube.com/embed/JOKhbv58_Ss?start=2158'
+
+    expect(youtubeResolveEmbed(carrierUrl(value, hosts))?.src).toBe(expected)
+  })
+
   it('should preserve the playlist and its position', () => {
     const value = 'https://www.youtube.com/embed/dQw4w9WgXcQ?list=PLabc123&index=4'
     const expected: EmbedResolverResult = {

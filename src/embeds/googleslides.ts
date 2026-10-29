@@ -1,6 +1,6 @@
-import { composeQuery, encodePathSegment, getQueryParam, isAnyOf } from 'trousse'
+import { encodePathSegment, getQueryParam, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
-import { pickQueryParams, pickUrlParams } from '../utils/urls.js'
+import { pickUrlFragment, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 import { getPathSegmentsWithoutWorkspace } from './googledrive.js'
 
@@ -20,13 +20,7 @@ const deckParams = ['slide']
 
 // A share link can write its slide in the fragment, beside flags for the toolbar and where the
 // file was opened from. Only the slide the deck opens on is kept.
-const readDeckFragment = (parsed: URL): string => {
-  const fragment = parsed.hash.slice(1)
-  const slideParams = pickQueryParams(fragment, ['slide'])
-  const query = composeQuery(slideParams)
-
-  return query.replace('?', '#')
-}
+const deckFragmentParams = ['slide']
 
 // `/presentation/d/e/{id}` names a deck published to the web and `/presentation/d/{id}` names it
 // by its Drive file id. The legacy `/presentation/embed?id={id}` 301s onto the second.
@@ -50,7 +44,7 @@ export const googleslidesResolveEmbed: ResolveUrlEmbed = (url) => {
     return {
       provider,
       id: fileId,
-      src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${readDeckFragment(url)}`,
+      src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${pickUrlFragment(url, deckFragmentParams)}`,
       url: `https://docs.google.com/presentation/d/${deckPath}/pub`,
       ...sizes.player,
     }
@@ -78,7 +72,7 @@ export const googleslidesResolveEmbed: ResolveUrlEmbed = (url) => {
   return {
     provider,
     id: deckId,
-    src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${readDeckFragment(url)}`,
+    src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${pickUrlFragment(url, deckFragmentParams)}`,
     url: `https://docs.google.com/presentation/d/${deckPath}/pub`,
     ...sizes.player,
   }
