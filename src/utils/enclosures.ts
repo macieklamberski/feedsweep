@@ -19,7 +19,7 @@ const strippedJsonAmpersandRegex = /(?<=\?.*)u0026(?:amp)?/g
 // script reads its hash, which can name the item, as Issuu's `embed.html#{configId}` does.
 const fileElements = ['audio', 'video', 'source']
 
-const mediaKeyOptions: NormalizeOptions = {
+const mediaFingerprintOptions: NormalizeOptions = {
   stripScheme: true,
   stripAuthentication: true,
   stripWww: true,
@@ -30,10 +30,10 @@ const mediaKeyOptions: NormalizeOptions = {
   normalizeUnicode: true,
 }
 
-// The image key drops a file's query, which is what tells podcast proxy episodes apart.
+// The image fingerprint drops a file's query, which is what tells podcast proxy episodes apart.
 // A podcast proxy's audio url is `…/play.mp3?url={episode}`, so its identity lives in the query.
 // Audio, video and embeds have no scaled variants.
-const readMediaKey = (element: Element, context?: TransformContext): string => {
+const readMediaFingerprint = (element: Element, context?: TransformContext): string => {
   const src = element.getAttribute('src') ?? element.getAttribute('data-embed-src') ?? ''
 
   if (element.localName === 'img') {
@@ -43,13 +43,16 @@ const readMediaKey = (element: Element, context?: TransformContext): string => {
   return cleanUrl(src, context) ?? src
 }
 
-// One file written over `http` and `https` is one key, and the output keeps what the feed wrote.
-// An image fingerprint is already folded and carries no scheme. Only a host with a port parses,
-// as a scheme, and that only sorts its query.
-export const buildMediaKey = (element: Element, context?: TransformContext): string => {
+// One file written over `http` and `https` is one fingerprint, and the output keeps what the feed
+// wrote. An image fingerprint is already folded and carries no scheme. Only a host with a port
+// parses, as a scheme, and that only sorts its query.
+export const buildMediaFingerprint = (element: Element, context?: TransformContext): string => {
   const stripHash = fileElements.includes(element.localName)
 
-  return normalizeUrl(readMediaKey(element, context), { ...mediaKeyOptions, stripHash })
+  return normalizeUrl(readMediaFingerprint(element, context), {
+    ...mediaFingerprintOptions,
+    stripHash,
+  })
 }
 
 // PeerTube ships an audio-only rendition as `type="audio/mp4"` under `medium="video"`, so the
