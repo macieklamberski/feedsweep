@@ -7,10 +7,13 @@ import {
   extractVideoId,
   hosts,
   isVideoId,
+  readThumbnailVideoId,
   readYoutubeEmbedSrc,
   youtubeAmpEmbedResolver,
   youtubeFc2EmbedResolver,
+  youtubeFrontendEmbedResolver,
   youtubeIframeEmbedResolver,
+  youtubeLiteEmbedResolver,
   youtubeMetasliderEmbedResolver,
   youtubeResolveEmbed,
 } from './youtube.js'
@@ -712,6 +715,75 @@ describe('youtubeResolveEmbed', () => {
   })
 })
 
+// The same poster, as YouTube serves it on each image host and route.
+const thumbnailUrls: Array<string> = [
+  'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+  'https://i.ytimg.com/vi_webp/dQw4w9WgXcQ/maxresdefault.webp',
+  'https://i.ytimg.com/an_webp/dQw4w9WgXcQ/mqdefault_6s.webp?du=3000',
+  'https://i1.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+  'https://i4.ytimg.com/vi/dQw4w9WgXcQ/0.jpg',
+  'https://i9.ytimg.com/vi_webp/dQw4w9WgXcQ/mqdefault.webp',
+  'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+  'https://img.youtube.com/vi_webp/dQw4w9WgXcQ/hqdefault.webp',
+  '//i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+]
+
+describe('readThumbnailVideoId', () => {
+  describe('happy paths', () => {
+    it.each(thumbnailUrls)('should read the video id off %s', (value) => {
+      expect(readThumbnailVideoId(value)).toBe('dQw4w9WgXcQ')
+    })
+
+    it('should read the video id off a parsed url', () => {
+      const value = new URL('https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg')
+
+      expect(readThumbnailVideoId(value)).toBe('dQw4w9WgXcQ')
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore the channel art route', () => {
+      const value = 'https://i.ytimg.com/an/cv7KJIAsiddB2YRegvrF7g/featured_channel.jpg?v=5ad3b468'
+
+      expect(readThumbnailVideoId(value)).toBeUndefined()
+    })
+
+    it("should ignore Blogger's own poster route", () => {
+      const value = 'https://i9.ytimg.com/vi_blogger/Gs4OK9-5zGb0/1.jpg'
+
+      expect(readThumbnailVideoId(value)).toBeUndefined()
+    })
+
+    it('should ignore a static asset', () => {
+      const value = 'https://s.ytimg.com/yt/img/pixel-vfl3z5WfW.gif'
+
+      expect(readThumbnailVideoId(value)).toBeUndefined()
+    })
+
+    it('should ignore a foreign host carrying the same path', () => {
+      const value = 'https://example.com/vi/dQw4w9WgXcQ/hqdefault.jpg'
+
+      expect(readThumbnailVideoId(value)).toBeUndefined()
+    })
+
+    it('should ignore a missing url', () => {
+      expect(readThumbnailVideoId(undefined)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should read the route in any case', () => {
+      const value = 'https://i.ytimg.com/VI/dQw4w9WgXcQ/hqdefault.jpg'
+
+      expect(readThumbnailVideoId(value)).toBe('dQw4w9WgXcQ')
+    })
+
+    it('should read back the url composeThumbnailUrl writes', () => {
+      expect(readThumbnailVideoId(composeThumbnailUrl('dQw4w9WgXcQ'))).toBe('dQw4w9WgXcQ')
+    })
+  })
+})
+
 describe('isVideoId', () => {
   describe('happy paths', () => {
     it('should accept an id of letters, digits, underscore and dash', () => {
@@ -1050,6 +1122,370 @@ describeForEachParser('youtubeIframeEmbedResolver', (parseHtml) => {
     }
 
     expect(await extract(value)).toEqual(expected)
+  })
+})
+
+describeForEachParser('youtubeFrontendEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, youtubeFrontendEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should rebuild an Invidious share snippet onto the YouTube player', async () => {
+      const value = html`
+        <iframe
+          id="ivplayer"
+          width="640"
+          height="360"
+          src="https://invidious.kavin.rocks/embed/zz5KauCbjPI"
+          style="border:none;"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'zz5KauCbjPI',
+        src: 'https://www.youtube.com/embed/zz5KauCbjPI',
+        url: 'https://www.youtube.com/watch?v=zz5KauCbjPI',
+        thumbnail: 'https://i.ytimg.com/vi/zz5KauCbjPI/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should rebuild a Piped frame by its host name alone', async () => {
+      const value = html`
+        <iframe
+          src="https://piped.adminforge.de/embed/-oschd3Jshk"
+          width="686"
+          height="384"
+          allow="autoplay"
+          allowfullscreen=""
+          frameborder="0"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: '-oschd3Jshk',
+        src: 'https://www.youtube.com/embed/-oschd3Jshk',
+        url: 'https://www.youtube.com/watch?v=-oschd3Jshk',
+        thumbnail: 'https://i.ytimg.com/vi/-oschd3Jshk/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should rebuild an Invidious frame by its host name alone', async () => {
+      const value = html`
+        <iframe
+          src="https://invidious.fdn.fr/embed/uC7h7pku900"
+          width="560"
+          height="315"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'uC7h7pku900',
+        src: 'https://www.youtube.com/embed/uC7h7pku900',
+        url: 'https://www.youtube.com/watch?v=uC7h7pku900',
+        thumbnail: 'https://i.ytimg.com/vi/uC7h7pku900/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should rebuild an Invidious share snippet on a host without the name', async () => {
+      const value = html`
+        <iframe
+          id="ivplayer"
+          src="https://www.invidio.us/embed/i1IKnWDecwA"
+          type="text/html"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'i1IKnWDecwA',
+        src: 'https://www.youtube.com/embed/i1IKnWDecwA',
+        url: 'https://www.youtube.com/watch?v=i1IKnWDecwA',
+        thumbnail: 'https://i.ytimg.com/vi/i1IKnWDecwA/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should rebuild a frame on a named Invidious host', async () => {
+      const value = html`
+        <iframe
+          width="560"
+          height="315"
+          src="https://yewtu.be/embed/OINa46HeWg8"
+          frameborder="0"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'OINa46HeWg8',
+        src: 'https://www.youtube.com/embed/OINa46HeWg8',
+        url: 'https://www.youtube.com/watch?v=OINa46HeWg8',
+        thumbnail: 'https://i.ytimg.com/vi/OINa46HeWg8/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should rebuild a frame on a subdomain of a named Invidious host', async () => {
+      const value = html`
+        <iframe
+          src="https://www.yewtu.be/embed/3YzRyjDLov8?autoplay=0&rel=0"
+          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;"
+          allowfullscreen
+          title="Route 666 by Helltrain"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: '3YzRyjDLov8',
+        src: 'https://www.youtube.com/embed/3YzRyjDLov8',
+        url: 'https://www.youtube.com/watch?v=3YzRyjDLov8',
+        thumbnail: 'https://i.ytimg.com/vi/3YzRyjDLov8/hqdefault.jpg',
+        ratio: '16/9',
+        title: 'Route 666 by Helltrain',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should rebuild a frame on the original Invidious host', async () => {
+      const value = html`
+        <iframe
+          width="560"
+          height="315"
+          src="https://www.invidio.us/embed/rYg40pJDF_A"
+          frameborder="0"
+          allow="encrypted-media;"
+          allowfullscreen
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'rYg40pJDF_A',
+        src: 'https://www.youtube.com/embed/rYg40pJDF_A',
+        url: 'https://www.youtube.com/watch?v=rYg40pJDF_A',
+        thumbnail: 'https://i.ytimg.com/vi/rYg40pJDF_A/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should rebuild a frame on the nadeko Invidious host', async () => {
+      const value = html`
+        <iframe
+          width="640"
+          height="360"
+          src="https://inv.nadeko.net/embed/jTL_7Dhv6ww"
+          frameborder="0"
+          allowfullscreen
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'jTL_7Dhv6ww',
+        src: 'https://www.youtube.com/embed/jTL_7Dhv6ww',
+        url: 'https://www.youtube.com/watch?v=jTL_7Dhv6ww',
+        thumbnail: 'https://i.ytimg.com/vi/jTL_7Dhv6ww/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should rebuild a frame on the riverside Invidious host', async () => {
+      const value = html`
+        <iframe
+          class="responsive-iframe"
+          src="https://inv.riverside.rocks/embed/PwV1-wZzT1Y"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'PwV1-wZzT1Y',
+        src: 'https://www.youtube.com/embed/PwV1-wZzT1Y',
+        url: 'https://www.youtube.com/watch?v=PwV1-wZzT1Y',
+        thumbnail: 'https://i.ytimg.com/vi/PwV1-wZzT1Y/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should rebuild a playlist frame onto the YouTube playlist player', async () => {
+      const value = html`
+        <iframe
+          loading="lazy"
+          width="360"
+          height="180"
+          src="https://inv.nadeko.net/embed/videoseries?list=OLAK5uy_nVrjWQJmbCwPk4l9KSh3t-zh46M7hs9tU"
+          frameborder="0"
+          allowfullscreen=""
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'playlist/OLAK5uy_nVrjWQJmbCwPk4l9KSh3t-zh46M7hs9tU',
+        src: 'https://www.youtube.com/embed/videoseries?list=OLAK5uy_nVrjWQJmbCwPk4l9KSh3t-zh46M7hs9tU',
+        url: 'https://www.youtube.com/playlist?list=OLAK5uy_nVrjWQJmbCwPk4l9KSh3t-zh46M7hs9tU',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the start an Invidious frame states', async () => {
+      const value = html`
+        <iframe
+          id="ivplayer"
+          class="video"
+          style="border: none;"
+          src="https://invidious.snopyta.org/embed/CjOT3CFy15Y?start=1009"
+          width="640"
+          height="360"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'CjOT3CFy15Y',
+        src: 'https://www.youtube.com/embed/CjOT3CFy15Y?start=1009',
+        url: 'https://www.youtube.com/watch?v=CjOT3CFy15Y',
+        thumbnail: 'https://i.ytimg.com/vi/CjOT3CFy15Y/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should move the share snippet offset over as the start', async () => {
+      const value = html`
+        <iframe
+          id='ivplayer'
+          width='640'
+          height='360'
+          src='https://yewtu.be/embed/4hDbhjgsAHg?t=7'
+          style='border:none;'
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: '4hDbhjgsAHg',
+        src: 'https://www.youtube.com/embed/4hDbhjgsAHg?start=7',
+        url: 'https://www.youtube.com/watch?v=4hDbhjgsAHg',
+        thumbnail: 'https://i.ytimg.com/vi/4hDbhjgsAHg/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should move an Invidious continue offset over as the start', async () => {
+      const value = html`
+        <iframe
+          loading="lazy"
+          id="ivplayer"
+          type="text/html"
+          src="https://invidious.silkky.cloud/embed/hZaQfnW1djo?time_continue=2&hl=en-US&local=true&autoplay=0&subtitles=%2C%2C"
+          width="700"
+          height="390"
+          frameborder="0"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'hZaQfnW1djo',
+        src: 'https://www.youtube.com/embed/hZaQfnW1djo?start=2',
+        url: 'https://www.youtube.com/watch?v=hZaQfnW1djo',
+        thumbnail: 'https://i.ytimg.com/vi/hZaQfnW1djo/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore an embed path on a host without the name or the snippet id', async () => {
+      const value = '<iframe src="https://evil.test/embed/zz5KauCbjPI"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore an instance host outside the named ones', async () => {
+      const value = html`
+        <iframe
+          src="https://iv.melmac.space/embed/fHKJ6IXcJ0I"
+          width="686"
+          height="384"
+          allow="autoplay"
+          allowfullscreen=""
+          frameborder="0"
+        ></iframe>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a host whose first label only starts with the name', async () => {
+      const value = '<iframe src="https://pipedrive.example.com/embed/zz5KauCbjPI"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore an instance host whose path opens on another route', async () => {
+      const value = '<iframe src="https://invidious.example.com/videos/embed/zz5KauCbjPI"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should keep an escaped ampersand inside a kept value', async () => {
+      const value = html`
+        <iframe
+          id="ivplayer"
+          src="https://invidious.example.com/embed/CjOT3CFy15Y?list=PLa%26b"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'CjOT3CFy15Y',
+        src: 'https://www.youtube.com/embed/CjOT3CFy15Y?list=PLa%26b',
+        url: 'https://www.youtube.com/watch?v=CjOT3CFy15Y',
+        thumbnail: 'https://i.ytimg.com/vi/CjOT3CFy15Y/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should take the offset before the start, as the front ends read them', async () => {
+      const value = html`
+        <iframe
+          id="ivplayer"
+          src="https://invidious.example.com/embed/CjOT3CFy15Y?t=1m30s&start=1009"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'CjOT3CFy15Y',
+        src: 'https://www.youtube.com/embed/CjOT3CFy15Y?start=90',
+        url: 'https://www.youtube.com/watch?v=CjOT3CFy15Y',
+        thumbnail: 'https://i.ytimg.com/vi/CjOT3CFy15Y/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
   })
 })
 
@@ -1527,6 +1963,294 @@ describeForEachParser('youtubeMetasliderEmbedResolver', (parseHtml) => {
         src: 'https://www.youtube.com/embed/i1kWnkHjDMI',
         url: 'https://www.youtube.com/watch?v=i1kWnkHjDMI',
         thumbnail: 'https://i.ytimg.com/vi/i1kWnkHjDMI/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+})
+
+describeForEachParser('youtubeLiteEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, youtubeLiteEmbedResolver)
+
+  describe('happy paths', () => {
+    it('should read the id off the poster of the react-lite-youtube-embed facade', async () => {
+      const value = html`
+        <article
+          class="yt-lite"
+          data-title="What Independence Day Means for Israel"
+          style="background-image:url(https://i.ytimg.com/vi/RrCe5eQOtdc/hqdefault.jpg);--aspect-ratio:56.25%"
+        >
+          <button
+            type="button"
+            class="lty-playbtn"
+            aria-label="Watch What Independence Day Means for Israel"
+          ></button>
+        </article>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'RrCe5eQOtdc',
+        src: 'https://www.youtube.com/embed/RrCe5eQOtdc',
+        url: 'https://www.youtube.com/watch?v=RrCe5eQOtdc',
+        thumbnail: 'https://i.ytimg.com/vi/RrCe5eQOtdc/hqdefault.jpg',
+        ratio: '16/9',
+        title: 'What Independence Day Means for Israel',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the id off a poster on img.youtube.com', async () => {
+      const value = html`
+        <article
+          class="yt-lite"
+          data-title="WebdriverIO Tutorials: Snapshot Testing"
+          style="background-image:url(https://img.youtube.com/vi/wQRGpWX3fsk/hqdefault.jpg);--aspect-ratio:56.25%"
+        >
+          <button
+            type="button"
+            class="lty-playbtn"
+          ></button>
+        </article>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'wQRGpWX3fsk',
+        src: 'https://www.youtube.com/embed/wQRGpWX3fsk',
+        url: 'https://www.youtube.com/watch?v=wQRGpWX3fsk',
+        thumbnail: 'https://i.ytimg.com/vi/wQRGpWX3fsk/hqdefault.jpg',
+        ratio: '16/9',
+        title: 'WebdriverIO Tutorials: Snapshot Testing',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the id off the WebP poster of an untitled facade', async () => {
+      const value = html`
+        <article
+          class="yt-lite"
+          style="background-image:url(https://i.ytimg.com/vi_webp/auUwAuJ8P-I/maxresdefault.webp);--aspect-ratio:56.25%"
+        >
+          <button
+            type="button"
+            class="lty-playbtn"
+            aria-label="Watch undefined"
+          ></button>
+        </article>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'auUwAuJ8P-I',
+        src: 'https://www.youtube.com/embed/auUwAuJ8P-I',
+        url: 'https://www.youtube.com/watch?v=auUwAuJ8P-I',
+        thumbnail: 'https://i.ytimg.com/vi/auUwAuJ8P-I/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the id a publisher copy of the facade names in data-video-id', async () => {
+      const value = html`
+        <div
+          class="yt-lite"
+          data-video-id="j8foCnJQ_xI"
+        >
+          <button
+            class="yt-lite__button"
+            aria-label="Play video"
+          >
+            <img
+              class="yt-lite__poster"
+              src="https://example.org/blogs.insead.edu/dist/3/152/files/2026/02/limitless2026-thumbnail.jpg"
+              alt="Watch the video"
+            >
+          </button>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'j8foCnJQ_xI',
+        src: 'https://www.youtube.com/embed/j8foCnJQ_xI',
+        url: 'https://www.youtube.com/watch?v=j8foCnJQ_xI',
+        thumbnail:
+          'https://example.org/blogs.insead.edu/dist/3/152/files/2026/02/limitless2026-thumbnail.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the id a publisher copy of the facade names in data-id', async () => {
+      const value = html`
+        <div
+          class="yt-lite"
+          data-id="v9LpTxMYaFI"
+          style="position: relative; padding-bottom: 56.25%; height: 0;"
+        >
+          <img
+            src="https://example.com/s/files/1/0810/2261/5854/files/EK5A2268.jpg?v=1777145029"
+            alt="Play video"
+          >
+          <button aria-label="Play"></button>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'v9LpTxMYaFI',
+        src: 'https://www.youtube.com/embed/v9LpTxMYaFI',
+        url: 'https://www.youtube.com/watch?v=v9LpTxMYaFI',
+        thumbnail: 'https://example.com/s/files/1/0810/2261/5854/files/EK5A2268.jpg?v=1777145029',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore a poster on a foreign host carrying the same path', async () => {
+      const value = html`
+        <article
+          class="yt-lite"
+          style="background-image:url(https://evil.test/vi/RrCe5eQOtdc/hqdefault.jpg)"
+        ></article>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a poster whose path opens with another route', async () => {
+      const value = html`
+        <article
+          class="yt-lite"
+          style="background-image:url(https://i.ytimg.com/cache/vi/RrCe5eQOtdc/hqdefault.jpg)"
+        ></article>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a playlist facade, whose poster names only its cover video', async () => {
+      const value = html`
+        <article
+          class="yt-lite"
+          data-title="A playlist"
+          style="background-image:url(https://i.ytimg.com/vi/RrCe5eQOtdc/hqdefault.jpg)"
+        >
+          <div
+            class="lty-playlist-icon"
+            aria-hidden="true"
+          ></div>
+          <button
+            type="button"
+            class="lty-playbtn"
+          ></button>
+        </article>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should leave a facade that already holds its player to the iframe', async () => {
+      const value = html`
+        <article
+          class="yt-lite lyt-activated"
+          style="background-image:url(https://i.ytimg.com/vi/RrCe5eQOtdc/hqdefault.jpg)"
+        >
+          <iframe src="https://www.youtube-nocookie.com/embed/RrCe5eQOtdc?autoplay=1&start=30"></iframe>
+        </article>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should prefer the id a data attribute names over the poster', async () => {
+      const value = html`
+        <div
+          class="yt-lite"
+          data-id="v9LpTxMYaFI"
+          style="background-image:url(https://i.ytimg.com/vi/RrCe5eQOtdc/hqdefault.jpg)"
+        ></div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'v9LpTxMYaFI',
+        src: 'https://www.youtube.com/embed/v9LpTxMYaFI',
+        url: 'https://www.youtube.com/watch?v=v9LpTxMYaFI',
+        thumbnail: 'https://i.ytimg.com/vi/v9LpTxMYaFI/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should prefer data-video-id over data-id', async () => {
+      const value = html`
+        <div
+          class="yt-lite"
+          data-video-id="j8foCnJQ_xI"
+          data-id="v9LpTxMYaFI"
+        ></div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'j8foCnJQ_xI',
+        src: 'https://www.youtube.com/embed/j8foCnJQ_xI',
+        url: 'https://www.youtube.com/watch?v=j8foCnJQ_xI',
+        thumbnail: 'https://i.ytimg.com/vi/j8foCnJQ_xI/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it("should fall back to the YouTube poster when the facade's img has no src", async () => {
+      const value = html`
+        <div
+          class="yt-lite"
+          data-id="5fZCwhrJhCc"
+        >
+          <img
+            loading="lazy"
+            alt="Video thumbnail"
+          >
+          <button
+            type="button"
+            aria-label="Play video"
+          ></button>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: '5fZCwhrJhCc',
+        src: 'https://www.youtube.com/embed/5fZCwhrJhCc',
+        url: 'https://www.youtube.com/watch?v=5fZCwhrJhCc',
+        thumbnail: 'https://i.ytimg.com/vi/5fZCwhrJhCc/hqdefault.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should pass an id of unusual length as written', async () => {
+      const value = html`
+        <article
+          class="yt-lite"
+          style="background-image:url(https://i.ytimg.com/vi/RrCe5eQ/hqdefault.jpg)"
+        ></article>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'RrCe5eQ',
+        src: 'https://www.youtube.com/embed/RrCe5eQ',
+        url: 'https://www.youtube.com/watch?v=RrCe5eQ',
+        thumbnail: 'https://i.ytimg.com/vi/RrCe5eQ/hqdefault.jpg',
         ratio: '16/9',
       }
 

@@ -106,11 +106,17 @@ export type EmbedResolver = {
   extract: (element: Element) => MaybePromise<EmbedResolverResult | undefined>
 }
 
-// A `<div>` attribute holding the url an iframe is built from at runtime: Pym.js `data-pym-src`,
-// @newswire/frames `data-frame-src` and Drupal's oEmbed `data-oembed-url`.
-export type DeferredIframeSource = {
-  selector: string
+// An attribute holding a url, read on the elements `selector` matches, or on any element that
+// carries it when there is no selector.
+export type ScopedAttribute = {
   attribute: string
+  selector?: string
+}
+
+// A host whose images are tracking, optionally narrowed to the paths `path` matches.
+export type TrackingUrl = {
+  host: string
+  path?: RegExp
 }
 
 // The relationship a citation expresses toward the linked work. Sparse: only sources that
@@ -217,12 +223,13 @@ export type TransformContext = {
   feedImageUrls?: Array<string>
   enclosures?: Array<Enclosure>
   widgetResolvers: Array<WidgetResolver>
-  mediaSrcAttributes: Array<string>
+  mediaSrcAttributes: Array<ScopedAttribute>
   lazySrcAttributes: Array<string>
   lazySrcsetAttributes: Array<string>
+  lazyAltAttributes: Array<string>
   lazyIframeAttributes: Array<string>
-  deferredIframeSources: Array<DeferredIframeSource>
-  trackingHosts: Array<string>
+  deferredIframeSources: Array<ScopedAttribute>
+  trackingUrls: Array<TrackingUrl>
   emojiResolvers: Array<EmojiResolver>
   avatarImageHosts: Array<string>
   nonContentSelectors: Array<string>

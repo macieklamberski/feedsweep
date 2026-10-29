@@ -1,4 +1,11 @@
-import { composeQuery, isAnyOf, type MaybePromise, startsWithAnyOf, trimObject } from 'trousse'
+import {
+  coerceArray,
+  composeQuery,
+  isAnyOf,
+  type MaybePromise,
+  startsWithAnyOf,
+  trimObject,
+} from 'trousse'
 import type {
   CiteResolverResult,
   DomTransform,
@@ -26,14 +33,17 @@ import {
   textNode,
 } from './dom.js'
 import {
+  audioFileRegex,
   cleanUrl,
   collapseSlashRuns,
   foldEscapedAmpersands,
+  isMediaWikiFilePage,
   parseUrlOnHosts,
   prepareUrl,
   repairUrl,
   resolveOrDropUrl,
   resolveOrKeepUrl,
+  videoFileRegex,
 } from './urls.js'
 
 const parseOrKeepDate = (
@@ -311,6 +321,20 @@ export const isMediaResult = (result: WidgetResolverResult): result is MediaReso
   return 'tag' in result
 }
 
+export const getMediaTag = (url: string): MediaResolverResult['tag'] | undefined => {
+  if (isMediaWikiFilePage(url)) {
+    return
+  }
+
+  if (videoFileRegex.test(url)) {
+    return 'video'
+  }
+
+  if (audioFileRegex.test(url)) {
+    return 'audio'
+  }
+}
+
 // The player a url-keyed resolver makes of a probe frame. A media result is skipped: it names a
 // file, not an embeddable player page.
 export const resolveEmbedProbe = async (
@@ -413,15 +437,16 @@ export const createImage = (document: Document, fields: ImageFields): HTMLElemen
 }
 
 // An <img>, an <audio> and a <video> have nowhere of their own to show a human-readable caption.
+// The caption is text, or the nodes of a caption the feed wrote with its own markup.
 export const createCaptionedFigure = (
   document: Document,
-  element: HTMLElement,
-  caption: string,
+  element: Element,
+  caption: string | Array<Node>,
 ): HTMLElement => {
   const figure = document.createElement('figure')
   const figcaption = document.createElement('figcaption')
 
-  figcaption.textContent = caption
+  figcaption.append(...coerceArray<Node | string>(caption))
   figure.append(element, figcaption)
 
   return figure

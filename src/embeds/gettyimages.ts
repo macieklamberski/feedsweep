@@ -83,7 +83,7 @@ export const readWidgetConfig = (source: string): WidgetConfig | undefined => {
 
 // The signature is bound to the item: a config's own url answers 200, and the same url carrying
 // another specimen's signature 400. Signatures do not appear to expire.
-export const composeWidgetEmbedUrl = (config: WidgetConfig): string => {
+export const composeEmbedUrl = (config: WidgetConfig): string => {
   // The signature covers `tld` only when the config wrote it: a `tld` added to a url signed
   // without one answers "Incorrect or invalid URL".
   const query = composeQuery(

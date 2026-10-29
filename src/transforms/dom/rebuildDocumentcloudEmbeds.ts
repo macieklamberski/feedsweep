@@ -1,4 +1,4 @@
-import { composeLoaderViewerUrl } from '../../embeds/documentcloud.js'
+import { composeEmbedUrl } from '../../embeds/documentcloud.js'
 import type { DomTransform } from '../../types.js'
 import { createIframe } from '../../utils/widgets.js'
 
@@ -11,7 +11,7 @@ export const rebuildDocumentcloudEmbeds: DomTransform = () => (document) => {
     const frames: Array<Element> = []
 
     for (const match of (script.textContent ?? '').matchAll(loadCallRegex)) {
-      const url = composeLoaderViewerUrl(match[2])
+      const url = composeEmbedUrl(match[2])
 
       if (url) {
         frames.push(createIframe(document, url))
