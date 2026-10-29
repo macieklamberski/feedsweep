@@ -10,6 +10,7 @@ export const defaultMediaSrcAttributes: Array<ScopedAttribute> = [
   { attribute: 'data-audiopath' }, // Sonaar MP3 Audio Player, ~100k WordPress installs.
   { attribute: 'data-qtmplayer-file' }, // QTM Player.
   { attribute: 'data-asset-url' }, // Squarespace audio block, Squarespace-hosted.
+  { attribute: 'data-url', selector: '.sqs-audio-embed' }, // Squarespace audio block, external.
   { attribute: 'data-nectar-video-src' }, // Salient theme.
   { attribute: 'data-videolazy-id' }, // Tilda, page markup only.
   { attribute: 'data-mp4video' }, // Tilda Zero Block, page markup only.
