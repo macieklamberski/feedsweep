@@ -206,24 +206,6 @@ const readEmbedParams = (url: URL): Record<string, string> => {
   return params
 }
 
-// The player url for a caller holding a url nothing has checked: a page builder stores whatever
-// the publisher pasted, so the host is checked here the way the factory checks it for a carrier.
-export const readYoutubeEmbedSrc = (link: string): string | undefined => {
-  const url = parseUrlOnHosts(link, hosts)
-
-  if (!url) {
-    return
-  }
-
-  const videoId = extractVideoId(url)
-
-  if (!videoId) {
-    return
-  }
-
-  return composeEmbedUrl(videoId, readEmbedParams(url))
-}
-
 // `PBS` is a legal playlist id, channel id and legacy username at once, so each key names its
 // route. A playlist resolves title and poster through YouTube's keyless oEmbed, a channel through
 // the Data API.
@@ -372,6 +354,19 @@ export const youtubeResolveEmbed: ResolveUrlEmbed = (url, element) => {
     ...target,
     title: attr(element, 'title'),
   }
+}
+
+// The player url for a caller holding a url nothing has checked: a page builder stores whatever
+// the publisher pasted, so the host is checked here the way the factory checks it for a carrier.
+// It reads the url the way the resolver does, playlists and start times included.
+export const readYoutubeEmbedSrc = (link: string): string | undefined => {
+  const url = parseUrlOnHosts(link, hosts)
+
+  if (!url) {
+    return
+  }
+
+  return youtubeResolveEmbed(url)?.src
 }
 
 // FC2's blog player shell on static.fc2.com, a page that builds only the YouTube player its query
