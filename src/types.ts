@@ -229,9 +229,7 @@ export type TransformContext = {
   lazyAltAttributes: Array<string>
   lazyIframeAttributes: Array<string>
   deferredIframeSources: Array<DeferredIframeSource>
-  /** @deprecated Use trackingUrls. */
-  trackingHosts?: Array<string>
-  trackingUrls?: Array<TrackingUrl>
+  trackingUrls: Array<TrackingUrl>
   emojiResolvers: Array<EmojiResolver>
   avatarImageHosts: Array<string>
   nonContentSelectors: Array<string>

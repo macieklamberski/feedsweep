@@ -361,32 +361,6 @@ describeForEachParser('removeTrackingPixels', (parseHtml) => {
 
       expect(await transform(value, pathContext)).toEqualHtml(value)
     })
-
-    it('should remove an image from a host given only in trackingHosts', async () => {
-      const context: TransformContext = {
-        ...baseContext,
-        trackingHosts: ['example.com'],
-        trackingUrls: undefined,
-      }
-      const value = '<img src="https://example.com/open.gif">'
-
-      expect(await transform(value, context)).toEqualHtml('')
-    })
-
-    it('should remove images from hosts in both trackingHosts and trackingUrls', async () => {
-      const context: TransformContext = {
-        ...baseContext,
-        trackingHosts: ['example.org'],
-        trackingUrls: [{ host: 'example.com' }],
-      }
-      const value = html`
-        <p>Text</p>
-        <img src="https://example.org/open.gif">
-        <img src="https://example.com/open.gif">
-      `
-
-      expect(await transform(value, context)).toEqualHtml('<p>Text</p>')
-    })
   })
 
   describe('path words', () => {
