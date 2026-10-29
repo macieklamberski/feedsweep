@@ -7,6 +7,7 @@ import {
   extractVideoId,
   hosts,
   isVideoId,
+  readThumbnailVideoId,
   readYoutubeEmbedSrc,
   youtubeAmpEmbedResolver,
   youtubeFc2EmbedResolver,
@@ -709,6 +710,75 @@ describe('youtubeResolveEmbed', () => {
       const value = 'https://www.youtube.com/playlist'
 
       expect(youtubeResolveEmbed(carrierUrl(value, hosts))).toBeUndefined()
+    })
+  })
+})
+
+// The same poster, as YouTube serves it on each image host and route.
+const thumbnailUrls: Array<string> = [
+  'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+  'https://i.ytimg.com/vi_webp/dQw4w9WgXcQ/maxresdefault.webp',
+  'https://i.ytimg.com/an_webp/dQw4w9WgXcQ/mqdefault_6s.webp?du=3000',
+  'https://i1.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+  'https://i4.ytimg.com/vi/dQw4w9WgXcQ/0.jpg',
+  'https://i9.ytimg.com/vi_webp/dQw4w9WgXcQ/mqdefault.webp',
+  'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+  'https://img.youtube.com/vi_webp/dQw4w9WgXcQ/hqdefault.webp',
+  '//i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+]
+
+describe('readThumbnailVideoId', () => {
+  describe('happy paths', () => {
+    it.each(thumbnailUrls)('should read the video id off %s', (value) => {
+      expect(readThumbnailVideoId(value)).toBe('dQw4w9WgXcQ')
+    })
+
+    it('should read the video id off a parsed url', () => {
+      const value = new URL('https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg')
+
+      expect(readThumbnailVideoId(value)).toBe('dQw4w9WgXcQ')
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should ignore the channel art route', () => {
+      const value = 'https://i.ytimg.com/an/cv7KJIAsiddB2YRegvrF7g/featured_channel.jpg?v=5ad3b468'
+
+      expect(readThumbnailVideoId(value)).toBeUndefined()
+    })
+
+    it("should ignore Blogger's own poster route", () => {
+      const value = 'https://i9.ytimg.com/vi_blogger/Gs4OK9-5zGb0/1.jpg'
+
+      expect(readThumbnailVideoId(value)).toBeUndefined()
+    })
+
+    it('should ignore a static asset', () => {
+      const value = 'https://s.ytimg.com/yt/img/pixel-vfl3z5WfW.gif'
+
+      expect(readThumbnailVideoId(value)).toBeUndefined()
+    })
+
+    it('should ignore a foreign host carrying the same path', () => {
+      const value = 'https://example.com/vi/dQw4w9WgXcQ/hqdefault.jpg'
+
+      expect(readThumbnailVideoId(value)).toBeUndefined()
+    })
+
+    it('should ignore a missing url', () => {
+      expect(readThumbnailVideoId(undefined)).toBeUndefined()
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should read the route in any case', () => {
+      const value = 'https://i.ytimg.com/VI/dQw4w9WgXcQ/hqdefault.jpg'
+
+      expect(readThumbnailVideoId(value)).toBe('dQw4w9WgXcQ')
+    })
+
+    it('should read back the url composeThumbnailUrl writes', () => {
+      expect(readThumbnailVideoId(composeThumbnailUrl('dQw4w9WgXcQ'))).toBe('dQw4w9WgXcQ')
     })
   })
 })
@@ -1562,6 +1632,32 @@ describeForEachParser('youtubeLiteEmbedResolver', (parseHtml) => {
         thumbnail: 'https://i.ytimg.com/vi/RrCe5eQOtdc/hqdefault.jpg',
         ratio: '16/9',
         title: 'What Independence Day Means for Israel',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the id off a poster on img.youtube.com', async () => {
+      const value = html`
+        <article
+          class="yt-lite"
+          data-title="WebdriverIO Tutorials: Snapshot Testing"
+          style="background-image:url(https://img.youtube.com/vi/wQRGpWX3fsk/hqdefault.jpg);--aspect-ratio:56.25%"
+        >
+          <button
+            type="button"
+            class="lty-playbtn"
+          ></button>
+        </article>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'youtube',
+        id: 'wQRGpWX3fsk',
+        src: 'https://www.youtube.com/embed/wQRGpWX3fsk',
+        url: 'https://www.youtube.com/watch?v=wQRGpWX3fsk',
+        thumbnail: 'https://i.ytimg.com/vi/wQRGpWX3fsk/hqdefault.jpg',
+        ratio: '16/9',
+        title: 'WebdriverIO Tutorials: Snapshot Testing',
       }
 
       expect(await extract(value)).toEqual(expected)

@@ -6,6 +6,7 @@ import {
   getQueryParam,
   isAnyOf,
   isHostOrSubdomainOf,
+  type Nullish,
 } from 'trousse'
 import type {
   EmbedRenderHint,
@@ -72,6 +73,30 @@ export const isVideoId = (value: string): boolean => {
 // TODO: prefer a higher-res thumbnail where one exists, which needs a HEAD probe per video.
 export const composeThumbnailUrl = (videoId: string): string => {
   return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
+}
+
+// YouTube serves one poster on every image host it runs: `i.ytimg.com`, the numbered `i1` to `i9`
+// and `img.youtube.com`, as `vi/{id}/hqdefault.jpg`, its WebP copy under `vi_webp` and the
+// animated preview under `an_webp`. The bare `an` route names a channel, `vi_blogger` an id of
+// Blogger's own, and `s.ytimg.com` serves static assets, none of them a video.
+const thumbnailHosts = ['ytimg.com', 'img.youtube.com']
+const thumbnailRoutes = ['vi', 'vi_webp', 'an_webp']
+
+// The video a poster url names, read back from the shape composeThumbnailUrl writes.
+export const readThumbnailVideoId = (link: Nullish<string | URL>): string | undefined => {
+  const url = parseUrlOnHosts(link, thumbnailHosts)
+
+  if (!url) {
+    return
+  }
+
+  const [route, videoId] = getPathSegments(url)
+
+  if (!isAnyOf(route, thumbnailRoutes)) {
+    return
+  }
+
+  return videoId
 }
 
 // The player url every transform that recovers an id has to build. Params are given as values,
@@ -432,25 +457,6 @@ export const youtubeMetasliderEmbedResolver = createMarkupEmbedResolver(
     }
   },
 )
-
-// The poster of a video, `i.ytimg.com/vi/{id}/hqdefault.jpg`, or its WebP copy under `vi_webp`.
-const thumbnailRoutes = ['vi', 'vi_webp']
-
-const readThumbnailVideoId = (link: string | undefined): string | undefined => {
-  const url = parseUrlOnHosts(link, 'i.ytimg.com')
-
-  if (!url) {
-    return
-  }
-
-  const [route, videoId] = getPathSegments(url)
-
-  if (!isAnyOf(route, thumbnailRoutes)) {
-    return
-  }
-
-  return videoId
-}
 
 // react-lite-youtube-embed's facade, `article.yt-lite` with the poster as its background, builds
 // the player only on click. Publishers' own copies of it name the id in a data attribute.
