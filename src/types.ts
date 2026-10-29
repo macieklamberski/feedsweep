@@ -113,9 +113,6 @@ export type ScopedAttribute = {
   selector?: string
 }
 
-/** @deprecated Use ScopedAttribute. */
-export type DeferredIframeSource = ScopedAttribute
-
 // The relationship a citation expresses toward the linked work. Sparse: only sources that
 // carry a real relationship set it (today only microformats h-cite, via its `u-*-of` class).
 // Every platform card leaves it unset, meaning a plain link preview with no relationship.
@@ -220,8 +217,7 @@ export type TransformContext = {
   feedImageUrls?: Array<string>
   enclosures?: Array<Enclosure>
   widgetResolvers: Array<WidgetResolver>
-  // A bare string is deprecated, and is read as `{ attribute }`.
-  mediaSrcAttributes: Array<ScopedAttribute | string>
+  mediaSrcAttributes: Array<ScopedAttribute>
   lazySrcAttributes: Array<string>
   lazySrcsetAttributes: Array<string>
   lazyAltAttributes: Array<string>

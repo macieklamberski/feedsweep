@@ -1769,24 +1769,6 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
       expect(await transform(value, context)).toEqualHtml(value)
     })
 
-    it('should read a bare string entry on any container', async () => {
-      const value = '<span data-track-url="https://cdn.example.com/ep.mp3"></span>'
-      const context: TransformContext = {
-        ...baseContext,
-        mediaSrcAttributes: ['data-track-url'],
-      }
-      const expected = html`
-        <span data-track-url="https://cdn.example.com/ep.mp3">
-          <audio
-            src="https://cdn.example.com/ep.mp3"
-            controls
-          ></audio>
-        </span>
-      `
-
-      expect(await transform(value, context)).toEqualHtml(expected)
-    })
-
     it('should resolve a relative parked url against the base url', async () => {
       const value = '<div data-video-src="/uploads/clip.mp4"></div>'
       const context = {

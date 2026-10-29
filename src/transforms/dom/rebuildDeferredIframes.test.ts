@@ -1,7 +1,7 @@
 import { expect, it } from 'bun:test'
 import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
-import type { DeferredIframeSource, TransformContext } from '../../types.js'
+import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { rebuildDeferredIframes } from './rebuildDeferredIframes.js'
 
@@ -171,26 +171,6 @@ describeForEachParser('rebuildDeferredIframes', (parseHtml) => {
     const context: TransformContext = {
       ...baseContext,
       deferredIframeSources: [{ attribute: 'data-player-url' }],
-    }
-    const expected = '<iframe src="https://player.example.com/1"></iframe>'
-
-    expect(await transform(value, context)).toEqualHtml(expected)
-  })
-
-  it('should read a source typed as DeferredIframeSource', async () => {
-    const value = html`
-      <div
-        class="player"
-        data-player-url="https://player.example.com/1"
-      ></div>
-    `
-    const source: DeferredIframeSource = {
-      selector: '.player',
-      attribute: 'data-player-url',
-    }
-    const context: TransformContext = {
-      ...baseContext,
-      deferredIframeSources: [source],
     }
     const expected = '<iframe src="https://player.example.com/1"></iframe>'
 

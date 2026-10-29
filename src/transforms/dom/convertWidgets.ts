@@ -193,9 +193,6 @@ const captionMedia = (
 export const convertWidgets: DomTransform = (context) => {
   const { widgetResolvers, mediaSrcAttributes } = context
   const embedOrMediaResolvers = widgetResolvers.filter(isEmbedOrMediaResolver)
-  const mediaSrcEntries = mediaSrcAttributes.map((entry) => {
-    return typeof entry === 'string' ? { attribute: entry } : entry
-  })
 
   return async (document) => {
     const queried = new Map<string, Array<Element>>()
@@ -215,7 +212,7 @@ export const convertWidgets: DomTransform = (context) => {
 
     // Runs before the tiers below, which replace the iframes the playable guard relies on.
     for (const element of document.querySelectorAll('div, figure, span, li')) {
-      const parked = findParkedMedia(element, mediaSrcEntries)
+      const parked = findParkedMedia(element, mediaSrcAttributes)
 
       if (!parked) {
         continue

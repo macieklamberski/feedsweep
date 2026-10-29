@@ -173,7 +173,6 @@ export type {
   CiteResolver,
   CiteResolverResult,
   CleanUrlFn,
-  DeferredIframeSource,
   DomTransform,
   EmbedRef,
   EmbedRenderHint,
