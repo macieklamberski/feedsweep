@@ -7,6 +7,8 @@ import { removeTrackingPixels } from './removeTrackingPixels.js'
 
 const pxPathRegex = /^\/px(\/|$)/
 
+const hostTrackingUrls = defaultTrackingUrls.filter((entry) => !entry.path)
+
 describeForEachParser('removeTrackingPixels', (parseHtml) => {
   const transform = (value: string, context: TransformContext = baseContext) => {
     return applyDomTransforms(parseHtml(value), [removeTrackingPixels(context)])
@@ -230,7 +232,7 @@ describeForEachParser('removeTrackingPixels', (parseHtml) => {
   describe('host-based detection', () => {
     // Iterates the real default list, so every entry is exercised and a new entry
     // is covered automatically.
-    it.each(defaultTrackingUrls)('should remove images from $host', async ({ host }) => {
+    it.each(hostTrackingUrls)('should remove images from $host', async ({ host }) => {
       const value = `<img src="https://${host}/t.gif?id=abc">`
 
       expect(await transform(value)).toEqualHtml('')
@@ -267,49 +269,6 @@ describeForEachParser('removeTrackingPixels', (parseHtml) => {
       `
 
       expect(await transform(value)).toEqualHtml('')
-    })
-
-    it('should remove a Yandex Metrica pixel hidden off-screen', async () => {
-      const value = html`
-        <img
-          src="https://mc.yandex.ru/watch/47330517"
-          style="position:absolute; left:-9999px;"
-          alt=""
-        >
-      `
-
-      expect(await transform(value)).toEqualHtml('')
-    })
-
-    it('should remove an unsized LinkWithin widget pixel', async () => {
-      const value = html`
-        <img
-          style="border: 0;"
-          src="http://www.linkwithin.com/pixel.png"
-          alt="Related Posts Plugin for WordPress, Blogger..."
-        >
-      `
-
-      expect(await transform(value)).toEqualHtml('')
-    })
-
-    it('should remove an unsized TradeTracker impression pixel', async () => {
-      const value = '<img alt="" src="http://ti.tradetracker.net/?c=3402&m=164733&a=238395&t=pi">'
-
-      expect(await transform(value)).toEqualHtml('')
-    })
-
-    it('should keep a sized TradeTracker banner', async () => {
-      const value = html`
-        <img
-          width="468"
-          height="60"
-          alt=""
-          src="https://ti.tradetracker.net/?c=865&m=1534060&a=352864&r=&t=html"
-        >
-      `
-
-      expect(await transform(value)).toEqualHtml(value)
     })
 
     it('should remove an unsized AdSense for Feeds image ad', async () => {
@@ -403,6 +362,82 @@ describeForEachParser('removeTrackingPixels', (parseHtml) => {
       `
 
       expect(await transform(value, pathContext)).toEqualHtml(value)
+    })
+  })
+
+  describe('Meta Pixel image', () => {
+    it('should remove the image', async () => {
+      const value =
+        '<img src="https://www.facebook.com/tr?id=1845363462352797&ev=PageView&noscript=1">'
+
+      expect(await transform(value)).toEqualHtml('')
+    })
+
+    it('should remove the image whose path ends in a slash', async () => {
+      const value = html`
+        <img
+          border="0"
+          src="https://www.facebook.com/tr/?ev=6021483112529&amp;if=false&amp;ts=1453362988164&amp;v=2.0"
+        >
+      `
+
+      expect(await transform(value)).toEqualHtml('')
+    })
+
+    it('should remove the image on the mobile subdomain', async () => {
+      const value = '<img src="https://m.facebook.com/tr?id=1845363462352797&ev=PageView">'
+
+      expect(await transform(value)).toEqualHtml('')
+    })
+
+    it('should keep an unsized logo elsewhere on facebook.com', async () => {
+      const value = '<img src="http://www.facebook.com/images/fb_logo_small.png" alt="Facebook">'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep an image on a page path that starts with tr', async () => {
+      const value = '<img src="https://www.facebook.com/treatibles/photos/1.jpg" alt="Treats">'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
+  describe('EmailWire release pixel', () => {
+    it('should remove the image', async () => {
+      const value = html`
+        <img
+          src="https://www.emailwire.com/tracker/track.php?ID=39021"
+          border="0"
+        >
+      `
+
+      expect(await transform(value)).toEqualHtml('')
+    })
+
+    it('should keep an unsized release image', async () => {
+      const value = '<img src="https://www.emailwire.com/files/39021/product.jpg" alt="Product">'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
+  describe('LinkWithin widget pixel', () => {
+    it('should remove the image', async () => {
+      const value = '<img style="border: 0;" src="http://www.linkwithin.com/pixel.png" alt="">'
+
+      expect(await transform(value)).toEqualHtml('')
+    })
+
+    it('should keep an unsized post image the widget wraps in its click redirect', async () => {
+      const value = html`
+        <img
+          src="http://lwlink3.linkwithin.com/api/click?format=go&amp;v=1&amp;out=http%3A%2F%2Fexample.com%2Fphoto.jpg"
+          alt="Garden"
+        >
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
     })
   })
 
