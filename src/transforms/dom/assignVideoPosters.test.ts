@@ -170,6 +170,48 @@ describeForEachParser('assignVideoPosters', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should leave a frame that names a video host only in its query', async () => {
+    const value = html`
+      <img src="https://example.com/files/news/infobrief.jpg" data-enclosure="">
+      <div data-embed-src="https://example.com/cookiebar/block/de/6?redirect=https%3A%2F%2Fwww.youtube.com%2Fembed%2FSeDnERmDjms"></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave a self-hosted player whose path names a video vendor', async () => {
+    const value = html`
+      <img src="https://example.com/site/artic/imag/foto_1.jpg" data-enclosure="">
+      <div data-embed-src="https://example.com/noticias/js-local/jwplayer7/7.8.2/embed/?src=multimedia_audio1.mp3"></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should move an image enclosure onto a VideoPress player as its resolver mints it', async () => {
+    const value = html`
+      <img src="https://media.beehiiv.com/uploads/poster.png" data-enclosure="">
+      <div data-embed-src="https://video.wordpress.com/embed/gRb7trlt"></div>
+    `
+    const expected = html`
+      <div
+        data-embed-src="https://video.wordpress.com/embed/gRb7trlt"
+        data-embed-thumbnail="https://media.beehiiv.com/uploads/poster.png"
+      ></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a VK widget that is not a player', async () => {
+    const value = html`
+      <img src="https://media.beehiiv.com/uploads/poster.png" data-enclosure="">
+      <div data-embed-src="https://vk.ru/widget_post.php?owner_id=-1&post_id=2"></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should remove the figure of a captioned enclosure image it matches to an embed', async () => {
     const value = html`
       <figure>

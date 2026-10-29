@@ -1,31 +1,31 @@
-import { escapeRegex } from 'trousse'
-import type { DomTransform, TransformContext } from '../../types.js'
+import type { DomTransform, TransformContext, UrlPattern } from '../../types.js'
 import { attr, removeWithEmptyWrappers } from '../../utils/dom.js'
 import { buildMediaKey, enclosureMarker } from '../../utils/enclosures.js'
 import { findPosterEvidence, getVideoThumbnail } from '../../utils/images.js'
-import { isUsableSrc, prepareUrl } from '../../utils/urls.js'
+import { isUsableSrc, matchesUrlPattern, prepareUrl } from '../../utils/urls.js'
 import { updateEmbedPlaceholder } from '../../utils/widgets.js'
 
-// A player without a resolver, like JW Player, carries no data-embed-provider to match on.
-const videoHostFragments = [
-  'youtube.com', // YouTube
-  'youtu.be', // YouTube share links
-  'player.vimeo.com', // Vimeo player
-  'vimeo.com/video', // Vimeo video path
-  'jwplayer', // JW Player (cdn.jwplayer.com)
-  'dailymotion.com', // Dailymotion
-  'wistia', // Wistia (fast.wistia.net/.com)
-  'videopress.com', // VideoPress (WordPress.com)
-  'brightcove', // Brightcove
-  'streamable.com', // Streamable
-  'v.redd.it', // Reddit-hosted video
-  'rutube.ru/play/embed', // Rutube player
-  'vk.ru/video_ext.php', // VK video player
-  'vk.ru/clip_ext.php', // VK clip player
-  'embedded-video/mmvo', // NBC News and TODAY video players
-  'nbcnews.com/widget/video-embed', // NBC News widget video player
+// A player without a resolver, like JW Player, carries no data-embed-provider to match on, and
+// a provider names no kind, so the video players are listed by the urls their resolvers mint.
+const videoPlayers: Array<UrlPattern> = [
+  { host: 'youtube.com' }, // YouTube
+  { host: 'youtu.be' }, // YouTube share links
+  { host: 'player.vimeo.com' }, // Vimeo player
+  { host: 'vimeo.com', path: /^\/video\//i }, // Vimeo video path
+  { host: 'jwplayer.com' }, // JW Player
+  { host: 'dailymotion.com' }, // Dailymotion
+  { host: 'wistia.net' }, // Wistia player
+  { host: 'wistia.com' }, // Wistia legacy player
+  { host: 'videopress.com' }, // VideoPress
+  { host: 'video.wordpress.com' }, // VideoPress player as its resolver mints it
+  { host: 'brightcove.net' }, // Brightcove player
+  { host: 'streamable.com' }, // Streamable
+  { host: 'v.redd.it' }, // Reddit-hosted video
+  { host: 'rutube.ru', path: /^\/play\/embed\//i }, // Rutube player
+  { host: 'vk.ru', path: /^\/(?:video|clip)_ext\.php$/i }, // VK video and clip players, not widgets
+  { host: 'nbcnews.com', path: /^\/(?:news\/embedded-video|widget\/video-embed)\//i }, // NBC News
+  { host: 'today.com', path: /\/embedded-video\//i }, // TODAY
 ]
-const videoHostRegex = new RegExp(videoHostFragments.map(escapeRegex).join('|'), 'i')
 
 const playerSelector = '[data-embed-src], iframe[src], video'
 
@@ -61,7 +61,7 @@ const findVideoElement = (players: Array<Element>): Element | undefined => {
   }
   const isHostedEmbed = (player: Element) => {
     const src = player.getAttribute('data-embed-src') ?? player.getAttribute('src') ?? ''
-    return player.localName !== 'video' && videoHostRegex.test(src)
+    return player.localName !== 'video' && matchesUrlPattern(src, videoPlayers)
   }
 
   return players.find(isNative) ?? players.find(isHostedEmbed)

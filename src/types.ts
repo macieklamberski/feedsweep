@@ -113,11 +113,14 @@ export type ScopedAttribute = {
   selector?: string
 }
 
-// A host whose images are tracking, optionally narrowed to the paths `path` matches.
-export type TrackingUrl = {
+// A host and its subdomains, optionally narrowed to the paths `path` matches.
+export type UrlPattern = {
   host: string
   path?: RegExp
 }
+
+// A host whose images are tracking, optionally narrowed to the paths `path` matches.
+export type TrackingUrl = UrlPattern
 
 // The relationship a citation expresses toward the linked work. Sparse: only sources that
 // carry a real relationship set it (today only microformats h-cite, via its `u-*-of` class).
