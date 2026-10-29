@@ -111,6 +111,10 @@ describeForEachParser('assignVideoPosters', (parseHtml) => {
     'https://videopress.com/embed/gRb7trlt',
     'https://players.brightcove.net/6178286496001/default_default/index.html?videoId=6278923408001',
     'https://streamable.com/e/qun2ij',
+    'https://rutube.ru/play/embed/f71daf234032934e3416a900ff90a9fc',
+    'https://vk.ru/video_ext.php?oid=-43425075&id=456239028',
+    'https://www.nbcnews.com/news/embedded-video/mmvo265959493641',
+    'https://www.today.com/today/embedded-video/mmvo265460805743',
   ]
 
   it.each(videoHostSrcs)('should move an image enclosure onto a player on %s', async (src) => {

@@ -19,6 +19,11 @@ const videoHostFragments = [
   'brightcove', // Brightcove
   'streamable.com', // Streamable
   'v.redd.it', // Reddit-hosted video
+  'rutube.ru/play/embed', // Rutube player
+  'vk.ru/video_ext.php', // VK video player
+  'vk.ru/clip_ext.php', // VK clip player
+  'embedded-video/mmvo', // NBC News and TODAY video players
+  'nbcnews.com/widget/video-embed', // NBC News widget video player
 ]
 const videoHostRegex = new RegExp(videoHostFragments.map(escapeRegex).join('|'), 'i')
 
