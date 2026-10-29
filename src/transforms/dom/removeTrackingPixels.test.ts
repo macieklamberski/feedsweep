@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'bun:test'
-import { defaultTrackingHosts } from '../../defaults.js'
+import { defaultTrackingUrls } from '../../defaults.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { removeTrackingPixels } from './removeTrackingPixels.js'
+
+const pxPathRegex = /^\/px(\/|$)/
+
+const hostTrackingUrls = defaultTrackingUrls.filter((entry) => !entry.path)
 
 describeForEachParser('removeTrackingPixels', (parseHtml) => {
   const transform = (value: string, context: TransformContext = baseContext) => {
@@ -228,7 +232,7 @@ describeForEachParser('removeTrackingPixels', (parseHtml) => {
   describe('host-based detection', () => {
     // Iterates the real default list, so every entry is exercised and a new entry
     // is covered automatically.
-    it.each(defaultTrackingHosts)('should remove images from %s', async (host) => {
+    it.each(hostTrackingUrls)('should remove images from $host', async ({ host }) => {
       const value = `<img src="https://${host}/t.gif?id=abc">`
 
       expect(await transform(value)).toEqualHtml('')
@@ -313,6 +317,125 @@ describeForEachParser('removeTrackingPixels', (parseHtml) => {
 
     it('should not remove images from look-alike hosts', async () => {
       const value = '<img src="https://notfeedsportal.com/photo.jpg">'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
+  describe('tracking url entries', () => {
+    const pathContext: TransformContext = {
+      ...baseContext,
+      trackingUrls: [{ host: 'example.com', path: pxPathRegex }],
+    }
+
+    it('should remove an image on a subdomain whose path matches', async () => {
+      const value = '<img src="https://www.example.com/px?id=1">'
+
+      expect(await transform(value, pathContext)).toEqualHtml('')
+    })
+
+    it('should remove an image whose path matches with a trailing slash', async () => {
+      const value = '<img src="https://cdn.example.com/px/">'
+
+      expect(await transform(value, pathContext)).toEqualHtml('')
+    })
+
+    it('should keep an image whose path only starts with the same letters', async () => {
+      const value = '<img src="https://example.com/pxl.gif">'
+
+      expect(await transform(value, pathContext)).toEqualHtml(value)
+    })
+
+    it('should keep an image whose path does not match', async () => {
+      const value = '<img src="https://example.com/img/a.jpg">'
+
+      expect(await transform(value, pathContext)).toEqualHtml(value)
+    })
+
+    it('should keep a content-sized image whose path matches', async () => {
+      const value = html`
+        <img
+          src="https://example.com/px/banner.png"
+          width="600"
+          height="400"
+        >
+      `
+
+      expect(await transform(value, pathContext)).toEqualHtml(value)
+    })
+  })
+
+  describe('Meta Pixel image', () => {
+    it('should remove the image', async () => {
+      const value =
+        '<img src="https://www.facebook.com/tr?id=1845363462352797&ev=PageView&noscript=1">'
+
+      expect(await transform(value)).toEqualHtml('')
+    })
+
+    it('should remove the image whose path ends in a slash', async () => {
+      const value = html`
+        <img
+          border="0"
+          src="https://www.facebook.com/tr/?ev=6021483112529&amp;if=false&amp;ts=1453362988164&amp;v=2.0"
+        >
+      `
+
+      expect(await transform(value)).toEqualHtml('')
+    })
+
+    it('should remove the image on the mobile subdomain', async () => {
+      const value = '<img src="https://m.facebook.com/tr?id=1845363462352797&ev=PageView">'
+
+      expect(await transform(value)).toEqualHtml('')
+    })
+
+    it('should keep an unsized logo elsewhere on facebook.com', async () => {
+      const value = '<img src="http://www.facebook.com/images/fb_logo_small.png" alt="Facebook">'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep an image on a page path that starts with tr', async () => {
+      const value = '<img src="https://www.facebook.com/treatibles/photos/1.jpg" alt="Treats">'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
+  describe('EmailWire release pixel', () => {
+    it('should remove the image', async () => {
+      const value = html`
+        <img
+          src="https://www.emailwire.com/tracker/track.php?ID=39021"
+          border="0"
+        >
+      `
+
+      expect(await transform(value)).toEqualHtml('')
+    })
+
+    it('should keep an unsized release image', async () => {
+      const value = '<img src="https://www.emailwire.com/files/39021/product.jpg" alt="Product">'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
+  describe('LinkWithin widget pixel', () => {
+    it('should remove the image', async () => {
+      const value = '<img style="border: 0;" src="http://www.linkwithin.com/pixel.png" alt="">'
+
+      expect(await transform(value)).toEqualHtml('')
+    })
+
+    it('should keep an unsized post image the widget wraps in its click redirect', async () => {
+      const value = html`
+        <img
+          src="http://lwlink3.linkwithin.com/api/click?format=go&amp;v=1&amp;out=http%3A%2F%2Fexample.com%2Fphoto.jpg"
+          alt="Garden"
+        >
+      `
 
       expect(await transform(value)).toEqualHtml(value)
     })

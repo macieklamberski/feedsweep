@@ -113,6 +113,12 @@ export type ScopedAttribute = {
   selector?: string
 }
 
+// A host whose images are tracking, optionally narrowed to the paths `path` matches.
+export type TrackingUrl = {
+  host: string
+  path?: RegExp
+}
+
 // The relationship a citation expresses toward the linked work. Sparse: only sources that
 // carry a real relationship set it (today only microformats h-cite, via its `u-*-of` class).
 // Every platform card leaves it unset, meaning a plain link preview with no relationship.
@@ -223,7 +229,7 @@ export type TransformContext = {
   lazyAltAttributes: Array<string>
   lazyIframeAttributes: Array<string>
   deferredIframeSources: Array<ScopedAttribute>
-  trackingHosts: Array<string>
+  trackingUrls: Array<TrackingUrl>
   emojiResolvers: Array<EmojiResolver>
   avatarImageHosts: Array<string>
   nonContentSelectors: Array<string>

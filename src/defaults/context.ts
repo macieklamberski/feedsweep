@@ -8,7 +8,7 @@ import {
   defaultMediaSrcAttributes,
 } from './attributes.js'
 import { defaultFieldCleaners } from './cleaners.js'
-import { defaultAvatarImageHosts, defaultTrackingHosts } from './hosts.js'
+import { defaultAvatarImageHosts, defaultTrackingUrls } from './hosts.js'
 import { defaultEmojiResolvers, defaultWidgetResolvers } from './resolvers.js'
 import {
   defaultNonContentSelectors,
@@ -26,7 +26,7 @@ export const defaultContext: TransformContext = {
   lazyAltAttributes: defaultLazyAltAttributes,
   lazyIframeAttributes: defaultLazyIframeAttributes,
   deferredIframeSources: defaultDeferredIframeSources,
-  trackingHosts: defaultTrackingHosts,
+  trackingUrls: defaultTrackingUrls,
   emojiResolvers: defaultEmojiResolvers,
   avatarImageHosts: defaultAvatarImageHosts,
   nonContentSelectors: defaultNonContentSelectors,

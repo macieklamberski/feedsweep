@@ -106,6 +106,20 @@ describeForEachParser('transformContent', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toBe(expected)
   })
 
+  it('should remove a lazy Meta Pixel image', async () => {
+    const value = html`
+      <p>Rehab Near Me: Troy<br>518-805-0816</p>
+      <img
+        class="lazy"
+        src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201%201%22%3E%3C%2Fsvg%3E"
+        data-src="https://www.facebook.com/tr?id=1845363462352797&amp;ev=PageView&amp;noscript=1"
+      >
+    `
+    const expected = '<p>Rehab Near Me: Troy<br>518-805-0816</p>'
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   it('should remove a 0x0 tracking pixel', async () => {
     // resolveMediaDimensions drops any width/height that is not a positive integer, so it used
     // to delete the zeros before removeTrackingPixels could read them. The pixel pass keys on

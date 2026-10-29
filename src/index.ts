@@ -195,6 +195,7 @@ export type {
   ResolveUrlFn,
   ScopedAttribute,
   StringTransform,
+  TrackingUrl,
   TransformContentOptions,
   TransformContext,
   UrlRole,

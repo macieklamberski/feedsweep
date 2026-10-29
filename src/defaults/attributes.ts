@@ -178,5 +178,11 @@ export const defaultDeferredIframeSources: Array<ScopedAttribute> = [
     attribute: 'data-src',
   },
   { selector: '.embed-lazy-video[data-embed]', attribute: 'data-embed' }, // LMPixels themes
+  // mihdan's Lite YouTube Embed shares the lite-youtube tag but parks the whole player url,
+  // YouTube or Rutube, in `player-src`.
+  {
+    selector: 'lite-youtube[player-src]:not(:has(iframe, embed, object, video, audio))',
+    attribute: 'player-src',
+  },
   { selector: '.ut-load-video[data-video]', attribute: 'data-video' }, // United Themes
 ]
