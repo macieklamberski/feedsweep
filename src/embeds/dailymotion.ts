@@ -182,19 +182,6 @@ export const composeEmbedUrl = (
   return `https://geo.dailymotion.com/player/${playerId}.html${composeQuery({ [route]: id, ...params })}`
 }
 
-// The player url for a caller holding a url nothing has checked: a page builder stores whatever
-// the publisher pasted, so the host is checked here the way the factory checks it for a carrier.
-export const readDailymotionEmbedSrc = (link: string): string | undefined => {
-  const url = parseUrlOnHosts(link, hosts)
-  const videoId = url && extractDailymotionId(url)
-
-  if (!videoId) {
-    return
-  }
-
-  return composeEmbedUrl('video', videoId)
-}
-
 // Where playback starts, whether it loops, and the playlist the video sits in. The rest of the
 // publisher's query is dropped with the rebuilt src.
 // Neither player reads `autoplay` off the query: autostart comes from the saved configuration.
@@ -246,6 +233,19 @@ export const dailymotionResolveEmbed: ResolveUrlEmbed = (url, element) => {
       title: attr(element, 'title'),
     }
   }
+}
+
+// The player url for a caller holding a url nothing has checked: a page builder stores whatever
+// the publisher pasted, so the host is checked here the way the factory checks it for a carrier.
+// It reads the url the way the resolver does, playlists and start times included.
+export const readDailymotionEmbedSrc = (link: string): string | undefined => {
+  const url = parseUrlOnHosts(link, hosts)
+
+  if (!url) {
+    return
+  }
+
+  return dailymotionResolveEmbed(url)?.src
 }
 
 // Dailymotion's player iframe for a video or a playlist, on its country hosts and dai.ly too.

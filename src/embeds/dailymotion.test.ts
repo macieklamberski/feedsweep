@@ -534,6 +534,20 @@ describe('readDailymotionEmbedSrc', () => {
 
     expect(readDailymotionEmbedSrc(value)).toBe(expected)
   })
+
+  it('should build the playlist player from a playlist page, as the resolver does', () => {
+    const value = 'http://www.dailymotion.com/playlist/x1cubo_jpchevenement_congres-mrc-2010'
+    const expected = 'https://geo.dailymotion.com/player/xpiw2.html?playlist=x1cubo'
+
+    expect(readDailymotionEmbedSrc(value)).toBe(expected)
+  })
+
+  it('should carry the start time of the url into the player, as the resolver does', () => {
+    const value = 'http://www.dailymotion.com/embed/video/x28favj?autoplay=0&start=0'
+    const expected = 'https://geo.dailymotion.com/player/xpiw2.html?video=x28favj&startTime=0'
+
+    expect(readDailymotionEmbedSrc(value)).toBe(expected)
+  })
 })
 
 describeForEachParser('dailymotionIframeEmbedResolver', (parseHtml) => {

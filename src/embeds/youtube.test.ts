@@ -190,6 +190,14 @@ describe('readYoutubeEmbedSrc', () => {
 
       expect(readYoutubeEmbedSrc(value)).toBe(expected)
     })
+
+    it('should build the playlist player from a playlist page, as the resolver does', () => {
+      const value = 'https://youtube.com/playlist?list=PL2ISb9UZjIYjfWzI7qiacTvVu09-Z0Wxr'
+      const expected =
+        'https://www.youtube.com/embed/videoseries?list=PL2ISb9UZjIYjfWzI7qiacTvVu09-Z0Wxr'
+
+      expect(readYoutubeEmbedSrc(value)).toBe(expected)
+    })
   })
 
   describe('sad paths', () => {
