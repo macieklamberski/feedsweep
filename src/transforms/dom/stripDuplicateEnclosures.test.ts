@@ -367,6 +367,22 @@ describeForEachParser('stripDuplicateEnclosures', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should keep a marked embed placeholder naming another document by its hash', async () => {
+      const value = html`
+        <div
+          data-embed-src="https://e.issuu.com/embed.html#333333/444444"
+          data-enclosure=""
+        ></div>
+        <div data-embed-src="https://e.issuu.com/embed.html#111111/222222"></div>
+      `
+      const expected = html`
+        <div data-embed-src="https://e.issuu.com/embed.html#333333/444444"></div>
+        <div data-embed-src="https://e.issuu.com/embed.html#111111/222222"></div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should keep a marked embed placeholder naming another playlist by its query', async () => {
       const value = html`
         <div
