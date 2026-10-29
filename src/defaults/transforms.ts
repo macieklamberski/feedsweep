@@ -68,6 +68,7 @@ import { rebuildVokiEmbeds } from '../transforms/dom/rebuildVokiEmbeds.js'
 import { rebuildWistiaEmbeds } from '../transforms/dom/rebuildWistiaEmbeds.js'
 import { rebuildWmakerEmbeds } from '../transforms/dom/rebuildWmakerEmbeds.js'
 import { rebuildWordpressEmbeds } from '../transforms/dom/rebuildWordpressEmbeds.js'
+import { rebuildWordpressShortcodes } from '../transforms/dom/rebuildWordpressShortcodes.js'
 import { removeTrackingPixels } from '../transforms/dom/removeTrackingPixels.js'
 import { replacePreLineBreaks } from '../transforms/dom/replacePreLineBreaks.js'
 import { resolveMediaDimensions } from '../transforms/dom/resolveMediaDimensions.js'
@@ -161,6 +162,11 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // Runs before unwrapWrappers, which dissolves the block's wrapper div, and before
   // convertWidgets, which claims the frame this rebuilds.
   rebuildWordpressEmbeds,
+
+  // Runs before linkifyUrls, which would link the url inside a shortcode, before convertWidgets,
+  // which claims the frame this rebuilds, and before stripEmptyTags, which drops a paragraph a
+  // gallery's dropped text leaves empty.
+  rebuildWordpressShortcodes,
   rebuildLiteVideoEmbeds,
   rebuildEmbettyVideoEmbeds,
   rebuildLyteEmbeds,
