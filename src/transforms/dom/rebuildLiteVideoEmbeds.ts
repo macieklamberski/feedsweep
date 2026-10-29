@@ -1,8 +1,8 @@
-import { encodePathSegment, toMap } from 'trousse'
+import { encodePathSegment, toMap, trimObject } from 'trousse'
 import { composeEmbedUrl as composeVimeoUrl } from '../../embeds/vimeo.js'
 import { composeEmbedUrl as composeYoutubeUrl, youtubeEmbedParams } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
-import { pickQueryParams } from '../../utils/urls.js'
+import { digitsRegex, pickQueryParams } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
 
 type EmbedSource = {
@@ -10,7 +10,7 @@ type EmbedSource = {
   startAttributes: ReadonlyArray<string>
   // An attribute naming a playlist, which the component plays in place of the video.
   playlistAttribute?: string
-  compose: (id: string, params: Record<string, string>) => string
+  compose: (id: string, params: Record<string, string>, element: Element) => string
 }
 
 const embedSources = toMap<EmbedSource>({
@@ -22,12 +22,16 @@ const embedSources = toMap<EmbedSource>({
     compose: (id, params) => composeYoutubeUrl(id, params),
   },
   // Vimeo's player takes the offset as a #t= fragment and reads nothing else. lite-vimeo's
-  // `start` counts seconds.
+  // `start` is either bare seconds or the player's own form, `5m30s`.
   'lite-vimeo': {
     params: ['start'],
     startAttributes: ['start'],
-    compose: (id, params) => {
-      return composeVimeoUrl(id, undefined, params.start ? `${params.start}s` : undefined)
+    compose: (id, params, element) => {
+      const start = digitsRegex.test(params.start ?? '') ? `${params.start}s` : params.start
+      // An unlisted video plays only with its hash, which the player takes as h=.
+      const query = trimObject({ h: element.getAttribute('videohash') }, Boolean)
+
+      return composeVimeoUrl(id, query, start)
     },
   },
 })
@@ -73,7 +77,7 @@ export const rebuildLiteVideoEmbeds: DomTransform = () => (document) => {
       params.list = playlistId
     }
 
-    const iframe = createIframe(document, source.compose(segment, params))
+    const iframe = createIframe(document, source.compose(segment, params, element))
 
     // paulirish's lite-youtube-embed names the video in `title`.
     const videoTitle = element.getAttribute('videotitle') ?? element.getAttribute('title')
