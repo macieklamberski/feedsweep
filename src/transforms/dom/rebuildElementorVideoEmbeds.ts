@@ -1,4 +1,4 @@
-import { toMap } from 'trousse'
+import { addMissingScheme, toMap } from 'trousse'
 import { readDailymotionEmbedSrc } from '../../embeds/dailymotion.js'
 import { readVideopressEmbedSrc } from '../../embeds/videopress.js'
 import { readVimeoEmbedSrc } from '../../embeds/vimeo.js'
@@ -16,13 +16,10 @@ const iframeSources = toMap({
 
 // Elementor's video widget ships an empty player div with the url only in a settings JSON.
 // Elementor's own script reads the url with the scheme optional, so a publisher who pasted
-// `youtube.com/watch?v={id}` gets a player on the page.
-const schemeRegex = /^[a-z][a-z0-9+.-]*:|^\/\//i
-
-// The url parser drops the whitespace a pasted url can open with, so the scheme is looked for past
-// it.
+// `youtube.com/watch?v={id}` gets a player on the page. The url parser drops the whitespace a
+// pasted url can open with, so the scheme is added past it.
 const readLink = (link: string): string => {
-  return schemeRegex.test(link.trim()) ? link : `https://${link.trim()}`
+  return addMissingScheme(link.trim())
 }
 
 // A self-hosted source ships server-side as a real <video>, so only the embed sources are read.

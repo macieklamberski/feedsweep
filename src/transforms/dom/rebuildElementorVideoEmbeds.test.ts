@@ -144,6 +144,21 @@ describeForEachParser('rebuildElementorVideoEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should leave a settings url with no host before its path', async () => {
+    const value = html`
+      <div
+        class="elementor-widget elementor-widget-video"
+        data-settings='{"youtube_url":"watch?v=DkIIn89qNP8","video_type":"youtube"}'
+      >
+        <div class="elementor-widget-container">
+          <div class="elementor-video"></div>
+        </div>
+      </div>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should leave a settings url that names a path on the publisher site', async () => {
     const value = html`
       <div
