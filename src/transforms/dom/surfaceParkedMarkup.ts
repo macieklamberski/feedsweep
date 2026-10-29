@@ -29,11 +29,6 @@ const decodeBase64 = (value: string): string | undefined => {
   } catch {}
 }
 
-// The parser has already decoded the entities, which are the only encoding the payload carries.
-const keepAsWritten = (value: string): string => {
-  return value
-}
-
 const parkedCarriers = [
   // A lazy loader's load-later div, which holds the embed percent-encoded and renders nothing
   // itself.
@@ -55,11 +50,11 @@ const parkedCarriers = [
 
   // Squarespace's video block wrapper, which holds the player iframe entity-encoded until
   // Squarespace's script draws it. A wrapper the feed left unclosed holds the rest of the post.
-  // A copy of the block with its classes stripped keeps only the two attributes.
+  // A copy of the block with its classes stripped keeps only the two attributes. The parser has
+  // already decoded the entities, which are the only encoding the payload carries.
   {
     selector: '.sqs-video-wrapper[data-html], div[data-provider-name][data-html]',
     attribute: 'data-html',
-    decode: keepAsWritten,
     hasOwnContent: true,
   },
 ]
@@ -80,7 +75,7 @@ export const surfaceParkedMarkup: DomTransform = (context) => async (document) =
         continue
       }
 
-      const markup = decode(encoded)
+      const markup = decode ? decode(encoded) : encoded
 
       if (markup === undefined) {
         continue
