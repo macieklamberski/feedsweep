@@ -1,6 +1,6 @@
 import type { DomTransform, TransformContext, UrlPattern } from '../../types.js'
 import { attr, removeWithEmptyWrappers } from '../../utils/dom.js'
-import { buildMediaKey, enclosureMarker } from '../../utils/enclosures.js'
+import { buildMediaFingerprint, enclosureMarker } from '../../utils/enclosures.js'
 import { findPosterEvidence, getVideoThumbnail } from '../../utils/images.js'
 import { isUsableSrc, matchesUrlPattern, prepareUrl } from '../../utils/urls.js'
 import { updateEmbedPlaceholder } from '../../utils/widgets.js'
@@ -30,24 +30,24 @@ const videoPlayers: Array<UrlPattern> = [
 
 const playerSelector = '[data-embed-src], iframe[src], video'
 
-const getFileKeys = (player: Element, context: TransformContext): Array<string> => {
+const getFileFingerprints = (player: Element, context: TransformContext): Array<string> => {
   return [player, ...player.querySelectorAll('source')]
-    .map((file) => buildMediaKey(file, context))
+    .map((file) => buildMediaFingerprint(file, context))
     .filter(Boolean)
 }
 
 // An injected enclosure that repeats a body player: stripDuplicateEnclosures removes that copy
 // later, with any poster set on it.
 const findRepeats = (players: Array<Element>, context: TransformContext): Set<Element> => {
-  const bodyKeys = new Set(
+  const bodyFingerprints = new Set(
     players
       .filter((player) => !player.hasAttribute(enclosureMarker))
-      .flatMap((player) => getFileKeys(player, context)),
+      .flatMap((player) => getFileFingerprints(player, context)),
   )
   const repeats = players.filter((player) => {
     return (
       player.hasAttribute(enclosureMarker) &&
-      getFileKeys(player, context).some((key) => bodyKeys.has(key))
+      getFileFingerprints(player, context).some((fingerprint) => bodyFingerprints.has(fingerprint))
     )
   })
 
