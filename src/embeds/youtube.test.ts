@@ -70,6 +70,9 @@ const videoUrls = [
   '//www.youtube.com/watch?v=dQw4w9WgXcQ',
   // The stray quote Steam news leaks into embed srcs.
   'https://www.youtube-nocookie.com/embed/"dQw4w9WgXcQ?fs=1&rel=0',
+  // The slash a share link carries before the id, which YouTube collapses.
+  'https://youtube.com/watch?v=/dQw4w9WgXcQ',
+  'https://youtube.com/watch?v=/dQw4w9WgXcQ?feature=share',
 ]
 
 describe('extractVideoId', () => {

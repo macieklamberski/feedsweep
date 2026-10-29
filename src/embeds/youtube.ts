@@ -35,8 +35,9 @@ const safeVideoIdRegex = /^[a-zA-Z0-9_-]{11}$/
 
 // Steam feeds leak a bbcode quote into the src as /embed/"{id}, and the video drops without it.
 // The quote reaches the id as a literal `"` from a param or percent-encoded `%22` from a path
-// segment.
-const strayLeadingQuoteRegex = /^(?:%22|")/
+// segment. `watch?v=/{id}` carries a slash the same way: Elementor builds `/embed//{id}` from it,
+// and YouTube collapses the slash and plays the video.
+const strayLeadingMarkRegex = /^(?:%22|"|\/)/
 
 // `videoseries` and `live_stream` are YouTube embed path words, and each is eleven legal id
 // characters.
@@ -146,7 +147,7 @@ export const extractVideoId = (url: URL | undefined): string | undefined => {
   ]
 
   return candidates
-    .map((candidate) => candidate?.replace(strayLeadingQuoteRegex, ''))
+    .map((candidate) => candidate?.replace(strayLeadingMarkRegex, ''))
     .find((candidate) => !!candidate && isVideoId(candidate))
 }
 
