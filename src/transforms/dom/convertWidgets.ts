@@ -1,5 +1,5 @@
 import { isSoundcloudStream } from '../../embeds/soundcloud.js'
-import type { DomTransform, EmbedResolverResult, WidgetResolver } from '../../types.js'
+import type { DomTransform, WidgetResolver } from '../../types.js'
 import { attr, isElement, isNonWhitespaceText } from '../../utils/dom.js'
 import { cleanUnclaimedUrl, flashFileRegex, resolveOrDropUrl } from '../../utils/urls.js'
 import {
@@ -16,13 +16,15 @@ import {
   prepareEmbedMetadata,
   prepareMediaMetadata,
   readCarrierUrl,
+  readPlayer,
   resolveEmbedProbe,
+  toPlayerKey,
 } from '../../utils/widgets.js'
 
 type PageMedia = {
   media: Element
   frame: Element
-  embed: EmbedResolverResult
+  player: string | undefined
 }
 
 // A WordPress video shortcode or a hand-written <video> or <audio> can name a platform's page,
@@ -59,7 +61,7 @@ const readPageMedia = async (
       return
     }
 
-    found.push({ media, frame, embed })
+    found.push({ media, frame, player: toPlayerKey(embed) })
   }
 
   // A resolver that claims the element itself reads it in the tiers below. The copy keeps a
@@ -162,20 +164,20 @@ export const convertWidgets: DomTransform = (context) => {
     }
 
     // A post that also frames the same video or file already plays it, so the dead element goes.
-    const framedKeys = new Set<string>()
+    const framedPlayers: Array<string> = []
 
     if (pageMedia.length) {
       for (const frame of document.querySelectorAll(embedCarrierSelector)) {
-        const embed = await resolveEmbedProbe(frame.cloneNode(true) as Element, widgetResolvers)
+        const player = await readPlayer(frame, widgetResolvers)
 
-        if (embed) {
-          framedKeys.add(`${embed.provider}/${embed.id}`)
+        if (player) {
+          framedPlayers.push(player)
         }
       }
     }
 
-    for (const { media, frame, embed } of pageMedia) {
-      if (framedKeys.has(`${embed.provider}/${embed.id}`)) {
+    for (const { media, frame, player } of pageMedia) {
+      if (player && framedPlayers.includes(player)) {
         media.remove()
         continue
       }
