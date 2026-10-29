@@ -13,6 +13,7 @@ import { convertEmojis } from '../transforms/dom/convertEmojis.js'
 import { convertGiphyEmbeds } from '../transforms/dom/convertGiphyEmbeds.js'
 import { convertLazyImageContainers } from '../transforms/dom/convertLazyImageContainers.js'
 import { convertNoteEmbeds } from '../transforms/dom/convertNoteEmbeds.js'
+import { convertParkedMediaContainers } from '../transforms/dom/convertParkedMediaContainers.js'
 import { convertSmartframeEmbeds } from '../transforms/dom/convertSmartframeEmbeds.js'
 import { convertTradingEconomicsEmbeds } from '../transforms/dom/convertTradingEconomicsEmbeds.js'
 import { convertUcozSpoilerButtons } from '../transforms/dom/convertUcozSpoilerButtons.js'
@@ -50,6 +51,7 @@ import { rebuildElementorVideoEmbeds } from '../transforms/dom/rebuildElementorV
 import { rebuildEmbedlyEmbeds } from '../transforms/dom/rebuildEmbedlyEmbeds.js'
 import { rebuildEmbedPlusEmbeds } from '../transforms/dom/rebuildEmbedPlusEmbeds.js'
 import { rebuildEmbedPrivacyLinks } from '../transforms/dom/rebuildEmbedPrivacyLinks.js'
+import { rebuildEmbettyVideoEmbeds } from '../transforms/dom/rebuildEmbettyVideoEmbeds.js'
 import { rebuildExternalVideoEmbeds } from '../transforms/dom/rebuildExternalVideoEmbeds.js'
 import { rebuildGettyImagesEmbeds } from '../transforms/dom/rebuildGettyImagesEmbeds.js'
 import { rebuildGofundmeEmbeds } from '../transforms/dom/rebuildGofundmeEmbeds.js'
@@ -161,6 +163,7 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // convertWidgets, which claims the frame this rebuilds.
   rebuildWordpressEmbeds,
   rebuildLiteVideoEmbeds,
+  rebuildEmbettyVideoEmbeds,
   rebuildLyteEmbeds,
   rebuildRocketYoutubePreviews,
   rebuildVideoJsEmbeds,
@@ -345,6 +348,9 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   stripWordBreaks,
   linkifyUrls,
   markTimestamps,
+
+  // Runs before convertWidgets, which replaces the iframes its playable guard relies on.
+  convertParkedMediaContainers,
   convertWidgets,
   injectEnclosures,
 

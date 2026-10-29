@@ -116,6 +116,30 @@ describeForEachParser('rebuildLyteEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should rebuild the feed thumbnail of a WebP poster', async () => {
+    const value = html`
+      <a href="https://example.com/blog/2013/11/18/buchtrailer/"><img
+          src="https://i.ytimg.com/vi_webp/XpMGiFb1488/hqdefault.webp"
+          alt="YouTube Video"
+        ></a>
+    `
+    const expected = '<iframe src="https://www.youtube.com/embed/XpMGiFb1488"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should rebuild the feed thumbnail of a poster on img.youtube.com', async () => {
+    const value = html`
+      <a href="https://example.com/blog/2013/11/18/buchtrailer/"><img
+          src="https://img.youtube.com/vi/XpMGiFb1488/hqdefault.jpg"
+          alt="YouTube Video"
+        ></a>
+    `
+    const expected = '<iframe src="https://www.youtube.com/embed/XpMGiFb1488"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should rebuild the feed thumbnail served through lyteCache.php', async () => {
     const value = html`
       <figure class="wp-block-embed-youtube wp-block-embed"><a href="https://charisma-magazin.eu/2026/05/25/trainingstage/"><img

@@ -1,13 +1,14 @@
 import type { TransformContext } from '../types.js'
 import {
   defaultDeferredIframeSources,
+  defaultLazyAltAttributes,
   defaultLazyIframeAttributes,
   defaultLazySrcAttributes,
   defaultLazySrcsetAttributes,
   defaultMediaSrcAttributes,
 } from './attributes.js'
 import { defaultFieldCleaners } from './cleaners.js'
-import { defaultAvatarImageHosts, defaultTrackingHosts } from './hosts.js'
+import { defaultAvatarImageHosts, defaultTrackingUrls } from './hosts.js'
 import { defaultEmojiResolvers, defaultWidgetResolvers } from './resolvers.js'
 import {
   defaultNonContentSelectors,
@@ -22,9 +23,10 @@ export const defaultContext: TransformContext = {
   mediaSrcAttributes: defaultMediaSrcAttributes,
   lazySrcAttributes: defaultLazySrcAttributes,
   lazySrcsetAttributes: defaultLazySrcsetAttributes,
+  lazyAltAttributes: defaultLazyAltAttributes,
   lazyIframeAttributes: defaultLazyIframeAttributes,
   deferredIframeSources: defaultDeferredIframeSources,
-  trackingHosts: defaultTrackingHosts,
+  trackingUrls: defaultTrackingUrls,
   emojiResolvers: defaultEmojiResolvers,
   avatarImageHosts: defaultAvatarImageHosts,
   nonContentSelectors: defaultNonContentSelectors,

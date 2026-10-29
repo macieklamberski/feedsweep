@@ -80,6 +80,22 @@ export const mastodonEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
+// Embetty's embetty-mastodon names the status url in `status` and renders nothing until its
+// script fetches the post from embetty's own server.
+// See: https://github.com/heiseonline/embetty/blob/master/embetty/src/embed/mastodon.ts.
+export const mastodonEmbettyEmbedResolver = createMarkupEmbedResolver(
+  'embetty-mastodon[status]',
+  (element) => {
+    const status = parseMastodonStatus(attr(element, 'status') ?? '')
+
+    if (!status) {
+      return
+    }
+
+    return composeEmbedResult(status)
+  },
+)
+
 // The player reports its height only when asked: post `setHeight` into the frame once it has
 // loaded and it answers with the same type and the rendered height. The frame is served by the
 // publisher's instance, so it has no origin to name here and the reader matches the frame's own.

@@ -203,10 +203,30 @@ export const twitterAmpEmbedResolver = createMarkupEmbedResolver(
   extractTweet,
 )
 
+// Embetty's embetty-tweet names the tweet in `status` and renders nothing until its script
+// fetches the tweet from embetty's own server.
+// See: https://github.com/heiseonline/embetty/blob/master/embetty/src/embed/tweet.ts.
+export const twitterEmbettyEmbedResolver = createMarkupEmbedResolver(
+  'embetty-tweet[status]',
+  (element) => {
+    const id = keepIfMatches(attr(element, 'status'), digitsRegex)
+
+    if (!id) {
+      return
+    }
+
+    return composeEmbed({ handle: '', id }, {})
+  },
+)
+
+// The 2018 `TwitterToDOM` payload names its fields `html` and `author_name`, where the later ones
+// write `full_text` and `name`.
 type SubstackTweetAttrs = {
   url?: string
   full_text?: string
+  html?: string
   name?: string
+  author_name?: string
   username?: string
   profile_image_url?: string
   date?: string
@@ -222,6 +242,10 @@ const readTweetText = (element: Element, fullText: string | undefined): string |
 
   const container = element.ownerDocument.createElement('div')
   setInnerHtml(container, fullText)
+
+  for (const lineBreak of container.querySelectorAll('br')) {
+    lineBreak.replaceWith('\n')
+  }
 
   return text(container)
 }
@@ -246,7 +270,7 @@ const readPhotoUrl = (photos: SubstackTweetAttrs['photos']): string | undefined 
 }
 
 const readSubstackAuthor = (attrs: SubstackTweetAttrs): string | undefined => {
-  const name = attrs.name?.trim()
+  const name = (attrs.name ?? attrs.author_name)?.trim()
 
   if (name) {
     return name
@@ -275,7 +299,7 @@ const extractSubstackTweet = (element: Element): EmbedResolverResult | undefined
   }
 
   return composeEmbed(status, {
-    description: readTweetText(element, attrs.full_text),
+    description: readTweetText(element, attrs.full_text ?? attrs.html),
     author: readSubstackAuthor(attrs),
     avatar: attrs.profile_image_url?.trim() || undefined,
     date: attrs.date?.trim() || undefined,
@@ -283,11 +307,12 @@ const extractSubstackTweet = (element: Element): EmbedResolverResult | undefined
   })
 }
 
-// Substack's tweet component: an empty div whose data-attrs JSON carries the whole tweet.
+// Substack's tweet component: a div whose data-attrs JSON carries the whole tweet. The earlier
+// `div.tweet` holds a static copy of the tweet and no player.
 export const twitterSubstackEmbedResolver = createMarkupEmbedResolver(
   // Sanitizers that strip classes keep data attributes, so some feeds carry the div with the
   // component name alone.
-  'div.twitter-embed[data-attrs], div[data-component-name="Twitter2ToDOM"]',
+  'div.twitter-embed[data-attrs], div.tweet[data-attrs], div[data-component-name="Twitter2ToDOM"]',
   extractSubstackTweet,
 )
 

@@ -1,4 +1,4 @@
-import { composeGofundmeWidgetUrl } from '../../embeds/gofundme.js'
+import { composeEmbedUrl } from '../../embeds/gofundme.js'
 import type { DomTransform } from '../../types.js'
 import { attr, isEmptyElement } from '../../utils/dom.js'
 import { createIframe } from '../../utils/widgets.js'
@@ -16,7 +16,7 @@ export const rebuildGofundmeEmbeds: DomTransform = () => (document) => {
     }
 
     // `gfm` also abbreviates GitHub Flavored Markdown, so the class alone does not name GoFundMe.
-    const src = composeGofundmeWidgetUrl(attr(element, 'data-url'))
+    const src = composeEmbedUrl(attr(element, 'data-url'))
 
     if (!src) {
       continue
