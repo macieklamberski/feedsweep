@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'bun:test'
-import { defaultTrackingHosts } from '../../defaults.js'
+import { defaultTrackingUrls } from '../../defaults.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { removeTrackingPixels } from './removeTrackingPixels.js'
+
+const pxPathRegex = /^\/px(\/|$)/
 
 describeForEachParser('removeTrackingPixels', (parseHtml) => {
   const transform = (value: string, context: TransformContext = baseContext) => {
@@ -228,7 +230,7 @@ describeForEachParser('removeTrackingPixels', (parseHtml) => {
   describe('host-based detection', () => {
     // Iterates the real default list, so every entry is exercised and a new entry
     // is covered automatically.
-    it.each(defaultTrackingHosts)('should remove images from %s', async (host) => {
+    it.each(defaultTrackingUrls)('should remove images from $host', async ({ host }) => {
       const value = `<img src="https://${host}/t.gif?id=abc">`
 
       expect(await transform(value)).toEqualHtml('')
@@ -315,6 +317,49 @@ describeForEachParser('removeTrackingPixels', (parseHtml) => {
       const value = '<img src="https://notfeedsportal.com/photo.jpg">'
 
       expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
+  describe('tracking url entries', () => {
+    const pathContext: TransformContext = {
+      ...baseContext,
+      trackingUrls: [{ host: 'example.com', path: pxPathRegex }],
+    }
+
+    it('should remove an image on a subdomain whose path matches', async () => {
+      const value = '<img src="https://www.example.com/px?id=1">'
+
+      expect(await transform(value, pathContext)).toEqualHtml('')
+    })
+
+    it('should remove an image whose path matches with a trailing slash', async () => {
+      const value = '<img src="https://cdn.example.com/px/">'
+
+      expect(await transform(value, pathContext)).toEqualHtml('')
+    })
+
+    it('should keep an image whose path only starts with the same letters', async () => {
+      const value = '<img src="https://example.com/pxl.gif">'
+
+      expect(await transform(value, pathContext)).toEqualHtml(value)
+    })
+
+    it('should keep an image whose path does not match', async () => {
+      const value = '<img src="https://example.com/img/a.jpg">'
+
+      expect(await transform(value, pathContext)).toEqualHtml(value)
+    })
+
+    it('should keep a content-sized image whose path matches', async () => {
+      const value = html`
+        <img
+          src="https://example.com/px/banner.png"
+          width="600"
+          height="400"
+        >
+      `
+
+      expect(await transform(value, pathContext)).toEqualHtml(value)
     })
   })
 
