@@ -171,6 +171,10 @@ const specimens: Record<string, string | [string, string]> = {
     '<a href="https://digg.com/submit?url=https%3A%2F%2Fexample.com%2Fa&title=A+post"><img src="https://digg.com/img/badges/100x20-digg-button.png" alt="Digg"></a>',
   'img[src*="digg.com/img/badges" i]':
     '<img src="https://digg.com/img/badges/100x20-digg-button.png" alt="Digg this">',
+  'a[href*="feeds.wordpress.com/1.0/" i]:has(img[src*="feeds.wordpress.com/1.0/" i])':
+    '<a rel="nofollow" href="http://feeds.wordpress.com/1.0/gocomments/example.wordpress.com/232/" id="link-id118a1950"><img alt="" border="0" src="http://feeds.wordpress.com/1.0/comments/example.wordpress.com/232/"></a>',
+  'img[src*="feeds.wordpress.com/1.0/" i]':
+    '<img alt="" border="0" src="http://feeds.wordpress.com/1.0/categories/example.wordpress.com/1/">',
   'iframe[src*="plusone.google.com" i]':
     '<iframe allowtransparency="true" frameborder="0" scrolling="no" src="https://plusone.google.com/_/+1/fastbutton?bsv&size=medium&hl=en-US&url=https%3A%2F%2Fexample.com%2Fa"></iframe>',
   'iframe[src*="tunein.com/embed/follow/" i]':
@@ -878,6 +882,22 @@ describeForEachParser('stripNonContentElements', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should keep a category link written onto the WordPress.com feed button path', async () => {
+      const value = html`
+        <p>Filed under: <a href="http://feeds.wordpress.com/1.0/gocomments/example.wordpress.com/208371/">classic hacks</a>, <a href="https://example.com/category/misc-hacks/">misc hacks</a></p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep an image on a blog whose name ends in feeds', async () => {
+      const value = html`
+        <a href="https://examplefeeds.wordpress.com/2016/03/photo/"><img src="https://examplefeeds.wordpress.com/wp-content/uploads/2016/03/photo.jpg"></a>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it('should keep a PayPal button image that links to its target', async () => {
       const value = html`
         <a href="https://www.paypal.com/donate/?hosted_button_id=2BXZQLFUKNZ3Y">
@@ -1064,6 +1084,24 @@ describeForEachParser('stripNonContentElements through the pipeline', (parseHtml
     })
 
     expect(result).toEqualHtml('')
+  })
+
+  it('should strip the WordPress.com feed button row and the paragraph it leaves empty', async () => {
+    const value = html`
+      <p>Thanks for reading.</p>
+      <p>
+        <img alt="" border="0" src="http://feeds.wordpress.com/1.0/categories/example.wordpress.com/232/">
+        <img alt="" border="0" src="http://feeds.wordpress.com/1.0/tags/example.wordpress.com/232/">
+        <a rel="nofollow" href="http://feeds.wordpress.com/1.0/gocomments/example.wordpress.com/232/" id="link-id118a1950"><img alt="" border="0" src="http://feeds.wordpress.com/1.0/comments/example.wordpress.com/232/"></a>
+        <a rel="nofollow" href="http://feeds.wordpress.com/1.0/godelicious/example.wordpress.com/232/" id="link-id148ffb08"><img alt="" border="0" src="http://feeds.wordpress.com/1.0/delicious/example.wordpress.com/232/"></a>
+      </p>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+
+    expect(result).toEqualHtml('<p>Thanks for reading.</p>')
   })
 
   it('should strip a reCAPTCHA fallback frame from its noscript', async () => {
