@@ -532,6 +532,12 @@ describeForEachParser('rebuildLiteVideoEmbeds', (parseHtml) => {
     expect(result).toEqualHtml(expected)
   })
 
+  it('should leave a mihdan element whose player-src is not a url', async () => {
+    const value = '<lite-youtube video-id="qdW9MLBu0rI" player-src="qdW9MLBu0rI"></lite-youtube>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should leave a mihdan element that already holds its player', async () => {
     const value = html`
       <lite-youtube
