@@ -283,6 +283,156 @@ describeForEachParser('rebuildLiteVideoEmbeds', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
+  it('should carry the poster lite-youtube-embed paints from style', async () => {
+    const value = html`
+      <lite-youtube
+        videoid="DrqgnmcDvpk"
+        style="background-image: url('https://example.com/images2026/IberiaStarlink.webp');"
+      ></lite-youtube>
+    `
+    const expected = html`
+      <iframe
+        src="https://www.youtube.com/embed/DrqgnmcDvpk"
+        data-thumbnail="https://example.com/images2026/IberiaStarlink.webp"
+      ></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should carry a YouTube poster of the quality the author picked in style', async () => {
+    const value = html`
+      <lite-youtube
+        videoid="mSmMJQdEiVo"
+        style="background-image: url('https://i.ytimg.com/vi/mSmMJQdEiVo/maxresdefault.jpg');"
+      ></lite-youtube>
+    `
+    const expected = html`
+      <iframe
+        src="https://www.youtube.com/embed/mSmMJQdEiVo"
+        data-thumbnail="https://i.ytimg.com/vi/mSmMJQdEiVo/maxresdefault.jpg"
+      ></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should carry the poster lite-youtube shows from its image slot', async () => {
+    const value = html`
+      <lite-youtube
+        videoid="EDzZjBXOI8U"
+        videotitle="Elon Musk's Grok and the Mass Undressing Scandal"
+        posterloading="lazy"
+      >
+        <img
+          src="https://i.ytimg.com/vi_webp/EDzZjBXOI8U/hqdefault.webp"
+          alt="Elon Musk's Grok and the Mass Undressing Scandal"
+          slot="image"
+        >
+      </lite-youtube>
+    `
+    const expected = html`
+      <iframe
+        src="https://www.youtube.com/embed/EDzZjBXOI8U"
+        title="Elon Musk's Grok and the Mass Undressing Scandal"
+        data-thumbnail="https://i.ytimg.com/vi_webp/EDzZjBXOI8U/hqdefault.webp"
+      ></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should prefer the image slot over a style poster', async () => {
+    const value = html`
+      <lite-youtube
+        videoid="EDzZjBXOI8U"
+        style="background-image: url('https://example.com/poster.jpg');"
+      >
+        <img
+          src="https://example.org/slotted-poster.jpg"
+          slot="image"
+        >
+      </lite-youtube>
+    `
+    const expected = html`
+      <iframe
+        src="https://www.youtube.com/embed/EDzZjBXOI8U"
+        data-thumbnail="https://example.org/slotted-poster.jpg"
+      ></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should carry the poster lite-vimeo-embed paints from style', async () => {
+    const value = html`
+      <lite-vimeo
+        videoid="357274789"
+        style="background-image: url('https://i.vimeocdn.com/video/810965406.webp?mw=1600&mh=900&q=70');"
+      ></lite-vimeo>
+    `
+    const expected = html`
+      <iframe
+        src="https://player.vimeo.com/video/357274789"
+        data-thumbnail="https://i.vimeocdn.com/video/810965406.webp?mw=1600&mh=900&q=70"
+      ></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave an image that fills no slot to the platform poster', async () => {
+    const value = html`
+      <lite-youtube videoid="_hjRvZYkAgA">
+        <img
+          src="https://i.ytimg.com/vi_webp/_hjRvZYkAgA/maxresdefault.webp"
+          alt="_hjRvZYkAgA thumbnail"
+          class="lty-thumbnail"
+        >
+      </lite-youtube>
+    `
+    const expected = '<iframe src="https://www.youtube.com/embed/_hjRvZYkAgA"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a style poster held in a custom property unread', async () => {
+    const value = html`
+      <lite-youtube
+        videoid="o27oYUtXX0k"
+        style="background-image: var(--yt-poster-img-url); --yt-poster-img-url-lazy: url('https://example.com/poster/auto/jpeg/')"
+      ></lite-youtube>
+    `
+    const expected = '<iframe src="https://www.youtube.com/embed/o27oYUtXX0k"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should resolve a relative style poster into the placeholder thumbnail', async () => {
+    const value = html`
+      <lite-youtube
+        videoid="Dk9QdDcWJIE"
+        style="background-image: url('/hqdefault_6006595100789835371.jpg')"
+      ></lite-youtube>
+    `
+    const expected = html`
+      <div
+        data-embed-url="https://www.youtube.com/watch?v=Dk9QdDcWJIE"
+        data-embed-thumbnail="https://example.com/hqdefault_6006595100789835371.jpg"
+        data-embed-src="https://www.youtube.com/embed/Dk9QdDcWJIE"
+        data-embed-ratio="16/9"
+        data-embed-provider="youtube"
+        data-embed-id="Dk9QdDcWJIE"
+      ></div>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/blog/post/',
+    })
+
+    expect(result).toEqualHtml(expected)
+  })
+
   it('should carry videotitle into the iframe title', async () => {
     const value = html`
       <lite-youtube

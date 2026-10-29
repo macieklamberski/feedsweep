@@ -2,6 +2,8 @@ import { encodePathSegment, toMap, trimObject } from 'trousse'
 import { composeEmbedUrl as composeVimeoUrl } from '../../embeds/vimeo.js'
 import { composeEmbedUrl as composeYoutubeUrl, youtubeEmbedParams } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
+import { attr } from '../../utils/dom.js'
+import * as styles from '../../utils/styles.js'
 import { digitsRegex, pickQueryParams } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
 
@@ -44,6 +46,19 @@ const readAttribute = (element: Element, name: string): string => {
   return element.getAttribute(name)?.replace(escapedQuotesRegex, '$1') ?? ''
 }
 
+// The poster the component shows in place of its own. justinribeiro's lite-youtube shows what
+// fills its `image` slot, and paulirish's lite-youtube-embed and luwes's lite-vimeo-embed keep a
+// background image the author set in `style`, painting their own only when none is set.
+const readPoster = (element: Element): string | undefined => {
+  const slotted = attr(element.querySelector('img[slot="image"]'), 'src')
+
+  if (slotted) {
+    return slotted
+  }
+
+  return styles.bgImage(element)
+}
+
 // lite-youtube and lite-vimeo are web components that only build their iframe with JS on click.
 export const rebuildLiteVideoEmbeds: DomTransform = () => (document) => {
   const selector = 'lite-youtube[videoid], lite-youtube[playlistid], lite-vimeo[videoid]'
@@ -83,6 +98,12 @@ export const rebuildLiteVideoEmbeds: DomTransform = () => (document) => {
     const videoTitle = element.getAttribute('videotitle') ?? element.getAttribute('title')
     if (videoTitle) {
       iframe.setAttribute('title', videoTitle)
+    }
+
+    const poster = readPoster(element)
+
+    if (poster) {
+      iframe.setAttribute('data-thumbnail', poster)
     }
 
     element.replaceWith(iframe)
