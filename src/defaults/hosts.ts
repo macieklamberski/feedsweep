@@ -1,8 +1,8 @@
-import type { TrackingUrl } from '../types.js'
+import type { UrlPattern } from '../types.js'
 
 // Images served from these hosts are tracking. An entry with a `path` matches only the
 // pathnames its regex tests true, for a host that also serves content images.
-export const defaultTrackingUrls: Array<TrackingUrl> = [
+export const defaultTrackingUrls: Array<UrlPattern> = [
   { host: 'feedsportal.com' }, // Postmedia/Newsfutures feed-syndication pixels (/c/<id>/<…>.gif).
   { host: 'stats.wordpress.com' }, // WordPress.com / Jetpack Stats pixels.
   { host: 'pixel.wp.com' }, // WordPress.com / Jetpack Stats pixels.
