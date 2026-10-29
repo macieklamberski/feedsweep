@@ -1,6 +1,6 @@
 import type { DomTransform } from '../../types.js'
 import { removeWithEmptyWrappers, walkElements } from '../../utils/dom.js'
-import { buildMediaKey, enclosureMarker } from '../../utils/enclosures.js'
+import { buildMediaFingerprint, enclosureMarker } from '../../utils/enclosures.js'
 
 const existingMediaSelector = 'audio[src], video[src], source[src], img[src], [data-embed-src]'
 
@@ -20,21 +20,22 @@ export const stripDuplicateEnclosures: DomTransform = (context) => (document) =>
     return
   }
 
-  const contentKeys = new Set<string>()
+  const contentFingerprints = new Set<string>()
 
   for (const element of document.querySelectorAll(existingMediaSelector)) {
     if (element.hasAttribute(enclosureMarker)) {
       continue
     }
 
-    contentKeys.add(buildMediaKey(element, context))
+    contentFingerprints.add(buildMediaFingerprint(element, context))
   }
 
   for (const element of injected) {
-    const key = buildMediaKey(element, context)
+    const fingerprint = buildMediaFingerprint(element, context)
 
-    // A file placeholder carries neither `src` nor `data-embed-src`, so it has no key to match.
-    if (key && contentKeys.has(key)) {
+    // A file placeholder carries neither `src` nor `data-embed-src`, so it has no fingerprint to
+    // match.
+    if (fingerprint && contentFingerprints.has(fingerprint)) {
       removeWithEmptyWrappers(element)
       continue
     }
