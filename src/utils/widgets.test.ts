@@ -2210,6 +2210,22 @@ describeForEachParser('createCaptionedFigure', (parseHtml) => {
 
     expect(figure.outerHTML).toEqualHtml(expected)
   })
+
+  it('should move caption nodes into the figcaption with their markup', () => {
+    const document = parseHtml('<p>Shot by <a href="https://example.com/">Ana</a></p>')
+    const cell = document.querySelector('p')
+    const image = createImage(document, { src: 'https://cdn.example.com/photo.jpg' })
+    const figure = createCaptionedFigure(document, image, ...(cell?.childNodes ?? []))
+    const expected = html`
+      <figure>
+        <img src="https://cdn.example.com/photo.jpg" />
+        <figcaption>Shot by <a href="https://example.com/">Ana</a></figcaption>
+      </figure>
+    `
+
+    expect(figure.outerHTML).toEqualHtml(expected)
+    expect(cell?.childNodes.length).toBe(0)
+  })
 })
 
 describeForEachParser('createLinkedImage', (parseHtml) => {

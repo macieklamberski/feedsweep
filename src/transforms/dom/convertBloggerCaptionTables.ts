@@ -1,5 +1,6 @@
 import type { DomTransform } from '../../types.js'
 import { hasText, isElement, isWhitespaceText, mediaSelector } from '../../utils/dom.js'
+import { createCaptionedFigure } from '../../utils/widgets.js'
 
 const jumpTargetSelector = '[id], [name]'
 
@@ -97,11 +98,7 @@ export const convertBloggerCaptionTables: DomTransform = () => {
         continue
       }
 
-      const figure = document.createElement('figure')
-      const figcaption = document.createElement('figcaption')
-      figcaption.append(...captionCell.childNodes)
-      figure.append(image, figcaption)
-      table.replaceWith(figure)
+      table.replaceWith(createCaptionedFigure(document, image, ...captionCell.childNodes))
     }
   }
 }

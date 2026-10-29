@@ -415,15 +415,16 @@ export const createImage = (document: Document, fields: ImageFields): HTMLElemen
 }
 
 // An <img>, an <audio> and a <video> have nowhere of their own to show a human-readable caption.
+// The caption is text, or the nodes of a caption the feed wrote with its own markup.
 export const createCaptionedFigure = (
   document: Document,
-  element: HTMLElement,
-  caption: string,
+  element: Element,
+  ...caption: Array<Node | string>
 ): HTMLElement => {
   const figure = document.createElement('figure')
   const figcaption = document.createElement('figcaption')
 
-  figcaption.textContent = caption
+  figcaption.append(...caption)
   figure.append(element, figcaption)
 
   return figure
