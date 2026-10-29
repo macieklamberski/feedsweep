@@ -475,6 +475,39 @@ describeForEachParser('YouTube', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
+  it('should convert the react-lite-youtube-embed facade into the player placeholder', async () => {
+    const value = html`
+      <p>Intro</p>
+      <div class="video-container">
+        <article
+          class="yt-lite"
+          data-title="WebdriverIO Tutorials: Snapshot Testing"
+          style="background-image:url(https://i.ytimg.com/vi/wQRGpWX3fsk/hqdefault.jpg);--aspect-ratio:56.25%"
+        >
+          <button
+            type="button"
+            class="lty-playbtn"
+            aria-label="Watch WebdriverIO Tutorials: Snapshot Testing"
+          ></button>
+        </article>
+      </div>
+    `
+    const expected = html`
+      <p>Intro</p>
+      <div
+        data-embed-title="WebdriverIO Tutorials: Snapshot Testing"
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://i.ytimg.com/vi/wQRGpWX3fsk/hqdefault.jpg"
+        data-embed-url="https://www.youtube.com/watch?v=wQRGpWX3fsk"
+        data-embed-id="wQRGpWX3fsk"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/wQRGpWX3fsk"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   it('should keep the playlist of a Drupal oEmbed frame whose inner url escaped its ampersands', async () => {
     const value = html`
       <iframe

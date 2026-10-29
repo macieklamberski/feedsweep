@@ -29,6 +29,12 @@ describeForEachParser('rebuildLiteVideoEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should leave a lite-youtube element with an empty videoid alone', async () => {
+    const value = '<lite-youtube videoid=""></lite-youtube>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should recover a lite-youtube id from quotes the feed escaped twice', async () => {
     const value = '<lite-youtube videoid=\\"k_3pRxdv-cI\\"></lite-youtube>'
     const expected = '<iframe src="https://www.youtube.com/embed/k_3pRxdv-cI"></iframe>'
@@ -77,6 +83,60 @@ describeForEachParser('rebuildLiteVideoEmbeds', (parseHtml) => {
       ></lite-vimeo>
     `
     const expected = '<iframe src="https://player.vimeo.com/video/76979871#t=90s"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should carry the videoStartAt of lite-youtube into the start param', async () => {
+    const value = html`
+      <lite-youtube
+        videoid="thNyy5eYfbc"
+        videotitle="High performance web user interfaces - Google I/O 2016"
+        videoStartAt="475"
+      ></lite-youtube>
+    `
+    const expected = html`
+      <iframe
+        src="https://www.youtube.com/embed/thNyy5eYfbc?start=475"
+        title="High performance web user interfaces - Google I/O 2016"
+      ></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should carry a videoStartAt of 0 as written', async () => {
+    const value = html`
+      <lite-youtube
+        videoid="8ppTpiG0TXM"
+        videoStartAt="0"
+      ></lite-youtube>
+    `
+    const expected = '<iframe src="https://www.youtube.com/embed/8ppTpiG0TXM?start=0"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should carry a videoStartAt in clock form as written', async () => {
+    const value = html`
+      <lite-youtube
+        videoid="t3smBkiGUWw"
+        videoStartAt="1:01"
+      ></lite-youtube>
+    `
+    const expected = '<iframe src="https://www.youtube.com/embed/t3smBkiGUWw?start=1:01"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a videoStartAt on lite-vimeo unread', async () => {
+    const value = html`
+      <lite-vimeo
+        videoid="76979871"
+        videoStartAt="90"
+      ></lite-vimeo>
+    `
+    const expected = '<iframe src="https://player.vimeo.com/video/76979871"></iframe>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })
@@ -163,6 +223,115 @@ describeForEachParser('rebuildLiteVideoEmbeds', (parseHtml) => {
     `
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should carry the title of paulirish lite-youtube-embed into the iframe title', async () => {
+    const value = html`
+      <lite-youtube
+        videoid="ogfYd705cRs"
+        title="Play: Keynote (Google I/O '18)"
+      ></lite-youtube>
+    `
+    const expected = html`
+      <iframe
+        src="https://www.youtube.com/embed/ogfYd705cRs"
+        title="Play: Keynote (Google I/O '18)"
+      ></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should prefer videotitle over title', async () => {
+    const value = html`
+      <lite-youtube
+        videoid="dQw4w9WgXcQ"
+        videotitle="Never Gonna Give You Up"
+        title="Play video"
+      ></lite-youtube>
+    `
+    const expected = html`
+      <iframe
+        src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+        title="Never Gonna Give You Up"
+      ></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should build the playlist player from a playlistid, as the component plays it', async () => {
+    const value = html`
+      <lite-youtube
+        videoid="VLrYOji75Vc"
+        playlistid="PL-G5r6j4GptH5JTveoLTVqpp7w2oc27Q9"
+      ></lite-youtube>
+    `
+    const expected = html`
+      <iframe
+        src="https://www.youtube.com/embed/videoseries?list=PL-G5r6j4GptH5JTveoLTVqpp7w2oc27Q9"
+      ></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should build the playlist player from a playlistid with no videoid', async () => {
+    const value = '<lite-youtube playlistid="PL-G5r6j4GptH5JTveoLTVqpp7w2oc27Q9"></lite-youtube>'
+    const expected = html`
+      <iframe
+        src="https://www.youtube.com/embed/videoseries?list=PL-G5r6j4GptH5JTveoLTVqpp7w2oc27Q9"
+      ></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should carry the start of a playlist into its player', async () => {
+    const value = html`
+      <lite-youtube
+        playlistid="PL-G5r6j4GptH5JTveoLTVqpp7w2oc27Q9"
+        videoStartAt="30"
+      ></lite-youtube>
+    `
+    const expected = html`
+      <iframe
+        src="https://www.youtube.com/embed/videoseries?start=30&list=PL-G5r6j4GptH5JTveoLTVqpp7w2oc27Q9"
+      ></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a playlistid on lite-vimeo unread', async () => {
+    const value = html`
+      <lite-vimeo
+        videoid="76979871"
+        playlistid="PL-G5r6j4GptH5JTveoLTVqpp7w2oc27Q9"
+      ></lite-vimeo>
+    `
+    const expected = '<iframe src="https://player.vimeo.com/video/76979871"></iframe>'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should produce a youtube playlist placeholder end to end', async () => {
+    const value = '<lite-youtube playlistid="PL-G5r6j4GptH5JTveoLTVqpp7w2oc27Q9"></lite-youtube>'
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-url="https://www.youtube.com/playlist?list=PL-G5r6j4GptH5JTveoLTVqpp7w2oc27Q9"
+        data-embed-id="playlist/PL-G5r6j4GptH5JTveoLTVqpp7w2oc27Q9"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/videoseries?list=PL-G5r6j4GptH5JTveoLTVqpp7w2oc27Q9"
+      ></div>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com',
+    })
+
+    expect(result).toEqualHtml(expected)
   })
 
   it('should produce a youtube placeholder end to end', async () => {
