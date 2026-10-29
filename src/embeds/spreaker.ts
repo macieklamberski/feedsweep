@@ -12,8 +12,8 @@ const hosts = ['spreaker.com']
 // An episode player, or a show player that plays the latest episode.
 const embedKinds = { episode_id: 'episode', show_id: 'show' } as const
 
-// Whether the player lists the show's episodes under the one playing, `false` or `show`.
-const playerParams = ['playlist']
+// Whether the player goes on to the next episode of its list when one ends.
+const playerParams = ['playlist-continuous']
 
 const sizes = {
   // The height Spreaker documents in its own embed snippet, `height="200px"`.

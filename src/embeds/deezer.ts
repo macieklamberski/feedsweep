@@ -1,12 +1,4 @@
-import {
-  composeQuery,
-  encodePathSegment,
-  getPathSegments,
-  getQueryParam,
-  isAnyOf,
-  toMap,
-  trimObject,
-} from 'trousse'
+import { encodePathSegment, getPathSegments, getQueryParam, isAnyOf, toMap } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { twoLettersRegex } from '../utils/urls.js'
@@ -45,8 +37,7 @@ const pluginTypes = toMap({
 // and `path=11969917` still a playlist.
 const trackSwfRegex = /^(?:small-widget(?:-v2)?|singlePlayer)\.swf$/i
 
-// `tracklist` is whether the widget lists the tracks under the player.
-type Resource = { type: string; id: string; tracklist?: string }
+type Resource = { type: string; id: string }
 
 const readResource = (url: URL): Resource | undefined => {
   const segments = getPathSegments(url)
@@ -59,22 +50,13 @@ const readResource = (url: URL): Resource | undefined => {
 
   // The current widget, `widget.deezer.com/widget/{theme}/{type}/{id}`.
   if (isAnyOf(route[0], 'widget')) {
-    return {
-      type: route[2]?.toLowerCase() ?? '',
-      id: route[3] ?? '',
-      tracklist: getQueryParam(url.searchParams, 'tracklist'),
-    }
+    return { type: route[2]?.toLowerCase() ?? '', id: route[3] ?? '' }
   }
 
   // The classic plugin player, `deezer.com/plugins/player?type={type}&id={id}`. It redirects to
-  // the current widget, which is minted here directly. Its `playlist` is the switch the widget
-  // calls `tracklist`: the widget ignores `playlist` and hides its list on `tracklist=false`.
+  // the current widget, which is minted here directly.
   if (isAnyOf(route[0], 'plugins') && isAnyOf(route[1], 'player')) {
-    return {
-      type: pluginTypes.get(query('type').toLowerCase()) ?? '',
-      id: query('id'),
-      tracklist: getQueryParam(url.searchParams, 'playlist'),
-    }
+    return { type: pluginTypes.get(query('type').toLowerCase()) ?? '', id: query('id') }
   }
 
   // `deezer.com/embedded/{player}.swf?idSong={id}` and its `swf/singlePlayer.swf` twin.
@@ -99,8 +81,7 @@ export const deezerResolveEmbed: ResolveUrlEmbed = (url, element) => {
     return
   }
 
-  const { type, id, tracklist } = resource
-  const query = composeQuery(trimObject({ tracklist }, Boolean))
+  const { type, id } = resource
 
   return {
     provider,
@@ -108,7 +89,7 @@ export const deezerResolveEmbed: ResolveUrlEmbed = (url, element) => {
     // `api.deezer.com/{type}/{id}`, and the id alone does not say which one.
     id: `${type}/${id}`,
     // The theme is the one Deezer's share dialog writes, whatever the carrier chose.
-    src: `https://widget.deezer.com/widget/dark/${type}/${id}${query}`,
+    src: `https://widget.deezer.com/widget/dark/${type}/${id}`,
     url: `https://www.deezer.com/${type}/${id}`,
     height: deezerHeights.get(type),
     title: attr(element, 'title'),
