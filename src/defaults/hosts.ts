@@ -22,7 +22,7 @@ export const defaultTrackingUrls: Array<TrackingUrl> = [
   { host: 'facebook.com', path: /^\/tr(\/|$)/i }, // Meta Pixel images. The host also serves logos and photos.
   { host: 'taboola.com' }, // Content-recommendation widget pixels.
   { host: 'outbrain.com' }, // Content-recommendation widget pixels.
-  { host: 'linkwithin.com' }, // LinkWithin related-posts widget pixels (/pixel.png).
+  { host: 'linkwithin.com', path: /^\/pixel\.png$/i }, // LinkWithin pixels. lwlink3 wraps post images.
   { host: 'scorecardresearch.com' }, // Comscore audience-measurement pixels.
   { host: 'quantserve.com' }, // Quantcast measurement pixels.
   { host: 'chartbeat.com' }, // Chartbeat analytics pixels.

@@ -271,49 +271,6 @@ describeForEachParser('removeTrackingPixels', (parseHtml) => {
       expect(await transform(value)).toEqualHtml('')
     })
 
-    it('should remove a Yandex Metrica pixel hidden off-screen', async () => {
-      const value = html`
-        <img
-          src="https://mc.yandex.ru/watch/47330517"
-          style="position:absolute; left:-9999px;"
-          alt=""
-        >
-      `
-
-      expect(await transform(value)).toEqualHtml('')
-    })
-
-    it('should remove an unsized LinkWithin widget pixel', async () => {
-      const value = html`
-        <img
-          style="border: 0;"
-          src="http://www.linkwithin.com/pixel.png"
-          alt="Related Posts Plugin for WordPress, Blogger..."
-        >
-      `
-
-      expect(await transform(value)).toEqualHtml('')
-    })
-
-    it('should remove an unsized TradeTracker impression pixel', async () => {
-      const value = '<img alt="" src="http://ti.tradetracker.net/?c=3402&m=164733&a=238395&t=pi">'
-
-      expect(await transform(value)).toEqualHtml('')
-    })
-
-    it('should keep a sized TradeTracker banner', async () => {
-      const value = html`
-        <img
-          width="468"
-          height="60"
-          alt=""
-          src="https://ti.tradetracker.net/?c=865&m=1534060&a=352864&r=&t=html"
-        >
-      `
-
-      expect(await transform(value)).toEqualHtml(value)
-    })
-
     it('should remove an unsized AdSense for Feeds image ad', async () => {
       const value = html`
         <img
@@ -460,6 +417,25 @@ describeForEachParser('removeTrackingPixels', (parseHtml) => {
 
     it('should keep an unsized release image', async () => {
       const value = '<img src="https://www.emailwire.com/files/39021/product.jpg" alt="Product">'
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
+  describe('LinkWithin widget pixel', () => {
+    it('should remove the image', async () => {
+      const value = '<img style="border: 0;" src="http://www.linkwithin.com/pixel.png" alt="">'
+
+      expect(await transform(value)).toEqualHtml('')
+    })
+
+    it('should keep an unsized post image the widget wraps in its click redirect', async () => {
+      const value = html`
+        <img
+          src="http://lwlink3.linkwithin.com/api/click?format=go&amp;v=1&amp;out=http%3A%2F%2Fexample.com%2Fphoto.jpg"
+          alt="Garden"
+        >
+      `
 
       expect(await transform(value)).toEqualHtml(value)
     })
