@@ -115,6 +115,10 @@ describeForEachParser('assignVideoPosters', (parseHtml) => {
     'https://vk.ru/video_ext.php?oid=-43425075&id=456239028',
     'https://www.nbcnews.com/news/embedded-video/mmvo265959493641',
     'https://www.today.com/today/embedded-video/mmvo265460805743',
+    'https://www.youtube.com/embed/videoseries?list=PLIoqMTM7qDWolqxEiNIX4rVLa8lAqT10_',
+    'https://www.youtube.com/embed?listType=user_uploads&list=praeventionstag',
+    'https://vimeo.com/showcase/9876543/embed',
+    'https://vimeo.com/event/1234567/embed',
   ]
 
   it.each(videoHostSrcs)('should move an image enclosure onto a player on %s', async (src) => {
@@ -201,6 +205,15 @@ describeForEachParser('assignVideoPosters', (parseHtml) => {
     `
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a YouTube live chat frame that is not a player', async () => {
+    const value = html`
+      <img src="https://media.beehiiv.com/uploads/poster.png" data-enclosure="">
+      <div data-embed-src="https://www.youtube.com/live_chat?v=SeDnERmDjms&embed_domain=example.com"></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
   })
 
   it('should leave a VK widget that is not a player', async () => {

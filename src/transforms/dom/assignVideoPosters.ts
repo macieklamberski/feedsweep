@@ -8,10 +8,11 @@ import { updateEmbedPlaceholder } from '../../utils/widgets.js'
 // A player without a resolver, like JW Player, carries no data-embed-provider to match on, and
 // a provider names no kind, so the video players are listed by the urls their resolvers mint.
 const videoPlayers: Array<UrlPattern> = [
-  { host: 'youtube.com' }, // YouTube
+  { host: 'youtube.com', path: /^\/embed(?:\/|$)/i }, // YouTube player, not its live chat
   { host: 'youtu.be' }, // YouTube share links
   { host: 'player.vimeo.com' }, // Vimeo player
   { host: 'vimeo.com', path: /^\/video\//i }, // Vimeo video path
+  { host: 'vimeo.com', path: /^\/(?:showcase|event)\/[^/]+\/embed/i }, // Vimeo showcase and event
   { host: 'jwplayer.com' }, // JW Player
   { host: 'dailymotion.com' }, // Dailymotion
   { host: 'wistia.net' }, // Wistia player
