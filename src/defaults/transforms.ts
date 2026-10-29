@@ -43,6 +43,7 @@ import { mergeWrappedCaptionText } from '../transforms/dom/mergeWrappedCaptionTe
 import { neutralizeUnsafeUrls } from '../transforms/dom/neutralizeUnsafeUrls.js'
 import { normalizeAnchoredHeadings } from '../transforms/dom/normalizeAnchoredHeadings.js'
 import { proxyAssetUrls } from '../transforms/dom/proxyAssetUrls.js'
+import { rebuildActionTextAttachments } from '../transforms/dom/rebuildActionTextAttachments.js'
 import { rebuildDeferredIframes } from '../transforms/dom/rebuildDeferredIframes.js'
 import { rebuildDocumentcloudEmbeds } from '../transforms/dom/rebuildDocumentcloudEmbeds.js'
 import { rebuildElementorVideoEmbeds } from '../transforms/dom/rebuildElementorVideoEmbeds.js'
@@ -130,6 +131,10 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // Runs before stripHiddenElements, which deletes an album div the plugin hides with inline
   // `display:none` when no revealableSelectors entry names it, with every photo url inside it.
   rebuildPublicalbumGalleries,
+
+  // Runs before the image passes, so a rebuilt image is dimensioned and proxied like any other,
+  // and before the pass that flattens a file card's divs, which it replaces whole.
+  rebuildActionTextAttachments,
   stripHiddenElements,
 
   // Normalize lazy-loaded video embeds into a plain <iframe> before the media/embed

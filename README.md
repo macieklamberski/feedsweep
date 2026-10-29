@@ -69,6 +69,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `injectEnclosures` | Inject feed enclosures as native media or embed placeholders, collapsing a media group to one rendition and merging a player page entry with its media file; an image enclosure injects only when the content has no image of its own, captioned with its description; anything else becomes a `data-file-*` placeholder, after the content |
 | `surfaceParkedMarkup` | Dissolve a container holding an embed encoded in an attribute, a lazy loader's `div.load-later` or a Borlabs Cookie content blocker, into the markup it holds |
 | `rebuildPublicalbumGalleries` | Rebuild a Publicalbum Google Photos album widget into its photos as linked images under a captioned `<figure>` |
+| `rebuildActionTextAttachments` | Rebuild a Rails Action Text `action-text-attachment` the feed carries without its rendered figure into an `<img>`, `<video>` or `<audio>` captioned from `caption`, and a file into a file placeholder |
 | `surfaceTemplateEmbeds` | Hoist a video embed out of a lazy-load `<template>` (e.g. Better Core Video Embeds) so it renders in a reader |
 | `unwrapDrupalOembedIframes` | Point a Drupal media oEmbed proxy frame (`/media/oembed?url=`) at the page url it wraps |
 | `unwrapWpcomWidgetFrames` | Rebuild a WordPress.com `wpcomwidgets.com` frame into the Flash `<embed>` it wraps, so a Flash resolver can claim it |
