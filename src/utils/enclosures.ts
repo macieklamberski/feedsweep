@@ -15,9 +15,9 @@ const kindTypePrefixes = ['audio/', 'video/', 'image/'] as const
 // anywhere after the `?`. A file name can carry the text `u0026` as written.
 const strippedJsonAmpersandRegex = /(?<=\?.*)u0026(?:amp)?/g
 
-// A media fragment such as `#t=30` names the same file, so it goes with the other spellings. Any
-// other hash stays: Issuu's `embed.html#{configId}` names the document there.
-const mediaFragmentRegex = /#t=[^#]*$/i
+// The server never sees a url's hash, so a file's hash cannot name another file. A player page's
+// script reads its hash, which can name the item, as Issuu's `embed.html#{configId}` does.
+const fileElements = ['audio', 'video', 'source']
 
 const mediaKeyOptions: NormalizeOptions = {
   stripScheme: true,
@@ -47,9 +47,9 @@ const readMediaKey = (element: Element, context?: TransformContext): string => {
 // An image fingerprint is already folded and carries no scheme. Only a host with a port parses,
 // as a scheme, and that only sorts its query.
 export const buildMediaKey = (element: Element, context?: TransformContext): string => {
-  const key = readMediaKey(element, context).replace(mediaFragmentRegex, '')
+  const stripHash = fileElements.includes(element.localName)
 
-  return normalizeUrl(key, mediaKeyOptions)
+  return normalizeUrl(readMediaKey(element, context), { ...mediaKeyOptions, stripHash })
 }
 
 // PeerTube ships an audio-only rendition as `type="audio/mp4"` under `medium="video"`, so the

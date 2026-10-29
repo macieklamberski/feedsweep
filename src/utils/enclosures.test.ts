@@ -763,6 +763,13 @@ describeForEachParser('buildMediaKey', (parseHtml) => {
     expect(buildMediaKey(value1)).toBe(buildMediaKey(value2))
   })
 
+  it('should key a media file the same whatever its hash', () => {
+    const value1 = getElement('<audio src="https://cdn.example.org/episodes/42.mp3"></audio>')
+    const value2 = getElement('<source src="https://cdn.example.org/episodes/42.mp3#chapter-2">')
+
+    expect(buildMediaKey(value1)).toBe(buildMediaKey(value2))
+  })
+
   it('should key two embeds that differ only by their hash apart', () => {
     const value1 = getElement(
       '<div data-embed-src="https://e.issuu.com/embed.html#111111/222222"></div>',
