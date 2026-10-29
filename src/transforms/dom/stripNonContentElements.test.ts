@@ -163,6 +163,10 @@ const specimens: Record<string, string | [string, string]> = {
     '<div class="ssba-classic-2 ssba ssbp-wrap alignleft ssbp--theme-1"><div style="text-align:left"><span class="ssba-share-text">Share this</span><a data-site="facebook" class="ssba_facebook_share ssba_share_link" href="https://example.com/share/facebook">Facebook</a></div></div>',
   '.swp_social_panel':
     '<div class="swp_social_panel swp_horizontal_panel swp_flat_fresh" data-min-width="1100"><div class="nc_tweetContainer swp_share_button"><a class="nc_tweet swp_share_link" href="https://example.com/share/facebook"><span class="swp_share">Share</span></a></div></div>',
+  '.sw-ctt-btn': [
+    '<a class="swp_CTT style1" href="https://twitter.com/share?text=The+key+to+successful+%23SoloTravel%3A+seek+help&amp;via=example&amp;url=https://example.com/things-to-do-in-peru/"><span class="sw-click-to-tweet"><span class="sw-ctt-text">The key to successful #SoloTravel: seek help</span><span class="sw-ctt-btn">Click To Tweet<i class="sw swp_twitter_icon"></i></span></span></a>',
+    '<a class="swp_CTT style1" href="https://twitter.com/share?text=The+key+to+successful+%23SoloTravel%3A+seek+help&amp;via=example&amp;url=https://example.com/things-to-do-in-peru/"><span class="sw-click-to-tweet"><span class="sw-ctt-text">The key to successful #SoloTravel: seek help</span></span></a>',
+  ],
   'div.ya-share2':
     '<div class="ya-share2" data-services="vkontakte,odnoklassniki,twitter,telegram" data-image="https://example.com/logo.png" data-title=""></div>',
   'div.zemanta-pixie':

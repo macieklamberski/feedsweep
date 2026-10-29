@@ -57,6 +57,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `cleanAnchorUrls` | Clean anchor hrefs (redirects, tracking params) via the `cleanUrlFn` option, after the shared url repair: an escaped `&amp;`, a run of slashes, a query glued onto the path and whitespace in values |
 | `stripDeadAnchors` | Unwrap links with empty, `#`, or `javascript:` hrefs |
 | `stripNonContentElements` | Strip non-content chrome — subscribe/share/related widgets, ads, author bios |
+| `stripShareIntentAnchors` | Strip links to a platform's share form, keeping the text of a quote they wrap |
 | `convertUcozSpoilerButtons` | Replace a titled uCoz spoiler button with its title in bold |
 | `stripHiddenElements` | Strip elements hidden from view (`hidden` attribute, inline `display:none` / `visibility:hidden`), and unhide the slides, spoilers, tabs and players a reader can reveal |
 | `removeTrackingPixels` | Strip 1×1 tracking pixels, keeping real images |

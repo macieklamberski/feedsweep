@@ -159,6 +159,7 @@ export const defaultNonContentSelectors = [
   // class despite the plugin's name.
   '.ssbp-wrap', // Simple Share Buttons Adder share bar.
   '.swp_social_panel', // Social Warfare share panel.
+  '.sw-ctt-btn', // Social Warfare's "Click To Tweet" label inside the quote it shares.
   'div.ya-share2', // Yandex share2 button row, whose data-image otherwise arrives as content.
   'div.zemanta-pixie', // Zemanta "Reblog this post" badge: a dead attribution link and its pixel.
   'a[href*="digg.com/submit" i]', // Digg submit button, and the badge image nested inside it.
@@ -325,6 +326,58 @@ export const defaultNonContentSelectors = [
   // no player, so the ones whose iframe survived are untouched. The video id is nowhere in the
   // markup, so there is nothing to recover here, only chrome to remove.
   'span[data-s9e-mediaembed]:not(:has(iframe, embed, object, video, audio))',
+]
+
+// Anchors whose href opens a platform's share or bookmark form for the post. Each is matched on
+// the form's own route, since the same hosts serve the posts, profiles and pin pages publishers
+// link to. `stripShareIntentAnchors` removes a matched anchor, or unwraps one holding a quote.
+export const defaultShareIntentSelectors = [
+  // Facebook, Twitter and X. A bare `facebook.com/share/{id}` is a link to a post or a group, and
+  // `twitter.com/shareaholic` a profile, so neither host is matched on `/share` alone.
+  'a:is([href*="facebook.com/sharer" i], [href*="facebook.com/share.php" i], [href*="facebook.com/dialog/share" i])',
+  'a:is([href*="twitter.com/intent/tweet" i], [href*="twitter.com/intent/post" i], [href*="twitter.com/share?" i], [href$="twitter.com/share" i])',
+  'a[href*="twitter.com/home" i][href*="status=" i]', // Twitter's share form before Web Intents.
+  'a:is([href*="//x.com/intent/tweet" i], [href*="//x.com/intent/post" i], [href*="//x.com/share?" i])',
+
+  // Other networks' share forms.
+  'a:is([href*="linkedin.com/shareArticle" i], [href*="linkedin.com/sharing/share-offsite" i], [href*="linkedin.com/cws/share" i])',
+  'a[href*="pinterest.com/pin/create/" i]', // Pinterest, on regional hosts too, such as `de.pinterest.com`.
+  'a[href*="reddit.com/submit" i]', // Reddit.
+  'a[href*="tumblr.com/widgets/share/tool" i]', // Tumblr.
+  'a[href*="tumblr.com/share" i]', // Tumblr, its retired form.
+  'a[href*="bsky.app/intent/compose" i]', // Bluesky.
+  'a[href*="threads.net/intent/post" i]', // Threads.
+  'a:is([href*="social-plugins.line.me/lineit/share" i], [href*="line.me/r/msg/text/" i])', // LINE.
+  'a:is([href*="//t.me/share/url" i], [href*="//telegram.me/share/url" i])', // Telegram.
+  'a[href*="xing.com/spi/shares/new" i]', // XING.
+  'a[href*="web.skype.com/share" i]', // Skype.
+  'a[href*="plus.google.com/share" i]', // Google+.
+  'a[href*="myspace.com/index.cfm?fuseaction=postto" i]', // MySpace.
+  'a[href*="myspace.com/modules/postto/" i]', // MySpace, its later form.
+  'a[href*="blogger.com/share-post.g" i]', // Blogger's share menu.
+  'a[href*="addtoany.com/share" i]', // AddToAny's share page, `/share` and `/share_save`.
+
+  // WhatsApp's share form carries the post in `text`. With `phone` it opens a chat with the
+  // publisher's own number, and so does `wa.me/{number}`, which are contact links and stay.
+  'a[href*="whatsapp.com/send" i]:not([href*="phone=" i])',
+  'a[href*="//wa.me/?" i]',
+
+  // Mail forms with no recipient. A `mailto:` naming an address, or a Gmail form with `to` and
+  // no `body`, writes to the publisher and stays.
+  'a[href^="mailto:?" i]',
+  'a[href*="mail.google.com/mail/" i][href*="view=cm" i][href*="body=" i]',
+
+  // Bookmarking services.
+  // Google Bookmarks. Anchored on the host, since a broken slideshow link writes the same route
+  // into a path on the publisher's site, as `%3A/www.google.com/bookmarks/mark`.
+  'a[href*="//www.google.com/bookmarks/mark" i]',
+  'a[href*="bookmarks.yahoo.com/myresults/bookmarklet" i]', // Yahoo Bookmarks.
+  'a:is([href*="delicious.com/save" i], [href*="delicious.com/post" i])', // Delicious.
+  'a[href*="stumbleupon.com/submit" i]', // StumbleUpon.
+  'a[href*="technorati.com/faves" i]', // Technorati.
+  'a[href*="getpocket.com/save" i]', // Pocket.
+  'a[href*="share.flipboard.com/bookmarklet" i]', // Flipboard.
+  'a[href*="evernote.com/clip.action" i]', // Evernote.
 ]
 
 // CSS class tokens that mark a <pre> as author-chosen distinct content
