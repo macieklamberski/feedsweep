@@ -1,4 +1,5 @@
-import { encodePathSegment, getSubdomain, isAnyOf, startsWithAnyOf } from 'trousse'
+import { getSubdomain, isAnyOf, startsWithAnyOf } from 'trousse'
+import { composePodcastUrl } from '../../embeds/podomatic.js'
 import type { DomTransform } from '../../types.js'
 import { flashVar } from '../../utils/dom.js'
 import { parseUrlOnHosts } from '../../utils/urls.js'
@@ -50,8 +51,6 @@ export const linkifyPodomaticPlaylists: DomTransform = () => (document) => {
       continue
     }
 
-    const url = `https://www.podomatic.com/podcasts/${encodePathSegment(sub)}`
-
-    element.replaceWith(createLink(document, url))
+    element.replaceWith(createLink(document, composePodcastUrl(sub)))
   }
 }
