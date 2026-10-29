@@ -18,11 +18,13 @@ import {
   readCarrierUrl,
   readPlayer,
   resolveEmbedProbe,
+  toPlayerKey,
 } from '../../utils/widgets.js'
 
 type PageMedia = {
   media: Element
   frame: Element
+  player: string | undefined
 }
 
 // A WordPress video shortcode or a hand-written <video> or <audio> can name a platform's page,
@@ -53,11 +55,13 @@ const readPageMedia = async (
     const frame = createIframe(document, url)
     frame.setAttribute('type', `${media.localName}/*`)
 
-    if (!(await resolveEmbedProbe(frame, resolvers))) {
+    const embed = await resolveEmbedProbe(frame, resolvers)
+
+    if (!embed) {
       return
     }
 
-    found.push({ media, frame })
+    found.push({ media, frame, player: toPlayerKey(embed) })
   }
 
   // A resolver that claims the element itself reads it in the tiers below. The copy keeps a
@@ -172,9 +176,7 @@ export const convertWidgets: DomTransform = (context) => {
       }
     }
 
-    for (const { media, frame } of pageMedia) {
-      const player = await readPlayer(frame, widgetResolvers)
-
+    for (const { media, frame, player } of pageMedia) {
       if (player && framedPlayers.includes(player)) {
         media.remove()
         continue
