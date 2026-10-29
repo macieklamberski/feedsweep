@@ -2215,7 +2215,7 @@ describeForEachParser('createCaptionedFigure', (parseHtml) => {
     const document = parseHtml('<p>Shot by <a href="https://example.com/">Ana</a></p>')
     const cell = document.querySelector('p')
     const image = createImage(document, { src: 'https://cdn.example.com/photo.jpg' })
-    const figure = createCaptionedFigure(document, image, ...(cell?.childNodes ?? []))
+    const figure = createCaptionedFigure(document, image, [...(cell?.childNodes ?? [])])
     const expected = html`
       <figure>
         <img src="https://cdn.example.com/photo.jpg" />

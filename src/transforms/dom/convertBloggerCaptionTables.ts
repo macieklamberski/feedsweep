@@ -98,7 +98,7 @@ export const convertBloggerCaptionTables: DomTransform = () => {
         continue
       }
 
-      table.replaceWith(createCaptionedFigure(document, image, ...captionCell.childNodes))
+      table.replaceWith(createCaptionedFigure(document, image, [...captionCell.childNodes]))
     }
   }
 }

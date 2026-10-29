@@ -1,4 +1,11 @@
-import { composeQuery, isAnyOf, type MaybePromise, startsWithAnyOf, trimObject } from 'trousse'
+import {
+  coerceArray,
+  composeQuery,
+  isAnyOf,
+  type MaybePromise,
+  startsWithAnyOf,
+  trimObject,
+} from 'trousse'
 import type {
   CiteResolverResult,
   DomTransform,
@@ -419,12 +426,12 @@ export const createImage = (document: Document, fields: ImageFields): HTMLElemen
 export const createCaptionedFigure = (
   document: Document,
   element: Element,
-  ...caption: Array<Node | string>
+  caption: string | Array<Node>,
 ): HTMLElement => {
   const figure = document.createElement('figure')
   const figcaption = document.createElement('figcaption')
 
-  figcaption.append(...caption)
+  figcaption.append(...coerceArray<Node | string>(caption))
   figure.append(element, figcaption)
 
   return figure
