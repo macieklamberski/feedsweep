@@ -12,6 +12,7 @@ import { convertEmojis } from '../transforms/dom/convertEmojis.js'
 import { convertGiphyEmbeds } from '../transforms/dom/convertGiphyEmbeds.js'
 import { convertLazyImageContainers } from '../transforms/dom/convertLazyImageContainers.js'
 import { convertNoteEmbeds } from '../transforms/dom/convertNoteEmbeds.js'
+import { convertParkedMediaContainers } from '../transforms/dom/convertParkedMediaContainers.js'
 import { convertSmartframeEmbeds } from '../transforms/dom/convertSmartframeEmbeds.js'
 import { convertTradingEconomicsEmbeds } from '../transforms/dom/convertTradingEconomicsEmbeds.js'
 import { convertUcozSpoilerButtons } from '../transforms/dom/convertUcozSpoilerButtons.js'
@@ -342,6 +343,9 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   stripWordBreaks,
   linkifyUrls,
   markTimestamps,
+
+  // Runs before convertWidgets, which replaces the iframes its playable guard relies on.
+  convertParkedMediaContainers,
   convertWidgets,
   injectEnclosures,
 

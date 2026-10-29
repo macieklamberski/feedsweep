@@ -109,7 +109,8 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `convertAsciinemaEmbeds` | Replace an asciinema loader script with the cast's static SVG render, linked to the recording |
 | `convertGiphyEmbeds` | Convert a Giphy gif shipped as an iframe (`giphy.com/embed/{id}`, `media.giphy.com`, `giphy.com/gifs/{id}`) into an `<img>` of the gif, linked to its Giphy page |
 | `convertSmartframeEmbeds` | Convert SmartFrame's `<smartframe-embed>` element into the picture it names as a static image |
-| `convertWidgets` | Convert recognized widgets: embeds become `data-embed-*` placeholders, platform-hosted media becomes a real `<video>`/`<audio>` (from an id template, a media-file src, or a URL parked in a lazy media attribute) |
+| `convertParkedMediaContainers` | Add a real `<video>`/`<audio>` to a container parking a media file URL in a lazy media attribute |
+| `convertWidgets` | Convert recognized widgets: embeds become `data-embed-*` placeholders, platform-hosted media becomes a real `<video>`/`<audio>` (from an id template or a media-file src) |
 | `assignVideoPosters` | _Heuristic (opt-in):_ move a redundant video-poster image (inline or an enclosure) onto the embed as its poster, then drop the standalone image |
 | `stripDuplicateEnclosures` | _Heuristic (opt-in):_ remove an injected enclosure that duplicates inline content (image size-variants, exact audio/video/embed) |
 | `stripDuplicateLeadingImages` | _Heuristic (opt-in):_ remove a leading image the body repeats as the very next image (featured-image prepends), keeping the larger copy |
