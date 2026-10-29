@@ -235,7 +235,7 @@ import { linkedinEmbedResolver } from '../embeds/linkedin.js'
 import { listennotesEmbedResolver } from '../embeds/listennotes.js'
 import { lividIframeEmbedResolver, lividMetasliderEmbedResolver } from '../embeds/livid.js'
 import { mailruIframeEmbedResolver, mailruWidgetEmbedResolver } from '../embeds/mailru.js'
-import { mastodonEmbedResolver } from '../embeds/mastodon.js'
+import { mastodonEmbedResolver, mastodonEmbettyEmbedResolver } from '../embeds/mastodon.js'
 import { matterportEmbedResolver } from '../embeds/matterport.js'
 import { mediacccEmbedResolver } from '../embeds/mediaccc.js'
 import { mediavineScriptEmbedResolver, mediavineWidgetEmbedResolver } from '../embeds/mediavine.js'
@@ -356,6 +356,7 @@ import { tuneinEmbedResolver } from '../embeds/tunein.js'
 import {
   twitterAmpEmbedResolver,
   twitterBlockquoteEmbedResolver,
+  twitterEmbettyEmbedResolver,
   twitterIframeEmbedResolver,
   twitterS9eEmbedResolver,
   twitterSubstackEmbedResolver,
@@ -390,6 +391,7 @@ import { youkuEmbedResolver } from '../embeds/youku.js'
 import {
   youtubeAmpEmbedResolver,
   youtubeFc2EmbedResolver,
+  youtubeFrontendEmbedResolver,
   youtubeIframeEmbedResolver,
   youtubeMetasliderEmbedResolver,
 } from '../embeds/youtube.js'
@@ -828,6 +830,7 @@ const embedResolvers: Array<EmbedResolver> = [
   tuneinEmbedResolver,
   twitterBlockquoteEmbedResolver,
   twitterAmpEmbedResolver,
+  twitterEmbettyEmbedResolver,
   twitterSubstackEmbedResolver,
   twitterIframeEmbedResolver,
   twitterS9eEmbedResolver,
@@ -858,6 +861,7 @@ const embedResolvers: Array<EmbedResolver> = [
   youtubeAmpEmbedResolver,
   youtubeFc2EmbedResolver,
   youtubeMetasliderEmbedResolver,
+  youtubeFrontendEmbedResolver,
   yumpuEmbedResolver,
   zencastrBlockquoteEmbedResolver,
   zencastrIframeEmbedResolver,
@@ -867,6 +871,7 @@ const embedResolvers: Array<EmbedResolver> = [
   // Last, outside the alphabet: keyed on a path shape rather than a host, so every resolver
   // naming a host gets the carrier first.
   mastodonEmbedResolver,
+  mastodonEmbettyEmbedResolver,
   wikimediaEmbedResolver,
   peertubeEmbedResolver,
   umapEmbedResolver,

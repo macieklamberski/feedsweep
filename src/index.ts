@@ -72,6 +72,7 @@ export { convertEmojis } from './transforms/dom/convertEmojis.js'
 export { convertGiphyEmbeds } from './transforms/dom/convertGiphyEmbeds.js'
 export { convertLazyImageContainers } from './transforms/dom/convertLazyImageContainers.js'
 export { convertNoteEmbeds } from './transforms/dom/convertNoteEmbeds.js'
+export { convertParkedMediaContainers } from './transforms/dom/convertParkedMediaContainers.js'
 export { convertSmartframeEmbeds } from './transforms/dom/convertSmartframeEmbeds.js'
 export { convertTradingEconomicsEmbeds } from './transforms/dom/convertTradingEconomicsEmbeds.js'
 export { convertUcozSpoilerButtons } from './transforms/dom/convertUcozSpoilerButtons.js'
@@ -109,6 +110,7 @@ export { rebuildElementorVideoEmbeds } from './transforms/dom/rebuildElementorVi
 export { rebuildEmbedlyEmbeds } from './transforms/dom/rebuildEmbedlyEmbeds.js'
 export { rebuildEmbedPlusEmbeds } from './transforms/dom/rebuildEmbedPlusEmbeds.js'
 export { rebuildEmbedPrivacyLinks } from './transforms/dom/rebuildEmbedPrivacyLinks.js'
+export { rebuildEmbettyVideoEmbeds } from './transforms/dom/rebuildEmbettyVideoEmbeds.js'
 export { rebuildExternalVideoEmbeds } from './transforms/dom/rebuildExternalVideoEmbeds.js'
 export { rebuildGettyImagesEmbeds } from './transforms/dom/rebuildGettyImagesEmbeds.js'
 export { rebuildGofundmeEmbeds } from './transforms/dom/rebuildGofundmeEmbeds.js'
@@ -172,7 +174,6 @@ export type {
   CiteResolver,
   CiteResolverResult,
   CleanUrlFn,
-  DeferredIframeSource,
   DomTransform,
   EmbedRef,
   EmbedRenderHint,
@@ -189,12 +190,13 @@ export type {
   IsSafeUrlFn,
   MediaResolver,
   MediaResolverResult,
-  MediaSrcAttribute,
   ParseDateFn,
   ParseHtmlFn,
   ResolveEmbed,
   ResolveUrlFn,
+  ScopedAttribute,
   StringTransform,
+  TrackingUrl,
   TransformContentOptions,
   TransformContext,
   UrlRole,

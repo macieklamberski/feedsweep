@@ -8,11 +8,11 @@ describeForEachParser('YouTube', (parseHtml) => {
   // Flash-era host Blogger feeds still ship), and youtubeFc2EmbedResolver claims the FC2 blog
   // player shell. Each plugin facade has its own rebuild:
   // rebuildLazyYtEmbeds, rebuildLyteEmbeds, rebuildRocketYoutubePreviews,
-  // rebuildLiteVideoEmbeds, rebuildEmbedPlusEmbeds, rebuildElementorVideoEmbeds and
-  // rebuildLazyLoadForVideos. surfaceParkedMarkup recovers iframes parked percent-encoded
-  // in data-content, extractVideoId strips the stray bbcode quote Steam news leaks into
-  // embed srcs, and defaultNonContentSelectors drops the Steam poster gif shown before
-  // its script swaps the real iframe in.
+  // rebuildLiteVideoEmbeds, rebuildEmbettyVideoEmbeds, rebuildEmbedPlusEmbeds,
+  // rebuildElementorVideoEmbeds and rebuildLazyLoadForVideos. surfaceParkedMarkup recovers
+  // iframes parked percent-encoded in data-content, extractVideoId strips the stray bbcode
+  // quote Steam news leaks into embed srcs, and defaultNonContentSelectors drops the Steam
+  // poster gif shown before its script swaps the real iframe in.
 
   // The carrier names its host but no scheme, and no baseUrl is stated, so the placeholder
   // depends on the pipeline giving it one before the resolver reads the host.
@@ -26,6 +26,30 @@ describeForEachParser('YouTube', (parseHtml) => {
         data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
         data-embed-ratio="16/9"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  it('should rebuild an Invidious share snippet onto the YouTube player', async () => {
+    const value = html`
+      <iframe
+        id="ivplayer"
+        width="640"
+        height="360"
+        src="https://invidious.kavin.rocks/embed/zz5KauCbjPI"
+        style="border:none;"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-ratio="16/9"
+        data-embed-thumbnail="https://i.ytimg.com/vi/zz5KauCbjPI/hqdefault.jpg"
+        data-embed-url="https://www.youtube.com/watch?v=zz5KauCbjPI"
+        data-embed-id="zz5KauCbjPI"
+        data-embed-provider="youtube"
+        data-embed-src="https://www.youtube.com/embed/zz5KauCbjPI"
       ></div>
     `
 

@@ -1,4 +1,5 @@
 import { expect, it } from 'bun:test'
+import { defaultLazyAltAttributes } from '../../defaults.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
@@ -179,6 +180,26 @@ describeForEachParser('flattenPictureElements', (parseHtml) => {
 
     expect(await transform(value)).toEqualHtml(expected)
   })
+
+  it.each(defaultLazyAltAttributes)(
+    'should take the alt of a synthesized img from %s',
+    async (attribute) => {
+      const value = html`
+      <picture ${attribute}="A hand holding a jar">
+        <source srcset="https://example.com/a.jpg">
+      </picture>
+    `
+      const expected = html`
+      <img
+        src="https://example.com/a.jpg"
+        srcset="https://example.com/a.jpg"
+        alt="A hand holding a jar"
+      >
+    `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    },
+  )
 
   it('should drop a picture that has no img and no usable source', async () => {
     const value = html`

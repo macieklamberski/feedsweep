@@ -1,4 +1,4 @@
-import { composePlayerUrl } from '../../embeds/voki.js'
+import { composeEmbedUrl } from '../../embeds/voki.js'
 import type { DomTransform } from '../../types.js'
 import { createIframe } from '../../utils/widgets.js'
 
@@ -12,7 +12,7 @@ export const rebuildVokiEmbeds: DomTransform = () => (document) => {
     const frames: Array<Element> = []
 
     for (const match of (script.textContent ?? '').matchAll(embedCallRegex)) {
-      const playerUrl = composePlayerUrl(match[3], match[2])
+      const playerUrl = composeEmbedUrl(match[3], match[2])
       frames.push(createIframe(document, playerUrl))
     }
 
