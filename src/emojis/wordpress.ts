@@ -1,4 +1,4 @@
-import type { EmojiResolver } from '../types.js'
+import type { EmojiResolver, UrlPattern } from '../types.js'
 import { attr, text } from '../utils/dom.js'
 import {
   glyphFromShortcode,
@@ -7,6 +7,7 @@ import {
   resolveEmojiElement,
   resolveEmojiImage,
 } from '../utils/emojis.js'
+import { matchesUrlPattern } from '../utils/urls.js'
 import { smiliesEmojiNames } from './smilies.js'
 
 const classSelector = 'img[class~="wp-smiley" i]'
@@ -17,6 +18,17 @@ const coreEmojiPath = 's.w.org/images/core/emoji/'
 const wpcomSmileysPath = 'wp.com/wp-content/mu-plugins/wpcom-smileys/'
 const hosts = [coreEmojiPath, wpcomSmileysPath]
 
+// The same files parsed by host, so a path named in another url's query never counts. Jetpack's
+// image proxy serves core's emoji as `i0.wp.com/s.w.org/images/core/emoji/…`.
+const coreEmojiFiles: Array<UrlPattern> = [
+  { host: 's.w.org', path: /^\/images\/core\/emoji\//i },
+  { host: 'wp.com', path: /^\/s\.w\.org\/images\/core\/emoji\//i },
+]
+const emojiFiles: Array<UrlPattern> = [
+  ...coreEmojiFiles,
+  { host: 'wp.com', path: /^\/wp-content\/mu-plugins\/wpcom-smileys\//i },
+]
+
 // WordPress core's smilies and emoji, and the WordPress.com copies of them.
 export const wordpressEmojiResolver: EmojiResolver = {
   kind: 'emoji',
@@ -24,8 +36,8 @@ export const wordpressEmojiResolver: EmojiResolver = {
   extract: (element) => {
     // A broken paste nests an emoji's markup inside another image's alt, which hands the class to
     // a real picture, often an Instagram photo. An outer file that is an emoji itself stays one.
-    const src = element.getAttribute('src')?.toLowerCase() ?? ''
-    const isEmojiFile = hosts.some((host) => src.includes(host))
+    const src = element.getAttribute('src') ?? ''
+    const isEmojiFile = matchesUrlPattern(src, emojiFiles)
 
     if (!isEmojiFile && element.getAttribute('alt')?.trimStart().startsWith('<img')) {
       return
@@ -36,7 +48,8 @@ export const wordpressEmojiResolver: EmojiResolver = {
     // Core writes the glyph into the alt of every emoji, and a smilie carries its typed code, so
     // the alt tells the emoji set from the smilies even behind a lazy placeholder.
     const alt = attr(element, 'alt')
-    const isEmojiSet = src.includes(coreEmojiPath) || (alt !== undefined && isEmojiShaped(alt))
+    const isEmojiSet =
+      matchesUrlPattern(src, coreEmojiFiles) || (alt !== undefined && isEmojiShaped(alt))
 
     return resolveEmojiImage(element, { isStrong: true, names, keepsPictures: !isEmojiSet })
   },
