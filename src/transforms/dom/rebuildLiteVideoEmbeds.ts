@@ -2,9 +2,9 @@ import { encodePathSegment, toMap, trimObject } from 'trousse'
 import { composeEmbedUrl as composeVimeoUrl } from '../../embeds/vimeo.js'
 import { composeEmbedUrl as composeYoutubeUrl, youtubeEmbedParams } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
-import { attr } from '../../utils/dom.js'
+import { attr, text } from '../../utils/dom.js'
 import * as styles from '../../utils/styles.js'
-import { digitsRegex, pickQueryParams } from '../../utils/urls.js'
+import { digitsRegex, isUrlShaped, pickQueryParams } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
 
 type EmbedSource = {
@@ -59,8 +59,40 @@ const readPoster = (element: Element): string | undefined => {
   return styles.bgImage(element)
 }
 
+// mihdan's Lite YouTube Embed shares the lite-youtube tag but parks the whole player url, YouTube
+// or Rutube, in `player-src`, and writes the poster and the video's name into the element: the
+// poster's `data-src` when its lazy loading is on, its `src` when not.
+const rebuildPlayerSrcEmbeds = (document: Document): void => {
+  const selector = 'lite-youtube[player-src]:not(:has(iframe, embed, object, video, audio))'
+
+  for (const element of document.querySelectorAll(selector)) {
+    const src = element.getAttribute('player-src')
+
+    if (!src || !isUrlShaped(src)) {
+      continue
+    }
+
+    const iframe = createIframe(document, src)
+    const image = element.querySelector('.lite-youtube__preview img')
+    const poster = attr(image, 'data-src') ?? attr(image, 'src')
+    const name = text(element, '.lite-youtube__name')
+
+    if (name) {
+      iframe.setAttribute('title', name)
+    }
+
+    if (poster) {
+      iframe.setAttribute('data-thumbnail', poster)
+    }
+
+    element.replaceWith(iframe)
+  }
+}
+
 // lite-youtube and lite-vimeo are web components that only build their iframe with JS on click.
 export const rebuildLiteVideoEmbeds: DomTransform = () => (document) => {
+  rebuildPlayerSrcEmbeds(document)
+
   const selector = 'lite-youtube[videoid], lite-youtube[playlistid], lite-vimeo[videoid]'
 
   for (const element of document.querySelectorAll(selector)) {

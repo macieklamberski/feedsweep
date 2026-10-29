@@ -433,6 +433,116 @@ describeForEachParser('rebuildLiteVideoEmbeds', (parseHtml) => {
     expect(result).toEqualHtml(expected)
   })
 
+  it('should rebuild the player of mihdan Lite YouTube Embed from player-src', async () => {
+    const value = html`
+      <lite-youtube
+        class="lite-youtube_16x9"
+        video-id="sDddGSDpgGw"
+        player-src="https://www.youtube-nocookie.com/embed/sDddGSDpgGw?autoplay=1&#038;feature=oembed"
+      >
+        <lite-youtube__button class="lite-youtube__button lty-playbtn"></lite-youtube__button>
+        <lite-youtube__preview class="lite-youtube__preview">
+          <img
+            decoding="async"
+            src="https://i.ytimg.com/vi/sDddGSDpgGw/maxresdefault.jpg"
+            width="1280"
+            height="720"
+            class="lite-youtube__image"
+            alt="Get Ready For The Immortal Man | Official Peaky Blinders S1-6 Recap"
+          >
+        </lite-youtube__preview>
+        <lite-youtube__name class="lite-youtube__name">Get Ready For The Immortal Man | Official Peaky Blinders S1-6 Recap</lite-youtube__name>
+      </lite-youtube>
+    `
+    const expected = html`
+      <iframe
+        src="https://www.youtube-nocookie.com/embed/sDddGSDpgGw?autoplay=1&amp;feature=oembed"
+        title="Get Ready For The Immortal Man | Official Peaky Blinders S1-6 Recap"
+        data-thumbnail="https://i.ytimg.com/vi/sDddGSDpgGw/maxresdefault.jpg"
+      ></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should carry the lazy poster of mihdan Lite YouTube Embed from data-src', async () => {
+    const value = html`
+      <lite-youtube
+        class="lite-youtube_16x9"
+        video-id="qdW9MLBu0rI"
+        player-src="https://www.youtube-nocookie.com/embed/qdW9MLBu0rI?autoplay=1&#038;feature=oembed"
+      >
+        <lite-youtube__preview class="lite-youtube__preview">
+          <img
+            data-src="https://i.ytimg.com/vi/qdW9MLBu0rI/maxresdefault.jpg"
+            data-placeholder-background="#000"
+            width="1280"
+            height="720"
+            class="lite-youtube__image lite-youtube_lazy mihdan-lozad"
+          >
+        </lite-youtube__preview>
+      </lite-youtube>
+    `
+    const expected = html`
+      <iframe
+        src="https://www.youtube-nocookie.com/embed/qdW9MLBu0rI?autoplay=1&amp;feature=oembed"
+        data-thumbnail="https://i.ytimg.com/vi/qdW9MLBu0rI/maxresdefault.jpg"
+      ></iframe>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should keep the poster and name of a mihdan Rutube player end to end', async () => {
+    const value = html`
+      <lite-youtube
+        class="lite-youtube_16x9"
+        video-id="8c50f13ca83955b4a234839c2085de0f"
+        player-src="https://rutube.ru/play/embed/8c50f13ca83955b4a234839c2085de0f"
+      >
+        <lite-youtube__button class="lite-youtube__button lty-playbtn"></lite-youtube__button>
+        <lite-youtube__preview class="lite-youtube__preview">
+          <img
+            src="https://pic.rtbcdn.ru/video/2026-03-30/71/b1/71b1db2d97121c53dd31483954af4074.jpg"
+            width="1280"
+            height="720"
+            class="lite-youtube__image"
+            alt="Как живут и о чём мечтают в детском хосписе?"
+          >
+        </lite-youtube__preview>
+        <lite-youtube__name class="lite-youtube__name">Как живут и о чём мечтают в детском хосписе?</lite-youtube__name>
+      </lite-youtube>
+    `
+    const expected = html`
+      <div
+        data-embed-url="https://rutube.ru/video/8c50f13ca83955b4a234839c2085de0f/"
+        data-embed-title="Как живут и о чём мечтают в детском хосписе?"
+        data-embed-thumbnail="https://pic.rtbcdn.ru/video/2026-03-30/71/b1/71b1db2d97121c53dd31483954af4074.jpg"
+        data-embed-src="https://rutube.ru/play/embed/8c50f13ca83955b4a234839c2085de0f"
+        data-embed-ratio="16/9"
+        data-embed-provider="rutube"
+        data-embed-id="8c50f13ca83955b4a234839c2085de0f"
+      ></div>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com',
+    })
+
+    expect(result).toEqualHtml(expected)
+  })
+
+  it('should leave a mihdan element that already holds its player', async () => {
+    const value = html`
+      <lite-youtube
+        video-id="qdW9MLBu0rI"
+        player-src="https://www.youtube-nocookie.com/embed/qdW9MLBu0rI"
+      ><iframe src="https://www.youtube-nocookie.com/embed/qdW9MLBu0rI?autoplay=1"></iframe></lite-youtube>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should carry videotitle into the iframe title', async () => {
     const value = html`
       <lite-youtube
