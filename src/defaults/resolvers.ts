@@ -393,6 +393,7 @@ import {
   youtubeFc2EmbedResolver,
   youtubeFrontendEmbedResolver,
   youtubeIframeEmbedResolver,
+  youtubeLiteEmbedResolver,
   youtubeMetasliderEmbedResolver,
 } from '../embeds/youtube.js'
 import { yumpuEmbedResolver } from '../embeds/yumpu.js'
@@ -860,6 +861,7 @@ const embedResolvers: Array<EmbedResolver> = [
   youtubeIframeEmbedResolver,
   youtubeAmpEmbedResolver,
   youtubeFc2EmbedResolver,
+  youtubeLiteEmbedResolver,
   youtubeMetasliderEmbedResolver,
   youtubeFrontendEmbedResolver,
   yumpuEmbedResolver,

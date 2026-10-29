@@ -6,6 +6,7 @@ import {
   getQueryParam,
   isAnyOf,
   isHostOrSubdomainOf,
+  type Nullish,
   parseUrl,
 } from 'trousse'
 import type {
@@ -15,6 +16,7 @@ import type {
   ResolveUrlEmbed,
 } from '../types.js'
 import { attr, find } from '../utils/dom.js'
+import * as styles from '../utils/styles.js'
 import { parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
@@ -76,6 +78,30 @@ export const isVideoId = (value: string): boolean => {
 // TODO: prefer a higher-res thumbnail where one exists, which needs a HEAD probe per video.
 export const composeThumbnailUrl = (videoId: string): string => {
   return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
+}
+
+// YouTube serves one poster on every image host it runs: `i.ytimg.com`, the numbered `i1` to `i9`
+// and `img.youtube.com`, as `vi/{id}/hqdefault.jpg`, its WebP copy under `vi_webp` and the
+// animated preview under `an_webp`. The bare `an` route names a channel, `vi_blogger` an id of
+// Blogger's own, and `s.ytimg.com` serves static assets, none of them a video.
+const thumbnailHosts = ['ytimg.com', 'img.youtube.com']
+const thumbnailRoutes = ['vi', 'vi_webp', 'an_webp']
+
+// The video a poster url names, read back from the shape composeThumbnailUrl writes.
+export const readThumbnailVideoId = (link: Nullish<string | URL>): string | undefined => {
+  const url = parseUrlOnHosts(link, thumbnailHosts)
+
+  if (!url) {
+    return
+  }
+
+  const [route, videoId] = getPathSegments(url)
+
+  if (!isAnyOf(route, thumbnailRoutes)) {
+    return
+  }
+
+  return videoId
 }
 
 // The player url every transform that recovers an id has to build. Params are given as values,
@@ -482,6 +508,32 @@ export const youtubeMetasliderEmbedResolver = createMarkupEmbedResolver(
       ...composeVideoEmbed(videoId, start ? { start } : undefined),
       // A lazy slide's poster carries the video's title as its `alt`.
       title: attr(find(element, 'img.msDefaultImage'), 'alt'),
+    }
+  },
+)
+
+// react-lite-youtube-embed's facade, `article.yt-lite` with the poster as its background, builds
+// the player only on click. Publishers' own copies of it name the id in a data attribute.
+export const youtubeLiteEmbedResolver = createMarkupEmbedResolver(
+  // A playlist facade's poster names only its cover video.
+  '.yt-lite:not(:has(iframe, .lty-playlist-icon))',
+  (element) => {
+    const videoId =
+      attr(element, 'data-video-id') ??
+      attr(element, 'data-id') ??
+      readThumbnailVideoId(styles.bgImage(element))
+
+    if (!videoId) {
+      return
+    }
+
+    const embed = composeVideoEmbed(videoId)
+
+    return {
+      ...embed,
+      // A publisher copy of the facade paints its own poster, which can be another picture.
+      thumbnail: attr(find(element, 'img'), 'src') ?? embed.thumbnail,
+      title: attr(element, 'data-title'),
     }
   },
 )
