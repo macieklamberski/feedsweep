@@ -78,6 +78,87 @@ describeForEachParser('rebuildElementorVideoEmbeds', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should rebuild a youtube iframe from a settings url written without a scheme', async () => {
+    const value = html`
+      <div
+        class="elementor-widget elementor-widget-video"
+        data-settings='{"youtube_url":"youtube.com/watch?v=5c-fxbwmEqk&feature=youtu.be","video_type":"youtube"}'
+      >
+        <div class="elementor-widget-container">
+          <div class="elementor-video"></div>
+        </div>
+      </div>
+    `
+    const expected = html`
+      <div class="elementor-widget elementor-widget-video">
+        <div class="elementor-widget-container">
+          <iframe src="https://www.youtube.com/embed/5c-fxbwmEqk"></iframe>
+        </div>
+      </div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should rebuild a youtube iframe from a settings url with a slash before the id', async () => {
+    const value = html`
+      <div
+        class="elementor-widget elementor-widget-video"
+        data-settings='{"youtube_url":"https://youtube.com/watch?v=/9T5wtXqbbRk","video_type":"youtube"}'
+      >
+        <div class="elementor-widget-container">
+          <div class="elementor-video"></div>
+        </div>
+      </div>
+    `
+    const expected = html`
+      <div class="elementor-widget elementor-widget-video">
+        <div class="elementor-widget-container">
+          <iframe src="https://www.youtube.com/embed/9T5wtXqbbRk"></iframe>
+        </div>
+      </div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should rebuild a youtube iframe from a settings url opening with a space', async () => {
+    const value = html`
+      <div
+        class="elementor-widget elementor-widget-video"
+        data-settings='{"youtube_url":" https://youtu.be/DkIIn89qNP8","video_type":"youtube"}'
+      >
+        <div class="elementor-widget-container">
+          <div class="elementor-video"></div>
+        </div>
+      </div>
+    `
+    const expected = html`
+      <div class="elementor-widget elementor-widget-video">
+        <div class="elementor-widget-container">
+          <iframe src="https://www.youtube.com/embed/DkIIn89qNP8"></iframe>
+        </div>
+      </div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a settings url that names a path on the publisher site', async () => {
+    const value = html`
+      <div
+        class="elementor-widget elementor-widget-video"
+        data-settings='{"youtube_url":"/videos/showreel","video_type":"youtube"}'
+      >
+        <div class="elementor-widget-container">
+          <div class="elementor-video"></div>
+        </div>
+      </div>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should rebuild a vimeo iframe from the widget settings', async () => {
     const value = html`
       <div

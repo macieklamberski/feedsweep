@@ -15,6 +15,16 @@ const iframeSources = toMap({
 })
 
 // Elementor's video widget ships an empty player div with the url only in a settings JSON.
+// Elementor's own script reads the url with the scheme optional, so a publisher who pasted
+// `youtube.com/watch?v={id}` gets a player on the page.
+const schemeRegex = /^[a-z][a-z0-9+.-]*:|^\/\//i
+
+// The url parser drops the whitespace a pasted url can open with, so the scheme is looked for past
+// it.
+const readLink = (link: string): string => {
+  return schemeRegex.test(link.trim()) ? link : `https://${link.trim()}`
+}
+
 // A self-hosted source ships server-side as a real <video>, so only the embed sources are read.
 export const rebuildElementorVideoEmbeds: DomTransform = () => (document) => {
   for (const widget of document.querySelectorAll('.elementor-widget-video[data-settings]')) {
@@ -34,7 +44,8 @@ export const rebuildElementorVideoEmbeds: DomTransform = () => (document) => {
     // Elementor names the url after the source that owns it, `{video_type}_url`, and the type is
     // one of the four above by the time it is read.
     const link = settings[`${videoType}_url`]
-    const source = typeof link === 'string' ? iframeSources.get(videoType)?.(link) : undefined
+    const source =
+      typeof link === 'string' ? iframeSources.get(videoType)?.(readLink(link)) : undefined
 
     if (!source) {
       continue
