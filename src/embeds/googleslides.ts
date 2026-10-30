@@ -7,7 +7,7 @@ import {
   getQueryParams,
   isAnyOf,
 } from 'trousse'
-import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 import { getPathSegmentsWithoutWorkspace } from './googledrive.js'
 
@@ -29,6 +29,21 @@ const deckParams = ['slide']
 // file was opened from. Only the slide the deck opens on is kept.
 const deckFragmentParams = ['slide']
 
+// Both routes mint the same deck player, from whichever id names the deck. `/pub` answers
+// `x-frame-options: SAMEORIGIN`, so the frame is always `/embed`.
+const composeDeckEmbed = (id: string, deckPath: string, url: URL): EmbedResolverResult => {
+  const query = composeQuery(getQueryParams(url, deckParams))
+  const fragment = composeFragment(getFragmentParams(url, deckFragmentParams))
+
+  return {
+    provider,
+    id,
+    src: `https://docs.google.com/presentation/d/${deckPath}/embed${query}${fragment}`,
+    url: `https://docs.google.com/presentation/d/${deckPath}/pub`,
+    ...sizes.player,
+  }
+}
+
 // `/presentation/d/e/{id}` names a deck published to the web and `/presentation/d/{id}` names it
 // by its Drive file id. The legacy `/presentation/embed?id={id}` 301s onto the second.
 export const googleslidesResolveEmbed: ResolveUrlEmbed = (url) => {
@@ -48,13 +63,7 @@ export const googleslidesResolveEmbed: ResolveUrlEmbed = (url) => {
     // The file id comes out of the query decoded, and it goes into a path.
     const deckPath = encodePathSegment(fileId)
 
-    return {
-      provider,
-      id: fileId,
-      src: `https://docs.google.com/presentation/d/${deckPath}/embed${composeQuery(getQueryParams(url, deckParams))}${composeFragment(getFragmentParams(url, deckFragmentParams))}`,
-      url: `https://docs.google.com/presentation/d/${deckPath}/pub`,
-      ...sizes.player,
-    }
+    return composeDeckEmbed(fileId, deckPath, url)
   }
 
   if (!isAnyOf(route, 'd')) {
@@ -75,14 +84,7 @@ export const googleslidesResolveEmbed: ResolveUrlEmbed = (url) => {
 
   const deckPath = isPublished ? `e/${deckId}` : deckId
 
-  // `/pub` answers `x-frame-options: SAMEORIGIN`, so the frame is always `/embed`.
-  return {
-    provider,
-    id: deckId,
-    src: `https://docs.google.com/presentation/d/${deckPath}/embed${composeQuery(getQueryParams(url, deckParams))}${composeFragment(getFragmentParams(url, deckFragmentParams))}`,
-    url: `https://docs.google.com/presentation/d/${deckPath}/pub`,
-    ...sizes.player,
-  }
+  return composeDeckEmbed(deckId, deckPath, url)
 }
 
 export const googleslidesEmbedResolver = createUrlEmbedResolver(
