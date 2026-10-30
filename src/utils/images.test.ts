@@ -12,6 +12,7 @@ import {
   parseSrcset,
   pickLargerImageUrl,
   sizeKeywordLiterals,
+  unwrapProxiedImage,
   widestSrcsetUrl,
 } from './images.js'
 
@@ -557,6 +558,22 @@ describe('getImageFingerprint', () => {
 
     expect(getImageFingerprint(preview)).toBe(previewExpected)
     expect(getImageFingerprint(original)).toBe(originalExpected)
+  })
+})
+
+describe('unwrapProxiedImage', () => {
+  it('should decode the url parameter once', () => {
+    const value = 'https://wsrv.nl/?url=https://cdn.example.com/2026%252F04/photo.jpg&w=300'
+    const expected = 'https://cdn.example.com/2026%2F04/photo.jpg'
+
+    expect(unwrapProxiedImage(value)).toBe(expected)
+  })
+
+  it('should cut an unencoded nested url at its first ampersand', () => {
+    const value = 'https://wsrv.nl/?url=https://cdn.example.com/photo.jpg?v=2&w=300'
+    const expected = 'https://cdn.example.com/photo.jpg?v=2'
+
+    expect(unwrapProxiedImage(value)).toBe(expected)
   })
 })
 

@@ -1,3 +1,4 @@
+import { getQueryParam, parseUrl } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import {
   getElementDimensions,
@@ -5,7 +6,7 @@ import {
   isElementHidden,
   pixelDimensionLimit,
 } from '../../utils/dom.js'
-import { matchesUrlPattern } from '../../utils/urls.js'
+import { matchesUrlPattern, placeholderBaseUrl } from '../../utils/urls.js'
 
 const isPixelDimension = (value: number | undefined): boolean => {
   return value !== undefined && value <= pixelDimensionLimit
@@ -26,7 +27,16 @@ const isContentSized = (dimensions: { width?: number; height?: number }): boolea
 // gif stays out of the raster list: it is the dominant spacer and pixel format.
 // Tracking pixels ship as GIF or script beacons.
 const rasterExtensionRegex = /\.(?:jpe?g|png|webp|avif)(?:$|[?#])/i
-const rasterFormatQueryRegex = /[?&](?:format|fm|output)=(?:jpe?g|png|webp|avif)\b/i
+const rasterFormatRegex = /^(?:jpe?g|png|webp|avif)\b/i
+const formatQueryParams = ['format', 'fm', 'output']
+
+const hasRasterFormatQuery = (src: string): boolean => {
+  const url = parseUrl(src, placeholderBaseUrl)
+
+  return formatQueryParams.some((name) => {
+    return rasterFormatRegex.test(getQueryParam(url, name) ?? '')
+  })
+}
 
 // A raster src clears a 0x0 lazy placeholder only: raster beacons ship at 1x1 as well.
 // A non-empty srcset is a content signal at any size.
@@ -47,7 +57,7 @@ const hasContentImageSignal = (
 
   const src = image.getAttribute('src')
 
-  return !!src && (rasterExtensionRegex.test(src) || rasterFormatQueryRegex.test(src))
+  return !!src && (rasterExtensionRegex.test(src) || hasRasterFormatQuery(src))
 }
 
 // A tracking pixel: a hidden or pixel-sized <img> whose only job is to fire a request.

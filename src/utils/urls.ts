@@ -3,6 +3,7 @@ import {
   documentExtensions,
   fixMalformedQuery,
   flashExtensions,
+  getQueryParam,
   imageExtensions,
   isHostOrSubdomainOf,
   type Nullish,
@@ -100,13 +101,22 @@ export const isFileName = (value: string): boolean => {
 // `/w/index.php?title=File:Clip.webm` spelling moves the namespace into the query.
 const filePagePathRegex = /\/wiki\/[^/?#]*(?::|%3A)[^/?#]*$/i
 const scriptPathRegex = /\/index\.php$/i
-const titleParamRegex = /[?&]title=[^&#]*(?::|%3A)/i
 const filePageNameRegex = /\/wiki\/[^/?#]*?(?::|%3A)([^/?#]+)$/i
 
 export const isMediaWikiFilePage = (value: string): boolean => {
   const path = value.split(queryOrHashRegex)[0]
 
-  return filePagePathRegex.test(path) || (scriptPathRegex.test(path) && titleParamRegex.test(value))
+  if (filePagePathRegex.test(path)) {
+    return true
+  }
+
+  if (!scriptPathRegex.test(path)) {
+    return false
+  }
+
+  const title = getQueryParam(parseUrl(value, placeholderBaseUrl), 'title')
+
+  return title?.includes(':') ?? false
 }
 
 // The name as the wiki spells it, percent-encoding intact, which is the form `Special:FilePath`
