@@ -28,7 +28,7 @@ export const steamResolveEmbed: ResolveUrlEmbed = (url) => {
 
   const widget = subId ? `${appId}/${subId}` : appId
   // The widget prints `t` in place of the game's own blurb, so it is the publisher's text.
-  const description = getQueryParam(url.searchParams, 't')?.trim() || undefined
+  const description = getQueryParam(url.searchParams, 't')
 
   return {
     provider,

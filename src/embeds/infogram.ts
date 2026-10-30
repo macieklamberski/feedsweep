@@ -27,7 +27,7 @@ const composeInfogramEmbed = (
   query: string,
   title: string | undefined,
 ): EmbedResolverResult => {
-  const live = hasQueryParam(new URLSearchParams(query), 'live') ? '&live' : ''
+  const live = hasQueryParam(query, 'live') ? '&live' : ''
 
   return {
     provider,

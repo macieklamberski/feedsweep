@@ -251,7 +251,7 @@ export const unwrapProxiedImage = (url: string): string => {
 // A key two renditions of one image share, whatever their size, crop or proxy.
 export const getImageFingerprint = (rawUrl: string, context?: TransformContext): string => {
   const cleaned = unwrapProxiedImage(cleanUrl(rawUrl, context) ?? rawUrl)
-  // With stripProtocol the result would not parse, so the protocol goes when the key is built.
+  // With stripScheme the result would not parse, so the scheme goes when the key is built.
   const normalized = normalizeUrl(cleaned, {
     stripWww: true,
     stripHash: true,

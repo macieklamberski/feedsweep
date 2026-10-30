@@ -184,16 +184,9 @@ export const flashVars = (element: Nullish<Element>): string | undefined => {
   return attr(element, 'flashvars') ?? paramValue(paramOwner(element), 'flashvars')
 }
 
-// A flashvars query string read as pairs, its twice-escaped `&amp;` folded and each value without
-// the whitespace a publisher left around it, so the id and the minted url name the same item.
+// A flashvars query string read as pairs, its twice-escaped `&amp;` folded.
 export const parseFlashVars = (query: Nullish<string>): URLSearchParams => {
-  const params = new URLSearchParams()
-
-  for (const [name, value] of new URLSearchParams(foldEscapedAmpersands(query ?? ''))) {
-    params.append(name, value.trim())
-  }
-
-  return params
+  return new URLSearchParams(foldEscapedAmpersands(query ?? ''))
 }
 
 // One named value out of that configuration, for a carrier that names a single thing.
