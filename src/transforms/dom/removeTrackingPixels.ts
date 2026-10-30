@@ -1,4 +1,4 @@
-import { getQueryParam, parseUrl } from 'trousse'
+import { getQueryParam, isAnyOf, parseUrl, webImageExtensions } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import {
   getElementDimensions,
@@ -24,17 +24,22 @@ const isContentSized = (dimensions: { width?: number; height?: number }): boolea
   return width > pixelDimensionLimit || height > pixelDimensionLimit
 }
 
-// gif stays out of the raster list: it is the dominant spacer and pixel format.
-// Tracking pixels ship as GIF or script beacons.
-const rasterExtensionRegex = /\.(?:jpe?g|png|webp|avif)(?:$|[?#])/i
-const rasterFormatRegex = /^(?:jpe?g|png|webp|avif)\b/i
+// gif and svg are the spacer, pixel and badge formats.
+const spacerExtensions = ['gif', 'svg']
+const rasterExtensions = webImageExtensions.filter((extension) => {
+  return !spacerExtensions.includes(extension)
+})
+const rasterExtensionRegex = new RegExp(`\\.(?:${rasterExtensions.join('|')})(?:$|[?#])`, 'i')
 const formatQueryParams = ['format', 'fm', 'output']
 
+// A format value can name several formats, such as `webp,auto`.
 const hasRasterFormatQuery = (src: string): boolean => {
   const url = parseUrl(src, placeholderBaseUrl)
 
   return formatQueryParams.some((name) => {
-    return rasterFormatRegex.test(getQueryParam(url, name) ?? '')
+    const formats = getQueryParam(url, name)?.split(',') ?? []
+
+    return formats.some((format) => isAnyOf(format.trim(), rasterExtensions))
   })
 }
 

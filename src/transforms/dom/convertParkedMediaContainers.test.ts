@@ -214,6 +214,20 @@ describeForEachParser('convertParkedMediaContainers', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should play a parked weba url as an audio element', async () => {
+    const value = '<div data-src="https://cdn.example.com/ep.weba"></div>'
+    const expected = html`
+      <div data-src="https://cdn.example.com/ep.weba">
+        <audio
+          src="https://cdn.example.com/ep.weba"
+          controls=""
+        ></audio>
+      </div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should be idempotent', async () => {
     const value = '<div data-src="https://cdn.example.com/ep.mp3"></div>'
     const once = await transform(value)
