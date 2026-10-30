@@ -100,6 +100,7 @@ const buildMedia = (
     name: attr(attachment, 'filename') ?? url,
     type: attr(attachment, 'content-type'),
     size: coerceNumber(attr(attachment, 'filesize')),
+    description: attr(attachment, 'caption'),
   })
 }
 

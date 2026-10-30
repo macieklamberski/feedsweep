@@ -366,7 +366,7 @@ describeForEachParser('rebuildActionTextAttachments', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should rebuild a captioned file into a file placeholder with no figure', async () => {
+    it('should carry the caption of a file onto its placeholder, with no figure', async () => {
       const value = html`
         <action-text-attachment
           content-type="application/pdf"
@@ -380,6 +380,7 @@ describeForEachParser('rebuildActionTextAttachments', (parseHtml) => {
           data-file-url="https://example.com/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NDJ9--5c1d/mri-report.pdf"
           data-file-name="mri-report.pdf"
           data-file-type="application/pdf"
+          data-file-description="The report the clinic sent"
         ></div>
       `
 

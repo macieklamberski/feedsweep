@@ -1572,6 +1572,29 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
       expect(await transform(value, context)).toEqualHtml(expected)
     })
 
+    it('should carry the description of a document onto its placeholder', async () => {
+      const value = '<p>Content</p>'
+      const context = withEnclosures([
+        {
+          url: 'https://example.com/files/minutes.pdf',
+          type: 'application/pdf',
+          description: 'Minutes of the October council meeting',
+        },
+      ])
+      const expected = html`
+        <p>Content</p>
+        <div
+          data-file-url="https://example.com/files/minutes.pdf"
+          data-file-name="minutes.pdf"
+          data-file-type="application/pdf"
+          data-file-description="Minutes of the October council meeting"
+          data-enclosure=""
+        ></div>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
     it('should inject a document after the content with its name, type and size', async () => {
       const value = '<p>Content</p>'
       const context = withEnclosures([

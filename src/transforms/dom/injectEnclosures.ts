@@ -270,6 +270,7 @@ export const injectEnclosures: DomTransform = (context) => {
             name: getFileName(enclosure, mediaSource),
             type: enclosure.type ?? enclosure.medium,
             size: enclosure.length,
+            description: enclosure.description,
           }),
         )
         continue

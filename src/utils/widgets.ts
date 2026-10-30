@@ -640,6 +640,8 @@ type FileFields = {
   name: string
   type?: string
   size?: number
+  // What the author wrote about the file: an enclosure's description, an attachment's caption.
+  description?: string
 }
 
 // A file the reader downloads, never frames.
@@ -649,6 +651,7 @@ export const createFilePlaceholder = (document: Document, fields: FileFields): H
     name: fields.name,
     type: fields.type,
     size: fields.size ? String(fields.size) : undefined,
+    description: fields.description,
   })
 }
 
