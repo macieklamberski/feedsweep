@@ -1,7 +1,6 @@
-import { composeQuery } from 'trousse'
+import { composeQuery, getQueryParams } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'bunnystream'
@@ -30,7 +29,7 @@ export const bunnystreamResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 
   const [, libraryId, videoId] = match
-  const picked = pickQueryParams(url.search, playbackParams)
+  const picked = getQueryParams(url.search, playbackParams)
   // The player autoplays unless the library turns it off, so a frame loaded without a click
   // would play unasked.
   const query = composeQuery({ autoplay: 'false', ...picked })

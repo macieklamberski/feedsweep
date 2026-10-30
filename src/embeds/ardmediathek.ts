@@ -1,5 +1,5 @@
+import { composeQuery, getQueryParams } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
-import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ardmediathek'
@@ -25,7 +25,7 @@ const ardmediathekResolveEmbed: ResolveUrlEmbed = (url) => {
   return {
     provider,
     id,
-    src: `https://www.ardmediathek.de/embed/${id}${pickUrlParams(url, ['startTime'])}`,
+    src: `https://www.ardmediathek.de/embed/${id}${composeQuery(getQueryParams(url, ['startTime']))}`,
     url: `https://www.ardmediathek.de/video/${id}`,
     ...sizes.player,
   }

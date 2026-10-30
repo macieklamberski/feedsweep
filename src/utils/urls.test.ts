@@ -5,10 +5,6 @@ import {
   cleanUrl,
   filterUrlQuery,
   parseUrlOnHosts,
-  pickFragmentParams,
-  pickQueryParams,
-  pickUrlFragment,
-  pickUrlParams,
   prepareUrl,
   readOrigin,
   repairCarrierUrl,
@@ -334,109 +330,6 @@ describe('prepareUrl', () => {
   })
 })
 
-describe('pickQueryParams', () => {
-  it('should keep only the named parameters', () => {
-    const value = 'start=90&autoplay=1&list=PLabc'
-    const expected = {
-      start: '90',
-      list: 'PLabc',
-    }
-
-    expect(pickQueryParams(value, ['start', 'list'])).toEqual(expected)
-  })
-
-  it('should state nothing when none are present', () => {
-    const value = 'autoplay=1&rel=0'
-
-    expect(pickQueryParams(value, ['start'])).toEqual({})
-  })
-
-  it('should state nothing for an empty query', () => {
-    expect(pickQueryParams('', ['start'])).toEqual({})
-  })
-
-  it('should skip a parameter present but empty', () => {
-    expect(pickQueryParams('start=', ['start'])).toEqual({})
-  })
-
-  // The query arrives from an attribute, so it may carry the punctuation a url would have
-  // percent-encoded; `URLSearchParams` decodes it the same way either way.
-  it('should decode a value that arrived encoded', () => {
-    const value = 'clipt=a%2Bb%2Fc'
-    const expected = { clipt: 'a+b/c' }
-
-    expect(pickQueryParams(value, ['clipt'])).toEqual(expected)
-  })
-
-  it('should take the first of a repeated parameter', () => {
-    const value = 'start=10&start=90'
-    const expected = { start: '10' }
-
-    expect(pickQueryParams(value, ['start'])).toEqual(expected)
-  })
-
-  it('should trim whitespace around a value', () => {
-    const value = 'start=90%20&list=PLabc'
-    const expected = { start: '90' }
-
-    expect(pickQueryParams(value, ['start'])).toEqual(expected)
-  })
-})
-
-describe('pickFragmentParams', () => {
-  it('should keep only the named parameters of the fragment', () => {
-    const value = new URL('https://platform.example/v/abc123?t=5#t=90&autoplay=1')
-    const expected = { t: '90' }
-
-    expect(pickFragmentParams(value, ['t'])).toEqual(expected)
-  })
-
-  it('should end a value at a query glued after the fragment', () => {
-    const value = new URL('https://platform.example/v/abc123#t=98?wmode=opaque')
-    const expected = { t: '98' }
-
-    expect(pickFragmentParams(value, ['t'])).toEqual(expected)
-  })
-
-  it('should read a pair of the query glued after the fragment', () => {
-    const value = new URL('https://platform.example/v/abc123#t=98?p=4')
-    const expected = {
-      t: '98',
-      p: '4',
-    }
-
-    expect(pickFragmentParams(value, ['t', 'p'])).toEqual(expected)
-  })
-
-  it('should state nothing for a url with no fragment', () => {
-    const value = new URL('https://platform.example/v/abc123?t=90')
-
-    expect(pickFragmentParams(value, ['t'])).toEqual({})
-  })
-})
-
-describe('pickUrlFragment', () => {
-  it('should write the named parameters back as a fragment', () => {
-    const value = new URL('https://platform.example/v/abc123#t=98?wmode=opaque')
-    const expected = '#t=98'
-
-    expect(pickUrlFragment(value, ['t'])).toBe(expected)
-  })
-
-  it('should escape a value that would open another pair', () => {
-    const value = new URL('https://platform.example/v/abc123#t=1%26autoplay%3D1')
-    const expected = '#t=1%26autoplay=1'
-
-    expect(pickUrlFragment(value, ['t'])).toBe(expected)
-  })
-
-  it('should write nothing when the fragment names none of them', () => {
-    const value = new URL('https://platform.example/v/abc123#?secret=abc')
-
-    expect(pickUrlFragment(value, ['t'])).toBe('')
-  })
-})
-
 describe('repairCarrierUrl', () => {
   it('should open a query glued onto the path', () => {
     const value = 'https://platform.example/v/abc123&hl=en'
@@ -493,36 +386,5 @@ describe('filterUrlQuery', () => {
     const value = new URL('https://example.com/e')
 
     expect(filterUrlQuery(value, isKept)).toBe('')
-  })
-})
-
-describe('pickUrlParams', () => {
-  it('should keep only the named parameters, in the order given', () => {
-    const value = 'https://example.com/e/x?utm_source=feed&index=4&list=PLabc&start=90'
-    const expected = '?start=90&list=PLabc&index=4'
-
-    expect(pickUrlParams(new URL(value), ['start', 'list', 'index'])).toBe(expected)
-  })
-
-  it('should return an empty string when none are present', () => {
-    const value = 'https://example.com/e/x?utm_source=feed'
-    const expected = ''
-
-    expect(pickUrlParams(new URL(value), ['start'])).toBe(expected)
-  })
-
-  it('should return an empty string when there is no query', () => {
-    expect(pickUrlParams(new URL('https://example.com/e/x'), ['start'])).toBe('')
-  })
-
-  it('should skip a parameter present but empty', () => {
-    expect(pickUrlParams(new URL('https://example.com/e/x?start='), ['start'])).toBe('')
-  })
-
-  it('should escape a decoded plus sign and write a decoded slash back bare', () => {
-    const value = 'https://example.com/e/x?clipt=a%2Bb%2Fc'
-    const expected = '?clipt=a%2Bb/c'
-
-    expect(pickUrlParams(new URL(value), ['clipt'])).toBe(expected)
   })
 })

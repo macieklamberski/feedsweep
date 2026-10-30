@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { composeFragment, getFragmentParams, getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { isFileName, pickUrlFragment } from '../utils/urls.js'
+import { isFileName } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'transistor'
@@ -59,7 +59,7 @@ export const transistorResolveEmbed: ResolveUrlEmbed = (url) => {
   // Dropping the mode mints /e/{slug}, an episode by a show's name, which answers 404.
   const path = embed.mode ? `e/${embed.id}/${embed.mode}` : `e/${embed.id}`
   // The player seeks to the `#t=` it reads from the fragment.
-  const fragment = pickUrlFragment(url, ['t'])
+  const fragment = composeFragment(getFragmentParams(url, ['t']))
 
   return {
     provider,

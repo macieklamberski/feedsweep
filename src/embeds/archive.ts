@@ -1,4 +1,11 @@
-import { composeQuery, encodePathSegment, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import {
+  composeQuery,
+  encodePathSegment,
+  getPathSegments,
+  getQueryParam,
+  getQueryParams,
+  isAnyOf,
+} from 'trousse'
 import type {
   EmbedRenderHint,
   EmbedResolverResult,
@@ -6,7 +13,7 @@ import type {
   ResolveUrlEmbed,
 } from '../types.js'
 import { attr, flashVar, flashVars } from '../utils/dom.js'
-import { audioFileRegex, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
+import { audioFileRegex, parseUrlOnHosts } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
@@ -95,7 +102,7 @@ const readItemEmbed = (url: URL | undefined): EmbedResolverResult | undefined =>
   }
 
   // The parameters that say what plays are carried over; the rest is dropped.
-  const query = composeQuery(pickQueryParams(url?.search ?? '', archiveEmbedParams))
+  const query = composeQuery(getQueryParams(url?.search ?? '', archiveEmbedParams))
 
   return composeEmbedResult(identifier, query, file)
 }

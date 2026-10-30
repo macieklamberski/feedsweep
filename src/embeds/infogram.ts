@@ -1,4 +1,4 @@
-import { encodePathSegment, getQueryParam } from 'trousse'
+import { encodePathSegment, hasQueryParam } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
 import { readIframeResizeHeight } from '../utils/hints.js'
@@ -27,7 +27,7 @@ const composeInfogramEmbed = (
   query: string,
   title: string | undefined,
 ): EmbedResolverResult => {
-  const live = getQueryParam(new URLSearchParams(query), 'live') !== undefined ? '&live' : ''
+  const live = hasQueryParam(new URLSearchParams(query), 'live') ? '&live' : ''
 
   return {
     provider,

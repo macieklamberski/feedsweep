@@ -1,7 +1,6 @@
-import { composeQuery, getPathSegments, isAnyOf } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParams, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'listennotes'
@@ -67,7 +66,7 @@ export const listennotesResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
   const [route = '', slug = '', item, embed] = segments
   const title = attr(element, 'title')
-  const episodeQuery = composeQuery(pickQueryParams(url.search, episodeParams))
+  const episodeQuery = composeQuery(getQueryParams(url.search, episodeParams))
 
   if (!item) {
     return

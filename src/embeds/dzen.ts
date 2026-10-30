@@ -1,5 +1,5 @@
+import { composeQuery, getQueryParams } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
-import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'dzen'
@@ -23,7 +23,7 @@ export const dzenResolveEmbed: ResolveUrlEmbed = (url) => {
   return {
     provider,
     id,
-    src: `https://dzen.ru/embed/${id}${pickUrlParams(url, ['t'])}`,
+    src: `https://dzen.ru/embed/${id}${composeQuery(getQueryParams(url, ['t']))}`,
     ...sizes.player,
   }
 }

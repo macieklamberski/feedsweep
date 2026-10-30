@@ -2,8 +2,10 @@ import {
   composeQuery,
   decodeSegment,
   encodePathSegment,
+  getFragmentParams,
   getPathSegments,
   getQueryParam,
+  getQueryParams,
   isAnyOf,
   isHostOrSubdomainOf,
   type Nullish,
@@ -17,7 +19,7 @@ import type {
 } from '../types.js'
 import { attr, find } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
-import { parseUrlOnHosts, pickFragmentParams, pickQueryParams } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
@@ -185,13 +187,13 @@ const parseWatchOffset = (value: string): string | undefined => {
 // The player ignores `t`, so an offset moves over as `start` unless one is stated. Besides the
 // query, publishers write it in the fragment as `#t=220`.
 const readEmbedParams = (url: URL): Record<string, string> => {
-  const params = pickQueryParams(url.search, youtubeEmbedParams)
+  const params = getQueryParams(url.search, youtubeEmbedParams)
 
   if (params.start) {
     return params
   }
 
-  const offsets = [pickQueryParams(url.search, ['t']).t, pickFragmentParams(url, ['t']).t]
+  const offsets = [getQueryParams(url.search, ['t']).t, getFragmentParams(url, ['t']).t]
   const start = offsets.map((offset) => parseWatchOffset(offset ?? '')).find(Boolean)
 
   if (start) {
@@ -426,7 +428,7 @@ export const youtubeFrontendEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const params = pickQueryParams(url.search, youtubeEmbedParams)
+    const params = getQueryParams(url.search, youtubeEmbedParams)
     const offset = frontendOffsetParams
       .map((name) => getQueryParam(url.searchParams, name))
       .find(Boolean)

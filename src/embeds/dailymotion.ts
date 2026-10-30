@@ -5,6 +5,7 @@ import {
   getPathSegments,
   getQueryParam,
   getQueryParams,
+  getQueryParamValues,
   isAnyOf,
   isHostOrSubdomainOf,
   isPlainObject,
@@ -18,7 +19,7 @@ import type {
   ResolveUrlEmbed,
 } from '../types.js'
 import { attr, find } from '../utils/dom.js'
-import { parseUrlOnHosts, pickQueryParams, twoLettersRegex } from '../utils/urls.js'
+import { parseUrlOnHosts, twoLettersRegex } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'dailymotion'
@@ -104,7 +105,7 @@ const readWidgetEntry = (url: URL): Array<string> => {
   if (isAnyOf(route, 'widget') && isAnyOf(widgetKind, 'jukebox')) {
     // A jukebox can list a user or a group beside a playlist, and only a video or a playlist maps
     // onto a player.
-    const entries = getQueryParams(url.searchParams, 'list[]').map((entry) => {
+    const entries = getQueryParamValues(url.searchParams, 'list[]').map((entry) => {
       return entry.split('/').filter(Boolean)
     })
 
@@ -189,7 +190,7 @@ const dailymotionEmbedParams = ['start', 'startTime', 'loop', 'playlist']
 
 // A player id's player reads the start as `startTime` and ignores the old `start`.
 const readPlayerParams = (url: URL): Record<string, string> => {
-  const params = pickQueryParams(url.search, dailymotionEmbedParams)
+  const params = getQueryParams(url.search, dailymotionEmbedParams)
 
   return {
     ...trimObject(

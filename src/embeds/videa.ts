@@ -1,7 +1,6 @@
-import { composeQuery, getQueryParam, isAnyOf } from 'trousse'
+import { composeQuery, getQueryParam, getQueryParams, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'videa'
@@ -29,7 +28,7 @@ export const videaResolveEmbed: ResolveUrlEmbed = (url, element) => {
     return
   }
 
-  const query = composeQuery({ v: id, ...pickQueryParams(url.search, ['start']) })
+  const query = composeQuery({ v: id, ...getQueryParams(url.search, ['start']) })
 
   return {
     provider,

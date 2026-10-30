@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf, parseUrl } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParams, isAnyOf, parseUrl } from 'trousse'
 import type { EmbedRenderHint } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { pickUrlParams, readOrigin, uuidRegex } from '../utils/urls.js'
+import { readOrigin, uuidRegex } from '../utils/urls.js'
 import { createMarkupEmbedResolver, readRepairedCarrierUrl } from '../utils/widgets.js'
 
 const provider = 'peertube'
@@ -107,7 +107,7 @@ export const peertubeEmbedResolver = createMarkupEmbedResolver(
       return {
         provider,
         id: `playlist/${video.id}`,
-        src: `${video.origin}/video-playlists/embed/${video.id}${pickUrlParams(url, peertubePlaylistParams)}`,
+        src: `${video.origin}/video-playlists/embed/${video.id}${composeQuery(getQueryParams(url, peertubePlaylistParams))}`,
         url: `${video.origin}/w/p/${video.id}`,
         ...sizes.player,
         title: attr(element, 'title'),
@@ -120,7 +120,7 @@ export const peertubeEmbedResolver = createMarkupEmbedResolver(
     return {
       provider,
       id: video.id,
-      src: `${video.origin}/videos/embed/${video.id}${pickUrlParams(url, peertubeEmbedParams)}`,
+      src: `${video.origin}/videos/embed/${video.id}${composeQuery(getQueryParams(url, peertubeEmbedParams))}`,
       url: `${video.origin}/w/${video.id}`,
       ...sizes.player,
       title: attr(element, 'title'),

@@ -1,8 +1,15 @@
-import { composeQuery, encodePathSegment, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import {
+  composeQuery,
+  encodePathSegment,
+  getPathSegments,
+  getQueryParam,
+  getQueryParams,
+  isAnyOf,
+} from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { digitsRegex, pickQueryParams } from '../utils/urls.js'
+import { digitsRegex } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'spreaker'
@@ -58,7 +65,7 @@ export const spreakerResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const title = attr(element, 'title')
   const query = composeQuery({
     [embed.param]: embed.id,
-    ...pickQueryParams(url.search, playerParams),
+    ...getQueryParams(url.search, playerParams),
   })
 
   // Both kinds name a page that takes the bare id and redirects to its canonical slugged form,

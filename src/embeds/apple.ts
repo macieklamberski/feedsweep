@@ -1,14 +1,15 @@
 import {
+  composeQuery,
   encodePathSegment,
   getPathSegments,
   getQueryParam,
+  getQueryParams,
   isHostOrSubdomainOf,
   type Nullish,
   toMap,
 } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr, jsonAttr } from '../utils/dom.js'
-import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const musicProvider = 'applemusic'
@@ -61,7 +62,7 @@ export const appleResolveEmbed: ResolveUrlEmbed = (url) => {
   const host = isPodcast ? 'podcasts.apple.com' : 'music.apple.com'
   const trackId = getQueryParam(url.searchParams, 'i')
   const id = trackId ? trackId : pathId.replace(podcastIdPrefixRegex, '')
-  const query = trackId ? pickUrlParams(url, ['i']) : ''
+  const query = trackId ? composeQuery(getQueryParams(url, ['i'])) : ''
 
   return {
     provider: isPodcast ? podcastsProvider : musicProvider,

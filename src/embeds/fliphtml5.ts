@@ -1,7 +1,7 @@
-import { getPathSegments } from 'trousse'
+import { composeFragment, getFragmentParams, getPathSegments } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { isFileName, parseUrlOnHosts, pickUrlFragment } from '../utils/urls.js'
+import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'fliphtml5'
@@ -26,7 +26,7 @@ export const fliphtml5ResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
   const viewerUrl = `https://online.fliphtml5.com/${account}/${book}/`
   // The start page sits in the fragment, so its query is written after `#`.
-  const fragment = pickUrlFragment(url, ['p'])
+  const fragment = composeFragment(getFragmentParams(url, ['p']))
 
   return {
     provider,

@@ -1,7 +1,7 @@
-import { encodePathSegment, getQueryParam } from 'trousse'
+import { composeQuery, encodePathSegment, getQueryParam, getQueryParams } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
-import { hexRegex, pickUrlParams } from '../utils/urls.js'
+import { hexRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'rutube'
@@ -30,7 +30,7 @@ const composeEmbed = (videoId: string, parsed: URL): EmbedResolverResult => {
   return {
     provider,
     id: videoId,
-    src: `https://rutube.ru/play/embed/${segment}${pickUrlParams(parsed, rutubeEmbedParams)}`,
+    src: `https://rutube.ru/play/embed/${segment}${composeQuery(getQueryParams(parsed, rutubeEmbedParams))}`,
     url: getQueryParam(parsed.searchParams, 'p')
       ? undefined
       : `https://rutube.ru/video/${segment}/`,

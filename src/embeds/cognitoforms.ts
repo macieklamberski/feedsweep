@@ -1,7 +1,14 @@
-import { encodePathSegment, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import {
+  composeQuery,
+  encodePathSegment,
+  getPathSegments,
+  getQueryParam,
+  getQueryParams,
+  isAnyOf,
+} from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, find, text } from '../utils/dom.js'
-import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'cognitoforms'
@@ -41,7 +48,7 @@ export const cognitoformsResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 
   // `entry` prefills the form.
-  return composeEmbed(orgKey, formNumber, pickUrlParams(url, ['entry']))
+  return composeEmbed(orgKey, formNumber, composeQuery(getQueryParams(url, ['entry'])))
 }
 
 // Cognito Forms' seamless embed, a script that renders the form into the page itself and that
