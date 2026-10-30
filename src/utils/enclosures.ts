@@ -35,12 +35,17 @@ const mediaFingerprintOptions: NormalizeOptions = {
 // Audio, video and embeds have no scaled variants.
 const readMediaFingerprint = (element: Element, context?: TransformContext): string => {
   const src = element.getAttribute('src') ?? element.getAttribute('data-embed-src') ?? ''
+  // The key is only compared, so the caller's matchUrlFn stands in for cleanUrlFn here. A
+  // measurement prefix such as `media.blubrry.com/{show}/{file}` names the body's bare file.
+  const matchContext = context?.matchUrlFn
+    ? { ...context, cleanUrlFn: context.matchUrlFn }
+    : context
 
   if (element.localName === 'img') {
-    return getImageFingerprint(src, context)
+    return getImageFingerprint(src, matchContext)
   }
 
-  return cleanUrl(src, context) ?? src
+  return cleanUrl(src, matchContext) ?? src
 }
 
 // One file written over `http` and `https` is one fingerprint, and the output keeps what the feed

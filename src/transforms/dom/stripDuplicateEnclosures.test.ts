@@ -4,6 +4,13 @@ import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { stripDuplicateEnclosures } from './stripDuplicateEnclosures.js'
 
+const measurementPrefixRegex = /^(https?:\/\/)media\.blubrry\.com\/[^/]+\//
+
+// Stands in for urlpurify's cleanUrl with downloadMeasurementUnwrappers.
+const unwrapMeasurementPrefix = (url: string) => {
+  return url.replace(measurementPrefixRegex, '$1')
+}
+
 describeForEachParser('stripDuplicateEnclosures', (parseHtml) => {
   const transform = (value: string, context: TransformContext = baseContext) => {
     return applyDomTransforms(parseHtml(value), [stripDuplicateEnclosures(context)])
@@ -459,6 +466,67 @@ describeForEachParser('stripDuplicateEnclosures', (parseHtml) => {
       const expected = '<video controls src="https://example.com/clip.mp4"></video>'
 
       expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should remove a marked audio behind a measurement prefix using matchUrlFn', async () => {
+      const value = html`
+        <audio
+          src="https://media.blubrry.com/ms_all_de_la_innovacin/example.com/wp-content/uploads/2021/05/TEAS9.mp3"
+          data-enclosure=""
+        ></audio>
+        <figure><audio controls src="https://example.com/wp-content/uploads/2021/05/TEAS9.mp3"></audio></figure>
+      `
+      const context: TransformContext = {
+        ...baseContext,
+        cleanUrlFn: (url) => url,
+        matchUrlFn: unwrapMeasurementPrefix,
+      }
+      const expected = html`
+        <figure><audio controls src="https://example.com/wp-content/uploads/2021/05/TEAS9.mp3"></audio></figure>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should remove a marked audio using cleanUrlFn when there is no matchUrlFn', async () => {
+      const value = html`
+        <audio
+          src="https://example.com/wp-content/uploads/2023/08/Entrevista-a-Faus-Nirvana-Verbal.mp3"
+          data-enclosure=""
+        ></audio>
+        <audio controls src="https://example.com/wp-content/uploads/2023/08/Entrevista-a-Faus-Nirvana-Verbal.mp3?_=2"></audio>
+      `
+      const context: TransformContext = {
+        ...baseContext,
+        cleanUrlFn: (url) => url.replace('?_=2', ''),
+      }
+      const expected = html`
+        <audio controls src="https://example.com/wp-content/uploads/2023/08/Entrevista-a-Faus-Nirvana-Verbal.mp3?_=2"></audio>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should keep a marked audio behind a measurement prefix with no matchUrlFn', async () => {
+      const value = html`
+        <audio
+          src="https://media.blubrry.com/ms_all_de_la_innovacin/example.com/wp-content/uploads/2021/05/TEAS9.mp3"
+          data-enclosure=""
+        ></audio>
+        <figure><audio controls src="https://example.com/wp-content/uploads/2021/05/TEAS9.mp3"></audio></figure>
+      `
+      const context: TransformContext = {
+        ...baseContext,
+        cleanUrlFn: (url) => url,
+      }
+      const expected = html`
+        <audio
+          src="https://media.blubrry.com/ms_all_de_la_innovacin/example.com/wp-content/uploads/2021/05/TEAS9.mp3"
+        ></audio>
+        <figure><audio controls src="https://example.com/wp-content/uploads/2021/05/TEAS9.mp3"></audio></figure>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
     })
 
     // In the pipeline convertWidgets has already turned any iframe that plays into a placeholder.
