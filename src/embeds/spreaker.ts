@@ -2,7 +2,7 @@ import { composeQuery, encodePathSegment, getPathSegments, getQueryParam, isAnyO
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { digitsRegex } from '../utils/urls.js'
+import { digitsRegex, pickQueryParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'spreaker'
@@ -11,6 +11,9 @@ const hosts = ['spreaker.com']
 
 // An episode player, or a show player that plays the latest episode.
 const embedKinds = { episode_id: 'episode', show_id: 'show' } as const
+
+// Whether the player goes on to the next episode of its list when one ends.
+const playerParams = ['playlist-continuous']
 
 const sizes = {
   // The height Spreaker documents in its own embed snippet, `height="200px"`.
@@ -53,13 +56,17 @@ export const spreakerResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 
   const title = attr(element, 'title')
+  const query = composeQuery({
+    [embed.param]: embed.id,
+    ...pickQueryParams(url.search, playerParams),
+  })
 
   // Both kinds name a page that takes the bare id and redirects to its canonical slugged form,
   // `/episode/{id}` and `/show/{id}`, so the click target is the resource the player plays.
   return {
     provider,
     id: `${embed.kind}/${embed.id}`,
-    src: `https://widget.spreaker.com/player${composeQuery({ [embed.param]: embed.id })}`,
+    src: `https://widget.spreaker.com/player${query}`,
     // The query id comes out decoded, and it goes into the page path.
     url: `https://www.spreaker.com/${embed.kind}/${encodePathSegment(embed.id)}`,
     ...sizes.player,

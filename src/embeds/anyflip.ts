@@ -1,7 +1,7 @@
-import { composeQuery, getPathSegments, isAnyOf, isHostOf } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { pickQueryParams } from '../utils/urls.js'
+import { pickUrlFragment } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'anyflip'
@@ -31,9 +31,7 @@ export const anyflipResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
   const viewerUrl = `https://online.anyflip.com/${user}/${book}/`
   // The start page sits in the fragment, so its query is written after `#`.
-  const hashQuery = url.hash.slice(1)
-  const startPage = pickQueryParams(hashQuery, ['p'])
-  const fragment = composeQuery(startPage).replace('?', '#')
+  const fragment = pickUrlFragment(url, ['p'])
 
   return {
     provider,

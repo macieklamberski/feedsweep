@@ -19,6 +19,7 @@ import {
   flashFileRegex,
   hexRegex,
   parseUrlOnHosts,
+  pickFragmentParams,
   pickQueryParams,
 } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -300,7 +301,7 @@ const vimeoEmbedParams = ['loop']
 // The player seeks to `t` in the fragment, `#t=30s`, and ignores a `t` in the query, which a page
 // url shared with a start carries.
 const readStart = (url: URL): string | undefined => {
-  return pickQueryParams(url.hash.slice(1), ['t']).t ?? pickQueryParams(url.search, ['t']).t
+  return pickFragmentParams(url, ['t']).t ?? pickQueryParams(url.search, ['t']).t
 }
 
 // The `title` a share snippet writes is usually the video's own title, but sometimes a player

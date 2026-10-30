@@ -33,8 +33,10 @@ const playerParams = ['access_key', 'start_page']
 
 // The embeds route answers 200 with an identical body for any id, rendering "Document deleted by
 // owner" for a Flash-era id and "Document Not Found" for an invented one.
-const composeEmbed = (document: string, search = ''): EmbedResolverResult => {
-  const params = pickQueryParams(search, playerParams)
+const composeEmbed = (
+  document: string,
+  params: Record<string, string> = {},
+): EmbedResolverResult => {
   // The Flash `document_id` comes out of a query decoded, and it goes into a path.
   const segment = encodePathSegment(document)
 
@@ -73,7 +75,9 @@ export const scribdResolveEmbed: ResolveUrlEmbed = (url, element) => {
     return
   }
 
-  return { ...composeEmbed(document, url.search), title: attr(element, 'title') }
+  const params = pickQueryParams(url.search, playerParams)
+
+  return { ...composeEmbed(document, params), title: attr(element, 'title') }
 }
 
 // Scribd's player iframe, /embeds/{id}/content.
@@ -91,8 +95,16 @@ export const scribdFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
     return
   }
 
-  // The access key sits beside the document id, in the swf query or in the flashvars.
-  return composeEmbed(document, queryDocument ? url.search : flashVars(element))
+  // The access key sits beside the document id, in the swf query or in the flashvars. The viewer
+  // named the page it opened on `page`, which the player calls `start_page`.
+  const search = queryDocument ? url.search : (flashVars(element) ?? '')
+  const { page, ...params } = pickQueryParams(search, ['access_key', 'page'])
+
+  if (page) {
+    params.start_page = page
+  }
+
+  return composeEmbed(document, params)
 }
 
 // Scribd's Flash viewer, scribdviewer.swf, dead since 2020 and naming its document in document_id.

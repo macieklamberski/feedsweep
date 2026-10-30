@@ -1,7 +1,6 @@
-import { composeQuery } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { pickQueryParams } from '../utils/urls.js'
+import { pickUrlFragment } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'mediaccc'
@@ -18,13 +17,7 @@ const playerPathRegex = /^\/v\/([^/]+)\/oembed\/?$/i
 
 // The player seeks to the `#t=` it reads from the hash. A WordPress auto-embed writes
 // `#?secret=` there.
-const readStartFragment = (parsed: URL): string => {
-  const hashQuery = parsed.hash.slice(1)
-  const startTime = pickQueryParams(hashQuery, ['t'])
-  const query = composeQuery(startTime)
-
-  return query.replace('?', '#')
-}
+const startFragmentParams = ['t']
 
 // The player of a media.ccc.de talk, the iframe its oEmbed answer writes. The talk page refuses
 // framing.
@@ -38,7 +31,7 @@ export const mediacccResolveEmbed: ResolveUrlEmbed = (url, element) => {
   return {
     provider,
     id: slug,
-    src: `https://media.ccc.de/v/${slug}/oembed${readStartFragment(url)}`,
+    src: `https://media.ccc.de/v/${slug}/oembed${pickUrlFragment(url, startFragmentParams)}`,
     url: `https://media.ccc.de/v/${slug}`,
     ...sizes.player,
     title: attr(element, 'title'),

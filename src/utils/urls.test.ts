@@ -5,7 +5,9 @@ import {
   cleanUrl,
   filterUrlQuery,
   parseUrlOnHosts,
+  pickFragmentParams,
   pickQueryParams,
+  pickUrlFragment,
   pickUrlParams,
   prepareUrl,
   readOrigin,
@@ -378,6 +380,60 @@ describe('pickQueryParams', () => {
     const expected = { start: '90' }
 
     expect(pickQueryParams(value, ['start'])).toEqual(expected)
+  })
+})
+
+describe('pickFragmentParams', () => {
+  it('should keep only the named parameters of the fragment', () => {
+    const value = new URL('https://platform.example/v/abc123?t=5#t=90&autoplay=1')
+    const expected = { t: '90' }
+
+    expect(pickFragmentParams(value, ['t'])).toEqual(expected)
+  })
+
+  it('should end a value at a query glued after the fragment', () => {
+    const value = new URL('https://platform.example/v/abc123#t=98?wmode=opaque')
+    const expected = { t: '98' }
+
+    expect(pickFragmentParams(value, ['t'])).toEqual(expected)
+  })
+
+  it('should read a pair of the query glued after the fragment', () => {
+    const value = new URL('https://platform.example/v/abc123#t=98?p=4')
+    const expected = {
+      t: '98',
+      p: '4',
+    }
+
+    expect(pickFragmentParams(value, ['t', 'p'])).toEqual(expected)
+  })
+
+  it('should state nothing for a url with no fragment', () => {
+    const value = new URL('https://platform.example/v/abc123?t=90')
+
+    expect(pickFragmentParams(value, ['t'])).toEqual({})
+  })
+})
+
+describe('pickUrlFragment', () => {
+  it('should write the named parameters back as a fragment', () => {
+    const value = new URL('https://platform.example/v/abc123#t=98?wmode=opaque')
+    const expected = '#t=98'
+
+    expect(pickUrlFragment(value, ['t'])).toBe(expected)
+  })
+
+  it('should escape a value that would open another pair', () => {
+    const value = new URL('https://platform.example/v/abc123#t=1%26autoplay%3D1')
+    const expected = '#t=1%26autoplay=1'
+
+    expect(pickUrlFragment(value, ['t'])).toBe(expected)
+  })
+
+  it('should write nothing when the fragment names none of them', () => {
+    const value = new URL('https://platform.example/v/abc123#?secret=abc')
+
+    expect(pickUrlFragment(value, ['t'])).toBe('')
   })
 })
 

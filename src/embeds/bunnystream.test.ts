@@ -12,7 +12,7 @@ describe('bunnystreamResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'bunnystream',
         id: '490164/808903b8-30ff-49df-b389-1f2baeef0ea7',
-        src: 'https://player.mediadelivery.net/embed/490164/808903b8-30ff-49df-b389-1f2baeef0ea7?autoplay=false',
+        src: 'https://player.mediadelivery.net/embed/490164/808903b8-30ff-49df-b389-1f2baeef0ea7?autoplay=false&loop=false',
         url: 'https://player.mediadelivery.net/play/490164/808903b8-30ff-49df-b389-1f2baeef0ea7',
         ratio: '16/9',
       }
@@ -26,7 +26,7 @@ describe('bunnystreamResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'bunnystream',
         id: '611228/c1627376-4b93-4d89-b335-552576450ee0',
-        src: 'https://player.mediadelivery.net/embed/611228/c1627376-4b93-4d89-b335-552576450ee0?autoplay=false',
+        src: 'https://player.mediadelivery.net/embed/611228/c1627376-4b93-4d89-b335-552576450ee0?autoplay=false&loop=false',
         url: 'https://player.mediadelivery.net/play/611228/c1627376-4b93-4d89-b335-552576450ee0',
         ratio: '16/9',
       }
@@ -40,7 +40,7 @@ describe('bunnystreamResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'bunnystream',
         id: '54257/cb983aec-cd8d-4c21-a2a5-937a077ad47f',
-        src: 'https://player.mediadelivery.net/embed/54257/cb983aec-cd8d-4c21-a2a5-937a077ad47f?autoplay=false',
+        src: 'https://player.mediadelivery.net/embed/54257/cb983aec-cd8d-4c21-a2a5-937a077ad47f?autoplay=false&loop=false',
         url: 'https://player.mediadelivery.net/play/54257/cb983aec-cd8d-4c21-a2a5-937a077ad47f',
         ratio: '16/9',
       }
@@ -167,7 +167,7 @@ describeForEachParser('bunnystreamEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'bunnystream',
         id: '490164/808903b8-30ff-49df-b389-1f2baeef0ea7',
-        src: 'https://player.mediadelivery.net/embed/490164/808903b8-30ff-49df-b389-1f2baeef0ea7?autoplay=false',
+        src: 'https://player.mediadelivery.net/embed/490164/808903b8-30ff-49df-b389-1f2baeef0ea7?autoplay=false&loop=false',
         url: 'https://player.mediadelivery.net/play/490164/808903b8-30ff-49df-b389-1f2baeef0ea7',
         ratio: '16/9',
       }
@@ -188,7 +188,7 @@ describeForEachParser('bunnystreamEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'bunnystream',
         id: '611228/c1627376-4b93-4d89-b335-552576450ee0',
-        src: 'https://player.mediadelivery.net/embed/611228/c1627376-4b93-4d89-b335-552576450ee0?autoplay=false',
+        src: 'https://player.mediadelivery.net/embed/611228/c1627376-4b93-4d89-b335-552576450ee0?autoplay=false&loop=false',
         url: 'https://player.mediadelivery.net/play/611228/c1627376-4b93-4d89-b335-552576450ee0',
         ratio: '16/9',
       }
@@ -210,7 +210,7 @@ describeForEachParser('bunnystreamEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'bunnystream',
         id: '283225/60611273-04a5-46fc-82cf-a6f5cad670ee',
-        src: 'https://player.mediadelivery.net/embed/283225/60611273-04a5-46fc-82cf-a6f5cad670ee?autoplay=false',
+        src: 'https://player.mediadelivery.net/embed/283225/60611273-04a5-46fc-82cf-a6f5cad670ee?autoplay=false&loop=false',
         url: 'https://player.mediadelivery.net/play/283225/60611273-04a5-46fc-82cf-a6f5cad670ee',
         ratio: '16/9',
         title: 'What is Azure Maps Video',
@@ -247,7 +247,7 @@ describeForEachParser('bunnystream through the pipeline', (parseHtml) => {
       '<div style="position:relative;width:100%;height:0;padding-bottom:56.25%;"><iframe src="https://iframe.mediadelivery.net/play/54257/cb983aec-cd8d-4c21-a2a5-937a077ad47f?autoplay=true&loop=false&muted=false&preload=true&responsive=true&chromecast=true" loading="lazy" style="border:0;position:absolute;top:0;left:0;width:100%;height:100%;" allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;" allowfullscreen="true"></iframe></div>'
     const expected = html`
       <div
-        data-embed-src="https://player.mediadelivery.net/embed/54257/cb983aec-cd8d-4c21-a2a5-937a077ad47f?autoplay=false"
+        data-embed-src="https://player.mediadelivery.net/embed/54257/cb983aec-cd8d-4c21-a2a5-937a077ad47f?autoplay=false&loop=false"
         data-embed-provider="bunnystream"
         data-embed-id="54257/cb983aec-cd8d-4c21-a2a5-937a077ad47f"
         data-embed-url="https://player.mediadelivery.net/play/54257/cb983aec-cd8d-4c21-a2a5-937a077ad47f"

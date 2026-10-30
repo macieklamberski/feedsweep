@@ -17,7 +17,7 @@ import type {
 } from '../types.js'
 import { attr, find } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
-import { parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
+import { parseUrlOnHosts, pickFragmentParams, pickQueryParams } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
@@ -191,14 +191,8 @@ const readEmbedParams = (url: URL): Record<string, string> => {
     return params
   }
 
-  const offsetQueries = [url.search, url.hash.slice(1)]
-  const start = offsetQueries
-    .map((query) => {
-      const offset = getQueryParam(new URLSearchParams(query), 't') ?? ''
-
-      return parseWatchOffset(offset)
-    })
-    .find(Boolean)
+  const offsets = [pickQueryParams(url.search, ['t']).t, pickFragmentParams(url, ['t']).t]
+  const start = offsets.map((offset) => parseWatchOffset(offset ?? '')).find(Boolean)
 
   if (start) {
     params.start = start
