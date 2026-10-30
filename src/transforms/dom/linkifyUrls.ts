@@ -5,6 +5,7 @@ import { cleanUrl } from '../../utils/urls.js'
 import { createLink } from '../../utils/widgets.js'
 
 const urlProtocolRegex = /^https?:\/\//i
+const closerBracketRegex = /\[(?=\/)/g
 const linkifyIgnoreTags = ['a', 'pre', 'code', 'kbd', 'samp', 'var', 'noscript']
 
 const shouldSkipElement = (element: Element): boolean => {
@@ -27,7 +28,10 @@ export const linkifyUrls: DomTransform = (context) => {
         continue
       }
 
-      const links = linkifyFind(text).filter(
+      // A bbcode or shortcode closer glued to a url, as in `{url}[/embed]`, ends it, while any
+      // other `[` belongs to the url, as in `?tag[]=`. A space in its place keeps every offset.
+      const scannedText = text.replace(closerBracketRegex, ' ')
+      const links = linkifyFind(scannedText).filter(
         (link) => link.type === 'url' && urlProtocolRegex.test(link.value),
       )
 
