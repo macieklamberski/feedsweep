@@ -127,6 +127,21 @@ describeForEachParser('prepareEnclosures', (parseHtml) => {
       expect(prepareUrls(enclosures)).toEqual(expected)
     })
 
+    it('should collapse an image behind a proxy prefix using matchUrlFn', () => {
+      const enclosures: Array<Enclosure> = [
+        { url: 'https://cdn.example.org/proxy/example.com/cover.jpg', type: 'image/jpeg' },
+        { url: 'https://example.com/cover.jpg', type: 'image/jpeg' },
+      ]
+      const context: TransformContext = {
+        ...baseContext,
+        cleanUrlFn: (url) => url,
+        matchUrlFn: (url) => url.replace('cdn.example.org/proxy/', ''),
+      }
+      const expected = ['https://cdn.example.org/proxy/example.com/cover.jpg']
+
+      expect(prepareUrls(enclosures, context)).toEqual(expected)
+    })
+
     it('should keep distinct images that differ by path', () => {
       const enclosures: Array<Enclosure> = [
         { url: 'https://example.com/a/photo.jpg', type: 'image/jpeg' },
@@ -451,6 +466,78 @@ describeForEachParser('prepareEnclosures', (parseHtml) => {
       expect(prepareUrls(enclosures, context)).toEqual(expected)
     })
 
+    it('should fold an ungrouped enclosure naming a group member over another scheme', () => {
+      const enclosures: Array<Enclosure> = [
+        { url: 'http://example.com/clip-720.mp4', type: 'video/mp4' },
+        { url: 'https://example.com/clip-720.mp4', type: 'video/mp4', height: 720, groupIndex: 0 },
+        {
+          url: 'https://example.com/clip-1080.mp4',
+          type: 'video/mp4',
+          height: 1080,
+          isDefault: true,
+          groupIndex: 0,
+        },
+      ]
+      const expected = ['https://example.com/clip-1080.mp4']
+
+      expect(prepareUrls(enclosures)).toEqual(expected)
+    })
+
+    it('should fold an ungrouped enclosure naming a group member with a media fragment', () => {
+      const enclosures: Array<Enclosure> = [
+        { url: 'https://example.com/clip-720.mp4#t=5', type: 'video/mp4' },
+        { url: 'https://example.com/clip-720.mp4', type: 'video/mp4', height: 720, groupIndex: 0 },
+        {
+          url: 'https://example.com/clip-1080.mp4',
+          type: 'video/mp4',
+          height: 1080,
+          isDefault: true,
+          groupIndex: 0,
+        },
+      ]
+      const expected = ['https://example.com/clip-1080.mp4']
+
+      expect(prepareUrls(enclosures)).toEqual(expected)
+    })
+
+    it('should fold an ungrouped enclosure behind a measurement prefix using matchUrlFn', () => {
+      const enclosures: Array<Enclosure> = [
+        {
+          url: 'https://media.blubrry.com/example_show/example.com/clip-720.mp4',
+          type: 'video/mp4',
+        },
+        { url: 'https://example.com/clip-720.mp4', type: 'video/mp4', height: 720, groupIndex: 0 },
+        {
+          url: 'https://example.com/clip-1080.mp4',
+          type: 'video/mp4',
+          height: 1080,
+          isDefault: true,
+          groupIndex: 0,
+        },
+      ]
+      const context: TransformContext = {
+        ...baseContext,
+        cleanUrlFn: (url) => url,
+        matchUrlFn: (url) => url.replace('media.blubrry.com/example_show/', ''),
+      }
+      const expected = ['https://example.com/clip-1080.mp4']
+
+      expect(prepareUrls(enclosures, context)).toEqual(expected)
+    })
+
+    it('should keep an ungrouped player page naming another document by its hash', () => {
+      const enclosures: Array<Enclosure> = [
+        { url: 'https://e.issuu.com/embed.html#333333/444444' },
+        { url: 'https://e.issuu.com/embed.html#111111/222222', groupIndex: 0 },
+      ]
+      const expected = [
+        'https://e.issuu.com/embed.html#333333/444444',
+        'https://e.issuu.com/embed.html#111111/222222',
+      ]
+
+      expect(prepareUrls(enclosures)).toEqual(expected)
+    })
+
     it('should drop a group whose renditions have no url', () => {
       const enclosures: Array<Enclosure> = [
         { type: 'video/mp4', height: 720, groupIndex: 0 },
@@ -581,6 +668,58 @@ describeForEachParser('prepareEnclosures', (parseHtml) => {
       ]
 
       expect(prepare(enclosures)).toEqual(expected)
+    })
+
+    it('should merge a player page naming its media file over another scheme', () => {
+      const enclosures: Array<Enclosure> = [
+        { url: 'https://player.example.com/?media_url=http%3A%2F%2Fexample.com%2Fep.mp3' },
+        { url: 'https://example.com/ep.mp3', type: 'audio/mpeg' },
+      ]
+      const expected = [
+        {
+          url: 'https://example.com/ep.mp3',
+          type: 'audio/mpeg',
+          playerUrl: 'https://player.example.com/?media_url=http%3A%2F%2Fexample.com%2Fep.mp3',
+        },
+      ]
+
+      expect(prepare(enclosures)).toEqual(expected)
+    })
+
+    it('should merge a player page with its media file behind a measurement prefix using matchUrlFn', () => {
+      const enclosures: Array<Enclosure> = [
+        { url: 'https://player.example.com/?media_url=https%3A%2F%2Fexample.com%2Fep.mp3' },
+        { url: 'https://media.blubrry.com/example_show/example.com/ep.mp3', type: 'audio/mpeg' },
+      ]
+      const context: TransformContext = {
+        ...baseContext,
+        cleanUrlFn: (url) => url,
+        matchUrlFn: (url) => url.replace('media.blubrry.com/example_show/', ''),
+      }
+      const expected = [
+        {
+          url: 'https://media.blubrry.com/example_show/example.com/ep.mp3',
+          type: 'audio/mpeg',
+          playerUrl: 'https://player.example.com/?media_url=https%3A%2F%2Fexample.com%2Fep.mp3',
+        },
+      ]
+
+      expect(prepare(enclosures, context)).toEqual(expected)
+    })
+
+    it('should not merge a player page whose nested url names a part by its hash', () => {
+      const enclosures: Array<Enclosure> = [
+        {
+          url: 'https://player.example.com/?media_url=https%3A%2F%2Fexample.com%2Fep.mp3%23part-2',
+        },
+        { url: 'https://example.com/ep.mp3', type: 'audio/mpeg' },
+      ]
+      const expected = [
+        'https://player.example.com/?media_url=https%3A%2F%2Fexample.com%2Fep.mp3%23part-2',
+        'https://example.com/ep.mp3',
+      ]
+
+      expect(prepareUrls(enclosures)).toEqual(expected)
     })
 
     it('should merge using cleanUrlFn-normalized urls', () => {

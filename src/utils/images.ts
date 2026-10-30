@@ -14,7 +14,13 @@ import {
 import { extractVideoId, hosts as youtubeHosts } from '../embeds/youtube.js'
 import type { TransformContext } from '../types.js'
 import { pixelDimensionLimit } from './dom.js'
-import { cleanUrl, isFileName, isUsableSrc, parseUrlOnHosts, placeholderBaseUrl } from './urls.js'
+import {
+  cleanMatchUrl,
+  isFileName,
+  isUsableSrc,
+  parseUrlOnHosts,
+  placeholderBaseUrl,
+} from './urls.js'
 
 // The parser reads a bare `225w` with no url as that candidate's url, and a proxy 404s on it.
 // Jetpack's feed export keeps only the first url, `…768w, 225w, 563w`, while the page has them all.
@@ -248,7 +254,7 @@ export const unwrapProxiedImage = (url: string): string => {
 
 // A key two renditions of one image share, whatever their size, crop or proxy.
 export const getImageFingerprint = (rawUrl: string, context?: TransformContext): string => {
-  const cleaned = unwrapProxiedImage(cleanUrl(rawUrl, context) ?? rawUrl)
+  const cleaned = unwrapProxiedImage(cleanMatchUrl(rawUrl, context) ?? rawUrl)
   // With stripProtocol the result would not parse, so the protocol goes when the key is built.
   const normalized = normalizeUrl(cleaned, {
     stripWww: true,

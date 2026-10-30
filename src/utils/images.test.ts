@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import type { Nullish } from 'trousse'
 import { baseContext, describeForEachParser, html } from '../tests.js'
+import type { TransformContext } from '../types.js'
 import {
   countSrcsetCandidates,
   findPosterEvidence,
@@ -212,6 +213,21 @@ describe('getImageFingerprint', () => {
     const bare = getImageFingerprint('https://example.com/photo.jpg', context)
 
     expect(glued).toBe(bare)
+  })
+
+  it('should clean through matchUrlFn in place of cleanUrlFn', () => {
+    const context: TransformContext = {
+      ...baseContext,
+      cleanUrlFn: (url) => url,
+      matchUrlFn: (url) => url.replace('cdn.example.org/proxy/', ''),
+    }
+    const wrapped = getImageFingerprint(
+      'https://cdn.example.org/proxy/example.com/cover.jpg',
+      context,
+    )
+    const bare = getImageFingerprint('https://example.com/cover.jpg', context)
+
+    expect(wrapped).toBe(bare)
   })
 
   it('should key a glued query as written when there is no cleaner', () => {

@@ -1522,6 +1522,63 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
       expect(await transform(value, context)).toEqualHtml(expected)
     })
 
+    it('should inject one element when two enclosures name the same file over http and https', async () => {
+      const value = '<p>Content</p>'
+      const context = withEnclosures([
+        { url: 'http://example.com/episode.mp3', type: 'audio/mpeg' },
+        { url: 'https://example.com/episode.mp3', type: 'audio/mpeg' },
+      ])
+      const expected = html`
+        <audio
+          src="http://example.com/episode.mp3"
+          controls
+          data-enclosure=""
+        ></audio>
+        <p>Content</p>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should inject one element when two enclosures differ only by a media fragment', async () => {
+      const value = '<p>Content</p>'
+      const context = withEnclosures([
+        { url: 'https://example.com/episode.mp3', type: 'audio/mpeg' },
+        { url: 'https://example.com/episode.mp3#t=30', type: 'audio/mpeg' },
+      ])
+      const expected = html`
+        <audio
+          src="https://example.com/episode.mp3"
+          controls
+          data-enclosure=""
+        ></audio>
+        <p>Content</p>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should keep two players that name different documents by their hash', async () => {
+      const value = '<p>Content</p>'
+      const context = withEnclosures([
+        { playerUrl: 'https://e.issuu.com/embed.html#111111/222222' },
+        { playerUrl: 'https://e.issuu.com/embed.html#333333/444444' },
+      ])
+      const expected = html`
+        <div
+          data-embed-src="https://e.issuu.com/embed.html#111111/222222"
+          data-enclosure=""
+        ></div>
+        <div
+          data-embed-src="https://e.issuu.com/embed.html#333333/444444"
+          data-enclosure=""
+        ></div>
+        <p>Content</p>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
     it('should keep two players that name different files', async () => {
       const value = '<p>Content</p>'
       const context = withEnclosures([
