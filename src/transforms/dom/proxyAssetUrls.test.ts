@@ -280,6 +280,18 @@ describeForEachParser('proxyAssetUrls', (parseHtml) => {
     expect(await transform(value, wrapProxy)).toEqualHtml(expected)
   })
 
+  it('should rewrite data-file-thumbnail as image', async () => {
+    const value = '<div data-file-thumbnail="https://cdn.example.com/preview.png"></div>'
+    const expected = html`
+      <div
+        data-file-thumbnail="https://proxy.example.com/?type=image&url=https%3A%2F%2Fcdn.example.com%2Fpreview.png"
+        data-proxied-file-thumbnail="https://cdn.example.com/preview.png"
+      ></div>
+    `
+
+    expect(await transform(value, wrapProxy)).toEqualHtml(expected)
+  })
+
   it('should not rewrite data-cite-url (navigation, not asset)', async () => {
     const value = '<div data-cite-url="https://example.com/post"></div>'
 

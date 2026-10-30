@@ -14,7 +14,13 @@ import type {
 } from '../../types.js'
 import { enclosureMarker, isEnclosureKind, prepareEnclosures } from '../../utils/enclosures.js'
 import { findPosterEvidence, getImageFingerprint } from '../../utils/images.js'
-import { cleanUrl, flashFileRegex, imageFileRegex, resolveOrDropUrl } from '../../utils/urls.js'
+import {
+  cleanUrl,
+  flashFileRegex,
+  imageFileRegex,
+  prepareUrl,
+  resolveOrDropUrl,
+} from '../../utils/urls.js'
 import {
   createCaptionedFigure,
   createEmbedPlaceholder,
@@ -270,6 +276,8 @@ export const injectEnclosures: DomTransform = (context) => {
             name: getFileName(enclosure, mediaSource),
             type: enclosure.type ?? enclosure.medium,
             size: enclosure.length,
+            description: enclosure.description,
+            thumbnail: prepareUrl(enclosure.thumbnails?.[0]?.url, context),
           }),
         )
         continue
