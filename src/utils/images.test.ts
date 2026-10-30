@@ -575,6 +575,12 @@ describe('unwrapProxiedImage', () => {
 
     expect(unwrapProxiedImage(value)).toBe(expected)
   })
+
+  it('should keep a proxy url that names no source', () => {
+    const value = 'https://example.com/_next/image?w=640&q=75'
+
+    expect(unwrapProxiedImage(value)).toBe(value)
+  })
 })
 
 describe('getUrlDimensions', () => {
