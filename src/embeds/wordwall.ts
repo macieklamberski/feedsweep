@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf, isHostOf } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParams, isAnyOf, isHostOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
-import { hexRegex, hyphenatedLettersRegex, lettersRegex, pickUrlParams } from '../utils/urls.js'
+import { hexRegex, hyphenatedLettersRegex, lettersRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'wordwall'
@@ -66,7 +66,7 @@ const wordwallResolveEmbed: ResolveUrlEmbed = (url) => {
   return {
     provider,
     id: activityId,
-    src: `https://wordwall.net/embed/${activityId}${pickUrlParams(url, playParams)}`,
+    src: `https://wordwall.net/embed/${activityId}${composeQuery(getQueryParams(url, playParams))}`,
     ...sizes.player,
   }
 }

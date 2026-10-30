@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf, isPlainObject } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParams, isAnyOf, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'nicovideo'
@@ -68,7 +68,7 @@ export const nicovideoResolveEmbed: ResolveUrlEmbed = (url) => {
   return {
     provider,
     id: videoId,
-    src: `https://embed.nicovideo.jp/watch/${videoId}${pickUrlParams(url, nicovideoEmbedParams)}`,
+    src: `https://embed.nicovideo.jp/watch/${videoId}${composeQuery(getQueryParams(url, nicovideoEmbedParams))}`,
     url: `https://www.nicovideo.jp/watch/${videoId}`,
     ...sizes.player,
   }

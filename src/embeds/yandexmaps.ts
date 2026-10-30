@@ -1,7 +1,7 @@
-import { composeQuery, getQueryParam, isAnyOf } from 'trousse'
+import { composeQuery, getQueryParam, getQueryParams, isAnyOf } from 'trousse'
 import type { EmbedResolverResult } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'yandexmaps'
@@ -81,7 +81,7 @@ const resolveCoordinateMap = (
     return
   }
 
-  const positionValues = pickQueryParams(query.toString(), positionParams)
+  const positionValues = getQueryParams(query.toString(), positionParams)
   const position = composeQuery(positionValues)
 
   return {
@@ -127,7 +127,7 @@ export const yandexMapsIframeEmbedResolver = createUrlEmbedResolver(hosts, (url,
     return
   }
 
-  const position = pickQueryParams(url.search, positionParams)
+  const position = getQueryParams(url.search, positionParams)
 
   return (
     resolveConstructorMap(url.hostname, url.searchParams, position) ??

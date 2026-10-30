@@ -1,7 +1,13 @@
-import { encodePathSegment, getPathSegments, isAnyOf, toMap } from 'trousse'
+import {
+  composeQuery,
+  encodePathSegment,
+  getPathSegments,
+  getQueryParams,
+  isAnyOf,
+  toMap,
+} from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { pickUrlParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'strava'
@@ -71,7 +77,7 @@ export const stravaResolveEmbed: ResolveUrlEmbed = (url) => {
     return composeEmbed(retiredKind, id)
   }
 
-  return composeEmbed(route, id, pickUrlParams(url, embedParams))
+  return composeEmbed(route, id, composeQuery(getQueryParams(url, embedParams)))
 }
 
 export const stravaIframeEmbedResolver = createUrlEmbedResolver(

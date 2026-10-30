@@ -1,10 +1,10 @@
-import { encodePathSegment, toMap, trimObject } from 'trousse'
+import { encodePathSegment, getQueryParams, toMap, trimObject } from 'trousse'
 import { composeEmbedUrl as composeVimeoUrl } from '../../embeds/vimeo.js'
 import { composeEmbedUrl as composeYoutubeUrl, youtubeEmbedParams } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
 import { attr, text } from '../../utils/dom.js'
 import * as styles from '../../utils/styles.js'
-import { digitsRegex, isUrlShaped, pickQueryParams } from '../../utils/urls.js'
+import { digitsRegex, isUrlShaped } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
 
 type EmbedSource = {
@@ -113,7 +113,7 @@ export const rebuildLiteVideoEmbeds: DomTransform = () => (document) => {
 
     // The options arrive either as the dedicated `start` attribute or inside `params`, and a
     // component may state both. The attribute is the more specific of the two, so it wins.
-    const params = pickQueryParams(element.getAttribute('params') ?? '', source.params)
+    const params = getQueryParams(element.getAttribute('params') ?? '', source.params)
     const start = source.startAttributes.map((name) => element.getAttribute(name)).find(Boolean)
 
     if (start) {

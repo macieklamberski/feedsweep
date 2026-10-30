@@ -1,8 +1,10 @@
 import {
   composeQuery,
   encodePathSegment,
+  getFragmentParams,
   getPathSegments,
   getQueryParam,
+  getQueryParams,
   isAnyOf,
   isHostOf,
   trimObject,
@@ -14,14 +16,7 @@ import type {
   ResolveUrlEmbed,
 } from '../types.js'
 import { attr, flashVar, keepIfMatches } from '../utils/dom.js'
-import {
-  digitsRegex,
-  flashFileRegex,
-  hexRegex,
-  parseUrlOnHosts,
-  pickFragmentParams,
-  pickQueryParams,
-} from '../utils/urls.js'
+import { digitsRegex, flashFileRegex, hexRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'vimeo'
@@ -252,12 +247,9 @@ const readReference = (url: URL): VimeoReference | undefined => {
     }
   }
 
-  const queryHash = getQueryParam(url.searchParams, 'h')
-
   return {
     id,
-    // biome-ignore lint/nursery/useNullishCoalescing: An empty hash reads as absent.
-    hash: queryHash || undefined,
+    hash: getQueryParam(url.searchParams, 'h'),
   }
 }
 
@@ -301,7 +293,7 @@ const vimeoEmbedParams = ['loop']
 // The player seeks to `t` in the fragment, `#t=30s`, and ignores a `t` in the query, which a page
 // url shared with a start carries.
 const readStart = (url: URL): string | undefined => {
-  return pickFragmentParams(url, ['t']).t ?? pickQueryParams(url.search, ['t']).t
+  return getFragmentParams(url, ['t']).t ?? getQueryParams(url.search, ['t']).t
 }
 
 // The `title` a share snippet writes is usually the video's own title, but sometimes a player
@@ -321,7 +313,7 @@ export const vimeoResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const params = {
     // The player takes the hash only as h=: the /video/{id}/{hash} path spelling is a 404.
     ...trimObject({ h: hash }, Boolean),
-    ...pickQueryParams(url.search, vimeoEmbedParams),
+    ...getQueryParams(url.search, vimeoEmbedParams),
   }
 
   return {

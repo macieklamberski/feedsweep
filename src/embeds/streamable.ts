@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf, isHostOf } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParams, isAnyOf, isHostOf } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr, find } from '../utils/dom.js'
-import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'streamable'
@@ -65,7 +65,7 @@ export const streamableResolveEmbed: ResolveUrlEmbed = (url, element) => {
   return {
     provider,
     id,
-    src: `https://streamable.com/e/${id}${pickUrlParams(url, streamableEmbedParams)}`,
+    src: `https://streamable.com/e/${id}${composeQuery(getQueryParams(url, streamableEmbedParams))}`,
     url: `https://streamable.com/${id}`,
     ...sizes.player,
     title,

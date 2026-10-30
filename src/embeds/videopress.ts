@@ -1,4 +1,12 @@
-import { encodePathSegment, getPathSegments, getQueryParam, isAnyOf, isHostOf } from 'trousse'
+import {
+  composeQuery,
+  encodePathSegment,
+  getPathSegments,
+  getQueryParam,
+  getQueryParams,
+  isAnyOf,
+  isHostOf,
+} from 'trousse'
 import type {
   EmbedRenderHint,
   EmbedResolverResult,
@@ -6,7 +14,7 @@ import type {
   ResolveUrlEmbed,
 } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'videopress'
@@ -48,7 +56,7 @@ const videopressResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 
   return {
-    ...composeEmbed(guid, pickUrlParams(url, videopressEmbedParams)),
+    ...composeEmbed(guid, composeQuery(getQueryParams(url, videopressEmbedParams))),
     // The block editor writes the poster the publisher chose into the player url.
     thumbnail: getQueryParam(url.searchParams, 'posterUrl'),
     title: attr(element, 'title'),

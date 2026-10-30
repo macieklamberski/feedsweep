@@ -1,6 +1,5 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParams, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
-import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'subsplash'
@@ -45,7 +44,7 @@ export const subsplashResolveEmbed: ResolveUrlEmbed = (url) => {
       return
     }
 
-    const query = pickUrlParams(url, ['t'])
+    const query = composeQuery(getQueryParams(url, ['t']))
 
     return composeEmbed(id, `https://subsplash.com/u/${org}/media/embed/d/${id}${query}`)
   }

@@ -1,6 +1,13 @@
-import { encodePathSegment, getQueryParam, isAnyOf } from 'trousse'
+import {
+  composeFragment,
+  composeQuery,
+  encodePathSegment,
+  getFragmentParams,
+  getQueryParam,
+  getQueryParams,
+  isAnyOf,
+} from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
-import { pickUrlFragment, pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 import { getPathSegmentsWithoutWorkspace } from './googledrive.js'
 
@@ -44,7 +51,7 @@ export const googleslidesResolveEmbed: ResolveUrlEmbed = (url) => {
     return {
       provider,
       id: fileId,
-      src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${pickUrlFragment(url, deckFragmentParams)}`,
+      src: `https://docs.google.com/presentation/d/${deckPath}/embed${composeQuery(getQueryParams(url, deckParams))}${composeFragment(getFragmentParams(url, deckFragmentParams))}`,
       url: `https://docs.google.com/presentation/d/${deckPath}/pub`,
       ...sizes.player,
     }
@@ -72,7 +79,7 @@ export const googleslidesResolveEmbed: ResolveUrlEmbed = (url) => {
   return {
     provider,
     id: deckId,
-    src: `https://docs.google.com/presentation/d/${deckPath}/embed${pickUrlParams(url, deckParams)}${pickUrlFragment(url, deckFragmentParams)}`,
+    src: `https://docs.google.com/presentation/d/${deckPath}/embed${composeQuery(getQueryParams(url, deckParams))}${composeFragment(getFragmentParams(url, deckFragmentParams))}`,
     url: `https://docs.google.com/presentation/d/${deckPath}/pub`,
     ...sizes.player,
   }

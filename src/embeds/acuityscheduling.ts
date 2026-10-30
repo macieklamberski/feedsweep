@@ -1,7 +1,6 @@
-import { getQueryParam, isAnyOf } from 'trousse'
+import { composeQuery, getQueryParam, getQueryParams, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { readPixels } from '../utils/hints.js'
-import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'acuityscheduling'
@@ -26,7 +25,7 @@ export const acuityschedulingResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 
   // The embed code repeats `owner`, and the first one is kept.
-  const query = pickUrlParams(url, schedulerParams)
+  const query = composeQuery(getQueryParams(url, schedulerParams))
   const appointmentType = getQueryParam(url.searchParams, 'appointmentType')
 
   return {

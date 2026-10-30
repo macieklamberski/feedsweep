@@ -1,6 +1,6 @@
-import { getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParam, getQueryParams, isAnyOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
-import { digitsRegex, pickUrlParams } from '../utils/urls.js'
+import { digitsRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'steam'
@@ -33,7 +33,7 @@ export const steamResolveEmbed: ResolveUrlEmbed = (url) => {
   return {
     provider,
     id: appId,
-    src: `https://store.steampowered.com/widget/${widget}/${pickUrlParams(url, widgetParams)}`,
+    src: `https://store.steampowered.com/widget/${widget}/${composeQuery(getQueryParams(url, widgetParams))}`,
     url: `https://store.steampowered.com/app/${appId}/`,
     thumbnail: `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/header.jpg`,
     ...sizes.player,

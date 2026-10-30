@@ -3,6 +3,7 @@ import {
   encodePathSegment,
   getPathSegments,
   getQueryParam,
+  getQueryParams,
   isAnyOf,
   isHostOf,
   type Nullish,
@@ -10,7 +11,7 @@ import {
 } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { flashVars, parseFlashVars } from '../utils/dom.js'
-import { absoluteUrlRegex, pickQueryParams, pickUrlParams } from '../utils/urls.js'
+import { absoluteUrlRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'pbs'
@@ -105,7 +106,7 @@ const readFlashCarrier = (url: URL, element?: Element): EmbedResolverResult | un
   const video = getQueryParam(params, 'video')
   // The viral player ignores a zero `start` or `end`, which every real Flash carrier writes.
   const flashQuery = flashVars(element) ?? ''
-  const playback = pickQueryParams(flashQuery, playbackParams)
+  const playback = getQueryParams(flashQuery, playbackParams)
   const picked = Object.entries(playback).filter(([, value]) => Number(value) !== 0)
   const query = composeQuery(Object.fromEntries(picked))
 
@@ -139,7 +140,7 @@ export const pbsResolveEmbed: ResolveUrlEmbed = (url, element) => {
     return
   }
 
-  return composeEmbed(route, segments.at(-1), pickUrlParams(url, playbackParams))
+  return composeEmbed(route, segments.at(-1), composeQuery(getQueryParams(url, playbackParams)))
 }
 
 export const pbsIframeEmbedResolver = createUrlEmbedResolver(playerHosts, pbsResolveEmbed)

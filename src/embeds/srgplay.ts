@@ -1,6 +1,5 @@
-import { composeQuery, getQueryParam, isHostOrSubdomainOf, toMap } from 'trousse'
+import { composeQuery, getQueryParam, getQueryParams, isHostOrSubdomainOf, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
-import { pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'srgplay'
@@ -57,7 +56,7 @@ const composeEmbed = (urn: string | undefined, search: string): EmbedResolverRes
   const page = urn.toLowerCase().includes(':video:')
     ? `https://www.${host}/play/tv/-/video/-${composeQuery({ urn })}`
     : undefined
-  const query = composeQuery({ urn, ...pickQueryParams(search, srgplayEmbedParams) })
+  const query = composeQuery({ urn, ...getQueryParams(search, srgplayEmbedParams) })
 
   return {
     provider,

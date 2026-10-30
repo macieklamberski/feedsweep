@@ -2,6 +2,7 @@ import {
   composeQuery,
   encodePathSegment,
   getQueryParam,
+  getQueryParams,
   isPlainObject,
   isPresent,
   toMap,
@@ -10,7 +11,6 @@ import {
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { pickQueryParams } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'vk'
@@ -68,8 +68,8 @@ export const vkResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 
   const params = page
-    ? { oid: ownerId, id: videoId, ...pickQueryParams(url.search, ['t']) }
-    : pickQueryParams(url.search, playerParams)
+    ? { oid: ownerId, id: videoId, ...getQueryParams(url.search, ['t']) }
+    : getQueryParams(url.search, playerParams)
   const id = `${ownerId}_${videoId}`
   // See: https://dev.vk.com/ru/widgets/video, which writes the player on vk.ru.
   const src = `https://vk.ru${player.path}${composeQuery(params)}`

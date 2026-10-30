@@ -1,6 +1,6 @@
-import { composeQuery, getPathSegments, isAnyOf } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParams, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
-import { hyphenatedLettersRegex, pickQueryParams } from '../utils/urls.js'
+import { hyphenatedLettersRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 type Resource = {
@@ -50,7 +50,7 @@ export const komootResolveEmbed: ResolveUrlEmbed = (url) => {
     return
   }
 
-  const params = pickQueryParams(url.search, accessParams)
+  const params = getQueryParams(url.search, accessParams)
   const result: EmbedResolverResult = {
     provider,
     id: resource.id,

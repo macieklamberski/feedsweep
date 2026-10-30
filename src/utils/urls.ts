@@ -1,10 +1,8 @@
 import {
   audioExtensions,
-  composeQuery,
   documentExtensions,
   fixMalformedQuery,
   flashExtensions,
-  getQueryParam,
   imageExtensions,
   isHostOrSubdomainOf,
   type Nullish,
@@ -293,43 +291,6 @@ export const readOrigin = (url: URL | undefined): string | undefined => {
   return url.origin
 }
 
-// The same pick as `pickUrlParams`, for a query that arrives on its own, not on a url, which is
-// how a facade states its player options (`lite-youtube`'s `params`). Returns the pairs instead
-// of a string, so a caller can override one from a dedicated attribute before building.
-export const pickQueryParams = (
-  query: string,
-  names: ReadonlyArray<string>,
-): Record<string, string> => {
-  const parsed = new URLSearchParams(query)
-  const picked: Record<string, string> = {}
-
-  for (const name of names) {
-    const value = getQueryParam(parsed, name)?.trim()
-
-    if (value) {
-      picked[name] = value
-    }
-  }
-
-  return picked
-}
-
-// The same pick for a fragment written as a query, `#t=30`, where several players read their
-// start. A query glued after it, `#t=98?wmode=opaque`, holds pairs of its own, so its `?`
-// separates them the way `fixMalformedQuery` reads a second `?` inside a query.
-export const pickFragmentParams = (
-  url: URL,
-  names: ReadonlyArray<string>,
-): Record<string, string> => {
-  return pickQueryParams(url.hash.slice(1).replaceAll('?', '&'), names)
-}
-
-// The fragment a player url carries over for a player that reads its start from there, built the
-// way `pickUrlParams` builds the query.
-export const pickUrlFragment = (url: URL, names: ReadonlyArray<string>): string => {
-  return composeQuery(pickFragmentParams(url, names)).replace('?', '#')
-}
-
 // The publisher's query with only the parameters a player reads left in it. Each pair stays as
 // written, so a repeated name and a bracketed one such as `pwc[size]` reach the player unchanged.
 export const filterUrlQuery = (url: URL, isKept: (name: string) => boolean): string => {
@@ -343,13 +304,6 @@ export const filterUrlQuery = (url: URL, isKept: (name: string) => boolean): str
     })
 
   return pairs.length > 0 ? `?${pairs.join('&')}` : ''
-}
-
-// The query string an embed resolver carries over when it rebuilds a src from the video id:
-// only the parameters that change what plays. Returns it ready to append, so a src with
-// nothing worth keeping stays bare.
-export const pickUrlParams = (url: URL, names: ReadonlyArray<string>): string => {
-  return composeQuery(pickQueryParams(url.search, names))
 }
 
 // Overloaded so a definite URL returns a string, with no undefined fallback needed at the call

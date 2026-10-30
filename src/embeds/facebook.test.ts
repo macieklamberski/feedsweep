@@ -1378,17 +1378,10 @@ describe('facebookResolveEmbed', () => {
     expect(facebookResolveEmbed(new URL(value))).toEqual(expected)
   })
 
-  it('should use a malformed watch id of one space as written, even if the player answers an error', () => {
+  it('should return undefined for a watch id of one space', () => {
     const value = 'https://www.facebook.com/watch/?v=%20'
-    const expected: EmbedResolverResult = {
-      provider: 'facebook',
-      id: 'https://www.facebook.com/watch/?v=%20',
-      src: 'https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=%2520',
-      url: 'https://www.facebook.com/watch/?v=%20',
-      ratio: '16/9',
-    }
 
-    expect(facebookResolveEmbed(new URL(value))).toEqual(expected)
+    expect(facebookResolveEmbed(new URL(value))).toBeUndefined()
   })
 
   it('should return undefined for the legacy video path under another segment', () => {

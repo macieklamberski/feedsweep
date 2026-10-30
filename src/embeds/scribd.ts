@@ -4,11 +4,11 @@ import {
   encodePathSegment,
   getPathSegments,
   getQueryParam,
+  getQueryParams,
   isAnyOf,
 } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVar, flashVars } from '../utils/dom.js'
-import { pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'scribd'
@@ -75,7 +75,7 @@ export const scribdResolveEmbed: ResolveUrlEmbed = (url, element) => {
     return
   }
 
-  const params = pickQueryParams(url.search, playerParams)
+  const params = getQueryParams(url.search, playerParams)
 
   return { ...composeEmbed(document, params), title: attr(element, 'title') }
 }
@@ -98,7 +98,7 @@ export const scribdFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
   // The access key sits beside the document id, in the swf query or in the flashvars. The viewer
   // named the page it opened on `page`, which the player calls `start_page`.
   const search = queryDocument ? url.search : (flashVars(element) ?? '')
-  const { page, ...params } = pickQueryParams(search, ['access_key', 'page'])
+  const { page, ...params } = getQueryParams(search, ['access_key', 'page'])
 
   if (page) {
     params.start_page = page

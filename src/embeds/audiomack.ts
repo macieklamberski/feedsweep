@@ -1,7 +1,6 @@
-import { composeQuery, getPathSegments, isAnyOf, toMap } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParams, isAnyOf, toMap } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'audiomack'
@@ -69,7 +68,7 @@ export const audiomackResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
   const { artist, kind, slug, search } = track
   const path = `${artist}/${kind}/${slug}`
-  const params = pickQueryParams(search, audiomackEmbedParams)
+  const params = getQueryParams(search, audiomackEmbedParams)
 
   return {
     provider,
