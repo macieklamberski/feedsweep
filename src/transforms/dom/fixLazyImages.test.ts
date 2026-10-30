@@ -75,6 +75,33 @@ describeForEachParser('fixLazyImages', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should extract noscript when the sibling names the same picture through matchUrlFn', async () => {
+    const value = html`
+      <img src="https://track.example/r/example.com/photo.jpg">
+      <noscript>
+        <img src="https://example.com/photo.jpg">
+      </noscript>
+    `
+    const context: TransformContext = {
+      ...baseContext,
+      matchUrlFn: (url) => url.replace('https://track.example/r/', 'https://'),
+    }
+    const expected = '<img src="https://example.com/photo.jpg">'
+
+    expect(await transform(value, context)).toEqualHtml(expected)
+  })
+
+  it('should not extract noscript when the sibling names another picture without matchUrlFn', async () => {
+    const value = html`
+      <img src="https://track.example/r/example.com/photo.jpg">
+      <noscript>
+        <img src="https://example.com/photo.jpg">
+      </noscript>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should not extract noscript when it holds a different image than the sibling', async () => {
     const value = html`
       <img src="https://example.com/photo.jpg">
