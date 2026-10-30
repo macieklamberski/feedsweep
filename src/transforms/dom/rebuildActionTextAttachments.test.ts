@@ -380,7 +380,37 @@ describeForEachParser('rebuildActionTextAttachments', (parseHtml) => {
           data-file-url="https://example.com/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NDJ9--5c1d/mri-report.pdf"
           data-file-name="mri-report.pdf"
           data-file-type="application/pdf"
-          data-file-description="The report the clinic sent"
+          data-file-caption="The report the clinic sent"
+        ></div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep the preview Rails rendered for a file as its thumbnail', async () => {
+      const value = html`
+        <action-text-attachment
+          content-type="application/pdf"
+          url="https://example.com/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NDN9--6d2e/brochure.pdf"
+          filename="brochure.pdf"
+          filesize="204800"
+          previewable="true"
+          caption="Our 2026 brochure"
+        >
+          <figure class="attachment attachment--preview attachment--pdf">
+            <img src="https://example.com/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NDN9--6d2e/eyJ2YXJpYXRpb24ifQ==--cccc/brochure.png">
+            <figcaption class="attachment__caption">Our 2026 brochure</figcaption>
+          </figure>
+        </action-text-attachment>
+      `
+      const expected = html`
+        <div
+          data-file-url="https://example.com/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NDN9--6d2e/brochure.pdf"
+          data-file-name="brochure.pdf"
+          data-file-type="application/pdf"
+          data-file-size="204800"
+          data-file-caption="Our 2026 brochure"
+          data-file-thumbnail="https://example.com/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NDN9--6d2e/eyJ2YXJpYXRpb24ifQ==--cccc/brochure.png"
         ></div>
       `
 
@@ -460,6 +490,30 @@ describeForEachParser('rebuildActionTextAttachments in the pipeline', (parseHtml
         <img src="https://example.com/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MTA5fQ==--606e3e61/eyJ2YXJpYXRpb24ifQ==--90eb/comparison.png">
         <figcaption class="attachment__caption">Comparison</figcaption>
       </figure>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should resolve a relative file preview against the item', async () => {
+    const value = html`
+      <action-text-attachment
+        content-type="application/pdf"
+        url="https://example.com/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NDN9--6d2e/brochure.pdf"
+        filename="brochure.pdf"
+      >
+        <figure class="attachment attachment--preview attachment--pdf">
+          <img src="/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NDN9--6d2e/eyJ2YXJpYXRpb24ifQ==--cccc/brochure.png">
+        </figure>
+      </action-text-attachment>
+    `
+    const expected = html`
+      <div
+        data-file-url="https://example.com/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NDN9--6d2e/brochure.pdf"
+        data-file-name="brochure.pdf"
+        data-file-type="application/pdf"
+        data-file-thumbnail="https://example.com/rails/active_storage/representations/redirect/eyJfcmFpbHMiOnsiZGF0YSI6NDN9--6d2e/eyJ2YXJpYXRpb24ifQ==--cccc/brochure.png"
+      ></div>
     `
 
     expect(await convert(value)).toEqualHtml(expected)

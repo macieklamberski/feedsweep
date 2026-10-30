@@ -100,7 +100,9 @@ const buildMedia = (
     name: attr(attachment, 'filename') ?? url,
     type: attr(attachment, 'content-type'),
     size: coerceNumber(attr(attachment, 'filesize')),
-    description: attr(attachment, 'caption'),
+    caption: attr(attachment, 'caption'),
+    // A previewable file, such as a PDF, holds the preview image Rails rendered for it.
+    thumbnail: attr(attachment.querySelector('img'), 'src'),
   })
 }
 
