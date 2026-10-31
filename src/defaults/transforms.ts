@@ -3,7 +3,6 @@ import { hljsHighlightFn } from '../highlighters/hljs.js'
 import { assignVideoPosters } from '../transforms/dom/assignVideoPosters.js'
 import { canonicalizeAlignment } from '../transforms/dom/canonicalizeAlignment.js'
 import { cleanAnchorUrls } from '../transforms/dom/cleanAnchorUrls.js'
-import { cleanFrameUrls } from '../transforms/dom/cleanFrameUrls.js'
 import { convertAmpNativeElements } from '../transforms/dom/convertAmpNativeElements.js'
 import { convertAsciinemaEmbeds } from '../transforms/dom/convertAsciinemaEmbeds.js'
 import { convertBloggerCaptionTables } from '../transforms/dom/convertBloggerCaptionTables.js'
@@ -138,23 +137,6 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // transforms run, so each is placeholdered and any poster connected.
   surfaceTemplateEmbeds,
 
-  // Runs after surfaceParkedMarkup and surfaceTemplateEmbeds, which can surface a lazy iframe, and
-  // before every pass that reads an iframe's `src`, convertDatawrapperEmbeds and convertGiphyEmbeds
-  // among them.
-  fixLazyIframes,
-
-  // Runs after fixLazyIframes, which promotes a parked wrapper url, and before cleanFrameUrls,
-  // whose cleanUrlFn unwraps the wrapper url its poster is read from. Runs before
-  // convertCiteCards so a payload naming `link` still reaches the cite pass, and before
-  // stripEmptyTags, which is what deletes an empty carrier nothing has claimed.
-  rebuildEmbedlyEmbeds,
-
-  // Runs after fixLazyIframes, so a parked src is cleaned once promoted, and before every pass
-  // that reads a frame's url: the frame unwraps below, surfaceNoscriptEmbeds and the rebuilds
-  // that ask the resolvers, and convertWidgets, which gives a frame no resolver claims its url
-  // back.
-  cleanFrameUrls,
-
   // Runs before convertWidgets, whose Flash resolvers claim the rebuilt embed and which drops a
   // swf none of them claims.
   unwrapWpcomWidgetFrames,
@@ -162,6 +144,11 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // Points a RebelMouse embed frame at the player or tweet it wraps, so the provider resolvers
   // below see it. Runs before surfaceNoscriptEmbeds, which surfaces only a frame a resolver claims.
   unwrapRebelmouseEmbedFrames,
+
+  // Runs after surfaceParkedMarkup and surfaceTemplateEmbeds, which can surface a lazy iframe, and
+  // before every pass that reads an iframe's `src`, convertDatawrapperEmbeds and convertGiphyEmbeds
+  // among them.
+  fixLazyIframes,
   surfaceNoscriptEmbeds,
   rebuildEmbedPlusEmbeds,
   rebuildIframelyEmbeds,
@@ -181,6 +168,11 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   rebuildLazyYtEmbeds,
   rebuildElementorVideoEmbeds,
 
+  // Carries an Embedly wrapper's poster as data-thumbnail, and rebuilds the empty div whose oEmbed
+  // payload rides in `data` into the iframe it names. Runs before convertCiteCards so a payload
+  // naming `link` still reaches the cite pass, and before stripEmptyTags, which is what deletes an
+  // empty carrier nothing has claimed.
+  rebuildEmbedlyEmbeds,
   rebuildDocumentcloudEmbeds,
   rebuildGettyImagesEmbeds,
   rebuildJsfiddleEmbeds,

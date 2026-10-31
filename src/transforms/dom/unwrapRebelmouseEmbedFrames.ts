@@ -60,10 +60,10 @@ const readInnerUrl = (src: string): string | undefined => {
 // RebelMouse's embed frames, served on each publisher's own domain, so the frame names the site
 // and not the player. `/res/scraper/embed/` takes the player url in `jwplayer_video_url` or
 // `video_url`, and `/res/community/twitter_embed/` takes a tweet's fields and answers 404.
-export const unwrapRebelmouseEmbedFrames: DomTransform = () => {
+export const unwrapRebelmouseEmbedFrames: DomTransform = (context) => {
   return (document) => {
     for (const iframe of document.querySelectorAll('iframe[src*="/res/" i]')) {
-      const url = readInnerUrl(readRepairedCarrierUrl(iframe))
+      const url = readInnerUrl(readRepairedCarrierUrl(iframe, context))
 
       if (!url) {
         continue

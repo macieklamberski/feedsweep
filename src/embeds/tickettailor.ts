@@ -3,7 +3,7 @@ import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find } from '../utils/dom.js'
 import { iframeResizerHeightRequest, readIframeResizerHeight } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { createMarkupEmbedResolver } from '../utils/widgets.js'
+import { createMarkupEmbedResolver, readCleanedAttributeUrl } from '../utils/widgets.js'
 
 const provider = 'tickettailor'
 
@@ -71,12 +71,12 @@ const isInlineLoader = (element: Element): boolean => {
 // frames it in place, and the pipeline drops the script.
 export const tickettailorScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="tickettailor" i][data-url], script[src*="tt-widget.js" i][data-url]',
-  (element) => {
+  (element, context) => {
     if (!isInlineLoader(element)) {
       return
     }
 
-    const page = parseUrlOnHosts(attr(element, 'data-url'), hosts)
+    const page = parseUrlOnHosts(readCleanedAttributeUrl(element, 'data-url', context), hosts)
 
     if (!page) {
       return

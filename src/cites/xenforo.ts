@@ -1,6 +1,7 @@
 import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
+import { readCleanedAttributeUrl } from '../utils/widgets.js'
 
 const provider = 'xenforo'
 
@@ -9,10 +10,10 @@ const provider = 'xenforo'
 export const xenforoCiteResolver: CiteResolver = {
   kind: 'cite',
   selector: '.bbCodeBlock--unfurl[data-url]',
-  extract: (element) => {
+  extract: (element, context) => {
     return buildCite({
       provider,
-      url: attr(element, 'data-url'),
+      url: readCleanedAttributeUrl(element, 'data-url', context),
       title: text(element, '.js-unfurl-title') ?? text(element, '.contentRow-title'),
       description: text(element, '.js-unfurl-desc') ?? text(element, '.contentRow-snippet'),
       publisher: attr(element, 'data-host'),

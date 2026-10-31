@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
-import { describeForEachParser, html, resolverExtractor } from '../tests.js'
-import type { CiteResolverResult } from '../types.js'
+import {
+  baseContext,
+  createProxyUnwrapFn,
+  describeForEachParser,
+  html,
+  resolverExtractor,
+} from '../tests.js'
+import type { CiteResolverResult, TransformContext } from '../types.js'
 import { nytimesCiteResolver } from './nytimes.js'
 
 describeForEachParser('nytimesCiteResolver', (parseHtml) => {
@@ -72,6 +78,30 @@ describeForEachParser('nytimesCiteResolver', (parseHtml) => {
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('a card behind an embed proxy the caller unwraps', () => {
+    const context: TransformContext = {
+      ...baseContext,
+      cleanUrlFn: createProxyUnwrapFn('cdn.embedly.com', 'src'),
+    }
+    const extractCleaned = resolverExtractor(parseHtml, nytimesCiteResolver, context)
+
+    it('should read the article the unwrapped card names', async () => {
+      const value = html`
+        <iframe
+          title="Putin’s Long War Against American Science"
+          src="https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.nytimes.com%2Fsvc%2Foembed%2Fhtml%2F%3Furl%3Dhttps%253A%252F%252Fwww.nytimes.com%252F2020%252F04%252F13%252Fscience%252Fputin-russia-disinformation-health-coronavirus.html"
+        ></iframe>
+      `
+      const expected: CiteResolverResult = {
+        provider: 'nytimes',
+        url: 'https://www.nytimes.com/2020/04/13/science/putin-russia-disinformation-health-coronavirus.html',
+        title: 'Putin’s Long War Against American Science',
+      }
+
+      expect(await extractCleaned(value)).toEqual(expected)
     })
   })
 

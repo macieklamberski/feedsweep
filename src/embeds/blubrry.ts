@@ -124,9 +124,9 @@ export const blubrryIframeEmbedResolver = createUrlEmbedResolver(hosts, blubrryR
 // `{site}/?powerpress_embed={postId}-{feed}`. The post id belongs to that site and maps onto no
 // Blubrry player, so the written url passes through.
 export const blubrryPowerpressEmbedResolver = createMarkupEmbedResolver(
-  'iframe[src*="powerpress_embed=" i]',
-  (element) => {
-    const link = readRepairedCarrierUrl(element)
+  'iframe[src]',
+  (element, context) => {
+    const link = readRepairedCarrierUrl(element, context)
     const url = parseUrl(link)
 
     if (!url) {

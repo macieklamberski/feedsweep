@@ -52,6 +52,7 @@ const resolveEnclosure = (
   enclosure: Enclosure,
   resolvers: ReadonlyArray<WidgetResolver>,
   document: Document,
+  context: TransformContext,
 ): Promise<EmbedResolverResult | undefined> => {
   const probe = document.createElement('iframe')
   probe.setAttribute('src', url)
@@ -63,7 +64,7 @@ const resolveEnclosure = (
     probe.setAttribute('type', enclosure.type)
   }
 
-  return resolveEmbedProbe(probe, resolvers)
+  return resolveEmbedProbe(probe, resolvers, context)
 }
 
 // TODO: render the enclosure title and description, <audio> and <video> have no caption slot.
@@ -226,6 +227,7 @@ export const injectEnclosures: DomTransform = (context) => {
         enclosure,
         context.widgetResolvers,
         document,
+        context,
       )
 
       // Only an enclosure no resolver claimed reaches the Flash checks, and a resolver rebuilds

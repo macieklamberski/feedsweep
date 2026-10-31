@@ -103,7 +103,10 @@ export type EnrichEmbedFn = (
 export type EmbedResolver = {
   kind: 'embed'
   selector: string
-  extract: (element: Element) => MaybePromise<EmbedResolverResult | undefined>
+  extract: (
+    element: Element,
+    context: TransformContext,
+  ) => MaybePromise<EmbedResolverResult | undefined>
 }
 
 // An attribute holding a url, read on the elements `selector` matches, or on any element that
@@ -153,7 +156,10 @@ export type EnrichCiteFn = (
 export type CiteResolver = {
   kind: 'cite'
   selector: string
-  extract: (element: Element) => MaybePromise<CiteResolverResult | undefined>
+  extract: (
+    element: Element,
+    context: TransformContext,
+  ) => MaybePromise<CiteResolverResult | undefined>
 }
 
 export type MediaResolverResult = {
@@ -170,7 +176,10 @@ export type MediaResolverResult = {
 export type MediaResolver = {
   kind: 'media'
   selector: string
-  extract: (element: Element) => MaybePromise<MediaResolverResult | undefined>
+  extract: (
+    element: Element,
+    context: TransformContext,
+  ) => MaybePromise<MediaResolverResult | undefined>
 }
 
 export type WidgetResolver = EmbedResolver | MediaResolver | CiteResolver

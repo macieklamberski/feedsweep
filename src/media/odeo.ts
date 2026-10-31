@@ -1,7 +1,8 @@
+import { getPathSegments, isAnyOf } from 'trousse'
 import type { MediaResolver } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { readCarrierUrl } from '../utils/widgets.js'
+import { cleanCarrierUrl, pluginCarrierSelector, readCarrierUrlOnHosts } from '../utils/widgets.js'
 
 const hosts = ['odeo.com']
 
@@ -12,17 +13,21 @@ const deadFileHosts = ['media.odeo.com']
 // player is gone and the file it names is usually on the publisher's own host.
 export const odeoMediaResolver: MediaResolver = {
   kind: 'media',
-  selector: hosts
-    .flatMap((host) => {
-      return [`embed[src*="${host}/flash/" i]`, `object[data*="${host}/flash/" i]`]
-    })
-    .join(', '),
-  extract: (element) => {
-    if (!parseUrlOnHosts(readCarrierUrl(element), hosts)) {
+  selector: pluginCarrierSelector,
+  extract: (element, context) => {
+    const player = readCarrierUrlOnHosts(element, hosts, context)
+
+    if (!player) {
       return
     }
 
-    const source = flashVar(element, 'external_url')
+    const [route] = getPathSegments(player)
+
+    if (!isAnyOf(route, 'flash')) {
+      return
+    }
+
+    const source = cleanCarrierUrl(element, flashVar(element, 'external_url'), context)
 
     if (!source || parseUrlOnHosts(source, deadFileHosts)) {
       return

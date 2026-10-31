@@ -7,11 +7,12 @@ import type {
 } from '../types.js'
 import { attr, find, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
+import { isFileName } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createS9eEmbedResolver,
   createUrlEmbedResolver,
+  readCarrierUrlOnHosts,
 } from '../utils/widgets.js'
 
 const provider = 'imgur'
@@ -196,9 +197,9 @@ const gifvPathRegex = /^\/(?<id>[a-zA-Z0-9]+)\.gifv$/i
 // Imgur's older gifv embed, `iframe.imgur-embed` on `i.imgur.com/{id}.gifv#embed`. The same id
 // plays on the post embed.
 export const imgurGifvEmbedResolver = createMarkupEmbedResolver(
-  'iframe.imgur-embed[src*="i.imgur.com/" i]',
-  (element) => {
-    const parsed = parseUrlOnHosts(attr(element, 'src'), 'i.imgur.com', isHostOf)
+  'iframe.imgur-embed',
+  (element, context) => {
+    const parsed = readCarrierUrlOnHosts(element, 'i.imgur.com', context, isHostOf)
 
     if (!parsed) {
       return

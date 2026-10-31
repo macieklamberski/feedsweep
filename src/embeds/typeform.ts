@@ -2,7 +2,11 @@ import { encodePathSegment, getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { alphanumericRegex, parseUrlOnHosts } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  createMarkupEmbedResolver,
+  createUrlEmbedResolver,
+  readCleanedAttributeUrl,
+} from '../utils/widgets.js'
 
 const provider = 'typeform'
 
@@ -59,7 +63,7 @@ const readTitle = (element: Element): string | undefined => {
 // loader is still served.
 export const typeformWidgetEmbedResolver = createMarkupEmbedResolver(
   'div[data-tf-widget], div[data-tf-live], div.typeform-widget[data-url]',
-  (element) => {
+  (element, context) => {
     if (launcherAttributes.some((name) => element.hasAttribute(name))) {
       return
     }
@@ -77,7 +81,7 @@ export const typeformWidgetEmbedResolver = createMarkupEmbedResolver(
       return composeLiveEmbed(liveId, element, title)
     }
 
-    const url = parseUrlOnHosts(attr(element, 'data-url'), hosts)
+    const url = parseUrlOnHosts(readCleanedAttributeUrl(element, 'data-url', context), hosts)
 
     if (!url) {
       return

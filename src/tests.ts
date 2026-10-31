@@ -50,7 +50,7 @@ export const describeForEachParser = (name: string, fn: (parseHtml: ParseHtml) =
 
 type AnyResolver<Result> = {
   selector: string
-  extract: (element: Element) => MaybePromise<Result | undefined>
+  extract: (element: Element, context: TransformContext) => MaybePromise<Result | undefined>
 }
 
 type ExtractFixture<Result> = (value: string) => Promise<Result | undefined>
@@ -83,6 +83,7 @@ export const createProxyUnwrapFn = (
 export const resolverExtractor = <Result>(
   parseHtml: ParseHtml,
   resolver: AnyResolver<Result>,
+  context: TransformContext = baseContext,
 ): ExtractFixture<Result> => {
   return async (value) => {
     const element = parseHtml(value).querySelector(resolver.selector)
@@ -91,13 +92,13 @@ export const resolverExtractor = <Result>(
       return
     }
 
-    const result = await resolver.extract(element)
+    const result = await resolver.extract(element, context)
 
     if (!result) {
       return
     }
 
-    return cleanResultFields(result, baseContext)
+    return cleanResultFields(result, context)
   }
 }
 

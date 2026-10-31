@@ -2,7 +2,8 @@ import { getQueryParam, isAnyOf, parseUrl } from 'trousse'
 import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr } from '../utils/dom.js'
-import { absoluteUrlRegex, parseUrlOnHosts } from '../utils/urls.js'
+import { absoluteUrlRegex } from '../utils/urls.js'
+import { readCarrierUrlOnHosts } from '../utils/widgets.js'
 
 const provider = 'nytimes'
 
@@ -15,9 +16,9 @@ const articleBaseUrl = 'https://www.nytimes.com'
 // for a pasted article link, and the snippet states the headline in the iframe's title.
 export const nytimesCiteResolver: CiteResolver = {
   kind: 'cite',
-  selector: `iframe[src*="nytimes.com${cardPath}" i]`,
-  extract: (element) => {
-    const card = parseUrlOnHosts(attr(element, 'src'), hosts)
+  selector: 'iframe[src]',
+  extract: (element, context) => {
+    const card = readCarrierUrlOnHosts(element, hosts, context)
 
     if (!card || !isAnyOf(card.pathname, cardPath)) {
       return

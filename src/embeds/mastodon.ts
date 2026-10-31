@@ -3,7 +3,11 @@ import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { readOrigin } from '../utils/urls.js'
-import { createMarkupEmbedResolver } from '../utils/widgets.js'
+import {
+  createMarkupEmbedResolver,
+  readCleanedAttributeUrl,
+  readCleanedCarrierUrl,
+} from '../utils/widgets.js'
 
 const provider = 'mastodon'
 
@@ -14,6 +18,7 @@ export type MastodonStatus = {
   id: string
 }
 
+const embedRouteEndRegex = /\/embed\/?$/i
 // A full handle, /@user@origin/{id}, 302s to a page served x-frame-options: DENY.
 // Six or more digits keep brunch.co.kr/@{user}/{n} posts out of the Discourse cite path.
 const statusPathRegex = /^\/@(?<user>[\w.-]+)\/(?<id>\d{6,})(?:\/embed)?\/?$/i
@@ -58,15 +63,21 @@ const composeEmbedResult = (status: MastodonStatus): EmbedResolverResult => {
 // WordPress strips embed.js, and the blockquote holds no post text, only a logo, a caption and a
 // link.
 export const mastodonEmbedResolver = createMarkupEmbedResolver(
-  // The status iframe is matched by its src, with or without the mastodon-embed class.
   // aside.mastodon-embed is a hand-typed quote carrying the post's body text, and
   // div.mastodon-embed only wraps the iframe.
-  'iframe[src$="/embed" i], iframe[src$="/embed/" i], blockquote.mastodon-embed, x-mastodon-embed[url]',
-  (element) => {
+  'iframe[src], blockquote.mastodon-embed, x-mastodon-embed[url]',
+  (element, context) => {
+    const src = readCleanedCarrierUrl(element, context)
+
+    // The status iframe is matched by its src, with or without the mastodon-embed class.
+    if (element.localName === 'iframe' && !embedRouteEndRegex.test(src)) {
+      return
+    }
+
     const status = [
-      attr(element, 'src'),
-      attr(element, 'data-embed-url'),
-      attr(element, 'url'),
+      src,
+      readCleanedAttributeUrl(element, 'data-embed-url', context),
+      readCleanedAttributeUrl(element, 'url', context),
       attr(find(element, 'a[href]'), 'href'),
     ]
       .map((link) => (link ? parseMastodonStatus(link) : undefined))

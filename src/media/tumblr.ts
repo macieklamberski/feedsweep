@@ -8,8 +8,8 @@ import { readRepairedCarrierUrl } from '../utils/widgets.js'
 export const tumblrMediaResolver: MediaResolver = {
   kind: 'media',
   selector: 'iframe.tumblr_audio_player',
-  extract: (element) => {
-    const parsed = parseUrl(readRepairedCarrierUrl(element), placeholderBaseUrl)
+  extract: (element, context) => {
+    const parsed = parseUrl(readRepairedCarrierUrl(element, context), placeholderBaseUrl)
     const file = getQueryParam(parsed?.searchParams, 'audio_file')
 
     if (!file || !audioFileRegex.test(file)) {

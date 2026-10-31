@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
-import { describeForEachParser, html, resolverExtractor } from '../tests.js'
-import type { MediaResolverResult } from '../types.js'
+import {
+  baseContext,
+  createProxyUnwrapFn,
+  describeForEachParser,
+  html,
+  resolverExtractor,
+} from '../tests.js'
+import type { MediaResolverResult, TransformContext } from '../types.js'
 import { podbeanFlashMediaResolver } from './podbean.js'
 
 describeForEachParser('podbeanFlashMediaResolver', (parseHtml) => {
@@ -86,6 +92,29 @@ describeForEachParser('podbeanFlashMediaResolver', (parseHtml) => {
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('a player behind a redirect the caller unwraps', () => {
+    const context: TransformContext = {
+      ...baseContext,
+      cleanUrlFn: createProxyUnwrapFn('redirect.example.com', 'url'),
+    }
+    const extractCleaned = resolverExtractor(parseHtml, podbeanFlashMediaResolver, context)
+
+    it('should play the file the unwrapped player names', async () => {
+      const value = html`
+        <embed
+          src="https://redirect.example.com/?url=http%3A%2F%2Fwww.podbean.com%2Fpodcast-audio-video-blog-player%2Fmp3playerlightsmallv3.swf%3FaudioPath%3Dhttp%3A%2F%2Fmusicalhotspot.podbean.com%2Fmf%2Fplay%2Fxv83p8%2FPrognosisDeathCharacterThemes.mp3%26autoStart%3Dno"
+          type="application/x-shockwave-flash"
+        />
+      `
+      const expected: MediaResolverResult = {
+        tag: 'audio',
+        src: 'http://musicalhotspot.podbean.com/mf/play/xv83p8/PrognosisDeathCharacterThemes.mp3',
+      }
+
+      expect(await extractCleaned(value)).toEqual(expected)
     })
   })
 

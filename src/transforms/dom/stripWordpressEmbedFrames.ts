@@ -46,7 +46,7 @@ export const stripWordpressEmbedFrames: DomTransform = (context) => {
 
   const isCited = async (blockquote: Element): Promise<boolean> => {
     for (const resolver of citeResolvers) {
-      if (blockquote.matches(resolver.selector) && (await resolver.extract(blockquote))) {
+      if (blockquote.matches(resolver.selector) && (await resolver.extract(blockquote, context))) {
         return true
       }
     }

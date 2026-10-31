@@ -17,6 +17,7 @@ import {
   createMarkupEmbedResolver,
   createS9eEmbedResolver,
   createUrlEmbedResolver,
+  readCleanedAttributeUrl,
 } from '../utils/widgets.js'
 
 const provider = 'facebook'
@@ -328,8 +329,8 @@ export const facebookS9eEmbedResolver = createS9eEmbedResolver('facebook', (frag
 // The embed dialog's fallback blockquote, kept by the publisher without its widget div.
 export const facebookBlockquoteEmbedResolver = createMarkupEmbedResolver(
   fallbackSelector,
-  (element) => {
-    const cite = attr(element, 'cite')
+  (element, context) => {
+    const cite = readCleanedAttributeUrl(element, 'cite', context)
     const parsed = parseUrlOnHosts(cite, hosts)
 
     if (!cite || !parsed) {

@@ -3,7 +3,11 @@ import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../t
 import { attr, paramValue, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  cleanCarrierUrl,
+  createMarkupEmbedResolver,
+  createUrlEmbedResolver,
+} from '../utils/widgets.js'
 
 type View = {
   workbook: string
@@ -108,9 +112,13 @@ export const tableauWidgetEmbedResolver = createMarkupEmbedResolver(
 // The snippet's object on its own, not hidden, so its params reach the widget pass.
 export const tableauObjectEmbedResolver = createMarkupEmbedResolver(
   'object.tableauViz',
-  (element) => {
+  (element, context) => {
     // `viz_v1.js` decodes `host_url` before it builds the frame url on it.
-    const hostUrl = decodeSegment(paramValue(element, 'host_url'))
+    const hostUrl = cleanCarrierUrl(
+      element,
+      decodeSegment(paramValue(element, 'host_url')),
+      context,
+    )
     const match = paramValue(element, 'name')?.match(viewNameRegex)
 
     if (!parseUrlOnHosts(hostUrl, hosts) || !match) {

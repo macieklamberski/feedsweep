@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
-import { describeForEachParser, html, resolverExtractor } from '../tests.js'
+import { baseContext, describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
   crowdsignalFlashEmbedResolver,
@@ -255,7 +255,7 @@ describeForEachParser('crowdsignalScriptEmbedResolver', (parseHtml) => {
       const document = parseHtml(value)
       const loader = document.querySelector('script') as Element
 
-      await crowdsignalScriptEmbedResolver.extract(loader)
+      await crowdsignalScriptEmbedResolver.extract(loader, baseContext)
 
       expect(document.querySelector('noscript')).toBeNull()
     })
@@ -270,7 +270,7 @@ describeForEachParser('crowdsignalScriptEmbedResolver', (parseHtml) => {
       const document = parseHtml(value)
       const loader = document.querySelector('script') as Element
 
-      await crowdsignalScriptEmbedResolver.extract(loader)
+      await crowdsignalScriptEmbedResolver.extract(loader, baseContext)
 
       expect(document.querySelector('noscript')).not.toBeNull()
     })
@@ -285,7 +285,7 @@ describeForEachParser('crowdsignalScriptEmbedResolver', (parseHtml) => {
       const document = parseHtml(value)
       const loader = document.querySelector('script') as Element
 
-      await crowdsignalScriptEmbedResolver.extract(loader)
+      await crowdsignalScriptEmbedResolver.extract(loader, baseContext)
 
       expect(document.querySelector('noscript')).toBeNull()
     })

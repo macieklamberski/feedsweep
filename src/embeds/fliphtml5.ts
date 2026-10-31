@@ -2,7 +2,11 @@ import { composeFragment, getFragmentParams, getPathSegments } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  createMarkupEmbedResolver,
+  createUrlEmbedResolver,
+  readCleanedAttributeUrl,
+} from '../utils/widgets.js'
 
 const provider = 'fliphtml5'
 
@@ -46,8 +50,8 @@ export const fliphtml5IframeEmbedResolver = createUrlEmbedResolver(hosts, flipht
 // in `data-href`. Without the script, only the cover renders.
 export const fliphtml5LightBoxEmbedResolver = createMarkupEmbedResolver(
   'img[data-rel="fh5-light-box-demo"][data-href]',
-  (element) => {
-    const url = parseUrlOnHosts(attr(element, 'data-href'), hosts)
+  (element, context) => {
+    const url = parseUrlOnHosts(readCleanedAttributeUrl(element, 'data-href', context), hosts)
 
     if (!url) {
       return

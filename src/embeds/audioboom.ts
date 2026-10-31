@@ -7,7 +7,11 @@ import type {
 } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  createMarkupEmbedResolver,
+  createUrlEmbedResolver,
+  readCleanedAttributeUrl,
+} from '../utils/widgets.js'
 
 const provider = 'audioboom'
 
@@ -81,8 +85,8 @@ export const audioboomIframeEmbedResolver = createUrlEmbedResolver(hosts, audiob
 // `data-boourl` holds the same player url the iframe form holds.
 export const audioboomWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.ab-player[data-boourl]',
-  (element) => {
-    const parsed = parseUrlOnHosts(attr(element, 'data-boourl'), hosts)
+  (element, context) => {
+    const parsed = parseUrlOnHosts(readCleanedAttributeUrl(element, 'data-boourl', context), hosts)
 
     return parsed && audioboomResolveEmbed(parsed)
   },

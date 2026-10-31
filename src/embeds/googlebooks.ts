@@ -33,9 +33,9 @@ const sizes = {
 // `/ngrams/interactive_chart` and the store redirect on `/ebooks?id={id}` are separate resources
 // on the same host.
 export const googlebooksEmbedResolver = createMarkupEmbedResolver(
-  'iframe[src*="books.google." i]',
-  (element) => {
-    const parsed = parseUrl(readRepairedCarrierUrl(element), placeholderBaseUrl)
+  'iframe[src]',
+  (element, context) => {
+    const parsed = parseUrl(readRepairedCarrierUrl(element, context), placeholderBaseUrl)
 
     if (!parsed || !viewerHostRegex.test(parsed.hostname)) {
       return

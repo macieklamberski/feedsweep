@@ -1,6 +1,7 @@
 import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
-import { attr, jsonAttr } from '../utils/dom.js'
+import { jsonAttr } from '../utils/dom.js'
+import { readCleanedAttributeUrl } from '../utils/widgets.js'
 
 const provider = 'paragraph'
 
@@ -20,7 +21,7 @@ type EmbedlyData = {
 export const paragraphCiteResolver: CiteResolver = {
   kind: 'cite',
   selector: 'div[data-type="embedly"]',
-  extract: (element) => {
+  extract: (element, context) => {
     const data = jsonAttr<EmbedlyData>(element, 'data')
 
     if (!data) {
@@ -36,7 +37,7 @@ export const paragraphCiteResolver: CiteResolver = {
     return buildCite({
       provider,
       // src is what the author typed, a bare host or another slug, so it is only the fallback.
-      url: data.url ?? attr(element, 'src'),
+      url: data.url ?? readCleanedAttributeUrl(element, 'src', context),
       title: data.title,
       description: data.description,
       author: data.author_name,

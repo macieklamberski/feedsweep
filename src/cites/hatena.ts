@@ -1,19 +1,16 @@
-import { getQueryParam, isHostOf, parseUrl } from 'trousse'
+import { getQueryParam, isHostOf, parseUrl, startsWithAnyOf } from 'trousse'
 import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
+import { readCleanedCarrierUrl } from '../utils/widgets.js'
 
 const provider = 'hatena'
 const hosts = ['hatenablog-parts.com']
 
 // The iframe's class is not dependable: embed-card is the common spelling, and the rest ship
 // hatenablogcard, wp-embedded-content, a theme's own class, or nothing at all.
-const cardIframeSelector = [
-  'iframe.embed-card',
-  'iframe.hatenablogcard',
-  ...hosts.map((host) => `iframe[src*="${host}/embed" i]`),
-].join(', ')
+const cardClassSelector = 'iframe.embed-card, iframe.hatenablogcard'
 
 // A host list misses this: a blog on a custom domain serves its own card from that domain.
 // The self-served card is at {blog}.hatenablog.com/embed/{entry}, and the citation beside it
@@ -33,9 +30,9 @@ const isSelfHosted = (source: string, citationHref: string | undefined): boolean
 // The iframe is the element replaced, so prose the author wrote beside it in its paragraph stays.
 export const hatenaCiteResolver: CiteResolver = {
   kind: 'cite',
-  selector: cardIframeSelector,
-  extract: (element) => {
-    const source = attr(element, 'src')
+  selector: `${cardClassSelector}, iframe[src]`,
+  extract: (element, context) => {
+    const source = readCleanedCarrierUrl(element, context)
 
     if (!source) {
       return
@@ -46,6 +43,11 @@ export const hatenaCiteResolver: CiteResolver = {
     const citationLink = find(citation, 'a')
     const citationHref = attr(citationLink, 'href')
     const cardUrl = parseUrlOnHosts(source, hosts)
+
+    // Without a card class, a frame is a card only on the renderer's own embed route.
+    if (!element.matches(cardClassSelector) && !startsWithAnyOf(cardUrl?.pathname, '/embed')) {
+      return
+    }
 
     // A foreign player carrying the class would become a cite.
     if (!cardUrl && !isSelfHosted(source, citationHref)) {

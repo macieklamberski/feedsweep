@@ -39,7 +39,7 @@ export const rebuildIframelyEmbeds: DomTransform = (context) => {
       // The probe is a bare iframe onto the destination, so a resolver answers for it alone.
       const probe = createIframe(document, href)
 
-      if (await isResolvedIframe(probe, resolvers)) {
+      if (await isResolvedIframe(probe, resolvers, context)) {
         target.replaceWith(probe)
         continue
       }
@@ -57,7 +57,7 @@ export const rebuildIframelyEmbeds: DomTransform = (context) => {
 
       const probe = createIframe(document, url)
 
-      if (await isResolvedIframe(probe, resolvers)) {
+      if (await isResolvedIframe(probe, resolvers, context)) {
         frame.replaceWith(probe)
       }
     }

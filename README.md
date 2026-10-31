@@ -55,7 +55,6 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `unwrapHeadingBold` | Unwrap redundant bold wrapping a whole heading |
 | `normalizeAnchoredHeadings` | Strip static-site-generator permalink anchors from headings (Sphinx/MkDocs, Docusaurus, AnchorJS, Zola) |
 | `cleanAnchorUrls` | Clean anchor hrefs (redirects, tracking params) via the `cleanUrlFn` option, after the shared url repair: an escaped `&amp;`, a run of slashes, a query glued onto the path and whitespace in values |
-| `cleanFrameUrls` | Clean iframe, embed and object urls via the `cleanUrlFn` option before the resolvers read them, after the same repair, so a cleaner that unwraps an embed proxy (Embedly, Iframely, Drupal media oEmbed) hands them the player; a frame no resolver claims keeps the url as written |
 | `stripDeadAnchors` | Unwrap links with empty, `#`, or `javascript:` hrefs |
 | `stripNonContentElements` | Strip non-content chrome — subscribe/share/related widgets, ads, author bios |
 | `convertUcozSpoilerButtons` | Replace a titled uCoz spoiler button with its title in bold |
@@ -168,7 +167,8 @@ const result = transformContent(html, {
   sameSiteUrls: ['https://example.com/?p=1'],
   // Resolve a relative URL against the base URL (defaults to standard URL resolution).
   resolveUrlFn: (url, baseUrl) => resolve(url, baseUrl),
-  // Rewrite anchor hrefs and frame urls: unwrap redirects and embed proxies and strip tracking params, also on the url and the src of embed placeholders.
+  // Rewrite anchor hrefs: unwrap redirects and strip tracking params, also on the url and the src of embed placeholders.
+  // The resolvers read every carrier url through it too, so a cleaner that unwraps an embed proxy hands them the player.
   cleanUrlFn: cleanUrl,
   // Clean a url only to compare it with another, as every duplicate check and the emoji
   // recognition do. The output keeps the url cleanUrlFn gives. Defaults to cleanUrlFn. The image
