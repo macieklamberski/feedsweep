@@ -2,10 +2,10 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { flickrAnchorEmbedResolver, flickrEmbedResolver } from './flickr.js'
+import { flickrAnchorEmbedResolver, flickrIframeEmbedResolver } from './flickr.js'
 
-describeForEachParser('flickrEmbedResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, flickrEmbedResolver)
+describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, flickrIframeEmbedResolver)
 
   describe('the slideshow object and embed pair', () => {
     // The NSID spelling of the owner names nobody, so it fills no author, where the path
@@ -1436,8 +1436,8 @@ describeForEachParser('flickrEmbedResolver', (parseHtml) => {
   })
 })
 
-describeForEachParser('flickrEmbedResolver carrier title', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, flickrEmbedResolver)
+describeForEachParser('flickrIframeEmbedResolver carrier title', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, flickrIframeEmbedResolver)
 
   it('should read the name the carrier states', async () => {
     const value = html`
@@ -2059,7 +2059,16 @@ describeForEachParser('flickr through the pipeline', (parseHtml) => {
       <script async src="https://embedr.flickr.com/assets/client-code.js"></script>
     `
     const expected = html`
-      <div data-embed-author="bees" data-embed-height="768" data-embed-width="1024" data-embed-thumbnail="https://live.staticflickr.com/3040/2362225867_4a87ab8baf_b.jpg" data-embed-url="https://www.flickr.com/photos/bees/2362225867/" data-embed-id="p/4AK2sc" data-embed-provider="flickr" data-embed-src="https://embedr.flickr.com/photos/2362225867?width=1024&height=768"></div>
+      <div
+        data-embed-author="bees"
+        data-embed-height="768"
+        data-embed-width="1024"
+        data-embed-thumbnail="https://live.staticflickr.com/3040/2362225867_4a87ab8baf_b.jpg"
+        data-embed-url="https://www.flickr.com/photos/bees/2362225867/"
+        data-embed-id="p/4AK2sc"
+        data-embed-provider="flickr"
+        data-embed-src="https://embedr.flickr.com/photos/2362225867?width=1024&height=768"
+      ></div>
     `
 
     expect(await convert(value)).toEqualHtml(expected)

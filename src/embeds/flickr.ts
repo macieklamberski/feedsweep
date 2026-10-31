@@ -386,7 +386,7 @@ export const flickrResolveEmbed: ResolveUrlEmbed = (url, element) => {
 // Flickr's slideshow swf, its video swf, the legacy iframe, a framed album or stream page, and
 // the two players for a single photo. Only `/player/` and `embedr.flickr.com` are served without
 // `x-frame-options: SAMEORIGIN`, so the rest name a frame that renders empty.
-export const flickrEmbedResolver = createUrlEmbedResolver(hosts, flickrResolveEmbed)
+export const flickrIframeEmbedResolver = createUrlEmbedResolver(hosts, flickrResolveEmbed)
 
 // What an anchor href names other than a photo: the album, the group pool or the photostream.
 const readAnchorSubject = (url: URL): FlickrSubject | undefined => {
