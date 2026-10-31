@@ -2,7 +2,7 @@ import { encodePathSegment, getPathSegments, isAnyOf, startsWithAnyOf } from 'tr
 import type { MediaResolver } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { readCarrierUrl } from '../utils/widgets.js'
+import { cleanCarrierUrl, pluginCarrierSelector, readCarrierUrlOnHosts } from '../utils/widgets.js'
 
 const hosts = ['podomatic.com']
 const playerPath = '/swf/joeplayer'
@@ -12,19 +12,16 @@ const playerPath = '/swf/joeplayer'
 // nothing, and the same timestamp names the episode's file on `/enclosure/{timestamp}.mp3`.
 export const podomaticFlashMediaResolver: MediaResolver = {
   kind: 'media',
-  selector: hosts
-    .flatMap((host) => {
-      return [`embed[src*="${host}${playerPath}" i]`, `object[data*="${host}${playerPath}" i]`]
-    })
-    .join(', '),
-  extract: (element) => {
-    const player = parseUrlOnHosts(readCarrierUrl(element), hosts)
+  selector: pluginCarrierSelector,
+  extract: (element, context) => {
+    const player = readCarrierUrlOnHosts(element, hosts, context)
 
     if (!player || !startsWithAnyOf(player.pathname, playerPath)) {
       return
     }
 
-    const location = parseUrlOnHosts(flashVar(element, 'jsonLocation'), hosts)
+    const jsonLocation = cleanCarrierUrl(element, flashVar(element, 'jsonLocation'), context)
+    const location = parseUrlOnHosts(jsonLocation, hosts)
 
     if (!location) {
       return

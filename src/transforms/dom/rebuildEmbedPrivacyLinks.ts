@@ -14,7 +14,7 @@ export const rebuildEmbedPrivacyLinks: DomTransform = (context) => {
       const href = attr(wrapper.querySelector('a'), 'href') ?? ''
       const probe = createIframe(document, href)
 
-      if (await isResolvedIframe(probe, resolvers)) {
+      if (await isResolvedIframe(probe, resolvers, context)) {
         wrapper.replaceWith(probe)
       }
     }

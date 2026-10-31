@@ -1,8 +1,7 @@
-import { getQueryParam } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf } from 'trousse'
 import type { MediaResolver } from '../types.js'
 import { flashVar } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
-import { readCarrierUrl } from '../utils/widgets.js'
+import { cleanCarrierUrl, pluginCarrierSelector, readCarrierUrlOnHosts } from '../utils/widgets.js'
 
 const hosts = ['flash-mp3-player.net']
 
@@ -10,19 +9,22 @@ const hosts = ['flash-mp3-player.net']
 // answers 404, so it renders nothing.
 export const flashMp3PlayerMediaResolver: MediaResolver = {
   kind: 'media',
-  selector: hosts
-    .flatMap((host) => {
-      return [`embed[src*="${host}/medias/" i]`, `object[data*="${host}/medias/" i]`]
-    })
-    .join(', '),
-  extract: (element) => {
-    const parsed = parseUrlOnHosts(readCarrierUrl(element), hosts)
+  selector: pluginCarrierSelector,
+  extract: (element, context) => {
+    const parsed = readCarrierUrlOnHosts(element, hosts, context)
 
     if (!parsed) {
       return
     }
 
-    const source = flashVar(element, 'mp3') ?? getQueryParam(parsed.searchParams, 'mp3')
+    const [route] = getPathSegments(parsed)
+
+    if (!isAnyOf(route, 'medias')) {
+      return
+    }
+
+    const declared = flashVar(element, 'mp3') ?? getQueryParam(parsed.searchParams, 'mp3')
+    const source = cleanCarrierUrl(element, declared, context)
 
     if (!source) {
       return

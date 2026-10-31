@@ -73,8 +73,8 @@ const composePlayerUrl = (url: string, fileName: string): string | undefined => 
 // carries the subtitles and the attribution the raw file does not.
 export const wikimediaEmbedResolver: EmbedResolver = createMarkupEmbedResolver(
   'iframe',
-  (element): EmbedResolverResult | undefined => {
-    const source = readRepairedCarrierUrl(element)
+  (element, context): EmbedResolverResult | undefined => {
+    const source = readRepairedCarrierUrl(element, context)
 
     if (!source || !isMediaWikiFilePage(source) || !videoFileRegex.test(source)) {
       return

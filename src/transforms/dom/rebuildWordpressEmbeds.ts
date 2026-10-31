@@ -42,7 +42,7 @@ export const rebuildWordpressEmbeds: DomTransform = (context) => {
       // url stays as the text or link it is.
       const probe = createIframe(document, url)
 
-      if (!(await isResolvedIframe(probe, resolvers))) {
+      if (!(await isResolvedIframe(probe, resolvers, context))) {
         continue
       }
 

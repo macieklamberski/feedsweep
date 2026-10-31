@@ -2,7 +2,11 @@ import { encodePathSegment, getQueryParam } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  createMarkupEmbedResolver,
+  createUrlEmbedResolver,
+  readCleanedAttributeUrl,
+} from '../utils/widgets.js'
 
 const provider = 'fc2'
 const videoHosts = ['video.fc2.com']
@@ -66,13 +70,14 @@ const fc2FlashResolveEmbed: ResolveUrlEmbed = (url) => {
 // FC2 Video's player loader, which writes the player client side and leaves nothing behind.
 export const fc2PlayerScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="static.fc2.com/video/js/outerplayer" i]',
-  (element) => {
+  (element, context) => {
     if (!parseUrlOnHosts(attr(element, 'src'), 'static.fc2.com')) {
       return
     }
 
     // The loader plays `data-id` whenever it is present, whatever `url` names.
-    const page = parseUrlOnHosts(attr(element, 'url'), videoHosts)?.pathname.match(contentPageRegex)
+    const pageUrl = readCleanedAttributeUrl(element, 'url', context)
+    const page = parseUrlOnHosts(pageUrl, videoHosts)?.pathname.match(contentPageRegex)
     const declaredId = attr(element, 'data-id')
     // The attribute comes out decoded, and it goes into a path beside the raw path spelling.
     const contentId = declaredId ? encodePathSegment(declaredId) : page?.[1]

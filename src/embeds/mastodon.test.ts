@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'bun:test'
-import { describeForEachParser, html, resolverExtractor } from '../tests.js'
-import type { EmbedResolverResult } from '../types.js'
+import {
+  baseContext,
+  createProxyUnwrapFn,
+  describeForEachParser,
+  html,
+  resolverExtractor,
+} from '../tests.js'
+import type { EmbedResolverResult, TransformContext } from '../types.js'
 import {
   type MastodonStatus,
   mastodonEmbedResolver,
@@ -81,6 +87,32 @@ describeForEachParser('mastodonEmbedResolver', (parseHtml) => {
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('a status frame behind an embed proxy the caller unwraps', () => {
+    const context: TransformContext = {
+      ...baseContext,
+      cleanUrlFn: createProxyUnwrapFn('cdn.embedly.com', 'src'),
+    }
+    const extractCleaned = resolverExtractor(parseHtml, mastodonEmbedResolver, context)
+
+    it('should resolve the status the unwrapped url names', async () => {
+      const value = html`
+        <iframe
+          src="https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fmastodon.social%2F%40Gargron%2F116535232552529093%2Fembed"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'mastodon',
+        id: 'mastodon.social/116535232552529093',
+        src: 'https://mastodon.social/@Gargron/116535232552529093/embed',
+        url: 'https://mastodon.social/@Gargron/116535232552529093',
+        author: '@Gargron@mastodon.social',
+        publisher: 'mastodon.social',
+      }
+
+      expect(await extractCleaned(value)).toEqual(expected)
     })
   })
 

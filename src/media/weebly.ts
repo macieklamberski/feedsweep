@@ -1,8 +1,8 @@
 import { getQueryParam, isAnyOf } from 'trousse'
 import type { MediaResolver } from '../types.js'
 import { flashVars, parseFlashVars } from '../utils/dom.js'
-import { audioFileRegex, imageFileRegex, parseUrlOnHosts } from '../utils/urls.js'
-import { readCarrierUrl } from '../utils/widgets.js'
+import { audioFileRegex, imageFileRegex } from '../utils/urls.js'
+import { cleanCarrierUrl, pluginCarrierSelector, readCarrierUrlOnHosts } from '../utils/widgets.js'
 
 const hosts = ['weebly.com']
 const audioPlayerPath = '/weebly/apps/audioPlayer2.swf'
@@ -55,23 +55,16 @@ export const weeblyMediaResolver: MediaResolver = {
 // The Flash audio block: Flash no longer runs, and the mp3 url and its label sit in flashvars.
 export const weeblyFlashMediaResolver: MediaResolver = {
   kind: 'media',
-  selector: hosts
-    .flatMap((host) => {
-      return [
-        `object[data*="${host}${audioPlayerPath}" i]`,
-        `embed[src*="${host}${audioPlayerPath}" i]`,
-      ]
-    })
-    .join(', '),
-  extract: (element) => {
-    const player = parseUrlOnHosts(readCarrierUrl(element), hosts)
+  selector: pluginCarrierSelector,
+  extract: (element, context) => {
+    const player = readCarrierUrlOnHosts(element, hosts, context)
 
     if (!player || !isAnyOf(player.pathname, audioPlayerPath)) {
       return
     }
 
     const config = parseFlashVars(flashVars(element))
-    const src = getQueryParam(config, 'soundFile')
+    const src = cleanCarrierUrl(element, getQueryParam(config, 'soundFile'), context)
 
     if (!src || !audioFileRegex.test(src)) {
       return

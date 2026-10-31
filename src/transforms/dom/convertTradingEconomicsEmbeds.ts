@@ -1,17 +1,16 @@
 import { getQueryParam } from 'trousse'
 import type { DomTransform } from '../../types.js'
-import { attr, getElementDimensions, parsePixelSize } from '../../utils/dom.js'
-import { parseUrlOnHosts } from '../../utils/urls.js'
-import { createImage, createLinkedImage } from '../../utils/widgets.js'
+import { getElementDimensions, parsePixelSize } from '../../utils/dom.js'
+import { createImage, createLinkedImage, readCarrierUrlOnHosts } from '../../utils/widgets.js'
 
 const hosts = ['tradingeconomics.com', 'd3fy651gv2fhd3.cloudfront.net']
 const embedPathRegex = /^\/embed\/?$/i
 
 // A Trading Economics chart iframe, whose page holds nothing but one static PNG of the chart.
 // tradingeconomics.com serves that PNG at /charts/embed.png with the iframe's own query.
-export const convertTradingEconomicsEmbeds: DomTransform = () => (document) => {
+export const convertTradingEconomicsEmbeds: DomTransform = (context) => (document) => {
   for (const iframe of document.querySelectorAll('iframe')) {
-    const url = parseUrlOnHosts(attr(iframe, 'src'), hosts)
+    const url = readCarrierUrlOnHosts(iframe, hosts, context)
 
     if (!url || !embedPathRegex.test(url.pathname) || !getQueryParam(url.searchParams, 's')) {
       continue

@@ -20,8 +20,8 @@ const umapEmbedParams = ['datalayers', 'feature']
 
 // A uMap map framed from any instance. The hash, `#{zoom}/{lat}/{lng}`, is the view the map opens
 // on, so it travels with the src.
-export const umapEmbedResolver = createMarkupEmbedResolver('iframe[src*="/map/"]', (element) => {
-  const link = readRepairedCarrierUrl(element)
+export const umapEmbedResolver = createMarkupEmbedResolver('iframe[src]', (element, context) => {
+  const link = readRepairedCarrierUrl(element, context)
   const url = parseUrl(link)
 
   if (!url || !readOrigin(url)) {

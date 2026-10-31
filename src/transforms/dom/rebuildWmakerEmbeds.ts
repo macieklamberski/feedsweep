@@ -1,7 +1,6 @@
 import { composeEmbedUrl, isFlashPlayerUrl } from '../../embeds/wmaker.js'
 import type { DomTransform } from '../../types.js'
-import { attr } from '../../utils/dom.js'
-import { createIframe, setDimensions } from '../../utils/widgets.js'
+import { createIframe, readCleanedCarrierUrl, setDimensions } from '../../utils/widgets.js'
 
 // The box WMaker's own snippet writes around a 16:9 video. The player fills its frame, and the dead
 // Flash box was drawn for another player.
@@ -10,11 +9,11 @@ const playerSize = { width: 640, height: 360 }
 // WMaker's Flash player is dead and its .swf 404s, so today the item renders a click-to-load
 // placeholder addressing nothing. The modern player lives at {origin}/embed/{articleId}/ and the
 // article id is in the item's own permalink, which is what makes the repair computable offline.
-export const rebuildWmakerEmbeds: DomTransform = ({ baseUrl }) => {
+export const rebuildWmakerEmbeds: DomTransform = (context) => {
   return (document) => {
     const objects = document.querySelectorAll('object[data]')
     const [element, ...others] = Array.from(objects).filter((candidate) => {
-      return isFlashPlayerUrl(attr(candidate, 'data'))
+      return isFlashPlayerUrl(readCleanedCarrierUrl(candidate, context))
     })
 
     // The embed route addresses the article rather than the video and serves one video for it: an
@@ -24,7 +23,7 @@ export const rebuildWmakerEmbeds: DomTransform = ({ baseUrl }) => {
       return
     }
 
-    const src = composeEmbedUrl(baseUrl)
+    const src = composeEmbedUrl(context.baseUrl)
 
     if (!src) {
       return

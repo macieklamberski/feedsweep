@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
-import { describeForEachParser, html, resolverExtractor } from '../tests.js'
-import type { MediaResolverResult } from '../types.js'
+import {
+  baseContext,
+  createProxyUnwrapFn,
+  describeForEachParser,
+  html,
+  resolverExtractor,
+} from '../tests.js'
+import type { MediaResolverResult, TransformContext } from '../types.js'
 import { podbeanFlashMediaResolver } from './podbean.js'
 
 describeForEachParser('podbeanFlashMediaResolver', (parseHtml) => {
@@ -60,6 +66,24 @@ describeForEachParser('podbeanFlashMediaResolver', (parseHtml) => {
   })
 
   describe('the Internet Explorer object with no embed', () => {
+    it('should play the file the movie param names under fallback text', async () => {
+      const value = html`
+        <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000">
+          <param
+            NAME="Movie"
+            VALUE="http://www.podbean.com/podcast-audio-video-blog-player/mp3playerlightsmallv3.swf?audioPath=http://darkbeige.podbean.com/mf/play/32ibxt/Interval-UnitedKingdomNILPOINTS.mp3&amp;autoStart=no"
+          >
+          Get the Flash Player to hear this episode.
+        </object>
+      `
+      const expected: MediaResolverResult = {
+        tag: 'audio',
+        src: 'http://darkbeige.podbean.com/mf/play/32ibxt/Interval-UnitedKingdomNILPOINTS.mp3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should play the file the movie param names', async () => {
       const value = html`
         <object
@@ -86,6 +110,29 @@ describeForEachParser('podbeanFlashMediaResolver', (parseHtml) => {
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('a player behind a redirect the caller unwraps', () => {
+    const context: TransformContext = {
+      ...baseContext,
+      cleanUrlFn: createProxyUnwrapFn('redirect.example.com', 'url'),
+    }
+    const extractCleaned = resolverExtractor(parseHtml, podbeanFlashMediaResolver, context)
+
+    it('should play the file the unwrapped player names', async () => {
+      const value = html`
+        <embed
+          src="https://redirect.example.com/?url=http%3A%2F%2Fwww.podbean.com%2Fpodcast-audio-video-blog-player%2Fmp3playerlightsmallv3.swf%3FaudioPath%3Dhttp%3A%2F%2Fmusicalhotspot.podbean.com%2Fmf%2Fplay%2Fxv83p8%2FPrognosisDeathCharacterThemes.mp3%26autoStart%3Dno"
+          type="application/x-shockwave-flash"
+        />
+      `
+      const expected: MediaResolverResult = {
+        tag: 'audio',
+        src: 'http://musicalhotspot.podbean.com/mf/play/xv83p8/PrognosisDeathCharacterThemes.mp3',
+      }
+
+      expect(await extractCleaned(value)).toEqual(expected)
     })
   })
 

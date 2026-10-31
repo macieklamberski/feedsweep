@@ -7,6 +7,7 @@ import {
   createMarkupEmbedResolver,
   createS9eEmbedResolver,
   createUrlEmbedResolver,
+  readCleanedAttributeUrl,
 } from '../utils/widgets.js'
 
 const provider = 'tumblr'
@@ -48,8 +49,8 @@ export const tumblrIframeEmbedResolver = createUrlEmbedResolver(hosts, readPostE
 // the pipeline drops, so the post renders as nothing but the anchor under it.
 export const tumblrPostEmbedResolver = createMarkupEmbedResolver(
   'div.tumblr-post[data-href]',
-  (element) => {
-    const frameUrl = parseUrlOnHosts(attr(element, 'data-href'), hosts)
+  (element, context) => {
+    const frameUrl = parseUrlOnHosts(readCleanedAttributeUrl(element, 'data-href', context), hosts)
     const result = readPostEmbed(frameUrl)
 
     if (!result) {

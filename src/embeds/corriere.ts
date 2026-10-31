@@ -1,8 +1,7 @@
 import { getPathSegments, getQueryParam, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
-import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { createUrlEmbedResolver } from '../utils/widgets.js'
+import { createUrlEmbedResolver, readCleanedFlashVar } from '../utils/widgets.js'
 
 const provider = 'corriere'
 
@@ -48,7 +47,7 @@ const readFeedVideo = (value: string | undefined): EmbedResolverResult | undefin
 // Corriere della Sera's player, `video.corriere.it/video-embed/{id}`, and two retired players
 // that render nothing: the Flash widget `static2.video.corriereobjects.it/widget/swf/`, with the
 // feed in the `videoUrl` flashvar, and `video.corriere.it/widget/players/`, in the `videoId` query.
-export const corriereResolveEmbed: ResolveUrlEmbed = (url, element) => {
+export const corriereResolveEmbed: ResolveUrlEmbed = (url, element, context) => {
   const flash = parseUrlOnHosts(url, flashHosts)
 
   if (flash) {
@@ -58,7 +57,7 @@ export const corriereResolveEmbed: ResolveUrlEmbed = (url, element) => {
       return
     }
 
-    return readFeedVideo(flashVar(element, 'videoUrl'))
+    return readFeedVideo(readCleanedFlashVar(element, 'videoUrl', context))
   }
 
   const segments = getPathSegments(url)

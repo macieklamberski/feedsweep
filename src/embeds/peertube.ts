@@ -89,9 +89,9 @@ const peertubePlaylistParams = ['playlistPosition']
 // page loads the instance's whole page, header and comments around the player, so the src is
 // rebuilt either way.
 export const peertubeEmbedResolver = createMarkupEmbedResolver(
-  'iframe[src*="/videos/embed/" i], iframe[src*="/videos/watch/" i], iframe[src*="/w/" i], iframe[src*="/video-playlists/embed/" i]',
-  (element) => {
-    const url = parseUrl(readRepairedCarrierUrl(element))
+  'iframe[src]',
+  (element, context) => {
+    const url = parseUrl(readRepairedCarrierUrl(element, context))
 
     if (!url) {
       return

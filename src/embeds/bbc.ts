@@ -1,8 +1,8 @@
 import { getPathSegments, isAnyOf } from 'trousse'
-import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
+import type { EmbedResolverResult, ResolveUrlEmbed, TransformContext } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { digitsRegex, flashFileRegex, parseUrlOnHosts } from '../utils/urls.js'
-import { createUrlEmbedResolver } from '../utils/widgets.js'
+import { createUrlEmbedResolver, readCleanedFlashVar } from '../utils/widgets.js'
 
 const provider = 'bbc'
 
@@ -58,9 +58,12 @@ const composeProgrammesEmbed = (pid: string, url?: string): EmbedResolverResult 
 
 // The retired news player names its clip in `externalIdentifier` and its article in
 // `embedPageUrl`, `/news/{slug}-{article}`, and states its poster in `holdingImage`.
-const readNewsFlash = (element: Element | undefined): EmbedResolverResult | undefined => {
+const readNewsFlash = (
+  element: Element | undefined,
+  context: TransformContext | undefined,
+): EmbedResolverResult | undefined => {
   const pid = flashVar(element, 'externalIdentifier')
-  const page = parseUrlOnHosts(flashVar(element, 'embedPageUrl'), hosts)
+  const page = parseUrlOnHosts(readCleanedFlashVar(element, 'embedPageUrl', context), hosts)
   const article = page?.pathname.match(newsPagePathRegex)?.groups?.article
 
   if (!isPidSlot(pid) || !article) {
@@ -69,26 +72,26 @@ const readNewsFlash = (element: Element | undefined): EmbedResolverResult | unde
 
   return {
     ...composeNewsEmbed(article, pid),
-    thumbnail: flashVar(element, 'holdingImage'),
+    thumbnail: readCleanedFlashVar(element, 'holdingImage', context),
   }
 }
 
 // BBC's news, World Service and programmes clip players, pasted in a portrait box that pads them,
 // and the retired Flash player. A news page needs its section slug, which the embed does not
 // carry, and a current programmes clip such as `p08s3bnj` has no page of its own.
-export const bbcResolveEmbed: ResolveUrlEmbed = (url, element) => {
+export const bbcResolveEmbed: ResolveUrlEmbed = (url, element, context) => {
   // The retired Flash player names its clip in the `playlist` flashvar, as
   // `/iplayer/playlist/{pid}` or `/comedy/forge-assets/extra/playlist/{pid}.xml`. News and World
   // Service playlists carry no pid, and the news player names it in other flashvars.
   if (flashFileRegex.test(url.pathname)) {
-    const playlist = parseUrlOnHosts(flashVar(element, 'playlist'), hosts)
+    const playlist = parseUrlOnHosts(readCleanedFlashVar(element, 'playlist', context), hosts)
     const pid = playlist?.pathname.match(playlistPathRegex)?.[1]
 
     if (isPid(pid)) {
       return composeProgrammesEmbed(pid, `https://www.bbc.co.uk/programmes/${pid}`)
     }
 
-    return readNewsFlash(element)
+    return readNewsFlash(element, context)
   }
 
   const segments = getPathSegments(url)

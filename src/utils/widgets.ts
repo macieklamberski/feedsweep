@@ -4,6 +4,7 @@ import {
   isAnyOf,
   isString,
   type MaybePromise,
+  type Nullish,
   startsWithAnyOf,
   trimObject,
 } from 'trousse'
@@ -23,6 +24,7 @@ import type {
 } from '../types.js'
 import {
   attr,
+  flashVar,
   type GeneratedWrapperType,
   getElementDimensions,
   getPairRatio,
@@ -109,6 +111,9 @@ export const embedCarrierSelector = [
   paramObjectSelector,
 ].join(', ')
 
+// The elements a browser plugin such as Flash ran in.
+export const pluginCarrierSelector = 'embed[src], object[data]'
+
 // Internet Explorer's Flash snippet names the player only in `<param name="movie">`. An object
 // holding text shows it as the fallback today, often the rest of the post an unclosed tag took
 // in, so it keeps its markup.
@@ -132,10 +137,103 @@ export const readCarrierUrl = (element: Element): string => {
   return collapseSlashRuns(foldEscapedAmpersands(url ?? ''))
 }
 
-// The carrier url a resolver reads, with the class repairs applied. A frame no resolver claims
-// keeps the url `readCarrierUrl` gives.
-export const readRepairedCarrierUrl = (element: Element): string => {
-  return repairUrl(readCarrierUrl(element))
+type CleanCarrierUrl = {
+  (element: Element, url: string, context: TransformContext): string
+  (element: Element, url: Nullish<string>, context: TransformContext): string | undefined
+}
+
+// Held off the document, so a carrier no resolver claims keeps the url its publisher wrote. Keyed
+// by the url read, since a pass can rewrite a carrier's url between two reads.
+const cleanedCarrierUrls = new WeakMap<Element, Map<string, string>>()
+
+const applyCarrierCleaner = (url: string, context: TransformContext): string => {
+  if (!context.cleanUrlFn) {
+    return url
+  }
+
+  // A cleaner reads the host, which a protocol-relative or site-relative url names only once
+  // resolved.
+  const resolved = resolveOrKeepUrl(repairUrl(url), context)
+  const cleaned = cleanUrl(resolved, context)
+
+  // A cleaner that changes nothing past the repairs leaves the url as written, which is what a
+  // resolver reads with no cleaner.
+  if (cleaned === repairUrl(resolved)) {
+    return url
+  }
+
+  return cleaned
+}
+
+// A url a resolver reads off a carrier, through the caller's cleanUrlFn, so a resolver reads the
+// url an embed proxy such as Embedly's or Iframely's wraps once the cleaner unwraps it.
+export const cleanCarrierUrl: CleanCarrierUrl = ((
+  element: Element,
+  url: Nullish<string>,
+  context: TransformContext,
+) => {
+  if (!url) {
+    return url ?? undefined
+  }
+
+  let urls = cleanedCarrierUrls.get(element)
+
+  if (!urls) {
+    urls = new Map()
+    cleanedCarrierUrls.set(element, urls)
+  }
+
+  let cleaned = urls.get(url)
+
+  if (cleaned === undefined) {
+    cleaned = applyCarrierCleaner(url, context)
+    urls.set(url, cleaned)
+  }
+
+  return cleaned
+}) as CleanCarrierUrl
+
+export const readCleanedCarrierUrl = (element: Element, context: TransformContext): string => {
+  return cleanCarrierUrl(element, readCarrierUrl(element), context)
+}
+
+// The carrier url a resolver reads, cleaned, with the class repairs applied. A frame no resolver
+// claims keeps the url `readCarrierUrl` gives.
+export const readRepairedCarrierUrl = (element: Element, context: TransformContext): string => {
+  return repairUrl(readCleanedCarrierUrl(element, context))
+}
+
+// The cleaned carrier url, parsed, when it sits on one of the hosts.
+export const readCarrierUrlOnHosts = (
+  element: Element,
+  hosts: string | ReadonlyArray<string>,
+  context: TransformContext,
+  isOnHost?: (url: URL, hosts: string | ReadonlyArray<string>) => boolean,
+): URL | undefined => {
+  return parseUrlOnHosts(readCleanedCarrierUrl(element, context), hosts, isOnHost)
+}
+
+// A flashvar holding a url, cleaned where a resolver reads it off its carrier.
+export const readCleanedFlashVar = (
+  element: Element | undefined,
+  name: string,
+  context: TransformContext | undefined,
+): string | undefined => {
+  const value = flashVar(element, name)
+
+  if (!element || !context) {
+    return value
+  }
+
+  return cleanCarrierUrl(element, value, context)
+}
+
+export const readCleanedAttributeUrl = (
+  element: Element,
+  attribute: string,
+  context: TransformContext,
+): string | undefined => {
+  return cleanCarrierUrl(element, attr(element, attribute), context)
 }
 
 type ResolverOptions = {
@@ -151,14 +249,14 @@ type ResolverOptions = {
 // A resolver whose selector names the platform's own markup.
 export const createMarkupEmbedResolver = (
   selector: string,
-  extract: (element: Element) => EmbedResolverResult | undefined,
+  extract: (element: Element, context: TransformContext) => EmbedResolverResult | undefined,
   options: ResolverOptions = {},
 ): EmbedResolver => {
   return {
     kind: 'embed',
     selector,
-    extract: (element) => {
-      return decideSize(element, extract(element), options.readCarrierSize)
+    extract: (element, context) => {
+      return decideSize(element, extract(element, context), options.readCarrierSize)
     },
   }
 }
@@ -280,8 +378,8 @@ export const createUrlEmbedResolver = (
   return {
     kind: 'embed',
     selector: embedCarrierSelector,
-    extract: (element) => {
-      const src = readCarrierUrl(element)
+    extract: (element, context) => {
+      const src = readCleanedCarrierUrl(element, context)
       const url = parseUrlOnHosts(src, hosts, options.isOnHost)
 
       // A script that never filled its template, `embed/$1`, names no item, and its frame stays
@@ -290,7 +388,7 @@ export const createUrlEmbedResolver = (
         return
       }
 
-      return decideSize(element, extract(url, element), options.readCarrierSize)
+      return decideSize(element, extract(url, element, context), options.readCarrierSize)
     },
   }
 }
@@ -308,9 +406,10 @@ export const isEmbedOrMediaResolver = (
 export const isResolvedIframe = async (
   iframe: Element,
   resolvers: ReadonlyArray<WidgetResolver>,
+  context: TransformContext,
 ): Promise<boolean> => {
   for (const resolver of resolvers) {
-    if (iframe.matches(resolver.selector) && (await resolver.extract(iframe))) {
+    if (iframe.matches(resolver.selector) && (await resolver.extract(iframe, context))) {
       return true
     }
   }
@@ -341,13 +440,14 @@ export const getMediaTag = (url: string): MediaResolverResult['tag'] | undefined
 export const resolveEmbedProbe = async (
   probe: Element,
   resolvers: ReadonlyArray<WidgetResolver>,
+  context: TransformContext,
 ): Promise<EmbedResolverResult | undefined> => {
   for (const resolver of resolvers.filter(isEmbedOrMediaResolver)) {
     if (!probe.matches(resolver.selector)) {
       continue
     }
 
-    const metadata = await resolver.extract(probe)
+    const metadata = await resolver.extract(probe, context)
 
     if (metadata && !isMediaResult(metadata)) {
       return metadata
@@ -369,8 +469,11 @@ export const toPlayerKey = (embed: EmbedResolverResult | undefined): string | un
 export const readPlayer = async (
   frame: Element,
   resolvers: ReadonlyArray<WidgetResolver>,
+  context: TransformContext,
 ): Promise<string | undefined> => {
-  return toPlayerKey(await resolveEmbedProbe(frame.cloneNode(true) as Element, resolvers))
+  const probe = frame.cloneNode(true) as Element
+
+  return toPlayerKey(await resolveEmbedProbe(probe, resolvers, context))
 }
 
 // Not used by the injectEnclosures probe: anything set here would change what every resolver sees.

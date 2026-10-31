@@ -12,6 +12,7 @@ import type {
   EmbedResolverResult,
   FieldCleaner,
   ResolveUrlEmbed,
+  TransformContext,
 } from '../types.js'
 import { attr, find, jsonAttr, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
@@ -19,9 +20,11 @@ import { parseUrlOnHosts } from '../utils/urls.js'
 import {
   atUsername,
   bareHandleRegex,
+  cleanCarrierUrl,
   createMarkupEmbedResolver,
   createS9eEmbedResolver,
   createUrlEmbedResolver,
+  readCleanedAttributeUrl,
 } from '../utils/widgets.js'
 
 const provider = 'instagram'
@@ -90,10 +93,16 @@ const composeEmbed = (
 // Tumblr wraps the quote in a figure that repeats the post url percent-encoded.
 const wrapperSelector = 'figure[data-provider="instagram"]'
 
-const readWrapperPost = (element: Element): Post | undefined => {
-  const dataUrl = attr(element.closest(wrapperSelector), 'data-url')
+const readWrapperPost = (element: Element, context: TransformContext): Post | undefined => {
+  const wrapper = element.closest(wrapperSelector)
+  const dataUrl = attr(wrapper, 'data-url')
 
-  const link = parseUrlOnHosts(decodeSegment(dataUrl) ?? dataUrl, hosts)
+  if (!wrapper || !dataUrl) {
+    return
+  }
+
+  const declared = cleanCarrierUrl(wrapper, decodeSegment(dataUrl) ?? dataUrl, context)
+  const link = parseUrlOnHosts(declared, hosts)
 
   return readPostUrl(link)
 }
@@ -101,8 +110,9 @@ const readWrapperPost = (element: Element): Post | undefined => {
 // Where the post is named, in the order the shapes provide it: the attribute the dialog writes,
 // then any anchor in the quote, which the pre-2018 versions and every sanitized copy leave as
 // the only trace.
-const findPost = (element: Element): Post | undefined => {
-  const permalink = parseUrlOnHosts(attr(element, 'data-instgrm-permalink'), hosts)
+const findPost = (element: Element, context: TransformContext): Post | undefined => {
+  const declaredUrl = readCleanedAttributeUrl(element, 'data-instgrm-permalink', context)
+  const permalink = parseUrlOnHosts(declaredUrl, hosts)
   const declared = readPostUrl(permalink)
 
   if (declared) {
@@ -174,8 +184,8 @@ const readContent = (element: Element): Partial<EmbedResolverResult> => {
 // Instagram's share dialog ships a post as a blockquote skeleton only its `embed.js` loader fills.
 export const instagramBlockquoteEmbedResolver = createMarkupEmbedResolver(
   'blockquote.instagram-media, blockquote[data-instgrm-permalink]',
-  (element) => {
-    const post = findPost(element) ?? readWrapperPost(element)
+  (element, context) => {
+    const post = findPost(element, context) ?? readWrapperPost(element, context)
 
     if (!post) {
       return

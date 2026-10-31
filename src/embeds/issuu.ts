@@ -10,7 +10,11 @@ import {
 import type { EmbedResolverResult, FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVars, parseFlashVars } from '../utils/dom.js'
 import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  createMarkupEmbedResolver,
+  createUrlEmbedResolver,
+  readCleanedAttributeUrl,
+} from '../utils/widgets.js'
 
 const provider = 'issuu'
 
@@ -91,16 +95,16 @@ const readDocumentUrl = (parsed: URL | undefined): EmbedResolverResult | undefin
 // `data-url` into the `u`, `d` and `p` query.
 export const issuuWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.issuuembed[data-configid], div.issuuembed[data-url]',
-  (element) => {
+  (element, context) => {
     const configEmbed = composeConfigEmbed(attr(element, 'data-configid'))
 
     if (configEmbed) {
       return configEmbed
     }
 
-    const documentUrl = parseUrlOnHosts(attr(element, 'data-url'), hosts)
+    const declared = readCleanedAttributeUrl(element, 'data-url', context)
 
-    return readDocumentUrl(documentUrl)
+    return readDocumentUrl(parseUrlOnHosts(declared, hosts))
   },
 )
 

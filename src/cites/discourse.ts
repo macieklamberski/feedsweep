@@ -4,6 +4,7 @@ import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, isElement, text } from '../utils/dom.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
+import { readCleanedAttributeUrl } from '../utils/widgets.js'
 
 const provider = 'discourse'
 
@@ -62,13 +63,13 @@ const fediverseHandleRegex = /@[\w.-]+@[\w-]+(?:\.[\w-]+)+/
 export const discourseCiteResolver: CiteResolver = {
   kind: 'cite',
   selector: `aside.onebox${omittedOneboxClasses.map((name) => `:not(.${name})`).join('')}`,
-  extract: (element) => {
+  extract: (element, context) => {
     const body = find(element, '.onebox-body')
     const source = find(element, 'header.source a')
 
     // Old-generation oneboxes (the Stack Exchange shape among them) carry no
     // data-onebox-src. Their canonical url is the source anchor's.
-    const url = attr(element, 'data-onebox-src') ?? attr(source, 'href')
+    const url = readCleanedAttributeUrl(element, 'data-onebox-src', context) ?? attr(source, 'href')
     // Engines differ on the heading level they use for the title.
     const title = text(body, 'h3, h4')
 

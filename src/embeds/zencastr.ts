@@ -1,8 +1,11 @@
 import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
-import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  createMarkupEmbedResolver,
+  createUrlEmbedResolver,
+  readCleanedAttributeUrl,
+} from '../utils/widgets.js'
 
 const provider = 'zencastr'
 
@@ -39,8 +42,9 @@ export const zencastrResolveEmbed: ResolveUrlEmbed = (url) => {
 // Without the script the reader shows a black box with a link and no player.
 export const zencastrBlockquoteEmbedResolver = createMarkupEmbedResolver(
   'blockquote.zenplayer[data-episode-href]',
-  (element) => {
-    const url = parseUrlOnHosts(attr(element, 'data-episode-href'), hosts)
+  (element, context) => {
+    const episodeUrl = readCleanedAttributeUrl(element, 'data-episode-href', context)
+    const url = parseUrlOnHosts(episodeUrl, hosts)
 
     if (!url) {
       return

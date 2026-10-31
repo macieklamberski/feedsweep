@@ -7,7 +7,12 @@ import type {
 } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  createMarkupEmbedResolver,
+  createUrlEmbedResolver,
+  readCleanedAttributeUrl,
+  readCleanedFlashVar,
+} from '../utils/widgets.js'
 
 const provider = 'audioboom'
 
@@ -81,8 +86,8 @@ export const audioboomIframeEmbedResolver = createUrlEmbedResolver(hosts, audiob
 // `data-boourl` holds the same player url the iframe form holds.
 export const audioboomWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.ab-player[data-boourl]',
-  (element) => {
-    const parsed = parseUrlOnHosts(attr(element, 'data-boourl'), hosts)
+  (element, context) => {
+    const parsed = parseUrlOnHosts(readCleanedAttributeUrl(element, 'data-boourl', context), hosts)
 
     return parsed && audioboomResolveEmbed(parsed)
   },
@@ -90,7 +95,7 @@ export const audioboomWidgetEmbedResolver = createMarkupEmbedResolver(
 
 // Audioboo's Flash player, which no browser runs. It names the post only in its flashvars, as the
 // page in `mp3LinkURL` or the audio file in `mp3`.
-const audioboomFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
+const audioboomFlashResolveEmbed: ResolveUrlEmbed = (url, element, context) => {
   // Another bucket, path-style or on its own subdomain of S3's host, is not Audioboo's.
   const isPathStyle = isHostOf(url, bucketHosts)
   const [bucket] = getPathSegments(url)
@@ -103,7 +108,9 @@ const audioboomFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
     return
   }
 
-  const link = flashVar(element, 'mp3LinkURL') ?? flashVar(element, 'mp3')
+  const link =
+    readCleanedFlashVar(element, 'mp3LinkURL', context) ??
+    readCleanedFlashVar(element, 'mp3', context)
   const parsed = parseUrlOnHosts(link?.replace(mp3ExtensionRegex, ''), hosts)
 
   if (!parsed) {

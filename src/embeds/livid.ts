@@ -2,7 +2,11 @@ import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { attr, find } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  cleanCarrierUrl,
+  createMarkupEmbedResolver,
+  createUrlEmbedResolver,
+} from '../utils/widgets.js'
 
 const provider = 'livid'
 
@@ -66,9 +70,9 @@ export const lividIframeEmbedResolver = createUrlEmbedResolver(hosts, lividResol
 // image, and only the plugin's script swaps them.
 export const lividMetasliderEmbedResolver = createMarkupEmbedResolver(
   'li.ms-livid div.ms-livid-lazy-wrap[data-embed]',
-  (element) => {
+  (element, context) => {
     const src = attr(element, 'data-embed')?.match(iframeSrcRegex)?.[1]
-    const url = parseUrlOnHosts(src, hosts)
+    const url = parseUrlOnHosts(cleanCarrierUrl(element, src, context), hosts)
 
     if (!url) {
       return

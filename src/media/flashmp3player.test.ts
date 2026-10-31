@@ -105,6 +105,17 @@ describeForEachParser('flashMp3PlayerMediaResolver', (parseHtml) => {
   })
 
   describe('sad paths', () => {
+    it('should ignore a swf on the player host outside its medias route', async () => {
+      const value = html`
+        <embed
+          src="http://flash-mp3-player.net/players/player_mp3_maxi.swf"
+          flashvars="mp3=http://example.com/audio/track.mp3"
+        />
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a player naming no file', async () => {
       const value = html`
         <embed

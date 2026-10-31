@@ -1,8 +1,8 @@
 import { encodePathSegment, isPresent } from 'trousse'
 import { composeEmbedUrl, readSrcMediaId } from '../../embeds/wistia.js'
-import type { DomTransform } from '../../types.js'
+import type { DomTransform, TransformContext } from '../../types.js'
 import { attr, parseRatio } from '../../utils/dom.js'
-import { createIframe } from '../../utils/widgets.js'
+import { createIframe, readCleanedCarrierUrl } from '../../utils/widgets.js'
 
 // Pulls the hashed id out of the `wistia_async_{id}` class the facade carries, up to the end of
 // the class token.
@@ -26,20 +26,21 @@ const wistiaSelector = [
   'div.wistia-video[id^="wistia_"]',
   'wistia-player[media-id]',
   'script[src*="/embed/medias/" i]',
-  'iframe[src*="wistia" i]',
+  'iframe[src]',
 ].join(', ')
 
-// Both carry the media id in the src path, which the platform module reads: the selector matches
-// them on a substring, so nothing before `readSrcMediaId` has looked at the host.
-const srcCarrierTags = ['script', 'iframe']
-
 // A src path is already a segment. An attribute comes out decoded, and its id goes into a path.
-const readMediaId = (element: Element): string | undefined => {
+const readMediaId = (element: Element, context: TransformContext): string | undefined => {
   if (element.localName === 'wistia-player') {
     return encodePathSegment(attr(element, 'media-id') ?? '')
   }
 
-  if (srcCarrierTags.includes(element.localName)) {
+  // A script or a frame carries the media id in its src path, and `readSrcMediaId` checks the host.
+  if (element.localName === 'iframe') {
+    return readSrcMediaId(readCleanedCarrierUrl(element, context))
+  }
+
+  if (element.localName === 'script') {
     return readSrcMediaId(attr(element, 'src'))
   }
 
@@ -55,7 +56,7 @@ const readMediaId = (element: Element): string | undefined => {
 // Wistia's async div, legacy API div, <wistia-player> element and loader script all render
 // nothing without JS, and the legacy div's Flash fallback needs a plugin no browser ships.
 // Wistia's poster needs the media JSON hop, so none of them states a thumbnail.
-export const rebuildWistiaEmbeds: DomTransform = () => (document) => {
+export const rebuildWistiaEmbeds: DomTransform = (context) => (document) => {
   const elements = Array.from(document.querySelectorAll(wistiaSelector))
 
   // An id already carried by a div, a custom element or a real iframe. Collected before any
@@ -64,7 +65,7 @@ export const rebuildWistiaEmbeds: DomTransform = () => (document) => {
   const carried = new Set(
     elements
       .filter((element) => element.localName !== 'script')
-      .map((element) => readMediaId(element)?.toLowerCase())
+      .map((element) => readMediaId(element, context)?.toLowerCase())
       .filter(isPresent),
   )
 
@@ -73,7 +74,7 @@ export const rebuildWistiaEmbeds: DomTransform = () => (document) => {
       continue
     }
 
-    const mediaId = readMediaId(element)
+    const mediaId = readMediaId(element, context)
 
     if (!mediaId) {
       continue

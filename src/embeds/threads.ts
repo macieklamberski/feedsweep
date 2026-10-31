@@ -1,8 +1,13 @@
-import type { EmbedRenderHint } from '../types.js'
+import type { EmbedRenderHint, TransformContext } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { atUsername, createMarkupEmbedResolver, findBareHandle } from '../utils/widgets.js'
+import {
+  atUsername,
+  createMarkupEmbedResolver,
+  findBareHandle,
+  readCleanedAttributeUrl,
+} from '../utils/widgets.js'
 
 const provider = 'threads'
 
@@ -31,8 +36,9 @@ const readPostUrl = (value: string | undefined): Post | undefined => {
 
 // Where the post is named: the attribute the dialog writes, then any anchor in the quote, which
 // a sanitized copy leaves as the only trace.
-const findPost = (element: Element): Post | undefined => {
-  const declared = readPostUrl(attr(element, 'data-text-post-permalink'))
+const findPost = (element: Element, context: TransformContext): Post | undefined => {
+  const permalink = readCleanedAttributeUrl(element, 'data-text-post-permalink', context)
+  const declared = readPostUrl(permalink)
 
   if (declared) {
     return declared
@@ -51,8 +57,8 @@ const findPost = (element: Element): Post | undefined => {
 // which `embed.js` replaces with the frame `{permalink}/embed/`.
 export const threadsBlockquoteEmbedResolver = createMarkupEmbedResolver(
   'blockquote.text-post-media',
-  (element) => {
-    const post = findPost(element)
+  (element, context) => {
+    const post = findPost(element, context)
 
     if (!post) {
       return
