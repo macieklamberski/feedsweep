@@ -197,11 +197,11 @@ describeForEachParser('abcnews player through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-id="39415146"
         data-embed-provider="abcnews"
+        data-embed-id="39415146"
         data-embed-src="https://abcnews.com/video/embed?id=39415146"
         data-embed-url="https://abcnews.com/video/39415146"
+        data-embed-ratio="16/9"
       ></div>
     `
 

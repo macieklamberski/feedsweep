@@ -198,10 +198,10 @@ describeForEachParser('washingtonpost through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-id="6c688908-1e4f-4130-b5ca-e371afc1c78b"
         data-embed-provider="washingtonpost"
+        data-embed-id="6c688908-1e4f-4130-b5ca-e371afc1c78b"
         data-embed-src="https://www.washingtonpost.com/video/c/embed/6c688908-1e4f-4130-b5ca-e371afc1c78b"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -220,10 +220,10 @@ describeForEachParser('washingtonpost through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-id="609cbc68-f753-11e1-8253-3f495ae70650"
         data-embed-provider="washingtonpost"
+        data-embed-id="609cbc68-f753-11e1-8253-3f495ae70650"
         data-embed-src="https://www.washingtonpost.com/video/c/embed/609cbc68-f753-11e1-8253-3f495ae70650"
+        data-embed-ratio="16/9"
       ></div>
     `
 

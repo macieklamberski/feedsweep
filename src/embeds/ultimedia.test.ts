@@ -201,10 +201,10 @@ describeForEachParser('ultimedia urls the pipeline absolutises first', (parseHtm
     `
     const expected = html`
       <div
-        data-embed-id="01357940/ml3ffr"
         data-embed-provider="ultimedia"
-        data-embed-ratio="16/9"
+        data-embed-id="01357940/ml3ffr"
         data-embed-src="https://www.ultimedia.com/deliver/generic/iframe/mdtk/01357940/src/ml3ffr/"
+        data-embed-ratio="16/9"
       ></div>
     `
 

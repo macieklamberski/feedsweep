@@ -430,11 +430,11 @@ describeForEachParser('drive files offered as enclosures', (parseHtml) => {
     const expected = html`
       <div
         data-enclosure
-        data-embed-height="252"
-        data-embed-url="https://drive.google.com/file/d/11xQxXUWu4JWxuhQkGH2FUGWPCh0Ow1aw/view"
-        data-embed-id="11xQxXUWu4JWxuhQkGH2FUGWPCh0Ow1aw"
         data-embed-provider="googledrive"
+        data-embed-id="11xQxXUWu4JWxuhQkGH2FUGWPCh0Ow1aw"
         data-embed-src="https://drive.google.com/file/d/11xQxXUWu4JWxuhQkGH2FUGWPCh0Ow1aw/preview"
+        data-embed-url="https://drive.google.com/file/d/11xQxXUWu4JWxuhQkGH2FUGWPCh0Ow1aw/view"
+        data-embed-height="252"
       ></div>
       <p>Body</p>
     `
@@ -452,11 +452,11 @@ describeForEachParser('drive files offered as enclosures', (parseHtml) => {
     const expected = html`
       <div
         data-enclosure
-        data-embed-height="252"
-        data-embed-url="https://drive.google.com/file/d/1-Y-8cPyGXZKDSo4wl4HgZ6-t2c1pH10_/view"
-        data-embed-id="1-Y-8cPyGXZKDSo4wl4HgZ6-t2c1pH10_"
         data-embed-provider="googledrive"
+        data-embed-id="1-Y-8cPyGXZKDSo4wl4HgZ6-t2c1pH10_"
         data-embed-src="https://drive.google.com/file/d/1-Y-8cPyGXZKDSo4wl4HgZ6-t2c1pH10_/preview"
+        data-embed-url="https://drive.google.com/file/d/1-Y-8cPyGXZKDSo4wl4HgZ6-t2c1pH10_/view"
+        data-embed-height="252"
       ></div>
       <p>Body</p>
     `
@@ -486,11 +486,11 @@ describeForEachParser('drive file pages in a media element', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="252"
-        data-embed-url="https://drive.google.com/file/d/1GRb_urzw2vn0JGKamTE70NIoELiXbAJA/view"
-        data-embed-id="1GRb_urzw2vn0JGKamTE70NIoELiXbAJA"
         data-embed-provider="googledrive"
+        data-embed-id="1GRb_urzw2vn0JGKamTE70NIoELiXbAJA"
         data-embed-src="https://drive.google.com/file/d/1GRb_urzw2vn0JGKamTE70NIoELiXbAJA/preview"
+        data-embed-url="https://drive.google.com/file/d/1GRb_urzw2vn0JGKamTE70NIoELiXbAJA/view"
+        data-embed-height="252"
       ></div>
     `
 
@@ -506,11 +506,11 @@ describeForEachParser('drive file pages in a media element', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="252"
-        data-embed-url="https://drive.google.com/file/d/1mfIjYMk3XStUeBh5Wo3GTofVdqVbEK1f/view"
-        data-embed-id="1mfIjYMk3XStUeBh5Wo3GTofVdqVbEK1f"
         data-embed-provider="googledrive"
+        data-embed-id="1mfIjYMk3XStUeBh5Wo3GTofVdqVbEK1f"
         data-embed-src="https://drive.google.com/file/d/1mfIjYMk3XStUeBh5Wo3GTofVdqVbEK1f/preview"
+        data-embed-url="https://drive.google.com/file/d/1mfIjYMk3XStUeBh5Wo3GTofVdqVbEK1f/view"
+        data-embed-height="252"
       ></div>
     `
 
@@ -525,11 +525,11 @@ describeForEachParser('drive file pages in a media element', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="252"
-        data-embed-url="https://drive.google.com/file/d/1tveioycFCl8gqz4Z0B3ZW_RORdZkMHWA/view"
-        data-embed-id="1tveioycFCl8gqz4Z0B3ZW_RORdZkMHWA"
         data-embed-provider="googledrive"
+        data-embed-id="1tveioycFCl8gqz4Z0B3ZW_RORdZkMHWA"
         data-embed-src="https://drive.google.com/file/d/1tveioycFCl8gqz4Z0B3ZW_RORdZkMHWA/preview"
+        data-embed-url="https://drive.google.com/file/d/1tveioycFCl8gqz4Z0B3ZW_RORdZkMHWA/view"
+        data-embed-height="252"
       ></div>
     `
 
@@ -545,12 +545,12 @@ describeForEachParser('drive file pages in a media element', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="4/3"
-        data-embed-thumbnail="https://drive.google.com/thumbnail?id=1VZerjwInNuY8lCcXuPA-mnKWIyIIVrYK&sz=w640"
-        data-embed-url="https://drive.google.com/file/d/1VZerjwInNuY8lCcXuPA-mnKWIyIIVrYK/view"
-        data-embed-id="1VZerjwInNuY8lCcXuPA-mnKWIyIIVrYK"
         data-embed-provider="googledrive"
+        data-embed-id="1VZerjwInNuY8lCcXuPA-mnKWIyIIVrYK"
         data-embed-src="https://drive.google.com/file/d/1VZerjwInNuY8lCcXuPA-mnKWIyIIVrYK/preview"
+        data-embed-url="https://drive.google.com/file/d/1VZerjwInNuY8lCcXuPA-mnKWIyIIVrYK/view"
+        data-embed-thumbnail="https://drive.google.com/thumbnail?id=1VZerjwInNuY8lCcXuPA-mnKWIyIIVrYK&sz=w640"
+        data-embed-ratio="4/3"
       ></div>
     `
 

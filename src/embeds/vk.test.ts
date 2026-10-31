@@ -688,10 +688,10 @@ describeForEachParser('vk widgets through the pipeline', (parseHtml) => {
     const expected = html`
       <p>Летний лагерь</p>
       <div
-        data-embed-url="https://vk.ru/wall-211296925_60"
-        data-embed-id="wall-211296925_60"
         data-embed-provider="vk"
+        data-embed-id="wall-211296925_60"
         data-embed-src="https://vk.ru/widget_post.php?owner_id=-211296925&post_id=60&hash=bVYhst3km4JT6iZGIjNrIdnZCDT1"
+        data-embed-url="https://vk.ru/wall-211296925_60"
       ></div>
     `
 
@@ -765,11 +765,11 @@ describeForEachParser('vk video pages through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-url="https://vkvideo.ru/video-42258342_456239658"
-        data-embed-id="-42258342_456239658"
         data-embed-provider="vk"
+        data-embed-id="-42258342_456239658"
         data-embed-src="https://vk.ru/video_ext.php?oid=-42258342&id=456239658"
+        data-embed-url="https://vkvideo.ru/video-42258342_456239658"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -786,11 +786,11 @@ describeForEachParser('vk video pages through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-url="https://vkvideo.ru/video-214240511_456239169"
-        data-embed-id="-214240511_456239169"
         data-embed-provider="vk"
+        data-embed-id="-214240511_456239169"
         data-embed-src="https://vk.ru/video_ext.php?oid=-214240511&id=456239169"
+        data-embed-url="https://vkvideo.ru/video-214240511_456239169"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -806,12 +806,12 @@ describeForEachParser('vk video pages through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://example.com/poster.jpg"
-        data-embed-url="https://vkvideo.ru/video-42258342_456239658"
-        data-embed-id="-42258342_456239658"
         data-embed-provider="vk"
+        data-embed-id="-42258342_456239658"
         data-embed-src="https://vk.ru/video_ext.php?oid=-42258342&id=456239658"
+        data-embed-url="https://vkvideo.ru/video-42258342_456239658"
+        data-embed-thumbnail="https://example.com/poster.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -825,11 +825,11 @@ describeForEachParser('vk video pages through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-url="https://vkvideo.ru/video-42258342_456239658"
-        data-embed-id="-42258342_456239658"
         data-embed-provider="vk"
+        data-embed-id="-42258342_456239658"
         data-embed-src="https://vk.ru/video_ext.php?oid=-42258342&id=456239658&hash=8cb3638a83a93268"
+        data-embed-url="https://vkvideo.ru/video-42258342_456239658"
+        data-embed-ratio="16/9"
       ></div>
     `
 

@@ -152,9 +152,9 @@ describeForEachParser('Facebook', (parseHtml) => {
       <div
         data-embed-provider="facebook"
         data-embed-id="https://www.facebook.com/video.php?v=123"
-        data-embed-ratio="16/9"
         data-embed-src="https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/reel/123/"
         data-embed-url="https://www.facebook.com/reel/123/"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -430,10 +430,10 @@ describeForEachParser('Facebook', (parseHtml) => {
     const value = '<iframe src="https://www.facebook.com/watch/?v=1010445561578533"></iframe>'
     const expected = html`
       <div
-        data-embed-url="https://www.facebook.com/watch/?v=1010445561578533"
-        data-embed-id="https://www.facebook.com/video.php?v=1010445561578533"
         data-embed-provider="facebook"
+        data-embed-id="https://www.facebook.com/video.php?v=1010445561578533"
         data-embed-src="https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=1010445561578533"
+        data-embed-url="https://www.facebook.com/watch/?v=1010445561578533"
         data-embed-ratio="16/9"
       ></div>
     `

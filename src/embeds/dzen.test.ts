@@ -168,10 +168,10 @@ describeForEachParser('dzen through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-id="ob1uPDp8NAAA"
         data-embed-provider="dzen"
+        data-embed-id="ob1uPDp8NAAA"
         data-embed-src="https://dzen.ru/embed/ob1uPDp8NAAA"
+        data-embed-ratio="16/9"
       ></div>
     `
 

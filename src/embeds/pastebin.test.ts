@@ -214,9 +214,9 @@ describeForEachParser('pastebin through the pipeline', (parseHtml) => {
     const expected = html`
       <p>The config:</p>
       <div
-        data-embed-src="https://pastebin.com/embed_iframe/heGyGJgS"
         data-embed-provider="pastebin"
         data-embed-id="heGyGJgS"
+        data-embed-src="https://pastebin.com/embed_iframe/heGyGJgS"
         data-embed-url="https://pastebin.com/heGyGJgS"
         data-embed-height="150"
       ></div>
@@ -234,11 +234,11 @@ describeForEachParser('pastebin through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="150"
-        data-embed-src="https://pastebin.com/embed_iframe/kiDpUViY"
         data-embed-provider="pastebin"
         data-embed-id="kiDpUViY"
+        data-embed-src="https://pastebin.com/embed_iframe/kiDpUViY"
         data-embed-url="https://pastebin.com/kiDpUViY"
+        data-embed-height="150"
       ></div>
     `
 

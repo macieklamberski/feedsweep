@@ -200,11 +200,11 @@ describeForEachParser('subsplash player through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-url="https://subspla.sh/r58c2x5"
-        data-embed-id="r58c2x5"
         data-embed-provider="subsplash"
+        data-embed-id="r58c2x5"
         data-embed-src="https://subsplash.com/+754a/embed/mi/+r58c2x5"
+        data-embed-url="https://subspla.sh/r58c2x5"
+        data-embed-ratio="16/9"
       ></div>
     `
 

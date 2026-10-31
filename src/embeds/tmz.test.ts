@@ -154,11 +154,11 @@ describeForEachParser('tmz player through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-id="2021-12-13-121321-danny-carey-1322198"
         data-embed-provider="tmz"
+        data-embed-id="2021-12-13-121321-danny-carey-1322198"
         data-embed-src="https://share.tmz.com/videos/2021-12-13-121321-danny-carey-1322198/"
         data-embed-url="https://www.tmz.com/watch/2021-12-13-121321-danny-carey-1322198/"
+        data-embed-ratio="16/9"
       ></div>
     `
 

@@ -334,11 +334,11 @@ describeForEachParser('srgplay through the pipeline', (parseHtml) => {
 
     const expected = html`
       <div
-        data-embed-url="https://www.srf.ch/play/tv/-/video/-?urn=urn:srf:ais:video:b47f4c3d-890a-4fe7-beb4-9a99e995d8c1"
-        data-embed-id="urn:srf:ais:video:b47f4c3d-890a-4fe7-beb4-9a99e995d8c1"
         data-embed-provider="srgplay"
-        data-embed-ratio="16/9"
+        data-embed-id="urn:srf:ais:video:b47f4c3d-890a-4fe7-beb4-9a99e995d8c1"
         data-embed-src="https://www.srf.ch/play/embed?urn=urn:srf:ais:video:b47f4c3d-890a-4fe7-beb4-9a99e995d8c1"
+        data-embed-url="https://www.srf.ch/play/tv/-/video/-?urn=urn:srf:ais:video:b47f4c3d-890a-4fe7-beb4-9a99e995d8c1"
+        data-embed-ratio="16/9"
       ></div>
     `
 

@@ -349,9 +349,9 @@ describeForEachParser('fliphtml5 enclosures', (parseHtml) => {
     const enclosures = [{ url: 'https://online.fliphtml5.com/mzsro/jvuq/', type: 'text/html' }]
     const expected = html`
       <div
-        data-embed-src="https://online.fliphtml5.com/mzsro/jvuq/"
         data-embed-provider="fliphtml5"
         data-embed-id="mzsro/jvuq"
+        data-embed-src="https://online.fliphtml5.com/mzsro/jvuq/"
         data-embed-url="https://online.fliphtml5.com/mzsro/jvuq/"
         data-embed-thumbnail="https://online.fliphtml5.com/mzsro/jvuq/files/shot.jpg"
         data-enclosure=""

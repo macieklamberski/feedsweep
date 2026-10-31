@@ -360,11 +360,11 @@ describeForEachParser('democracynow player through the pipeline', (parseHtml) =>
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-url="https://www.democracynow.org/shows/2023/6/27"
-        data-embed-id="show/2023/6/27"
         data-embed-provider="democracynow"
+        data-embed-id="show/2023/6/27"
         data-embed-src="https://www.democracynow.org/embed/show/2023/6/27"
+        data-embed-url="https://www.democracynow.org/shows/2023/6/27"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -380,11 +380,11 @@ describeForEachParser('democracynow player through the pipeline', (parseHtml) =>
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-url="https://www.democracynow.org/2010/6/9/scientist_bp_well_could_be_leaking"
-        data-embed-id="story/2010/6/9/scientist_bp_well_could_be_leaking"
         data-embed-provider="democracynow"
+        data-embed-id="story/2010/6/9/scientist_bp_well_could_be_leaking"
         data-embed-src="https://www.democracynow.org/embed/story/2010/6/9/scientist_bp_well_could_be_leaking"
+        data-embed-url="https://www.democracynow.org/2010/6/9/scientist_bp_well_could_be_leaking"
+        data-embed-ratio="16/9"
       ></div>
     `
 

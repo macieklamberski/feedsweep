@@ -511,10 +511,10 @@ describeForEachParser('mrcvideo through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-id="109422"
         data-embed-provider="mrcvideo"
+        data-embed-id="109422"
         data-embed-src="https://mrcvideo.org/embed/109422"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -537,10 +537,10 @@ describeForEachParser('mrcvideo through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-id="116586"
         data-embed-provider="mrcvideo"
+        data-embed-id="116586"
         data-embed-src="https://mrcvideo.org/embed/116586"
+        data-embed-ratio="16/9"
       ></div>
     `
 

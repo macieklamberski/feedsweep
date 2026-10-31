@@ -80,13 +80,13 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       `
       const expected = html`
         <div
-          data-embed-src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/1"
           data-embed-provider="soundcloud"
           data-embed-id="tracks/1"
+          data-embed-src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/1"
           data-embed-url="https://soundcloud.com/artist/track"
+          data-embed-height="166"
           data-embed-title="Track title"
           data-embed-author="Artist"
-          data-embed-height="166"
         ></div>
       `
 
@@ -160,13 +160,13 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       `
       const expected = html`
         <div
-          data-embed-src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/68669052"
           data-embed-provider="soundcloud"
           data-embed-id="tracks/68669052"
+          data-embed-src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/68669052"
           data-embed-url="http://soundcloud.com/rozie-3/13-bks-suicide"
+          data-embed-height="166"
           data-embed-title="13-BKS-Suicide"
           data-embed-author="rozie"
-          data-embed-height="166"
         ></div>
       `
 
@@ -995,9 +995,9 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       `
       const expected = html`
         <div
-          data-embed-src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/1"
           data-embed-provider="soundcloud"
           data-embed-id="tracks/1"
+          data-embed-src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/1"
           data-embed-height="166"
         ></div>
         <p>A caption the author wrote with one <a href="https://soundcloud.com/artist">link</a>.</p>
@@ -1013,9 +1013,9 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       `
       const expected = html`
         <div
-          data-embed-src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/41638331"
           data-embed-provider="soundcloud"
           data-embed-id="tracks/41638331"
+          data-embed-src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/41638331"
           data-embed-height="166"
         ></div>
         <p>Follow Me Hip Hop Instrumental <a href="http://soundcloud.com/305dopebeats/follow-me#">beat making</a> software <a href="http://soundcloud.com/305dopebeats/follow-me">305DopeBeats-Follow Me Hip Hop Instrumental</a></p>
@@ -1036,9 +1036,9 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
       `
       const expected = html`
         <div
-          data-embed-src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/1"
           data-embed-provider="soundcloud"
           data-embed-id="tracks/1"
+          data-embed-src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/1"
           data-embed-height="166"
         ></div>
         <div>
@@ -1143,10 +1143,10 @@ describeForEachParser('soundcloud through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="166"
-        data-embed-id="tracks/235469515"
         data-embed-provider="soundcloud"
+        data-embed-id="tracks/235469515"
         data-embed-src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/235469515"
+        data-embed-height="166"
       ></div>
     `
 
@@ -1162,10 +1162,10 @@ describeForEachParser('soundcloud through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="166"
-        data-embed-id="tracks/1039766461"
         data-embed-provider="soundcloud"
+        data-embed-id="tracks/1039766461"
         data-embed-src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/1039766461"
+        data-embed-height="166"
       ></div>
     `
 

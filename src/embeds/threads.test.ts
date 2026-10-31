@@ -356,11 +356,11 @@ describeForEachParser('threads through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-author="@jeremyburge"
-        data-embed-url="https://www.threads.com/@jeremyburge/post/DM1953uN6IJ"
-        data-embed-id="DM1953uN6IJ"
         data-embed-provider="threads"
+        data-embed-id="DM1953uN6IJ"
         data-embed-src="https://www.threads.com/@jeremyburge/post/DM1953uN6IJ/embed/"
+        data-embed-url="https://www.threads.com/@jeremyburge/post/DM1953uN6IJ"
+        data-embed-author="@jeremyburge"
       ></div>
     `
 

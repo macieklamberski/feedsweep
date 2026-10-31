@@ -289,8 +289,8 @@ describeForEachParser('fireside through the pipeline', (parseHtml) => {
 
     const expected = html`
       <div
-        data-embed-id="N8LaNbQY+MI2PkJ2g"
         data-embed-provider="fireside"
+        data-embed-id="N8LaNbQY+MI2PkJ2g"
         data-embed-src="https://player.fireside.fm/v3/N8LaNbQY+MI2PkJ2g"
         data-embed-height="200"
       ></div>

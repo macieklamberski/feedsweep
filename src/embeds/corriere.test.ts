@@ -250,11 +250,11 @@ describeForEachParser('corriere players through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-url="https://video.corriere.it/x/790590a2-7f4a-11e2-b0f8-b0cda815bb62"
-        data-embed-id="790590a2-7f4a-11e2-b0f8-b0cda815bb62"
         data-embed-provider="corriere"
+        data-embed-id="790590a2-7f4a-11e2-b0f8-b0cda815bb62"
         data-embed-src="https://video.corriere.it/video-embed/790590a2-7f4a-11e2-b0f8-b0cda815bb62"
+        data-embed-url="https://video.corriere.it/x/790590a2-7f4a-11e2-b0f8-b0cda815bb62"
+        data-embed-ratio="16/9"
       ></div>
     `
 

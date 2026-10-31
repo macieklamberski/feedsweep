@@ -987,11 +987,11 @@ describeForEachParser('createCitePlaceholder', (parseHtml) => {
     const expected = html`
       <div
         data-cite-provider="ghost"
+        data-cite-url="https://example.com/post"
+        data-cite-title="Post title"
         data-cite-description="Preview text"
         data-cite-author="Author name"
         data-cite-publisher="Publisher name"
-        data-cite-url="https://example.com/post"
-        data-cite-title="Post title"
         data-cite-icon="https://example.com/favicon.ico"
         data-cite-thumbnail="https://example.com/og-image.jpg"
       ></div>
@@ -1013,9 +1013,9 @@ describeForEachParser('createCitePlaceholder', (parseHtml) => {
     const expected = html`
       <div
         data-cite-provider="ghost"
-        data-cite-description="Preview text"
         data-cite-url="https://example.com/post"
         data-cite-title="Post title"
+        data-cite-description="Preview text"
       ></div>
     `
 
@@ -1877,12 +1877,12 @@ describeForEachParser('objects naming their player in a movie param', (parseHtml
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://i.ytimg.com/vi/oq4-7rK3dUM/hqdefault.jpg"
-        data-embed-url="https://www.youtube.com/watch?v=oq4-7rK3dUM"
-        data-embed-id="oq4-7rK3dUM"
         data-embed-provider="youtube"
+        data-embed-id="oq4-7rK3dUM"
         data-embed-src="https://www.youtube.com/embed/oq4-7rK3dUM"
+        data-embed-url="https://www.youtube.com/watch?v=oq4-7rK3dUM"
+        data-embed-thumbnail="https://i.ytimg.com/vi/oq4-7rK3dUM/hqdefault.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 

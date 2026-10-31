@@ -196,9 +196,9 @@ describeForEachParser('unwrapDrupalOembedIframes through the pipeline', (parseHt
     })
     const expected = html`
       <div
-        data-embed-src="https://www.youtube.com/embed/2dEj10uaqAs"
         data-embed-provider="youtube"
         data-embed-id="2dEj10uaqAs"
+        data-embed-src="https://www.youtube.com/embed/2dEj10uaqAs"
         data-embed-url="https://www.youtube.com/watch?v=2dEj10uaqAs"
         data-embed-thumbnail="https://i.ytimg.com/vi/2dEj10uaqAs/hqdefault.jpg"
         data-embed-ratio="16/9"
@@ -225,9 +225,9 @@ describeForEachParser('unwrapDrupalOembedIframes through the pipeline', (parseHt
     })
     const expected = html`
       <div
-        data-embed-src="https://www.youtube.com/embed/fKXGDRnkljI"
         data-embed-provider="youtube"
         data-embed-id="fKXGDRnkljI"
+        data-embed-src="https://www.youtube.com/embed/fKXGDRnkljI"
         data-embed-url="https://www.youtube.com/watch?v=fKXGDRnkljI"
         data-embed-thumbnail="https://i.ytimg.com/vi/fKXGDRnkljI/hqdefault.jpg"
         data-embed-ratio="16/9"

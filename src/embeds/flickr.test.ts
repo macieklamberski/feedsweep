@@ -2089,14 +2089,14 @@ describeForEachParser('flickr through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-author="bees"
-        data-embed-height="768"
-        data-embed-width="1024"
-        data-embed-thumbnail="https://live.staticflickr.com/3040/2362225867_4a87ab8baf_b.jpg"
-        data-embed-url="https://www.flickr.com/photos/bees/2362225867/"
-        data-embed-id="p/4AK2sc"
         data-embed-provider="flickr"
+        data-embed-id="p/4AK2sc"
         data-embed-src="https://embedr.flickr.com/photos/2362225867"
+        data-embed-url="https://www.flickr.com/photos/bees/2362225867/"
+        data-embed-thumbnail="https://live.staticflickr.com/3040/2362225867_4a87ab8baf_b.jpg"
+        data-embed-width="1024"
+        data-embed-height="768"
+        data-embed-author="bees"
       ></div>
     `
 

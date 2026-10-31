@@ -168,11 +168,11 @@ describeForEachParser('Twitter', (parseHtml) => {
         data-embed-id="123456789012345"
         data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=123456789012345"
         data-embed-url="https://x.com/user/status/123456789012345"
+        data-embed-thumbnail="https://pbs.substack.com/media/DVgu7f1WsAAkNMr.jpg"
         data-embed-description="Tweet text here. example.com/notes"
         data-embed-author="Display Name"
         data-embed-avatar="https://pbs.substack.com/media/profile.jpg"
         data-embed-date="Thu Feb 08 12:00:45 +0000 2018"
-        data-embed-thumbnail="https://pbs.substack.com/media/DVgu7f1WsAAkNMr.jpg"
       ></div>
     `
 

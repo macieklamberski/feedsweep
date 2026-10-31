@@ -311,9 +311,9 @@ describeForEachParser('typeform through the pipeline', (parseHtml) => {
     const expected = html`
       <p>Before</p>
       <div
-        data-embed-title="User Satisfaction Survey"
-        data-embed-id="01HCZ4DNW8JM6PEGNTQWF2PW87"
         data-embed-provider="typeform"
+        data-embed-id="01HCZ4DNW8JM6PEGNTQWF2PW87"
+        data-embed-title="User Satisfaction Survey"
       ></div>
       <p>After</p>
     `
@@ -330,10 +330,10 @@ describeForEachParser('typeform through the pipeline', (parseHtml) => {
     const value = '<div data-tf-live="01HCZ4DNW8JM6PEGNTQWF2PW87" data-tf-region="eu"></div>'
     const expected = html`
       <div
-        data-embed-url="https://form.typeform.com/to/bd3tQuXe"
-        data-embed-src="https://form.typeform.com/to/bd3tQuXe"
-        data-embed-id="eu/01HCZ4DNW8JM6PEGNTQWF2PW87"
         data-embed-provider="typeform"
+        data-embed-id="eu/01HCZ4DNW8JM6PEGNTQWF2PW87"
+        data-embed-src="https://form.typeform.com/to/bd3tQuXe"
+        data-embed-url="https://form.typeform.com/to/bd3tQuXe"
       ></div>
     `
 

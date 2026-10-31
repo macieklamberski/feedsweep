@@ -419,11 +419,11 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
     `
     const expected = html`
       <div
-        data-embed-height="533"
         data-embed-provider="crowdsignal"
         data-embed-id="13332507"
         data-embed-src="https://poll.fm/13332507/embed"
         data-embed-url="https://poll.fm/13332507"
+        data-embed-height="533"
       ></div>
     `
 
@@ -444,11 +444,11 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
     const expected = html`
       <p>Vote in <a href="https://poll.fm/13332507">our poll</a> before Friday.</p>
       <div
-        data-embed-height="533"
         data-embed-provider="crowdsignal"
         data-embed-id="13332507"
         data-embed-src="https://poll.fm/13332507/embed"
         data-embed-url="https://poll.fm/13332507"
+        data-embed-height="533"
       ></div>
     `
 
@@ -464,11 +464,11 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
     const expected = html`
       <p>Intro.</p>
       <div
-        data-embed-height="533"
         data-embed-provider="crowdsignal"
         data-embed-id="13332507"
         data-embed-src="https://poll.fm/13332507/embed"
         data-embed-url="https://poll.fm/13332507"
+        data-embed-height="533"
       ></div>
       <p>Last week's <a href="https://poll.fm/13332507">poll</a> said yes.</p>
     `
@@ -485,11 +485,11 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
     `
     const expected = html`
       <div
-        data-embed-height="533"
         data-embed-provider="crowdsignal"
         data-embed-id="1333"
         data-embed-src="https://poll.fm/1333/embed"
         data-embed-url="https://poll.fm/1333"
+        data-embed-height="533"
       ></div>
       <p>Last week's <a href="https://poll.fm/13332507">poll</a> said yes.</p>
     `
@@ -506,11 +506,11 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
     `
     const expected = html`
       <div
-        data-embed-height="533"
         data-embed-provider="crowdsignal"
         data-embed-id="1804433"
         data-embed-src="https://poll.fm/1804433/embed"
         data-embed-url="https://poll.fm/1804433"
+        data-embed-height="533"
       ></div>
     `
 
@@ -528,11 +528,11 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
     `
     const expected = html`
       <div
-        data-embed-height="533"
         data-embed-provider="crowdsignal"
         data-embed-id="13332507"
         data-embed-src="https://poll.fm/13332507/embed"
         data-embed-url="https://poll.fm/13332507"
+        data-embed-height="533"
       ></div>
       <p>Enable JS to see <a href="https://example.org/other">our other survey</a>.</p>
     `
@@ -549,11 +549,11 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
     `
     const expected = html`
       <div
-        data-embed-height="533"
         data-embed-provider="crowdsignal"
         data-embed-id="13332507"
         data-embed-src="https://poll.fm/13332507/embed"
         data-embed-url="https://poll.fm/13332507"
+        data-embed-height="533"
       ></div>
       <p><noscript><a href="https://poll.fm/13332508">POLL: Another question?</a></noscript></p>
     `
@@ -570,11 +570,11 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
     `
     const expected = html`
       <div
-        data-embed-height="533"
         data-embed-provider="crowdsignal"
         data-embed-id="13332507"
         data-embed-src="https://poll.fm/13332507/embed"
         data-embed-url="https://poll.fm/13332507"
+        data-embed-height="533"
       ></div>
       <p><noscript><a href="https://poll.fm/13332507/results">View Results</a></noscript></p>
     `
@@ -591,11 +591,11 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
     `
     const expected = html`
       <div
-        data-embed-height="533"
         data-embed-provider="crowdsignal"
         data-embed-id="1804433"
         data-embed-src="https://poll.fm/1804433/embed"
         data-embed-url="https://poll.fm/1804433"
+        data-embed-height="533"
       ></div>
       <p><noscript><a href="https://polldaddy.com/poll/1804434/">View This Poll</a></noscript></p>
     `
@@ -612,11 +612,11 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
     `
     const expected = html`
       <div
-        data-embed-height="533"
         data-embed-provider="crowdsignal"
         data-embed-id="1804433"
         data-embed-src="https://poll.fm/1804433/embed"
         data-embed-url="https://poll.fm/1804433"
+        data-embed-height="533"
       ></div>
       <p><noscript><a href="https://polldaddy.com/x/poll/1804433/">View This Poll</a></noscript></p>
     `
@@ -633,11 +633,11 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
     `
     const expected = html`
       <div
-        data-embed-height="533"
         data-embed-provider="crowdsignal"
         data-embed-id="1804433"
         data-embed-src="https://poll.fm/1804433/embed"
         data-embed-url="https://poll.fm/1804433"
+        data-embed-height="533"
       ></div>
       <p><noscript><a href="https://polldaddy.com/poll/1804433/extra">View This Poll</a></noscript></p>
     `
@@ -679,12 +679,12 @@ describeForEachParser('crowdsignal snippets through the pipeline', (parseHtml) =
       <figure class="wp-block-embed is-provider-crowdsignal">
         <p><script>var pd_tags = new Array;pd_tags["17125374-src"]="poll-oembed-simple";</script></p>
         <div
-          data-embed-title="A question?"
-          data-embed-height="533"
           data-embed-provider="crowdsignal"
           data-embed-id="17125374"
           data-embed-src="https://poll.fm/17125374/embed"
           data-embed-url="https://poll.fm/17125374"
+          data-embed-height="533"
+          data-embed-title="A question?"
         ></div>
       </figure>
     `

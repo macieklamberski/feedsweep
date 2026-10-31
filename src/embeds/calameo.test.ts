@@ -512,9 +512,9 @@ describeForEachParser('calameoEmbedResolver through the pipeline', (parseHtml) =
       <div
         data-embed-provider="calameo"
         data-embed-id="0077756511c9c6e552299"
-        data-embed-ratio="300/194"
         data-embed-src="https://v.calameo.com/?bkcode=0077756511c9c6e552299"
         data-embed-url="https://www.calameo.com/books/0077756511c9c6e552299"
+        data-embed-ratio="300/194"
       ></div>
     `
 
@@ -538,8 +538,8 @@ describeForEachParser('calameoEmbedResolver through the pipeline', (parseHtml) =
       <div
         data-embed-provider="calameo"
         data-embed-id="002574221fb7a74a40f7a"
-        data-embed-ratio="300/194"
         data-embed-src="https://v.calameo.com/?bkcode=002574221fb7a74a40f7a&amp;authid=WdhyTr98dSUk"
+        data-embed-ratio="300/194"
       ></div>
     `
 
@@ -562,9 +562,9 @@ describeForEachParser('calameoEmbedResolver through the pipeline', (parseHtml) =
       <div
         data-embed-provider="calameo"
         data-embed-id="library/account/6112630"
-        data-embed-height="925"
         data-embed-src="https://v.calameo.com/library/?type=account&amp;id=6112630&amp;rows=5"
         data-embed-url="https://www.calameo.com/accounts/6112630"
+        data-embed-height="925"
       ></div>
     `
 

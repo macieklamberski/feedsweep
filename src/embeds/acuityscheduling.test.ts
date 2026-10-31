@@ -211,10 +211,10 @@ describeForEachParser('acuityscheduling through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-url="https://app.acuityscheduling.com/schedule.php?owner=12572531&amp;appointmentType=1914136"
-        data-embed-id="12572531/1914136"
         data-embed-provider="acuityscheduling"
+        data-embed-id="12572531/1914136"
         data-embed-src="https://app.acuityscheduling.com/schedule.php?owner=12572531&amp;appointmentType=1914136"
+        data-embed-url="https://app.acuityscheduling.com/schedule.php?owner=12572531&amp;appointmentType=1914136"
       ></div>
     `
 

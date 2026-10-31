@@ -279,11 +279,11 @@ describeForEachParser('voki shapes the pipeline repairs first', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="547"
-        data-embed-url="https://www.voki.com/site/pickup?scid=6133078&chsm=3edcf5f086b130f93d1406299863e1a4"
-        data-embed-id="6133078/3edcf5f086b130f93d1406299863e1a4"
         data-embed-provider="voki"
+        data-embed-id="6133078/3edcf5f086b130f93d1406299863e1a4"
         data-embed-src="https://www.voki.com/site/pickup?scid=6133078&chsm=3edcf5f086b130f93d1406299863e1a4"
+        data-embed-url="https://www.voki.com/site/pickup?scid=6133078&chsm=3edcf5f086b130f93d1406299863e1a4"
+        data-embed-height="547"
       ></div>
     `
 

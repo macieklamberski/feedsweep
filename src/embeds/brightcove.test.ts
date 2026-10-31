@@ -873,9 +873,9 @@ describeForEachParser('brightcove video-js through the pipeline', (parseHtml) =>
 
     const expected = html`
       <div
-        data-embed-src="https://players.brightcove.net/1234567890/default_default/index.html?videoId=6098765432"
         data-embed-provider="brightcove"
         data-embed-id="1234567890/6098765432"
+        data-embed-src="https://players.brightcove.net/1234567890/default_default/index.html?videoId=6098765432"
         data-embed-ratio="16/9"
       ></div>
     `
@@ -902,9 +902,9 @@ describeForEachParser('brightcove video-js playlist through the pipeline', (pars
 
     const expected = html`
       <div
-        data-embed-src="https://players.brightcove.net/6103636748001/zf2tqmk2_default/index.html?playlistId=1862619660780412498"
         data-embed-provider="brightcove"
         data-embed-id="6103636748001/playlist/1862619660780412498"
+        data-embed-src="https://players.brightcove.net/6103636748001/zf2tqmk2_default/index.html?playlistId=1862619660780412498"
         data-embed-ratio="16/9"
       ></div>
     `
@@ -1167,12 +1167,12 @@ describeForEachParser('brightcove sky widget through the pipeline', (parseHtml) 
 
     const expected = html`
       <div
-        data-embed-title="Minister on Brazil variant and travel ban"
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://images.example.com/21/01/768x432/transport_5238009.jpg"
-        data-embed-id="6058004172001/ref:953c249f-651b-474a-a8b5-30546a0a8ae9"
         data-embed-provider="brightcove"
+        data-embed-id="6058004172001/ref:953c249f-651b-474a-a8b5-30546a0a8ae9"
         data-embed-src="https://players.brightcove.net/6058004172001/RC9PQUaJ6_default/index.html?videoId=ref:953c249f-651b-474a-a8b5-30546a0a8ae9"
+        data-embed-thumbnail="https://images.example.com/21/01/768x432/transport_5238009.jpg"
+        data-embed-ratio="16/9"
+        data-embed-title="Minister on Brazil variant and travel ban"
       ></div>
     `
 
@@ -1310,9 +1310,9 @@ describeForEachParser('brightcove experience through the pipeline', (parseHtml) 
 
     const expected = html`
       <div
-        data-embed-src="https://players.brightcove.net/1265527910001/default_default/index.html?videoId=4188894097001"
         data-embed-provider="brightcove"
         data-embed-id="1265527910001/4188894097001"
+        data-embed-src="https://players.brightcove.net/1265527910001/default_default/index.html?videoId=4188894097001"
         data-embed-ratio="16/9"
       ></div>
     `

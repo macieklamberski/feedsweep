@@ -233,9 +233,9 @@ describeForEachParser('unwrapRebelmouseEmbedFrames through the pipeline', (parse
     `
     const expected = html`
       <div
-        data-embed-src="https://cdn.jwplayer.com/players/hVoHh4GA-FvQKszTI.html"
         data-embed-provider="jwplayer"
         data-embed-id="hVoHh4GA"
+        data-embed-src="https://cdn.jwplayer.com/players/hVoHh4GA-FvQKszTI.html"
         data-embed-thumbnail="https://cdn.jwplayer.com/v2/media/hVoHh4GA/poster.jpg"
         data-embed-ratio="16/9"
       ></div>
@@ -260,9 +260,9 @@ describeForEachParser('unwrapRebelmouseEmbedFrames through the pipeline', (parse
     `
     const expected = html`
       <div
-        data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=723349244531204096"
         data-embed-provider="twitter"
         data-embed-id="723349244531204096"
+        data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=723349244531204096"
         data-embed-url="https://x.com/yeswecode/status/723349244531204096"
         data-embed-author="@yeswecode"
       ></div>

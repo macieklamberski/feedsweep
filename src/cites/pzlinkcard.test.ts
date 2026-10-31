@@ -210,9 +210,9 @@ describeForEachParser('pzlinkcardCiteResolver', (parseHtml) => {
       `
       const expected = html`
         <div
-          data-cite-title="Page title"
-          data-cite-url="https://example.com/page"
           data-cite-provider="pzlinkcard"
+          data-cite-url="https://example.com/page"
+          data-cite-title="Page title"
         ></div>
       `
 

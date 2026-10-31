@@ -227,9 +227,9 @@ describeForEachParser('dead WMaker players the pipeline repairs into an embed', 
     `
     const expected = html`
       <div
-        data-embed-height="360"
-        data-embed-width="640"
         data-embed-src="https://www.hospitalia.fr/embed/4183/"
+        data-embed-width="640"
+        data-embed-height="360"
       ></div>
     `
 

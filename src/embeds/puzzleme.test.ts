@@ -284,11 +284,11 @@ describeForEachParser('puzzleme through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="700"
-        data-embed-id="66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7/ef03f959"
         data-embed-provider="puzzleme"
+        data-embed-id="66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7/ef03f959"
         data-embed-src="https://puzzleme.amuselabs.com/pmm/crossword?id=ef03f959&amp;set=66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7&amp;embed=1"
         data-embed-url="https://puzzleme.amuselabs.com/pmm/crossword?id=ef03f959&amp;set=66ec9635ecbe3d3edf3a74bfe0bdbefbd90f7186bb71b1a7f9adb80dda3a06c7"
+        data-embed-height="700"
       ></div>
     `
 
@@ -307,11 +307,11 @@ describeForEachParser('puzzleme through the pipeline', (parseHtml) => {
     const expected = html`
       <p><code><script id="pm-script" src="https://puzzleme.amuselabs.com/pmm/js/puzzleme-embed.js"></script></code></p>
       <div
-        data-embed-height="700"
-        data-embed-id="5af39ea5bb2b35a56ac4bd3ce390f334711dcd7db2135f17dcababdeae256d48/54602d16"
         data-embed-provider="puzzleme"
+        data-embed-id="5af39ea5bb2b35a56ac4bd3ce390f334711dcd7db2135f17dcababdeae256d48/54602d16"
         data-embed-src="https://puzzleme.amuselabs.com/pmm/crossword?id=54602d16&amp;set=5af39ea5bb2b35a56ac4bd3ce390f334711dcd7db2135f17dcababdeae256d48&amp;embed=1"
         data-embed-url="https://puzzleme.amuselabs.com/pmm/crossword?id=54602d16&amp;set=5af39ea5bb2b35a56ac4bd3ce390f334711dcd7db2135f17dcababdeae256d48"
+        data-embed-height="700"
       ></div>
       <p>Today's mini crossword.</p>
     `

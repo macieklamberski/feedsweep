@@ -264,9 +264,9 @@ describeForEachParser('anyflip pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-src="https://online.anyflip.com/zruyy/qaan/index.html"
         data-embed-provider="anyflip"
         data-embed-id="zruyy/qaan"
+        data-embed-src="https://online.anyflip.com/zruyy/qaan/index.html"
         data-embed-url="https://anyflip.com/zruyy/qaan"
         data-embed-thumbnail="https://online.anyflip.com/zruyy/qaan/files/shot.jpg"
         data-embed-ratio="550/350"
@@ -284,9 +284,9 @@ describeForEachParser('anyflip pipeline', (parseHtml) => {
     ]
     const expected = html`
       <div
-        data-embed-src="https://online.anyflip.com/zruyy/qaan/index.html"
         data-embed-provider="anyflip"
         data-embed-id="zruyy/qaan"
+        data-embed-src="https://online.anyflip.com/zruyy/qaan/index.html"
         data-embed-url="https://anyflip.com/zruyy/qaan"
         data-embed-thumbnail="https://online.anyflip.com/zruyy/qaan/files/shot.jpg"
         data-enclosure=""
