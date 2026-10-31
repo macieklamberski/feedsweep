@@ -235,7 +235,10 @@ import { linkedinEmbedResolver } from '../embeds/linkedin.js'
 import { listennotesEmbedResolver } from '../embeds/listennotes.js'
 import { lividIframeEmbedResolver, lividMetasliderEmbedResolver } from '../embeds/livid.js'
 import { mailruIframeEmbedResolver, mailruWidgetEmbedResolver } from '../embeds/mailru.js'
-import { mastodonEmbedResolver, mastodonEmbettyEmbedResolver } from '../embeds/mastodon.js'
+import {
+  mastodonBlockquoteEmbedResolver,
+  mastodonEmbettyEmbedResolver,
+} from '../embeds/mastodon.js'
 import { matterportEmbedResolver } from '../embeds/matterport.js'
 import { mediacccEmbedResolver } from '../embeds/mediaccc.js'
 import { mediavineScriptEmbedResolver, mediavineWidgetEmbedResolver } from '../embeds/mediavine.js'
@@ -517,7 +520,7 @@ import { podomaticFlashMediaResolver } from '../media/podomatic.js'
 import { substackMediaResolver } from '../media/substack.js'
 import { tumblrMediaResolver } from '../media/tumblr.js'
 import { wechatMediaResolver } from '../media/wechat.js'
-import { weeblyFlashMediaResolver, weeblyMediaResolver } from '../media/weebly.js'
+import { weeblyFlashMediaResolver, weeblyVideoMediaResolver } from '../media/weebly.js'
 import { wikimediaMediaResolver } from '../media/wikimedia.js'
 import type {
   CiteResolver,
@@ -872,7 +875,7 @@ const embedResolvers: Array<EmbedResolver> = [
 
   // Last, outside the alphabet: keyed on a path shape rather than a host, so every resolver
   // naming a host gets the carrier first.
-  mastodonEmbedResolver,
+  mastodonBlockquoteEmbedResolver,
   mastodonEmbettyEmbedResolver,
   wikimediaEmbedResolver,
   peertubeEmbedResolver,
@@ -897,7 +900,7 @@ const mediaResolvers: Array<MediaResolver> = [
   substackMediaResolver,
   tumblrMediaResolver,
   wechatMediaResolver,
-  weeblyMediaResolver,
+  weeblyVideoMediaResolver,
   weeblyFlashMediaResolver,
   wikimediaMediaResolver,
 ]

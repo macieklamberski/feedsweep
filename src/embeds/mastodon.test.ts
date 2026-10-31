@@ -3,14 +3,14 @@ import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
 import {
   type MastodonStatus,
-  mastodonEmbedResolver,
+  mastodonBlockquoteEmbedResolver,
   mastodonEmbettyEmbedResolver,
   parseMastodonStatus,
   readMastodonHeight,
 } from './mastodon.js'
 
-describeForEachParser('mastodonEmbedResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, mastodonEmbedResolver)
+describeForEachParser('mastodonBlockquoteEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, mastodonBlockquoteEmbedResolver)
 
   describe('happy paths', () => {
     it('should resolve the status the player url names', async () => {
