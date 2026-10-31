@@ -57,7 +57,7 @@ const composeEmbedResult = (status: MastodonStatus): EmbedResolverResult => {
 // A Mastodon status: an iframe before 4.3, and from 4.3 a blockquote only embed.js hydrates.
 // WordPress strips embed.js, and the blockquote holds no post text, only a logo, a caption and a
 // link.
-export const mastodonEmbedResolver = createMarkupEmbedResolver(
+export const mastodonBlockquoteEmbedResolver = createMarkupEmbedResolver(
   // The status iframe is matched by its src, with or without the mastodon-embed class.
   // aside.mastodon-embed is a hand-typed quote carrying the post's body text, and
   // div.mastodon-embed only wraps the iframe.

@@ -18,7 +18,10 @@ describeForEachParser('assignVideoPosters', (parseHtml) => {
   it('should replace the resolver thumbnail with the publisher inline poster', async () => {
     const value = html`
       <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg">
-      <div data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ" data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"></div>
+      <div
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+        data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
+      ></div>
     `
     const expected = html`
       <div
@@ -509,7 +512,10 @@ describeForEachParser('assignVideoPosters', (parseHtml) => {
   it('should be idempotent', async () => {
     const value = html`
       <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg">
-      <div data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ" data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"></div>
+      <div
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+        data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
+      ></div>
     `
     const once = await transform(value)
     const twice = await transform(once)
