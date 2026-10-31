@@ -1,8 +1,7 @@
 import { toMap } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
-import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { createUrlEmbedResolver } from '../utils/widgets.js'
+import { createUrlEmbedResolver, readCleanedFlashVar } from '../utils/widgets.js'
 
 const provider = 'guardian'
 
@@ -81,17 +80,20 @@ const endpointPathRegex = /^(?<path>\/.+)\/json$/i
 
 // The retired Flash player, `guardian.co.uk/video/embed`, names the video in its `endpoint`
 // flashvar, `{page}/json`, and the page's path plays on today's player.
-export const guardianFlashEmbedResolver = createUrlEmbedResolver(flashHosts, (url, element) => {
-  if (!flashPlayerPathRegex.test(url.pathname)) {
-    return
-  }
+export const guardianFlashEmbedResolver = createUrlEmbedResolver(
+  flashHosts,
+  (url, element, context) => {
+    if (!flashPlayerPathRegex.test(url.pathname)) {
+      return
+    }
 
-  const endpoint = parseUrlOnHosts(flashVar(element, 'endpoint'), flashHosts)
-  const path = endpoint?.pathname.match(endpointPathRegex)?.groups?.path
+    const endpoint = parseUrlOnHosts(readCleanedFlashVar(element, 'endpoint', context), flashHosts)
+    const path = endpoint?.pathname.match(endpointPathRegex)?.groups?.path
 
-  if (!path) {
-    return
-  }
+    if (!path) {
+      return
+    }
 
-  return guardianResolveEmbed(new URL(`https://embed.theguardian.com/embed/video${path}`))
-})
+    return guardianResolveEmbed(new URL(`https://embed.theguardian.com/embed/video${path}`))
+  },
+)

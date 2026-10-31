@@ -50,7 +50,11 @@ export type EmbedResolverResult = {
 export type ResolveEmbed = (url: string, element?: Element) => EmbedResolverResult | undefined
 
 // The reader createUrlEmbedResolver calls, handed the carrier url it already parsed.
-export type ResolveUrlEmbed = (url: URL, element?: Element) => EmbedResolverResult | undefined
+export type ResolveUrlEmbed = (
+  url: URL,
+  element?: Element,
+  context?: TransformContext,
+) => EmbedResolverResult | undefined
 
 export type EmbedRenderHint = {
   provider: string

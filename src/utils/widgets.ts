@@ -24,6 +24,7 @@ import type {
 } from '../types.js'
 import {
   attr,
+  flashVar,
   type GeneratedWrapperType,
   getElementDimensions,
   getPairRatio,
@@ -212,6 +213,21 @@ export const readCarrierUrlOnHosts = (
   return parseUrlOnHosts(readCleanedCarrierUrl(element, context), hosts, isOnHost)
 }
 
+// A flashvar holding a url, cleaned where a resolver reads it off its carrier.
+export const readCleanedFlashVar = (
+  element: Element | undefined,
+  name: string,
+  context: TransformContext | undefined,
+): string | undefined => {
+  const value = flashVar(element, name)
+
+  if (!element || !context) {
+    return value
+  }
+
+  return cleanCarrierUrl(element, value, context)
+}
+
 export const readCleanedAttributeUrl = (
   element: Element,
   attribute: string,
@@ -372,7 +388,7 @@ export const createUrlEmbedResolver = (
         return
       }
 
-      return decideSize(element, extract(url, element), options.readCarrierSize)
+      return decideSize(element, extract(url, element, context), options.readCarrierSize)
     },
   }
 }

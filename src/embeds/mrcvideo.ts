@@ -1,8 +1,13 @@
 import { encodePathSegment, getPathSegments, getQueryParam, isAnyOf, isHostOf } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
+import type {
+  EmbedRenderHint,
+  EmbedResolverResult,
+  ResolveUrlEmbed,
+  TransformContext,
+} from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { createUrlEmbedResolver } from '../utils/widgets.js'
+import { createUrlEmbedResolver, readCleanedFlashVar } from '../utils/widgets.js'
 
 const provider = 'mrcvideo'
 
@@ -51,8 +56,12 @@ const readSharingId = (element: Element | undefined): string | undefined => {
   return readEmbedId(player)
 }
 
-const readCallbackId = (element: Element | undefined): string | undefined => {
-  const parsed = parseUrlOnHosts(flashVar(element, 'yourlytics.callback'), hosts, isHostOf)
+const readCallbackId = (
+  element: Element | undefined,
+  context: TransformContext | undefined,
+): string | undefined => {
+  const callback = readCleanedFlashVar(element, 'yourlytics.callback', context)
+  const parsed = parseUrlOnHosts(callback, hosts, isHostOf)
 
   return getQueryParam(parsed?.searchParams, 'nodeid')
 }
@@ -72,14 +81,14 @@ export const mrcvideoIframeEmbedResolver = createUrlEmbedResolver(hosts, mrcvide
   isOnHost: isHostOf,
 })
 
-const mrcvideoFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
+const mrcvideoFlashResolveEmbed: ResolveUrlEmbed = (url, element, context) => {
   const [directory, file, ...rest] = getPathSegments(url)
 
   if (!isAnyOf(directory, 'jwplayer') || !isAnyOf(file, 'player.swf') || rest.length > 0) {
     return
   }
 
-  const id = readSharingId(element) ?? readCallbackId(element)
+  const id = readSharingId(element) ?? readCallbackId(element, context)
 
   if (!id) {
     return
