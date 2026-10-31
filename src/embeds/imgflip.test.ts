@@ -104,6 +104,12 @@ describeForEachParser('imgflipEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore the file host carrying the embed path', async () => {
+      const value = '<iframe src="https://i.imgflip.com/embed/1dp0s5"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore an embed path under another prefix', async () => {
       const value = '<iframe src="https://imgflip.com/x/embed/1dp0s5"></iframe>'
 

@@ -1,15 +1,16 @@
+import { isHostOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'imgflip'
 
-const hosts = ['imgflip.com']
+const hosts = ['imgflip.com', 'www.imgflip.com']
 
 const gifPathRegex = /^\/embed\/([^/]+)\/?$/i
 
 const sizes = {
   // Imgflip draws each GIF at its own ratio, which its snippet writes on the frame. A frame that
-  // declares no box gets 16:9, the commonest ratio among the corpus's GIF frames.
+  // declares no box gets 16:9, the ratio of 3 of the 7 corpus frames counting 9:5 as 16:9.
   gif: { ratio: '16/9' },
 }
 
@@ -32,5 +33,6 @@ const imgflipResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 export const imgflipEmbedResolver = createUrlEmbedResolver(hosts, imgflipResolveEmbed, {
+  isOnHost: isHostOf,
   readCarrierSize: true,
 })
