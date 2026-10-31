@@ -219,7 +219,11 @@ describe('getImageFingerprint', () => {
     const context: TransformContext = {
       ...baseContext,
       cleanUrlFn: (url) => url,
-      matchUrlFn: (url) => url.replace('cdn.example.org/proxy/', ''),
+      matchUrlFn: (url) => {
+        return url === 'https://cdn.example.org/proxy/example.com/cover.jpg'
+          ? 'https://example.com/cover.jpg'
+          : url
+      },
     }
     const wrapped = getImageFingerprint(
       'https://cdn.example.org/proxy/example.com/cover.jpg',

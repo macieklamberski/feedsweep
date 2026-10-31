@@ -135,7 +135,11 @@ describeForEachParser('prepareEnclosures', (parseHtml) => {
       const context: TransformContext = {
         ...baseContext,
         cleanUrlFn: (url) => url,
-        matchUrlFn: (url) => url.replace('cdn.example.org/proxy/', ''),
+        matchUrlFn: (url) => {
+          return url === 'https://cdn.example.org/proxy/example.com/cover.jpg'
+            ? 'https://example.com/cover.jpg'
+            : url
+        },
       }
       const expected = ['https://cdn.example.org/proxy/example.com/cover.jpg']
 
@@ -518,7 +522,11 @@ describeForEachParser('prepareEnclosures', (parseHtml) => {
       const context: TransformContext = {
         ...baseContext,
         cleanUrlFn: (url) => url,
-        matchUrlFn: (url) => url.replace('media.blubrry.com/example_show/', ''),
+        matchUrlFn: (url) => {
+          return url === 'https://media.blubrry.com/example_show/example.com/clip-720.mp4'
+            ? 'https://example.com/clip-720.mp4'
+            : url
+        },
       }
       const expected = ['https://example.com/clip-1080.mp4']
 
@@ -694,7 +702,11 @@ describeForEachParser('prepareEnclosures', (parseHtml) => {
       const context: TransformContext = {
         ...baseContext,
         cleanUrlFn: (url) => url,
-        matchUrlFn: (url) => url.replace('media.blubrry.com/example_show/', ''),
+        matchUrlFn: (url) => {
+          return url === 'https://media.blubrry.com/example_show/example.com/ep.mp3'
+            ? 'https://example.com/ep.mp3'
+            : url
+        },
       }
       const expected = [
         {
