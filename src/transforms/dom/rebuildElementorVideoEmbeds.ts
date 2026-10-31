@@ -1,4 +1,4 @@
-import { addMissingScheme, toMap } from 'trousse'
+import { addMissingScheme, isString, toMap } from 'trousse'
 import { readDailymotionEmbedSrc } from '../../embeds/dailymotion.js'
 import { readVideopressEmbedSrc } from '../../embeds/videopress.js'
 import { readVimeoEmbedSrc } from '../../embeds/vimeo.js'
@@ -27,7 +27,7 @@ export const rebuildElementorVideoEmbeds: DomTransform = () => (document) => {
 
     const videoType = settings.video_type
 
-    if (typeof videoType !== 'string' || !iframeSources.has(videoType)) {
+    if (!isString(videoType) || !iframeSources.has(videoType)) {
       continue
     }
 
@@ -36,10 +36,9 @@ export const rebuildElementorVideoEmbeds: DomTransform = () => (document) => {
     // optional, so a pasted `youtube.com/watch?v={id}` gets a player, and the scheme goes past the
     // whitespace a pasted url can open with.
     const link = settings[`${videoType}_url`]
-    const source =
-      typeof link === 'string'
-        ? iframeSources.get(videoType)?.(addMissingScheme(link.trim()))
-        : undefined
+    const source = isString(link)
+      ? iframeSources.get(videoType)?.(addMissingScheme(link.trim()))
+      : undefined
 
     if (!source) {
       continue

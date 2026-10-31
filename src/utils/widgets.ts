@@ -2,6 +2,7 @@ import {
   coerceArray,
   composeQuery,
   isAnyOf,
+  isString,
   type MaybePromise,
   startsWithAnyOf,
   trimObject,
@@ -486,7 +487,7 @@ export const updatePlaceholder = <Type extends object>(
   // whitespace trims to an empty string and is skipped with the other empty fields.
   for (const [key, value] of Object.entries(fields)) {
     const name = `data-${type}-${key}`
-    const cleaned = typeof value === 'string' ? value.trim() : value
+    const cleaned = isString(value) ? value.trim() : value
 
     if (cleaned) {
       element.setAttribute(name, cleaned)

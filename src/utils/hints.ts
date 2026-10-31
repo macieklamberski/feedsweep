@@ -1,4 +1,4 @@
-import { coerceNumber, isPlainObject } from 'trousse'
+import { coerceNumber, isPlainObject, isString } from 'trousse'
 
 // A height a player reported, or nothing. A player says 0 before it has rendered and `null`
 // for a post it could not load, and neither is a size to draw.
@@ -22,7 +22,7 @@ export const playerJsPlayRequest = JSON.stringify({
 })
 
 export const isPlayerJsReady = (data: unknown): boolean => {
-  if (typeof data !== 'string') {
+  if (!isString(data)) {
     return false
   }
 
@@ -47,7 +47,7 @@ export const readObjectHeight = (data: unknown): number | undefined => {
 // The resize message several embeds post unasked, `{ src, context: 'iframe.resize', height }`
 // serialised to a JSON string.
 export const readIframeResizeHeight = (data: unknown): number | undefined => {
-  if (typeof data !== 'string') {
+  if (!isString(data)) {
     return
   }
 
@@ -74,7 +74,7 @@ const iframeResizerScrollEvents = ['scrollTo', 'scrollToOffset', 'inPageLink']
 
 // The height in iframe-resizer's answer, `[iFrameSizer]{id}:{height}:{width}:{event}`.
 export const readIframeResizerHeight = (data: unknown): number | undefined => {
-  if (typeof data !== 'string') {
+  if (!isString(data)) {
     return
   }
 

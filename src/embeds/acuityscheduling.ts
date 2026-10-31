@@ -1,4 +1,4 @@
-import { composeQuery, getQueryParam, getQueryParams, isAnyOf } from 'trousse'
+import { composeQuery, getQueryParam, getQueryParams, isAnyOf, isString } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { readPixels } from '../utils/hints.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -45,7 +45,7 @@ export const acuityschedulingEmbedResolver = createUrlEmbedResolver(
 // The scheduler posts its rendered height unasked, as the string `sizing:{height}`, again on
 // each step it changes to.
 export const readAcuityschedulingHeight = (data: unknown): number | undefined => {
-  if (typeof data !== 'string') {
+  if (!isString(data)) {
     return
   }
 

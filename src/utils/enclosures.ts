@@ -1,4 +1,4 @@
-import { parseUrl } from 'trousse'
+import { isString, parseUrl } from 'trousse'
 import type { Enclosure, TransformContext } from '../types.js'
 import { setInnerHtml } from './dom.js'
 import { getImageFingerprint, getSizeKeywordRank, getUrlSizeHint } from './images.js'
@@ -84,7 +84,7 @@ const dedupeImageEnclosures = (
   const result: Array<Enclosure> = []
 
   for (const enclosure of enclosures) {
-    if (typeof enclosure.url !== 'string' || !isEnclosureKind(enclosure, 'image')) {
+    if (!isString(enclosure.url) || !isEnclosureKind(enclosure, 'image')) {
       result.push(enclosure)
       continue
     }
@@ -182,7 +182,7 @@ const foldEqualMembers = (
   const members = new Map<string, Enclosure>()
 
   for (const enclosure of enclosures) {
-    if (enclosure.groupIndex !== undefined && typeof enclosure.url === 'string') {
+    if (enclosure.groupIndex !== undefined && isString(enclosure.url)) {
       members.set(cleanUrl(enclosure.url, context), enclosure)
     }
   }
@@ -204,7 +204,7 @@ const foldEqualMembers = (
       continue
     }
 
-    if (typeof enclosure.url !== 'string') {
+    if (!isString(enclosure.url)) {
       folded.push(enclosure)
       continue
     }
@@ -327,7 +327,7 @@ const readEnclosure = (
   const extracted = extractEnclosureFromEmbed(enclosure, document)
   let url = extracted.url
 
-  if (typeof url === 'string') {
+  if (isString(url)) {
     url = url.replace(strippedJsonAmpersandRegex, '&')
   }
 
@@ -353,14 +353,14 @@ const mergePlayerEnclosures = (
         return false
       }
 
-      return typeof candidate.url === 'string' && cleanUrl(candidate.url, context) === nestedUrl
+      return isString(candidate.url) && cleanUrl(candidate.url, context) === nestedUrl
     })
   }
 
   for (let playerIndex = 0; playerIndex < result.length; playerIndex++) {
     const player = result[playerIndex]
 
-    if (removed.has(playerIndex) || typeof player.url !== 'string') {
+    if (removed.has(playerIndex) || !isString(player.url)) {
       continue
     }
 

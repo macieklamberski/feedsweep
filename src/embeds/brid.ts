@@ -1,4 +1,4 @@
-import { decodeSegment, encodePathSegment } from 'trousse'
+import { decodeSegment, encodePathSegment, isString } from 'trousse'
 import type { EmbedRenderHint } from '../types.js'
 import { attr, findConfigScript } from '../utils/dom.js'
 import { createMarkupEmbedResolver } from '../utils/widgets.js'
@@ -57,7 +57,7 @@ export const bridEmbedResolver = createMarkupEmbedResolver('div.brid[id^="Brid_"
 
 // The player posts `Brid|{player uid}|trigger|ready` once it has loaded.
 export const isBridReady = (data: unknown): boolean => {
-  return typeof data === 'string' && data.startsWith('Brid|') && data.endsWith('|trigger|ready')
+  return isString(data) && data.startsWith('Brid|') && data.endsWith('|trigger|ready')
 }
 
 // The player runs a string command `Brid|{method}`, and ignores it while an ad plays.

@@ -6,6 +6,7 @@ import {
   getQueryParam,
   isAnyOf,
   isHostOrSubdomainOf,
+  isString,
   type Nullish,
   parseUrl,
   trimObject,
@@ -351,7 +352,7 @@ export const facebookBlockquoteEmbedResolver = createMarkupEmbedResolver(
 // `type=resize&cb=&width=500&height=421`, and only when its url carries the SDK's `sdk` flag and a
 // `channel`. The video plugin posts nothing.
 export const readFacebookHeight = (data: unknown): number | undefined => {
-  if (typeof data !== 'string') {
+  if (!isString(data)) {
     return
   }
 

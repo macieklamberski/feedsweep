@@ -4,6 +4,7 @@ import {
   isAnyOf,
   isHostOf,
   isPlainObject,
+  isString,
   startsWithAnyOf,
 } from 'trousse'
 import type {
@@ -239,7 +240,7 @@ export const imgurS9eEmbedResolver = createS9eEmbedResolver('imgur', (path) => {
 // `message: 'resize_imgur'`. An album is served by an older template that posts nothing, and the
 // height is sent once, for the width the post loaded at, and never again.
 export const readImgurHeight = (data: unknown): number | undefined => {
-  if (typeof data !== 'string') {
+  if (!isString(data)) {
     return
   }
 
