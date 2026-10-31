@@ -379,14 +379,29 @@ export const cleanUrl: CleanUrl = ((url, context?: TransformContext) => {
   return applyCleaner(url, true, context)
 }) as CleanUrl
 
-// A url that is only compared, never written, goes through the caller's matchUrlFn when there is
-// one. A measurement prefix such as `media.blubrry.com/{show}/{file}` names the bare file.
+// A url that is only compared, never written, is repaired with no cleaner too, then goes through
+// the caller's matchUrlFn, or its cleanUrlFn. A measurement prefix such as
+// `media.blubrry.com/{show}/{file}` names the bare file.
 export const cleanMatchUrl: CleanUrl = ((url, context?: TransformContext) => {
-  const matchContext = context?.matchUrlFn
-    ? { ...context, cleanUrlFn: context.matchUrlFn }
-    : context
+  if (!url) {
+    return
+  }
 
-  return cleanUrl(url, matchContext)
+  const repaired = repairUrl(url)
+  const matchUrlFn = context?.matchUrlFn ?? context?.cleanUrlFn
+
+  if (!matchUrlFn) {
+    return repaired
+  }
+
+  const cleaned = matchUrlFn(repaired)
+
+  // An empty cleaned url keeps the repaired url.
+  if (!cleaned) {
+    return repaired
+  }
+
+  return cleaned
 }) as CleanUrl
 
 // The src of a frame no resolver claims reaches the cleaner as written. The repairs read a url's
