@@ -1,3 +1,4 @@
+import { getQueryParam, isAnyOf, parseUrl, webImageExtensions } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import {
   getElementDimensions,
@@ -5,7 +6,7 @@ import {
   isElementHidden,
   pixelDimensionLimit,
 } from '../../utils/dom.js'
-import { matchesUrlPattern } from '../../utils/urls.js'
+import { matchesUrlPattern, placeholderBaseUrl } from '../../utils/urls.js'
 
 const isPixelDimension = (value: number | undefined): boolean => {
   return value !== undefined && value <= pixelDimensionLimit
@@ -23,10 +24,24 @@ const isContentSized = (dimensions: { width?: number; height?: number }): boolea
   return width > pixelDimensionLimit || height > pixelDimensionLimit
 }
 
-// gif stays out of the raster list: it is the dominant spacer and pixel format.
-// Tracking pixels ship as GIF or script beacons.
-const rasterExtensionRegex = /\.(?:jpe?g|png|webp|avif)(?:$|[?#])/i
-const rasterFormatQueryRegex = /[?&](?:format|fm|output)=(?:jpe?g|png|webp|avif)\b/i
+// gif and svg are the spacer, pixel and badge formats.
+const spacerExtensions = ['gif', 'svg']
+const rasterExtensions = webImageExtensions.filter((extension) => {
+  return !spacerExtensions.includes(extension)
+})
+const rasterExtensionRegex = new RegExp(`\\.(?:${rasterExtensions.join('|')})(?:$|[?#])`, 'i')
+const formatQueryParams = ['format', 'fm', 'output']
+
+// A format value can name several formats, such as `webp,auto`.
+const hasRasterFormatQuery = (src: string): boolean => {
+  const url = parseUrl(src, placeholderBaseUrl)
+
+  return formatQueryParams.some((name) => {
+    const formats = getQueryParam(url, name)?.split(',') ?? []
+
+    return formats.some((format) => isAnyOf(format.trim(), rasterExtensions))
+  })
+}
 
 // A raster src clears a 0x0 lazy placeholder only: raster beacons ship at 1x1 as well.
 // A non-empty srcset is a content signal at any size.
@@ -47,7 +62,7 @@ const hasContentImageSignal = (
 
   const src = image.getAttribute('src')
 
-  return !!src && (rasterExtensionRegex.test(src) || rasterFormatQueryRegex.test(src))
+  return !!src && (rasterExtensionRegex.test(src) || hasRasterFormatQuery(src))
 }
 
 // A tracking pixel: a hidden or pixel-sized <img> whose only job is to fire a request.

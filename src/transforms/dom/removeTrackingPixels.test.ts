@@ -110,6 +110,18 @@ describeForEachParser('removeTrackingPixels', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
+    it('should keep a 0x0 image whose format query lists a raster format second', async () => {
+      const value = html`
+        <img
+          src="https://img.cdn.example.com/abc?format=auto,webp"
+          width="0"
+          height="0"
+        >
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it('should keep a tiny image that declares a srcset at any size', async () => {
       const value = '<img src="placeholder.gif" srcset="real.jpg 800w" width="1" height="1">'
 
