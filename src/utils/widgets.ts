@@ -213,14 +213,10 @@ export const readCarrierUrlOnHosts = (
 }
 
 export const readCleanedAttributeUrl = (
-  element: Nullish<Element>,
+  element: Element,
   attribute: string,
   context: TransformContext,
 ): string | undefined => {
-  if (!element) {
-    return
-  }
-
   return cleanCarrierUrl(element, attr(element, attribute), context)
 }
 

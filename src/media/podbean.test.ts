@@ -66,6 +66,24 @@ describeForEachParser('podbeanFlashMediaResolver', (parseHtml) => {
   })
 
   describe('the Internet Explorer object with no embed', () => {
+    it('should play the file the movie param names under fallback text', async () => {
+      const value = html`
+        <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000">
+          <param
+            NAME="Movie"
+            VALUE="http://www.podbean.com/podcast-audio-video-blog-player/mp3playerlightsmallv3.swf?audioPath=http://darkbeige.podbean.com/mf/play/32ibxt/Interval-UnitedKingdomNILPOINTS.mp3&amp;autoStart=no"
+          >
+          Get the Flash Player to hear this episode.
+        </object>
+      `
+      const expected: MediaResolverResult = {
+        tag: 'audio',
+        src: 'http://darkbeige.podbean.com/mf/play/32ibxt/Interval-UnitedKingdomNILPOINTS.mp3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should play the file the movie param names', async () => {
       const value = html`
         <object

@@ -54,13 +54,8 @@ export const crowdsignalIframeEmbedResolver = createUrlEmbedResolver(
 // `polldaddy.com/poll/{id}` page.
 const readFallbackPollId = (fallback: Element, context: TransformContext): string | undefined => {
   const named = fallback.querySelector('a[href], iframe[src]')
-
-  if (!named) {
-    return
-  }
-
   const url =
-    named.localName === 'iframe' ? readCleanedCarrierUrl(named, context) : attr(named, 'href')
+    named?.localName === 'iframe' ? readCleanedCarrierUrl(named, context) : attr(named, 'href')
   const frame = parseUrlOnHosts(url, 'poll.fm')
 
   if (frame) {
