@@ -7,10 +7,18 @@ import {
   type Nullish,
 } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
-import { attr, flashVar, flashVars, keepIfMatches, parseFlashVars } from '../utils/dom.js'
+import {
+  attr,
+  find,
+  flashVar,
+  flashVars,
+  keepIfMatches,
+  parseFlashVars,
+  parsePixelSize,
+} from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { digitsRegex } from '../utils/urls.js'
-import { createUrlEmbedResolver } from '../utils/widgets.js'
+import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
+import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'flickr'
 
@@ -40,6 +48,11 @@ const groupAliasPoolPathRegex = /^\/groups\/[^/]+\/pool\/show(?:\/with\/[^/]+)?\
 // An owner of `_` names nobody: the player ignores it, and `/photos/_/{photoId}/` answers 404.
 const photoPathRegex = /^\/photos\/(?:_|([^/]+))\/(\d+)(?:\/in\/[^/]+)?\/player(?:\/([^/]+))?\/?$/i
 const embedrPhotoPathRegex = /^\/photos\/(\d+)\/?$/i
+// The page hrefs Flickr's embed script turns into a player. A photo page keeps whatever follows
+// its id, such as the `in/{context}` it was opened from, and a pool filtered by a tag has none.
+const anchorPhotoPathRegex = /^\/photos\/([^/]+)\/(\d+)(?:\/|$)/i
+const anchorGroupPathRegex = /^\/groups\/([^/]+)\/pool\/?$/i
+const anchorStreamPathRegex = /^\/photos\/([^/]+)\/?$/i
 
 // A group and a photostream each resolve by NSID and only by NSID: the player answers 200 for
 // `groups/{nsid}` and for `photostreams/{nsid}`, and 404 for a path alias in either position.
@@ -373,7 +386,109 @@ export const flickrResolveEmbed: ResolveUrlEmbed = (url, element) => {
 // Flickr's slideshow swf, its video swf, the legacy iframe, a framed album or stream page, and
 // the two players for a single photo. Only `/player/` and `embedr.flickr.com` are served without
 // `x-frame-options: SAMEORIGIN`, so the rest name a frame that renders empty.
-export const flickrEmbedResolver = createUrlEmbedResolver(hosts, flickrResolveEmbed)
+export const flickrIframeEmbedResolver = createUrlEmbedResolver(hosts, flickrResolveEmbed)
+
+// What an anchor href names other than a photo: the album, the group pool or the photostream.
+const readAnchorSubject = (url: URL): FlickrSubject | undefined => {
+  const set = setPathRegex.exec(url.pathname)
+
+  if (set) {
+    return { owner: decodePathValue(set[1]), setId: decodePathValue(set[2]) }
+  }
+
+  const group = anchorGroupPathRegex.exec(url.pathname)
+
+  if (group) {
+    return { groupId: group[1] }
+  }
+
+  // The script maps an owner page to the photostream by NSID only, and leaves an alias as a link.
+  const stream = anchorStreamPathRegex.exec(url.pathname)
+
+  if (stream && nsidRegex.test(stream[1])) {
+    return { owner: stream[1] }
+  }
+}
+
+type AnchorSize = { width: number; height: number }
+
+// embedr draws its player at the size the query names, so the frame and the placeholder share one.
+const sizeAnchorPlayer = (result: EmbedResolverResult, size: AnchorSize): EmbedResolverResult => {
+  const { ratio, ...rest } = result
+
+  return {
+    ...rest,
+    src: `${result.src}${composeQuery(size)}`,
+    ...size,
+  }
+}
+
+const readAnchorTarget = (
+  url: URL,
+  size: AnchorSize | undefined,
+): EmbedResolverResult | undefined => {
+  const photo = anchorPhotoPathRegex.exec(url.pathname)
+
+  if (photo) {
+    const photoId = photo[2]
+    const result = composePhotoEmbed(composePhotoPlayer(photoId), {
+      owner: decodePathValue(photo[1]),
+      photoId,
+    })
+
+    if (!size) {
+      return result
+    }
+
+    return sizeAnchorPlayer(result, size)
+  }
+
+  const subject = readAnchorSubject(url)
+  const result = subject && composeEmbed(subject)
+
+  if (!result) {
+    return
+  }
+
+  return sizeAnchorPlayer(result, size ?? sizes.slideshow)
+}
+
+// The script leaves an image this narrow as a linked thumbnail.
+const maximumThumbnailWidth = 150
+
+// Flickr's embed code, an anchor around an image that its embedr script replaces with a player
+// asked for the image's own size. Without the script the anchor is a linked image.
+// See: https://widgets.flickr.com/embedr/embedr-47ad26da5deade67d472950b12c94b6c.js.
+export const flickrAnchorEmbedResolver = createMarkupEmbedResolver(
+  'a[data-flickr-embed="true"][href]',
+  (element) => {
+    const image = find(element, 'img')
+    const url = parseUrlOnHosts(attr(element, 'href'), hosts)
+
+    if (!image || !url) {
+      return
+    }
+
+    const width = parsePixelSize(attr(image, 'width'))
+    const height = parsePixelSize(attr(image, 'height'))
+
+    if (width && width <= maximumThumbnailWidth) {
+      return
+    }
+
+    const result = readAnchorTarget(url, width && height ? { width, height } : undefined)
+
+    if (!result) {
+      return
+    }
+
+    return {
+      ...result,
+      thumbnail: attr(image, 'src'),
+      title: attr(element, 'title') ?? attr(image, 'alt'),
+    }
+  },
+)
 
 // Only embedr's video player answers player.js. A photo and the page player post no ready message.
 export const flickrRenderHint: EmbedRenderHint = {

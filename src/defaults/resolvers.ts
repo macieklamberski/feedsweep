@@ -161,7 +161,7 @@ import { figmaEmbedResolver } from '../embeds/figma.js'
 import { figshareEmbedResolver } from '../embeds/figshare.js'
 import { firesideEmbedResolver } from '../embeds/fireside.js'
 import { firstoryEmbedResolver } from '../embeds/firstory.js'
-import { flickrEmbedResolver } from '../embeds/flickr.js'
+import { flickrAnchorEmbedResolver, flickrIframeEmbedResolver } from '../embeds/flickr.js'
 import {
   fliphtml5IframeEmbedResolver,
   fliphtml5LightBoxEmbedResolver,
@@ -638,7 +638,8 @@ const embedResolvers: Array<EmbedResolver> = [
   figshareEmbedResolver,
   firesideEmbedResolver,
   firstoryEmbedResolver,
-  flickrEmbedResolver,
+  flickrAnchorEmbedResolver,
+  flickrIframeEmbedResolver,
   fliphtml5IframeEmbedResolver,
   fliphtml5LightBoxEmbedResolver,
   flipsnackEmbedResolver,
