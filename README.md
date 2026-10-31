@@ -35,6 +35,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | Transform | Description |
 | --- | --- |
 | `decodeDoubleEncodedTags` | Decode double-escaped tags (`&lt;tag&gt;`) back to real HTML |
+| `unwrapFilledShareRows` | Unwrap a copied Yandex share row holding the post's own text, so the strip deletes only empty rows |
 | `fixLazyImages` | Promote lazy-loaded `data-src` / `data-original` to real `src` |
 | `fixLazyIframes` | Promote a lazy or consent-parked iframe `src` (real URL in a `data-*` attribute) to real `src`, skipping placeholder pages |
 | `fixLazyVideos` | Promote a lazy `<video>` src and `data-poster` to real attributes |

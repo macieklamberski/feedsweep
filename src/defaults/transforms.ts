@@ -95,6 +95,7 @@ import { surfaceTemplateEmbeds } from '../transforms/dom/surfaceTemplateEmbeds.j
 import { trimPreWhitespace } from '../transforms/dom/trimPreWhitespace.js'
 import { unwrapDoublyNestedLists } from '../transforms/dom/unwrapDoublyNestedLists.js'
 import { unwrapDrupalOembedIframes } from '../transforms/dom/unwrapDrupalOembedIframes.js'
+import { unwrapFilledShareRows } from '../transforms/dom/unwrapFilledShareRows.js'
 import { unwrapHeadingBold } from '../transforms/dom/unwrapHeadingBold.js'
 import { unwrapNestedCodeWrappers } from '../transforms/dom/unwrapNestedCodeWrappers.js'
 import { unwrapRebelmouseEmbedFrames } from '../transforms/dom/unwrapRebelmouseEmbedFrames.js'
@@ -121,6 +122,10 @@ export const defaultStringTransforms: Array<StringTransform> = [
 
 export const defaultStandardDomTransforms: Array<DomTransform> = [
   decodeDoubleEncodedTags,
+
+  // Runs before stripNonContentElements, which deletes the row with the text inside it, and
+  // before convertLazyImageContainers, which turns the row's data-image into an <img>.
+  unwrapFilledShareRows,
 
   // Dissolves a lazy-loader or Borlabs Cookie container into the original embed markup it holds
   // encoded. Runs at the head of the cluster because what comes out is ordinary markup of any
