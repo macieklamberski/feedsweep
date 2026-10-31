@@ -4,6 +4,7 @@ import {
   isAnyOf,
   isPresent,
   type Nullish,
+  parseJson,
   startsWithAnyOf,
 } from 'trousse'
 import type { ScopedAttribute } from '../types.js'
@@ -213,15 +214,7 @@ export const paramValue = (root: Nullish<Element>, name: string): string | undef
 
 // Several platforms ship a whole card or widget settings as JSON in one attribute.
 export const jsonAttr = <Value>(element: Nullish<Element>, name: string): Value | undefined => {
-  const raw = attr(element, name)
-
-  if (!raw) {
-    return
-  }
-
-  try {
-    return JSON.parse(raw)
-  } catch {}
+  return parseJson<Value>(attr(element, name))
 }
 
 // SVG2 spells it `href`, SVG1 `xlink:href`.
