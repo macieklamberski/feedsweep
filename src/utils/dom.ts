@@ -1,4 +1,11 @@
-import { coerceNumber, getQueryParam, isAnyOf, type Nullish, startsWithAnyOf } from 'trousse'
+import {
+  coerceNumber,
+  getQueryParam,
+  isAnyOf,
+  isPresent,
+  type Nullish,
+  startsWithAnyOf,
+} from 'trousse'
 import type { ScopedAttribute } from '../types.js'
 import * as styles from './styles.js'
 import { foldEscapedAmpersands, isUrlShaped } from './urls.js'
@@ -668,7 +675,7 @@ const isPercentageLength = (
 ): boolean => {
   const value = declarations[name] ?? element.getAttribute(name)
 
-  return value !== null && value !== undefined && percentageLengthRegex.test(value)
+  return isPresent(value) && percentageLengthRegex.test(value)
 }
 
 export const isPercentageSized = (element: Element): boolean => {
