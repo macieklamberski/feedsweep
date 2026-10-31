@@ -42,7 +42,6 @@ import {
 // What a stub platform's snippet writes where the item's own fields belong.
 const playerLabelRegex = /^example player$/
 const typeLabelRegex = /^video$/
-const utmParamRegex = /[?&]utm_\w+=\w+/g
 
 describeForEachParser('createEmbedPlaceholder', (parseHtml) => {
   it('should leave the placeholder empty', () => {
@@ -2470,7 +2469,11 @@ describe('prepareEmbedMetadata', () => {
     }
     const context = {
       ...baseContext,
-      cleanUrlFn: (url: string) => url.split('?')[0] ?? url,
+      cleanUrlFn: (url: string) => {
+        return url === 'https://blog.example.com/watch/abc?utm_source=feed'
+          ? 'https://blog.example.com/watch/abc'
+          : url
+      },
     }
 
     expect(prepareEmbedMetadata(value, context)).toEqual(expected)
@@ -2487,7 +2490,11 @@ describe('prepareEmbedMetadata', () => {
     }
     const context = {
       ...baseContext,
-      cleanUrlFn: (url: string) => url.replace(utmParamRegex, ''),
+      cleanUrlFn: (url: string) => {
+        return url === 'https://player.example/embed/abc?start=30&utm_source=feed'
+          ? 'https://player.example/embed/abc?start=30'
+          : url
+      },
     }
 
     expect(prepareEmbedMetadata(value, context)).toEqual(expected)
@@ -2504,7 +2511,11 @@ describe('prepareEmbedMetadata', () => {
     }
     const context = {
       ...baseContext,
-      cleanUrlFn: (url: string) => url.replace(utmParamRegex, ''),
+      cleanUrlFn: (url: string) => {
+        return url === 'https://cdn.example.com/thumbs/abc.png?time=2017&utm_source=feed'
+          ? 'https://cdn.example.com/thumbs/abc.png?time=2017'
+          : url
+      },
     }
 
     expect(prepareEmbedMetadata(value, context)).toEqual(expected)
@@ -2521,7 +2532,11 @@ describe('prepareEmbedMetadata', () => {
     }
     const context = {
       ...baseContext,
-      cleanUrlFn: (url: string) => url.replace(utmParamRegex, ''),
+      cleanUrlFn: (url: string) => {
+        return url === 'https://cdn.example.com/avatars/jane.png?size=96&utm_source=feed'
+          ? 'https://cdn.example.com/avatars/jane.png?size=96'
+          : url
+      },
     }
 
     expect(prepareEmbedMetadata(value, context)).toEqual(expected)
@@ -2651,7 +2666,11 @@ describe('prepareCiteMetadata', () => {
     }
     const context = {
       ...baseContext,
-      cleanUrlFn: (url: string) => url.split('?')[0] ?? url,
+      cleanUrlFn: (url: string) => {
+        return url === 'https://blog.example.com/article?utm_source=feed'
+          ? 'https://blog.example.com/article'
+          : url
+      },
     }
 
     expect(prepareCiteMetadata(value, context)).toEqual(expected)
@@ -2668,7 +2687,11 @@ describe('prepareCiteMetadata', () => {
     }
     const context = {
       ...baseContext,
-      cleanUrlFn: (url: string) => url.replace(utmParamRegex, ''),
+      cleanUrlFn: (url: string) => {
+        return url === 'https://blog.example.com/favicon.png?v=2&utm_source=feed'
+          ? 'https://blog.example.com/favicon.png?v=2'
+          : url
+      },
     }
 
     expect(prepareCiteMetadata(value, context)).toEqual(expected)
@@ -2685,7 +2708,11 @@ describe('prepareCiteMetadata', () => {
     }
     const context = {
       ...baseContext,
-      cleanUrlFn: (url: string) => url.replace(utmParamRegex, ''),
+      cleanUrlFn: (url: string) => {
+        return url === 'https://blog.example.com/thumbs/article.jpg?w=600&utm_source=feed'
+          ? 'https://blog.example.com/thumbs/article.jpg?w=600'
+          : url
+      },
     }
 
     expect(prepareCiteMetadata(value, context)).toEqual(expected)

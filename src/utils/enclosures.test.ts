@@ -897,7 +897,11 @@ describeForEachParser('buildMediaFingerprint', (parseHtml) => {
 
   it('should clean the url of a media file', () => {
     const value = getElement('<video src="https://example.com/clip.mp4?utm_source=feed"></video>')
-    const cleanUrlFn = (url: string) => url.split('?')[0]
+    const cleanUrlFn = (url: string) => {
+      return url === 'https://example.com/clip.mp4?utm_source=feed'
+        ? 'https://example.com/clip.mp4'
+        : url
+    }
 
     expect(buildMediaFingerprint(value, { ...baseContext, cleanUrlFn })).toBe(
       'example.com/clip.mp4',

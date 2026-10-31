@@ -274,7 +274,9 @@ describe('repairUrl', () => {
 describe('cleanUrl', () => {
   it('should return what the cleaner answers', () => {
     const valueUrl = 'https://example.com/post?utm_source=feed'
-    const cleanUrlFn = (url: string) => url.split('?')[0] ?? url
+    const cleanUrlFn = (url: string) => {
+      return url === 'https://example.com/post?utm_source=feed' ? 'https://example.com/post' : url
+    }
     const expectedUrl = 'https://example.com/post'
 
     expect(cleanUrl(valueUrl, { ...baseContext, cleanUrlFn })).toBe(expectedUrl)
@@ -319,7 +321,11 @@ describe('prepareUrl', () => {
   it('should resolve the url before cleaning it', () => {
     const valueUrl = '/media/poster.jpg?utm_source=feed'
     const baseUrl = 'https://example.com/post'
-    const cleanUrlFn = (url: string) => url.split('?')[0] ?? url
+    const cleanUrlFn = (url: string) => {
+      return url === 'https://example.com/media/poster.jpg?utm_source=feed'
+        ? 'https://example.com/media/poster.jpg'
+        : url
+    }
     const expectedUrl = 'https://example.com/media/poster.jpg'
 
     expect(prepareUrl(valueUrl, { ...baseContext, baseUrl, cleanUrlFn })).toBe(expectedUrl)

@@ -787,7 +787,12 @@ describeForEachParser('blubrryPowerpressEmbedResolver through the pipeline', (pa
         data-embed-height="40"
       ></div>
     `
-    const cleanUrlFn = (url: string) => url.replace(/&utm_\w+=\w+/g, '')
+    const cleanUrlFn = (url: string) => {
+      return url ===
+        'https://joy.org.au/bentnotes/?powerpress_embed=3443-podcast&powerpress_player=mediaelement-audio&utm_source=feed'
+        ? 'https://joy.org.au/bentnotes/?powerpress_embed=3443-podcast&powerpress_player=mediaelement-audio'
+        : url
+    }
 
     expect(await convert(value, cleanUrlFn)).toEqualHtml(expected)
   })

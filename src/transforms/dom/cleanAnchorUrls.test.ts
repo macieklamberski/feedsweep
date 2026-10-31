@@ -4,7 +4,15 @@ import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { cleanAnchorUrls } from './cleanAnchorUrls.js'
 
-const stripQueryFn = (url: string) => url.split('?')[0]
+const stripQueryFn = (url: string) => {
+  const cleanedUrls: Record<string, string> = {
+    'https://example.com/a?utm_source=feed': 'https://example.com/a',
+    'https://example.com/b?utm_medium=email': 'https://example.com/b',
+    'https://example.com/page?utm_source=feed': 'https://example.com/page',
+  }
+
+  return cleanedUrls[url] ?? url
+}
 
 describeForEachParser('cleanAnchorUrls', (parseHtml) => {
   const transform = (value: string, context: TransformContext = baseContext) => {
