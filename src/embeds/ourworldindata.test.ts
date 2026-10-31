@@ -237,7 +237,16 @@ describeForEachParser('ourworldindata through the pipeline', (parseHtml) => {
     const result = await transformContent(value, {
       parseHtmlFn: parseHtml,
       baseUrl: 'https://example.com/post',
-      cleanUrlFn: (url) => url.replace('utm_source=newsletter&', ''),
+      cleanUrlFn: (url) => {
+        const cleanedUrls: Record<string, string> = {
+          'https://ourworldindata.org/grapher/co2-by-source?utm_source=newsletter&time=1900..2017':
+            'https://ourworldindata.org/grapher/co2-by-source?time=1900..2017',
+          'https://ourworldindata.org/grapher/co2-by-source.png?utm_source=newsletter&time=1900..2017':
+            'https://ourworldindata.org/grapher/co2-by-source.png?time=1900..2017',
+        }
+
+        return cleanedUrls[url] ?? url
+      },
     })
 
     expect(result).toEqualHtml(expected)

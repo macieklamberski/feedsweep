@@ -226,7 +226,9 @@ describeForEachParser('linkifyUrls', (parseHtml) => {
   describe('cleanUrlFn', () => {
     const withCleanUrlFn: TransformContext = {
       ...baseContext,
-      cleanUrlFn: (url) => url.split('?')[0] ?? url,
+      cleanUrlFn: (url) => {
+        return url === 'https://example.com/post?utm_source=feed' ? 'https://example.com/post' : url
+      },
     }
 
     it('should clean both the href and the link text of a linkified url', async () => {

@@ -53,7 +53,11 @@ describeForEachParser('rebuildVideoJsEmbeds', (parseHtml) => {
       `
       const context: TransformContext = {
         ...baseContext,
-        cleanUrlFn: (url) => url.split('?')[0] ?? url,
+        cleanUrlFn: (url) => {
+          return url === 'https://example.com/poster.jpg?utm_source=feed'
+            ? 'https://example.com/poster.jpg'
+            : url
+        },
       }
       const expected = html`
         <video
@@ -124,7 +128,11 @@ describeForEachParser('rebuildVideoJsEmbeds', (parseHtml) => {
       `
       const context: TransformContext = {
         ...baseContext,
-        cleanUrlFn: (url) => url.replace('https://dts.podtrac.com/redirect.mp4/', 'https://'),
+        cleanUrlFn: (url) => {
+          return url === 'https://dts.podtrac.com/redirect.mp4/example.com/clip.mp4'
+            ? 'https://example.com/clip.mp4'
+            : url
+        },
       }
       const expected = '<video controls src="https://example.com/clip.mp4"></video>'
 

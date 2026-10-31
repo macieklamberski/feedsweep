@@ -222,7 +222,11 @@ describeForEachParser('enrichEmbedPlaceholders', (parseHtml) => {
     `
     const context: TransformContext = {
       ...withFn(fn),
-      cleanUrlFn: (url) => url.split('?')[0] ?? url,
+      cleanUrlFn: (url) => {
+        return url === 'https://example.com/watch/abc?utm_source=api'
+          ? 'https://example.com/watch/abc'
+          : url
+      },
     }
 
     expect(await transform(value, context)).toEqualHtml(expected)

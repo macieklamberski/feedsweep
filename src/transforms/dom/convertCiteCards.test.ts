@@ -212,7 +212,9 @@ describeForEachParser('convertCiteCards', (parseHtml) => {
       const context: TransformContext = {
         ...baseContext,
         widgetResolvers: [cardResolver],
-        cleanUrlFn: (url) => url.split('?')[0] ?? url,
+        cleanUrlFn: (url) => {
+          return url === 'https://example.com/p?utm_source=feed' ? 'https://example.com/p' : url
+        },
       }
       const value = html`
         <div class="card" data-url="https://example.com/p?utm_source=feed" data-title="T"></div>
@@ -235,7 +237,9 @@ describeForEachParser('convertCiteCards', (parseHtml) => {
         ...baseContext,
         widgetResolvers: [cardResolver],
         baseUrl: 'https://example.com/post/',
-        cleanUrlFn: (url) => url.split('?')[0] ?? url,
+        cleanUrlFn: (url) => {
+          return url === 'https://example.com/p?utm_source=feed' ? 'https://example.com/p' : url
+        },
       }
       const value = html`
         <div class="card" data-url="/p?utm_source=feed" data-title="T"></div>

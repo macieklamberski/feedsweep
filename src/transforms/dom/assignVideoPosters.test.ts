@@ -12,7 +12,15 @@ describeForEachParser('assignVideoPosters', (parseHtml) => {
 
   const withCleaner: TransformContext = {
     ...baseContext,
-    cleanUrlFn: (url) => url.split('?')[0] ?? url,
+    cleanUrlFn: (url) => {
+      const cleanedUrls: Record<string, string> = {
+        'https://example.com/poster.jpg?utm_source=feed': 'https://example.com/poster.jpg',
+        'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg?utm_source=feed':
+          'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+      }
+
+      return cleanedUrls[url] ?? url
+    },
   }
 
   it('should replace the resolver thumbnail with the publisher inline poster', async () => {

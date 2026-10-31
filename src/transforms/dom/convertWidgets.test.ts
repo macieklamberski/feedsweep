@@ -665,7 +665,11 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     it('should clean a generic iframe src with the provided cleanUrlFn', async () => {
       const context: TransformContext = {
         ...withNoResolvers,
-        cleanUrlFn: (url) => url.split('?')[0] ?? url,
+        cleanUrlFn: (url) => {
+          return url === 'https://widget.example.com/thing?utm_source=feed'
+            ? 'https://widget.example.com/thing'
+            : url
+        },
       }
       const value = '<iframe src="https://widget.example.com/thing?utm_source=feed"></iframe>'
       const expected = html`
@@ -692,7 +696,9 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     it('should clean a non-iframe carrier src with the provided cleanUrlFn', async () => {
       const context: TransformContext = {
         ...withNoResolvers,
-        cleanUrlFn: (url) => url.split('?')[0] ?? url,
+        cleanUrlFn: (url) => {
+          return url === 'https://example.com/v/x?utm_source=feed' ? 'https://example.com/v/x' : url
+        },
       }
       const value = '<object data="https://example.com/v/x?utm_source=feed"></object>'
       const expected = html`
@@ -717,7 +723,11 @@ describeForEachParser('convertWidgets', (parseHtml) => {
       const context: TransformContext = {
         ...baseContext,
         widgetResolvers: [urlResolver],
-        cleanUrlFn: (url) => url.split('?')[0] ?? url,
+        cleanUrlFn: (url) => {
+          return url === 'https://example.com/watch/x?utm_source=feed'
+            ? 'https://example.com/watch/x'
+            : url
+        },
       }
       const value = '<iframe src="https://example.com/e/x"></iframe>'
       const expected = html`
@@ -1321,7 +1331,12 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
   it('should clean a media src with the provided cleanUrlFn', async () => {
     const context: TransformContext = {
       ...withResolver(tumblrMediaResolver),
-      cleanUrlFn: (url) => url.replace('http://www.podtrac.com/pts/redirect.mp3/', 'http://'),
+      cleanUrlFn: (url) => {
+        return url ===
+          'http://www.podtrac.com/pts/redirect.mp3/stormsabrewin.org/ihaventseenthat/ihaventseenthat_065.mp3'
+          ? 'http://stormsabrewin.org/ihaventseenthat/ihaventseenthat_065.mp3'
+          : url
+      },
     }
     const value = html`
       <iframe
@@ -1394,7 +1409,11 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
     }
     const context: TransformContext = {
       ...withResolver(posterResolver),
-      cleanUrlFn: (url) => url.split('?')[0] ?? url,
+      cleanUrlFn: (url) => {
+        return url === 'https://example.com/still.jpg?utm_source=feed'
+          ? 'https://example.com/still.jpg'
+          : url
+      },
     }
     const value = '<div class="poster-embed"></div>'
     const expected = html`

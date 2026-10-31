@@ -463,7 +463,11 @@ describeForEachParser('prepareEnclosures', (parseHtml) => {
       ]
       const context: TransformContext = {
         ...baseContext,
-        cleanUrlFn: (url) => url.split('?')[0],
+        cleanUrlFn: (url) => {
+          return url === 'https://example.com/clip-720.mp4?utm_source=feed'
+            ? 'https://example.com/clip-720.mp4'
+            : url
+        },
       }
       const expected = ['https://example.com/clip-1080.mp4']
 
@@ -741,7 +745,11 @@ describeForEachParser('prepareEnclosures', (parseHtml) => {
       ]
       const context: TransformContext = {
         ...baseContext,
-        cleanUrlFn: (url) => url.split('?')[0],
+        cleanUrlFn: (url) => {
+          return url === 'https://example.com/ep.mp3?utm_source=feed'
+            ? 'https://example.com/ep.mp3'
+            : url
+        },
       }
       const expected = [
         {

@@ -237,7 +237,14 @@ describeForEachParser('stripDuplicateEnclosures', (parseHtml) => {
       `
       const context: TransformContext = {
         ...baseContext,
-        cleanUrlFn: (url) => url.split('?')[0],
+        cleanUrlFn: (url) => {
+          const cleanedUrls: Record<string, string> = {
+            'https://example.com/a/photo.png?ref=1': 'https://example.com/a/photo.png',
+            'https://example.com/a/photo.png?utm=2': 'https://example.com/a/photo.png',
+          }
+
+          return cleanedUrls[url] ?? url
+        },
       }
       const expected = '<img src="https://example.com/a/photo.png?utm=2">'
 

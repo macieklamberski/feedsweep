@@ -374,7 +374,11 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
       const value = '<p>Content</p>'
       const context: TransformContext = {
         ...withExampleResolver([{ url: 'https://example.com/e/x', medium: 'video' }]),
-        cleanUrlFn: (url) => url.split('?')[0] ?? url,
+        cleanUrlFn: (url) => {
+          return url === 'https://example.com/watch/x?utm_source=feed'
+            ? 'https://example.com/watch/x'
+            : url
+        },
       }
       const expected = html`
         <div
@@ -398,7 +402,9 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
       const context: TransformContext = {
         ...withExampleResolver([{ url: 'https://example.com/e/x', medium: 'video' }]),
         widgetResolvers: [trackedResolver],
-        cleanUrlFn: (url) => url.split('?')[0] ?? url,
+        cleanUrlFn: (url) => {
+          return url === 'https://example.com/e/x?utm_source=feed' ? 'https://example.com/e/x' : url
+        },
       }
       const expected = html`
         <div
@@ -474,7 +480,11 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
             thumbnails: [{ url: 'https://example.com/still.jpg?utm_source=feed' }],
           },
         ]),
-        cleanUrlFn: (url) => url.split('?')[0] ?? url,
+        cleanUrlFn: (url) => {
+          return url === 'https://example.com/still.jpg?utm_source=feed'
+            ? 'https://example.com/still.jpg'
+            : url
+        },
       }
       const expected = html`
         <video
@@ -531,7 +541,11 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
         ...withEnclosures([
           { url: 'https://example.com/photo.jpg?utm_source=feed', type: 'image/jpeg' },
         ]),
-        cleanUrlFn: (url) => url.split('?')[0] ?? url,
+        cleanUrlFn: (url) => {
+          return url === 'https://example.com/photo.jpg?utm_source=feed'
+            ? 'https://example.com/photo.jpg'
+            : url
+        },
       }
       const expected = html`
         <img src="https://example.com/photo.jpg" data-enclosure="">
@@ -1513,7 +1527,14 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
           { url: 'https://example.com/episode.mp3?utm_source=feed', type: 'audio/mpeg' },
           { url: 'https://example.com/episode.mp3?utm_source=web', type: 'audio/mpeg' },
         ]),
-        cleanUrlFn: (url) => url.split('?')[0],
+        cleanUrlFn: (url) => {
+          const cleanedUrls: Record<string, string> = {
+            'https://example.com/episode.mp3?utm_source=feed': 'https://example.com/episode.mp3',
+            'https://example.com/episode.mp3?utm_source=web': 'https://example.com/episode.mp3',
+          }
+
+          return cleanedUrls[url] ?? url
+        },
       }
       const expected = html`
         <audio
@@ -1619,7 +1640,11 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
             title: 'Annual report',
           },
         ]),
-        cleanUrlFn: (url) => url.split('?')[0] ?? url,
+        cleanUrlFn: (url) => {
+          return url === 'https://example.com/files/report.pdf?utm_source=feed'
+            ? 'https://example.com/files/report.pdf'
+            : url
+        },
       }
       const expected = html`
         <p>Content</p>

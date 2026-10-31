@@ -144,7 +144,11 @@ describeForEachParser('enrichCitePlaceholders', (parseHtml) => {
     `
     const context: TransformContext = {
       ...withFn(fn),
-      cleanUrlFn: (url) => url.split('?')[0] ?? url,
+      cleanUrlFn: (url) => {
+        return url === 'https://example.com/article?utm_source=api'
+          ? 'https://example.com/article'
+          : url
+      },
     }
 
     expect(await transform(value, context)).toEqualHtml(expected)
