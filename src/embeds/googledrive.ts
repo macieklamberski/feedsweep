@@ -6,6 +6,7 @@ import {
   getQueryParam,
   getQueryParams,
   isAnyOf,
+  startsWithAnyOf,
 } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
@@ -64,7 +65,7 @@ export const composeDriveThumbnail = (fileId: string): string => {
 // `/drive/folders` or `/embeddedfolderview` is a listing, not a file, and stays unclaimed.
 export const googledriveResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const segments = getPathSegmentsWithoutWorkspace(url)
-  const isAudio = attr(element, 'type')?.toLowerCase().startsWith('audio/')
+  const isAudio = startsWithAnyOf(attr(element, 'type'), 'audio/')
   const fileId = readFileId(segments, url, isAudio)
 
   if (!fileId) {

@@ -10,6 +10,8 @@ import {
   extractBlubrryEmbed,
 } from './blubrry.js'
 
+const utmParamRegex = /&utm_\w+=\w+/g
+
 describe('extractBlubrryEmbed', () => {
   it('should read an episode id', () => {
     const value = 'https://player.blubrry.com/id/12345678/'
@@ -787,7 +789,7 @@ describeForEachParser('blubrryPowerpressEmbedResolver through the pipeline', (pa
         data-embed-height="40"
       ></div>
     `
-    const cleanUrlFn = (url: string) => url.replace(/&utm_\w+=\w+/g, '')
+    const cleanUrlFn = (url: string) => url.replace(utmParamRegex, '')
 
     expect(await convert(value, cleanUrlFn)).toEqualHtml(expected)
   })

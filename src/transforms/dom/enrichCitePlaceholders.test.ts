@@ -1,4 +1,5 @@
 import { expect, it } from 'bun:test'
+import { sleep } from 'trousse'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { CiteResolverResult, EnrichCiteFn, TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
@@ -295,7 +296,7 @@ describeForEachParser('enrichCitePlaceholders', (parseHtml) => {
   it('should accept async (Promise-returning) enrichCiteFn', async () => {
     const value = '<div data-cite-provider="tumblr" data-cite-url="https://example.com/post"></div>'
     const fn: EnrichCiteFn = async (cites) => {
-      await new Promise((resolve) => setTimeout(resolve, 1))
+      await sleep(1)
       return cites.map(() => ({ title: 'Page title' }))
     }
     const expected = html`

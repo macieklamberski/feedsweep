@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, isAnyOf, startsWithAnyOf } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { readObjectHeight } from '../utils/hints.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -13,11 +13,7 @@ const hosts = ['helloasso.com']
 export const helloassoResolveEmbed: ResolveUrlEmbed = (url) => {
   const [route, org, type, slug, kind, ...rest] = getPathSegments(url)
 
-  if (
-    !isAnyOf(route, 'associations') ||
-    rest.length > 0 ||
-    !kind?.toLowerCase().startsWith('widget')
-  ) {
+  if (!isAnyOf(route, 'associations') || rest.length > 0 || !startsWithAnyOf(kind, 'widget')) {
     return
   }
 

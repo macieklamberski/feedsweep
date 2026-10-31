@@ -1,10 +1,12 @@
 import {
   coerceNumber,
   composeQuery,
+  endsWithAnyOf,
   getPathSegments,
   getQueryParam,
   isAnyOf,
   isHostOrSubdomainOf,
+  isString,
   type Nullish,
   parseUrl,
   trimObject,
@@ -260,7 +262,7 @@ export const facebookResolveEmbed: ResolveUrlEmbed = (url) => {
 
   // The plugin is rebuilt around the href it names. The caption toggle, the size the dialog wrote,
   // the app id and a Graph API version in the path are the look.
-  const plugin = url.pathname.toLowerCase().endsWith('/video.php') ? 'video' : 'post'
+  const plugin = endsWithAnyOf(url.pathname, '/video.php') ? 'video' : 'post'
 
   return composePluginEmbed(plugin, href, {}, getQueryParam(url.searchParams, 't'))
 }
@@ -350,7 +352,7 @@ export const facebookBlockquoteEmbedResolver = createMarkupEmbedResolver(
 // `type=resize&cb=&width=500&height=421`, and only when its url carries the SDK's `sdk` flag and a
 // `channel`. The video plugin posts nothing.
 export const readFacebookHeight = (data: unknown): number | undefined => {
-  if (typeof data !== 'string') {
+  if (!isString(data)) {
     return
   }
 

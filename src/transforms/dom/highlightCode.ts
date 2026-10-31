@@ -1,4 +1,4 @@
-import { toMap } from 'trousse'
+import { isAnyOf, toMap } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import {
   attr,
@@ -174,7 +174,7 @@ export const detectLanguage = (pre: Element | null, code: Element | null): strin
 }
 
 // highlight.js maps plaintext, text and txt to a Plain text grammar that only escapes the text.
-const plaintextLanguages = new Set(['plaintext', 'text', 'txt'])
+const plaintextLanguages = ['plaintext', 'text', 'txt']
 
 const preTag = new Set(['pre'])
 
@@ -367,7 +367,7 @@ export const highlightCode: DomTransform = ({ highlightFn }) => {
         continue
       }
 
-      if (plaintextLanguages.has(language.toLowerCase())) {
+      if (isAnyOf(language, plaintextLanguages)) {
         continue
       }
 
