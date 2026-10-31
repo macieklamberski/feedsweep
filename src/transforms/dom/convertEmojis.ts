@@ -36,7 +36,7 @@ export const convertEmojis: DomTransform = (context) => {
 
     // A proxied image matches no selector as written, so the query cannot find it.
     for (const image of document.querySelectorAll('img[src]')) {
-      if (unwrapProxiedEmoji(image) !== image) {
+      if (unwrapProxiedEmoji(image, context) !== image) {
         candidates.add(image)
       }
     }
@@ -58,7 +58,7 @@ export const convertEmojis: DomTransform = (context) => {
 
       // A copy carrying the url behind an image proxy, matched only when the image itself is not,
       // since the copy has no ancestors for a selector to read.
-      const target = unwrapProxiedEmoji(element)
+      const target = unwrapProxiedEmoji(element, context)
       const matches = (selector: string): Element | undefined => {
         if (element.matches(selector)) {
           return element

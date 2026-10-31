@@ -262,8 +262,8 @@ export type TransformContentOptions = {
   enclosures?: Array<Enclosure>
   resolveUrlFn?: ResolveUrlFn
   cleanUrlFn?: CleanUrlFn
-  // Cleans a url only to compare two media files, as the heuristic duplicate checks do. Defaults to
-  // cleanUrlFn. The output keeps the url cleanUrlFn gives.
+  // Cleans a url only to compare it with another, as every duplicate check and the emoji
+  // recognition do. Defaults to cleanUrlFn. The output keeps the url cleanUrlFn gives.
   matchUrlFn?: CleanUrlFn
   assetProxyFn?: AssetProxyFn
   isSafeUrlFn?: IsSafeUrlFn

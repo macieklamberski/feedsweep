@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import type { Nullish } from 'trousse'
 import { baseContext, describeForEachParser, html } from '../tests.js'
+import type { TransformContext } from '../types.js'
 import {
   countSrcsetCandidates,
   findPosterEvidence,
@@ -12,7 +13,6 @@ import {
   parseSrcset,
   pickLargerImageUrl,
   sizeKeywordLiterals,
-  unwrapProxiedImage,
   widestSrcsetUrl,
 } from './images.js'
 
@@ -90,41 +90,6 @@ describe('widestSrcsetUrl', () => {
 })
 
 // Each case is [wrapped input URL, expected inner-source key], with its CDN beside the row.
-const imageProxyCases: Array<[string, string]> = [
-  [
-    'https://files.zhedge.com/cdn-cgi/image/width=1080/https://assets.zerohedge.com/s3fs/photo.jpg',
-    'assets.zerohedge.com/s3fs/photo.jpg',
-  ], // Cloudflare image
-  [
-    'https://assets.thelocal.com/cdn-cgi/plain/https://apiwp.thelocal.com/wp-content/uploads/photo.jpg',
-    'apiwp.thelocal.com/wp-content/uploads/photo.jpg',
-  ], // Cloudflare plain
-  [
-    'https://x.com.br/_next/image?url=https%3A%2F%2Fx.com.br%2Ffotos%2Fphoto.jpg&w=384',
-    'x.com.br/fotos/photo.jpg',
-  ], // Next.js image
-  [
-    'https://npr.brightspotcdn.com/dims4/default/f008/resize/300x169!/quality/90/?url=https%3A%2F%2Fmedia.npr.org%2Fphoto.jpg',
-    'media.npr.org/photo.jpg',
-  ], // Brightspot dims
-  [
-    'https://ik.imagekit.io/demo/tr:w-200/https://cdn.example.com/photo.jpg',
-    'cdn.example.com/photo.jpg',
-  ], // ImageKit
-  [
-    'https://media2.dev.to/dynamic/image/width=800/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fphoto.png',
-    'dev-to-uploads.s3.amazonaws.com/photo.png',
-  ], // dev.to
-  [
-    'https://s.yimg.com/ny/api/res/1.2/As60/YXBw/https://d29szjachogqwa.cloudfront.net/images/photo.jpg',
-    'd29szjachogqwa.cloudfront.net/images/photo.jpg',
-  ], // Yahoo image API
-  [
-    'https://images.podigee-cdn.net/0x,siN6/https://main.podigee-cdn.net/uploads/u17132/photo.jpg',
-    'main.podigee-cdn.net/uploads/u17132/photo.jpg',
-  ], // podigee
-]
-
 const identityQueryCases: Array<[string, string]> = [
   [
     'http://media2.picsearch.com/is?7x-TvXUWzFuw0nuQvzQUkbFYJkCHdIan17jTrQmagWk&height=240',
@@ -215,11 +180,31 @@ describe('getImageFingerprint', () => {
     expect(glued).toBe(bare)
   })
 
-  it('should key a glued query as written when there is no cleaner', () => {
+  it('should clean through matchUrlFn in place of cleanUrlFn', () => {
+    const matchUrlFn = (url: string) => {
+      return url === 'https://cdn.example.org/proxy/example.com/cover.jpg'
+        ? 'https://example.com/cover.jpg'
+        : url
+    }
+    const context: TransformContext = {
+      ...baseContext,
+      cleanUrlFn: (url) => url,
+      matchUrlFn,
+    }
+    const wrapped = getImageFingerprint(
+      'https://cdn.example.org/proxy/example.com/cover.jpg',
+      context,
+    )
+    const bare = getImageFingerprint('https://example.com/cover.jpg', context)
+
+    expect(wrapped).toBe(bare)
+  })
+
+  it('should repair a glued query before keying it when there is no cleaner', () => {
     const glued = getImageFingerprint('https://example.com/photo.jpg&w=100')
     const bare = getImageFingerprint('https://example.com/photo.jpg')
 
-    expect(glued).not.toBe(bare)
+    expect(glued).toBe(bare)
   })
 
   it('should drop the query so resize variants collapse', () => {
@@ -278,17 +263,6 @@ describe('getImageFingerprint', () => {
     expect(getImageFingerprint(first)).toBe(getImageFingerprint(second))
   })
 
-  it('should drop the query of an extensionless url behind an image proxy', () => {
-    const direct = getImageFingerprint(
-      'https://ik.imagekit.io/wpkauw5rry/trik-menang-cepat-di-casino-texas-holdem-tanpa-ribet',
-    )
-    const proxied = getImageFingerprint(
-      'https://i0.wp.com/ik.imagekit.io/wpkauw5rry/trik-menang-cepat-di-casino-texas-holdem-tanpa-ribet?ssl=1',
-    )
-
-    expect(proxied).toBe(direct)
-  })
-
   it('should collapse a hyphen -WxH dimension suffix to the base filename', () => {
     const bare = getImageFingerprint('https://example.com/uploads/photo.jpg')
     const scaled = getImageFingerprint('https://example.com/uploads/photo-800x450.jpg')
@@ -343,17 +317,16 @@ describe('getImageFingerprint', () => {
     expect(insecure).toBe(secure)
   })
 
-  it('should unwrap an image-proxy URL to its inner source', () => {
+  it('should key an image-proxy url apart from its source when there is no matchUrlFn', () => {
     const direct = getImageFingerprint('https://cdn.example.com/photo.jpg')
     const proxied = getImageFingerprint(
       'https://images.weserv.nl/?url=https%3A%2F%2Fcdn.example.com%2Fphoto.jpg&w=200',
     )
 
-    expect(proxied).toBe(direct)
+    expect(proxied).not.toBe(direct)
   })
 
-  it('should keep the raw capture when the proxied source is malformed', () => {
-    // `%E0%A4%A` is an incomplete percent-escape. Decoding throws and the raw value is kept.
+  it('should not throw on a malformed percent-escape', () => {
     const throwing = () =>
       getImageFingerprint('https://images.weserv.nl/?url=https%3A%2F%2F%E0%A4%A')
 
@@ -362,13 +335,6 @@ describe('getImageFingerprint', () => {
 
   it('should return the input unchanged when it is not a parseable URL', () => {
     expect(getImageFingerprint('not-a-url')).toBe('not-a-url')
-  })
-
-  it('should unwrap a WordPress Photon URL, re-adding the stripped scheme', () => {
-    const value = 'https://i0.wp.com/cdn.example.com/photo.jpg'
-    const expected = 'cdn.example.com/photo.jpg'
-
-    expect(getImageFingerprint(value)).toBe(expected)
   })
 
   it('should drop a whole leaf that is only dimensions', () => {
@@ -380,46 +346,21 @@ describe('getImageFingerprint', () => {
     expect(getImageFingerprint(two)).toBe(expected)
   })
 
-  it('should unwrap the Blogger opensocial proxy, keeping distinct images distinct', () => {
-    const first =
-      'https://images-blogger-opensocial.googleusercontent.com/gadgets/proxy?url=https%3A%2F%2Fcdn.example.com%2Fa.jpg'
-    const second =
-      'https://images-blogger-opensocial.googleusercontent.com/gadgets/proxy?url=https%3A%2F%2Fcdn.example.com%2Fb.jpg'
-
-    expect(getImageFingerprint(first)).toBe('cdn.example.com/a.jpg')
-    expect(getImageFingerprint(second)).toBe('cdn.example.com/b.jpg')
-  })
-
-  const mailProxyCases: Array<string> = [
-    'https://ecp.yusercontent.com/mail?url=https%3A%2F%2Fcdn.example.com%2Fphoto.jpg&t=1554239749&sig=DzxCZnIn6aGz57UknE9zMw--~C',
-    'https://resize.yandex.net/mailservice?url=https%3A%2F%2Fcdn.example.com%2Fphoto.jpg&proxy=yes&key=fbb6e138eabfa3da556a345b6f3faea8',
-  ]
-
-  it.each(mailProxyCases)('should unwrap the mail proxy at %s to its inner source', (value) => {
-    expect(getImageFingerprint(value)).toBe('cdn.example.com/photo.jpg')
-  })
-
-  it('should unwrap the Hatena image scaler to its inner source', () => {
+  it('should fold the rendition of the url matchUrlFn returns', () => {
     const value =
-      'https://cdn.image.st-hatena.com/image/scale/abc/width=1300/https%3A%2F%2Fcdn.example.com%2Fphoto.jpg'
-    const expected = 'cdn.example.com/photo.jpg'
-
-    expect(getImageFingerprint(value)).toBe(expected)
-  })
-
-  it.each(imageProxyCases)(
-    'should unwrap the image proxy in %s to its inner source',
-    (url, expected) => {
-      expect(getImageFingerprint(url)).toBe(expected)
-    },
-  )
-
-  it('should unwrap then strip a Cloudinary fetch of an upload URL', () => {
-    const value =
-      'https://assets.example.com/x/image/fetch/c_fill,q_75/https://res.cloudinary.com/y/image/upload/v161/clients/a/DSC_0326.jpg'
+      'https://assets.example.com/x/image/fetch/c_fill,q_75/https://res.cloudinary.com/y/image/upload/c_fill,w_300/v161/clients/a/DSC_0326.jpg'
+    const matchUrlFn = (url: string) => {
+      return url === value
+        ? 'https://res.cloudinary.com/y/image/upload/c_fill,w_300/v161/clients/a/DSC_0326.jpg'
+        : url
+    }
+    const context: TransformContext = {
+      ...baseContext,
+      matchUrlFn,
+    }
     const expected = 'res.cloudinary.com/y/image/upload/v161/clients/a/DSC_0326.jpg'
 
-    expect(getImageFingerprint(value)).toBe(expected)
+    expect(getImageFingerprint(value, context)).toBe(expected)
   })
 
   it('should collapse Blogger size segments to the base image', () => {
@@ -486,36 +427,6 @@ describe('getImageFingerprint', () => {
     )
   })
 
-  it('should unwrap a Cloudinary fetch URL to its inner source', () => {
-    const value =
-      'https://res.cloudinary.com/demo/image/fetch/w_200/https://cdn.example.com/photo.jpg'
-    const expected = 'cdn.example.com/photo.jpg'
-
-    expect(getImageFingerprint(value)).toBe(expected)
-  })
-
-  it('should unwrap a Cloudflare cdn-cgi image URL relative to the proxy host', () => {
-    const value = 'https://example.com/cdn-cgi/image/width=200/uploads/photo.jpg'
-    const expected = 'example.com/uploads/photo.jpg'
-
-    expect(getImageFingerprint(value)).toBe(expected)
-  })
-
-  it('should unwrap an ImageKit URL to its inner source', () => {
-    const value = 'https://ik.imagekit.io/demo/tr:w-200/https://cdn.example.com/photo.jpg'
-    const expected = 'cdn.example.com/photo.jpg'
-
-    expect(getImageFingerprint(value)).toBe(expected)
-  })
-
-  it('should unwrap a Next.js image optimizer URL to its inner source', () => {
-    const value =
-      'https://example.com/_next/image?url=https%3A%2F%2Fcdn.example.com%2Fphoto.jpg&w=200'
-    const expected = 'cdn.example.com/photo.jpg'
-
-    expect(getImageFingerprint(value)).toBe(expected)
-  })
-
   it('should drop a whole leaf that is a crop name plus dimensions', () => {
     const value = 'https://example.com/gallery/original__640x360.jpg'
     const expected = 'example.com/gallery'
@@ -558,28 +469,6 @@ describe('getImageFingerprint', () => {
 
     expect(getImageFingerprint(preview)).toBe(previewExpected)
     expect(getImageFingerprint(original)).toBe(originalExpected)
-  })
-})
-
-describe('unwrapProxiedImage', () => {
-  it('should decode the url parameter once', () => {
-    const value = 'https://wsrv.nl/?url=https://cdn.example.com/2026%252F04/photo.jpg&w=300'
-    const expected = 'https://cdn.example.com/2026%2F04/photo.jpg'
-
-    expect(unwrapProxiedImage(value)).toBe(expected)
-  })
-
-  it('should cut an unencoded nested url at its first ampersand', () => {
-    const value = 'https://wsrv.nl/?url=https://cdn.example.com/photo.jpg?v=2&w=300'
-    const expected = 'https://cdn.example.com/photo.jpg?v=2'
-
-    expect(unwrapProxiedImage(value)).toBe(expected)
-  })
-
-  it('should keep a proxy url that names no source', () => {
-    const value = 'https://example.com/_next/image?w=640&q=75'
-
-    expect(unwrapProxiedImage(value)).toBe(value)
   })
 })
 
