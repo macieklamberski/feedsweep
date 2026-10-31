@@ -36,7 +36,7 @@ export const lividResolveEmbed: ResolveUrlEmbed = (url, element) => {
   if (isAnyOf(route, 'oe')) {
     const [, account, kind, number] = segments
 
-    if (kind?.toLowerCase() !== 'video' || !number) {
+    if (!isAnyOf(kind, 'video') || !number) {
       return
     }
 

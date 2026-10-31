@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf, isPlainObject } from 'trousse'
+import { getPathSegments, isAnyOf, isPlainObject, isString } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
@@ -74,7 +74,7 @@ export const tumblrS9eEmbedResolver = createS9eEmbedResolver('tumblr', (fragment
 // The frame posts its height unasked, as a JSON string whose `args` holds the body's scroll
 // height, on load and again whenever its body resizes.
 export const readTumblrHeight = (data: unknown): number | undefined => {
-  if (typeof data !== 'string') {
+  if (!isString(data)) {
     return
   }
 

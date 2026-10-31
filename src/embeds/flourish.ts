@@ -1,4 +1,11 @@
-import { encodePathSegment, getPathSegments, isAnyOf, isHostOf, isPlainObject } from 'trousse'
+import {
+  encodePathSegment,
+  getPathSegments,
+  isAnyOf,
+  isHostOf,
+  isPlainObject,
+  isString,
+} from 'trousse'
 import type {
   EmbedRenderHint,
   EmbedResolverResult,
@@ -97,7 +104,7 @@ export const flourishIframeEmbedResolver = createUrlEmbedResolver(hosts, flouris
 // The chart posts its rendered height unasked, as a JSON string and not an object. The value
 // settles over several messages and can be fractional, 400 and then 324.0625 on one chart.
 export const readFlourishHeight = (data: unknown): number | undefined => {
-  if (typeof data !== 'string') {
+  if (!isString(data)) {
     return
   }
 

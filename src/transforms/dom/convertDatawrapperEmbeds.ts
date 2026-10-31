@@ -1,4 +1,4 @@
-import { encodePathSegment, type Nullish } from 'trousse'
+import { encodePathSegment, includesAnyOf, type Nullish } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
 import { parseUrlOnHosts } from '../../utils/urls.js'
@@ -43,7 +43,7 @@ export const convertDatawrapperEmbeds: DomTransform = (context) => (document) =>
     const chartId = getChartId(src)
 
     // A secret= preview url is an unpublished chart whose full.png 404s.
-    if (!chartId || src?.toLowerCase().includes('secret=')) {
+    if (!chartId || includesAnyOf(src, 'secret=')) {
       continue
     }
 

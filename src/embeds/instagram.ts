@@ -297,7 +297,7 @@ export const instagramResolveEmbed: ResolveUrlEmbed = (url) => {
     return
   }
 
-  return composeEmbed(post, url.pathname.toLowerCase().includes('/embed/captioned') === true)
+  return composeEmbed(post, includesAnyOf(url.pathname, '/embed/captioned'))
 }
 
 export const instagramIframeEmbedResolver = createUrlEmbedResolver(hosts, instagramResolveEmbed)

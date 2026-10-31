@@ -1,3 +1,4 @@
+import { includesAnyOf } from 'trousse'
 import type { EmojiResolver } from '../types.js'
 import { text } from '../utils/dom.js'
 import { getFileStem, glyphFromCodepoints, isEmojiShaped } from '../utils/emojis.js'
@@ -31,7 +32,7 @@ export const whatsappEmojiResolver: EmojiResolver = {
 
     const url = bgImage(element)
 
-    if (!url?.toLowerCase().includes(paintedPath)) {
+    if (!url || !includesAnyOf(url, paintedPath)) {
       return
     }
 

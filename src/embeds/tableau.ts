@@ -1,4 +1,4 @@
-import { decodeSegment, encodePathSegment, type Nullish } from 'trousse'
+import { decodeSegment, encodePathSegment, isString, type Nullish } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, paramValue, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
@@ -161,7 +161,7 @@ export const tableauIframeEmbedResolver = createUrlEmbedResolver(hosts, tableauR
 // JSON holding JSON. A dashboard with a fixed size states it as both bounds, one sized by its
 // container states zeros, and the toolbar under the viz adds `chromeHeight`.
 export const readTableauHeight = (data: unknown): number | undefined => {
-  if (typeof data !== 'string') {
+  if (!isString(data)) {
     return
   }
 

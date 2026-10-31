@@ -1,4 +1,5 @@
 import { stringifySrcset } from 'srcset'
+import { isString } from 'trousse'
 import type { DomTransform, TransformContext } from '../../types.js'
 import { svgHrefAttribute } from '../../utils/dom.js'
 import { countSrcsetCandidates, parseSrcset } from '../../utils/images.js'
@@ -111,7 +112,7 @@ export const resolveRelativeUrls: DomTransform = (context) => {
           continue
         }
 
-        const name = typeof attribute === 'string' ? attribute : attribute(element)
+        const name = isString(attribute) ? attribute : attribute(element)
 
         resolveAttribute(element, name, context)
       }

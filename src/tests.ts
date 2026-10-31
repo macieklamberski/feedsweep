@@ -1,7 +1,7 @@
 import { describe, expect } from 'bun:test'
 import { JSDOM } from 'jsdom'
 import { parseHTML } from 'linkedom'
-import { getQueryParam, type MaybePromise } from 'trousse'
+import { getQueryParam, isString, type MaybePromise } from 'trousse'
 import { defaultContext } from './defaults/context.js'
 import { parseHtml as parseWithLinkedom } from './parsers/linkedom.js'
 import { convertEmojis } from './transforms/dom/convertEmojis.js'
@@ -128,9 +128,9 @@ export const emojiConverters = (parseHtml: ParseHtml): EmojiConverters => {
 // The value side of jsonAttr: a payload with its quotes entity-encoded, or a string as written.
 // Substack ships a card this way in `data-attrs` and Embedly in `data`.
 export const jsonAttrValue = (attrs: Record<string, unknown> | string): string => {
-  const raw = typeof attrs === 'string' ? attrs : JSON.stringify(attrs)
+  const raw = isString(attrs) ? attrs : JSON.stringify(attrs)
 
-  return raw.replace(/"/g, '&quot;')
+  return raw.replaceAll('"', '&quot;')
 }
 
 // An element the fixture guarantees, throwing instead of returning null.

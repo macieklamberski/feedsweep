@@ -1,4 +1,4 @@
-import { encodePathSegment, getQueryParam, parseUrl } from 'trousse'
+import { encodePathSegment, endsWithAnyOf, getQueryParam, parseUrl } from 'trousse'
 import {
   composeEmbedUrl,
   extractVideoId,
@@ -31,8 +31,8 @@ const readFeedThumbnailVideoId = (
   context: TransformContext,
 ): string | undefined => {
   const src = parseUrl(readRepairedCarrierUrl(image, context), placeholderBaseUrl)
-  const cachedUrl = src?.pathname.toLowerCase().endsWith('/lytecache.php')
-    ? getQueryParam(src.searchParams, 'origThumbUrl')
+  const cachedUrl = endsWithAnyOf(src?.pathname, '/lytecache.php')
+    ? getQueryParam(src, 'origThumbUrl')
     : undefined
   const videoId = readThumbnailVideoId(cachedUrl ?? src)
 

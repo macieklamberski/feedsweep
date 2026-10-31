@@ -1,4 +1,4 @@
-import { type NormalizeOptions, normalizeUrl, parseUrl } from 'trousse'
+import { isString, type NormalizeOptions, normalizeUrl, parseUrl } from 'trousse'
 import type { Enclosure, TransformContext } from '../types.js'
 import { setInnerHtml } from './dom.js'
 import { getImageFingerprint, getSizeKeywordRank, getUrlSizeHint } from './images.js'
@@ -124,7 +124,7 @@ const dedupeImageEnclosures = (
   const result: Array<Enclosure> = []
 
   for (const enclosure of enclosures) {
-    if (typeof enclosure.url !== 'string' || !isEnclosureKind(enclosure, 'image')) {
+    if (!isString(enclosure.url) || !isEnclosureKind(enclosure, 'image')) {
       result.push(enclosure)
       continue
     }
@@ -222,7 +222,7 @@ const foldEqualMembers = (
   const members = new Map<string, Enclosure>()
 
   for (const enclosure of enclosures) {
-    if (enclosure.groupIndex !== undefined && typeof enclosure.url === 'string') {
+    if (enclosure.groupIndex !== undefined && isString(enclosure.url)) {
       const fingerprint = buildUrlFingerprint(enclosure.url, isFileEnclosure(enclosure), context)
 
       members.set(fingerprint, enclosure)
@@ -246,7 +246,7 @@ const foldEqualMembers = (
       continue
     }
 
-    if (typeof enclosure.url !== 'string') {
+    if (!isString(enclosure.url)) {
       folded.push(enclosure)
       continue
     }
@@ -370,7 +370,7 @@ const readEnclosure = (
   const extracted = extractEnclosureFromEmbed(enclosure, document)
   let url = extracted.url
 
-  if (typeof url === 'string') {
+  if (isString(url)) {
     url = url.replace(strippedJsonAmpersandRegex, '&')
   }
 
@@ -392,7 +392,7 @@ const mergePlayerEnclosures = (
 
   const findFileIndex = (nestedUrl: string, playerIndex: number): number => {
     return result.findIndex((candidate, index) => {
-      if (index === playerIndex || removed.has(index) || typeof candidate.url !== 'string') {
+      if (index === playerIndex || removed.has(index) || !isString(candidate.url)) {
         return false
       }
 
@@ -406,7 +406,7 @@ const mergePlayerEnclosures = (
   for (let playerIndex = 0; playerIndex < result.length; playerIndex++) {
     const player = result[playerIndex]
 
-    if (removed.has(playerIndex) || typeof player.url !== 'string') {
+    if (removed.has(playerIndex) || !isString(player.url)) {
       continue
     }
 

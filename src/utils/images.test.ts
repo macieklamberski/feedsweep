@@ -788,6 +788,17 @@ describeForEachParser('findPosterEvidence', (parseHtml) => {
     expect(findPosterEvidence(value, video)).toBe('id')
   })
 
+  it('should read the player id from a proxy url with a malformed escape', () => {
+    const document = parseHtml(
+      '<div data-embed-id="dQw4w9WgXcQ" data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"></div>',
+    )
+    const video = document.querySelector('div') as Element
+    const value =
+      'https://proxy.example.com/?url=https%3A%2F%2Fi.ytimg.com%2Fvi%2FdQw4w9WgXcQ%2Fhqdefault.jpg&q=100%'
+
+    expect(findPosterEvidence(value, video)).toBe('id')
+  })
+
   it('should keep a malformed percent sequence as written', () => {
     const document = parseHtml('<video src="https://example.com/media/interview.mp4"></video>')
     const video = document.querySelector('video') as Element

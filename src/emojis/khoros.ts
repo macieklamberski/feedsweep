@@ -1,4 +1,4 @@
-import { toMap } from 'trousse'
+import { isString, toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
 import { attr } from '../utils/dom.js'
 import {
@@ -121,7 +121,7 @@ export const khorosImageEmojiResolver: EmojiResolver = {
     }
 
     // Samsung's codepoint-named set is a set of its own beside the faces Khoros keeps.
-    if (typeof glyph === 'string') {
+    if (isString(glyph)) {
       return resolveEmojiImage(element, { isStrong: true, glyph, keepsPictures: false })
     }
 
