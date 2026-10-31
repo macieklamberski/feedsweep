@@ -1,20 +1,24 @@
 import { parseSrcset as parseRawSrcset } from 'srcset'
 import {
-  addMissingProtocol,
-  decodeSegment,
   escapeRegex,
   getPathSegments,
+  getQueryParam,
   isAnyOf,
   type Nullish,
   normalizeUrl,
   parseUrl,
-  resolveUrl,
   toMap,
 } from 'trousse'
 import { extractVideoId, hosts as youtubeHosts } from '../embeds/youtube.js'
 import type { TransformContext } from '../types.js'
 import { pixelDimensionLimit } from './dom.js'
-import { cleanUrl, isFileName, isUsableSrc, parseUrlOnHosts, placeholderBaseUrl } from './urls.js'
+import {
+  cleanMatchUrl,
+  isFileName,
+  isUsableSrc,
+  parseUrlOnHosts,
+  placeholderBaseUrl,
+} from './urls.js'
 
 // The parser reads a bare `225w` with no url as that candidate's url, and a proxy 404s on it.
 // Jetpack's feed export keeps only the first url, `…768w, 225w, 563w`, while the page has them all.
@@ -68,75 +72,6 @@ const sizeKeywordLeafRegex = new RegExp(
   `^(?:${sizeKeywordLiterals.join('|')})(\\.[a-z0-9]+)?$`,
   'i',
 )
-
-// The capture is (or resolves to) a URL: absolute, protocol-relative, or relative
-// to the proxy's own origin (a Cloudflare relative path, Next.js, wsrv).
-const resolvedSource = (capture: string, proxy: URL): string | undefined => {
-  const source = decodeSegment(capture) ?? capture
-
-  if (!source) {
-    return
-  }
-
-  return resolveUrl(source, proxy.origin)
-}
-
-// The capture is a bare host+path with the scheme stripped (Photon): re-add it.
-const bareHostSource = (capture: string): string | undefined => {
-  const source = decodeSegment(capture) ?? capture
-
-  return source && addMissingProtocol(source)
-}
-
-type ImageProxy = {
-  pattern: RegExp
-  toSource: (capture: string, proxy: URL) => string | undefined
-}
-const imageProxies: Array<ImageProxy> = [
-  // Cloudflare Image Resizing, which beehiiv serves its images through.
-  { pattern: /\/cdn-cgi\/image\/[^/]+\/(.+)$/i, toSource: resolvedSource },
-  // Cloudflare passthrough.
-  { pattern: /\/cdn-cgi\/plain\/(https?(?:%3a|:).+)$/i, toSource: resolvedSource },
-  // WordPress Photon / Jetpack: i{0-3}.wp.com/{src-host}/{path}, scheme stripped.
-  { pattern: /\/\/i[0-3]\.wp\.com\/([^?]+)/i, toSource: bareHostSource },
-  // wsrv.nl / images.weserv.nl: source in the url= query param.
-  {
-    pattern: /(?:wsrv\.nl|images\.weserv\.nl)\/\?(?:[^#]*&)?url=([^&]+)/i,
-    toSource: resolvedSource,
-  },
-  // Next.js / Vercel image optimizer: source in the url= query param.
-  { pattern: /\/_next\/image\?(?:[^#]*&)?url=([^&]+)/i, toSource: resolvedSource },
-  // Blogger opensocial gadget proxy: gadgets/proxy?url={src}.
-  {
-    pattern:
-      /images-blogger-opensocial\.googleusercontent\.com\/gadgets\/proxy\?(?:[^#]*&)?url=([^&]+)/i,
-    toSource: resolvedSource,
-  },
-  // Yahoo Mail: ecp.yusercontent.com/mail?url={src}.
-  {
-    pattern: /\/\/ecp\.yusercontent\.com\/mail\?(?:[^#]*&)?url=([^&]+)/i,
-    toSource: resolvedSource,
-  },
-  // Yandex Mail: resize.yandex.net/mailservice?url={src}.
-  {
-    pattern: /\/\/resize\.yandex\.net\/mailservice\?(?:[^#]*&)?url=([^&]+)/i,
-    toSource: resolvedSource,
-  },
-  // Brightspot dims (NPR, LA Times, Scripps): *.brightspotcdn.com/dims{3,4}/.../?url={src}.
-  { pattern: /\.brightspotcdn\.com\/dims\d\/.*[?&]url=([^&]+)/i, toSource: resolvedSource },
-  // Cloudinary fetch, which Substack's substackcdn.com serves its images through.
-  { pattern: /\/image\/fetch\/.*?(https?(?:%3a|:).+)$/i, toSource: resolvedSource },
-  // ImageKit web proxy: ik.imagekit.io/{id}/[tr:..]/{src url}.
-  { pattern: /ik\.imagekit\.io\/.*?(https?(?:%3a|:).+)$/i, toSource: resolvedSource },
-  // Hatena image scaler: cdn.image.st-hatena.com/image/scale/{sig}/{opts}/{src url}.
-  { pattern: /cdn\.image\.st-hatena\.com\/.*?(https?(?:%3a|:).+)$/i, toSource: resolvedSource },
-  // dev.to image optimizer: media*.dev.to/dynamic/image/{opts}/{src url}.
-  { pattern: /\.dev\.to\/dynamic\/image\/.*?(https?(?:%3a|:).+)$/i, toSource: resolvedSource },
-  // Yahoo image API: *.yimg.com/{ns}/api/res/{ver}/{opts}/{src url}.
-  { pattern: /\.yimg\.com\/.*?\/api\/res\/.*?(https?(?:%3a|:).+)$/i, toSource: resolvedSource },
-  // podigee (podcast art): images.podigee-cdn.net/{opts}/{src url}.
-  { pattern: /\.podigee-cdn\.net\/.*?(https?(?:%3a|:).+)$/i, toSource: resolvedSource },
-]
 
 type PathTransform = { host?: RegExp; strip: RegExp; replace: string }
 const pathTransforms: Array<PathTransform> = [
@@ -214,41 +149,10 @@ const dimensionLeafRegex = /^(.*__)?\d{1,5}x\d{1,5}(\.[a-z0-9]+)?$/i
 // A scaled copy's suffix: `photo-800x450.jpg`, `photo_800x450.jpg`. WordPress writes the hyphen.
 const dimensionSuffixRegex = /[-_]\d{1,5}x\d{1,5}(\.[a-z0-9]+)$/i
 
-// A proxy url can wrap another, a Cloudinary fetch of a Cloudinary upload.
-export const unwrapProxiedImage = (url: string): string => {
-  let current = url
-
-  for (let depth = 0; depth < 5; depth++) {
-    const proxy = parseUrl(current)
-
-    if (!proxy) {
-      break
-    }
-
-    let next = current
-
-    for (const { pattern, toSource } of imageProxies) {
-      const match = current.match(pattern)
-
-      if (match) {
-        next = toSource(match[1], proxy) ?? current
-        break
-      }
-    }
-
-    if (next === current) {
-      break
-    }
-
-    current = next
-  }
-
-  return current
-}
-
-// A key two renditions of one image share, whatever their size, crop or proxy.
+// A key two renditions of one image share, whatever their size or crop. A proxied copy shares it
+// when the caller's matchUrlFn unwraps the proxy.
 export const getImageFingerprint = (rawUrl: string, context?: TransformContext): string => {
-  const cleaned = unwrapProxiedImage(cleanUrl(rawUrl, context) ?? rawUrl)
+  const cleaned = cleanMatchUrl(rawUrl, context) ?? rawUrl
   // With stripScheme the result would not parse, so the scheme goes when the key is built.
   const normalized = normalizeUrl(cleaned, {
     stripWww: true,
@@ -304,8 +208,22 @@ export const getImageFingerprint = (rawUrl: string, context?: TransformContext):
 }
 
 const urlPairRegex = /(?:^|[/_=-])(\d{2,5})x(\d{2,5})(?=[._\-&)?/]|$)/gi
-const urlQueryWidthRegex = /[?&](?:w|width)=(\d{2,5})\b/i
-const urlQueryHeightRegex = /[?&](?:h|height)=(\d{2,5})\b/i
+const queryPixelsRegex = /^\d{2,5}\b/
+const widthQueryParams = ['w', 'width']
+const heightQueryParams = ['h', 'height']
+
+// The first of the names whose value opens with two to five digits, or 0.
+const readQueryPixels = (url: URL | undefined, names: Array<string>): number => {
+  for (const name of names) {
+    const pixels = queryPixelsRegex.exec(getQueryParam(url, name) ?? '')?.[0]
+
+    if (pixels) {
+      return Number(pixels)
+    }
+  }
+
+  return 0
+}
 
 // A `data:` src is a lazy placeholder and carries no size.
 export const getUrlDimensions = (
@@ -317,8 +235,9 @@ export const getUrlDimensions = (
 
   // Explicit w/h query params win. Otherwise the last WxH pair in the path or
   // filename (the rendition size sits after any path digits).
-  let width = Number(urlQueryWidthRegex.exec(src)?.[1])
-  let height = Number(urlQueryHeightRegex.exec(src)?.[1])
+  const url = parseUrl(src, placeholderBaseUrl)
+  let width = readQueryPixels(url, widthQueryParams)
+  let height = readQueryPixels(url, heightQueryParams)
 
   if (!(width > pixelDimensionLimit && height > pixelDimensionLimit)) {
     const pair = [...src.matchAll(urlPairRegex)].at(-1)
@@ -337,7 +256,7 @@ export const getUrlSizeHint = (url: string): number => {
     return dimensions.width * dimensions.height
   }
 
-  const queryWidth = Number(urlQueryWidthRegex.exec(url)?.[1])
+  const queryWidth = readQueryPixels(parseUrl(url, placeholderBaseUrl), widthQueryParams)
   if (queryWidth > 0) {
     return queryWidth
   }

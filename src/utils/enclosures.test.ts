@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { baseContext, describeForEachParser } from '../tests.js'
 import type { Enclosure, TransformContext } from '../types.js'
-import { buildMediaKey, isEnclosureKind, prepareEnclosures } from './enclosures.js'
+import { buildMediaFingerprint, isEnclosureKind, prepareEnclosures } from './enclosures.js'
 
 describeForEachParser('prepareEnclosures', (parseHtml) => {
   const prepare = (
@@ -125,6 +125,25 @@ describeForEachParser('prepareEnclosures', (parseHtml) => {
       const expected = ['https://example.com/cover.jpg']
 
       expect(prepareUrls(enclosures)).toEqual(expected)
+    })
+
+    it('should collapse an image behind a proxy prefix using matchUrlFn', () => {
+      const enclosures: Array<Enclosure> = [
+        { url: 'https://cdn.example.org/proxy/example.com/cover.jpg', type: 'image/jpeg' },
+        { url: 'https://example.com/cover.jpg', type: 'image/jpeg' },
+      ]
+      const context: TransformContext = {
+        ...baseContext,
+        cleanUrlFn: (url) => url,
+        matchUrlFn: (url) => {
+          return url === 'https://cdn.example.org/proxy/example.com/cover.jpg'
+            ? 'https://example.com/cover.jpg'
+            : url
+        },
+      }
+      const expected = ['https://cdn.example.org/proxy/example.com/cover.jpg']
+
+      expect(prepareUrls(enclosures, context)).toEqual(expected)
     })
 
     it('should keep distinct images that differ by path', () => {
@@ -451,6 +470,82 @@ describeForEachParser('prepareEnclosures', (parseHtml) => {
       expect(prepareUrls(enclosures, context)).toEqual(expected)
     })
 
+    it('should fold an ungrouped enclosure naming a group member over another scheme', () => {
+      const enclosures: Array<Enclosure> = [
+        { url: 'http://example.com/clip-720.mp4', type: 'video/mp4' },
+        { url: 'https://example.com/clip-720.mp4', type: 'video/mp4', height: 720, groupIndex: 0 },
+        {
+          url: 'https://example.com/clip-1080.mp4',
+          type: 'video/mp4',
+          height: 1080,
+          isDefault: true,
+          groupIndex: 0,
+        },
+      ]
+      const expected = ['https://example.com/clip-1080.mp4']
+
+      expect(prepareUrls(enclosures)).toEqual(expected)
+    })
+
+    it('should fold an ungrouped enclosure naming a group member with a media fragment', () => {
+      const enclosures: Array<Enclosure> = [
+        { url: 'https://example.com/clip-720.mp4#t=5', type: 'video/mp4' },
+        { url: 'https://example.com/clip-720.mp4', type: 'video/mp4', height: 720, groupIndex: 0 },
+        {
+          url: 'https://example.com/clip-1080.mp4',
+          type: 'video/mp4',
+          height: 1080,
+          isDefault: true,
+          groupIndex: 0,
+        },
+      ]
+      const expected = ['https://example.com/clip-1080.mp4']
+
+      expect(prepareUrls(enclosures)).toEqual(expected)
+    })
+
+    it('should fold an ungrouped enclosure behind a measurement prefix using matchUrlFn', () => {
+      const enclosures: Array<Enclosure> = [
+        {
+          url: 'https://media.blubrry.com/example_show/example.com/clip-720.mp4',
+          type: 'video/mp4',
+        },
+        { url: 'https://example.com/clip-720.mp4', type: 'video/mp4', height: 720, groupIndex: 0 },
+        {
+          url: 'https://example.com/clip-1080.mp4',
+          type: 'video/mp4',
+          height: 1080,
+          isDefault: true,
+          groupIndex: 0,
+        },
+      ]
+      const context: TransformContext = {
+        ...baseContext,
+        cleanUrlFn: (url) => url,
+        matchUrlFn: (url) => {
+          return url === 'https://media.blubrry.com/example_show/example.com/clip-720.mp4'
+            ? 'https://example.com/clip-720.mp4'
+            : url
+        },
+      }
+      const expected = ['https://example.com/clip-1080.mp4']
+
+      expect(prepareUrls(enclosures, context)).toEqual(expected)
+    })
+
+    it('should keep an ungrouped player page naming another document by its hash', () => {
+      const enclosures: Array<Enclosure> = [
+        { url: 'https://e.issuu.com/embed.html#333333/444444' },
+        { url: 'https://e.issuu.com/embed.html#111111/222222', groupIndex: 0 },
+      ]
+      const expected = [
+        'https://e.issuu.com/embed.html#333333/444444',
+        'https://e.issuu.com/embed.html#111111/222222',
+      ]
+
+      expect(prepareUrls(enclosures)).toEqual(expected)
+    })
+
     it('should drop a group whose renditions have no url', () => {
       const enclosures: Array<Enclosure> = [
         { type: 'video/mp4', height: 720, groupIndex: 0 },
@@ -583,6 +678,62 @@ describeForEachParser('prepareEnclosures', (parseHtml) => {
       expect(prepare(enclosures)).toEqual(expected)
     })
 
+    it('should merge a player page naming its media file over another scheme', () => {
+      const enclosures: Array<Enclosure> = [
+        { url: 'https://player.example.com/?media_url=http%3A%2F%2Fexample.com%2Fep.mp3' },
+        { url: 'https://example.com/ep.mp3', type: 'audio/mpeg' },
+      ]
+      const expected = [
+        {
+          url: 'https://example.com/ep.mp3',
+          type: 'audio/mpeg',
+          playerUrl: 'https://player.example.com/?media_url=http%3A%2F%2Fexample.com%2Fep.mp3',
+        },
+      ]
+
+      expect(prepare(enclosures)).toEqual(expected)
+    })
+
+    it('should merge a player page with its media file behind a measurement prefix using matchUrlFn', () => {
+      const enclosures: Array<Enclosure> = [
+        { url: 'https://player.example.com/?media_url=https%3A%2F%2Fexample.com%2Fep.mp3' },
+        { url: 'https://media.blubrry.com/example_show/example.com/ep.mp3', type: 'audio/mpeg' },
+      ]
+      const context: TransformContext = {
+        ...baseContext,
+        cleanUrlFn: (url) => url,
+        matchUrlFn: (url) => {
+          return url === 'https://media.blubrry.com/example_show/example.com/ep.mp3'
+            ? 'https://example.com/ep.mp3'
+            : url
+        },
+      }
+      const expected = [
+        {
+          url: 'https://media.blubrry.com/example_show/example.com/ep.mp3',
+          type: 'audio/mpeg',
+          playerUrl: 'https://player.example.com/?media_url=https%3A%2F%2Fexample.com%2Fep.mp3',
+        },
+      ]
+
+      expect(prepare(enclosures, context)).toEqual(expected)
+    })
+
+    it('should not merge a player page whose nested url names a part by its hash', () => {
+      const enclosures: Array<Enclosure> = [
+        {
+          url: 'https://player.example.com/?media_url=https%3A%2F%2Fexample.com%2Fep.mp3%23part-2',
+        },
+        { url: 'https://example.com/ep.mp3', type: 'audio/mpeg' },
+      ]
+      const expected = [
+        'https://player.example.com/?media_url=https%3A%2F%2Fexample.com%2Fep.mp3%23part-2',
+        'https://example.com/ep.mp3',
+      ]
+
+      expect(prepareUrls(enclosures)).toEqual(expected)
+    })
+
     it('should merge using cleanUrlFn-normalized urls', () => {
       const enclosures: Array<Enclosure> = [
         { url: 'https://player.example.com/?media_url=https%3A%2F%2Fexample.com%2Fep.mp3' },
@@ -689,7 +840,7 @@ describe('isEnclosureKind', () => {
   })
 })
 
-describeForEachParser('buildMediaKey', (parseHtml) => {
+describeForEachParser('buildMediaFingerprint', (parseHtml) => {
   const getElement = (value: string): Element => {
     const element = parseHtml(value).body.firstElementChild
 
@@ -702,50 +853,114 @@ describeForEachParser('buildMediaKey', (parseHtml) => {
 
   it('should repair a glued query before the cleaner keys a media file', () => {
     const value = getElement('<audio src="https://example.com/track.mp3&t=1"></audio>')
-    const expected = 'https://example.com/track.mp3?t=1'
+    const expected = 'example.com/track.mp3?t=1'
 
-    expect(buildMediaKey(value, { ...baseContext, cleanUrlFn: (url) => url })).toBe(expected)
+    expect(buildMediaFingerprint(value, { ...baseContext, cleanUrlFn: (url) => url })).toBe(
+      expected,
+    )
   })
 
   it('should key an image rendition like the original image', () => {
     const value1 = getElement('<img src="https://example.com/uploads/photo-300x200.jpg">')
     const value2 = getElement('<img src="https://example.com/uploads/photo.jpg">')
 
-    expect(buildMediaKey(value1)).toBe(buildMediaKey(value2))
+    expect(buildMediaFingerprint(value1)).toBe(buildMediaFingerprint(value2))
   })
 
   it('should drop the query of an image', () => {
     const value1 = getElement('<img src="https://example.com/uploads/photo.jpg?w=300">')
     const value2 = getElement('<img src="https://example.com/uploads/photo.jpg">')
 
-    expect(buildMediaKey(value1)).toBe(buildMediaKey(value2))
+    expect(buildMediaFingerprint(value1)).toBe(buildMediaFingerprint(value2))
   })
 
   it('should keep the query that tells podcast proxy episodes apart', () => {
     const value1 = getElement('<audio src="https://example.com/play.mp3?url=episode-1"></audio>')
     const value2 = getElement('<audio src="https://example.com/play.mp3?url=episode-2"></audio>')
 
-    expect(buildMediaKey(value1)).not.toBe(buildMediaKey(value2))
+    expect(buildMediaFingerprint(value1)).not.toBe(buildMediaFingerprint(value2))
   })
 
   it('should key an embed placeholder by its source', () => {
     const value = getElement('<div data-embed-src="https://www.youtube.com/embed/abc123"></div>')
 
-    expect(buildMediaKey(value)).toBe('https://www.youtube.com/embed/abc123')
+    expect(buildMediaFingerprint(value)).toBe('youtube.com/embed/abc123')
   })
 
   it('should clean the url of a media file', () => {
     const value = getElement('<video src="https://example.com/clip.mp4?utm_source=feed"></video>')
     const cleanUrlFn = (url: string) => url.split('?')[0]
 
-    expect(buildMediaKey(value, { ...baseContext, cleanUrlFn })).toBe(
-      'https://example.com/clip.mp4',
+    expect(buildMediaFingerprint(value, { ...baseContext, cleanUrlFn })).toBe(
+      'example.com/clip.mp4',
     )
+  })
+
+  it('should key a media file the same over http and https', () => {
+    const value1 = getElement(
+      '<audio src="http://archive.org/download/Episode14LegoArt/Episode%2014%20Lego%20Art.mp3"></audio>',
+    )
+    const value2 = getElement(
+      '<source src="https://archive.org/download/Episode14LegoArt/Episode%2014%20Lego%20Art.mp3">',
+    )
+
+    expect(buildMediaFingerprint(value1)).toBe(buildMediaFingerprint(value2))
+  })
+
+  it('should key a media file the same with and without a media fragment', () => {
+    const value1 = getElement(
+      '<video src="https://www.example.org/wp-content/uploads/2025/05/Station-Platform-Heating-1.3x.mp4"></video>',
+    )
+    const value2 = getElement(
+      '<source src="https://www.example.org/wp-content/uploads/2025/05/Station-Platform-Heating-1.3x.mp4#t=5">',
+    )
+
+    expect(buildMediaFingerprint(value1)).toBe(buildMediaFingerprint(value2))
+  })
+
+  it('should key a media file the same whatever its hash', () => {
+    const value1 = getElement('<audio src="https://cdn.example.org/episodes/42.mp3"></audio>')
+    const value2 = getElement('<source src="https://cdn.example.org/episodes/42.mp3#chapter-2">')
+
+    expect(buildMediaFingerprint(value1)).toBe(buildMediaFingerprint(value2))
+  })
+
+  it('should key two embeds that differ only by their hash apart', () => {
+    const value1 = getElement(
+      '<div data-embed-src="https://e.issuu.com/embed.html#111111/222222"></div>',
+    )
+    const value2 = getElement(
+      '<div data-embed-src="https://e.issuu.com/embed.html#333333/444444"></div>',
+    )
+
+    expect(buildMediaFingerprint(value1)).not.toBe(buildMediaFingerprint(value2))
+  })
+
+  it('should key a media file the same with and without www', () => {
+    const value1 = getElement(
+      '<audio src="http://www.example.org/wp-content/uploads/2018/07/%D8%A7%D9%85%DB%8C%D9%86-%D8%AD%DB%8C%D8%A7%DB%8C%DB%8C.mp3"></audio>',
+    )
+    const value2 = getElement(
+      '<source src="https://example.org/wp-content/uploads/2018/07/%D8%A7%D9%85%DB%8C%D9%86-%D8%AD%DB%8C%D8%A7%DB%8C%DB%8C.mp3">',
+    )
+
+    expect(buildMediaFingerprint(value1)).toBe(buildMediaFingerprint(value2))
+  })
+
+  it('should keep the query that tells two playlists apart', () => {
+    const value1 = getElement(
+      '<div data-embed-src="https://www.youtube.com/embed/videoseries?list=OLAK5uy_nsps_H4gEjwaNQ0rbSQjemMeFLqxFAQ4s"></div>',
+    )
+    const value2 = getElement(
+      '<div data-embed-src="https://www.youtube.com/embed/videoseries?list=OLAK5uy_m7PeZhZWRDY_-s1WhTtUasNNSFYyWVEAQ"></div>',
+    )
+
+    expect(buildMediaFingerprint(value1)).not.toBe(buildMediaFingerprint(value2))
   })
 
   it('should return an empty key for an element without a url', () => {
     const value = getElement('<video></video>')
 
-    expect(buildMediaKey(value)).toBe('')
+    expect(buildMediaFingerprint(value)).toBe('')
   })
 })
