@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { EmbedResolverResult } from '../types.js'
-import { flickrEmbedResolver } from './flickr.js'
+import { flickrAnchorEmbedResolver, flickrEmbedResolver } from './flickr.js'
 
 describeForEachParser('flickrEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, flickrEmbedResolver)
@@ -1466,6 +1466,505 @@ describeForEachParser('flickrEmbedResolver carrier title', (parseHtml) => {
   })
 })
 
+describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, flickrAnchorEmbedResolver)
+
+  describe('the photo anchor', () => {
+    it('should map the photo page onto the embedr photo player at the image size', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/photos/201411445@N05/53996765444/in/dateposted-public"
+          title="Sims2EP9 2022-06-28 21-46-04-87"
+        >
+          <img
+            alt="Sims2EP9 2022-06-28 21-46-04-87"
+            height="360"
+            src="https://live.staticflickr.com/65535/53996765444_ce07136ea1_h.jpg"
+            width="640"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/2qgvx9y',
+        src: 'https://embedr.flickr.com/photos/53996765444?width=640&height=360',
+        url: 'https://www.flickr.com/photos/201411445@N05/53996765444/',
+        thumbnail: 'https://live.staticflickr.com/65535/53996765444_ce07136ea1_h.jpg',
+        width: 640,
+        height: 360,
+        title: 'Sims2EP9 2022-06-28 21-46-04-87',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the owner alias as the author', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/photos/bees/2362225867/"
+        >
+          <img
+            src="https://live.staticflickr.com/3040/2362225867_4a87ab8baf_b.jpg"
+            width="1024"
+            height="768"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/4AK2sc',
+        src: 'https://embedr.flickr.com/photos/2362225867?width=1024&height=768',
+        url: 'https://www.flickr.com/photos/bees/2362225867/',
+        thumbnail: 'https://live.staticflickr.com/3040/2362225867_4a87ab8baf_b.jpg',
+        width: 1024,
+        height: 768,
+        author: 'bees',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should take the image alt as the title when the anchor states none', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/photos/201411445@N05/53996765444/in/dateposted-public"
+        >
+          <img
+            alt="Sims2EP9 2022-06-28 21-46-04-87"
+            height="360"
+            src="https://live.staticflickr.com/65535/53996765444_ce07136ea1_h.jpg"
+            width="640"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/2qgvx9y',
+        src: 'https://embedr.flickr.com/photos/53996765444?width=640&height=360',
+        url: 'https://www.flickr.com/photos/201411445@N05/53996765444/',
+        thumbnail: 'https://live.staticflickr.com/65535/53996765444_ce07136ea1_h.jpg',
+        width: 640,
+        height: 360,
+        title: 'Sims2EP9 2022-06-28 21-46-04-87',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the photo size when the image states no height', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/photos/lydiaabate/44717108900/in/dateposted-public/"
+        >
+          <img
+            src="https://farm8.staticflickr.com/7877/44717108900_029fbfbf69_o.jpg"
+            width="800"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/2b8uSyd',
+        src: 'https://embedr.flickr.com/photos/44717108900',
+        url: 'https://www.flickr.com/photos/lydiaabate/44717108900/',
+        thumbnail: 'https://farm8.staticflickr.com/7877/44717108900_029fbfbf69_o.jpg',
+        ratio: '4/3',
+        author: 'lydiaabate',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('the album anchor', () => {
+    it('should map the albums page onto the embedr album player at the image size', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/photos/riatpennstate/albums/72177720327772894"
+        >
+          <img
+            src="https://live.staticflickr.com/65535/54676434565_0cf2dcfa4c_h.jpg"
+            width="1600"
+            height="1200"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photosets/72177720327772894',
+        src: 'https://embedr.flickr.com/photosets/72177720327772894?width=1600&height=1200',
+        url: 'https://www.flickr.com/photos/riatpennstate/sets/72177720327772894',
+        thumbnail: 'https://live.staticflickr.com/65535/54676434565_0cf2dcfa4c_h.jpg',
+        width: 1600,
+        height: 1200,
+        author: 'riatpennstate',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should map the sets page onto the same album player', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/photos/dublx/sets/72157623516208778"
+        >
+          <img
+            src="https://live.staticflickr.com/2770/4390312561_34843547fe_b.jpg"
+            width="800"
+            height="600"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photosets/72157623516208778',
+        src: 'https://embedr.flickr.com/photosets/72157623516208778?width=800&height=600',
+        url: 'https://www.flickr.com/photos/dublx/sets/72157623516208778',
+        thumbnail: 'https://live.staticflickr.com/2770/4390312561_34843547fe_b.jpg',
+        width: 800,
+        height: 600,
+        author: 'dublx',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should ask for the slideshow size when the image states none', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/photos/hanskellner/albums/72157628665527009"
+        >
+          <img src="https://live.staticflickr.com/7010/6613392169_0f23d79b04_b.jpg" />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photosets/72157628665527009',
+        src: 'https://embedr.flickr.com/photosets/72157628665527009?width=400&height=300',
+        url: 'https://www.flickr.com/photos/hanskellner/sets/72157628665527009',
+        thumbnail: 'https://live.staticflickr.com/7010/6613392169_0f23d79b04_b.jpg',
+        width: 400,
+        height: 300,
+        author: 'hanskellner',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('the group pool anchor', () => {
+    it('should map the pool onto the embedr group player', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/groups/340946@N24/pool/"
+        >
+          <img
+            src="https://live.staticflickr.com/65535/55319721849_b8908b10a5.jpg"
+            width="800"
+            height="600"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'groups/340946@N24',
+        src: 'https://embedr.flickr.com/groups/340946@N24?width=800&height=600',
+        url: 'https://www.flickr.com/groups/340946@N24/',
+        thumbnail: 'https://live.staticflickr.com/65535/55319721849_b8908b10a5.jpg',
+        width: 800,
+        height: 600,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // Constructed carrier: no feed writes a tag pool anchor. embedr shows the whole pool for it.
+    it('should leave a pool filtered by a tag alone', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/groups/340946@N24/pool/tags/sunset/"
+        >
+          <img
+            src="https://live.staticflickr.com/65535/55319721849_b8908b10a5.jpg"
+            width="800"
+            height="600"
+          />
+        </a>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('the photostream anchor', () => {
+    it('should map an NSID owner page onto the embedr photostream player', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/photos/48340645@N05"
+        >
+          <img
+            src="https://live.staticflickr.com/65535/53196963117_14994bda8c_z.jpg"
+            width="640"
+            height="480"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photostreams/48340645@N05',
+        src: 'https://embedr.flickr.com/photostreams/48340645@N05?width=640&height=480',
+        url: 'https://www.flickr.com/photos/48340645@N05/',
+        thumbnail: 'https://live.staticflickr.com/65535/53196963117_14994bda8c_z.jpg',
+        width: 640,
+        height: 480,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should leave an alias owner page as a link', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/photos/govph/"
+        >
+          <img
+            src="https://live.staticflickr.com/478/20453022001_f5fc8978fe_b.jpg"
+            width="640"
+            height="452"
+          />
+        </a>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    // Constructed carrier: the script maps an owner's favorites page to another item.
+    it('should leave a page under an NSID owner alone', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/photos/48340645@N05/favorites"
+        >
+          <img
+            src="https://live.staticflickr.com/65535/53196963117_14994bda8c_z.jpg"
+            width="640"
+            height="480"
+          />
+        </a>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should leave an anchor whose embed flag is false alone', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="false"
+          href="https://www.flickr.com/photos/claremansell/24065618152/in/dateposted/"
+        >
+          <img
+            src="https://farm2.staticflickr.com/1582/24065618152_18ec8b499c_n.jpg"
+            width="320"
+            height="214"
+          />
+        </a>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should leave an image the script keeps as a thumbnail alone', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/photos/__u___/51104880060/in/datetaken-public/"
+        >
+          <img
+            src="https://live.staticflickr.com/65535/51104880060_362beba670_w.jpg"
+            width="144"
+            height="400"
+          />
+        </a>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should claim an image one pixel wider than a thumbnail', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/photos/__u___/51104880060/in/datetaken-public/"
+        >
+          <img
+            src="https://live.staticflickr.com/65535/51104880060_362beba670_w.jpg"
+            width="151"
+            height="400"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/2kRXSnJ',
+        src: 'https://embedr.flickr.com/photos/51104880060?width=151&height=400',
+        url: 'https://www.flickr.com/photos/__u___/51104880060/',
+        thumbnail: 'https://live.staticflickr.com/65535/51104880060_362beba670_w.jpg',
+        width: 151,
+        height: 400,
+        author: '__u___',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should leave an anchor with no image alone', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/photos/bees/2362225867/"
+        >Bacon Lollys</a>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a foreign host carrying the photo path', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://evil.test/photos/bees/2362225867/"
+        >
+          <img
+            src="https://live.staticflickr.com/3040/2362225867_4a87ab8baf_b.jpg"
+            width="1024"
+            height="768"
+          />
+        </a>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the pool path below another segment', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/x/groups/340946@N24/pool/"
+        >
+          <img
+            src="https://live.staticflickr.com/65535/55319721849_b8908b10a5.jpg"
+            width="800"
+            height="600"
+          />
+        </a>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the owner path below another segment', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/x/photos/48340645@N05"
+        >
+          <img
+            src="https://live.staticflickr.com/65535/53196963117_14994bda8c_z.jpg"
+            width="640"
+            height="480"
+          />
+        </a>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the photo path below another segment', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/x/photos/bees/2362225867/"
+        >
+          <img
+            src="https://live.staticflickr.com/3040/2362225867_4a87ab8baf_b.jpg"
+            width="1024"
+            height="768"
+          />
+        </a>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('anchors the script turns into nothing', () => {
+    it('should leave a flic.kr short link alone', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://flic.kr/p/2oFUpVc"
+        >
+          <img
+            src="https://live.staticflickr.com/65535/52960111065_07008a79c6_b.jpg"
+            width="3000"
+          />
+        </a>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('kinds the script plays that no key covers yet', () => {
+    it('should leave a gallery alone', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/photos/corinnedangas/galleries/72157632398296719"
+        >
+          <img
+            src="https://live.staticflickr.com/7027/6762140925_76153f807a_z.jpg"
+            width="100%"
+            height="auto"
+          />
+        </a>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should leave a guest pass alone', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/gp/nanpalmero/8zMGCx"
+        >
+          <img
+            src="https://farm2.staticflickr.com/1733/27846819297_026fde2072_z.jpg"
+            width="640"
+            height="281"
+          />
+        </a>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+})
+
 // www.flickr.com serves a photo's video file on its play route, so an enclosure there reaches the
 // resolver.
 describeForEachParser('flickr through the pipeline', (parseHtml) => {
@@ -1476,6 +1975,27 @@ describeForEachParser('flickr through the pipeline', (parseHtml) => {
       enclosures,
     })
   }
+
+  it('should turn the embed code into a placeholder with the image as its poster', async () => {
+    const value = html`
+      <a
+        data-flickr-embed="true"
+        href="https://www.flickr.com/photos/bees/2362225867/"
+      >
+        <img
+          src="https://live.staticflickr.com/3040/2362225867_4a87ab8baf_b.jpg"
+          width="1024"
+          height="768"
+        />
+      </a>
+      <script async src="https://embedr.flickr.com/assets/client-code.js"></script>
+    `
+    const expected = html`
+      <div data-embed-author="bees" data-embed-height="768" data-embed-width="1024" data-embed-thumbnail="https://live.staticflickr.com/3040/2362225867_4a87ab8baf_b.jpg" data-embed-url="https://www.flickr.com/photos/bees/2362225867/" data-embed-id="p/4AK2sc" data-embed-provider="flickr" data-embed-src="https://embedr.flickr.com/photos/2362225867?width=1024&height=768"></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
 
   // Constructed carrier: no feed lists a Flickr video as an enclosure. The item is the real 360p
   // video the media resolver's own test pins, so the case plays.
