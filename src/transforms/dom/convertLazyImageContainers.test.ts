@@ -140,6 +140,20 @@ describeForEachParser('convertLazyImageContainers', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  it('should leave a container a strip selector names for the strip', async () => {
+    const value = html`
+      <div
+        class="ya-share2"
+        data-curtain=""
+        data-shape="round"
+        data-services="vkontakte,facebook,odnoklassniki,telegram,twitter,viber"
+        data-image="https://www.gsu.by/themes/gsutheme/images/skoryna_logo.jpg"
+      ></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should be idempotent', async () => {
     const value = '<div data-src="https://example.com/photo.jpg"></div>'
     const once = await transform(value)
@@ -169,6 +183,22 @@ describeForEachParser('convertLazyImageContainers through the pipeline', (parseH
   it('should turn a gallery container into an image', async () => {
     const value = '<div class="cesis_gallery_img" data-src="https://example.com/photo.jpg"></div>'
     const expected = '<img src="https://example.com/photo.jpg">'
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should leave a Yandex share row to the strip, logo and all', async () => {
+    const value = html`
+      <p>Text</p>
+      <div
+        class="ya-share2"
+        data-curtain=""
+        data-shape="round"
+        data-services="vkontakte,facebook,odnoklassniki,telegram,twitter,viber"
+        data-image="https://www.gsu.by/themes/gsutheme/images/skoryna_logo.jpg"
+      ></div>
+    `
+    const expected = '<p>Text</p>'
 
     expect(await convert(value)).toEqualHtml(expected)
   })

@@ -1,5 +1,5 @@
 import type { DomTransform } from '../../types.js'
-import { hasText } from '../../utils/dom.js'
+import { batchSelectors, hasText } from '../../utils/dom.js'
 import { imageFileRegex } from '../../utils/urls.js'
 import { createImage } from '../../utils/widgets.js'
 
@@ -7,6 +7,7 @@ import { createImage } from '../../utils/widgets.js'
 // A gallery widget renders one as <div class="…_gallery_img" data-src="…">.
 export const convertLazyImageContainers: DomTransform = (context) => {
   const { lazySrcAttributes } = context
+  const nonContentSelectors = batchSelectors(context.nonContentSelectors)
 
   return (document) => {
     for (const element of document.querySelectorAll('div, figure')) {
@@ -16,6 +17,12 @@ export const convertLazyImageContainers: DomTransform = (context) => {
         .find((value) => !!value && imageFileRegex.test(value))
 
       if (!src) {
+        continue
+      }
+
+      // stripNonContentElements runs later and matches the container, not an <img>. Replaced, a
+      // share row that names its logo in data-image reaches the reader as a content image.
+      if (nonContentSelectors.some((selector) => element.matches(selector))) {
         continue
       }
 
