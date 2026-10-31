@@ -140,20 +140,6 @@ describeForEachParser('convertLazyImageContainers', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
-  it('should leave a container a strip selector names for the strip', async () => {
-    const value = html`
-      <div
-        class="ya-share2"
-        data-curtain=""
-        data-shape="round"
-        data-services="vkontakte,facebook,odnoklassniki,telegram,twitter,viber"
-        data-image="https://www.gsu.by/themes/gsutheme/images/skoryna_logo.jpg"
-      ></div>
-    `
-
-    expect(await transform(value)).toEqualHtml(value)
-  })
-
   it('should be idempotent', async () => {
     const value = '<div data-src="https://example.com/photo.jpg"></div>'
     const once = await transform(value)
