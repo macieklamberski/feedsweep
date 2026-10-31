@@ -15,7 +15,13 @@ import {
   parseFlashVars,
   text,
 } from '../utils/dom.js'
+import { digitsRegex } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+
+type PlayerItem = {
+  key: string
+  query: Record<string, string>
+}
 
 const provider = 'brightcove'
 
@@ -75,15 +81,36 @@ const readPlayerKeyAccount = (key: Nullish<string>): string | undefined => {
   return keepIfMatches(String(account), brightcoveIdRegex)
 }
 
+// A player loads one video or one playlist, and both ids share one grammar, so a playlist's key
+// names its kind.
+const readPlayerItem = (
+  videoId: Nullish<string>,
+  playlistId: Nullish<string>,
+): PlayerItem | undefined => {
+  if (videoId) {
+    return {
+      key: videoId,
+      query: { videoId },
+    }
+  }
+
+  if (playlistId) {
+    return {
+      key: `playlist/${playlistId}`,
+      query: { playlistId },
+    }
+  }
+}
+
 // The playback API is `/playback/v1/accounts/{account}/videos/{video}`, so a video id alone names
 // nothing. A fabricated account 404s on the player host, and a wrong video id still serves a shell.
 const composePlayerUrl = (
   account: string,
-  videoId: string,
+  params: PlayerItem['query'],
   player = 'default',
   embed = 'default',
 ): string => {
-  const query = composeQuery({ videoId })
+  const query = composeQuery(params)
   // Each part stays in its own segment: unescaped, `data-player="../../999999/stolen"` names
   // another account's player, and the Flash `publisherID` comes out of a query decoded.
   const segment = `${encodePathSegment(player)}_${encodePathSegment(embed)}`
@@ -94,7 +121,7 @@ const composePlayerUrl = (
 // Brightcove's in-page embed: a bare <video-js> or video element only its loader script fills.
 // Brightcove has no public watch page.
 export const brightcoveVideoJsEmbedResolver = createMarkupEmbedResolver(
-  'video-js[data-video-id], video[data-video-id]',
+  'video-js[data-video-id], video[data-video-id], video-js[data-playlist-id], video[data-playlist-id]',
   (element) => {
     // The older syntax puts the same attributes on a `<video class="video-js">`. Empty, it
     // renders as a blank video element, so the episode is lost the same way. One carrying a
@@ -103,22 +130,25 @@ export const brightcoveVideoJsEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    // Video.js is a library anyone can use, and `data-video-id` is not a name only Brightcove
-    // could have chosen, so the id shape is all this carrier has to go on. The inference is safe
-    // in practice too: nearly every feed carrying the element also ships the loader script.
-    const videoId = keepIfMatches(attr(element, 'data-video-id'), brightcoveVideoIdRegex)
-    const account = videoId ? readPlayerAccount(element) : undefined
+    // Video.js is a library anyone can use, and `data-video-id` and `data-playlist-id` are not
+    // names only Brightcove could have chosen, so the id shape is all this carrier has to go on.
+    // Nearly every feed carrying the element also ships the loader script.
+    const item = readPlayerItem(
+      keepIfMatches(attr(element, 'data-video-id'), brightcoveVideoIdRegex),
+      keepIfMatches(attr(element, 'data-playlist-id'), digitsRegex),
+    )
+    const account = item ? readPlayerAccount(element) : undefined
 
-    if (!videoId || !account) {
+    if (!item || !account) {
       return
     }
 
     return {
       provider,
-      id: `${account}/${videoId}`,
+      id: `${account}/${item.key}`,
       src: composePlayerUrl(
         account,
-        videoId,
+        item.query,
         attr(element, 'data-player'),
         attr(element, 'data-embed'),
       ),
@@ -155,7 +185,7 @@ export const brightcoveSkyEmbedResolver = createMarkupEmbedResolver(
     return {
       provider,
       id: `${account}/${videoId}`,
-      src: composePlayerUrl(account, videoId, attr(element, 'data-player-id')),
+      src: composePlayerUrl(account, { videoId }, attr(element, 'data-player-id')),
       thumbnail: attr(poster, 'src'),
       ...sizes.player,
       title:
@@ -195,7 +225,7 @@ const brightcoveFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
   return {
     provider,
     id: `${account}/${videoId}`,
-    src: composePlayerUrl(account, videoId),
+    src: composePlayerUrl(account, { videoId }),
     ...sizes.player,
   }
 }
@@ -208,7 +238,8 @@ export const brightcoveFlashEmbedResolver = createUrlEmbedResolver(
 )
 
 // The BrightcoveExperience object, configured by <param>s, whose loader host no longer resolves.
-// A snippet carrying a player but no `@videoPlayer` is a channel or playlist player.
+// A snippet with no `@videoPlayer` is a channel, or a Flash playlist in `@videoList` or
+// `@playlistCombo`.
 export const brightcoveExperienceEmbedResolver = createMarkupEmbedResolver(
   'object.BrightcoveExperience',
   (element) => {
@@ -222,7 +253,7 @@ export const brightcoveExperienceEmbedResolver = createMarkupEmbedResolver(
     return {
       provider,
       id: `${account}/${videoId}`,
-      src: composePlayerUrl(account, videoId),
+      src: composePlayerUrl(account, { videoId }),
       ...sizes.player,
     }
   },
@@ -238,9 +269,12 @@ export const brightcoveResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 
   const [account, player] = getPathSegments(url)
-  const videoId = getQueryParam(url.searchParams, 'videoId')
+  const item = readPlayerItem(
+    getQueryParam(url.searchParams, 'videoId'),
+    getQueryParam(url.searchParams, 'playlistId'),
+  )
 
-  if (!account || !player || !videoId) {
+  if (!account || !player || !item) {
     return
   }
 
@@ -252,8 +286,8 @@ export const brightcoveResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
   return {
     provider,
-    id: `${account}/${videoId}`,
-    src: `https://players.brightcove.net/${account}/${player}/index.html${composeQuery({ videoId })}`,
+    id: `${account}/${item.key}`,
+    src: `https://players.brightcove.net/${account}/${player}/index.html${composeQuery(item.query)}`,
     ...sizes.player,
     title: attr(element, 'title'),
   }
