@@ -86,6 +86,7 @@ const readPlayerKeyAccount = (key: Nullish<string>): string | undefined => {
 const readPlayerItem = (
   videoId: Nullish<string>,
   playlistId: Nullish<string>,
+  playlistVideoId?: Nullish<string>,
 ): PlayerItem | undefined => {
   if (videoId) {
     return {
@@ -94,11 +95,19 @@ const readPlayerItem = (
     }
   }
 
-  if (playlistId) {
-    return {
-      key: `playlist/${playlistId}`,
-      query: { playlistId },
-    }
+  if (!playlistId) {
+    return
+  }
+
+  const query: PlayerItem['query'] = { playlistId }
+
+  if (playlistVideoId) {
+    query.playlistVideoId = playlistVideoId
+  }
+
+  return {
+    key: `playlist/${playlistId}`,
+    query,
   }
 }
 
@@ -272,6 +281,7 @@ export const brightcoveResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const item = readPlayerItem(
     getQueryParam(url.searchParams, 'videoId'),
     getQueryParam(url.searchParams, 'playlistId'),
+    getQueryParam(url.searchParams, 'playlistVideoId'),
   )
 
   if (!account || !player || !item) {

@@ -310,13 +310,13 @@ describe('brightcoveResolveEmbed', () => {
       expect(brightcoveResolveEmbed(new URL(value))).toEqual(expected)
     })
 
-    it('should drop the playlist start video', () => {
+    it('should keep the playlist start video', () => {
       const value =
         'https://players.brightcove.net/78144477/rJTUsTUa_default/index.html?playlistId=5542458508001&playlistVideoId=5535319443001'
       const expected: EmbedResolverResult = {
         provider: 'brightcove',
         id: '78144477/playlist/5542458508001',
-        src: 'https://players.brightcove.net/78144477/rJTUsTUa_default/index.html?playlistId=5542458508001',
+        src: 'https://players.brightcove.net/78144477/rJTUsTUa_default/index.html?playlistId=5542458508001&playlistVideoId=5535319443001',
         ratio: '16/9',
       }
 
