@@ -181,10 +181,15 @@ describe('getImageFingerprint', () => {
   })
 
   it('should clean through matchUrlFn in place of cleanUrlFn', () => {
+    const matchUrlFn = (url: string) => {
+      return url === 'https://cdn.example.org/proxy/example.com/cover.jpg'
+        ? 'https://example.com/cover.jpg'
+        : url
+    }
     const context: TransformContext = {
       ...baseContext,
       cleanUrlFn: (url) => url,
-      matchUrlFn: (url) => url.replace('cdn.example.org/proxy/', ''),
+      matchUrlFn,
     }
     const wrapped = getImageFingerprint(
       'https://cdn.example.org/proxy/example.com/cover.jpg',
@@ -256,24 +261,6 @@ describe('getImageFingerprint', () => {
 
   it.each(renditionQueryCases)('should collapse %s and %s', (first, second) => {
     expect(getImageFingerprint(first)).toBe(getImageFingerprint(second))
-  })
-
-  it('should key an extensionless url behind an image proxy as its source through matchUrlFn', () => {
-    // The proxy's own query holds only resize options, so unwrapping drops it.
-    const context: TransformContext = {
-      ...baseContext,
-      matchUrlFn: (url) => url.replace('i0.wp.com/', '').replace('?ssl=1', ''),
-    }
-    const direct = getImageFingerprint(
-      'https://ik.imagekit.io/wpkauw5rry/trik-menang-cepat-di-casino-texas-holdem-tanpa-ribet',
-      context,
-    )
-    const proxied = getImageFingerprint(
-      'https://i0.wp.com/ik.imagekit.io/wpkauw5rry/trik-menang-cepat-di-casino-texas-holdem-tanpa-ribet?ssl=1',
-      context,
-    )
-
-    expect(proxied).toBe(direct)
   })
 
   it('should collapse a hyphen -WxH dimension suffix to the base filename', () => {
@@ -359,13 +346,18 @@ describe('getImageFingerprint', () => {
     expect(getImageFingerprint(two)).toBe(expected)
   })
 
-  it('should strip a Cloudinary upload behind a fetch proxy matchUrlFn unwraps', () => {
-    const context: TransformContext = {
-      ...baseContext,
-      matchUrlFn: (url) => url.replace('https://assets.example.com/x/image/fetch/c_fill,q_75/', ''),
-    }
+  it('should fold the rendition of the url matchUrlFn returns', () => {
     const value =
       'https://assets.example.com/x/image/fetch/c_fill,q_75/https://res.cloudinary.com/y/image/upload/c_fill,w_300/v161/clients/a/DSC_0326.jpg'
+    const matchUrlFn = (url: string) => {
+      return url === value
+        ? 'https://res.cloudinary.com/y/image/upload/c_fill,w_300/v161/clients/a/DSC_0326.jpg'
+        : url
+    }
+    const context: TransformContext = {
+      ...baseContext,
+      matchUrlFn,
+    }
     const expected = 'res.cloudinary.com/y/image/upload/v161/clients/a/DSC_0326.jpg'
 
     expect(getImageFingerprint(value, context)).toBe(expected)

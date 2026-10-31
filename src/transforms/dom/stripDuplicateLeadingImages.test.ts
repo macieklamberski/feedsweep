@@ -115,21 +115,26 @@ describeForEachParser('stripDuplicateLeadingImages', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    it('should remove a leading image whose repeat hides behind an image proxy matchUrlFn unwraps', async () => {
+    it('should remove a leading image whose repeat matchUrlFn maps to the same url', async () => {
       const value = html`
         <img src="https://i0.wp.com/example.com/uploads/photo.jpg">
         <img src="https://example.com/uploads/photo.jpg">
       `
+      const matchUrlFn = (url: string) => {
+        return url === 'https://i0.wp.com/example.com/uploads/photo.jpg'
+          ? 'https://example.com/uploads/photo.jpg'
+          : url
+      }
       const context: TransformContext = {
         ...baseContext,
-        matchUrlFn: (url) => url.replace('i0.wp.com/', ''),
+        matchUrlFn,
       }
       const expected = '<img src="https://example.com/uploads/photo.jpg">'
 
       expect(await transform(value, context)).toEqualHtml(expected)
     })
 
-    it('should keep a leading image behind an image proxy when there is no matchUrlFn', async () => {
+    it('should keep a proxied leading image beside its source when there is no matchUrlFn', async () => {
       const value = html`
         <img src="https://i0.wp.com/example.com/uploads/photo.jpg">
         <img src="https://example.com/uploads/photo.jpg">

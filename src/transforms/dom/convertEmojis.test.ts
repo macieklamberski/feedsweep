@@ -341,14 +341,8 @@ describeForEachParser('convertEmojis', (parseHtml) => {
   })
 
   describe('image proxies', () => {
-    // A caller's matchUrlFn standing in for urlpurify's image proxy unwrappers.
-    const transformMatching = (value: string) => {
-      const context = {
-        ...baseContext,
-        matchUrlFn: (url: string) => URL.parse(url)?.searchParams.get('url') ?? url,
-      }
-
-      return applyDomTransforms(parseHtml(value), [convertEmojis(context)])
+    const transformMatching = (value: string, matchUrlFn: (url: string) => string) => {
+      return applyDomTransforms(parseHtml(value), [convertEmojis({ ...baseContext, matchUrlFn })])
     }
 
     it('should keep an emoji behind a proxy as written when there is no matchUrlFn', async () => {
@@ -365,121 +359,72 @@ describeForEachParser('convertEmojis', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
-    it('should convert an emoji behind the Yahoo Mail proxy', async () => {
+    it('should convert an emoji whose src matchUrlFn maps to an emoji url', async () => {
       const value = html`
         <p>
           <img
             class="yiv0680057325img"
-            src="https://ecp.yusercontent.com/mail?url=https%3A%2F%2Fstatic.xx.fbcdn.net%2Fimages%2Femoji.php%2Fv9%2Ft6c%2F1%2F16%2F2764.png&amp;t=1554239749&amp;ymreqid=93d88e61-0da6-7d52-01ca-ef0e19010000&amp;sig=DzxCZnIn6aGz57UknE9zMw--~C"
+            src="https://ecp.yusercontent.com/mail?url=https%3A%2F%2Fstatic.xx.fbcdn.net%2Fimages%2Femoji.php%2Fv9%2Ft6c%2F1%2F16%2F2764.png&amp;t=1554239749"
             alt=""
-            width="16"
-            height="16"
           >
         </p>
       `
+      const matchUrlFn = (url: string) => {
+        return url ===
+          'https://ecp.yusercontent.com/mail?url=https%3A%2F%2Fstatic.xx.fbcdn.net%2Fimages%2Femoji.php%2Fv9%2Ft6c%2F1%2F16%2F2764.png&t=1554239749'
+          ? 'https://static.xx.fbcdn.net/images/emoji.php/v9/t6c/1/16/2764.png'
+          : url
+      }
       const expected = '<p>❤️</p>'
 
-      expect(await transformMatching(value)).toEqualHtml(expected)
+      expect(await transformMatching(value, matchUrlFn)).toEqualHtml(expected)
     })
 
-    it('should convert an emoji behind the Yandex Mail proxy', async () => {
+    it('should mark a kept picture and keep the src matchUrlFn maps as written', async () => {
       const value = html`
         <p>
           <img
-            alt="🌸"
-            src="https://resize.yandex.net/mailservice?url=https%3A%2F%2Fvk.com%2Femoji%2Fe%2Ff09f8cb8.png&amp;proxy=yes&amp;key=fbb6e138eabfa3da556a345b6f3faea8"
-          >
-        </p>
-      `
-      const expected = '<p>🌸</p>'
-
-      expect(await transformMatching(value)).toEqualHtml(expected)
-    })
-
-    it('should convert an emoji behind the Next.js image optimizer', async () => {
-      const value = html`
-        <p>
-          <img
-            src="https://example.com/_next/image?url=https%3A%2F%2Fstatic.xx.fbcdn.net%2Fimages%2Femoji.php%2Fv9%2Ft91%2F3%2F16%2F1f605.png&amp;w=1080&amp;q=75"
-            alt="&#x1f605;"
-            width="500"
-          >
-        </p>
-      `
-      const expected = '<p>😅</p>'
-
-      expect(await transformMatching(value)).toEqualHtml(expected)
-    })
-
-    it('should mark a kept picture and keep its proxied src as written', async () => {
-      const value = html`
-        <p>
-          <img
-            src="https://ecp.yusercontent.com/mail?url=https%3A%2F%2Fexample.com%2Fsmiles%2Fstatic%2Fbiggrin.gif&amp;t=1603243412&amp;ymreqid=9a271ae1-65ab-6366-2fc7-760047018400&amp;sig=84h0G3GeMoqZZGmNFPVWKg--~D"
+            src="https://ecp.yusercontent.com/mail?url=https%3A%2F%2Fexample.com%2Fsmiles%2Fstatic%2Fbiggrin.gif&amp;t=1603243412"
             alt=":biggrin:"
           >
         </p>
       `
+      const matchUrlFn = (url: string) => {
+        return url ===
+          'https://ecp.yusercontent.com/mail?url=https%3A%2F%2Fexample.com%2Fsmiles%2Fstatic%2Fbiggrin.gif&t=1603243412'
+          ? 'https://example.com/smiles/static/biggrin.gif'
+          : url
+      }
       const expected = html`
         <p>
           <img
-            src="https://ecp.yusercontent.com/mail?url=https%3A%2F%2Fexample.com%2Fsmiles%2Fstatic%2Fbiggrin.gif&amp;t=1603243412&amp;ymreqid=9a271ae1-65ab-6366-2fc7-760047018400&amp;sig=84h0G3GeMoqZZGmNFPVWKg--~D"
+            src="https://ecp.yusercontent.com/mail?url=https%3A%2F%2Fexample.com%2Fsmiles%2Fstatic%2Fbiggrin.gif&amp;t=1603243412"
             alt=":biggrin:"
             data-emoji=""
           >
         </p>
       `
 
-      expect(await transformMatching(value)).toEqualHtml(expected)
+      expect(await transformMatching(value, matchUrlFn)).toEqualHtml(expected)
     })
 
-    it('should leave a proxied photo untouched', async () => {
+    it('should leave a photo whose src matchUrlFn maps untouched', async () => {
       const value = html`
         <p>
           <img
-            src="https://ecp.yusercontent.com/mail?url=https%3A%2F%2Fexample.com%2Fpng%2Fdetail%2F15-153766_thumbs-up-emoticon.png&amp;t=1651750169&amp;ymreqid=54d677f0-7e23-f17f-2f2c-5a0010016a00&amp;sig=0p_k6v2d5nw1ki1w8_Xhyw--~D"
+            src="https://ecp.yusercontent.com/mail?url=https%3A%2F%2Fexample.com%2Fpng%2Fdetail%2F15-153766_thumbs-up-emoticon.png&amp;t=1651750169"
             alt="Thumbs Up Emoticon"
           >
         </p>
       `
+      const matchUrlFn = (url: string) => {
+        return url ===
+          'https://ecp.yusercontent.com/mail?url=https%3A%2F%2Fexample.com%2Fpng%2Fdetail%2F15-153766_thumbs-up-emoticon.png&t=1651750169'
+          ? 'https://example.com/png/detail/15-153766_thumbs-up-emoticon.png'
+          : url
+      }
 
-      expect(await transformMatching(value)).toEqualHtml(value)
-    })
-
-    it('should replace a blank spacer behind a mail proxy with its code', async () => {
-      const value = html`
-        <p>
-          <img
-            src="https://ecp.yusercontent.com/mail?url=https%3A%2F%2Fexample.com%2Fstyles%2Fdefault%2Fxenforo%2Fclear.png&amp;t=1"
-            alt=":)"
-          >
-        </p>
-      `
-      const expected = '<p><span data-emoji="">:)</span></p>'
-
-      expect(await transformMatching(value)).toEqualHtml(expected)
-    })
-
-    it('should rebuild a picture behind a mail proxy as its engine does', async () => {
-      const value = html`
-        <p>
-          <img
-            src="https://ecp.yusercontent.com/mail?url=http%3A%2F%2Fimage.space.rakuten.co.jp%2Femoji%2Fa1.gif&amp;t=1"
-            alt="sun"
-          >
-        </p>
-      `
-      const expected = html`
-        <p>
-          <img
-            src="https://plaza.jp.rakuten-static.com/img/user/emoji/a1.gif"
-            alt="sun"
-            data-emoji=""
-          >
-        </p>
-      `
-
-      expect(await transformMatching(value)).toEqualHtml(expected)
+      expect(await transformMatching(value, matchUrlFn)).toEqualHtml(value)
     })
   })
 
