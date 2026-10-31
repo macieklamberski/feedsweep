@@ -192,6 +192,7 @@ import { heyzineEmbedResolver } from '../embeds/heyzine.js'
 import { hudlIframeEmbedResolver, hudlWidgetEmbedResolver } from '../embeds/hudl.js'
 import { iheartEmbedResolver } from '../embeds/iheart.js'
 import { imdbEmbedResolver } from '../embeds/imdb.js'
+import { imgflipEmbedResolver } from '../embeds/imgflip.js'
 import {
   imgurBlockquoteEmbedResolver,
   imgurGifvEmbedResolver,
@@ -673,6 +674,7 @@ const embedResolvers: Array<EmbedResolver> = [
   hudlWidgetEmbedResolver,
   iheartEmbedResolver,
   imdbEmbedResolver,
+  imgflipEmbedResolver,
   imgurBlockquoteEmbedResolver,
   imgurGifvEmbedResolver,
   imgurIframeEmbedResolver,
