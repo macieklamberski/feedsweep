@@ -335,7 +335,12 @@ describeForEachParser('stripDuplicateEnclosures', (parseHtml) => {
       `
       const context: TransformContext = {
         ...baseContext,
-        cleanUrlFn: (url) => url.split('?')[0],
+        cleanUrlFn: (url) => {
+          return url ===
+            'https://archive.org/download/Episode14LegoArt/Episode%2014%20Lego%20Art.mp3?_=2'
+            ? 'https://archive.org/download/Episode14LegoArt/Episode%2014%20Lego%20Art.mp3'
+            : url
+        },
       }
 
       expect(await transform(value, context)).toEqualHtml(expected)
@@ -498,7 +503,12 @@ describeForEachParser('stripDuplicateEnclosures', (parseHtml) => {
       `
       const context: TransformContext = {
         ...baseContext,
-        cleanUrlFn: (url) => url.replace('?_=2', ''),
+        cleanUrlFn: (url) => {
+          return url ===
+            'https://example.com/wp-content/uploads/2023/08/Entrevista-a-Faus-Nirvana-Verbal.mp3?_=2'
+            ? 'https://example.com/wp-content/uploads/2023/08/Entrevista-a-Faus-Nirvana-Verbal.mp3'
+            : url
+        },
       }
       const expected = html`
         <audio controls src="https://example.com/wp-content/uploads/2023/08/Entrevista-a-Faus-Nirvana-Verbal.mp3?_=2"></audio>

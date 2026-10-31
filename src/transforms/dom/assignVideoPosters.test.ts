@@ -618,7 +618,11 @@ describeForEachParser('assignVideoPosters under heuristics', (parseHtml) => {
         { url: 'https://example.org/images/cover.jpg', type: 'image/jpeg' },
       ],
       heuristics: true,
-      matchUrlFn: (url) => url.replace('media.blubrry.com/show/', ''),
+      matchUrlFn: (url) => {
+        return url === 'https://media.blubrry.com/show/example.org/videos/clip.mp4'
+          ? 'https://example.org/videos/clip.mp4'
+          : url
+      },
     })
     const expected = html`
       <img src="https://example.org/images/cover.jpg">
