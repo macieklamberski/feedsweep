@@ -297,6 +297,45 @@ describe('brightcoveResolveEmbed', () => {
       expect(brightcoveResolveEmbed(new URL(value))).toEqual(expected)
     })
 
+    it('should read a playlist player and key it as a playlist', () => {
+      const value =
+        'https://players.brightcove.net/78144477/rJTUsTUa_default/index.html?playlistId=5542458508001'
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: '78144477/playlist/5542458508001',
+        src: 'https://players.brightcove.net/78144477/rJTUsTUa_default/index.html?playlistId=5542458508001',
+        ratio: '16/9',
+      }
+
+      expect(brightcoveResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
+    it('should drop the playlist start video', () => {
+      const value =
+        'https://players.brightcove.net/78144477/rJTUsTUa_default/index.html?playlistId=5542458508001&playlistVideoId=5535319443001'
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: '78144477/playlist/5542458508001',
+        src: 'https://players.brightcove.net/78144477/rJTUsTUa_default/index.html?playlistId=5542458508001',
+        ratio: '16/9',
+      }
+
+      expect(brightcoveResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
+    it('should prefer the video id when the url names a playlist too', () => {
+      const value =
+        'https://players.brightcove.net/1234567890/default_default/index.html?playlistId=5542458508001&videoId=6098765432'
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: '1234567890/6098765432',
+        src: 'https://players.brightcove.net/1234567890/default_default/index.html?videoId=6098765432',
+        ratio: '16/9',
+      }
+
+      expect(brightcoveResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
     it('should drop the other player parameters', () => {
       const value = `${playerUrl}&autoplay=true&muted=true`
       const expected: EmbedResolverResult = {
@@ -451,6 +490,96 @@ describeForEachParser('brightcoveVideoJsEmbedResolver', (parseHtml) => {
         provider: 'brightcove',
         id: '1234567890/6098765432',
         src: 'https://players.brightcove.net/1234567890/AbCdEf_custom/index.html?videoId=6098765432',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should mint a playlist player from an older video element', async () => {
+      const value = html`
+        <video
+          id="brightcove-video-player-5e673a6d04"
+          data-account="6103636748001"
+          data-playlist-id="1862619660780412498"
+          data-player="zf2tqmk2"
+          data-application-id=""
+          class="video-js"
+          data-embed="default"
+          controls=""
+          muted
+          playsinline
+          style="width: 100%; aspect-ratio: 16 / 9;"
+        ></video>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: '6103636748001/playlist/1862619660780412498',
+        src: 'https://players.brightcove.net/6103636748001/zf2tqmk2_default/index.html?playlistId=1862619660780412498',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should mint a playlist player from a video-js element', async () => {
+      const value = html`
+        <video-js
+          id="myPlayerID"
+          data-playlist-id="2764931906001"
+          data-account="1752604059001"
+          data-player="H1TMG31PW"
+          data-embed="default"
+          data-application-id
+          class="video-js"
+          controls
+        ></video-js>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: '1752604059001/playlist/2764931906001',
+        src: 'https://players.brightcove.net/1752604059001/H1TMG31PW_default/index.html?playlistId=2764931906001',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // Brightcove's own snippet writes an empty `data-playlist-id` beside the video id.
+    it('should read the video id beside an empty playlist id', async () => {
+      const value = html`
+        <video-js
+          data-account="6101674909001"
+          data-player="jo35ggX8qg"
+          data-embed="default"
+          controls=""
+          data-video-id="6363078307112"
+          data-playlist-id=""
+          data-application-id=""
+        ></video-js>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: '6101674909001/6363078307112',
+        src: 'https://players.brightcove.net/6101674909001/jo35ggX8qg_default/index.html?videoId=6363078307112',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should prefer the video id when the element names a playlist too', async () => {
+      const value = html`
+        <video-js
+          data-account="1234567890"
+          data-video-id="6098765432"
+          data-playlist-id="2764931906001"
+        ></video-js>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'brightcove',
+        id: '1234567890/6098765432',
+        src: 'https://players.brightcove.net/1234567890/default_default/index.html?videoId=6098765432',
         ratio: '16/9',
       }
 
@@ -648,6 +777,17 @@ describeForEachParser('brightcoveVideoJsEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should return undefined when the playlist id is not a brightcove id', async () => {
+      const value = html`
+        <video-js
+          data-account="1234567890"
+          data-playlist-id="uJkJUw7u"
+        ></video-js>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should return undefined for a reference prefix with no id after it', async () => {
       const value = html`
         <video-js
@@ -722,6 +862,35 @@ describeForEachParser('brightcove video-js through the pipeline', (parseHtml) =>
         data-embed-src="https://players.brightcove.net/1234567890/default_default/index.html?videoId=6098765432"
         data-embed-provider="brightcove"
         data-embed-id="1234567890/6098765432"
+        data-embed-ratio="16/9"
+      ></div>
+    `
+
+    expect(result).toEqualHtml(expected)
+  })
+})
+
+describeForEachParser('brightcove video-js playlist through the pipeline', (parseHtml) => {
+  it('should become a playlist placeholder', async () => {
+    const value = html`
+      <video
+        data-account="6103636748001"
+        data-playlist-id="1862619660780412498"
+        data-player="zf2tqmk2"
+        class="video-js"
+        data-embed="default"
+      ></video>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+
+    const expected = html`
+      <div
+        data-embed-src="https://players.brightcove.net/6103636748001/zf2tqmk2_default/index.html?playlistId=1862619660780412498"
+        data-embed-provider="brightcove"
+        data-embed-id="6103636748001/playlist/1862619660780412498"
         data-embed-ratio="16/9"
       ></div>
     `
