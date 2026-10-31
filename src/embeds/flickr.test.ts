@@ -1608,6 +1608,36 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should take the anchor title over the image alt', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/photos/197910129@N04/albums/72177720334022027/"
+          title="33rd Annual Celebration of Mundelein - 2026 - Photographer Photos by University of Saint Mary of the Lake, on Flickr"
+        >
+          <img
+            src="https://live.staticflickr.com/65535/55314222738_99e28970f0_z.jpg"
+            width="800"
+            height="600"
+            alt="DSC_6044"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photosets/72177720334022027',
+        src: 'https://embedr.flickr.com/photosets/72177720334022027?width=800&height=600',
+        url: 'https://www.flickr.com/photos/197910129@N04/sets/72177720334022027',
+        thumbnail: 'https://live.staticflickr.com/65535/55314222738_99e28970f0_z.jpg',
+        width: 800,
+        height: 600,
+        title:
+          '33rd Annual Celebration of Mundelein - 2026 - Photographer Photos by University of Saint Mary of the Lake, on Flickr',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should map the sets page onto the same album player', async () => {
       const value = html`
         <a
@@ -1803,6 +1833,25 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should leave an image exactly as wide as a thumbnail alone', async () => {
+      const value = html`
+        <a
+          title="Patty Larkin and her Olsons"
+          href="https://www.flickr.com/photos/thomconlon/55451163/in/photolist-5UcGx-oZV3A-oZV3k-7QHE29-9i3pDw-9i3q47-9hZjfB-9i3qEm-9hFCas-9hCwc8-9i3pLJ-4vrXLc-9i3pxQ-9i3p3b-9hZk9p-9hZj3e-9hZkr6-9hZj8p-pyw2H-9hZkdp-9hZjKP-9hZk3p-9hZjkF-5rzDpg-9i3qMj-5rzCKB-9i3oX3-9i3pYS-4vrWzz-iab1Sq-9i3oQC-5rDX59-4vw3u7-4vw3dA-5rDXnm-4vrWNv-5rDWxj-5rDWcd-5rzBha-5rzAT6-5rDWiW-5rDVX5-7VMkXK-5rzDDr-5rDY8f-pyw7S-pyzHR-4vw2Zh-pywu2-pywQi"
+          data-flickr-embed="true"
+        >
+          <img
+            src="https://c4.staticflickr.com/1/27/55451163_8121b38288_q.jpg"
+            alt="Patty Larkin and her Olsons"
+            width="150"
+            height="150"
+          />
+        </a>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should claim an image one pixel wider than a thumbnail', async () => {
       const value = html`
         <a
@@ -1902,6 +1951,25 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
             src="https://live.staticflickr.com/3040/2362225867_4a87ab8baf_b.jpg"
             width="1024"
             height="768"
+          />
+        </a>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a photo id followed by a stray quote', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href=https://www.flickr.com/photos/mgmax/55066413117"
+          title="IMG_0721"
+        >
+          <img
+            src="https://live.staticflickr.com/65535/55066413117_bebd2b07c0_z.jpg"
+            width="640"
+            height="480"
+            alt="IMG_0721"
           />
         </a>
       `
