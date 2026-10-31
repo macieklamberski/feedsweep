@@ -1,6 +1,6 @@
-import { getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParam, getQueryParams, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
-import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'radioradicale'
@@ -59,7 +59,7 @@ export const radioradicaleResolveEmbed: ResolveUrlEmbed = (url) => {
     return
   }
 
-  return composeEmbed(id, pickUrlParams(url, playbackParams))
+  return composeEmbed(id, composeQuery(getQueryParams(url, playbackParams)))
 }
 
 export const radioradicaleEmbedResolver = createUrlEmbedResolver(hosts, radioradicaleResolveEmbed)

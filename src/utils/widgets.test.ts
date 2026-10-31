@@ -30,9 +30,11 @@ import {
   prepareCiteMetadata,
   prepareEmbedMetadata,
   readCarrierUrl,
+  readPlayer,
   readS9eFragment,
   resolveEmbedProbe,
   setDimensions,
+  toPlayerKey,
   updateCitePlaceholder,
   updateEmbedPlaceholder,
 } from './widgets.js'
@@ -2045,6 +2047,61 @@ describeForEachParser('resolveEmbedProbe', (parseHtml) => {
   })
 })
 
+describe('toPlayerKey', () => {
+  it('should key an embed by its provider and id', () => {
+    expect(toPlayerKey({ provider: 'example', id: 'abc' })).toBe('example/abc')
+  })
+
+  it('should answer nothing for an embed without an id', () => {
+    expect(toPlayerKey({ provider: 'example' })).toBeUndefined()
+  })
+
+  it('should answer nothing without an embed', () => {
+    expect(toPlayerKey(undefined)).toBeUndefined()
+  })
+})
+
+describeForEachParser('readPlayer', (parseHtml) => {
+  const embedResolver: EmbedResolver = {
+    kind: 'embed',
+    selector: 'iframe[src*="player.example"]',
+    extract: () => ({ provider: 'example', id: 'abc' }),
+  }
+
+  it('should key the player a resolver reads off the frame', async () => {
+    const value = createIframe(parseHtml(''), 'https://player.example/abc')
+
+    expect(await readPlayer(value, [embedResolver])).toBe('example/abc')
+  })
+
+  it('should answer nothing for a frame no resolver claims', async () => {
+    const value = createIframe(parseHtml(''), 'https://other.example/abc')
+
+    expect(await readPlayer(value, [embedResolver])).toBeUndefined()
+  })
+
+  it('should leave the frame and its companion markup in place', async () => {
+    const document = parseHtml(
+      '<div><iframe src="https://player.example/abc"></iframe><p>Caption</p></div>',
+    )
+    const removingResolver: EmbedResolver = {
+      kind: 'embed',
+      selector: 'iframe[src*="player.example"]',
+      extract: (element) => {
+        element.nextElementSibling?.remove()
+        element.remove()
+
+        return { provider: 'example', id: 'abc' }
+      },
+    }
+    const frame = document.querySelector('iframe') as Element
+    const expected = '<div><iframe src="https://player.example/abc"></iframe><p>Caption</p></div>'
+
+    expect(await readPlayer(frame, [removingResolver])).toBe('example/abc')
+    expect(document.body.innerHTML).toEqualHtml(expected)
+  })
+})
+
 describeForEachParser('createIframe', (parseHtml) => {
   // Eleven rebuild transforms mint their player through this, and each adds its own title, size,
   // shape or poster afterwards. Anything extra here would land on all of them at once.
@@ -2209,6 +2266,22 @@ describeForEachParser('createCaptionedFigure', (parseHtml) => {
     `
 
     expect(figure.outerHTML).toEqualHtml(expected)
+  })
+
+  it('should move caption nodes into the figcaption with their markup', () => {
+    const document = parseHtml('<p>Shot by <a href="https://example.com/">Ana</a></p>')
+    const cell = document.querySelector('p')
+    const image = createImage(document, { src: 'https://cdn.example.com/photo.jpg' })
+    const figure = createCaptionedFigure(document, image, [...(cell?.childNodes ?? [])])
+    const expected = html`
+      <figure>
+        <img src="https://cdn.example.com/photo.jpg" />
+        <figcaption>Shot by <a href="https://example.com/">Ana</a></figcaption>
+      </figure>
+    `
+
+    expect(figure.outerHTML).toEqualHtml(expected)
+    expect(cell?.childNodes.length).toBe(0)
   })
 })
 

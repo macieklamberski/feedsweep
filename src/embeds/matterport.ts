@@ -1,7 +1,6 @@
-import { composeQuery, encodePathSegment, getQueryParam } from 'trousse'
+import { composeQuery, encodePathSegment, getQueryParam, getQueryParams } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'matterport'
@@ -29,7 +28,7 @@ const matterportResolveEmbed: ResolveUrlEmbed = (url, element) => {
     return
   }
 
-  const query = composeQuery({ m: id, ...pickQueryParams(url.search, navigationParams) })
+  const query = composeQuery({ m: id, ...getQueryParams(url.search, navigationParams) })
 
   return {
     provider,

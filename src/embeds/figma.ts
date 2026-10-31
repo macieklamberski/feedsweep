@@ -1,6 +1,13 @@
-import { composeQuery, getPathSegments, getQueryParam, isAnyOf, isHostOf } from 'trousse'
+import {
+  composeQuery,
+  getPathSegments,
+  getQueryParam,
+  getQueryParams,
+  isAnyOf,
+  isHostOf,
+} from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
-import { alphanumericRegex, lettersRegex, parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
+import { alphanumericRegex, lettersRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'figma'
@@ -41,7 +48,7 @@ const readFileEmbed = (url: URL): EmbedResolverResult | undefined => {
     return
   }
 
-  const params = pickQueryParams(url.search, contentParams)
+  const params = getQueryParams(url.search, contentParams)
   const path = `${kind}/${key}/${name}`
   // Figma renamed the `file` route to `design`, and both name one file, so they share one key.
   const idKind = isAnyOf(kind, 'file') ? 'design' : kind

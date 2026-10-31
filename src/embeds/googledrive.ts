@@ -4,11 +4,12 @@ import {
   encodePathSegment,
   getPathSegments,
   getQueryParam,
+  getQueryParams,
   isAnyOf,
 } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'googledrive'
@@ -71,7 +72,7 @@ export const googledriveResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 
   const src = `https://drive.google.com/file/d/${fileId}/preview`
-  const accessQuery = pickUrlParams(url, accessParams)
+  const accessQuery = composeQuery(getQueryParams(url, accessParams))
 
   // The page and the thumbnail refuse a keyed file without its key, which stays in `src` alone.
   if (accessQuery) {

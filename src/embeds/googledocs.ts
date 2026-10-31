@@ -1,7 +1,6 @@
-import { isAnyOf } from 'trousse'
+import { composeQuery, getQueryParams, isAnyOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 import { composeDriveThumbnail, getPathSegmentsWithoutWorkspace } from './googledrive.js'
 
@@ -54,7 +53,7 @@ export const googledocsResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 
   const docPath = isPublished ? `e/${docId}` : docId
-  const query = pickUrlParams(url, isShared ? sharedParams : publishedParams)
+  const query = composeQuery(getQueryParams(url, isShared ? sharedParams : publishedParams))
 
   return {
     provider,

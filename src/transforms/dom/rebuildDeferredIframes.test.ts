@@ -1,12 +1,13 @@
 import { expect, it } from 'bun:test'
 import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
+import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { rebuildDeferredIframes } from './rebuildDeferredIframes.js'
 
 describeForEachParser('rebuildDeferredIframes', (parseHtml) => {
-  const transform = (value: string) => {
-    return applyDomTransforms(parseHtml(value), [rebuildDeferredIframes(baseContext)])
+  const transform = (value: string, context: TransformContext = baseContext) => {
+    return applyDomTransforms(parseHtml(value), [rebuildDeferredIframes(context)])
   }
 
   it('should rebuild an iframe from a Pym.js data-pym-src div', async () => {
@@ -163,6 +164,17 @@ describeForEachParser('rebuildDeferredIframes', (parseHtml) => {
     `
 
     expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should rebuild an iframe from a source with no selector on any element', async () => {
+    const value = '<section data-player-url="https://player.example.com/1"></section>'
+    const context: TransformContext = {
+      ...baseContext,
+      deferredIframeSources: [{ attribute: 'data-player-url' }],
+    }
+    const expected = '<iframe src="https://player.example.com/1"></iframe>'
+
+    expect(await transform(value, context)).toEqualHtml(expected)
   })
 
   it('should be idempotent', async () => {

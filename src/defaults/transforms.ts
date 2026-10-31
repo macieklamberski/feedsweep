@@ -5,6 +5,7 @@ import { canonicalizeAlignment } from '../transforms/dom/canonicalizeAlignment.j
 import { cleanAnchorUrls } from '../transforms/dom/cleanAnchorUrls.js'
 import { convertAmpNativeElements } from '../transforms/dom/convertAmpNativeElements.js'
 import { convertAsciinemaEmbeds } from '../transforms/dom/convertAsciinemaEmbeds.js'
+import { convertBloggerCaptionTables } from '../transforms/dom/convertBloggerCaptionTables.js'
 import { convertBreaksToParagraphs } from '../transforms/dom/convertBreaksToParagraphs.js'
 import { convertCiteCards } from '../transforms/dom/convertCiteCards.js'
 import { convertDatawrapperEmbeds } from '../transforms/dom/convertDatawrapperEmbeds.js'
@@ -12,6 +13,7 @@ import { convertEmojis } from '../transforms/dom/convertEmojis.js'
 import { convertGiphyEmbeds } from '../transforms/dom/convertGiphyEmbeds.js'
 import { convertLazyImageContainers } from '../transforms/dom/convertLazyImageContainers.js'
 import { convertNoteEmbeds } from '../transforms/dom/convertNoteEmbeds.js'
+import { convertParkedMediaContainers } from '../transforms/dom/convertParkedMediaContainers.js'
 import { convertSmartframeEmbeds } from '../transforms/dom/convertSmartframeEmbeds.js'
 import { convertTradingEconomicsEmbeds } from '../transforms/dom/convertTradingEconomicsEmbeds.js'
 import { convertUcozSpoilerButtons } from '../transforms/dom/convertUcozSpoilerButtons.js'
@@ -49,6 +51,7 @@ import { rebuildElementorVideoEmbeds } from '../transforms/dom/rebuildElementorV
 import { rebuildEmbedlyEmbeds } from '../transforms/dom/rebuildEmbedlyEmbeds.js'
 import { rebuildEmbedPlusEmbeds } from '../transforms/dom/rebuildEmbedPlusEmbeds.js'
 import { rebuildEmbedPrivacyLinks } from '../transforms/dom/rebuildEmbedPrivacyLinks.js'
+import { rebuildEmbettyVideoEmbeds } from '../transforms/dom/rebuildEmbettyVideoEmbeds.js'
 import { rebuildExternalVideoEmbeds } from '../transforms/dom/rebuildExternalVideoEmbeds.js'
 import { rebuildGettyImagesEmbeds } from '../transforms/dom/rebuildGettyImagesEmbeds.js'
 import { rebuildGofundmeEmbeds } from '../transforms/dom/rebuildGofundmeEmbeds.js'
@@ -160,6 +163,7 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // convertWidgets, which claims the frame this rebuilds.
   rebuildWordpressEmbeds,
   rebuildLiteVideoEmbeds,
+  rebuildEmbettyVideoEmbeds,
   rebuildLyteEmbeds,
   rebuildRocketYoutubePreviews,
   rebuildVideoJsEmbeds,
@@ -205,6 +209,10 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // cluster, so wrapBareInlineInParagraphs later sees block boundaries and keeps the
   // caption, images, and PREV/NEXT nav apart instead of gluing them into one paragraph.
   wrapCargoGalleryImages,
+
+  // Runs before wrapTablesForScroll, which wraps the caption table as a data table, and before
+  // canonicalizeAlignment, so alignment set on the link around the image lands on the figure.
+  convertBloggerCaptionTables,
 
   // Converts AMP custom elements into their native HTML equivalents so the image/embed
   // transforms below can dimension, placeholder, and proxy them. Runs in this normalize
@@ -340,6 +348,9 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   stripWordBreaks,
   linkifyUrls,
   markTimestamps,
+
+  // Runs before convertWidgets, which replaces the iframes its playable guard relies on.
+  convertParkedMediaContainers,
   convertWidgets,
   injectEnclosures,
 

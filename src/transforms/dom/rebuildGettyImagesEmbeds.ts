@@ -1,4 +1,4 @@
-import { composeWidgetEmbedUrl, readWidgetConfig } from '../../embeds/gettyimages.js'
+import { composeEmbedUrl, readWidgetConfig } from '../../embeds/gettyimages.js'
 import type { DomTransform } from '../../types.js'
 import { createIframe } from '../../utils/widgets.js'
 
@@ -21,7 +21,7 @@ export const rebuildGettyImagesEmbeds: DomTransform = () => (document) => {
       continue
     }
 
-    const iframe = createIframe(document, composeWidgetEmbedUrl(config))
+    const iframe = createIframe(document, composeEmbedUrl(config))
 
     // Getty writes one token into the config's et and onto the <a> id, which pairs the two when a
     // post carries several photos.

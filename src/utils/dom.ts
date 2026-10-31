@@ -1,4 +1,5 @@
 import { coerceNumber, getQueryParam, isAnyOf, type Nullish, startsWithAnyOf } from 'trousse'
+import type { ScopedAttribute } from '../types.js'
 import * as styles from './styles.js'
 import { foldEscapedAmpersands, isUrlShaped } from './urls.js'
 
@@ -143,6 +144,15 @@ export const attr = (element: Nullish<Element>, name: string): string | undefine
   return element?.getAttribute(name)?.trim() || undefined
 }
 
+// Whether a scoped attribute entry reads this element: any element when it names no selector.
+export const isInScope = (element: Element, entry: ScopedAttribute): boolean => {
+  if (!entry.selector) {
+    return true
+  }
+
+  return element.matches(entry.selector)
+}
+
 // Keeps a value read out of an attribute or a url when its shape tells it apart, such as an id
 // from a route word, and drops it otherwise.
 export const keepIfMatches = (value: Nullish<string>, regex: RegExp): string | undefined => {
@@ -174,16 +184,9 @@ export const flashVars = (element: Nullish<Element>): string | undefined => {
   return attr(element, 'flashvars') ?? paramValue(paramOwner(element), 'flashvars')
 }
 
-// A flashvars query string read as pairs, its twice-escaped `&amp;` folded and each value without
-// the whitespace a publisher left around it, so the id and the minted url name the same item.
+// A flashvars query string read as pairs, its twice-escaped `&amp;` folded.
 export const parseFlashVars = (query: Nullish<string>): URLSearchParams => {
-  const params = new URLSearchParams()
-
-  for (const [name, value] of new URLSearchParams(foldEscapedAmpersands(query ?? ''))) {
-    params.append(name, value.trim())
-  }
-
-  return params
+  return new URLSearchParams(foldEscapedAmpersands(query ?? ''))
 }
 
 // One named value out of that configuration, for a carrier that names a single thing.

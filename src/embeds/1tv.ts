@@ -1,6 +1,5 @@
-import { getPathSegments, isAnyOf, toMap } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParams, isAnyOf, toMap } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
-import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = '1tv'
@@ -39,7 +38,7 @@ export const channelOneResolveEmbed: ResolveUrlEmbed = (url) => {
     return
   }
 
-  const query = pickUrlParams(url, ['t'])
+  const query = composeQuery(getQueryParams(url, ['t']))
 
   return {
     provider,

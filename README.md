@@ -66,6 +66,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `wrapBareInlineInParagraphs` | Wrap loose inline content in `<p>` blocks |
 | `hoistBlocksFromParagraphs` | Hoist block elements out of enclosing paragraphs, keeping only halves that still render |
 | `wrapCargoGalleryImages` | Wrap Cargo portfolio captions and images in `<figure>` blocks so they stay apart |
+| `convertBloggerCaptionTables` | Convert a Blogger caption table (`table.tr-caption-container`) into a `<figure>` with the image and its `<figcaption>` |
 | `injectEnclosures` | Inject feed enclosures as native media or embed placeholders, collapsing a media group to one rendition and merging a player page entry with its media file; an image enclosure injects only when the content has no image of its own, captioned with its description; anything else becomes a `data-file-*` placeholder, after the content |
 | `surfaceParkedMarkup` | Dissolve a container holding an embed encoded in an attribute, a lazy loader's `div.load-later` or a Borlabs Cookie content blocker, into the markup it holds |
 | `rebuildPublicalbumGalleries` | Rebuild a Publicalbum Google Photos album widget into its photos as linked images under a captioned `<figure>` |
@@ -77,7 +78,8 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `rebuildEmbedPlusEmbeds` | Rebuild a real `<iframe>` from an "Embed Plus for YouTube" facade (`.epyt-facade[data-facadesrc]`) |
 | `rebuildIframelyEmbeds` | Rebuild an Iframely anchor facade (an empty `a[data-iframely-url]`) into the destination's frame or a plain link, and point an Iframely frame at the player of the url it proxies |
 | `rebuildWordpressEmbeds` | Rebuild a WordPress embed block that holds only its source url into the platform's frame, when a resolver claims the url |
-| `rebuildLiteVideoEmbeds` | Rebuild a real `<iframe>` from a `lite-youtube` / `lite-vimeo` web component's `videoid`, carrying over `start` and `videotitle` |
+| `rebuildLiteVideoEmbeds` | Rebuild a real `<iframe>` from a `lite-youtube` / `lite-vimeo` web component's `videoid`, `playlistid` or `player-src`, carrying over its start, title and poster |
+| `rebuildEmbettyVideoEmbeds` | Rebuild a real `<iframe>` from an `embetty-video` web component's `type` and `video-id`, carrying over `start-at` and `poster-image` |
 | `rebuildLyteEmbeds` | Rebuild a real `<iframe>` from a WP YouTube Lyte facade (`WYL_`/`lyte_` id) or the thumbnail it writes into feeds |
 | `rebuildRocketYoutubePreviews` | Rebuild a real `<iframe>` from a WP Rocket YouTube preview facade (`.rll-youtube-player[data-id]`), carrying over `data-query` |
 | `rebuildVideoJsEmbeds` | Rebuild a native `<video>` from a Video.js `<video-js>` element, reading the source from a `<source>` child or the `data-setup` JSON |
@@ -108,7 +110,8 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `convertAsciinemaEmbeds` | Replace an asciinema loader script with the cast's static SVG render, linked to the recording |
 | `convertGiphyEmbeds` | Convert a Giphy gif shipped as an iframe (`giphy.com/embed/{id}`, `media.giphy.com`, `giphy.com/gifs/{id}`) into an `<img>` of the gif, linked to its Giphy page |
 | `convertSmartframeEmbeds` | Convert SmartFrame's `<smartframe-embed>` element into the picture it names as a static image |
-| `convertWidgets` | Convert recognized widgets: embeds become `data-embed-*` placeholders, platform-hosted media becomes a real `<video>`/`<audio>` (from an id template, a media-file src, or a URL parked in a lazy media attribute) |
+| `convertParkedMediaContainers` | Add a real `<video>`/`<audio>` to a container parking a media file URL in a lazy media attribute |
+| `convertWidgets` | Convert recognized widgets: embeds become `data-embed-*` placeholders, platform-hosted media becomes a real `<video>`/`<audio>` (from an id template or a media-file src) |
 | `assignVideoPosters` | _Heuristic (opt-in):_ move a redundant video-poster image (inline or an enclosure) onto the embed as its poster, then drop the standalone image |
 | `stripDuplicateEnclosures` | _Heuristic (opt-in):_ remove an injected enclosure that duplicates inline content (image size-variants, exact audio/video/embed) |
 | `stripDuplicateLeadingImages` | _Heuristic (opt-in):_ remove a leading image the body repeats as the very next image (featured-image prepends), keeping the larger copy |

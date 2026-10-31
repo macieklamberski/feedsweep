@@ -4,11 +4,11 @@ import {
   encodePathSegment,
   getPathSegments,
   getQueryParam,
+  getQueryParams,
   isAnyOf,
   toMap,
 } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
-import { pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 type EmbedShape = {
@@ -100,7 +100,7 @@ const readQueryEmbed = (parsed: URL): EmbedResolverResult | undefined => {
   }
 
   // `title` is the heading the player draws over the map in place of the route's own name.
-  const { title, ...playerParams } = pickQueryParams(parsed.search, embedParams)
+  const { title, ...playerParams } = getQueryParams(parsed.search, embedParams)
   const src = composeSource(kind, shape, id, playerParams)
 
   if (playerParams.privacyCode) {
@@ -128,7 +128,7 @@ const readPathEmbed = (parsed: URL): EmbedResolverResult | undefined => {
     return
   }
 
-  const playerParams = pickQueryParams(parsed.search, privateParams)
+  const playerParams = getQueryParams(parsed.search, privateParams)
   const src = composeSource(kind, shape, decodeSegment(id) ?? id, playerParams)
 
   if (playerParams.privacyCode) {

@@ -1,7 +1,6 @@
-import { composeQuery } from 'trousse'
+import { composeQuery, getQueryParams } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { pickQueryParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'bunnystream'
@@ -14,8 +13,9 @@ const hosts = [
 // `/play` is the full-window page around the same player, addressed by the same pair.
 const playerPathRegex = /^\/(?:embed|play)\/([^/]+)\/([^/]+)$/i
 
-// The start position, and the token pair a library with embed authentication needs.
-const playbackParams = ['t', 'token', 'expires']
+// The start position, whether the video replays when it ends, and the token pair a library with
+// embed authentication needs.
+const playbackParams = ['t', 'loop', 'token', 'expires']
 
 const sizes = {
   player: { ratio: '16/9' },
@@ -29,7 +29,7 @@ export const bunnystreamResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 
   const [, libraryId, videoId] = match
-  const picked = pickQueryParams(url.search, playbackParams)
+  const picked = getQueryParams(url.search, playbackParams)
   // The player autoplays unless the library turns it off, so a frame loaded without a click
   // would play unasked.
   const query = composeQuery({ autoplay: 'false', ...picked })

@@ -1,4 +1,4 @@
-import { composeQuery, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import { composeQuery, encodePathSegment, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -14,6 +14,11 @@ const sizes = {
   // is what Podomatic's own snippet writes on all 11 frames in the corpus, and it sits between the
   // two.
   current: { height: 205 },
+}
+
+// A podcast's page on Podomatic, named by the subdomain its feed and its pages sit on.
+export const composePodcastUrl = (subdomain: string): string => {
+  return `https://www.podomatic.com/podcasts/${encodePathSegment(subdomain)}`
 }
 
 type Player = { kind: string; id: string; src: string; size: { height: number } }

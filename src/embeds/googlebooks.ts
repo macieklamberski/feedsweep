@@ -1,5 +1,12 @@
-import { composeQuery, getPathSegments, getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import { pickQueryParams, placeholderBaseUrl } from '../utils/urls.js'
+import {
+  composeQuery,
+  getPathSegments,
+  getQueryParam,
+  getQueryParams,
+  isAnyOf,
+  parseUrl,
+} from 'trousse'
+import { placeholderBaseUrl } from '../utils/urls.js'
 import { createMarkupEmbedResolver, readRepairedCarrierUrl } from '../utils/widgets.js'
 
 const provider = 'googlebooks'
@@ -41,8 +48,8 @@ export const googlebooksEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const volume = { id, ...pickQueryParams(parsed.search, pageParams) }
-    const highlights = pickQueryParams(parsed.search, highlightParams)
+    const volume = { id, ...getQueryParams(parsed.search, pageParams) }
+    const highlights = getQueryParams(parsed.search, highlightParams)
     const cover = { id, printsec: 'frontcover', img: '1', zoom: '1' }
 
     return {

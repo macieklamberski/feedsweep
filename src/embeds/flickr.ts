@@ -192,11 +192,8 @@ const readFlashPhoto = (element: Nullish<Element>): FlickrPhoto | undefined => {
 // The iframe carrier names its subject in its own query. A set is preferred where several
 // appear, being the narrowest of the three.
 const readLegacySubject = (parsed: URL): FlickrSubject => {
-  const setId = getQueryParam(parsed.searchParams, 'set_id')
-
   return {
-    // biome-ignore lint/nursery/useNullishCoalescing: An empty set id reads as absent.
-    setId: setId || undefined,
+    setId: getQueryParam(parsed.searchParams, 'set_id'),
     owner: getQueryParam(parsed.searchParams, 'user_id'),
     groupId: getQueryParam(parsed.searchParams, 'group_id'),
   }

@@ -1,6 +1,5 @@
-import { toMap } from 'trousse'
+import { composeQuery, getQueryParams, toMap } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
-import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'zohoworkdrive'
@@ -47,7 +46,7 @@ export const zohoworkdriveResolveEmbed: ResolveUrlEmbed = (url, element) => {
     return {
       provider,
       id: `embed/${fileId}`,
-      src: `${page}${pickUrlParams(url, playbackParams)}`,
+      src: `${page}${composeQuery(getQueryParams(url, playbackParams))}`,
       url: page,
       thumbnail: `https://previewengine.${domain}/thumbnail/WD/${fileId}?size=l`,
       ratio: readRatio(element),

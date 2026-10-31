@@ -414,6 +414,222 @@ describeForEachParser('surfaceParkedMarkup', (parseHtml) => {
     })
   })
 
+  describe('Squarespace video block', () => {
+    it('should surface the Vimeo player iframe beside the empty wrapper', async () => {
+      const value = html`
+        <div
+          id="yui_3_17_2_1_1776787386805_102"
+          class="sqs-video-wrapper video-none"
+          data-provider-name="Vimeo"
+          data-html="&lt;iframe src=&quot;https://player.vimeo.com/video/1174726104?app_id=122963&quot; width=&quot;426&quot; height=&quot;240&quot; frameborder=&quot;0&quot; allow=&quot;autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share&quot; referrerpolicy=&quot;strict-origin-when-cross-origin&quot; title=&quot;[ÒDIO] teaser&quot;&gt;&lt;/iframe&gt;"
+        ><div class="intrinsic"> </div></div>
+      `
+      const expected = html`
+        <iframe
+          src="https://player.vimeo.com/video/1174726104?app_id=122963"
+          width="426"
+          height="240"
+          frameborder="0"
+          allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          title="[ÒDIO] teaser"
+        ></iframe><div
+          id="yui_3_17_2_1_1776787386805_102"
+          class="sqs-video-wrapper video-none"
+          data-provider-name="Vimeo"
+        ><div class="intrinsic"> </div></div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should surface the player from a block copied with its classes stripped', async () => {
+      const value = html`
+        <div
+          data-provider-name="Vimeo"
+          data-html="<iframe src=&quot;https://player.vimeo.com/video/451156213?app_id=122963&quot; width=&quot;426&quot; height=&quot;240&quot; frameborder=&quot;0&quot; allow=&quot;autoplay; fullscreen; picture-in-picture&quot; title=&quot;HELROM -Trailer Rail / August 2020&quot;></iframe>"
+        ><div><p><img data-src="https://example.com/content/v1/startbild-video.jpg" data-load="false" data-image-focal-point="0.5,0.5" src="https://example.com/content/v1/startbild-video.jpg"></p></div></div>
+      `
+      const expected = html`
+        <iframe
+          src="https://player.vimeo.com/video/451156213?app_id=122963"
+          width="426"
+          height="240"
+          frameborder="0"
+          allow="autoplay; fullscreen; picture-in-picture"
+          title="HELROM -Trailer Rail / August 2020"
+        ></iframe><div
+          data-provider-name="Vimeo"
+        ><div><p><img data-src="https://example.com/content/v1/startbild-video.jpg" data-load="false" data-image-focal-point="0.5,0.5" src="https://example.com/content/v1/startbild-video.jpg"></p></div></div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should leave a consent blocker that parks a player without naming its provider', async () => {
+      const value = html`
+        <div
+          class="ub-cmp-embed-wrapper"
+          data-cmp-vendor="social_embeds"
+          data-html="<div class=&quot;social-media-wrapper&quot;><iframe width=&quot;500&quot; height=&quot;281&quot; src=&quot;https://www.youtube.com/embed/cFPgSSAIDBw?feature=oembed&quot; frameborder=&quot;0&quot; allowfullscreen></iframe></div>"
+        ><h3 class="headline">Externer Inhalt</h3><p class="txt">An dieser Stelle finden Sie einen externen Inhalt.</p></div>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should keep the post a wrapper left unclosed holds', async () => {
+      const value = html`
+        <div
+          class="sqs-video-wrapper video-none"
+          data-provider-name="YouTube"
+          data-html="&lt;iframe src=&quot;//www.youtube.com/embed/3gbUgwwCTeI?wmode=opaque&amp;enablejsapi=1&quot; height=&quot;480&quot; width=&quot;854&quot; scrolling=&quot;no&quot; frameborder=&quot;0&quot; allowfullscreen=&quot;&quot;&gt;&lt;br/&gt;&lt;/iframe&gt;"
+        >
+          <div class="intrinsic">
+            <a href="https://youtu.be/3gbUgwwCTeI">https://youtu.be/3gbUgwwCTeI</a><br>
+            <p>The webinar covered permits, budgets and timelines.</p>
+          </div>
+        </div>
+      `
+      const expected = html`
+        <iframe
+          src="//www.youtube.com/embed/3gbUgwwCTeI?wmode=opaque&amp;enablejsapi=1"
+          height="480"
+          width="854"
+          scrolling="no"
+          frameborder="0"
+          allowfullscreen=""
+        ><br/></iframe><div
+          class="sqs-video-wrapper video-none"
+          data-provider-name="YouTube"
+        >
+          <div class="intrinsic">
+            <a href="https://youtu.be/3gbUgwwCTeI">https://youtu.be/3gbUgwwCTeI</a><br>
+            <p>The webinar covered permits, budgets and timelines.</p>
+          </div>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should leave a wrapper that already holds the player Squarespace drew', async () => {
+      const value = html`
+        <div
+          class="sqs-video-wrapper video-none"
+          data-provider-name="YouTube"
+          data-html="&lt;iframe src=&quot;//www.youtube.com/embed/on3M7YWlewo?wmode=opaque&amp;enablejsapi=1&quot; height=&quot;480&quot; width=&quot;854&quot; scrolling=&quot;no&quot; frameborder=&quot;0&quot; allowfullscreen=&quot;&quot;&gt;&lt;br/&gt;&lt;/iframe&gt;"
+        >
+          <div class="intrinsic">
+            <div class="intrinsic-inner"><iframe loading="lazy" title="The Greatest Story Ever Told Official Trailer #1 - Max von Sydow Movie (1965) HD" src="https://www.youtube.com/embed/on3M7YWlewo?wmode=opaque&amp;enablejsapi=1" width="854" height="480" frameborder="0" scrolling="no" allowfullscreen="allowfullscreen"></iframe></div>
+          </div>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a wrapper that holds a drawn player no resolver claims', async () => {
+      const value = html`
+        <div
+          class="sqs-video-wrapper video-none"
+          data-html='&lt;iframe src="https://giphy.com/embed/3o6wrCSt4FgRSRiMsU" width="480" height="260" frameBorder="0" class="giphy-embed" allowFullScreen&gt;&lt;/iframe&gt;&lt;p&gt;&lt;a href="https://giphy.com/gifs/filmeditor-sacha-baron-cohen-3o6wrCSt4FgRSRiMsU"&gt;via GIPHY&lt;/a&gt;&lt;/p&gt;'
+          data-provider-name=""
+        >
+          <div class="intrinsic">
+            <div class="intrinsic-inner"><iframe src="https://giphy.com/embed/3o6wrCSt4FgRSRiMsU?" width="480" height="260" frameborder="0" allowfullscreen="allowfullscreen"></iframe></div>
+          </div>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should leave a wrapper whose video the post embeds again', async () => {
+      const value = html`
+        <figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube">
+          <div class="wp-block-embed__wrapper"><iframe loading="lazy" title="18 Years Old, Already?! YIKES!!!" width="500" height="281" src="https://www.youtube.com/embed/gUl6qmkm-UM?feature=oembed" frameborder="0" allowfullscreen></iframe></div>
+        </figure>
+        <div
+          class="sqs-video-wrapper"
+          data-provider-name="YouTube"
+          data-html=" &lt;br /&gt; &lt;iframe src=&quot;//www.youtube.com/embed/gUl6qmkm-UM?wmode=opaque&quot; height=&quot;480&quot; width=&quot;854&quot; scrolling=&quot;no&quot; frameborder=&quot;0&quot; allowfullscreen&gt;&lt;/iframe&gt;&lt;/p&gt; &lt;p&gt;"
+        > </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should surface the frame when the post embeds another video', async () => {
+      const value = html`
+        <figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube">
+          <div class="wp-block-embed__wrapper"><iframe loading="lazy" title="18 Years Old, Already?! YIKES!!!" width="500" height="281" src="https://www.youtube.com/embed/gUl6qmkm-UM?feature=oembed" frameborder="0" allowfullscreen></iframe></div>
+        </figure>
+        <div
+          class="sqs-video-wrapper"
+          data-provider-name="YouTube"
+          data-html=" &lt;br /&gt; &lt;iframe src=&quot;//www.youtube.com/embed/o30nkbBCmlY?wmode=opaque&quot; height=&quot;480&quot; width=&quot;854&quot; scrolling=&quot;no&quot; frameborder=&quot;0&quot; allowfullscreen&gt;&lt;/iframe&gt;&lt;/p&gt; &lt;p&gt;"
+        > </div>
+      `
+      const expected = html`
+        <figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube">
+          <div class="wp-block-embed__wrapper"><iframe loading="lazy" title="18 Years Old, Already?! YIKES!!!" width="500" height="281" src="https://www.youtube.com/embed/gUl6qmkm-UM?feature=oembed" frameborder="0" allowfullscreen></iframe></div>
+        </figure>
+        <iframe
+          src="//www.youtube.com/embed/o30nkbBCmlY?wmode=opaque"
+          height="480"
+          width="854"
+          scrolling="no"
+          frameborder="0"
+          allowfullscreen
+        ></iframe><div
+          class="sqs-video-wrapper"
+          data-provider-name="YouTube"
+        > </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should leave a wrapper whose attribute the feed cut short at an unescaped quote', async () => {
+      const value = html`
+        <div
+          class="sqs-video-wrapper video-none"
+          data-provider-name="YouTube"
+          data-html= "<br/><br/><br/><br/><br/><iframe src="//www.youtube.com/embed/lU9Zm0rW1PI?wmode=opaque" height="480" width="854" scrolling="no" frameborder="0" allowfullscreen></iframe><br/>"
+        > <div class="intrinsic">&nbsp;</div> </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
+    it('should bring the wrapper back as the YouTube placeholder end to end', async () => {
+      const value = html`
+        <div
+          class="sqs-video-wrapper video-none"
+          data-provider-name="YouTube"
+          data-html="&lt;iframe src=&quot;//www.youtube.com/embed/3gbUgwwCTeI?wmode=opaque&amp;enablejsapi=1&quot; height=&quot;480&quot; width=&quot;854&quot; scrolling=&quot;no&quot; frameborder=&quot;0&quot; allowfullscreen=&quot;&quot;&gt;&lt;br/&gt;&lt;/iframe&gt;"
+        ><div class="intrinsic"></div></div>
+      `
+      const expected = html`
+        <div
+          data-embed-ratio="16/9"
+          data-embed-thumbnail="https://i.ytimg.com/vi/3gbUgwwCTeI/hqdefault.jpg"
+          data-embed-url="https://www.youtube.com/watch?v=3gbUgwwCTeI"
+          data-embed-id="3gbUgwwCTeI"
+          data-embed-provider="youtube"
+          data-embed-src="https://www.youtube.com/embed/3gbUgwwCTeI"
+        ></div>
+      `
+      const result = await transformContent(value, {
+        parseHtmlFn: parseHtml,
+        baseUrl: 'https://example.com/feed/',
+      })
+
+      expect(result).toEqualHtml(expected)
+    })
+  })
+
   it('should resolve a feed-relative container url against the base url end to end', async () => {
     const value = html`
       <div
@@ -466,6 +682,20 @@ describeForEachParser('surfaceParkedMarkup', (parseHtml) => {
     })
 
     expect(result).toEqualHtml(expected)
+  })
+
+  it('should be idempotent on a Squarespace wrapper', async () => {
+    const value = html`
+      <div
+        class="sqs-video-wrapper video-none"
+        data-provider-name="Vimeo"
+        data-html="&lt;iframe src=&quot;https://player.vimeo.com/video/1174726104?app_id=122963&quot; width=&quot;426&quot; height=&quot;240&quot;&gt;&lt;/iframe&gt;"
+      ><div class="intrinsic"> </div></div>
+    `
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
   })
 
   it('should be idempotent', async () => {

@@ -1,7 +1,14 @@
-import { encodePathSegment, getQueryParam, isHostOf, isHostOrSubdomainOf } from 'trousse'
+import {
+  composeQuery,
+  encodePathSegment,
+  getQueryParam,
+  getQueryParams,
+  isHostOf,
+  isHostOrSubdomainOf,
+} from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr, keepIfMatches } from '../utils/dom.js'
-import { absoluteUrlRegex, parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { absoluteUrlRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'cloudflarestream'
@@ -57,7 +64,7 @@ export const cloudflarestreamResolveEmbed: ResolveUrlEmbed = (url) => {
     provider,
     // The bare `videodelivery.net` serves every account's video, so the id needs no account code.
     id: videoId,
-    src: `https://${url.hostname}${playerPath}${pickUrlParams(url, playbackParams)}`,
+    src: `https://${url.hostname}${playerPath}${composeQuery(getQueryParams(url, playbackParams))}`,
     thumbnail: poster ?? composeThumbnail(videoId, thumbnailHost),
     ...sizes.player,
   }

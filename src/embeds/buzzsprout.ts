@@ -1,4 +1,4 @@
-import { composeQuery } from 'trousse'
+import { composeQuery, getQueryParams } from 'trousse'
 import type {
   EmbedRenderHint,
   EmbedResolver,
@@ -7,7 +7,7 @@ import type {
 } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'buzzsprout'
@@ -91,7 +91,7 @@ export const buzzsproutScriptEmbedResolver = createMarkupEmbedResolver(
     const show = url.pathname.match(showScriptPathRegex)
 
     if (show?.[1]) {
-      return composeEmbed(show[1], undefined, pickQueryParams(url.search, showPlayerParams))
+      return composeEmbed(show[1], undefined, getQueryParams(url.search, showPlayerParams))
     }
   },
 )

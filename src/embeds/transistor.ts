@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { composeFragment, getFragmentParams, getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { isFileName } from '../utils/urls.js'
@@ -58,11 +58,13 @@ export const transistorResolveEmbed: ResolveUrlEmbed = (url) => {
 
   // Dropping the mode mints /e/{slug}, an episode by a show's name, which answers 404.
   const path = embed.mode ? `e/${embed.id}/${embed.mode}` : `e/${embed.id}`
+  // The player seeks to the `#t=` it reads from the fragment.
+  const fragment = composeFragment(getFragmentParams(url, ['t']))
 
   return {
     provider,
     id: `${subjectNames[embed.kind]}/${embed.id}`,
-    src: `https://share.transistor.fm/${path}`,
+    src: `https://share.transistor.fm/${path}${fragment}`,
     // A show mode has no page: the embed slug is not the show's subdomain, which 404s.
     // `/s/{id}` is the same episode's share page, which answers under `frame-ancestors 'self'`.
     ...(embed.kind === 'e' && { url: `https://share.transistor.fm/s/${embed.id}` }),
