@@ -4,6 +4,13 @@ import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { stripDuplicateEnclosures } from './stripDuplicateEnclosures.js'
 
+// The prefix each image proxy puts before its source, for a stand-in of urlpurify's
+// imageProxyUnwrappers.
+const imageFetchProxyRegex = /^.*\/image\/fetch\/[^/]+\//
+const photonProxyRegex = /i\d\.wp\.com\//
+const cloudflareProxyRegex = /^.*\/cdn-cgi\/image\/[^/]+\//
+const cloudflareRelativeProxyRegex = /cdn-cgi\/image\/[^/]+\//
+const imagekitProxyRegex = /^.*\/tr:[^/]+\//
 const measurementPrefixRegex = /^(https?:\/\/)media\.blubrry\.com\/[^/]+\//
 
 // Stands in for urlpurify's cleanUrl with downloadMeasurementUnwrappers.
@@ -39,6 +46,14 @@ describeForEachParser('stripDuplicateEnclosures', (parseHtml) => {
   })
 
   describe('image enclosures', () => {
+    // A caller's matchUrlFn standing in for urlpurify's imageProxyUnwrappers.
+    const transformUnwrapping = (value: string, proxyRegex: RegExp) => {
+      return transform(value, {
+        ...baseContext,
+        matchUrlFn: (url) => decodeURIComponent(url.replace(proxyRegex, '')),
+      })
+    }
+
     it('should remove a marked image that exactly matches a content image', async () => {
       const value = html`
         <img src="https://example.com/photo.jpg" data-enclosure="">
@@ -124,7 +139,7 @@ describeForEachParser('stripDuplicateEnclosures', (parseHtml) => {
         >
       `
 
-      expect(await transform(value)).toEqualHtml(expected)
+      expect(await transformUnwrapping(value, imageFetchProxyRegex)).toEqualHtml(expected)
     })
 
     it('should keep two Substack images with different inner sources', async () => {
@@ -149,7 +164,7 @@ describeForEachParser('stripDuplicateEnclosures', (parseHtml) => {
         <img src="https://i0.wp.com/example.com/wp-content/uploads/2024/05/photo.png?w=300">
       `
 
-      expect(await transform(value)).toEqualHtml(expected)
+      expect(await transformUnwrapping(value, photonProxyRegex)).toEqualHtml(expected)
     })
 
     it('should remove a Photon image that duplicates a non-proxied content image', async () => {
@@ -158,6 +173,19 @@ describeForEachParser('stripDuplicateEnclosures', (parseHtml) => {
         <img src="https://example.com/wp-content/uploads/photo.png">
       `
       const expected = '<img src="https://example.com/wp-content/uploads/photo.png">'
+
+      expect(await transformUnwrapping(value, photonProxyRegex)).toEqualHtml(expected)
+    })
+
+    it('should keep a Photon image beside its non-proxied source when there is no matchUrlFn', async () => {
+      const value = html`
+        <img src="https://i1.wp.com/example.com/wp-content/uploads/photo.png?w=300" data-enclosure="">
+        <img src="https://example.com/wp-content/uploads/photo.png">
+      `
+      const expected = html`
+        <img src="https://i1.wp.com/example.com/wp-content/uploads/photo.png?w=300">
+        <img src="https://example.com/wp-content/uploads/photo.png">
+      `
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -173,7 +201,7 @@ describeForEachParser('stripDuplicateEnclosures', (parseHtml) => {
         >
       `
 
-      expect(await transform(value)).toEqualHtml(expected)
+      expect(await transformUnwrapping(value, cloudflareProxyRegex)).toEqualHtml(expected)
     })
 
     it('should remove a Cloudflare image-resize variant with a relative source (beehiiv)', async () => {
@@ -187,7 +215,7 @@ describeForEachParser('stripDuplicateEnclosures', (parseHtml) => {
         >
       `
 
-      expect(await transform(value)).toEqualHtml(expected)
+      expect(await transformUnwrapping(value, cloudflareRelativeProxyRegex)).toEqualHtml(expected)
     })
 
     it('should remove an ImageKit variant of the same source', async () => {
@@ -199,7 +227,7 @@ describeForEachParser('stripDuplicateEnclosures', (parseHtml) => {
         <img src="https://ik.imagekit.io/acct/tr:w-900/https://origin.example.com/a/photo.jpg">
       `
 
-      expect(await transform(value)).toEqualHtml(expected)
+      expect(await transformUnwrapping(value, imagekitProxyRegex)).toEqualHtml(expected)
     })
 
     it('should remove a wsrv.nl variant of the same source', async () => {

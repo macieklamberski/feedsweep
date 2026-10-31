@@ -32,6 +32,10 @@ const nonCaptionDescriptions: Array<string> = [
 
 const shortCaptions: Array<string> = ['Madrid.', 'Ana Tijoux', '東京タワー']
 
+// The prefix an image fetch proxy puts before its source, for a stand-in of urlpurify's
+// imageProxyUnwrappers.
+const imageFetchProxyRegex = /^.*\/image\/fetch\/[^/]+\//
+
 describeForEachParser('injectEnclosures', (parseHtml) => {
   const transform = (value: string, context: TransformContext = baseContext) => {
     return applyDomTransforms(parseHtml(value), [injectEnclosures(context)])
@@ -906,7 +910,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
       expect(await transform(value, context)).toEqualHtml(value)
     })
 
-    it('should not inject the feed image served as another rendition', async () => {
+    it('should not inject the feed image served as another rendition behind a proxy matchUrlFn unwraps', async () => {
       const value = '<p>Content</p>'
       const logo = 'https%3A%2F%2Fmedia.example.com%2Fpublic%2Fimages%2Flogo_1010x1010.png'
       const context: TransformContext = {
@@ -917,6 +921,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
           },
         ]),
         feedImageUrls: [`https://substackcdn.com/image/fetch/w_512,c_limit,f_auto/${logo}`],
+        matchUrlFn: (url) => decodeURIComponent(url.replace(imageFetchProxyRegex, '')),
       }
 
       expect(await transform(value, context)).toEqualHtml(value)

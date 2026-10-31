@@ -1,14 +1,11 @@
 import { parseSrcset as parseRawSrcset } from 'srcset'
 import {
-  addMissingProtocol,
-  decodeSegment,
   escapeRegex,
   getPathSegments,
   isAnyOf,
   type Nullish,
   normalizeUrl,
   parseUrl,
-  resolveUrl,
   toMap,
 } from 'trousse'
 import { extractVideoId, hosts as youtubeHosts } from '../embeds/youtube.js'
@@ -74,75 +71,6 @@ const sizeKeywordLeafRegex = new RegExp(
   `^(?:${sizeKeywordLiterals.join('|')})(\\.[a-z0-9]+)?$`,
   'i',
 )
-
-// The capture is (or resolves to) a URL: absolute, protocol-relative, or relative
-// to the proxy's own origin (a Cloudflare relative path, Next.js, wsrv).
-const resolvedSource = (capture: string, proxy: URL): string | undefined => {
-  const source = decodeSegment(capture) ?? capture
-
-  if (!source) {
-    return
-  }
-
-  return resolveUrl(source, proxy.origin)
-}
-
-// The capture is a bare host+path with the scheme stripped (Photon): re-add it.
-const bareHostSource = (capture: string): string | undefined => {
-  const source = decodeSegment(capture) ?? capture
-
-  return source && addMissingProtocol(source)
-}
-
-type ImageProxy = {
-  pattern: RegExp
-  toSource: (capture: string, proxy: URL) => string | undefined
-}
-const imageProxies: Array<ImageProxy> = [
-  // Cloudflare Image Resizing, which beehiiv serves its images through.
-  { pattern: /\/cdn-cgi\/image\/[^/]+\/(.+)$/i, toSource: resolvedSource },
-  // Cloudflare passthrough.
-  { pattern: /\/cdn-cgi\/plain\/(https?(?:%3a|:).+)$/i, toSource: resolvedSource },
-  // WordPress Photon / Jetpack: i{0-3}.wp.com/{src-host}/{path}, scheme stripped.
-  { pattern: /\/\/i[0-3]\.wp\.com\/([^?]+)/i, toSource: bareHostSource },
-  // wsrv.nl / images.weserv.nl: source in the url= query param.
-  {
-    pattern: /(?:wsrv\.nl|images\.weserv\.nl)\/\?(?:[^#]*&)?url=([^&]+)/i,
-    toSource: resolvedSource,
-  },
-  // Next.js / Vercel image optimizer: source in the url= query param.
-  { pattern: /\/_next\/image\?(?:[^#]*&)?url=([^&]+)/i, toSource: resolvedSource },
-  // Blogger opensocial gadget proxy: gadgets/proxy?url={src}.
-  {
-    pattern:
-      /images-blogger-opensocial\.googleusercontent\.com\/gadgets\/proxy\?(?:[^#]*&)?url=([^&]+)/i,
-    toSource: resolvedSource,
-  },
-  // Yahoo Mail: ecp.yusercontent.com/mail?url={src}.
-  {
-    pattern: /\/\/ecp\.yusercontent\.com\/mail\?(?:[^#]*&)?url=([^&]+)/i,
-    toSource: resolvedSource,
-  },
-  // Yandex Mail: resize.yandex.net/mailservice?url={src}.
-  {
-    pattern: /\/\/resize\.yandex\.net\/mailservice\?(?:[^#]*&)?url=([^&]+)/i,
-    toSource: resolvedSource,
-  },
-  // Brightspot dims (NPR, LA Times, Scripps): *.brightspotcdn.com/dims{3,4}/.../?url={src}.
-  { pattern: /\.brightspotcdn\.com\/dims\d\/.*[?&]url=([^&]+)/i, toSource: resolvedSource },
-  // Cloudinary fetch, which Substack's substackcdn.com serves its images through.
-  { pattern: /\/image\/fetch\/.*?(https?(?:%3a|:).+)$/i, toSource: resolvedSource },
-  // ImageKit web proxy: ik.imagekit.io/{id}/[tr:..]/{src url}.
-  { pattern: /ik\.imagekit\.io\/.*?(https?(?:%3a|:).+)$/i, toSource: resolvedSource },
-  // Hatena image scaler: cdn.image.st-hatena.com/image/scale/{sig}/{opts}/{src url}.
-  { pattern: /cdn\.image\.st-hatena\.com\/.*?(https?(?:%3a|:).+)$/i, toSource: resolvedSource },
-  // dev.to image optimizer: media*.dev.to/dynamic/image/{opts}/{src url}.
-  { pattern: /\.dev\.to\/dynamic\/image\/.*?(https?(?:%3a|:).+)$/i, toSource: resolvedSource },
-  // Yahoo image API: *.yimg.com/{ns}/api/res/{ver}/{opts}/{src url}.
-  { pattern: /\.yimg\.com\/.*?\/api\/res\/.*?(https?(?:%3a|:).+)$/i, toSource: resolvedSource },
-  // podigee (podcast art): images.podigee-cdn.net/{opts}/{src url}.
-  { pattern: /\.podigee-cdn\.net\/.*?(https?(?:%3a|:).+)$/i, toSource: resolvedSource },
-]
 
 type PathTransform = { host?: RegExp; strip: RegExp; replace: string }
 const pathTransforms: Array<PathTransform> = [
@@ -220,41 +148,10 @@ const dimensionLeafRegex = /^(.*__)?\d{1,5}x\d{1,5}(\.[a-z0-9]+)?$/i
 // A scaled copy's suffix: `photo-800x450.jpg`, `photo_800x450.jpg`. WordPress writes the hyphen.
 const dimensionSuffixRegex = /[-_]\d{1,5}x\d{1,5}(\.[a-z0-9]+)$/i
 
-// A proxy url can wrap another, a Cloudinary fetch of a Cloudinary upload.
-export const unwrapProxiedImage = (url: string): string => {
-  let current = url
-
-  for (let depth = 0; depth < 5; depth++) {
-    const proxy = parseUrl(current)
-
-    if (!proxy) {
-      break
-    }
-
-    let next = current
-
-    for (const { pattern, toSource } of imageProxies) {
-      const match = current.match(pattern)
-
-      if (match) {
-        next = toSource(match[1], proxy) ?? current
-        break
-      }
-    }
-
-    if (next === current) {
-      break
-    }
-
-    current = next
-  }
-
-  return current
-}
-
-// A key two renditions of one image share, whatever their size, crop or proxy.
+// A key two renditions of one image share, whatever their size or crop. A proxied copy shares it
+// when the caller's matchUrlFn unwraps the proxy.
 export const getImageFingerprint = (rawUrl: string, context?: TransformContext): string => {
-  const cleaned = unwrapProxiedImage(cleanMatchUrl(rawUrl, context) ?? rawUrl)
+  const cleaned = cleanMatchUrl(rawUrl, context) ?? rawUrl
   // With stripProtocol the result would not parse, so the protocol goes when the key is built.
   const normalized = normalizeUrl(cleaned, {
     stripWww: true,

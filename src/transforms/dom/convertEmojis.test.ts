@@ -341,6 +341,30 @@ describeForEachParser('convertEmojis', (parseHtml) => {
   })
 
   describe('image proxies', () => {
+    // A caller's matchUrlFn standing in for urlpurify's image proxy unwrappers.
+    const transformMatching = (value: string) => {
+      const context = {
+        ...baseContext,
+        matchUrlFn: (url: string) => URL.parse(url)?.searchParams.get('url') ?? url,
+      }
+
+      return applyDomTransforms(parseHtml(value), [convertEmojis(context)])
+    }
+
+    it('should keep an emoji behind a proxy as written when there is no matchUrlFn', async () => {
+      const value = html`
+        <p>
+          <img
+            class="yiv0680057325img"
+            src="https://ecp.yusercontent.com/mail?url=https%3A%2F%2Fstatic.xx.fbcdn.net%2Fimages%2Femoji.php%2Fv9%2Ft6c%2F1%2F16%2F2764.png&amp;t=1554239749"
+            alt=""
+          >
+        </p>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it('should convert an emoji behind the Yahoo Mail proxy', async () => {
       const value = html`
         <p>
@@ -355,7 +379,7 @@ describeForEachParser('convertEmojis', (parseHtml) => {
       `
       const expected = '<p>❤️</p>'
 
-      expect(await transform(value)).toEqualHtml(expected)
+      expect(await transformMatching(value)).toEqualHtml(expected)
     })
 
     it('should convert an emoji behind the Yandex Mail proxy', async () => {
@@ -369,7 +393,7 @@ describeForEachParser('convertEmojis', (parseHtml) => {
       `
       const expected = '<p>🌸</p>'
 
-      expect(await transform(value)).toEqualHtml(expected)
+      expect(await transformMatching(value)).toEqualHtml(expected)
     })
 
     it('should convert an emoji behind the Next.js image optimizer', async () => {
@@ -384,7 +408,7 @@ describeForEachParser('convertEmojis', (parseHtml) => {
       `
       const expected = '<p>😅</p>'
 
-      expect(await transform(value)).toEqualHtml(expected)
+      expect(await transformMatching(value)).toEqualHtml(expected)
     })
 
     it('should mark a kept picture and keep its proxied src as written', async () => {
@@ -406,7 +430,7 @@ describeForEachParser('convertEmojis', (parseHtml) => {
         </p>
       `
 
-      expect(await transform(value)).toEqualHtml(expected)
+      expect(await transformMatching(value)).toEqualHtml(expected)
     })
 
     it('should leave a proxied photo untouched', async () => {
@@ -419,7 +443,7 @@ describeForEachParser('convertEmojis', (parseHtml) => {
         </p>
       `
 
-      expect(await transform(value)).toEqualHtml(value)
+      expect(await transformMatching(value)).toEqualHtml(value)
     })
 
     it('should replace a blank spacer behind a mail proxy with its code', async () => {
@@ -433,7 +457,7 @@ describeForEachParser('convertEmojis', (parseHtml) => {
       `
       const expected = '<p><span data-emoji="">:)</span></p>'
 
-      expect(await transform(value)).toEqualHtml(expected)
+      expect(await transformMatching(value)).toEqualHtml(expected)
     })
 
     it('should rebuild a picture behind a mail proxy as its engine does', async () => {
@@ -455,19 +479,7 @@ describeForEachParser('convertEmojis', (parseHtml) => {
         </p>
       `
 
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    const lookalikeProxySrcs: Array<string> = [
-      'https://example.com/mailservice?url=https%3A%2F%2Fvk.com%2Femoji%2Fe%2Ff09f8cb8.png',
-      'https://resize.yandex.net/preview?url=https%3A%2F%2Fvk.com%2Femoji%2Fe%2Ff09f8cb8.png',
-    ]
-
-    it.each(lookalikeProxySrcs)('should not unwrap %s', async (src) => {
-      const value = `<p><img class="emoji" src="${src}"></p>`
-      const expected = `<p><img class="emoji" src="${src}" data-emoji=""></p>`
-
-      expect(await transform(value)).toEqualHtml(expected)
+      expect(await transformMatching(value)).toEqualHtml(expected)
     })
   })
 

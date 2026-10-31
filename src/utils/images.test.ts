@@ -90,41 +90,6 @@ describe('widestSrcsetUrl', () => {
 })
 
 // Each case is [wrapped input URL, expected inner-source key], with its CDN beside the row.
-const imageProxyCases: Array<[string, string]> = [
-  [
-    'https://files.zhedge.com/cdn-cgi/image/width=1080/https://assets.zerohedge.com/s3fs/photo.jpg',
-    'assets.zerohedge.com/s3fs/photo.jpg',
-  ], // Cloudflare image
-  [
-    'https://assets.thelocal.com/cdn-cgi/plain/https://apiwp.thelocal.com/wp-content/uploads/photo.jpg',
-    'apiwp.thelocal.com/wp-content/uploads/photo.jpg',
-  ], // Cloudflare plain
-  [
-    'https://x.com.br/_next/image?url=https%3A%2F%2Fx.com.br%2Ffotos%2Fphoto.jpg&w=384',
-    'x.com.br/fotos/photo.jpg',
-  ], // Next.js image
-  [
-    'https://npr.brightspotcdn.com/dims4/default/f008/resize/300x169!/quality/90/?url=https%3A%2F%2Fmedia.npr.org%2Fphoto.jpg',
-    'media.npr.org/photo.jpg',
-  ], // Brightspot dims
-  [
-    'https://ik.imagekit.io/demo/tr:w-200/https://cdn.example.com/photo.jpg',
-    'cdn.example.com/photo.jpg',
-  ], // ImageKit
-  [
-    'https://media2.dev.to/dynamic/image/width=800/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fphoto.png',
-    'dev-to-uploads.s3.amazonaws.com/photo.png',
-  ], // dev.to
-  [
-    'https://s.yimg.com/ny/api/res/1.2/As60/YXBw/https://d29szjachogqwa.cloudfront.net/images/photo.jpg',
-    'd29szjachogqwa.cloudfront.net/images/photo.jpg',
-  ], // Yahoo image API
-  [
-    'https://images.podigee-cdn.net/0x,siN6/https://main.podigee-cdn.net/uploads/u17132/photo.jpg',
-    'main.podigee-cdn.net/uploads/u17132/photo.jpg',
-  ], // podigee
-]
-
 const identityQueryCases: Array<[string, string]> = [
   [
     'http://media2.picsearch.com/is?7x-TvXUWzFuw0nuQvzQUkbFYJkCHdIan17jTrQmagWk&height=240',
@@ -293,12 +258,19 @@ describe('getImageFingerprint', () => {
     expect(getImageFingerprint(first)).toBe(getImageFingerprint(second))
   })
 
-  it('should drop the query of an extensionless url behind an image proxy', () => {
+  it('should key an extensionless url behind an image proxy as its source through matchUrlFn', () => {
+    // The proxy's own query holds only resize options, so unwrapping drops it.
+    const context: TransformContext = {
+      ...baseContext,
+      matchUrlFn: (url) => url.replace('i0.wp.com/', '').replace('?ssl=1', ''),
+    }
     const direct = getImageFingerprint(
       'https://ik.imagekit.io/wpkauw5rry/trik-menang-cepat-di-casino-texas-holdem-tanpa-ribet',
+      context,
     )
     const proxied = getImageFingerprint(
       'https://i0.wp.com/ik.imagekit.io/wpkauw5rry/trik-menang-cepat-di-casino-texas-holdem-tanpa-ribet?ssl=1',
+      context,
     )
 
     expect(proxied).toBe(direct)
@@ -358,17 +330,16 @@ describe('getImageFingerprint', () => {
     expect(insecure).toBe(secure)
   })
 
-  it('should unwrap an image-proxy URL to its inner source', () => {
+  it('should key an image-proxy url apart from its source when there is no matchUrlFn', () => {
     const direct = getImageFingerprint('https://cdn.example.com/photo.jpg')
     const proxied = getImageFingerprint(
       'https://images.weserv.nl/?url=https%3A%2F%2Fcdn.example.com%2Fphoto.jpg&w=200',
     )
 
-    expect(proxied).toBe(direct)
+    expect(proxied).not.toBe(direct)
   })
 
-  it('should keep the raw capture when the proxied source is malformed', () => {
-    // `%E0%A4%A` is an incomplete percent-escape. Decoding throws and the raw value is kept.
+  it('should not throw on a malformed percent-escape', () => {
     const throwing = () =>
       getImageFingerprint('https://images.weserv.nl/?url=https%3A%2F%2F%E0%A4%A')
 
@@ -377,13 +348,6 @@ describe('getImageFingerprint', () => {
 
   it('should return the input unchanged when it is not a parseable URL', () => {
     expect(getImageFingerprint('not-a-url')).toBe('not-a-url')
-  })
-
-  it('should unwrap a WordPress Photon URL, re-adding the stripped scheme', () => {
-    const value = 'https://i0.wp.com/cdn.example.com/photo.jpg'
-    const expected = 'cdn.example.com/photo.jpg'
-
-    expect(getImageFingerprint(value)).toBe(expected)
   })
 
   it('should drop a whole leaf that is only dimensions', () => {
@@ -395,46 +359,16 @@ describe('getImageFingerprint', () => {
     expect(getImageFingerprint(two)).toBe(expected)
   })
 
-  it('should unwrap the Blogger opensocial proxy, keeping distinct images distinct', () => {
-    const first =
-      'https://images-blogger-opensocial.googleusercontent.com/gadgets/proxy?url=https%3A%2F%2Fcdn.example.com%2Fa.jpg'
-    const second =
-      'https://images-blogger-opensocial.googleusercontent.com/gadgets/proxy?url=https%3A%2F%2Fcdn.example.com%2Fb.jpg'
-
-    expect(getImageFingerprint(first)).toBe('cdn.example.com/a.jpg')
-    expect(getImageFingerprint(second)).toBe('cdn.example.com/b.jpg')
-  })
-
-  const mailProxyCases: Array<string> = [
-    'https://ecp.yusercontent.com/mail?url=https%3A%2F%2Fcdn.example.com%2Fphoto.jpg&t=1554239749&sig=DzxCZnIn6aGz57UknE9zMw--~C',
-    'https://resize.yandex.net/mailservice?url=https%3A%2F%2Fcdn.example.com%2Fphoto.jpg&proxy=yes&key=fbb6e138eabfa3da556a345b6f3faea8',
-  ]
-
-  it.each(mailProxyCases)('should unwrap the mail proxy at %s to its inner source', (value) => {
-    expect(getImageFingerprint(value)).toBe('cdn.example.com/photo.jpg')
-  })
-
-  it('should unwrap the Hatena image scaler to its inner source', () => {
+  it('should strip a Cloudinary upload behind a fetch proxy matchUrlFn unwraps', () => {
+    const context: TransformContext = {
+      ...baseContext,
+      matchUrlFn: (url) => url.replace('https://assets.example.com/x/image/fetch/c_fill,q_75/', ''),
+    }
     const value =
-      'https://cdn.image.st-hatena.com/image/scale/abc/width=1300/https%3A%2F%2Fcdn.example.com%2Fphoto.jpg'
-    const expected = 'cdn.example.com/photo.jpg'
-
-    expect(getImageFingerprint(value)).toBe(expected)
-  })
-
-  it.each(imageProxyCases)(
-    'should unwrap the image proxy in %s to its inner source',
-    (url, expected) => {
-      expect(getImageFingerprint(url)).toBe(expected)
-    },
-  )
-
-  it('should unwrap then strip a Cloudinary fetch of an upload URL', () => {
-    const value =
-      'https://assets.example.com/x/image/fetch/c_fill,q_75/https://res.cloudinary.com/y/image/upload/v161/clients/a/DSC_0326.jpg'
+      'https://assets.example.com/x/image/fetch/c_fill,q_75/https://res.cloudinary.com/y/image/upload/c_fill,w_300/v161/clients/a/DSC_0326.jpg'
     const expected = 'res.cloudinary.com/y/image/upload/v161/clients/a/DSC_0326.jpg'
 
-    expect(getImageFingerprint(value)).toBe(expected)
+    expect(getImageFingerprint(value, context)).toBe(expected)
   })
 
   it('should collapse Blogger size segments to the base image', () => {
@@ -499,36 +433,6 @@ describe('getImageFingerprint', () => {
     expect(getImageFingerprint(value)).toBe(
       'images.dwell.com/photos-6818593/a-house-thats-large/the-house.jpg',
     )
-  })
-
-  it('should unwrap a Cloudinary fetch URL to its inner source', () => {
-    const value =
-      'https://res.cloudinary.com/demo/image/fetch/w_200/https://cdn.example.com/photo.jpg'
-    const expected = 'cdn.example.com/photo.jpg'
-
-    expect(getImageFingerprint(value)).toBe(expected)
-  })
-
-  it('should unwrap a Cloudflare cdn-cgi image URL relative to the proxy host', () => {
-    const value = 'https://example.com/cdn-cgi/image/width=200/uploads/photo.jpg'
-    const expected = 'example.com/uploads/photo.jpg'
-
-    expect(getImageFingerprint(value)).toBe(expected)
-  })
-
-  it('should unwrap an ImageKit URL to its inner source', () => {
-    const value = 'https://ik.imagekit.io/demo/tr:w-200/https://cdn.example.com/photo.jpg'
-    const expected = 'cdn.example.com/photo.jpg'
-
-    expect(getImageFingerprint(value)).toBe(expected)
-  })
-
-  it('should unwrap a Next.js image optimizer URL to its inner source', () => {
-    const value =
-      'https://example.com/_next/image?url=https%3A%2F%2Fcdn.example.com%2Fphoto.jpg&w=200'
-    const expected = 'cdn.example.com/photo.jpg'
-
-    expect(getImageFingerprint(value)).toBe(expected)
   })
 
   it('should drop a whole leaf that is a crop name plus dimensions', () => {
