@@ -2,6 +2,7 @@ import {
   decodeSegment,
   getPathSegments,
   isHostOrSubdomainOf,
+  isString,
   type Nullish,
   parseUrl,
 } from 'trousse'
@@ -12,7 +13,13 @@ import type {
   TransformContext,
   WidgetResolver,
 } from '../../types.js'
-import { enclosureMarker, isEnclosureKind, prepareEnclosures } from '../../utils/enclosures.js'
+import {
+  buildUrlFingerprint,
+  enclosureMarker,
+  isEnclosureKind,
+  isFileElement,
+  prepareEnclosures,
+} from '../../utils/enclosures.js'
 import { findPosterEvidence, getImageFingerprint } from '../../utils/images.js'
 import { cleanUrl, flashFileRegex, imageFileRegex, resolveOrDropUrl } from '../../utils/urls.js'
 import {
@@ -203,7 +210,7 @@ export const injectEnclosures: DomTransform = (context) => {
       // doesn't honor the required-`url` type, so guard before any URL handling.
       const embedSource = enclosure.playerUrl ?? enclosure.url
 
-      if (typeof embedSource !== 'string' || !embedSource) {
+      if (!isString(embedSource) || !embedSource) {
         continue
       }
 
@@ -311,15 +318,15 @@ export const injectEnclosures: DomTransform = (context) => {
 
     // A source already on the page, put there by a previous run or by an earlier entry in this
     // one, would show up twice. A feed naming one file twice does it, and so does an item whose
-    // enclosures all inherit the same media:embed. Sources compare cleaned, so a tracking
-    // parameter does not make two copies of one file look like two files.
+    // enclosures all inherit the same media:embed. Sources compare by fingerprint, so a tracking
+    // parameter or a second spelling does not make two copies of one file look like two files.
     const injectedSources = new Set<string>()
 
     for (const element of document.querySelectorAll(`[${enclosureMarker}]`)) {
       const source = getInjectedSource(element)
 
       if (source) {
-        injectedSources.add(cleanUrl(source, context))
+        injectedSources.add(buildUrlFingerprint(source, isFileElement(element), context))
       }
     }
 
@@ -330,13 +337,13 @@ export const injectEnclosures: DomTransform = (context) => {
         return true
       }
 
-      const key = cleanUrl(source, context)
+      const fingerprint = buildUrlFingerprint(source, isFileElement(element), context)
 
-      if (injectedSources.has(key)) {
+      if (injectedSources.has(fingerprint)) {
         return false
       }
 
-      injectedSources.add(key)
+      injectedSources.add(fingerprint)
 
       return true
     }

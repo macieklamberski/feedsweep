@@ -1,4 +1,5 @@
 import { expect, it } from 'bun:test'
+import { sleep } from 'trousse'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { EmbedRef, EmbedResolverResult, EnrichEmbedFn, TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
@@ -383,7 +384,7 @@ describeForEachParser('enrichEmbedPlaceholders', (parseHtml) => {
   it('should accept async (Promise-returning) enrichEmbedFn', async () => {
     const value = '<div data-embed-provider="youtube" data-embed-id="abc"></div>'
     const fn: EnrichEmbedFn = async (embeds) => {
-      await new Promise((resolve) => setTimeout(resolve, 1))
+      await sleep(1)
       return embeds.map((embed) => ({ title: `t-${embed.id}` }))
     }
     const expected = html`

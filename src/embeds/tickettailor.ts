@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, includesAnyOf, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find } from '../utils/dom.js'
 import { iframeResizerHeightRequest, readIframeResizerHeight } from '../utils/hints.js'
@@ -58,7 +58,7 @@ const composeEmbed = (page: URL): EmbedResolverResult | undefined => {
 // frames one whose own `type` is `inline`, or whose parent's class is exactly `tt-widget`, so a
 // script that WordPress wrapped in a paragraph inside the snippet's div stays a link.
 const isInlineLoader = (element: Element): boolean => {
-  if (attr(element, 'src')?.toLowerCase().includes('tt-widget.js')) {
+  if (includesAnyOf(attr(element, 'src'), 'tt-widget.js')) {
     return isAnyOf(attr(element, 'data-type'), 'inline')
   }
 

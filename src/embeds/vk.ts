@@ -5,6 +5,7 @@ import {
   getQueryParams,
   isPlainObject,
   isPresent,
+  isString,
   toMap,
   trimObject,
 } from 'trousse'
@@ -183,7 +184,7 @@ export const isVkReady = (data: unknown): boolean => {
 
 // See: https://vk.ru/js/api/openapi.js, whose fastXDM client posts `{key}:["resize",[height]]`.
 export const readVkHeight = (data: unknown): number | undefined => {
-  if (typeof data !== 'string' || !data.startsWith(`${widgetFrameKey}:`)) {
+  if (!isString(data) || !data.startsWith(`${widgetFrameKey}:`)) {
     return
   }
 

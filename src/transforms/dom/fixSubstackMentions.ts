@@ -1,4 +1,4 @@
-import { isNonEmptyString, isNumber } from 'trousse'
+import { isInteger, isNonEmptyString } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { jsonAttr } from '../../utils/dom.js'
 import { isUrlShaped } from '../../utils/urls.js'
@@ -26,7 +26,7 @@ export const fixSubstackMentions: DomTransform = () => (document) => {
     // emits is dropped.
     if (isNonEmptyString(attrs.url) && isUrlShaped(attrs.url)) {
       url = attrs.url
-    } else if (isNumber(attrs.id) && Number.isInteger(attrs.id) && attrs.id > 0) {
+    } else if (isInteger(attrs.id) && attrs.id > 0) {
       url = `https://substack.com/profile/${attrs.id}`
     }
 

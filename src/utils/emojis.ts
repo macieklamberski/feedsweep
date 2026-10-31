@@ -1,9 +1,9 @@
 import { t, toMap } from 'trousse'
 import locales from '../locales.json' with { type: 'json' }
-import type { EmojiResolverResult } from '../types.js'
+import type { EmojiResolverResult, TransformContext } from '../types.js'
 import { attr } from './dom.js'
-import { unwrapProxiedImage } from './images.js'
 import { emojiShortcodes } from './shortcodes.js'
+import { cleanMatchUrl } from './urls.js'
 
 // A glyph, or false for a known name whose picture differs per engine, which is only marked.
 export type EmojiGlyph = string | false
@@ -130,15 +130,16 @@ export const getNameStem = (src: string): string => {
   return getFileStem(src).toLowerCase().replace(namePrefixRegex, '').replace(nameVariantRegex, '')
 }
 
-// The image as the resolvers read it: a proxied one as a copy carrying the original url.
-export const unwrapProxiedEmoji = (element: Element): Element => {
+// The image as the resolvers read it: a proxied one as a copy carrying the url the caller's
+// matchUrlFn unwraps it to. Recognising an emoji only reads the url, so the src stays as written.
+export const unwrapProxiedEmoji = (element: Element, context: TransformContext): Element => {
   const src = attr(element, 'src')
 
   if (element.localName !== 'img' || !src) {
     return element
   }
 
-  const source = unwrapProxiedImage(src)
+  const source = cleanMatchUrl(src, context)
 
   if (source === src) {
     return element

@@ -1,4 +1,4 @@
-import { encodePathSegment, type Nullish } from 'trousse'
+import { encodePathSegment, includesAnyOf, type Nullish } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
 import { parseUrlOnHosts } from '../../utils/urls.js'
@@ -39,11 +39,11 @@ export const convertDatawrapperEmbeds: DomTransform = () => (document) => {
   // comes from the iframe's title. Skip `#?secret=` preview URLs: the chart is unpublished,
   // so full.png 404s. Leave those for the generic iframe placeholder, which keeps the secret.
   for (const iframe of document.querySelectorAll('iframe[src*="datawrapper.dwcdn.net/" i]')) {
-    const src = iframe.getAttribute('src')
+    const src = attr(iframe, 'src')
     const chartId = getChartId(src)
 
     // A secret= preview url is an unpublished chart whose full.png 404s.
-    if (!chartId || src?.toLowerCase().includes('secret=')) {
+    if (!chartId || includesAnyOf(src, 'secret=')) {
       continue
     }
 

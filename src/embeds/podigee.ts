@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf, isPlainObject, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, isPlainObject, isString, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest, readPixels } from '../utils/hints.js'
@@ -96,7 +96,7 @@ export const podigeeIframeEmbedResolver = createUrlEmbedResolver(hosts, podigeeR
 // The player reports its height under a configurePlayer message serialised to a JSON string, 0
 // before it has rendered and the real value after.
 export const readPodigeeHeight = (data: unknown): number | undefined => {
-  if (typeof data !== 'string') {
+  if (!isString(data)) {
     return
   }
 

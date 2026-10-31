@@ -1,4 +1,4 @@
-import { encodePathSegment, getQueryParam, parseUrl } from 'trousse'
+import { encodePathSegment, endsWithAnyOf, getQueryParam, parseUrl } from 'trousse'
 import {
   composeEmbedUrl,
   extractVideoId,
@@ -28,8 +28,8 @@ const feedThumbnailSelector = 'a:has(> img[alt="YouTube Video"])'
 // the id has to have a video's shape.
 const readFeedThumbnailVideoId = (image: Element): string | undefined => {
   const src = parseUrl(readRepairedCarrierUrl(image), placeholderBaseUrl)
-  const cachedUrl = src?.pathname.toLowerCase().endsWith('/lytecache.php')
-    ? getQueryParam(src.searchParams, 'origThumbUrl')
+  const cachedUrl = endsWithAnyOf(src?.pathname, '/lytecache.php')
+    ? getQueryParam(src, 'origThumbUrl')
     : undefined
   const videoId = readThumbnailVideoId(cachedUrl ?? src)
 

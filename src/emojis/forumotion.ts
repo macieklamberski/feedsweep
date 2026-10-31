@@ -1,4 +1,4 @@
-import { toMap } from 'trousse'
+import { includesAnyOf, toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
 import { type EmojiGlyph, queryOrHashRegex, resolveEmojiImage } from '../utils/emojis.js'
 import { getDirectoryGlyph, smiliesEmojiNames } from './smilies.js'
@@ -47,7 +47,7 @@ export const forumotionEmojiResolver: EmojiResolver = {
     const src = element.getAttribute('src') ?? ''
     const isUpload = uploadRegex.test(src.split(queryOrHashRegex)[0])
 
-    if (!isUpload && !src.toLowerCase().includes(directory)) {
+    if (!isUpload && !includesAnyOf(src, directory)) {
       return
     }
 

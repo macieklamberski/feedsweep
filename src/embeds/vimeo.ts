@@ -1,4 +1,5 @@
 import {
+  composeFragment,
   composeQuery,
   encodePathSegment,
   getFragmentParams,
@@ -282,7 +283,7 @@ export const composeEmbedUrl = (
   start?: string,
 ): string => {
   const query = composeQuery(params)
-  const fragment = start ? composeQuery({ t: start }).replace('?', '#') : ''
+  const fragment = start ? composeFragment({ t: start }) : ''
 
   return `https://player.vimeo.com/video/${videoId}${query}${fragment}`
 }

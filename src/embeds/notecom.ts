@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, isAnyOf, isString } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { readPixels } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -76,7 +76,7 @@ export const notecomIframeEmbedResolver = createUrlEmbedResolver(hosts, (url) =>
 const heightMessageRegex = /^height::.*::(\d+(?:\.\d+)?)$/
 
 export const readNotecomHeight = (data: unknown): number | undefined => {
-  if (typeof data !== 'string') {
+  if (!isString(data)) {
     return
   }
 

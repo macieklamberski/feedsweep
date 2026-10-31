@@ -1,4 +1,12 @@
-import { coerceNumber, getQueryParam, isAnyOf, type Nullish, startsWithAnyOf } from 'trousse'
+import {
+  coerceNumber,
+  getQueryParam,
+  isAnyOf,
+  isPresent,
+  type Nullish,
+  parseJson,
+  startsWithAnyOf,
+} from 'trousse'
 import type { ScopedAttribute } from '../types.js'
 import * as styles from './styles.js'
 import { foldEscapedAmpersands, isUrlShaped } from './urls.js'
@@ -206,15 +214,7 @@ export const paramValue = (root: Nullish<Element>, name: string): string | undef
 
 // Several platforms ship a whole card or widget settings as JSON in one attribute.
 export const jsonAttr = <Value>(element: Nullish<Element>, name: string): Value | undefined => {
-  const raw = attr(element, name)
-
-  if (!raw) {
-    return
-  }
-
-  try {
-    return JSON.parse(raw)
-  } catch {}
+  return parseJson<Value>(attr(element, name))
 }
 
 // SVG2 spells it `href`, SVG1 `xlink:href`.
@@ -668,7 +668,7 @@ const isPercentageLength = (
 ): boolean => {
   const value = declarations[name] ?? element.getAttribute(name)
 
-  return value !== null && value !== undefined && percentageLengthRegex.test(value)
+  return isPresent(value) && percentageLengthRegex.test(value)
 }
 
 export const isPercentageSized = (element: Element): boolean => {

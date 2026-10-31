@@ -5,6 +5,7 @@ import { describeForEachParser, html } from './tests.js'
 import { enrichEmbedPlaceholders } from './transforms/dom/enrichEmbedPlaceholders.js'
 
 const lineBreakAfterBraceRegex = /\{\n\s+/
+const preOpenTagRegex = /<pre /g
 
 describeForEachParser('transformContent', (parseHtml) => {
   it('should apply all default transforms', async () => {
@@ -189,7 +190,7 @@ describeForEachParser('transformContent', (parseHtml) => {
     ].join('\n')
     const result = await transformContent(value, { parseHtmlFn: parseHtml })
 
-    expect((result.match(/<pre /g) ?? []).length).toBe(2)
+    expect((result.match(preOpenTagRegex) ?? []).length).toBe(2)
     expect(result).toContain('data-pre-label="HTML"')
     expect(result).toContain('data-pre-label="CSS"')
     expect(result).toMatch(lineBreakAfterBraceRegex)

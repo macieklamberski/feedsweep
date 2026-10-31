@@ -1,4 +1,4 @@
-import { isString } from 'trousse'
+import { isString, parseJson } from 'trousse'
 import { readNicovideoEmbedSrc } from '../../embeds/nicovideo.js'
 import { readYoutubeEmbedSrc } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
@@ -16,13 +16,7 @@ const configRegex = /extVideoConfig\s*=\s*(\{[^}]*\})/
 const readConfig = (script: Element): ExternalVideoConfig | undefined => {
   const json = script.textContent?.match(configRegex)?.[1]
 
-  if (!json) {
-    return
-  }
-
-  try {
-    return JSON.parse(json)
-  } catch {}
+  return parseJson<ExternalVideoConfig>(json)
 }
 
 // Each loader follows its own config, so the nearest inline script before it is the one that

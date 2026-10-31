@@ -5,6 +5,7 @@ import {
   getQueryParam,
   getQueryParams,
   isAnyOf,
+  startsWithAnyOf,
 } from 'trousse'
 import type {
   EmbedRenderHint,
@@ -85,7 +86,7 @@ const sizes = {
 const audioCarrierHeightLimit = 200
 
 const declaresAudioPlayer = (element: Element): boolean => {
-  if (attr(element, 'type')?.toLowerCase().startsWith('audio/')) {
+  if (startsWithAnyOf(attr(element, 'type'), 'audio/')) {
     return true
   }
 

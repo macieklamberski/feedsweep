@@ -1,8 +1,8 @@
-import { type NormalizeOptions, normalizeUrl, parseUrl } from 'trousse'
+import { isString, type NormalizeOptions, normalizeUrl, parseUrl } from 'trousse'
 import type { Enclosure, TransformContext } from '../types.js'
 import { setInnerHtml } from './dom.js'
 import { getImageFingerprint, getSizeKeywordRank, getUrlSizeHint } from './images.js'
-import { absoluteUrlRegex, cleanUrl, resolveOrKeepUrl } from './urls.js'
+import { absoluteUrlRegex, cleanMatchUrl, resolveOrKeepUrl } from './urls.js'
 import { getEmbedSize } from './widgets.js'
 
 // Marks an injected element so a repeat run skips it and stripDuplicateEnclosures (an
@@ -10,6 +10,7 @@ import { getEmbedSize } from './widgets.js'
 export const enclosureMarker = 'data-enclosure'
 
 const kindTypePrefixes = ['audio/', 'video/', 'image/'] as const
+const enclosureKinds = ['audio', 'video', 'image'] as const
 
 // A JSON-escaped `&` that lost its backslash, `\u0026` or `\u0026amp;` without its semicolon,
 // anywhere after the `?`. A file name can carry the text `u0026` as written.
@@ -30,34 +31,36 @@ const mediaFingerprintOptions: NormalizeOptions = {
   normalizeUnicode: true,
 }
 
-// The image fingerprint drops a file's query, which is what tells podcast proxy episodes apart.
-// A podcast proxy's audio url is `…/play.mp3?url={episode}`, so its identity lives in the query.
-// Audio, video and embeds have no scaled variants.
-const readMediaFingerprint = (element: Element, context?: TransformContext): string => {
-  const src = element.getAttribute('src') ?? element.getAttribute('data-embed-src') ?? ''
-  // The key is only compared, so the caller's matchUrlFn stands in for cleanUrlFn here. A
-  // measurement prefix such as `media.blubrry.com/{show}/{file}` names the body's bare file.
-  const matchContext = context?.matchUrlFn
-    ? { ...context, cleanUrlFn: context.matchUrlFn }
-    : context
-
-  if (element.localName === 'img') {
-    return getImageFingerprint(src, matchContext)
-  }
-
-  return cleanUrl(src, matchContext) ?? src
+export const isFileElement = (element: Element): boolean => {
+  return fileElements.includes(element.localName)
 }
 
 // One file written over `http` and `https` is one fingerprint, and the output keeps what the feed
-// wrote. An image fingerprint is already folded and carries no scheme. Only a host with a port
-// parses, as a scheme, and that only sorts its query.
-export const buildMediaFingerprint = (element: Element, context?: TransformContext): string => {
-  const stripHash = fileElements.includes(element.localName)
-
-  return normalizeUrl(readMediaFingerprint(element, context), {
+// wrote.
+export const buildUrlFingerprint = (
+  url: string,
+  isFile: boolean,
+  context?: TransformContext,
+): string => {
+  return normalizeUrl(cleanMatchUrl(url, context) ?? url, {
     ...mediaFingerprintOptions,
-    stripHash,
+    stripHash: isFile,
   })
+}
+
+// The image fingerprint drops a file's query, which is what tells podcast proxy episodes apart.
+// A podcast proxy's audio url is `…/play.mp3?url={episode}`, so its identity lives in the query.
+// Audio, video and embeds have no scaled variants.
+export const buildMediaFingerprint = (element: Element, context?: TransformContext): string => {
+  const src = element.getAttribute('src') ?? element.getAttribute('data-embed-src') ?? ''
+
+  // An image fingerprint is already folded and carries no scheme. Only a host with a port parses,
+  // as a scheme, and that only sorts its query.
+  if (element.localName === 'img') {
+    return normalizeUrl(getImageFingerprint(src, context), mediaFingerprintOptions)
+  }
+
+  return buildUrlFingerprint(src, isFileElement(element), context)
 }
 
 // PeerTube ships an audio-only rendition as `type="audio/mp4"` under `medium="video"`, so the
@@ -74,6 +77,11 @@ export const isEnclosureKind = (
   }
 
   return enclosure.medium === kind
+}
+
+// An enclosure of a media kind names a file, and an untyped one may name a player page.
+const isFileEnclosure = (enclosure: Enclosure): boolean => {
+  return enclosureKinds.some((kind) => isEnclosureKind(enclosure, kind))
 }
 
 const isPreferredVariant = (incoming: Enclosure, kept: Enclosure): boolean => {
@@ -116,7 +124,7 @@ const dedupeImageEnclosures = (
   const result: Array<Enclosure> = []
 
   for (const enclosure of enclosures) {
-    if (typeof enclosure.url !== 'string' || !isEnclosureKind(enclosure, 'image')) {
+    if (!isString(enclosure.url) || !isEnclosureKind(enclosure, 'image')) {
       result.push(enclosure)
       continue
     }
@@ -214,8 +222,10 @@ const foldEqualMembers = (
   const members = new Map<string, Enclosure>()
 
   for (const enclosure of enclosures) {
-    if (enclosure.groupIndex !== undefined && typeof enclosure.url === 'string') {
-      members.set(cleanUrl(enclosure.url, context), enclosure)
+    if (enclosure.groupIndex !== undefined && isString(enclosure.url)) {
+      const fingerprint = buildUrlFingerprint(enclosure.url, isFileEnclosure(enclosure), context)
+
+      members.set(fingerprint, enclosure)
     }
   }
 
@@ -236,12 +246,13 @@ const foldEqualMembers = (
       continue
     }
 
-    if (typeof enclosure.url !== 'string') {
+    if (!isString(enclosure.url)) {
       folded.push(enclosure)
       continue
     }
 
-    const member = members.get(cleanUrl(enclosure.url, context))
+    const fingerprint = buildUrlFingerprint(enclosure.url, isFileEnclosure(enclosure), context)
+    const member = members.get(fingerprint)
 
     if (!member) {
       folded.push(enclosure)
@@ -359,7 +370,7 @@ const readEnclosure = (
   const extracted = extractEnclosureFromEmbed(enclosure, document)
   let url = extracted.url
 
-  if (typeof url === 'string') {
+  if (isString(url)) {
     url = url.replace(strippedJsonAmpersandRegex, '&')
   }
 
@@ -381,23 +392,26 @@ const mergePlayerEnclosures = (
 
   const findFileIndex = (nestedUrl: string, playerIndex: number): number => {
     return result.findIndex((candidate, index) => {
-      if (index === playerIndex || removed.has(index)) {
+      if (index === playerIndex || removed.has(index) || !isString(candidate.url)) {
         return false
       }
 
-      return typeof candidate.url === 'string' && cleanUrl(candidate.url, context) === nestedUrl
+      // A url read out of a player page's query may name a page, so both keep their hash.
+      const fingerprint = buildUrlFingerprint(candidate.url, false, context)
+
+      return fingerprint === buildUrlFingerprint(nestedUrl, false, context)
     })
   }
 
   for (let playerIndex = 0; playerIndex < result.length; playerIndex++) {
     const player = result[playerIndex]
 
-    if (removed.has(playerIndex) || typeof player.url !== 'string') {
+    if (removed.has(playerIndex) || !isString(player.url)) {
       continue
     }
 
     for (const nested of extractNestedUrls(player.url)) {
-      const fileIndex = findFileIndex(cleanUrl(nested, context), playerIndex)
+      const fileIndex = findFileIndex(nested, playerIndex)
 
       if (fileIndex === -1) {
         continue

@@ -9,6 +9,7 @@ import {
   isAnyOf,
   isHostOrSubdomainOf,
   isPlainObject,
+  isString,
   type Nullish,
   trimObject,
 } from 'trousse'
@@ -324,7 +325,7 @@ export const dailymotionFieldCleaners: Array<FieldCleaner> = [
 const iframeId = 'dm1'
 
 const isDailymotionReady = (data: unknown): boolean => {
-  if (typeof data !== 'string') {
+  if (!isString(data)) {
     return false
   }
 

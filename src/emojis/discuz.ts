@@ -1,4 +1,4 @@
-import { toMap } from 'trousse'
+import { includesAnyOf, toMap } from 'trousse'
 import type { EmojiResolver } from '../types.js'
 import { type EmojiGlyph, resolveEmojiImage } from '../utils/emojis.js'
 import { digitsRegex } from '../utils/urls.js'
@@ -32,7 +32,7 @@ export const discuzEmojiResolver: EmojiResolver = {
     const src = element.getAttribute('src') ?? ''
     const hasSmilieId = digitsRegex.test(element.getAttribute('smilieid') ?? '')
 
-    if (!hasSmilieId && !src.toLowerCase().includes(directory)) {
+    if (!hasSmilieId && !includesAnyOf(src, directory)) {
       return
     }
 

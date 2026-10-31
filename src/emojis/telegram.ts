@@ -1,3 +1,4 @@
+import { includesAnyOf } from 'trousse'
 import type { EmojiResolver } from '../types.js'
 import { text } from '../utils/dom.js'
 import {
@@ -62,7 +63,7 @@ export const telegramElementEmojiResolver: EmojiResolver = {
 
     const url = bgImage(element)
 
-    if (!url?.toLowerCase().includes(paintedPath)) {
+    if (!url || !includesAnyOf(url, paintedPath)) {
       return
     }
 

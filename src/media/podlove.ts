@@ -1,4 +1,4 @@
-import { isAnyOf } from 'trousse'
+import { isAnyOf, parseJson, startsWithAnyOf } from 'trousse'
 import type { MediaResolver } from '../types.js'
 import { findConfigScript } from '../utils/dom.js'
 
@@ -22,16 +22,6 @@ type PodloveEpisode = {
 }
 
 type PodloveConfig = Array<{ data?: PodloveEpisode } | null>
-
-const parseJson = <T>(raw: string | undefined): T | undefined => {
-  if (!raw) {
-    return
-  }
-
-  try {
-    return JSON.parse(raw)
-  } catch {}
-}
 
 // Each regex is anchored to the first call, since trying it from every call in a script with
 // thousands of them and no closing bracket takes seconds.
@@ -73,7 +63,7 @@ export const podloveMediaResolver: MediaResolver = {
 
     const files = data.audio?.filter(
       (audio): audio is { url: string; mimeType: string } =>
-        audio.url !== undefined && audio.mimeType?.toLowerCase().startsWith('audio/') === true,
+        audio.url !== undefined && startsWithAnyOf(audio.mimeType, 'audio/'),
     )
     const file = files?.find((audio) => isAnyOf(audio.mimeType, preferredMimeTypes)) ?? files?.[0]
     const source = file?.url
