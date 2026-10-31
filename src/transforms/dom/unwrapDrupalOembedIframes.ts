@@ -1,4 +1,4 @@
-import { getQueryParam } from 'trousse'
+import { getQueryParam, includesAnyOf } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { getLazyValue } from '../../utils/dom.js'
 import { isUrlShaped, parseRepairedUrl } from '../../utils/urls.js'
@@ -15,7 +15,7 @@ export const unwrapDrupalOembedIframes: DomTransform = (context) => {
   return (document) => {
     for (const iframe of document.querySelectorAll('iframe')) {
       const proxyUrl = getLazyValue(iframe, attributes, (value) =>
-        value.toLowerCase().includes('/media/oembed?'),
+        includesAnyOf(value, '/media/oembed?'),
       )
       const url = getQueryParam(parseRepairedUrl(proxyUrl)?.searchParams, 'url')
 

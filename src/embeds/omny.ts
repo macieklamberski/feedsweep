@@ -1,4 +1,11 @@
-import { composeQuery, getPathSegments, getQueryParams, isAnyOf, trimObject } from 'trousse'
+import {
+  composeQuery,
+  getPathSegments,
+  getQueryParams,
+  includesAnyOf,
+  isAnyOf,
+  trimObject,
+} from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -50,7 +57,7 @@ export const omnyResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const { media, t } = getQueryParams(url.search, omnyEmbedParams)
   // The player reads the value in any case.
   const isVideo = isAnyOf(media, 'video')
-  const isPlaylist = clip.toLowerCase().includes('/playlists/')
+  const isPlaylist = includesAnyOf(clip, '/playlists/')
   const isVideoClip = isVideo && !isPlaylist
   const audioSize = isPlaylist ? sizes.playlist : sizes.audio
   const query = composeQuery(trimObject({ media: isVideo ? media : undefined, t }))

@@ -1,4 +1,4 @@
-import { composeQuery, getPathSegments, isHostOf, parseUrl } from 'trousse'
+import { composeQuery, getPathSegments, isHostOf, parseUrl, startsWithAnyOf } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../../utils/urls.js'
@@ -29,10 +29,7 @@ const readDonateButtonId = (form: Element, imageSrc: string): string | undefined
   // On `/cgi-bin/webscr` a hosted button is a donation, a sale, a cart or a subscription alike,
   // and the donate page renders "This organization's page is broken" for any but a donation.
 
-  if (
-    !action.pathname.toLowerCase().startsWith('/donate') &&
-    !donateImageRegex.test(imageFileName)
-  ) {
+  if (!startsWithAnyOf(action.pathname, '/donate') && !donateImageRegex.test(imageFileName)) {
     return
   }
 

@@ -1,6 +1,7 @@
 import {
   coerceNumber,
   composeQuery,
+  endsWithAnyOf,
   getPathSegments,
   getQueryParam,
   isAnyOf,
@@ -260,7 +261,7 @@ export const facebookResolveEmbed: ResolveUrlEmbed = (url) => {
 
   // The plugin is rebuilt around the href it names. The caption toggle, the size the dialog wrote,
   // the app id and a Graph API version in the path are the look.
-  const plugin = url.pathname.toLowerCase().endsWith('/video.php') ? 'video' : 'post'
+  const plugin = endsWithAnyOf(url.pathname, '/video.php') ? 'video' : 'post'
 
   return composePluginEmbed(plugin, href, {}, getQueryParam(url.searchParams, 't'))
 }

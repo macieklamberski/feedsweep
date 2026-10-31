@@ -1,4 +1,11 @@
-import { encodePathSegment, getPathSegments, isAnyOf, isHostOf, isPlainObject } from 'trousse'
+import {
+  encodePathSegment,
+  getPathSegments,
+  isAnyOf,
+  isHostOf,
+  isPlainObject,
+  startsWithAnyOf,
+} from 'trousse'
 import type {
   EmbedRenderHint,
   EmbedResolverResult,
@@ -95,7 +102,7 @@ type ImgurPost = {
 }
 
 const parsePost = (value: string): ImgurPost | undefined => {
-  const isAlbum = value.toLowerCase().startsWith(albumPrefix)
+  const isAlbum = startsWithAnyOf(value, albumPrefix)
   // The id comes out of its attribute decoded, and it goes into a path.
   const id = encodePathSegment(isAlbum ? value.slice(albumPrefix.length) : value)
 

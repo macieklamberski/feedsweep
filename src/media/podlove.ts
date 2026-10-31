@@ -1,4 +1,4 @@
-import { isAnyOf } from 'trousse'
+import { isAnyOf, startsWithAnyOf } from 'trousse'
 import type { MediaResolver } from '../types.js'
 import { findConfigScript } from '../utils/dom.js'
 
@@ -73,7 +73,7 @@ export const podloveMediaResolver: MediaResolver = {
 
     const files = data.audio?.filter(
       (audio): audio is { url: string; mimeType: string } =>
-        audio.url !== undefined && audio.mimeType?.toLowerCase().startsWith('audio/') === true,
+        audio.url !== undefined && startsWithAnyOf(audio.mimeType, 'audio/'),
     )
     const file = files?.find((audio) => isAnyOf(audio.mimeType, preferredMimeTypes)) ?? files?.[0]
     const source = file?.url

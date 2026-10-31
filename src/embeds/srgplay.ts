@@ -1,4 +1,11 @@
-import { composeQuery, getQueryParam, getQueryParams, isHostOrSubdomainOf, toMap } from 'trousse'
+import {
+  composeQuery,
+  getQueryParam,
+  getQueryParams,
+  includesAnyOf,
+  isHostOrSubdomainOf,
+  toMap,
+} from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -53,7 +60,7 @@ const composeEmbed = (urn: string | undefined, search: string): EmbedResolverRes
 
   // `/play/tv/-/video/-` redirects onto the slugged page and answers 404 for a urn naming nothing.
   // The route spells the medium, so an audio urn needs one this platform has not been measured on.
-  const page = urn.toLowerCase().includes(':video:')
+  const page = includesAnyOf(urn, ':video:')
     ? `https://www.${host}/play/tv/-/video/-${composeQuery({ urn })}`
     : undefined
   const query = composeQuery({ urn, ...getQueryParams(search, srgplayEmbedParams) })
