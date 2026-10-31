@@ -2,7 +2,7 @@ import { encodePathSegment, type Nullish } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
 import { parseUrlOnHosts } from '../../utils/urls.js'
-import { createLinkedImage } from '../../utils/widgets.js'
+import { createLinkedImage, readCleanedCarrierUrl } from '../../utils/widgets.js'
 
 const hosts = ['datawrapper.dwcdn.net']
 
@@ -34,12 +34,12 @@ const buildChartImage = (document: Document, chartId: string, alt?: string): HTM
 
 // A Datawrapper chart as a script loader, an iframe or a bare link: the script needs JS, the
 // iframe a third-party frame a reader may block, and the link shows no chart at all.
-export const convertDatawrapperEmbeds: DomTransform = () => (document) => {
+export const convertDatawrapperEmbeds: DomTransform = (context) => (document) => {
   // Responsive iframe (the dominant form): `<iframe src="dwcdn.net/<id>/<ver>/">`. The alt
   // comes from the iframe's title. Skip `#?secret=` preview URLs: the chart is unpublished,
   // so full.png 404s. Leave those for the generic iframe placeholder, which keeps the secret.
-  for (const iframe of document.querySelectorAll('iframe[src*="datawrapper.dwcdn.net/" i]')) {
-    const src = iframe.getAttribute('src')
+  for (const iframe of document.querySelectorAll('iframe[src]')) {
+    const src = readCleanedCarrierUrl(iframe, context)
     const chartId = getChartId(src)
 
     // A secret= preview url is an unpublished chart whose full.png 404s.

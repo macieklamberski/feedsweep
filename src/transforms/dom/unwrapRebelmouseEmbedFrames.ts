@@ -62,7 +62,7 @@ const readInnerUrl = (src: string): string | undefined => {
 // `video_url`, and `/res/community/twitter_embed/` takes a tweet's fields and answers 404.
 export const unwrapRebelmouseEmbedFrames: DomTransform = (context) => {
   return (document) => {
-    for (const iframe of document.querySelectorAll('iframe[src*="/res/" i]')) {
+    for (const iframe of document.querySelectorAll('iframe[src]')) {
       const url = readInnerUrl(readRepairedCarrierUrl(iframe, context))
 
       if (!url) {

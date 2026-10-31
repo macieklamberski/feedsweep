@@ -1,11 +1,12 @@
 import type { DomTransform } from '../../types.js'
 import { attr, hasText } from '../../utils/dom.js'
-import { isUrlShaped, parseUrlOnHosts } from '../../utils/urls.js'
+import { isUrlShaped } from '../../utils/urls.js'
 import {
   createIframe,
   createLink,
   isEmbedOrMediaResolver,
   isResolvedIframe,
+  readCarrierUrlOnHosts,
 } from '../../utils/widgets.js'
 
 const facadeSelector = 'a[data-iframely-url][href]'
@@ -22,7 +23,7 @@ export const rebuildIframelyEmbeds: DomTransform = (context) => {
   // CKEditor's oEmbed wrapper names the source url around a short-id frame, whose own url holds
   // no target.
   const readSourceUrl = (frame: Element): string | undefined => {
-    if (parseUrlOnHosts(attr(frame, 'src'), iframelyFrameHosts)) {
+    if (readCarrierUrlOnHosts(frame, iframelyFrameHosts, context)) {
       return attr(frame.closest('[data-oembed-url]'), 'data-oembed-url')
     }
   }
