@@ -1,6 +1,7 @@
 import { parseSrcset as parseRawSrcset } from 'srcset'
 import {
   addMissingProtocol,
+  decodePercent,
   decodeSegment,
   escapeRegex,
   getPathSegments,
@@ -425,17 +426,13 @@ const decodeUrl = (url: string): string => {
   let value = url
 
   for (let depth = 0; depth < 3; depth++) {
-    try {
-      const decoded = decodeURIComponent(value)
+    const decoded = decodePercent(value)
 
-      if (decoded === value) {
-        break
-      }
-
-      value = decoded
-    } catch {
+    if (decoded === value) {
       break
     }
+
+    value = decoded
   }
 
   return value
