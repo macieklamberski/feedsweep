@@ -788,6 +788,20 @@ describeForEachParser('brightcoveVideoJsEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    // Mediavine writes digit playlist ids on a div. The account is constructed to reach past the
+    // account check.
+    it('should return undefined for a mediavine playlist mount', async () => {
+      const value = html`
+        <div
+          class="mv-video-target mv-playlist-id-262"
+          data-playlist-id="262"
+          data-account="1234567890"
+        ></div>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should return undefined for a reference prefix with no id after it', async () => {
       const value = html`
         <video-js
