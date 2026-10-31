@@ -157,7 +157,7 @@ A placeholder may also carry `data-embed-params`: settings the publisher chose f
 ```typescript
 import { fixLazyImages, resolveRelativeUrls, stripControlChars, transformContent } from 'feedsweep'
 import { parseHtml } from 'feedsweep/linkedom'
-import { cleanUrl } from 'urlpurify'
+import { cleanUrl, defaultUnwrappers, downloadMeasurementUnwrappers } from 'urlpurify'
 
 const result = transformContent(html, {
   // Required: function that turns an HTML string into a `Document`. See "DOM library".
@@ -170,6 +170,9 @@ const result = transformContent(html, {
   resolveUrlFn: (url, baseUrl) => resolve(url, baseUrl),
   // Rewrite anchor hrefs: unwrap redirects and strip tracking params, also on the url and the src of embed placeholders.
   cleanUrlFn: cleanUrl,
+  // Clean a url only to compare an enclosure with the body's media, as the heuristic duplicate checks
+  // do. The output keeps the url cleanUrlFn gives. Defaults to cleanUrlFn.
+  matchUrlFn: (url) => cleanUrl(url, { unwrappers: [...defaultUnwrappers, ...downloadMeasurementUnwrappers] }),
   // Feed item enclosures (audio/video/image), injected into the content.
   enclosures: [{ url: 'https://example.com/audio.mp3', type: 'audio/mpeg' }],
   // Images also attached to the feed itself (logo, icon). An item enclosure that repeats one of them is not injected.
@@ -201,7 +204,7 @@ const result = transformContent(html, {
 })
 ```
 
-All caller-provided functions (`parseHtmlFn`, `resolveUrlFn`, `cleanUrlFn`, `assetProxyFn`, `isSafeUrlFn`, `enrichEmbedFn`, `enrichCiteFn`, `parseDateFn`, `highlightFn`) must not throw — an exception is not caught and rejects the `transformContent` promise.
+All caller-provided functions (`parseHtmlFn`, `resolveUrlFn`, `cleanUrlFn`, `matchUrlFn`, `assetProxyFn`, `isSafeUrlFn`, `enrichEmbedFn`, `enrichCiteFn`, `parseDateFn`, `highlightFn`) must not throw — an exception is not caught and rejects the `transformContent` promise.
 
 Code blocks are highlighted only when they declare a language (`language-*` class, `data-language`, Pandoc/Rouge/Expressive Code/etc.); unlabeled blocks are left plain rather than guessed at. The default highlighter is highlight.js (exported as `defaultHighlightFn` / `hljsHighlightFn`); replace it with `highlightFn`.
 

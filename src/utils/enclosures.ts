@@ -1,4 +1,4 @@
-import { parseUrl } from 'trousse'
+import { type NormalizeOptions, normalizeUrl, parseUrl } from 'trousse'
 import type { Enclosure, TransformContext } from '../types.js'
 import { setInnerHtml } from './dom.js'
 import { getImageFingerprint, getSizeKeywordRank, getUrlSizeHint } from './images.js'
@@ -15,17 +15,49 @@ const kindTypePrefixes = ['audio/', 'video/', 'image/'] as const
 // anywhere after the `?`. A file name can carry the text `u0026` as written.
 const strippedJsonAmpersandRegex = /(?<=\?.*)u0026(?:amp)?/g
 
-// The image key drops a file's query, which is what tells podcast proxy episodes apart.
+// The server never sees a url's hash, so a file's hash cannot name another file. A player page's
+// script reads its hash, which can name the item, as Issuu's `embed.html#{configId}` does.
+const fileElements = ['audio', 'video', 'source']
+
+const mediaFingerprintOptions: NormalizeOptions = {
+  stripScheme: true,
+  stripAuthentication: true,
+  stripWww: true,
+  stripTrailingSlash: true,
+  sortQueryParams: true,
+  stripEmptyQuery: true,
+  normalizeEncoding: true,
+  normalizeUnicode: true,
+}
+
+// The image fingerprint drops a file's query, which is what tells podcast proxy episodes apart.
 // A podcast proxy's audio url is `…/play.mp3?url={episode}`, so its identity lives in the query.
 // Audio, video and embeds have no scaled variants.
-export const buildMediaKey = (element: Element, context?: TransformContext): string => {
+const readMediaFingerprint = (element: Element, context?: TransformContext): string => {
   const src = element.getAttribute('src') ?? element.getAttribute('data-embed-src') ?? ''
+  // The key is only compared, so the caller's matchUrlFn stands in for cleanUrlFn here. A
+  // measurement prefix such as `media.blubrry.com/{show}/{file}` names the body's bare file.
+  const matchContext = context?.matchUrlFn
+    ? { ...context, cleanUrlFn: context.matchUrlFn }
+    : context
 
   if (element.localName === 'img') {
-    return getImageFingerprint(src, context)
+    return getImageFingerprint(src, matchContext)
   }
 
-  return cleanUrl(src, context) ?? src
+  return cleanUrl(src, matchContext) ?? src
+}
+
+// One file written over `http` and `https` is one fingerprint, and the output keeps what the feed
+// wrote. An image fingerprint is already folded and carries no scheme. Only a host with a port
+// parses, as a scheme, and that only sorts its query.
+export const buildMediaFingerprint = (element: Element, context?: TransformContext): string => {
+  const stripHash = fileElements.includes(element.localName)
+
+  return normalizeUrl(readMediaFingerprint(element, context), {
+    ...mediaFingerprintOptions,
+    stripHash,
+  })
 }
 
 // PeerTube ships an audio-only rendition as `type="audio/mp4"` under `medium="video"`, so the

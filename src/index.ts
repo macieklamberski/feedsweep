@@ -21,6 +21,7 @@ export const transformContent = async (
     enclosures: options.enclosures,
     resolveUrlFn: options.resolveUrlFn ?? defaultResolveUrlFn,
     cleanUrlFn: options.cleanUrlFn,
+    matchUrlFn: options.matchUrlFn,
     assetProxyFn: options.assetProxyFn,
     isSafeUrlFn: options.isSafeUrlFn,
     enrichEmbedFn: options.enrichEmbedFn,

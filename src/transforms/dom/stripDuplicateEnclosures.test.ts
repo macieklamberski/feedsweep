@@ -4,6 +4,13 @@ import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { stripDuplicateEnclosures } from './stripDuplicateEnclosures.js'
 
+const measurementPrefixRegex = /^(https?:\/\/)media\.blubrry\.com\/[^/]+\//
+
+// Stands in for urlpurify's cleanUrl with downloadMeasurementUnwrappers.
+const unwrapMeasurementPrefix = (url: string) => {
+  return url.replace(measurementPrefixRegex, '$1')
+}
+
 describeForEachParser('stripDuplicateEnclosures', (parseHtml) => {
   const transform = (value: string, context: TransformContext = baseContext) => {
     return applyDomTransforms(parseHtml(value), [stripDuplicateEnclosures(context)])
@@ -293,6 +300,111 @@ describeForEachParser('stripDuplicateEnclosures', (parseHtml) => {
     })
   })
 
+  describe('equivalent spellings', () => {
+    it('should remove a marked audio that differs from a content audio only by scheme', async () => {
+      const value = html`
+        <audio
+          src="http://archive.org/download/Episode14LegoArt/Episode%2014%20Lego%20Art.mp3"
+          controls
+          data-enclosure=""
+        ></audio>
+        <audio
+          class="wp-audio-shortcode"
+          id="audio-87-2"
+          preload="none"
+          controls="controls"
+        >
+          <source
+            type="audio/mpeg"
+            src="https://archive.org/download/Episode14LegoArt/Episode%2014%20Lego%20Art.mp3?_=2"
+          >
+        </audio>
+      `
+      const expected = html`
+        <audio
+          class="wp-audio-shortcode"
+          id="audio-87-2"
+          preload="none"
+          controls="controls"
+        >
+          <source
+            type="audio/mpeg"
+            src="https://archive.org/download/Episode14LegoArt/Episode%2014%20Lego%20Art.mp3?_=2"
+          >
+        </audio>
+      `
+      const context: TransformContext = {
+        ...baseContext,
+        cleanUrlFn: (url) => {
+          return url ===
+            'https://archive.org/download/Episode14LegoArt/Episode%2014%20Lego%20Art.mp3?_=2'
+            ? 'https://archive.org/download/Episode14LegoArt/Episode%2014%20Lego%20Art.mp3'
+            : url
+        },
+      }
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should remove a marked video that differs from a content video only by a media fragment', async () => {
+      const value = html`
+        <video
+          src="https://www.example.org/wp-content/uploads/2025/05/Station-Platform-Heating-1.3x.mp4"
+          controls
+          data-enclosure=""
+        ></video>
+        <video controls preload="none">
+          <source
+            src="https://www.example.org/wp-content/uploads/2025/05/Station-Platform-Heating-1.3x.mp4#t=5"
+            type="video/mp4"
+          >
+        </video>
+      `
+      const expected = html`
+        <video controls preload="none">
+          <source
+            src="https://www.example.org/wp-content/uploads/2025/05/Station-Platform-Heating-1.3x.mp4#t=5"
+            type="video/mp4"
+          >
+        </video>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep a marked embed placeholder naming another document by its hash', async () => {
+      const value = html`
+        <div
+          data-embed-src="https://e.issuu.com/embed.html#333333/444444"
+          data-enclosure=""
+        ></div>
+        <div data-embed-src="https://e.issuu.com/embed.html#111111/222222"></div>
+      `
+      const expected = html`
+        <div data-embed-src="https://e.issuu.com/embed.html#333333/444444"></div>
+        <div data-embed-src="https://e.issuu.com/embed.html#111111/222222"></div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep a marked embed placeholder naming another playlist by its query', async () => {
+      const value = html`
+        <div
+          data-embed-src="https://www.youtube.com/embed/videoseries?list=OLAK5uy_nsps_H4gEjwaNQ0rbSQjemMeFLqxFAQ4s"
+          data-enclosure=""
+        ></div>
+        <div data-embed-src="https://www.youtube.com/embed/videoseries?list=OLAK5uy_m7PeZhZWRDY_-s1WhTtUasNNSFYyWVEAQ"></div>
+      `
+      const expected = html`
+        <div data-embed-src="https://www.youtube.com/embed/videoseries?list=OLAK5uy_nsps_H4gEjwaNQ0rbSQjemMeFLqxFAQ4s"></div>
+        <div data-embed-src="https://www.youtube.com/embed/videoseries?list=OLAK5uy_m7PeZhZWRDY_-s1WhTtUasNNSFYyWVEAQ"></div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
   describe('non-image enclosures', () => {
     it('should remove a marked audio that exactly matches a content audio', async () => {
       const value = html`
@@ -359,6 +471,72 @@ describeForEachParser('stripDuplicateEnclosures', (parseHtml) => {
       const expected = '<video controls src="https://example.com/clip.mp4"></video>'
 
       expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should remove a marked audio behind a measurement prefix using matchUrlFn', async () => {
+      const value = html`
+        <audio
+          src="https://media.blubrry.com/ms_all_de_la_innovacin/example.com/wp-content/uploads/2021/05/TEAS9.mp3"
+          data-enclosure=""
+        ></audio>
+        <figure><audio controls src="https://example.com/wp-content/uploads/2021/05/TEAS9.mp3"></audio></figure>
+      `
+      const context: TransformContext = {
+        ...baseContext,
+        cleanUrlFn: (url) => url,
+        matchUrlFn: unwrapMeasurementPrefix,
+      }
+      const expected = html`
+        <figure><audio controls src="https://example.com/wp-content/uploads/2021/05/TEAS9.mp3"></audio></figure>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should remove a marked audio using cleanUrlFn when there is no matchUrlFn', async () => {
+      const value = html`
+        <audio
+          src="https://example.com/wp-content/uploads/2023/08/Entrevista-a-Faus-Nirvana-Verbal.mp3"
+          data-enclosure=""
+        ></audio>
+        <audio controls src="https://example.com/wp-content/uploads/2023/08/Entrevista-a-Faus-Nirvana-Verbal.mp3?_=2"></audio>
+      `
+      const context: TransformContext = {
+        ...baseContext,
+        cleanUrlFn: (url) => {
+          return url ===
+            'https://example.com/wp-content/uploads/2023/08/Entrevista-a-Faus-Nirvana-Verbal.mp3?_=2'
+            ? 'https://example.com/wp-content/uploads/2023/08/Entrevista-a-Faus-Nirvana-Verbal.mp3'
+            : url
+        },
+      }
+      const expected = html`
+        <audio controls src="https://example.com/wp-content/uploads/2023/08/Entrevista-a-Faus-Nirvana-Verbal.mp3?_=2"></audio>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should keep a marked audio behind a measurement prefix with no matchUrlFn', async () => {
+      const value = html`
+        <audio
+          src="https://media.blubrry.com/ms_all_de_la_innovacin/example.com/wp-content/uploads/2021/05/TEAS9.mp3"
+          data-enclosure=""
+        ></audio>
+        <figure><audio controls src="https://example.com/wp-content/uploads/2021/05/TEAS9.mp3"></audio></figure>
+      `
+      const context: TransformContext = {
+        ...baseContext,
+        cleanUrlFn: (url) => url,
+      }
+      const expected = html`
+        <audio
+          src="https://media.blubrry.com/ms_all_de_la_innovacin/example.com/wp-content/uploads/2021/05/TEAS9.mp3"
+        ></audio>
+        <figure><audio controls src="https://example.com/wp-content/uploads/2021/05/TEAS9.mp3"></audio></figure>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
     })
 
     // In the pipeline convertWidgets has already turned any iframe that plays into a placeholder.

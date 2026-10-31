@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { baseContext, describeForEachParser } from '../tests.js'
 import type { Enclosure, TransformContext } from '../types.js'
-import { buildMediaKey, isEnclosureKind, prepareEnclosures } from './enclosures.js'
+import { buildMediaFingerprint, isEnclosureKind, prepareEnclosures } from './enclosures.js'
 
 describeForEachParser('prepareEnclosures', (parseHtml) => {
   const prepare = (
@@ -689,7 +689,7 @@ describe('isEnclosureKind', () => {
   })
 })
 
-describeForEachParser('buildMediaKey', (parseHtml) => {
+describeForEachParser('buildMediaFingerprint', (parseHtml) => {
   const getElement = (value: string): Element => {
     const element = parseHtml(value).body.firstElementChild
 
@@ -702,50 +702,114 @@ describeForEachParser('buildMediaKey', (parseHtml) => {
 
   it('should repair a glued query before the cleaner keys a media file', () => {
     const value = getElement('<audio src="https://example.com/track.mp3&t=1"></audio>')
-    const expected = 'https://example.com/track.mp3?t=1'
+    const expected = 'example.com/track.mp3?t=1'
 
-    expect(buildMediaKey(value, { ...baseContext, cleanUrlFn: (url) => url })).toBe(expected)
+    expect(buildMediaFingerprint(value, { ...baseContext, cleanUrlFn: (url) => url })).toBe(
+      expected,
+    )
   })
 
   it('should key an image rendition like the original image', () => {
     const value1 = getElement('<img src="https://example.com/uploads/photo-300x200.jpg">')
     const value2 = getElement('<img src="https://example.com/uploads/photo.jpg">')
 
-    expect(buildMediaKey(value1)).toBe(buildMediaKey(value2))
+    expect(buildMediaFingerprint(value1)).toBe(buildMediaFingerprint(value2))
   })
 
   it('should drop the query of an image', () => {
     const value1 = getElement('<img src="https://example.com/uploads/photo.jpg?w=300">')
     const value2 = getElement('<img src="https://example.com/uploads/photo.jpg">')
 
-    expect(buildMediaKey(value1)).toBe(buildMediaKey(value2))
+    expect(buildMediaFingerprint(value1)).toBe(buildMediaFingerprint(value2))
   })
 
   it('should keep the query that tells podcast proxy episodes apart', () => {
     const value1 = getElement('<audio src="https://example.com/play.mp3?url=episode-1"></audio>')
     const value2 = getElement('<audio src="https://example.com/play.mp3?url=episode-2"></audio>')
 
-    expect(buildMediaKey(value1)).not.toBe(buildMediaKey(value2))
+    expect(buildMediaFingerprint(value1)).not.toBe(buildMediaFingerprint(value2))
   })
 
   it('should key an embed placeholder by its source', () => {
     const value = getElement('<div data-embed-src="https://www.youtube.com/embed/abc123"></div>')
 
-    expect(buildMediaKey(value)).toBe('https://www.youtube.com/embed/abc123')
+    expect(buildMediaFingerprint(value)).toBe('youtube.com/embed/abc123')
   })
 
   it('should clean the url of a media file', () => {
     const value = getElement('<video src="https://example.com/clip.mp4?utm_source=feed"></video>')
     const cleanUrlFn = (url: string) => url.split('?')[0]
 
-    expect(buildMediaKey(value, { ...baseContext, cleanUrlFn })).toBe(
-      'https://example.com/clip.mp4',
+    expect(buildMediaFingerprint(value, { ...baseContext, cleanUrlFn })).toBe(
+      'example.com/clip.mp4',
     )
+  })
+
+  it('should key a media file the same over http and https', () => {
+    const value1 = getElement(
+      '<audio src="http://archive.org/download/Episode14LegoArt/Episode%2014%20Lego%20Art.mp3"></audio>',
+    )
+    const value2 = getElement(
+      '<source src="https://archive.org/download/Episode14LegoArt/Episode%2014%20Lego%20Art.mp3">',
+    )
+
+    expect(buildMediaFingerprint(value1)).toBe(buildMediaFingerprint(value2))
+  })
+
+  it('should key a media file the same with and without a media fragment', () => {
+    const value1 = getElement(
+      '<video src="https://www.example.org/wp-content/uploads/2025/05/Station-Platform-Heating-1.3x.mp4"></video>',
+    )
+    const value2 = getElement(
+      '<source src="https://www.example.org/wp-content/uploads/2025/05/Station-Platform-Heating-1.3x.mp4#t=5">',
+    )
+
+    expect(buildMediaFingerprint(value1)).toBe(buildMediaFingerprint(value2))
+  })
+
+  it('should key a media file the same whatever its hash', () => {
+    const value1 = getElement('<audio src="https://cdn.example.org/episodes/42.mp3"></audio>')
+    const value2 = getElement('<source src="https://cdn.example.org/episodes/42.mp3#chapter-2">')
+
+    expect(buildMediaFingerprint(value1)).toBe(buildMediaFingerprint(value2))
+  })
+
+  it('should key two embeds that differ only by their hash apart', () => {
+    const value1 = getElement(
+      '<div data-embed-src="https://e.issuu.com/embed.html#111111/222222"></div>',
+    )
+    const value2 = getElement(
+      '<div data-embed-src="https://e.issuu.com/embed.html#333333/444444"></div>',
+    )
+
+    expect(buildMediaFingerprint(value1)).not.toBe(buildMediaFingerprint(value2))
+  })
+
+  it('should key a media file the same with and without www', () => {
+    const value1 = getElement(
+      '<audio src="http://www.example.org/wp-content/uploads/2018/07/%D8%A7%D9%85%DB%8C%D9%86-%D8%AD%DB%8C%D8%A7%DB%8C%DB%8C.mp3"></audio>',
+    )
+    const value2 = getElement(
+      '<source src="https://example.org/wp-content/uploads/2018/07/%D8%A7%D9%85%DB%8C%D9%86-%D8%AD%DB%8C%D8%A7%DB%8C%DB%8C.mp3">',
+    )
+
+    expect(buildMediaFingerprint(value1)).toBe(buildMediaFingerprint(value2))
+  })
+
+  it('should keep the query that tells two playlists apart', () => {
+    const value1 = getElement(
+      '<div data-embed-src="https://www.youtube.com/embed/videoseries?list=OLAK5uy_nsps_H4gEjwaNQ0rbSQjemMeFLqxFAQ4s"></div>',
+    )
+    const value2 = getElement(
+      '<div data-embed-src="https://www.youtube.com/embed/videoseries?list=OLAK5uy_m7PeZhZWRDY_-s1WhTtUasNNSFYyWVEAQ"></div>',
+    )
+
+    expect(buildMediaFingerprint(value1)).not.toBe(buildMediaFingerprint(value2))
   })
 
   it('should return an empty key for an element without a url', () => {
     const value = getElement('<video></video>')
 
-    expect(buildMediaKey(value)).toBe('')
+    expect(buildMediaFingerprint(value)).toBe('')
   })
 })

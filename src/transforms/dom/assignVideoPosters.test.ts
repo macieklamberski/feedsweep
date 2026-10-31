@@ -667,6 +667,30 @@ describeForEachParser('assignVideoPosters under heuristics', (parseHtml) => {
     expect(await convert(value, enclosures)).toEqualHtml(expected)
   })
 
+  it('should keep the image enclosure beside a body video a measured enclosure repeats', async () => {
+    const value = '<video controls src="https://example.org/videos/clip.mp4"></video>'
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.org/post',
+      enclosures: [
+        { url: 'https://media.blubrry.com/show/example.org/videos/clip.mp4', type: 'video/mp4' },
+        { url: 'https://example.org/images/cover.jpg', type: 'image/jpeg' },
+      ],
+      heuristics: true,
+      matchUrlFn: (url) => {
+        return url === 'https://media.blubrry.com/show/example.org/videos/clip.mp4'
+          ? 'https://example.org/videos/clip.mp4'
+          : url
+      },
+    })
+    const expected = html`
+      <img src="https://example.org/images/cover.jpg">
+      <video controls src="https://example.org/videos/clip.mp4"></video>
+    `
+
+    expect(result).toEqualHtml(expected)
+  })
+
   it('should keep a second rendition of the poster under another file name', async () => {
     const value = '<p>Amnistía Internacional ha detectado casos de tortura.</p>'
     const enclosures = [
