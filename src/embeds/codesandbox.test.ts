@@ -1,13 +1,15 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
-import { describeForEachParser, html, resolverExtractor } from '../tests.js'
-import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
+import { createProxyUnwrapFn, describeForEachParser, html, resolverExtractor } from '../tests.js'
+import type { CleanUrlFn, EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { readIframeResizeHeight } from '../utils/hints.js'
 import {
   codesandboxIframeEmbedResolver,
   codesandboxRenderHint,
   codesandboxResolveEmbed,
 } from './codesandbox.js'
+
+const unwrapEmbedlyFn = createProxyUnwrapFn('cdn.embedly.com', 'src')
 
 // Every `data-embed-*` field the placeholder carries, for the shapes that only resolve once the
 // pipeline has repaired them and so cannot be asserted on the resolver alone.
@@ -387,12 +389,19 @@ describeForEachParser('codesandboxIframeEmbedResolver', (parseHtml) => {
 // The lazy attribute and the Embedly wrapper only name a sandbox after earlier passes have promoted
 // or unwrapped them, so the assertion belongs at the end of the pipeline.
 describeForEachParser('codesandbox shapes the pipeline repairs first', (parseHtml) => {
-  const convert = (value: string): Promise<string> => {
-    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  const convert = (value: string, cleanUrlFn?: CleanUrlFn): Promise<string> => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      cleanUrlFn,
+    })
   }
 
-  const placeholder = async (value: string): Promise<Record<string, string>> => {
-    return readPlaceholder(await convert(value), parseHtml)
+  const placeholder = async (
+    value: string,
+    cleanUrlFn?: CleanUrlFn,
+  ): Promise<Record<string, string>> => {
+    return readPlaceholder(await convert(value, cleanUrlFn), parseHtml)
   }
 
   it('should resolve a frame whose url only arrives once the lazy attribute is promoted', async () => {
@@ -430,7 +439,7 @@ describeForEachParser('codesandbox shapes the pipeline repairs first', (parseHtm
       height: '500',
     }
 
-    expect(await placeholder(value)).toEqual(expected)
+    expect(await placeholder(value, unwrapEmbedlyFn)).toEqual(expected)
   })
 
   it('should not leave the Embedly wrapper behind', async () => {
@@ -443,7 +452,7 @@ describeForEachParser('codesandbox shapes the pipeline repairs first', (parseHtm
       ></iframe>
     `
 
-    expect(await convert(value)).not.toContain('cdn.embedly.com')
+    expect(await convert(value, unwrapEmbedlyFn)).not.toContain('cdn.embedly.com')
   })
 })
 

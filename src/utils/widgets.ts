@@ -137,6 +137,32 @@ export const readRepairedCarrierUrl = (element: Element): string => {
   return repairUrl(readCarrierUrl(element))
 }
 
+type CleanedCarrierUrl = {
+  attribute: string
+  original: string
+  cleaned: string
+}
+
+// Held off the document, so no attribute of its own reaches the output on any path.
+const cleanedCarrierUrls = new WeakMap<Element, CleanedCarrierUrl>()
+
+export const setCleanedCarrierUrl = (element: Element, url: CleanedCarrierUrl): void => {
+  element.setAttribute(url.attribute, url.cleaned)
+  cleanedCarrierUrls.set(element, url)
+}
+
+// A frame no resolver claims gets back the url its publisher wrote. A pass that rewrote the url
+// after cleanFrameUrls, such as unwrapRebelmouseEmbedFrames, keeps its own.
+export const restoreCarrierUrl = (element: Element): void => {
+  const url = cleanedCarrierUrls.get(element)
+
+  if (!url || element.getAttribute(url.attribute) !== url.cleaned) {
+    return
+  }
+
+  element.setAttribute(url.attribute, url.original)
+}
+
 type ResolverOptions = {
   // Deep handling only: the carrier's declared box replaces the resolver's size. Pass it on a
   // carrier the publisher sized for the player that loads, never on a retired tool's or dead

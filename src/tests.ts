@@ -1,11 +1,11 @@
 import { describe, expect } from 'bun:test'
 import { JSDOM } from 'jsdom'
 import { parseHTML } from 'linkedom'
-import type { MaybePromise } from 'trousse'
+import { getQueryParam, type MaybePromise } from 'trousse'
 import { defaultContext } from './defaults/context.js'
 import { parseHtml as parseWithLinkedom } from './parsers/linkedom.js'
 import { convertEmojis } from './transforms/dom/convertEmojis.js'
-import type { TransformContext } from './types.js'
+import type { CleanUrlFn, TransformContext } from './types.js'
 import { applyDomTransforms } from './utils/transforms.js'
 import { parseUrlOnHosts } from './utils/urls.js'
 import { cleanResultFields } from './utils/widgets.js'
@@ -65,6 +65,17 @@ export const carrierUrl = (value: string, hosts: string | ReadonlyArray<string>)
   }
 
   return url
+}
+
+// A caller's cleanUrlFn standing in for urlpurify's embedProxyUnwrappers: a url on the proxy's
+// hosts gives the url in its `param` query value.
+export const createProxyUnwrapFn = (
+  hosts: string | ReadonlyArray<string>,
+  param: string,
+): CleanUrlFn => {
+  return (url) => {
+    return getQueryParam(parseUrlOnHosts(url, hosts)?.searchParams, param) ?? url
+  }
 }
 
 // Runs a resolver's extract on the element its selector claims in a fixture, then the field

@@ -18,6 +18,7 @@ import {
   readCarrierUrl,
   readPlayer,
   resolveEmbedProbe,
+  restoreCarrierUrl,
   toPlayerKey,
 } from '../../utils/widgets.js'
 
@@ -249,6 +250,8 @@ export const convertWidgets: DomTransform = (context) => {
       if (!element.parentNode) {
         continue
       }
+
+      restoreCarrierUrl(element)
 
       const src = readCarrierUrl(element)
 

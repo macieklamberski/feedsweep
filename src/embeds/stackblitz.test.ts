@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
-import { describeForEachParser, html, resolverExtractor } from '../tests.js'
-import type { EmbedResolverResult } from '../types.js'
+import { createProxyUnwrapFn, describeForEachParser, html, resolverExtractor } from '../tests.js'
+import type { CleanUrlFn, EmbedResolverResult } from '../types.js'
 import { stackblitzIframeEmbedResolver, stackblitzResolveEmbed } from './stackblitz.js'
+
+const unwrapEmbedlyFn = createProxyUnwrapFn('cdn.embedly.com', 'src')
 
 // Every `data-embed-*` field the placeholder carries, for the shapes that only resolve once the
 // pipeline has repaired them and so cannot be asserted on the resolver alone.
@@ -431,12 +433,19 @@ describeForEachParser('stackblitzIframeEmbedResolver', (parseHtml) => {
 // The Embedly wrapper only names the project after an earlier pass has decoded its query, so the
 // assertion belongs at the end of the pipeline.
 describeForEachParser('stackblitz shapes the pipeline repairs first', (parseHtml) => {
-  const convert = (value: string): Promise<string> => {
-    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  const convert = (value: string, cleanUrlFn?: CleanUrlFn): Promise<string> => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      cleanUrlFn,
+    })
   }
 
-  const placeholder = async (value: string): Promise<Record<string, string>> => {
-    return readPlaceholder(await convert(value), parseHtml)
+  const placeholder = async (
+    value: string,
+    cleanUrlFn?: CleanUrlFn,
+  ): Promise<Record<string, string>> => {
+    return readPlaceholder(await convert(value, cleanUrlFn), parseHtml)
   }
 
   it('should resolve the project Embedly proxies for Medium and Substack', async () => {
@@ -456,7 +465,7 @@ describeForEachParser('stackblitz shapes the pipeline repairs first', (parseHtml
       height: '500',
     }
 
-    expect(await placeholder(value)).toEqual(expected)
+    expect(await placeholder(value, unwrapEmbedlyFn)).toEqual(expected)
   })
 
   it('should not leave the Embedly wrapper behind', async () => {
@@ -469,7 +478,7 @@ describeForEachParser('stackblitz shapes the pipeline repairs first', (parseHtml
       ></iframe>
     `
 
-    expect(await convert(value)).not.toContain('cdn.embedly.com')
+    expect(await convert(value, unwrapEmbedlyFn)).not.toContain('cdn.embedly.com')
   })
 
   // injectEnclosures offers every attachment a feed carries to this resolver, and only this path

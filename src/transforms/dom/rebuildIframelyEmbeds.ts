@@ -1,4 +1,3 @@
-import { getQueryParam, isAnyOf } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr, hasText } from '../../utils/dom.js'
 import { isUrlShaped, parseUrlOnHosts } from '../../utils/urls.js'
@@ -12,24 +11,18 @@ import {
 const facadeSelector = 'a[data-iframely-url][href]'
 const wrapperSelector = '.iframely-embed'
 const iframelyFrameHosts = ['if-cdn.com']
-const iframelyApiHosts = ['cdn.iframe.ly', 'iframely.net']
 
 // Iframely's anchor facade: an empty <a> holding the destination inside a responsive wrapper that
 // only embed.js fills, so the pipeline deletes the anchor as empty and the destination with it.
+// Unwrapping an Iframely frame's url to the url it proxies is the caller's cleanUrlFn's, through
+// urlpurify's embedProxyUnwrappers.
 export const rebuildIframelyEmbeds: DomTransform = (context) => {
   const resolvers = context.widgetResolvers.filter(isEmbedOrMediaResolver)
 
-  // The source url a frame Iframely renders proxies: the `url` query value of its iframe API, or
-  // the url CKEditor's oEmbed wrapper names around a short-id frame.
+  // CKEditor's oEmbed wrapper names the source url around a short-id frame, whose own url holds
+  // no target.
   const readSourceUrl = (frame: Element): string | undefined => {
-    const src = attr(frame, 'src')
-    const apiUrl = parseUrlOnHosts(src, iframelyApiHosts)
-
-    if (apiUrl && isAnyOf(apiUrl.pathname, '/api/iframe')) {
-      return getQueryParam(apiUrl.searchParams, 'url')
-    }
-
-    if (parseUrlOnHosts(src, iframelyFrameHosts)) {
+    if (parseUrlOnHosts(attr(frame, 'src'), iframelyFrameHosts)) {
       return attr(frame.closest('[data-oembed-url]'), 'data-oembed-url')
     }
   }

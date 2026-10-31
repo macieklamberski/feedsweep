@@ -55,6 +55,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `unwrapHeadingBold` | Unwrap redundant bold wrapping a whole heading |
 | `normalizeAnchoredHeadings` | Strip static-site-generator permalink anchors from headings (Sphinx/MkDocs, Docusaurus, AnchorJS, Zola) |
 | `cleanAnchorUrls` | Clean anchor hrefs (redirects, tracking params) via the `cleanUrlFn` option, after the shared url repair: an escaped `&amp;`, a run of slashes, a query glued onto the path and whitespace in values |
+| `cleanFrameUrls` | Clean iframe, embed and object urls via the `cleanUrlFn` option before the resolvers read them, after the same repair, so a cleaner that unwraps an embed proxy (Embedly, Iframely, Drupal media oEmbed) hands them the player; a frame no resolver claims keeps the url as written |
 | `stripDeadAnchors` | Unwrap links with empty, `#`, or `javascript:` hrefs |
 | `stripNonContentElements` | Strip non-content chrome — subscribe/share/related widgets, ads, author bios |
 | `convertUcozSpoilerButtons` | Replace a titled uCoz spoiler button with its title in bold |
@@ -71,12 +72,11 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `surfaceParkedMarkup` | Dissolve a container holding an embed encoded in an attribute, a lazy loader's `div.load-later` or a Borlabs Cookie content blocker, into the markup it holds |
 | `rebuildPublicalbumGalleries` | Rebuild a Publicalbum Google Photos album widget into its photos as linked images under a captioned `<figure>` |
 | `surfaceTemplateEmbeds` | Hoist a video embed out of a lazy-load `<template>` (e.g. Better Core Video Embeds) so it renders in a reader |
-| `unwrapDrupalOembedIframes` | Point a Drupal media oEmbed proxy frame (`/media/oembed?url=`) at the page url it wraps |
 | `unwrapWpcomWidgetFrames` | Rebuild a WordPress.com `wpcomwidgets.com` frame into the Flash `<embed>` it wraps, so a Flash resolver can claim it |
 | `unwrapRebelmouseEmbedFrames` | Point a RebelMouse embed frame (`/res/scraper/embed/`, `/res/community/twitter_embed/`) at the player or tweet it wraps |
 | `surfaceNoscriptEmbeds` | Hoist a video `<iframe>` out of a `<noscript>` lazy-load fallback (e.g. WP Rocket, a3 Lazy Load); ignores non-video noscript iframes like Google Tag Manager |
 | `rebuildEmbedPlusEmbeds` | Rebuild a real `<iframe>` from an "Embed Plus for YouTube" facade (`.epyt-facade[data-facadesrc]`) |
-| `rebuildIframelyEmbeds` | Rebuild an Iframely anchor facade (an empty `a[data-iframely-url]`) into the destination's frame or a plain link, and point an Iframely frame at the player of the url it proxies |
+| `rebuildIframelyEmbeds` | Rebuild an Iframely anchor facade (an empty `a[data-iframely-url]`) into the destination's frame or a plain link, and point a short-id Iframely frame at the url its CKEditor oEmbed wrapper names |
 | `rebuildWordpressEmbeds` | Rebuild a WordPress embed block that holds only its source url into the platform's frame, when a resolver claims the url |
 | `rebuildLiteVideoEmbeds` | Rebuild a real `<iframe>` from a `lite-youtube` / `lite-vimeo` web component's `videoid`, `playlistid` or `player-src`, carrying over its start, title and poster |
 | `rebuildEmbettyVideoEmbeds` | Rebuild a real `<iframe>` from an `embetty-video` web component's `type` and `video-id`, carrying over `start-at` and `poster-image` |
@@ -89,7 +89,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `rebuildLazyYtEmbeds` | Rebuild a real `<iframe>` from a lazy YouTube facade parking the id in a data attribute (`data-youtube-id`, `data-youtube`, `.youtube-embed`, `.youtube-player`) |
 | `rebuildElementorVideoEmbeds` | Rebuild a real `<iframe>` from an Elementor video widget's deferred `data-settings` (YouTube / Vimeo / Dailymotion / VideoPress) |
 | `rebuildEmbedPrivacyLinks` | Rebuild the link an Embed Privacy feed carries in place of an embed into that url's frame, when a resolver claims the url |
-| `rebuildEmbedlyEmbeds` | Unwrap an Embedly media widget to the inner provider iframe, carrying the poster as `data-thumbnail` |
+| `rebuildEmbedlyEmbeds` | Carry an Embedly media widget's poster as `data-thumbnail`, and rebuild an Embedly oEmbed payload div into the iframe it names |
 | `rebuildDocumentcloudEmbeds` | Rebuild a real `<iframe>` from DocumentCloud's old viewer snippet onto the document's embed page, reading the document from the inline `DV.load` call |
 | `rebuildGettyImagesEmbeds` | Rebuild a real `<iframe>` from a Getty Images `gie` widget facade, composing the player URL from the inline config the loader script never runs |
 | `rebuildExternalVideoEmbeds` | Rebuild a real `<iframe>` from a Seesaa or Sakura blog's `external_video.js` block onto the YouTube or Nicovideo video it names |
@@ -168,7 +168,7 @@ const result = transformContent(html, {
   sameSiteUrls: ['https://example.com/?p=1'],
   // Resolve a relative URL against the base URL (defaults to standard URL resolution).
   resolveUrlFn: (url, baseUrl) => resolve(url, baseUrl),
-  // Rewrite anchor hrefs: unwrap redirects and strip tracking params, also on the url and the src of embed placeholders.
+  // Rewrite anchor hrefs and frame urls: unwrap redirects and embed proxies and strip tracking params, also on the url and the src of embed placeholders.
   cleanUrlFn: cleanUrl,
   // Feed item enclosures (audio/video/image), injected into the content.
   enclosures: [{ url: 'https://example.com/audio.mp3', type: 'audio/mpeg' }],
