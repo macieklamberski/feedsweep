@@ -4,6 +4,7 @@ import {
   decodeSegment,
   escapeRegex,
   getPathSegments,
+  getQueryParam,
   isAnyOf,
   type Nullish,
   normalizeUrl,
@@ -81,6 +82,17 @@ const resolvedSource = (capture: string, proxy: URL): string | undefined => {
   return resolveUrl(source, proxy.origin)
 }
 
+// The proxy names its source in the `url` query parameter, which the reader decodes once.
+const queryUrlSource = (_capture: string, proxy: URL): string | undefined => {
+  const source = getQueryParam(proxy, 'url')
+
+  if (!source) {
+    return
+  }
+
+  return resolveUrl(source, proxy.origin)
+}
+
 // The capture is a bare host+path with the scheme stripped (Photon): re-add it.
 const bareHostSource = (capture: string): string | undefined => {
   const source = decodeSegment(capture) ?? capture
@@ -100,30 +112,20 @@ const imageProxies: Array<ImageProxy> = [
   // WordPress Photon / Jetpack: i{0-3}.wp.com/{src-host}/{path}, scheme stripped.
   { pattern: /\/\/i[0-3]\.wp\.com\/([^?]+)/i, toSource: bareHostSource },
   // wsrv.nl / images.weserv.nl: source in the url= query param.
-  {
-    pattern: /(?:wsrv\.nl|images\.weserv\.nl)\/\?(?:[^#]*&)?url=([^&]+)/i,
-    toSource: resolvedSource,
-  },
+  { pattern: /(?:wsrv\.nl|images\.weserv\.nl)\/\?/i, toSource: queryUrlSource },
   // Next.js / Vercel image optimizer: source in the url= query param.
-  { pattern: /\/_next\/image\?(?:[^#]*&)?url=([^&]+)/i, toSource: resolvedSource },
+  { pattern: /\/_next\/image\?/i, toSource: queryUrlSource },
   // Blogger opensocial gadget proxy: gadgets/proxy?url={src}.
   {
-    pattern:
-      /images-blogger-opensocial\.googleusercontent\.com\/gadgets\/proxy\?(?:[^#]*&)?url=([^&]+)/i,
-    toSource: resolvedSource,
+    pattern: /images-blogger-opensocial\.googleusercontent\.com\/gadgets\/proxy\?/i,
+    toSource: queryUrlSource,
   },
   // Yahoo Mail: ecp.yusercontent.com/mail?url={src}.
-  {
-    pattern: /\/\/ecp\.yusercontent\.com\/mail\?(?:[^#]*&)?url=([^&]+)/i,
-    toSource: resolvedSource,
-  },
+  { pattern: /\/\/ecp\.yusercontent\.com\/mail\?/i, toSource: queryUrlSource },
   // Yandex Mail: resize.yandex.net/mailservice?url={src}.
-  {
-    pattern: /\/\/resize\.yandex\.net\/mailservice\?(?:[^#]*&)?url=([^&]+)/i,
-    toSource: resolvedSource,
-  },
+  { pattern: /\/\/resize\.yandex\.net\/mailservice\?/i, toSource: queryUrlSource },
   // Brightspot dims (NPR, LA Times, Scripps): *.brightspotcdn.com/dims{3,4}/.../?url={src}.
-  { pattern: /\.brightspotcdn\.com\/dims\d\/.*[?&]url=([^&]+)/i, toSource: resolvedSource },
+  { pattern: /\.brightspotcdn\.com\/dims\d\//i, toSource: queryUrlSource },
   // Cloudinary fetch, which Substack's substackcdn.com serves its images through.
   { pattern: /\/image\/fetch\/.*?(https?(?:%3a|:).+)$/i, toSource: resolvedSource },
   // ImageKit web proxy: ik.imagekit.io/{id}/[tr:..]/{src url}.
@@ -304,8 +306,22 @@ export const getImageFingerprint = (rawUrl: string, context?: TransformContext):
 }
 
 const urlPairRegex = /(?:^|[/_=-])(\d{2,5})x(\d{2,5})(?=[._\-&)?/]|$)/gi
-const urlQueryWidthRegex = /[?&](?:w|width)=(\d{2,5})\b/i
-const urlQueryHeightRegex = /[?&](?:h|height)=(\d{2,5})\b/i
+const queryPixelsRegex = /^\d{2,5}\b/
+const widthQueryParams = ['w', 'width']
+const heightQueryParams = ['h', 'height']
+
+// The first of the names whose value opens with two to five digits, or 0.
+const readQueryPixels = (url: URL | undefined, names: Array<string>): number => {
+  for (const name of names) {
+    const pixels = queryPixelsRegex.exec(getQueryParam(url, name) ?? '')?.[0]
+
+    if (pixels) {
+      return Number(pixels)
+    }
+  }
+
+  return 0
+}
 
 // A `data:` src is a lazy placeholder and carries no size.
 export const getUrlDimensions = (
@@ -317,8 +333,9 @@ export const getUrlDimensions = (
 
   // Explicit w/h query params win. Otherwise the last WxH pair in the path or
   // filename (the rendition size sits after any path digits).
-  let width = Number(urlQueryWidthRegex.exec(src)?.[1])
-  let height = Number(urlQueryHeightRegex.exec(src)?.[1])
+  const url = parseUrl(src, placeholderBaseUrl)
+  let width = readQueryPixels(url, widthQueryParams)
+  let height = readQueryPixels(url, heightQueryParams)
 
   if (!(width > pixelDimensionLimit && height > pixelDimensionLimit)) {
     const pair = [...src.matchAll(urlPairRegex)].at(-1)
@@ -337,7 +354,7 @@ export const getUrlSizeHint = (url: string): number => {
     return dimensions.width * dimensions.height
   }
 
-  const queryWidth = Number(urlQueryWidthRegex.exec(url)?.[1])
+  const queryWidth = readQueryPixels(parseUrl(url, placeholderBaseUrl), widthQueryParams)
   if (queryWidth > 0) {
     return queryWidth
   }
