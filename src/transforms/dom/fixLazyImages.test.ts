@@ -84,7 +84,11 @@ describeForEachParser('fixLazyImages', (parseHtml) => {
     `
     const context: TransformContext = {
       ...baseContext,
-      matchUrlFn: (url) => url.replace('https://track.example/r/', 'https://'),
+      matchUrlFn: (url) => {
+        return url === 'https://track.example/r/example.com/photo.jpg'
+          ? 'https://example.com/photo.jpg'
+          : url
+      },
     }
     const expected = '<img src="https://example.com/photo.jpg">'
 
