@@ -154,7 +154,8 @@ const applyCarrierCleaner = (url: string, context: TransformContext): string => 
   const resolved = resolveOrKeepUrl(repairUrl(url), context)
   const cleaned = cleanUrl(resolved, context)
 
-  // The repairs alone run on the parsed url every resolver reads, never on the string it matches.
+  // A cleaner that changes nothing past the repairs leaves the url as written, which is what a
+  // resolver reads with no cleaner.
   if (cleaned === repairUrl(resolved)) {
     return url
   }
