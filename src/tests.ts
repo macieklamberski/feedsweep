@@ -118,7 +118,7 @@ export const emojiConverters = (parseHtml: ParseHtml): EmojiConverters => {
 export const jsonAttrValue = (attrs: Record<string, unknown> | string): string => {
   const raw = typeof attrs === 'string' ? attrs : JSON.stringify(attrs)
 
-  return raw.replace(/"/g, '&quot;')
+  return raw.replaceAll('"', '&quot;')
 }
 
 // An element the fixture guarantees, throwing instead of returning null.
