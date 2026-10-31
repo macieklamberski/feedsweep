@@ -1,4 +1,12 @@
-import { getPathSegments, getQueryParam, isAnyOf, isPlainObject, toMap } from 'trousse'
+import {
+  composeQuery,
+  getPathSegments,
+  getQueryParam,
+  getQueryParams,
+  isAnyOf,
+  isPlainObject,
+  toMap,
+} from 'trousse'
 import type {
   EmbedRenderHint,
   EmbedResolverResult,
@@ -6,7 +14,7 @@ import type {
   ResolveUrlEmbed,
 } from '../types.js'
 import { attr, jsonAttr } from '../utils/dom.js'
-import { parseUrlOnHosts, pickUrlParams } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 // The player is fluid-width and fixed-height: a compact bar for a single item, a taller box for
@@ -120,7 +128,7 @@ export const spotifyResolveEmbed: ResolveUrlEmbed = (url, element) => {
   return {
     provider,
     id: `${type}/${id}`,
-    src: `https://open.spotify.com/embed/${type}/${id}${pickUrlParams(url, spotifyEmbedParams)}`,
+    src: `https://open.spotify.com/embed/${type}/${id}${composeQuery(getQueryParams(url, spotifyEmbedParams))}`,
     url: `https://open.spotify.com/${type}/${id}`,
     thumbnail: card.thumbnail,
     height: spotifyHeights.get(type),

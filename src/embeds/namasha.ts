@@ -1,6 +1,6 @@
+import { composeQuery, getQueryParams } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'namasha'
@@ -25,7 +25,7 @@ export const namashaResolveEmbed: ResolveUrlEmbed = (url, element) => {
   return {
     provider,
     id,
-    src: `https://www.namasha.com/embed/${id}${pickUrlParams(url, ['t'])}`,
+    src: `https://www.namasha.com/embed/${id}${composeQuery(getQueryParams(url, ['t']))}`,
     url: `https://www.namasha.com/v/${id}`,
     ...sizes.video,
     title: attr(element, 'title'),

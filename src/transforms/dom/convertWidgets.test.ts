@@ -1666,22 +1666,6 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
-    // A parked url has to name a media file before the container is claimed, so an unmatched
-    // extension left the container empty and the reader got nothing at all.
-    it('should play a parked aac url as an audio element', async () => {
-      const value = '<div data-src="https://cdn.example.com/ep.aac"></div>'
-      const expected = html`
-        <div data-src="https://cdn.example.com/ep.aac">
-          <audio
-            src="https://cdn.example.com/ep.aac"
-            controls=""
-          ></audio>
-        </div>
-      `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
     // A manifest plays natively only in Safari, so it stays an embed placeholder.
     it('should keep a streaming manifest as a placeholder', async () => {
       const value = '<iframe src="https://stream.example.com/live/index.m3u8"></iframe>'
@@ -1702,105 +1686,6 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
         ></div>
       `
       const expected = '<video src="https://cdn.example.com/clip.mp4" controls></video>'
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should convert an audio url into an audio element', async () => {
-      const value = html`
-        <div
-          class="audiofield-wordpress-player"
-          data-src="https://x.example/a.mp3"
-        ></div>
-      `
-      const expected = html`
-        <div class="audiofield-wordpress-player" data-src="https://x.example/a.mp3">
-          <audio
-            src="https://x.example/a.mp3"
-            controls
-          ></audio>
-        </div>
-      `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should keep the container and its text, adding the media in front', async () => {
-      const value = '<li data-audiopath="https://x.example/track.mp3">Track one</li>'
-      const expected = html`
-        <li
-          data-audiopath="https://x.example/track.mp3"
-        ><audio src="https://x.example/track.mp3" controls></audio>Track one</li>
-      `
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should resolve a relative parked url against the base url', async () => {
-      const value = '<div data-video-src="/uploads/clip.mp4"></div>'
-      const context = {
-        ...baseContext,
-        baseUrl: 'https://forum.example/t/1',
-      }
-      const expected = html`
-        <div data-video-src="/uploads/clip.mp4">
-          <video
-            src="https://forum.example/uploads/clip.mp4"
-            controls
-          ></video>
-        </div>
-      `
-
-      expect(await transform(value, context)).toEqualHtml(expected)
-    })
-
-    it('should skip a streaming manifest', async () => {
-      const value = '<div data-video-src="https://x.example/index.m3u8"></div>'
-
-      expect(await transform(value)).toEqualHtml(value)
-    })
-
-    it('should skip a value that names an image', async () => {
-      const value = '<div data-src="https://x.example/photo.jpg"></div>'
-
-      expect(await transform(value)).toEqualHtml(value)
-    })
-
-    it('should skip a parked MediaWiki file page', async () => {
-      const value =
-        '<div data-src="https://commons.wikimedia.org/wiki/File:Example.webm?embedplayer=yes"></div>'
-
-      expect(await transform(value)).toEqualHtml(value)
-    })
-
-    it('should skip a container that already wraps a player', async () => {
-      const value = html`
-        <div data-src="https://x.example/a.mp3">
-          <audio
-            controls
-            src="https://x.example/a.mp3"
-          ></audio>
-        </div>
-      `
-
-      expect(await transform(value)).toEqualHtml(value)
-    })
-
-    it('should take the first attribute that names a media file', async () => {
-      const value = html`
-        <div
-          data-mp4="https://x.example/a.mp4"
-          data-webm="https://x.example/a.webm"
-        ></div>
-      `
-      const expected = html`
-        <div data-mp4="https://x.example/a.mp4" data-webm="https://x.example/a.webm">
-          <video
-            src="https://x.example/a.mp4"
-            controls
-          ></video>
-        </div>
-      `
 
       expect(await transform(value)).toEqualHtml(expected)
     })
@@ -2163,6 +2048,30 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
         data-embed-id="dQw4w9WgXcQ"
         data-embed-provider="youtube"
         data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+      ></div>
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should frame the element when the post frames another player with no id', async () => {
+    const value = html`
+      <audio
+        controls
+        src="https://on.soundcloud.com/x3NpZ7LmQaB2"
+      ></audio>
+      <iframe src="https://w.soundcloud.com/player/?url=https%3A//on.soundcloud.com/Vb8TkR2yHs41"></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-height="166"
+        data-embed-provider="soundcloud"
+        data-embed-src="https://w.soundcloud.com/player/?url=https://on.soundcloud.com/x3NpZ7LmQaB2"
+      ></div>
+      <div
+        data-embed-height="166"
+        data-embed-provider="soundcloud"
+        data-embed-src="https://w.soundcloud.com/player/?url=https://on.soundcloud.com/Vb8TkR2yHs41"
       ></div>
     `
 

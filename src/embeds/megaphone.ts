@@ -1,7 +1,7 @@
-import { composeQuery, getQueryParam, isHostOf } from 'trousse'
+import { composeQuery, getQueryParam, getQueryParams, isHostOf } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { digitsRegex, isFileName, pickQueryParams } from '../utils/urls.js'
+import { digitsRegex, isFileName } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'megaphone'
@@ -66,7 +66,7 @@ export const megaphoneResolveEmbed: ResolveUrlEmbed = (url) => {
     return
   }
 
-  const playback = pickQueryParams(url.search, ['start'])
+  const playback = getQueryParams(url.search, ['start'])
   const query = composeQuery({ [embed.param]: embed.id, ...playback })
 
   return {

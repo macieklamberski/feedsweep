@@ -200,11 +200,11 @@ describe('getImageFingerprint', () => {
     expect(wrapped).toBe(bare)
   })
 
-  it('should key a glued query as written when there is no cleaner', () => {
+  it('should repair a glued query before keying it when there is no cleaner', () => {
     const glued = getImageFingerprint('https://example.com/photo.jpg&w=100')
     const bare = getImageFingerprint('https://example.com/photo.jpg')
 
-    expect(glued).not.toBe(bare)
+    expect(glued).toBe(bare)
   })
 
   it('should drop the query so resize variants collapse', () => {

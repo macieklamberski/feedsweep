@@ -5,7 +5,8 @@ import { describeForEachParser, html, jsonAttrValue } from '../tests.js'
 describeForEachParser('Twitter', (parseHtml) => {
   // twitterBlockquoteEmbedResolver claims the blockquote the embed dialog writes, including the
   // twitter-video spelling of it, twitterAmpEmbedResolver the amp-twitter component,
-  // twitterSubstackEmbedResolver the div Substack's editor stores a pasted tweet in, and
+  // twitterEmbettyEmbedResolver the embetty-tweet component, twitterSubstackEmbedResolver the div
+  // Substack's editor stores a pasted tweet in, and
   // twitterIframeEmbedResolver the player frame and the status page a wrapper frames instead of
   // it. The host eras (twitter.com, x.com, mobile.twitter.com) and the proxy front-ends are read
   // off the anchor inside the resolver, and no pass before it touches them, so they stay pinned
@@ -125,6 +126,20 @@ describeForEachParser('Twitter', (parseHtml) => {
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
   })
 
+  it('should convert an embetty-tweet component that carries no text', async () => {
+    const value = '<embetty-tweet status="1196161740582588416"></embetty-tweet>'
+    const expected = html`
+      <div
+        data-embed-provider="twitter"
+        data-embed-id="1196161740582588416"
+        data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=1196161740582588416"
+        data-embed-url="https://x.com/i/status/1196161740582588416"
+      ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
   // Substack renders this div client-side, so it arrives childless and stripEmptyTags takes
   // whatever the resolver does not claim first. The tweet text is markup inside the JSON and
   // reaches the placeholder as plain text, its links flattened.
@@ -159,6 +174,72 @@ describeForEachParser('Twitter', (parseHtml) => {
         data-embed-date="Thu Feb 08 12:00:45 +0000 2018"
         data-embed-thumbnail="https://pbs.substack.com/media/DVgu7f1WsAAkNMr.jpg"
       ></div>
+    `
+
+    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+  })
+
+  // The static card Substack wrote before the Twitter2ToDOM div holds its own copy of the tweet,
+  // and the placeholder replaces the whole card, prose beside it kept.
+  it('should convert a Substack div.tweet card with its static copy into one placeholder', async () => {
+    const cardAttrs = jsonAttrValue({
+      url: 'https://twitter.com/rdrn_/status/1593251129147920386',
+      full_text: 'I think tech/SW teams should build APIs of core business data concepts earlier',
+      username: 'mattarderne',
+      name: 'Matt Arderne',
+      date: 'Thu Nov 17 14:34:05 +0000 2022',
+      photos: [],
+    })
+    const value = html`
+      <p>Before.</p>
+      <div
+        class="tweet"
+        data-attrs="${cardAttrs}"
+      >
+        <a
+          class="tweet-link-top"
+          href="https://twitter.com/rdrn_/status/1593251129147920386"
+          target="_blank"
+        >
+          <div class="tweet-header">
+            <img
+              class="tweet-header-avatar"
+              src="https://substackcdn.com/image/twitter_name/w_96/mattarderne.jpg"
+              alt="Twitter avatar for @mattarderne"
+            >
+            <div class="tweet-header-text">
+              <span class="tweet-author-name">Matt Arderne</span>
+              <span class="tweet-author-handle">@mattarderne</span>
+            </div>
+          </div>
+          <div class="tweet-text">
+            I think tech/SW teams should build APIs of core business data concepts earlier
+          </div>
+        </a>
+        <a
+          class="tweet-link-bottom"
+          href="https://twitter.com/rdrn_/status/1593251129147920386"
+          target="_blank"
+        >
+          <div class="tweet-footer">
+            <span class="tweet-date">2:34 PM ∙ Nov 17, 2022</span>
+          </div>
+        </a>
+      </div>
+      <p>After.</p>
+    `
+    const expected = html`
+      <p>Before.</p>
+      <div
+        data-embed-provider="twitter"
+        data-embed-id="1593251129147920386"
+        data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=1593251129147920386"
+        data-embed-url="https://x.com/rdrn_/status/1593251129147920386"
+        data-embed-description="I think tech/SW teams should build APIs of core business data concepts earlier"
+        data-embed-author="Matt Arderne"
+        data-embed-date="Thu Nov 17 14:34:05 +0000 2022"
+      ></div>
+      <p>After.</p>
     `
 
     expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)

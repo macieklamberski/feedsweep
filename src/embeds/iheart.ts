@@ -1,4 +1,4 @@
-import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
+import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -21,6 +21,22 @@ const sizes = {
   station: { height: 200 },
 }
 
+const composePlayerEmbed = (
+  id: string,
+  page: string,
+  size: { height: number },
+  element?: Element,
+): EmbedResolverResult => {
+  return {
+    provider,
+    id,
+    src: `${page}?embed=true`,
+    url: page,
+    ...size,
+    title: attr(element, 'title'),
+  }
+}
+
 // An iHeart podcast player, of one episode or of a show, and the live station and artist radio
 // players, on www.iheart.com or beta.iheart.com.
 export const iheartResolveEmbed: ResolveUrlEmbed = (url, element) => {
@@ -30,14 +46,9 @@ export const iheartResolveEmbed: ResolveUrlEmbed = (url, element) => {
   if (episode) {
     const page = `https://www.iheart.com/podcast/${episode.showId}/episode/${episode.episodeId}/`
 
-    return {
-      provider,
-      id: `${episode.showId}/${episode.episodeId}`,
-      src: `${page}?embed=true`,
-      url: page,
-      ...sizes.episode,
-      title: attr(element, 'title'),
-    }
+    const id = `${episode.showId}/${episode.episodeId}`
+
+    return composePlayerEmbed(id, page, sizes.episode, element)
   }
 
   const station = pathname.match(stationPathRegex)?.groups
@@ -45,14 +56,7 @@ export const iheartResolveEmbed: ResolveUrlEmbed = (url, element) => {
   if (station?.kind && station.id) {
     const page = `https://www.iheart.com/${station.kind}/${station.id}/`
 
-    return {
-      provider,
-      id: `${station.kind}/${station.id}`,
-      src: `${page}?embed=true`,
-      url: page,
-      ...sizes.station,
-      title: attr(element, 'title'),
-    }
+    return composePlayerEmbed(`${station.kind}/${station.id}`, page, sizes.station, element)
   }
 
   const show = pathname.match(showPathRegex)
@@ -63,14 +67,7 @@ export const iheartResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
   const page = `https://www.iheart.com/podcast/${show[1]}/`
 
-  return {
-    provider,
-    id: show[1],
-    src: `${page}?embed=true`,
-    url: page,
-    ...sizes.show,
-    title: attr(element, 'title'),
-  }
+  return composePlayerEmbed(show[1], page, sizes.show, element)
 }
 
 export const iheartEmbedResolver = createUrlEmbedResolver(hosts, iheartResolveEmbed)

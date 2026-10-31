@@ -2,10 +2,14 @@ import {
   composeQuery,
   decodeSegment,
   encodePathSegment,
+  getFragmentParams,
   getPathSegments,
   getQueryParam,
+  getQueryParams,
   isAnyOf,
   isHostOrSubdomainOf,
+  type Nullish,
+  parseUrl,
 } from 'trousse'
 import type {
   EmbedRenderHint,
@@ -14,8 +18,13 @@ import type {
   ResolveUrlEmbed,
 } from '../types.js'
 import { attr, find } from '../utils/dom.js'
-import { parseUrlOnHosts, pickQueryParams } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import * as styles from '../utils/styles.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
+import {
+  createMarkupEmbedResolver,
+  createUrlEmbedResolver,
+  readRepairedCarrierUrl,
+} from '../utils/widgets.js'
 
 const provider = 'youtube'
 
@@ -28,8 +37,9 @@ const safeVideoIdRegex = /^[a-zA-Z0-9_-]{11}$/
 
 // Steam feeds leak a bbcode quote into the src as /embed/"{id}, and the video drops without it.
 // The quote reaches the id as a literal `"` from a param or percent-encoded `%22` from a path
-// segment.
-const strayLeadingQuoteRegex = /^(?:%22|")/
+// segment. `watch?v=/{id}` carries a slash the same way: Elementor builds `/embed//{id}` from it,
+// and YouTube collapses the slash and plays the video.
+const strayLeadingMarkRegex = /^(?:%22|"|\/)/
 
 // `videoseries` and `live_stream` are YouTube embed path words, and each is eleven legal id
 // characters.
@@ -71,6 +81,30 @@ export const isVideoId = (value: string): boolean => {
 // TODO: prefer a higher-res thumbnail where one exists, which needs a HEAD probe per video.
 export const composeThumbnailUrl = (videoId: string): string => {
   return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
+}
+
+// YouTube serves one poster on every image host it runs: `i.ytimg.com`, the numbered `i1` to `i9`
+// and `img.youtube.com`, as `vi/{id}/hqdefault.jpg`, its WebP copy under `vi_webp` and the
+// animated preview under `an_webp`. The bare `an` route names a channel, `vi_blogger` an id of
+// Blogger's own, and `s.ytimg.com` serves static assets, none of them a video.
+const thumbnailHosts = ['ytimg.com', 'img.youtube.com']
+const thumbnailRoutes = ['vi', 'vi_webp', 'an_webp']
+
+// The video a poster url names, read back from the shape composeThumbnailUrl writes.
+export const readThumbnailVideoId = (link: Nullish<string | URL>): string | undefined => {
+  const url = parseUrlOnHosts(link, thumbnailHosts)
+
+  if (!url) {
+    return
+  }
+
+  const [route, videoId] = getPathSegments(url)
+
+  if (!isAnyOf(route, thumbnailRoutes)) {
+    return
+  }
+
+  return videoId
 }
 
 // The player url every transform that recovers an id has to build. Params are given as values,
@@ -115,7 +149,7 @@ export const extractVideoId = (url: URL | undefined): string | undefined => {
   ]
 
   return candidates
-    .map((candidate) => candidate?.replace(strayLeadingQuoteRegex, ''))
+    .map((candidate) => candidate?.replace(strayLeadingMarkRegex, ''))
     .find((candidate) => !!candidate && isVideoId(candidate))
 }
 
@@ -153,44 +187,20 @@ const parseWatchOffset = (value: string): string | undefined => {
 // The player ignores `t`, so an offset moves over as `start` unless one is stated. Besides the
 // query, publishers write it in the fragment as `#t=220`.
 const readEmbedParams = (url: URL): Record<string, string> => {
-  const params = pickQueryParams(url.search, youtubeEmbedParams)
+  const params = getQueryParams(url.search, youtubeEmbedParams)
 
   if (params.start) {
     return params
   }
 
-  const offsetQueries = [url.search, url.hash.slice(1)]
-  const start = offsetQueries
-    .map((query) => {
-      const offset = getQueryParam(new URLSearchParams(query), 't') ?? ''
-
-      return parseWatchOffset(offset)
-    })
-    .find(Boolean)
+  const offsets = [getQueryParams(url.search, ['t']).t, getFragmentParams(url, ['t']).t]
+  const start = offsets.map((offset) => parseWatchOffset(offset ?? '')).find(Boolean)
 
   if (start) {
     params.start = start
   }
 
   return params
-}
-
-// The player url for a caller holding a url nothing has checked: a page builder stores whatever
-// the publisher pasted, so the host is checked here the way the factory checks it for a carrier.
-export const readYoutubeEmbedSrc = (link: string): string | undefined => {
-  const url = parseUrlOnHosts(link, hosts)
-
-  if (!url) {
-    return
-  }
-
-  const videoId = extractVideoId(url)
-
-  if (!videoId) {
-    return
-  }
-
-  return composeEmbedUrl(videoId, readEmbedParams(url))
 }
 
 // `PBS` is a legal playlist id, channel id and legacy username at once, so each key names its
@@ -343,6 +353,19 @@ export const youtubeResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 }
 
+// The player url for a caller holding a url nothing has checked: a page builder stores whatever
+// the publisher pasted, so the host is checked here the way the factory checks it for a carrier.
+// It reads the url the way the resolver does, playlists and start times included.
+export const readYoutubeEmbedSrc = (link: string): string | undefined => {
+  const url = parseUrlOnHosts(link, hosts)
+
+  if (!url) {
+    return
+  }
+
+  return youtubeResolveEmbed(url)?.src
+}
+
 // FC2's blog player shell on static.fc2.com, a page that builds only the YouTube player its query
 // `id` names. The generic iframe placeholder for it carries no provider and no poster.
 export const youtubeFc2EmbedResolver = createUrlEmbedResolver(
@@ -371,6 +394,55 @@ export const youtubeFc2EmbedResolver = createUrlEmbedResolver(
 
 // A YouTube player iframe, a frame of a watch, shorts or playlist page, or the Flash player.
 export const youtubeIframeEmbedResolver = createUrlEmbedResolver(hosts, youtubeResolveEmbed)
+
+// Invidious and Piped instances run on any host and serve YouTube's own `/embed` route for the
+// same ids. An instance host opens on its software's name, and Invidious's share snippet names
+// its frame `ivplayer` on any host.
+const frontendLabels = ['invidious', 'piped']
+
+// Invidious instances whose host carries neither name.
+const instanceHosts = ['invidio.us', 'yewtu.be', 'inv.nadeko.net', 'inv.riverside.rocks']
+
+// Both front ends read the start from `t` before `start`, and Invidious from `time_continue`
+// between them, each as seconds or as `1m30s`.
+const frontendOffsetParams = ['t', 'time_continue']
+
+const isFrontendFrame = (url: URL, element: Element): boolean => {
+  const [label] = url.hostname.split('.')
+
+  return (
+    frontendLabels.includes(label) ||
+    isHostOrSubdomainOf(url, instanceHosts) ||
+    isAnyOf(attr(element, 'id'), 'ivplayer')
+  )
+}
+
+// An Invidious or Piped frame: the instance's player for a YouTube id, mostly on instances that
+// are gone.
+export const youtubeFrontendEmbedResolver = createMarkupEmbedResolver(
+  'iframe[src*="/embed/" i]',
+  (element) => {
+    const url = parseUrl(readRepairedCarrierUrl(element))
+
+    if (!url || !isFrontendFrame(url, element)) {
+      return
+    }
+
+    const params = getQueryParams(url.search, youtubeEmbedParams)
+    const offset = frontendOffsetParams
+      .map((name) => getQueryParam(url.searchParams, name))
+      .find(Boolean)
+    const start = parseWatchOffset(offset ?? '')
+
+    if (start) {
+      params.start = start
+    }
+
+    const youtubeUrl = new URL(`${url.pathname}${composeQuery(params)}`, 'https://www.youtube.com')
+
+    return youtubeResolveEmbed(youtubeUrl, element)
+  },
+)
 
 // AMP's amp-youtube names the video in data-videoid and renders nothing without the AMP runtime.
 export const youtubeAmpEmbedResolver = createMarkupEmbedResolver(
@@ -428,6 +500,32 @@ export const youtubeMetasliderEmbedResolver = createMarkupEmbedResolver(
       ...composeVideoEmbed(videoId, start ? { start } : undefined),
       // A lazy slide's poster carries the video's title as its `alt`.
       title: attr(find(element, 'img.msDefaultImage'), 'alt'),
+    }
+  },
+)
+
+// react-lite-youtube-embed's facade, `article.yt-lite` with the poster as its background, builds
+// the player only on click. Publishers' own copies of it name the id in a data attribute.
+export const youtubeLiteEmbedResolver = createMarkupEmbedResolver(
+  // A playlist facade's poster names only its cover video.
+  '.yt-lite:not(:has(iframe, .lty-playlist-icon))',
+  (element) => {
+    const videoId =
+      attr(element, 'data-video-id') ??
+      attr(element, 'data-id') ??
+      readThumbnailVideoId(styles.bgImage(element))
+
+    if (!videoId) {
+      return
+    }
+
+    const embed = composeVideoEmbed(videoId)
+
+    return {
+      ...embed,
+      // A publisher copy of the facade paints its own poster, which can be another picture.
+      thumbnail: attr(find(element, 'img'), 'src') ?? embed.thumbnail,
+      title: attr(element, 'data-title'),
     }
   },
 )

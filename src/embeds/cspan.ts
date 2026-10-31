@@ -1,6 +1,5 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParams, isAnyOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
-import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'cspan'
@@ -31,7 +30,7 @@ export const cspanResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 
   // The id leads the query with no name, so the kept pairs follow it after `&`.
-  const query = pickUrlParams(url, ['start']).replace('?', '&')
+  const query = composeQuery(getQueryParams(url, ['start'])).replace('?', '&')
 
   return {
     provider,

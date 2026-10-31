@@ -1,20 +1,7 @@
 import { isSoundcloudStream } from '../../embeds/soundcloud.js'
-import type {
-  DomTransform,
-  EmbedResolverResult,
-  MediaResolverResult,
-  WidgetResolver,
-} from '../../types.js'
-import { attr, isElement, isNonWhitespaceText, playableElements } from '../../utils/dom.js'
-import {
-  audioFileRegex,
-  cleanUnclaimedUrl,
-  flashFileRegex,
-  isMediaWikiFilePage,
-  prepareUrl,
-  resolveOrDropUrl,
-  videoFileRegex,
-} from '../../utils/urls.js'
+import type { DomTransform, WidgetResolver } from '../../types.js'
+import { attr, isElement, isNonWhitespaceText } from '../../utils/dom.js'
+import { cleanUnclaimedUrl, flashFileRegex, resolveOrDropUrl } from '../../utils/urls.js'
 import {
   createCaptionedFigure,
   createEmbedPlaceholder,
@@ -22,56 +9,22 @@ import {
   createMediaElement,
   embedCarrierSelector,
   getEmbedSize,
+  getMediaTag,
   isEmbedOrMediaResolver,
   isMediaResult,
   isResolvedIframe,
   prepareEmbedMetadata,
   prepareMediaMetadata,
   readCarrierUrl,
+  readPlayer,
   resolveEmbedProbe,
+  toPlayerKey,
 } from '../../utils/widgets.js'
-
-const playableSelector = playableElements.join(', ')
-
-const getMediaTag = (url: string): MediaResolverResult['tag'] | undefined => {
-  if (isMediaWikiFilePage(url)) {
-    return
-  }
-
-  if (videoFileRegex.test(url)) {
-    return 'video'
-  }
-
-  if (audioFileRegex.test(url)) {
-    return 'audio'
-  }
-}
-
-// A Discourse video placeholder, a Beaver Builder row background, the Drupal audio field and
-// several WordPress audio players park the media url in an attribute for JS to build the player.
-const findParkedMedia = (
-  element: Element,
-  attributes: Array<string>,
-): MediaResolverResult | undefined => {
-  for (const attribute of attributes) {
-    const value = attr(element, attribute)
-
-    if (!value) {
-      continue
-    }
-
-    const tag = getMediaTag(value)
-
-    if (tag) {
-      return { tag, src: value }
-    }
-  }
-}
 
 type PageMedia = {
   media: Element
   frame: Element
-  embed: EmbedResolverResult
+  player: string | undefined
 }
 
 // A WordPress video shortcode or a hand-written <video> or <audio> can name a platform's page,
@@ -108,7 +61,7 @@ const readPageMedia = async (
       return
     }
 
-    found.push({ media, frame, embed })
+    found.push({ media, frame, player: toPlayerKey(embed) })
   }
 
   // A resolver that claims the element itself reads it in the tiers below. The copy keeps a
@@ -178,9 +131,9 @@ const captionMedia = (
   return createCaptionedFigure(document, media, text)
 }
 
-// Embed carriers as shipped: third-party iframes, dead Flash objects, media urls parked in data-*.
+// Embed carriers as shipped: third-party iframes and dead Flash objects.
 export const convertWidgets: DomTransform = (context) => {
-  const { widgetResolvers, mediaSrcAttributes } = context
+  const { widgetResolvers } = context
   const embedOrMediaResolvers = widgetResolvers.filter(isEmbedOrMediaResolver)
 
   return async (document) => {
@@ -199,28 +152,6 @@ export const convertWidgets: DomTransform = (context) => {
       return found
     }
 
-    // Runs before the tiers below, which replace the iframes the playable guard relies on.
-    for (const element of document.querySelectorAll('div, figure, span, li')) {
-      const parked = findParkedMedia(element, mediaSrcAttributes)
-
-      if (!parked) {
-        continue
-      }
-
-      // A container that already wraps something playable is chrome around a real player,
-      // and the attribute belongs to that player, not to a missing element.
-      if (element.querySelector(playableSelector)) {
-        continue
-      }
-
-      // An unresolved url is kept, unlike the tiers below: dropping it takes the media out of the
-      // item, since no browser reads a data-* url and the container renders nothing on its own.
-      const src = prepareUrl(parked.src, context)
-
-      // The container often holds a caption or a track title beside the parked url.
-      element.prepend(createMediaElement(document, { tag: parked.tag, src }))
-    }
-
     // Runs before the tiers below, which claim the frame it leaves.
     const pageMedia: Array<PageMedia> = []
 
@@ -233,20 +164,20 @@ export const convertWidgets: DomTransform = (context) => {
     }
 
     // A post that also frames the same video or file already plays it, so the dead element goes.
-    const framedKeys = new Set<string>()
+    const framedPlayers: Array<string> = []
 
     if (pageMedia.length) {
       for (const frame of document.querySelectorAll(embedCarrierSelector)) {
-        const embed = await resolveEmbedProbe(frame.cloneNode(true) as Element, widgetResolvers)
+        const player = await readPlayer(frame, widgetResolvers)
 
-        if (embed) {
-          framedKeys.add(`${embed.provider}/${embed.id}`)
+        if (player) {
+          framedPlayers.push(player)
         }
       }
     }
 
-    for (const { media, frame, embed } of pageMedia) {
-      if (framedKeys.has(`${embed.provider}/${embed.id}`)) {
+    for (const { media, frame, player } of pageMedia) {
+      if (player && framedPlayers.includes(player)) {
         media.remove()
         continue
       }

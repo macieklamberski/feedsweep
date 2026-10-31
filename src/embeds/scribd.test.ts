@@ -244,6 +244,26 @@ describeForEachParser('scribdFlashEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    it('should carry the page the viewer opened on over as the start page', async () => {
+      const value = html`
+        <embed
+          type="application/x-shockwave-flash"
+          src="http://d1.scribdassets.com/ScribdViewer.swf?document_id=12236822&amp;access_key=key-196wuw8zci2vzyzu1ifb&amp;page=1&amp;version=1&amp;viewMode=list"
+          width="100%"
+          height="500"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'scribd',
+        id: '12236822',
+        src: 'https://www.scribd.com/embeds/12236822/content?access_key=key-196wuw8zci2vzyzu1ifb&start_page=1',
+        url: 'https://www.scribd.com/document/12236822',
+        height: 600,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     // The earlier snippet leaves the swf url bare and names the document in the flashvars.
     it('should read the document off the flashvars when the swf query is bare', async () => {
       const value = html`
@@ -258,7 +278,7 @@ describeForEachParser('scribdFlashEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'scribd',
         id: '41131710',
-        src: 'https://www.scribd.com/embeds/41131710/content?access_key=key-abc',
+        src: 'https://www.scribd.com/embeds/41131710/content?access_key=key-abc&start_page=1',
         url: 'https://www.scribd.com/document/41131710',
         height: 600,
       }

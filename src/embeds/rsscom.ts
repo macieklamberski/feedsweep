@@ -1,8 +1,8 @@
-import { composeQuery, getPathSegments } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParams } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readObjectHeight } from '../utils/hints.js'
-import { digitsRegex, pickQueryParams } from '../utils/urls.js'
+import { digitsRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'rsscom'
@@ -25,7 +25,7 @@ export const rsscomResolveEmbed: ResolveUrlEmbed = (url, element) => {
     return
   }
 
-  const query = composeQuery({ ...playerParams, ...pickQueryParams(url.search, ['time']) })
+  const query = composeQuery({ ...playerParams, ...getQueryParams(url.search, ['time']) })
   const title = attr(element, 'title')
 
   if (episodeId === latestSegment) {

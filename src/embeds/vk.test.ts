@@ -573,7 +573,7 @@ describeForEachParser('vkWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should pass an empty hash through as written', async () => {
+    it('should drop an empty hash', async () => {
       const value = html`
         <div id="vk_playlist_-224301543_164"></div>
         <script type="text/javascript">
@@ -583,7 +583,7 @@ describeForEachParser('vkWidgetEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'vk',
         id: 'audio_playlist-224301543_164',
-        src: 'https://vk.ru/widget_playlist.php?oid=-224301543&pid=164&hash=',
+        src: 'https://vk.ru/widget_playlist.php?oid=-224301543&pid=164',
       }
 
       expect(await extract(value)).toEqual(expected)

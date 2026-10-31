@@ -55,17 +55,10 @@ export const calameoResolveEmbed: ResolveUrlEmbed = (url, element) => {
     return
   }
 
-  // The viewer reads every name in any case, and the Flash players wrote a private publication's
-  // token as `AuthID`.
-  const namedParams = new URLSearchParams()
-
-  for (const [name, value] of params) {
-    namedParams.append(name.toLowerCase(), value)
-  }
-
-  const authId = getQueryParam(namedParams, 'authid')
+  // The Flash players wrote a private publication's token as `AuthID`.
+  const authId = getQueryParam(params, 'authid')
   // The page the viewer opens on.
-  const page = getQueryParam(namedParams, 'page')
+  const page = getQueryParam(params, 'page')
   const query = composeQuery(trimObject({ bkcode: code, page, authid: authId }, Boolean))
   const src = `https://v.calameo.com/${query}`
 

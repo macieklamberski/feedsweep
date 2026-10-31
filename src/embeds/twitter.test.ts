@@ -6,6 +6,7 @@ import {
   readTwitterHeight,
   twitterAmpEmbedResolver,
   twitterBlockquoteEmbedResolver,
+  twitterEmbettyEmbedResolver,
   twitterIframeEmbedResolver,
   twitterResolveEmbed,
   twitterS9eEmbedResolver,
@@ -1018,6 +1019,34 @@ describeForEachParser('twitterAmpEmbedResolver', (parseHtml) => {
   })
 })
 
+describeForEachParser('twitterEmbettyEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, twitterEmbettyEmbedResolver)
+
+  it('should build the player from the status id', async () => {
+    const value = '<embetty-tweet status="1196161740582588416"></embetty-tweet>'
+    const expected: EmbedResolverResult = {
+      provider: 'twitter',
+      id: '1196161740582588416',
+      src: 'https://platform.twitter.com/embed/Tweet.html?id=1196161740582588416',
+      url: 'https://x.com/i/status/1196161740582588416',
+    }
+
+    expect(await extract(value)).toEqual(expected)
+  })
+
+  it('should not claim a status that is not a tweet id', async () => {
+    const value = '<embetty-tweet status="../1196161740582588416"></embetty-tweet>'
+
+    expect(await extract(value)).toBeUndefined()
+  })
+
+  it('should not claim an empty status', async () => {
+    const value = '<embetty-tweet status=""></embetty-tweet>'
+
+    expect(await extract(value)).toBeUndefined()
+  })
+})
+
 describeForEachParser('twitterSubstackEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, twitterSubstackEmbedResolver)
 
@@ -1321,6 +1350,126 @@ describeForEachParser('twitterSubstackEmbedResolver', (parseHtml) => {
       })
 
       expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('the static div.tweet card the component wrote before', () => {
+    it('should read the full_text payload of a card with no component name', async () => {
+      const cardAttrs = jsonAttrValue({
+        url: 'https://twitter.com/rdrn_/status/1593251129147920386',
+        full_text:
+          'I think tech/SW teams should (be required) to build APIs of core business data concepts (customers, orders, products) way earlier',
+        username: 'mattarderne',
+        name: 'Matt Arderne',
+        date: 'Thu Nov 17 14:34:05 +0000 2022',
+        photos: [],
+        quoted_tweet: {},
+        retweet_count: 2,
+        like_count: 39,
+        expanded_url: {},
+        video_url: null,
+        belowTheFold: false,
+      })
+      const value = html`
+        <div
+          class="tweet"
+          data-attrs="${cardAttrs}"
+        >
+          <a
+            class="tweet-link-top"
+            href="https://twitter.com/rdrn_/status/1593251129147920386"
+            target="_blank"
+          >
+            <div class="tweet-header">
+              <img
+                class="tweet-header-avatar"
+                src="https://substackcdn.com/image/twitter_name/w_96/mattarderne.jpg"
+                alt="Twitter avatar for @mattarderne"
+              >
+              <div class="tweet-header-text">
+                <span class="tweet-author-name">Matt Arderne</span>
+                <span class="tweet-author-handle">@mattarderne</span>
+              </div>
+            </div>
+            <div class="tweet-text">
+              I think tech/SW teams should (be required) to build APIs of core business data
+              concepts (customers, orders, products) way earlier
+            </div>
+          </a>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: '1593251129147920386',
+        src: 'https://platform.twitter.com/embed/Tweet.html?id=1593251129147920386',
+        url: 'https://x.com/rdrn_/status/1593251129147920386',
+        description:
+          'I think tech/SW teams should (be required) to build APIs of core business data concepts (customers, orders, products) way earlier',
+        author: 'Matt Arderne',
+        date: 'Thu Nov 17 14:34:05 +0000 2022',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the html and author_name of a TwitterToDOM payload', async () => {
+      const cardAttrs = jsonAttrValue({
+        url: 'https://twitter.com/nwquah/status/1006226551942377472',
+        html: '<p lang="en" dir="ltr">the dude <a href="https://twitter.com/pkafka?ref_src=twsrc%5Etfw">@pkafka</a> articulates a thing I’ve been trying to say for a while but better<br><br>“You may well see podcast advertising move much faster — but it also means podcast advertising will be more unpleasant. Let’s hope the podcast guys keep puttering along.”<a href="https://t.co/LSmr9iVwIH">https://t.co/LSmr9iVwIH</a></p>',
+        author: 'nwquah',
+        author_name: 'nick q',
+        date: 'June 11, 2018',
+      })
+      const value = html`
+        <div
+          class="tweet"
+          data-component-name="TwitterToDOM"
+          data-attrs="${cardAttrs}"
+        >
+          <a
+            class="tweet-header"
+            href="https://twitter.com/nwquah"
+            target="_blank"
+          >
+            <img src="https://substackcdn.com/image/twitter_name/w_48/nwquah.jpg">
+            <span class="tweet-author-name">nick q</span>
+            <span class="tweet-author">@nwquah</span>
+          </a>
+          <p>
+            the dude
+            <a
+              href="https://twitter.com/pkafka?ref_src=twsrc%5Etfw"
+              target="_blank"
+            >@pkafka</a>
+            articulates a thing I’ve been trying to say for a while but better
+            <br>
+            <br>
+            “You may well see podcast advertising move much faster — but it also means podcast
+            advertising will be more unpleasant. Let’s hope the podcast guys keep puttering along.”
+            <a
+              href="https://t.co/LSmr9iVwIH"
+              target="_blank"
+            >https://t.co/LSmr9iVwIH</a>
+          </p>
+          <a
+            class="tweet-date"
+            href="https://twitter.com/nwquah/status/1006226551942377472"
+            target="_blank"
+          >June 11, 2018</a>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: '1006226551942377472',
+        src: 'https://platform.twitter.com/embed/Tweet.html?id=1006226551942377472',
+        url: 'https://x.com/nwquah/status/1006226551942377472',
+        description:
+          'the dude @pkafka articulates a thing I’ve been trying to say for a while but better\n\n“You may well see podcast advertising move much faster — but it also means podcast advertising will be more unpleasant. Let’s hope the podcast guys keep puttering along.”https://t.co/LSmr9iVwIH',
+        author: 'nick q',
+        date: 'June 11, 2018',
+      }
+
+      expect(await extract(value)).toEqual(expected)
     })
   })
 })

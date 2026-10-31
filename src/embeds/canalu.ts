@@ -1,6 +1,5 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParams, isAnyOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
-import { pickUrlParams } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'canalu'
@@ -17,7 +16,7 @@ const sizes = {
 // both routes. The player reads `t` as the start position and nothing else from its query.
 export const canaluResolveEmbed: ResolveUrlEmbed = (url) => {
   const segments = getPathSegments(url)
-  const query = pickUrlParams(url, ['t'])
+  const query = composeQuery(getQueryParams(url, ['t']))
 
   if (segments.length === 4) {
     const [chaines, channel, embed, id] = segments

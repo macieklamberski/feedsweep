@@ -152,7 +152,7 @@ const dimensionSuffixRegex = /[-_]\d{1,5}x\d{1,5}(\.[a-z0-9]+)$/i
 // when the caller's matchUrlFn unwraps the proxy.
 export const getImageFingerprint = (rawUrl: string, context?: TransformContext): string => {
   const cleaned = cleanMatchUrl(rawUrl, context) ?? rawUrl
-  // With stripProtocol the result would not parse, so the protocol goes when the key is built.
+  // With stripScheme the result would not parse, so the scheme goes when the key is built.
   const normalized = normalizeUrl(cleaned, {
     stripWww: true,
     stripHash: true,

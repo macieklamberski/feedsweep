@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 import { describeForEachParser, html, queryElement } from '../tests.js'
+import type { ScopedAttribute } from '../types.js'
 import {
   attr,
   batchSelectors,
@@ -16,6 +17,7 @@ import {
   hasZeroOpacity,
   isElementHidden,
   isEmptyElement,
+  isInScope,
   isPercentageSized,
   keepIfMatches,
   paramValue,
@@ -1353,6 +1355,43 @@ describeForEachParser('attr', (parseHtml) => {
   })
 })
 
+describeForEachParser('isInScope', (parseHtml) => {
+  it('should match any element when the entry names no selector', () => {
+    const document = parseHtml('<section data-track-url="https://example.com/a.mp3"></section>')
+    const element = queryElement(document, 'section')
+    const value: ScopedAttribute = { attribute: 'data-track-url' }
+
+    expect(isInScope(element, value)).toBe(true)
+  })
+
+  it('should match an element the selector matches', () => {
+    const document = parseHtml(html`
+      <div
+        class="track"
+        data-track-url="https://example.com/a.mp3"
+      ></div>
+    `)
+    const element = queryElement(document, 'div')
+    const value: ScopedAttribute = {
+      attribute: 'data-track-url',
+      selector: '.track',
+    }
+
+    expect(isInScope(element, value)).toBe(true)
+  })
+
+  it('should not match an element outside the selector', () => {
+    const document = parseHtml('<div data-track-url="https://example.com/a.mp3"></div>')
+    const element = queryElement(document, 'div')
+    const value: ScopedAttribute = {
+      attribute: 'data-track-url',
+      selector: '.track',
+    }
+
+    expect(isInScope(element, value)).toBe(false)
+  })
+})
+
 describeForEachParser('flashVars', (parseHtml) => {
   // `<embed>` spells the config as its own attribute and `<object>` as a sibling `<param>`,
   // and the same snippet often carries both so a reader of one dialect sees half the markup.
@@ -1494,20 +1533,6 @@ describe('parseFlashVars', () => {
     }
 
     expect(Object.fromEntries(parseFlashVars('config=1&id=2'))).toEqual(expected)
-  })
-
-  it('should strip the whitespace around each value', () => {
-    const value = parseFlashVars('id= 17216&file=https://example.com/episode.mp3 ')
-    const expected = {
-      id: '17216',
-      file: 'https://example.com/episode.mp3',
-    }
-
-    expect(Object.fromEntries(value)).toEqual(expected)
-  })
-
-  it('should strip an encoded space around a value', () => {
-    expect(parseFlashVars('id=%2017216+').get('id')).toBe('17216')
   })
 
   it('should keep the whitespace inside a value', () => {

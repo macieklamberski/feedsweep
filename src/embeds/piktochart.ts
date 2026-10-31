@@ -17,7 +17,7 @@ const sizes = {
   player: { ratio: '1/2' },
 }
 
-export const composePiktochartEmbedUrl = (uid: string): string => {
+export const composeEmbedUrl = (uid: string): string => {
   return `https://create.piktochart.com/embed/${uid}`
 }
 
@@ -25,7 +25,7 @@ const composePiktochartEmbed = (uid: string, title: string | undefined): EmbedRe
   return {
     provider,
     id: uid,
-    src: composePiktochartEmbedUrl(uid),
+    src: composeEmbedUrl(uid),
     url: `https://create.piktochart.com/output/${uid}`,
     ...sizes.player,
     title,

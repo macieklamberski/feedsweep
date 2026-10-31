@@ -1,6 +1,6 @@
-import { parseUrl } from 'trousse'
+import { composeQuery, getQueryParams, parseUrl } from 'trousse'
 import { attr } from '../utils/dom.js'
-import { pickUrlParams, readOrigin } from '../utils/urls.js'
+import { readOrigin } from '../utils/urls.js'
 import { createMarkupEmbedResolver, readRepairedCarrierUrl } from '../utils/widgets.js'
 
 const provider = 'umap'
@@ -42,7 +42,7 @@ export const umapEmbedResolver = createMarkupEmbedResolver('iframe[src*="/map/"]
     provider,
     // A map id is unique only within its instance, so the host travels in the id.
     id: `${url.hostname}/${mapId}`,
-    src: `${page}${pickUrlParams(url, umapEmbedParams)}${url.hash}`,
+    src: `${page}${composeQuery(getQueryParams(url, umapEmbedParams))}${url.hash}`,
     url: page,
     ...sizes.map,
     title: attr(element, 'title'),

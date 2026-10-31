@@ -66,6 +66,7 @@ export { canonicalizeAlignment } from './transforms/dom/canonicalizeAlignment.js
 export { cleanAnchorUrls } from './transforms/dom/cleanAnchorUrls.js'
 export { convertAmpNativeElements } from './transforms/dom/convertAmpNativeElements.js'
 export { convertAsciinemaEmbeds } from './transforms/dom/convertAsciinemaEmbeds.js'
+export { convertBloggerCaptionTables } from './transforms/dom/convertBloggerCaptionTables.js'
 export { convertBreaksToParagraphs } from './transforms/dom/convertBreaksToParagraphs.js'
 export { convertCiteCards } from './transforms/dom/convertCiteCards.js'
 export { convertDatawrapperEmbeds } from './transforms/dom/convertDatawrapperEmbeds.js'
@@ -73,6 +74,7 @@ export { convertEmojis } from './transforms/dom/convertEmojis.js'
 export { convertGiphyEmbeds } from './transforms/dom/convertGiphyEmbeds.js'
 export { convertLazyImageContainers } from './transforms/dom/convertLazyImageContainers.js'
 export { convertNoteEmbeds } from './transforms/dom/convertNoteEmbeds.js'
+export { convertParkedMediaContainers } from './transforms/dom/convertParkedMediaContainers.js'
 export { convertSmartframeEmbeds } from './transforms/dom/convertSmartframeEmbeds.js'
 export { convertTradingEconomicsEmbeds } from './transforms/dom/convertTradingEconomicsEmbeds.js'
 export { convertUcozSpoilerButtons } from './transforms/dom/convertUcozSpoilerButtons.js'
@@ -110,6 +112,7 @@ export { rebuildElementorVideoEmbeds } from './transforms/dom/rebuildElementorVi
 export { rebuildEmbedlyEmbeds } from './transforms/dom/rebuildEmbedlyEmbeds.js'
 export { rebuildEmbedPlusEmbeds } from './transforms/dom/rebuildEmbedPlusEmbeds.js'
 export { rebuildEmbedPrivacyLinks } from './transforms/dom/rebuildEmbedPrivacyLinks.js'
+export { rebuildEmbettyVideoEmbeds } from './transforms/dom/rebuildEmbettyVideoEmbeds.js'
 export { rebuildExternalVideoEmbeds } from './transforms/dom/rebuildExternalVideoEmbeds.js'
 export { rebuildGettyImagesEmbeds } from './transforms/dom/rebuildGettyImagesEmbeds.js'
 export { rebuildGofundmeEmbeds } from './transforms/dom/rebuildGofundmeEmbeds.js'
@@ -173,7 +176,6 @@ export type {
   CiteResolver,
   CiteResolverResult,
   CleanUrlFn,
-  DeferredIframeSource,
   DomTransform,
   EmbedRef,
   EmbedRenderHint,
@@ -194,9 +196,11 @@ export type {
   ParseHtmlFn,
   ResolveEmbed,
   ResolveUrlFn,
+  ScopedAttribute,
   StringTransform,
   TransformContentOptions,
   TransformContext,
+  UrlPattern,
   UrlRole,
   WidgetResolver,
   WidgetResolverResult,

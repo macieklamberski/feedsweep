@@ -219,6 +219,19 @@ describe('transistorResolveEmbed', () => {
     expect(transistorResolveEmbed(new URL(value))).toEqual(expected)
   })
 
+  it('should keep the start the player reads from the fragment', () => {
+    const value = 'https://share.transistor.fm/e/9c9c187c#t=20m55s'
+    const expected: EmbedResolverResult = {
+      provider: 'transistor',
+      id: 'episode/9c9c187c',
+      src: 'https://share.transistor.fm/e/9c9c187c#t=20m55s',
+      url: 'https://share.transistor.fm/s/9c9c187c',
+      height: 180,
+    }
+
+    expect(transistorResolveEmbed(new URL(value))).toEqual(expected)
+  })
+
   // 180 across 49 of 49 sampled corpus iframes, and their oEmbed agrees.
   it('should size an episode at the fixed height', () => {
     const value = 'https://share.transistor.fm/e/c3be87f9/dark'

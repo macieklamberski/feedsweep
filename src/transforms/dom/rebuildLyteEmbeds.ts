@@ -1,15 +1,9 @@
-import {
-  encodePathSegment,
-  getPathSegments,
-  getQueryParam,
-  isAnyOf,
-  isHostOf,
-  parseUrl,
-} from 'trousse'
+import { encodePathSegment, getQueryParam, parseUrl } from 'trousse'
 import {
   composeEmbedUrl,
   extractVideoId,
   isVideoId,
+  readThumbnailVideoId,
   hosts as youtubeHosts,
 } from '../../embeds/youtube.js'
 import type { DomTransform } from '../../types.js'
@@ -29,22 +23,17 @@ import { createIframe, readRepairedCarrierUrl } from '../../utils/widgets.js'
 // YouTube</a>.<br />` when its "links" setting is on, the label in the site's language.
 const feedThumbnailSelector = 'a:has(> img[alt="YouTube Video"])'
 
-// The thumbnail is `i.ytimg.com/vi/{id}/hqdefault.jpg`, or that url in the `origThumbUrl` param of
-// the plugin's own `lyteCache.php` when it serves thumbnails locally.
-const readThumbnailVideoId = (image: Element): string | undefined => {
+// The thumbnail is YouTube's poster url, or that url in the `origThumbUrl` param of the plugin's
+// own `lyteCache.php` when it serves thumbnails locally. A bare <img> is claimed as a player, so
+// the id has to have a video's shape.
+const readFeedThumbnailVideoId = (image: Element): string | undefined => {
   const src = parseUrl(readRepairedCarrierUrl(image), placeholderBaseUrl)
   const cachedUrl = src?.pathname.toLowerCase().endsWith('/lytecache.php')
     ? getQueryParam(src.searchParams, 'origThumbUrl')
     : undefined
-  const url = parseUrlOnHosts(cachedUrl ?? src, 'i.ytimg.com', isHostOf)
+  const videoId = readThumbnailVideoId(cachedUrl ?? src)
 
-  if (!url) {
-    return
-  }
-
-  const [route, videoId] = getPathSegments(url)
-
-  if (isAnyOf(route, 'vi') && videoId && isVideoId(videoId)) {
+  if (videoId && isVideoId(videoId)) {
     return videoId
   }
 }
@@ -99,7 +88,7 @@ const rebuildFeedThumbnails = (document: Document): void => {
 
     // The selector matched an `img` child, and the link holds no other element.
     const image = thumbnail.firstElementChild as Element
-    const videoId = readThumbnailVideoId(image)
+    const videoId = readFeedThumbnailVideoId(image)
 
     if (!videoId) {
       continue

@@ -236,6 +236,8 @@ describeForEachParser('wordpressEmojiResolver', (parseHtml) => {
       's0.wp.com/wp-content/mu-plugins/wpcom-smileys/',
       's1.wp.com/wp-content/mu-plugins/wpcom-smileys/',
       's2.wp.com/wp-content/mu-plugins/wpcom-smileys/',
+      // Jetpack's image proxy serving core's emoji.
+      'i0.wp.com/s.w.org/images/core/emoji/',
     ]
 
     it.each(hostCases)('should replace an emoji image from %s', async (host) => {
@@ -256,6 +258,13 @@ describeForEachParser('wordpressEmojiResolver', (parseHtml) => {
   it('should leave a photo that took the class from emoji markup in its alt untouched', async () => {
     const value =
       '<p><img src="https://example.com/wp-content/plugins/instagram-feed/img/placeholder.png" alt="<img src=&quot;https://s.w.org/images/core/emoji/15.0.3/72x72/1f5f3.png&quot; alt=&quot;🗳&quot;" class="wp-smiley"></p>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave a photo that names an emoji file only in its query untouched', async () => {
+    const value =
+      '<p><img src="https://example.com/photo.php?fallback=https://s.w.org/images/core/emoji/15.0.3/72x72/1f5f3.png" alt="<img src=&quot;https://s.w.org/images/core/emoji/15.0.3/72x72/1f5f3.png&quot; alt=&quot;🗳&quot;" class="wp-smiley"></p>'
 
     expect(await transform(value)).toEqualHtml(value)
   })

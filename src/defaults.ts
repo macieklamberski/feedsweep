@@ -1,5 +1,6 @@
 export {
   defaultDeferredIframeSources,
+  defaultLazyAltAttributes,
   defaultLazyIframeAttributes,
   defaultLazySrcAttributes,
   defaultLazySrcsetAttributes,
@@ -7,7 +8,10 @@ export {
 } from './defaults/attributes.js'
 export { defaultFieldCleaners } from './defaults/cleaners.js'
 export { defaultEmbedRenderHints } from './defaults/hints.js'
-export { defaultAvatarImageHosts, defaultTrackingHosts } from './defaults/hosts.js'
+export {
+  defaultAvatarImageHosts,
+  defaultTrackingUrls,
+} from './defaults/hosts.js'
 export { defaultEmojiResolvers, defaultWidgetResolvers } from './defaults/resolvers.js'
 export {
   defaultNonContentSelectors,

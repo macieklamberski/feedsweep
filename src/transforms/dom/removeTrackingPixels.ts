@@ -1,4 +1,3 @@
-import { isHostOrSubdomainOf, parseUrl } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import {
   getElementDimensions,
@@ -6,17 +5,7 @@ import {
   isElementHidden,
   pixelDimensionLimit,
 } from '../../utils/dom.js'
-import { placeholderBaseUrl } from '../../utils/urls.js'
-
-const isTrackingUrl = (src: string, hosts: ReadonlyArray<string>): boolean => {
-  const url = parseUrl(src, placeholderBaseUrl)
-
-  if (!url) {
-    return false
-  }
-
-  return isHostOrSubdomainOf(url, hosts)
-}
+import { matchesUrlPattern } from '../../utils/urls.js'
 
 const isPixelDimension = (value: number | undefined): boolean => {
   return value !== undefined && value <= pixelDimensionLimit
@@ -63,7 +52,7 @@ const hasContentImageSignal = (
 
 // A tracking pixel: a hidden or pixel-sized <img> whose only job is to fire a request.
 export const removeTrackingPixels: DomTransform = (context) => {
-  const hosts = context.trackingHosts
+  const entries = context.trackingUrls
 
   return (document) => {
     const images = document.querySelectorAll('img')
@@ -84,7 +73,7 @@ export const removeTrackingPixels: DomTransform = (context) => {
       if (!isContentSized(dimensions)) {
         const src = image.getAttribute('src')
 
-        if (src && isTrackingUrl(src, hosts)) {
+        if (src && matchesUrlPattern(src, entries)) {
           image.remove()
         }
       }
