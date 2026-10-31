@@ -1,6 +1,6 @@
 import { parseSrcset as parseRawSrcset } from 'srcset'
 import {
-  addMissingProtocol,
+  addMissingScheme,
   decodePercent,
   decodeSegment,
   escapeRegex,
@@ -98,7 +98,7 @@ const queryUrlSource = (_capture: string, proxy: URL): string | undefined => {
 const bareHostSource = (capture: string): string | undefined => {
   const source = decodeSegment(capture) ?? capture
 
-  return source && addMissingProtocol(source)
+  return source && addMissingScheme(source)
 }
 
 type ImageProxy = {
