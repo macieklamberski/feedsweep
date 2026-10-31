@@ -1,5 +1,5 @@
 import { coerceNumber } from 'trousse'
-import type { DomTransform } from '../../types.js'
+import type { DomTransform, TransformContext } from '../../types.js'
 import { getElementDimensions, getLazyValue, pixelDimensionLimit } from '../../utils/dom.js'
 import { getImageFingerprint, parseSrcset } from '../../utils/images.js'
 import * as styles from '../../utils/styles.js'
@@ -50,6 +50,7 @@ const getImageFingerprints = (
   element: Element,
   srcAttributes: Array<string>,
   srcsetAttributes: Array<string>,
+  context: TransformContext,
 ): Set<string> => {
   const urls: Array<string> = []
 
@@ -72,7 +73,7 @@ const getImageFingerprints = (
       continue
     }
 
-    fingerprints.add(getImageFingerprint(url))
+    fingerprints.add(getImageFingerprint(url, context))
   }
 
   return fingerprints
@@ -139,8 +140,18 @@ export const fixLazyImages: DomTransform = (context) => {
         continue
       }
 
-      const siblingFingerprints = getImageFingerprints(sibling, srcAttributes, srcsetAttributes)
-      const imageFingerprints = getImageFingerprints(image, srcAttributes, srcsetAttributes)
+      const siblingFingerprints = getImageFingerprints(
+        sibling,
+        srcAttributes,
+        srcsetAttributes,
+        context,
+      )
+      const imageFingerprints = getImageFingerprints(
+        image,
+        srcAttributes,
+        srcsetAttributes,
+        context,
+      )
       const isPlaceholder = siblingFingerprints.size === 0
       const isSamePicture = [...imageFingerprints].some((fingerprint) => {
         return siblingFingerprints.has(fingerprint)

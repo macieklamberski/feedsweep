@@ -380,6 +380,31 @@ export const cleanUrl: CleanUrl = ((url, context?: TransformContext) => {
   return applyCleaner(url, true, context)
 }) as CleanUrl
 
+// A url that is only compared, never written, is repaired with no cleaner too, then goes through
+// the caller's matchUrlFn, or its cleanUrlFn. A measurement prefix such as
+// `media.blubrry.com/{show}/{file}` names the bare file.
+export const cleanMatchUrl: CleanUrl = ((url, context?: TransformContext) => {
+  if (!url) {
+    return
+  }
+
+  const repaired = repairUrl(url)
+  const matchUrlFn = context?.matchUrlFn ?? context?.cleanUrlFn
+
+  if (!matchUrlFn) {
+    return repaired
+  }
+
+  const cleaned = matchUrlFn(repaired)
+
+  // An empty cleaned url keeps the repaired url.
+  if (!cleaned) {
+    return repaired
+  }
+
+  return cleaned
+}) as CleanUrl
+
 // The src of a frame no resolver claims reaches the cleaner as written. The repairs read a url's
 // grammar the way the platforms a resolver knows write it, and on a host nobody checked an `&` or
 // a `?` can be load-bearing: a stray `?` in a Google Docs url answers 200 as written and 400

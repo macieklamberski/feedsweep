@@ -340,6 +340,38 @@ describeForEachParser('transformContent', (parseHtml) => {
     expect(result).toEqualHtml(expected)
   })
 
+  it('should strip an enclosure that repeats a body video with a media fragment', async () => {
+    const value = html`
+      <video controls preload="none">
+        <source
+          src="https://www.example.org/wp-content/uploads/2025/05/Station-Platform-Heating-1.3x.mp4#t=5"
+          type="video/mp4"
+        >
+      </video>
+    `
+    const enclosures = [
+      {
+        url: 'https://www.example.org/wp-content/uploads/2025/05/Station-Platform-Heating-1.3x.mp4',
+        type: 'video/mp4',
+      },
+    ]
+    const expected = html`
+      <video controls preload="none">
+        <source
+          src="https://www.example.org/wp-content/uploads/2025/05/Station-Platform-Heating-1.3x.mp4#t=5"
+          type="video/mp4"
+        >
+      </video>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      enclosures,
+      heuristics: true,
+    })
+
+    expect(result).toEqualHtml(expected)
+  })
+
   it('should not inject an image enclosure when the content already has an image', async () => {
     // The enclosure is a WordPress-sized copy of the inline content image. Because the
     // content already carries an image, injectEnclosures skips it in both modes, so the
@@ -385,6 +417,63 @@ describeForEachParser('transformContent', (parseHtml) => {
 
     expect(standard).toEqualHtml(expectedStandard)
     expect(heuristic).toBe(value)
+  })
+
+  it('should strip an enclosure behind a measurement prefix that matchUrlFn unwraps', async () => {
+    const value = html`
+      <figure class="wp-block-audio">
+        <audio controls src="https://example.com/wp-content/uploads/2021/05/TEAS9.mp3"></audio>
+      </figure>
+    `
+    const enclosures = [
+      {
+        url: 'https://media.blubrry.com/ms_all_de_la_innovacin/example.com/wp-content/uploads/2021/05/TEAS9.mp3',
+        type: 'audio/mpeg',
+      },
+    ]
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      enclosures,
+      heuristics: true,
+      matchUrlFn: (url) => {
+        return url ===
+          'https://media.blubrry.com/ms_all_de_la_innovacin/example.com/wp-content/uploads/2021/05/TEAS9.mp3'
+          ? 'https://example.com/wp-content/uploads/2021/05/TEAS9.mp3'
+          : url
+      },
+    })
+
+    expect(result).toEqualHtml(value)
+  })
+
+  it('should keep the url an enclosure carries when only matchUrlFn unwraps it', async () => {
+    const value = '<p>Content</p>'
+    const enclosures = [
+      {
+        url: 'https://media.blubrry.com/ms_all_de_la_innovacin/example.com/wp-content/uploads/2021/05/TEAS9.mp3',
+        type: 'audio/mpeg',
+      },
+    ]
+    const expected = html`
+      <audio
+        src="https://media.blubrry.com/ms_all_de_la_innovacin/example.com/wp-content/uploads/2021/05/TEAS9.mp3"
+        controls
+      ></audio>
+      <p>Content</p>
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      enclosures,
+      heuristics: true,
+      matchUrlFn: (url) => {
+        return url ===
+          'https://media.blubrry.com/ms_all_de_la_innovacin/example.com/wp-content/uploads/2021/05/TEAS9.mp3'
+          ? 'https://example.com/wp-content/uploads/2021/05/TEAS9.mp3'
+          : url
+      },
+    })
+
+    expect(result).toEqualHtml(expected)
   })
 
   it('should remove paragraphs left empty after boundary br stripping', async () => {
