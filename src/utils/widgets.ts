@@ -478,20 +478,51 @@ export const createLinkedImage = (
   return link
 }
 
+// Every write lays the kind's attributes out again in the key order of `fields`, then any the
+// element already had that `fields` does not name. linkedom puts a new attribute first and jsdom
+// last, so the attributes are written once and, when they came out reversed, again backwards.
 export const updatePlaceholder = <Type extends object>(
   element: Element,
   type: GeneratedWrapperType,
   fields: Type,
 ): void => {
+  const prefix = `data-${type}-`
+  const attributes: Array<[string, string]> = []
+
   // Trimming here lets resolvers pass extracted text as-is. A value that is only
   // whitespace trims to an empty string and is skipped with the other empty fields.
   for (const [key, value] of Object.entries(fields)) {
-    const name = `data-${type}-${key}`
+    const name = `${prefix}${key}`
     const cleaned = isString(value) ? value.trim() : value
+    const kept = cleaned ? String(cleaned) : element.getAttribute(name)
 
-    if (cleaned) {
-      element.setAttribute(name, cleaned)
+    if (kept !== null) {
+      attributes.push([name, kept])
     }
+  }
+
+  for (const name of element.getAttributeNames()) {
+    if (name.startsWith(prefix) && !attributes.some(([written]) => written === name)) {
+      attributes.push([name, element.getAttribute(name) ?? ''])
+    }
+  }
+
+  const write = (ordered: Array<[string, string]>) => {
+    for (const [name] of ordered) {
+      element.removeAttribute(name)
+    }
+
+    for (const [name, value] of ordered) {
+      element.setAttribute(name, value)
+    }
+  }
+
+  write(attributes)
+
+  const names = element.getAttributeNames().filter((name) => name.startsWith(prefix))
+
+  if (names.length > 1 && names[0] !== attributes[0][0]) {
+    write([...attributes].reverse())
   }
 }
 
@@ -506,17 +537,17 @@ export const createPlaceholder = <Type extends object>(
   return element
 }
 
-// Key order is the attribute write order.
+// Key order is the attribute order, the order EmbedResolverResult declares its fields in.
 export const normalizeEmbedFields = (
   metadata: Partial<EmbedResolverResult>,
 ): Record<string, string | undefined> => {
   const params = composeQuery(metadata.params).slice(1)
 
   return {
-    src: metadata.src,
-    params: params || undefined,
     provider: metadata.provider,
     id: metadata.id,
+    src: metadata.src,
+    params: params || undefined,
     url: metadata.url,
     thumbnail: metadata.thumbnail,
     width: metadata.width ? String(metadata.width) : undefined,
@@ -630,22 +661,22 @@ export const createEmbedPlaceholder = (
   return element
 }
 
-// Key order is the attribute write order.
+// Key order is the attribute order, the order CiteResolverResult declares its fields in.
 export const normalizeCiteFields = (
   result: Partial<CiteResolverResult>,
 ): Record<string, string | undefined> => {
   return {
     provider: result.provider,
+    url: result.url,
+    title: result.title,
     description: result.description,
     caption: result.caption,
     author: result.author,
     publisher: result.publisher,
     date: result.date,
-    kind: result.kind,
-    url: result.url,
-    title: result.title,
     icon: result.icon,
     thumbnail: result.thumbnail,
+    kind: result.kind,
   }
 }
 
