@@ -3,6 +3,7 @@ import {
   documentExtensions,
   fixMalformedQuery,
   flashExtensions,
+  getQueryParam,
   imageExtensions,
   isHostOrSubdomainOf,
   type Nullish,
@@ -10,6 +11,9 @@ import {
   parseUrl,
   trimUrlValues,
   videoExtensions,
+  webAudioExtensions,
+  webImageExtensions,
+  webVideoExtensions,
 } from 'trousse'
 import type { AssetType, ResolveUrlFn, TransformContext, UrlPattern, UrlRole } from '../types.js'
 
@@ -64,9 +68,9 @@ export const stripUrlIgnorableChars = (url: string): string => {
 }
 
 // No m3u8 or mpd: only Safari plays them natively, so promoting one breaks the player elsewhere.
-export const imageFileRegex = /\.(avif|gif|jpe?g|png|svg|webp)(\?|#|$)/i
-export const videoFileRegex = /\.(mp4|m4v|webm|mov|ogv)(\?|#|$)/i
-export const audioFileRegex = /\.(aac|mp3|m4a|ogg|oga|wav|flac|opus)(\?|#|$)/i
+export const imageFileRegex = new RegExp(`\\.(${webImageExtensions.join('|')})(\\?|#|$)`, 'i')
+export const videoFileRegex = new RegExp(`\\.(${webVideoExtensions.join('|')})(\\?|#|$)`, 'i')
+export const audioFileRegex = new RegExp(`\\.(${webAudioExtensions.join('|')})(\\?|#|$)`, 'i')
 
 // A file no browser can play. Flash was blocked everywhere in January 2021, and hosts still
 // serve the `.swf` bytes, so a URL that reaches this is one that answers 200 and renders
@@ -100,13 +104,22 @@ export const isFileName = (value: string): boolean => {
 // `/w/index.php?title=File:Clip.webm` spelling moves the namespace into the query.
 const filePagePathRegex = /\/wiki\/[^/?#]*(?::|%3A)[^/?#]*$/i
 const scriptPathRegex = /\/index\.php$/i
-const titleParamRegex = /[?&]title=[^&#]*(?::|%3A)/i
 const filePageNameRegex = /\/wiki\/[^/?#]*?(?::|%3A)([^/?#]+)$/i
 
 export const isMediaWikiFilePage = (value: string): boolean => {
   const path = value.split(queryOrHashRegex)[0]
 
-  return filePagePathRegex.test(path) || (scriptPathRegex.test(path) && titleParamRegex.test(value))
+  if (filePagePathRegex.test(path)) {
+    return true
+  }
+
+  if (!scriptPathRegex.test(path)) {
+    return false
+  }
+
+  const title = getQueryParam(parseUrl(value, placeholderBaseUrl), 'title')
+
+  return title?.includes(':') ?? false
 }
 
 // The name as the wiki spells it, percent-encoding intact, which is the form `Special:FilePath`

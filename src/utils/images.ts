@@ -2,6 +2,7 @@ import { parseSrcset as parseRawSrcset } from 'srcset'
 import {
   escapeRegex,
   getPathSegments,
+  getQueryParam,
   isAnyOf,
   type Nullish,
   normalizeUrl,
@@ -207,8 +208,22 @@ export const getImageFingerprint = (rawUrl: string, context?: TransformContext):
 }
 
 const urlPairRegex = /(?:^|[/_=-])(\d{2,5})x(\d{2,5})(?=[._\-&)?/]|$)/gi
-const urlQueryWidthRegex = /[?&](?:w|width)=(\d{2,5})\b/i
-const urlQueryHeightRegex = /[?&](?:h|height)=(\d{2,5})\b/i
+const queryPixelsRegex = /^\d{2,5}\b/
+const widthQueryParams = ['w', 'width']
+const heightQueryParams = ['h', 'height']
+
+// The first of the names whose value opens with two to five digits, or 0.
+const readQueryPixels = (url: URL | undefined, names: Array<string>): number => {
+  for (const name of names) {
+    const pixels = queryPixelsRegex.exec(getQueryParam(url, name) ?? '')?.[0]
+
+    if (pixels) {
+      return Number(pixels)
+    }
+  }
+
+  return 0
+}
 
 // A `data:` src is a lazy placeholder and carries no size.
 export const getUrlDimensions = (
@@ -220,8 +235,9 @@ export const getUrlDimensions = (
 
   // Explicit w/h query params win. Otherwise the last WxH pair in the path or
   // filename (the rendition size sits after any path digits).
-  let width = Number(urlQueryWidthRegex.exec(src)?.[1])
-  let height = Number(urlQueryHeightRegex.exec(src)?.[1])
+  const url = parseUrl(src, placeholderBaseUrl)
+  let width = readQueryPixels(url, widthQueryParams)
+  let height = readQueryPixels(url, heightQueryParams)
 
   if (!(width > pixelDimensionLimit && height > pixelDimensionLimit)) {
     const pair = [...src.matchAll(urlPairRegex)].at(-1)
@@ -240,7 +256,7 @@ export const getUrlSizeHint = (url: string): number => {
     return dimensions.width * dimensions.height
   }
 
-  const queryWidth = Number(urlQueryWidthRegex.exec(url)?.[1])
+  const queryWidth = readQueryPixels(parseUrl(url, placeholderBaseUrl), widthQueryParams)
   if (queryWidth > 0) {
     return queryWidth
   }
