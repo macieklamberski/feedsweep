@@ -402,7 +402,12 @@ describeForEachParser('transformContent', (parseHtml) => {
       parseHtmlFn: parseHtml,
       enclosures,
       heuristics: true,
-      matchUrlFn: (url) => url.replace('media.blubrry.com/ms_all_de_la_innovacin/', ''),
+      matchUrlFn: (url) => {
+        return url ===
+          'https://media.blubrry.com/ms_all_de_la_innovacin/example.com/wp-content/uploads/2021/05/TEAS9.mp3'
+          ? 'https://example.com/wp-content/uploads/2021/05/TEAS9.mp3'
+          : url
+      },
     })
 
     expect(result).toEqualHtml(value)
@@ -427,7 +432,12 @@ describeForEachParser('transformContent', (parseHtml) => {
       parseHtmlFn: parseHtml,
       enclosures,
       heuristics: true,
-      matchUrlFn: (url) => url.replace('media.blubrry.com/ms_all_de_la_innovacin/', ''),
+      matchUrlFn: (url) => {
+        return url ===
+          'https://media.blubrry.com/ms_all_de_la_innovacin/example.com/wp-content/uploads/2021/05/TEAS9.mp3'
+          ? 'https://example.com/wp-content/uploads/2021/05/TEAS9.mp3'
+          : url
+      },
     })
 
     expect(result).toEqualHtml(expected)
