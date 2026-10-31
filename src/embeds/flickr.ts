@@ -412,13 +412,14 @@ const readAnchorSubject = (url: URL): FlickrSubject | undefined => {
 
 type AnchorSize = { width: number; height: number }
 
-// embedr draws its player at the size the query names, so the frame and the placeholder share one.
+// The image's size goes on the placeholder only. embedr lays out at the size a query names and
+// ignores its frame, so a query crops the player in a frame narrower than the image, while a bare
+// src fills whatever frame it gets.
 const sizeAnchorPlayer = (result: EmbedResolverResult, size: AnchorSize): EmbedResolverResult => {
   const { ratio, ...rest } = result
 
   return {
     ...rest,
-    src: `${result.src}${composeQuery(size)}`,
     ...size,
   }
 }

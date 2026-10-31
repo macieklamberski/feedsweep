@@ -1470,7 +1470,7 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, flickrAnchorEmbedResolver)
 
   describe('the photo anchor', () => {
-    it('should map the photo page onto the embedr photo player at the image size', async () => {
+    it('should map the photo page onto the embedr photo player, sized as the image', async () => {
       const value = html`
         <a
           data-flickr-embed="true"
@@ -1488,7 +1488,7 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/2qgvx9y',
-        src: 'https://embedr.flickr.com/photos/53996765444?width=640&height=360',
+        src: 'https://embedr.flickr.com/photos/53996765444',
         url: 'https://www.flickr.com/photos/201411445@N05/53996765444/',
         thumbnail: 'https://live.staticflickr.com/65535/53996765444_ce07136ea1_h.jpg',
         width: 640,
@@ -1515,7 +1515,7 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/4AK2sc',
-        src: 'https://embedr.flickr.com/photos/2362225867?width=1024&height=768',
+        src: 'https://embedr.flickr.com/photos/2362225867',
         url: 'https://www.flickr.com/photos/bees/2362225867/',
         thumbnail: 'https://live.staticflickr.com/3040/2362225867_4a87ab8baf_b.jpg',
         width: 1024,
@@ -1543,7 +1543,7 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/2qgvx9y',
-        src: 'https://embedr.flickr.com/photos/53996765444?width=640&height=360',
+        src: 'https://embedr.flickr.com/photos/53996765444',
         url: 'https://www.flickr.com/photos/201411445@N05/53996765444/',
         thumbnail: 'https://live.staticflickr.com/65535/53996765444_ce07136ea1_h.jpg',
         width: 640,
@@ -1581,7 +1581,7 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
   })
 
   describe('the album anchor', () => {
-    it('should map the albums page onto the embedr album player at the image size', async () => {
+    it('should map the albums page onto the embedr album player, sized as the image', async () => {
       const value = html`
         <a
           data-flickr-embed="true"
@@ -1597,7 +1597,7 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photosets/72177720327772894',
-        src: 'https://embedr.flickr.com/photosets/72177720327772894?width=1600&height=1200',
+        src: 'https://embedr.flickr.com/photosets/72177720327772894',
         url: 'https://www.flickr.com/photos/riatpennstate/sets/72177720327772894',
         thumbnail: 'https://live.staticflickr.com/65535/54676434565_0cf2dcfa4c_h.jpg',
         width: 1600,
@@ -1626,7 +1626,7 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photosets/72177720334022027',
-        src: 'https://embedr.flickr.com/photosets/72177720334022027?width=800&height=600',
+        src: 'https://embedr.flickr.com/photosets/72177720334022027',
         url: 'https://www.flickr.com/photos/197910129@N04/sets/72177720334022027',
         thumbnail: 'https://live.staticflickr.com/65535/55314222738_99e28970f0_z.jpg',
         width: 800,
@@ -1654,7 +1654,7 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photosets/72157623516208778',
-        src: 'https://embedr.flickr.com/photosets/72157623516208778?width=800&height=600',
+        src: 'https://embedr.flickr.com/photosets/72157623516208778',
         url: 'https://www.flickr.com/photos/dublx/sets/72157623516208778',
         thumbnail: 'https://live.staticflickr.com/2770/4390312561_34843547fe_b.jpg',
         width: 800,
@@ -1665,7 +1665,36 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ask for the slideshow size when the image states none', async () => {
+    it('should keep the image size out of the src', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/photos/98447946@N02/albums/72177720326463417"
+          title="CNS Research Review 2025"
+        >
+          <img
+            src="https://live.staticflickr.com/65535/54552464381_645a03ee21_h.jpg"
+            width="1600"
+            height="1200"
+            alt="CNS Research Review 2025"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photosets/72177720326463417',
+        src: 'https://embedr.flickr.com/photosets/72177720326463417',
+        url: 'https://www.flickr.com/photos/98447946@N02/sets/72177720326463417',
+        thumbnail: 'https://live.staticflickr.com/65535/54552464381_645a03ee21_h.jpg',
+        width: 1600,
+        height: 1200,
+        title: 'CNS Research Review 2025',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should size the placeholder as the slideshow when the image states none', async () => {
       const value = html`
         <a
           data-flickr-embed="true"
@@ -1677,7 +1706,7 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photosets/72157628665527009',
-        src: 'https://embedr.flickr.com/photosets/72157628665527009?width=400&height=300',
+        src: 'https://embedr.flickr.com/photosets/72157628665527009',
         url: 'https://www.flickr.com/photos/hanskellner/sets/72157628665527009',
         thumbnail: 'https://live.staticflickr.com/7010/6613392169_0f23d79b04_b.jpg',
         width: 400,
@@ -1706,7 +1735,7 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'groups/340946@N24',
-        src: 'https://embedr.flickr.com/groups/340946@N24?width=800&height=600',
+        src: 'https://embedr.flickr.com/groups/340946@N24',
         url: 'https://www.flickr.com/groups/340946@N24/',
         thumbnail: 'https://live.staticflickr.com/65535/55319721849_b8908b10a5.jpg',
         width: 800,
@@ -1752,7 +1781,7 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams/48340645@N05',
-        src: 'https://embedr.flickr.com/photostreams/48340645@N05?width=640&height=480',
+        src: 'https://embedr.flickr.com/photostreams/48340645@N05',
         url: 'https://www.flickr.com/photos/48340645@N05/',
         thumbnail: 'https://live.staticflickr.com/65535/53196963117_14994bda8c_z.jpg',
         width: 640,
@@ -1868,7 +1897,7 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/2kRXSnJ',
-        src: 'https://embedr.flickr.com/photos/51104880060?width=151&height=400',
+        src: 'https://embedr.flickr.com/photos/51104880060',
         url: 'https://www.flickr.com/photos/__u___/51104880060/',
         thumbnail: 'https://live.staticflickr.com/65535/51104880060_362beba670_w.jpg',
         width: 151,
@@ -2067,7 +2096,7 @@ describeForEachParser('flickr through the pipeline', (parseHtml) => {
         data-embed-url="https://www.flickr.com/photos/bees/2362225867/"
         data-embed-id="p/4AK2sc"
         data-embed-provider="flickr"
-        data-embed-src="https://embedr.flickr.com/photos/2362225867?width=1024&height=768"
+        data-embed-src="https://embedr.flickr.com/photos/2362225867"
       ></div>
     `
 
