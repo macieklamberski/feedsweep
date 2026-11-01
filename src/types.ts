@@ -65,6 +65,10 @@ export type EmbedRenderHint = {
   // Query parameters that start playback, for a load that follows a person's click. They never
   // go on the placeholder's url, since a placeholder must not start on page load.
   autoplayParams?: Record<string, string>
+  // Query parameters a reader sets to the frame's drawn size in CSS pixels, over whatever the
+  // placeholder's url carries, when it loads the player after a click, so the player picks a size
+  // that fits the frame. A reader never writes them onto the placeholder's url.
+  sizeParams?: { width?: string; height?: string }
   // The `name` a reader gives the frame before it loads. A player that reads `window.name` to
   // open its message channel posts no ready message without it.
   frameName?: string
