@@ -74,8 +74,9 @@ describe('extractJwplayerId', () => {
     expect(extractJwplayerId(new URL(value))).toBe(expected)
   })
 
-  // An underscore is outside the alphabet a media id is written in, and it is what tells a
-  // malformed id from a short one, since a short id fails the same whether minted or passed through.
+  // An underscore is outside the alphabet a media id is written in,
+  // and it is what tells a malformed id from a short one, since a
+  // short id fails the same whether minted or passed through.
   it('should use a malformed media id as written, even if the player answers an error', () => {
     const value = 'https://cdn.jwplayer.com/players/H4GX_r873-abc12345.html'
     const expected = 'H4GX_r873'

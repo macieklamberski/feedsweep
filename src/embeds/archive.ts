@@ -171,7 +171,8 @@ const flowPlayerPathRegex = /^\/(?:flow|flv)\//i
 const xspfPlayerPathRegex = /^\/audio\/xspf_player\.swf$/i
 // The WordPress audio player swf, uploaded into an item of its own or beside the files it plays.
 const itemPlayerPathRegex = /^\/download\/.+\/player\.swf$/i
-// `archive.org/download/{identifier}/{file}`, or `/{n}/items/{identifier}/{file}` on a storage host.
+// `archive.org/download/{identifier}/{file}`, or
+// `/{n}/items/{identifier}/{file}` on a storage host.
 const itemFilePathRegex = /^\/+(?:download|\d+\/items)\/([^/]+)\/(.+)/i
 // The segment after `archive.org/download/` on any subdomain.
 // Both dialects write the file as `archive.org/download/{identifier}/{file}`, on the playlist

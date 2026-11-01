@@ -19,7 +19,8 @@ export const unwrapDrupalOembedIframes: DomTransform = (context) => {
       )
       const url = getQueryParam(parseRepairedUrl(proxyUrl)?.searchParams, 'url')
 
-      // Requiring a scheme here drops protocol-relative and site-relative urls later passes resolve.
+      // Requiring a scheme here drops protocol-relative
+      // and site-relative urls later passes resolve.
       if (!url || !isUrlShaped(url)) {
         continue
       }

@@ -76,9 +76,9 @@ export const streamableIframeEmbedResolver = createUrlEmbedResolver(hosts, strea
   isOnHost: isHostOf,
 })
 
-// The SB Nation MLB snippet: a div holding a "View Link" anchor to the clip's page on mlb.com, which
-// the site's own page frames as `streamable.com/m/{slug}`. A legacy `/c-{id}` page is left: the
-// slug in the frame is not the one in the link.
+// The SB Nation MLB snippet: a div holding a "View Link" anchor to the clip's page
+// on mlb.com, which the site's own page frames as `streamable.com/m/{slug}`. A
+// legacy `/c-{id}` page is left: the slug in the frame is not the one in the link.
 export const streamableMlbEmbedResolver = createMarkupEmbedResolver(
   'div.mlb\\.com-embed, div.mlb-com-embed',
   (element) => {

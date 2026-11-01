@@ -61,7 +61,8 @@ describeForEachParser('wikimediaEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The player and the poster are served by whichever wiki framed the file, Commons upload or not.
+    // The player and the poster are served by whichever
+    // wiki framed the file, Commons upload or not.
     it('should mint the player and the poster on the framing wiki', async () => {
       const value = html`
         <iframe
