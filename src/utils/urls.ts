@@ -294,16 +294,6 @@ export const parseRepairedUrl = (url: Nullish<string>): URL | undefined => {
   return parseCarrierUrl(repairUrl(url))
 }
 
-// The origin a url can be rebuilt on. A url with no host, such as `javascript:/@user/123`, has an
-// opaque origin, which serializes as the string `null` and builds a relative path.
-export const readOrigin = (url: URL | undefined): string | undefined => {
-  if (!url || url.origin === 'null') {
-    return
-  }
-
-  return url.origin
-}
-
 // The publisher's query with only the parameters a player reads left in it. Each pair stays as
 // written, so a repeated name and a bracketed one such as `pwc[size]` reach the player unchanged.
 export const filterUrlQuery = (url: URL, isKept: (name: string) => boolean): string => {

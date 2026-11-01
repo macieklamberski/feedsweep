@@ -1,8 +1,7 @@
-import { isPlainObject, parseUrl } from 'trousse'
+import { getOrigin, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { readOrigin } from '../utils/urls.js'
 import { createMarkupEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'mastodon'
@@ -23,7 +22,7 @@ const usersStatusPathRegex = /^\/users\/(?<user>[\w.-]+)\/statuses\/(?<id>\d{6,}
 // Any host filing posts under an author and a number takes this shape, brunch.co.kr among them.
 export const parseMastodonStatus = (link: string): MastodonStatus | undefined => {
   const parsed = parseUrl(link)
-  const origin = readOrigin(parsed)
+  const origin = getOrigin(parsed)
 
   if (!parsed || !origin) {
     return
