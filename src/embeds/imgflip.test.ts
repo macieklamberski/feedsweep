@@ -150,13 +150,13 @@ describeForEachParser('imgflip snippets through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="398"
-        data-embed-width="398"
-        data-embed-thumbnail="https://i.imgflip.com/2/5gh77x.jpg"
-        data-embed-url="https://imgflip.com/gif/5gh77x"
-        data-embed-id="5gh77x"
         data-embed-provider="imgflip"
+        data-embed-id="5gh77x"
         data-embed-src="https://imgflip.com/embed/5gh77x"
+        data-embed-url="https://imgflip.com/gif/5gh77x"
+        data-embed-thumbnail="https://i.imgflip.com/2/5gh77x.jpg"
+        data-embed-width="398"
+        data-embed-height="398"
       ></div>
       <p><a href="https://imgflip.com/gif/5gh77x">via Imgflip</a></p>
     `
