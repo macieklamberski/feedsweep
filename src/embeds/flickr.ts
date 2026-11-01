@@ -94,7 +94,8 @@ const composePhotoPlayer = (photoId: string): string => {
   return `https://embedr.flickr.com/photos/${photoId}`
 }
 
-// The owner before the gallery id is the script's spelling. embedr serves the gallery by its id.
+// The owner before the gallery id is the script's spelling. embedr serves the gallery by its id
+// under any existing account.
 const composeGalleryPlayer = (owner: string, galleryId: string): string => {
   return `https://embedr.flickr.com/galleries/${encodePathSegment(owner)}-${galleryId}`
 }
@@ -433,8 +434,8 @@ const sizeAnchorPlayer = (result: EmbedResolverResult, size: AnchorSize): EmbedR
   }
 }
 
-// A gallery id is global: embedr serves it under any owner, while its page answers 404 under an
-// owner who did not curate it.
+// A gallery id is global: embedr serves it under any existing account and with no owner at all,
+// while its page answers 404 under an owner who did not curate it.
 const composeGalleryEmbed = (owner: string, galleryId: string): EmbedResolverResult => {
   const ownerSegment = encodePathSegment(owner)
 
