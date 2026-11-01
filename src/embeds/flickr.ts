@@ -34,6 +34,9 @@ const sizes = {
 
 const hosts = ['flickr.com']
 const embedrHosts = ['embedr.flickr.com']
+// WordPress's Photon serves a copy of an image at `i{n}.wp.com/{host}/{path}`, with its resize
+// query after the file name.
+const photonHosts = ['i0.wp.com', 'i1.wp.com', 'i2.wp.com']
 
 // Both swf urls name only the player. Their `?v=` cache-buster names no item.
 const flashPlayerPathRegex = /^\/apps\/slideshow\//i
@@ -482,7 +485,8 @@ const readAnchorPhoto = (
   if (photo) {
     const photoId = photo[2]
     // Flickr's script sends the secret the image file names, whatever photo or size the file is.
-    const file = imageSrc ? photoFileRegex.exec(imageSrc) : undefined
+    const photon = parseUrlOnHosts(imageSrc, photonHosts)
+    const file = imageSrc ? photoFileRegex.exec(photon?.pathname ?? imageSrc) : undefined
 
     return composePhotoEmbed(composePhotoPlayer(photoId, { secret: file?.[2] }), {
       owner: decodePathValue(photo[1]),

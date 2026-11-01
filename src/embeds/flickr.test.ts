@@ -1763,7 +1763,7 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should send no secret for an image behind a resizing proxy', async () => {
+    it('should send the secret of an i0.wp.com Photon copy, read before its resize query', async () => {
       const value = html`
         <a
           title="31st anniversary of the foundation of the House of Mercy San Martin de Tours"
@@ -1780,10 +1780,96 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/2qSShSs',
-        src: 'https://embedr.flickr.com/photos/54396892126',
+        src: 'https://embedr.flickr.com/photos/54396892126?secret=caa73b7c88',
         url: 'https://www.flickr.com/photos/verboencarnado/54396892126/',
         thumbnail:
           'https://i0.wp.com/live.staticflickr.com/65535/54396892126_caa73b7c88_b.jpg?resize=1024%2C683&ssl=1',
+        width: 1024,
+        height: 683,
+        title: '31st anniversary of the foundation of the House of Mercy San Martin de Tours',
+        author: 'verboencarnado',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should send the secret of an i1.wp.com Photon copy', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/photos/119805613@N07/30170269775/in/dateposted-public/"
+          title="クチベニタケ"
+        >
+          <img
+            src="https://i1.wp.com/c8.staticflickr.com/9/8550/30170269775_691b5db663_c.jpg?resize=680%2C454&amp;ssl=1"
+            alt="クチベニタケ"
+            data-recalc-dims="1"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/MY3w66',
+        src: 'https://embedr.flickr.com/photos/30170269775?secret=691b5db663',
+        url: 'https://www.flickr.com/photos/119805613@N07/30170269775/',
+        thumbnail:
+          'https://i1.wp.com/c8.staticflickr.com/9/8550/30170269775_691b5db663_c.jpg?resize=680%2C454&ssl=1',
+        ratio: '4/3',
+        title: 'クチベニタケ',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should send the secret of an i2.wp.com Photon copy', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/photos/119805613@N07/29877899113/in/dateposted-public/"
+          title="キツネノハナガサ"
+        >
+          <img
+            src="https://i2.wp.com/c2.staticflickr.com/9/8653/29877899113_679fe68c55_c.jpg?resize=534%2C800&amp;ssl=1"
+            alt="キツネノハナガサ"
+            data-recalc-dims="1"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/Mwd3tB',
+        src: 'https://embedr.flickr.com/photos/29877899113?secret=679fe68c55',
+        url: 'https://www.flickr.com/photos/119805613@N07/29877899113/',
+        thumbnail:
+          'https://i2.wp.com/c2.staticflickr.com/9/8653/29877899113_679fe68c55_c.jpg?resize=534%2C800&ssl=1',
+        ratio: '4/3',
+        title: 'キツネノハナガサ',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should send no secret for a copy behind a resizing proxy on another host', async () => {
+      const value = html`
+        <a
+          title="31st anniversary of the foundation of the House of Mercy San Martin de Tours"
+          href="https://www.flickr.com/photos/verboencarnado/54396892126/in/dateposted-public/"
+          data-flickr-embed="true"
+        >
+          <img
+            src="https://evil.test/live.staticflickr.com/65535/54396892126_caa73b7c88_b.jpg?resize=1024%2C683&amp;ssl=1"
+            width="1024"
+            height="683"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/2qSShSs',
+        src: 'https://embedr.flickr.com/photos/54396892126',
+        url: 'https://www.flickr.com/photos/verboencarnado/54396892126/',
+        thumbnail:
+          'https://evil.test/live.staticflickr.com/65535/54396892126_caa73b7c88_b.jpg?resize=1024%2C683&ssl=1',
         width: 1024,
         height: 683,
         title: '31st anniversary of the foundation of the House of Mercy San Martin de Tours',
