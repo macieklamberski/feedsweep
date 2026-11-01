@@ -53,6 +53,10 @@ const embedrPhotoPathRegex = /^\/photos\/(\d+)\/?$/i
 const anchorPhotoPathRegex = /^\/photos\/([^/]+)\/(\d+)(?:\/|$)/i
 const anchorGroupPathRegex = /^\/groups\/([^/]+)\/pool\/?$/i
 const anchorStreamPathRegex = /^\/photos\/([^/]+)\/?$/i
+const anchorGalleryPathRegex = /^\/photos\/([^/]+)\/galleries\/(\d+)(?:\/|$)/i
+// A guest pass names no photo, so the script reads the photo and its secret from the image file.
+const anchorGuestPassPathRegex = /^\/gp\/([^/]+)\/([a-z0-9]+)(?:\/|$)/i
+const photoFileRegex = /(?:^|\/)(\d+)_([a-z0-9]+)(?:_[a-z0-9]{1,2})?\.jpg(?:\?zz=1)?$/i
 
 // A group and a photostream each resolve by NSID and only by NSID: the player answers 200 for
 // `groups/{nsid}` and for `photostreams/{nsid}`, and 404 for a path alias in either position.
@@ -88,6 +92,11 @@ const composeGroupPlayer = (groupId: string): string => {
 
 const composePhotoPlayer = (photoId: string): string => {
   return `https://embedr.flickr.com/photos/${photoId}`
+}
+
+// The owner before the gallery id is the script's spelling. embedr serves the gallery by its id.
+const composeGalleryPlayer = (owner: string, galleryId: string): string => {
+  return `https://embedr.flickr.com/galleries/${encodePathSegment(owner)}-${galleryId}`
 }
 
 // The page player ignores the owner segment and the secret after `player/`, and serves the same
@@ -424,24 +433,89 @@ const sizeAnchorPlayer = (result: EmbedResolverResult, size: AnchorSize): EmbedR
   }
 }
 
-const readAnchorTarget = (
+// A gallery id is global: embedr serves it under any owner, while its page answers 404 under an
+// owner who did not curate it.
+const composeGalleryEmbed = (owner: string, galleryId: string): EmbedResolverResult => {
+  const ownerSegment = encodePathSegment(owner)
+
+  return {
+    provider,
+    id: `galleries/${galleryId}`,
+    src: composeGalleryPlayer(owner, galleryId),
+    url: `https://www.flickr.com/photos/${ownerSegment}/galleries/${galleryId}`,
+    author: readOwnerAlias(owner),
+  }
+}
+
+// A guest pass shows a photo its owner keeps from the public. embedr answers 404 for it without
+// the secret, and plays it with any guest pass code. The code is an access token, so it stays in
+// the src and no page url is minted.
+const composeGuestPassEmbed = (
+  owner: string,
+  code: string,
+  imageSrc: string | undefined,
+): EmbedResolverResult | undefined => {
+  const file = imageSrc ? photoFileRegex.exec(imageSrc) : undefined
+
+  if (!file) {
+    return
+  }
+
+  const photoId = file[1]
+  const query = composeQuery({ secret: file[2], gp: code })
+
+  return {
+    provider,
+    id: `p/${encodeBase58(photoId)}`,
+    src: `${composePhotoPlayer(photoId)}${query}`,
+    ...sizes.photo,
+    author: readOwnerAlias(owner),
+  }
+}
+
+const readAnchorPhoto = (
   url: URL,
-  size: AnchorSize | undefined,
+  imageSrc: string | undefined,
 ): EmbedResolverResult | undefined => {
   const photo = anchorPhotoPathRegex.exec(url.pathname)
 
   if (photo) {
     const photoId = photo[2]
-    const result = composePhotoEmbed(composePhotoPlayer(photoId), {
+
+    return composePhotoEmbed(composePhotoPlayer(photoId), {
       owner: decodePathValue(photo[1]),
       photoId,
     })
+  }
 
+  const guestPass = anchorGuestPassPathRegex.exec(url.pathname)
+
+  if (guestPass) {
+    return composeGuestPassEmbed(decodePathValue(guestPass[1]), guestPass[2], imageSrc)
+  }
+}
+
+const readAnchorTarget = (
+  url: URL,
+  imageSrc: string | undefined,
+  size: AnchorSize | undefined,
+): EmbedResolverResult | undefined => {
+  const photo = readAnchorPhoto(url, imageSrc)
+
+  if (photo) {
     if (!size) {
-      return result
+      return photo
     }
 
-    return sizeAnchorPlayer(result, size)
+    return sizeAnchorPlayer(photo, size)
+  }
+
+  const gallery = anchorGalleryPathRegex.exec(url.pathname)
+
+  if (gallery) {
+    const result = composeGalleryEmbed(decodePathValue(gallery[1]), gallery[2])
+
+    return sizeAnchorPlayer(result, size ?? sizes.slideshow)
   }
 
   const subject = readAnchorSubject(url)
@@ -477,7 +551,8 @@ export const flickrAnchorEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const result = readAnchorTarget(url, width && height ? { width, height } : undefined)
+    const imageSrc = attr(image, 'src')
+    const result = readAnchorTarget(url, imageSrc, width && height ? { width, height } : undefined)
 
     if (!result) {
       return
@@ -485,7 +560,7 @@ export const flickrAnchorEmbedResolver = createMarkupEmbedResolver(
 
     return {
       ...result,
-      thumbnail: attr(image, 'src'),
+      thumbnail: imageSrc,
       title: attr(element, 'title') ?? attr(image, 'alt'),
     }
   },

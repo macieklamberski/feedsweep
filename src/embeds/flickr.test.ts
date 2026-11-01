@@ -2025,17 +2025,129 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
     })
   })
 
-  describe('kinds the script plays that no key covers yet', () => {
-    it('should leave a gallery alone', async () => {
+  describe('the gallery anchor', () => {
+    it('should map the gallery page onto the embedr gallery player, sized as the image', async () => {
       const value = html`
         <a
           data-flickr-embed="true"
-          href="https://www.flickr.com/photos/corinnedangas/galleries/72157632398296719"
+          data-header="true"
+          data-footer="true"
+          href="https://www.flickr.com/photos/199551882@N05/galleries/72157724600586866"
+          title="Erzbergwerk Rammelsberg"
         >
           <img
+            src="https://live.staticflickr.com/65535/55037117758_38cd0be5fe_z.jpg"
+            width="640"
+            height="480"
+            alt="Erzbergwerk Rammelsberg"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'galleries/72157724600586866',
+        src: 'https://embedr.flickr.com/galleries/199551882@N05-72157724600586866',
+        url: 'https://www.flickr.com/photos/199551882@N05/galleries/72157724600586866',
+        thumbnail: 'https://live.staticflickr.com/65535/55037117758_38cd0be5fe_z.jpg',
+        width: 640,
+        height: 480,
+        title: 'Erzbergwerk Rammelsberg',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should size the placeholder as the slideshow when the image states none', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/photos/199551882@N05/galleries/72157724600586866"
+        >
+          <img src="https://live.staticflickr.com/65535/55037117758_38cd0be5fe_z.jpg" />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'galleries/72157724600586866',
+        src: 'https://embedr.flickr.com/galleries/199551882@N05-72157724600586866',
+        url: 'https://www.flickr.com/photos/199551882@N05/galleries/72157724600586866',
+        thumbnail: 'https://live.staticflickr.com/65535/55037117758_38cd0be5fe_z.jpg',
+        width: 400,
+        height: 300,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the owner alias as the author', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          data-footer="true"
+          href="https://www.flickr.com/photos/corinnedangas/galleries/72157632398296719"
+          title="Aurores polaires -1"
+        >
+          <img
+            decoding="async"
             src="https://live.staticflickr.com/7027/6762140925_76153f807a_z.jpg"
             width="100%"
             height="auto"
+            alt="Aurores polaires -1"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'galleries/72157632398296719',
+        src: 'https://embedr.flickr.com/galleries/corinnedangas-72157632398296719',
+        url: 'https://www.flickr.com/photos/corinnedangas/galleries/72157632398296719',
+        thumbnail: 'https://live.staticflickr.com/7027/6762140925_76153f807a_z.jpg',
+        width: 400,
+        height: 300,
+        title: 'Aurores polaires -1',
+        author: 'corinnedangas',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep an owner that holds a path separator inside its own segment', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/photos/a%2F..%2Fx/galleries/72157632398296719"
+        >
+          <img
+            src="https://live.staticflickr.com/7027/6762140925_76153f807a_z.jpg"
+            width="640"
+            height="480"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'galleries/72157632398296719',
+        src: 'https://embedr.flickr.com/galleries/a%2F..%2Fx-72157632398296719',
+        url: 'https://www.flickr.com/photos/a%2F..%2Fx/galleries/72157632398296719',
+        thumbnail: 'https://live.staticflickr.com/7027/6762140925_76153f807a_z.jpg',
+        width: 640,
+        height: 480,
+        author: 'a/../x',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should ignore the gallery path below another segment', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/x/photos/199551882@N05/galleries/72157724600586866"
+        >
+          <img
+            src="https://live.staticflickr.com/65535/55037117758_38cd0be5fe_z.jpg"
+            width="640"
+            height="480"
           />
         </a>
       `
@@ -2043,16 +2155,203 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should leave a guest pass alone', async () => {
+    it('should ignore a gallery id followed by more than digits', async () => {
       const value = html`
         <a
           data-flickr-embed="true"
-          href="https://www.flickr.com/gp/nanpalmero/8zMGCx"
+          href="https://www.flickr.com/photos/199551882@N05/galleries/72157724600586866x"
         >
           <img
-            src="https://farm2.staticflickr.com/1733/27846819297_026fde2072_z.jpg"
+            src="https://live.staticflickr.com/65535/55037117758_38cd0be5fe_z.jpg"
             width="640"
+            height="480"
+          />
+        </a>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+  })
+
+  describe('the guest pass anchor', () => {
+    it('should map the guest pass onto the embedr photo player with the secret from the image', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/gp/klizana/817M8cnW6u"
+          style="margin-left: 1em; margin-right: 1em;"
+          title="Business card Watercolor Travel Palette"
+        >
+          <img
+            alt="Business card Watercolor Travel Palette"
+            height="419"
+            src="https://live.staticflickr.com/65535/54518210014_0483ce805f_b.jpg"
+            width="640"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/2r4A5sb',
+        src: 'https://embedr.flickr.com/photos/54518210014?secret=0483ce805f&gp=817M8cnW6u',
+        thumbnail: 'https://live.staticflickr.com/65535/54518210014_0483ce805f_b.jpg',
+        width: 640,
+        height: 419,
+        title: 'Business card Watercolor Travel Palette',
+        author: 'klizana',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should name no author for an NSID owner', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/gp/149366529@N08/219A4X"
+          title="videos"
+        >
+          <img
+            src="https://farm8.staticflickr.com/7817/33226798358_808de006c6.jpg"
+            width="500"
             height="281"
+            alt="videos"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/SC92xL',
+        src: 'https://embedr.flickr.com/photos/33226798358?secret=808de006c6&gp=219A4X',
+        thumbnail: 'https://farm8.staticflickr.com/7817/33226798358_808de006c6.jpg',
+        width: 500,
+        height: 281,
+        title: 'videos',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep the photo ratio when the image states no size', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/gp/klizana/817M8cnW6u"
+        >
+          <img src="https://live.staticflickr.com/65535/54518210014_0483ce805f_b.jpg" />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/2r4A5sb',
+        src: 'https://embedr.flickr.com/photos/54518210014?secret=0483ce805f&gp=817M8cnW6u',
+        thumbnail: 'https://live.staticflickr.com/65535/54518210014_0483ce805f_b.jpg',
+        ratio: '4/3',
+        author: 'klizana',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should leave a guest pass with no code alone', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/gp/49597043@N03/"
+          title="The Greetery - Spring Jardin March 2026"
+        >
+          <img
+            alt="The Greetery - Spring Jardin March 2026"
+            height="640"
+            src="https://live.staticflickr.com/65535/55139360784_06fc0dd4f7_c.jpg"
+            width="640"
+          />
+        </a>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should leave a guest pass whose image file name is followed by a query alone', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/gp/136645148@N04/2A91iY"
+          title="2019-06 CAVALAIRE"
+        >
+          <img
+            src="https://i0.wp.com/live.staticflickr.com/65535/48841518641_c9321d3ab9_z.jpg?resize=411%2C308&amp;ssl=1"
+            alt="2019-06 CAVALAIRE"
+            width="411"
+            height="308"
+          />
+        </a>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should leave a guest pass whose image file name has a prefix before the photo id alone', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/gp/klizana/817M8cnW6u"
+        >
+          <img
+            src="https://live.staticflickr.com/65535/x54518210014_0483ce805f_b.jpg"
+            width="640"
+            height="419"
+          />
+        </a>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should leave a guest pass whose image secret holds a character outside its alphabet alone', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/gp/klizana/817M8cnW6u"
+        >
+          <img
+            src="https://live.staticflickr.com/65535/54518210014_0483ce805f%20_b.jpg"
+            width="640"
+            height="419"
+          />
+        </a>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore the guest pass path below another segment', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/x/gp/klizana/817M8cnW6u"
+        >
+          <img
+            src="https://live.staticflickr.com/65535/54518210014_0483ce805f_b.jpg"
+            width="640"
+            height="419"
+          />
+        </a>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
+    it('should ignore a guest pass code followed by a stray quote', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/gp/klizana/817M8cnW6u%22"
+        >
+          <img
+            src="https://live.staticflickr.com/65535/54518210014_0483ce805f_b.jpg"
+            width="640"
+            height="419"
           />
         </a>
       `
