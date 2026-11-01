@@ -1048,7 +1048,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/8NKp7f',
-        src: 'https://embedr.flickr.com/photos/5123523742?width=640&height=360',
+        src: 'https://embedr.flickr.com/photos/5123523742?secret=9f9359f01e&width=640&height=360',
         url: 'https://flic.kr/p/8NKp7f',
         thumbnail: 'https://live.staticflickr.com/0/5123523742_9f9359f01e_b.jpg',
         ratio: '16/9',
@@ -1070,7 +1070,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/8NKp7f',
-        src: 'https://embedr.flickr.com/photos/5123523742?width=640&height=360',
+        src: 'https://embedr.flickr.com/photos/5123523742?secret=9f9359f01e&width=640&height=360',
         url: 'https://flic.kr/p/8NKp7f',
         thumbnail: 'https://live.staticflickr.com/0/5123523742_9f9359f01e_b.jpg',
         ratio: '16/9',
@@ -1110,7 +1110,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/4Jm8J9',
-        src: 'https://embedr.flickr.com/photos/2448291368?width=640&height=360',
+        src: 'https://embedr.flickr.com/photos/2448291368?secret=3dfa305404&width=640&height=360',
         url: 'https://flic.kr/p/4Jm8J9',
         thumbnail: 'https://live.staticflickr.com/0/2448291368_3dfa305404_b.jpg',
         ratio: '16/9',
@@ -1129,9 +1129,28 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/4Jm8J9',
-        src: 'https://embedr.flickr.com/photos/2448291368?width=640&height=360',
+        src: 'https://embedr.flickr.com/photos/2448291368?secret=3dfa305404/../x&width=640&height=360',
         url: 'https://flic.kr/p/4Jm8J9',
         thumbnail: 'https://live.staticflickr.com/0/2448291368_3dfa305404%2F..%2Fx_b.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should keep a decoded secret carrying an ampersand in one query value', async () => {
+      const value = html`
+        <embed
+          src="https://www.flickr.com/apps/video/stewart.swf"
+          flashvars="photo_secret=3dfa305404%26gp%3Dx&amp;photo_id=2448291368"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/4Jm8J9',
+        src: 'https://embedr.flickr.com/photos/2448291368?secret=3dfa305404%26gp=x&width=640&height=360',
+        url: 'https://flic.kr/p/4Jm8J9',
+        thumbnail: 'https://live.staticflickr.com/0/2448291368_3dfa305404&gp=x_b.jpg',
         ratio: '16/9',
       }
 
@@ -1488,7 +1507,7 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/2qgvx9y',
-        src: 'https://embedr.flickr.com/photos/53996765444',
+        src: 'https://embedr.flickr.com/photos/53996765444?secret=ce07136ea1',
         url: 'https://www.flickr.com/photos/201411445@N05/53996765444/',
         thumbnail: 'https://live.staticflickr.com/65535/53996765444_ce07136ea1_h.jpg',
         width: 640,
@@ -1515,7 +1534,7 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/4AK2sc',
-        src: 'https://embedr.flickr.com/photos/2362225867',
+        src: 'https://embedr.flickr.com/photos/2362225867?secret=4a87ab8baf',
         url: 'https://www.flickr.com/photos/bees/2362225867/',
         thumbnail: 'https://live.staticflickr.com/3040/2362225867_4a87ab8baf_b.jpg',
         width: 1024,
@@ -1543,7 +1562,7 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/2qgvx9y',
-        src: 'https://embedr.flickr.com/photos/53996765444',
+        src: 'https://embedr.flickr.com/photos/53996765444?secret=ce07136ea1',
         url: 'https://www.flickr.com/photos/201411445@N05/53996765444/',
         thumbnail: 'https://live.staticflickr.com/65535/53996765444_ce07136ea1_h.jpg',
         width: 640,
@@ -1569,11 +1588,189 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/2b8uSyd',
-        src: 'https://embedr.flickr.com/photos/44717108900',
+        src: 'https://embedr.flickr.com/photos/44717108900?secret=029fbfbf69',
         url: 'https://www.flickr.com/photos/lydiaabate/44717108900/',
         thumbnail: 'https://farm8.staticflickr.com/7877/44717108900_029fbfbf69_o.jpg',
         ratio: '4/3',
         author: 'lydiaabate',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should send the secret a private photo needs', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/photos/goaliej54/22404841959/in/photostream/"
+          title="20151031_172747"
+        >
+          <img
+            alt="20151031_172747"
+            height="500"
+            src="https://farm6.staticflickr.com/5662/22404841959_8bd221e41f.jpg"
+            width="333"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/A8QEWB',
+        src: 'https://embedr.flickr.com/photos/22404841959?secret=8bd221e41f',
+        url: 'https://www.flickr.com/photos/goaliej54/22404841959/',
+        thumbnail: 'https://farm6.staticflickr.com/5662/22404841959_8bd221e41f.jpg',
+        width: 333,
+        height: 500,
+        title: '20151031_172747',
+        author: 'goaliej54',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the secret from an image file with the zz flag', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/photos/robert_trudeau/2749653854/in/photostream/"
+          title="Harriet Dehan, Shreveport"
+        >
+          <img
+            src="https://farm4.staticflickr.com/3193/2749653854_014489cdac_z.jpg?zz=1"
+            width="426"
+            height="640"
+            alt="Harriet Dehan, Shreveport"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/5bYGi5',
+        src: 'https://embedr.flickr.com/photos/2749653854?secret=014489cdac',
+        url: 'https://www.flickr.com/photos/robert_trudeau/2749653854/',
+        thumbnail: 'https://farm4.staticflickr.com/3193/2749653854_014489cdac_z.jpg?zz=1',
+        width: 426,
+        height: 640,
+        title: 'Harriet Dehan, Shreveport',
+        author: 'robert_trudeau',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should send the secret of an image that names another photo', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/photos/magnacasta/29729137680/in/album-72157671173657274/"
+          title="Encruzado Day by #daowinelover 2016"
+        >
+          <img
+            alt="Real Companhia Velha - Open Doors 260 anos"
+            src="https://c8.staticflickr.com/8/7770/29396601663_0de516a68e_k.jpg"
+            style="width: 320px; height: 427px;"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/Mi4ATj',
+        src: 'https://embedr.flickr.com/photos/29729137680?secret=0de516a68e',
+        url: 'https://www.flickr.com/photos/magnacasta/29729137680/',
+        thumbnail: 'https://c8.staticflickr.com/8/7770/29396601663_0de516a68e_k.jpg',
+        ratio: '4/3',
+        title: 'Encruzado Day by #daowinelover 2016',
+        author: 'magnacasta',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should send the secret of a 4k file, which names its own', async () => {
+      const value = html`
+        <a
+          title="Velocity 2021"
+          href="https://www.flickr.com/photos/romanista/51444344145/in/album-72157719814802262/"
+          data-flickr-embed="true"
+        >
+          <img
+            src="https://live.staticflickr.com/65535/51444344145_83b0ac47ab_4k.jpg"
+            alt="Velocity 2021"
+            width="449"
+            height="337"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/2mnXHdM',
+        src: 'https://embedr.flickr.com/photos/51444344145?secret=83b0ac47ab',
+        url: 'https://www.flickr.com/photos/romanista/51444344145/',
+        thumbnail: 'https://live.staticflickr.com/65535/51444344145_83b0ac47ab_4k.jpg',
+        width: 449,
+        height: 337,
+        title: 'Velocity 2021',
+        author: 'romanista',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    // Constructed: no real file name holds a url separator in its secret.
+    it('should send no secret for a file name with a separator in the secret', async () => {
+      const value = html`
+        <a
+          title="Velocity 2021"
+          href="https://www.flickr.com/photos/romanista/51444344145/in/album-72157719814802262/"
+          data-flickr-embed="true"
+        >
+          <img
+            src="https://live.staticflickr.com/65535/51444344145_83b0ac47ab%3Fx.jpg"
+            width="449"
+            height="337"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/2mnXHdM',
+        src: 'https://embedr.flickr.com/photos/51444344145',
+        url: 'https://www.flickr.com/photos/romanista/51444344145/',
+        thumbnail: 'https://live.staticflickr.com/65535/51444344145_83b0ac47ab%3Fx.jpg',
+        width: 449,
+        height: 337,
+        title: 'Velocity 2021',
+        author: 'romanista',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should send no secret for an image behind a resizing proxy', async () => {
+      const value = html`
+        <a
+          title="31st anniversary of the foundation of the House of Mercy San Martin de Tours"
+          href="https://www.flickr.com/photos/verboencarnado/54396892126/in/dateposted-public/"
+          data-flickr-embed="true"
+        >
+          <img
+            src="https://i0.wp.com/live.staticflickr.com/65535/54396892126_caa73b7c88_b.jpg?resize=1024%2C683&amp;ssl=1"
+            width="1024"
+            height="683"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/2qSShSs',
+        src: 'https://embedr.flickr.com/photos/54396892126',
+        url: 'https://www.flickr.com/photos/verboencarnado/54396892126/',
+        thumbnail:
+          'https://i0.wp.com/live.staticflickr.com/65535/54396892126_caa73b7c88_b.jpg?resize=1024%2C683&ssl=1',
+        width: 1024,
+        height: 683,
+        title: '31st anniversary of the foundation of the House of Mercy San Martin de Tours',
+        author: 'verboencarnado',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1897,7 +2094,7 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/2kRXSnJ',
-        src: 'https://embedr.flickr.com/photos/51104880060',
+        src: 'https://embedr.flickr.com/photos/51104880060?secret=362beba670',
         url: 'https://www.flickr.com/photos/__u___/51104880060/',
         thumbnail: 'https://live.staticflickr.com/65535/51104880060_362beba670_w.jpg',
         width: 151,
@@ -2091,7 +2288,7 @@ describeForEachParser('flickr through the pipeline', (parseHtml) => {
       <div
         data-embed-provider="flickr"
         data-embed-id="p/4AK2sc"
-        data-embed-src="https://embedr.flickr.com/photos/2362225867"
+        data-embed-src="https://embedr.flickr.com/photos/2362225867?secret=4a87ab8baf"
         data-embed-url="https://www.flickr.com/photos/bees/2362225867/"
         data-embed-thumbnail="https://live.staticflickr.com/3040/2362225867_4a87ab8baf_b.jpg"
         data-embed-width="1024"
