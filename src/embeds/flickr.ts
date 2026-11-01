@@ -71,7 +71,7 @@ type FlickrSubject = { setId?: string; owner?: string; groupId?: string }
 // A single photo, whose owner and secret are each in the path on one of the two carriers only.
 type FlickrPhoto = { photoId: string; owner?: string; secret?: string }
 
-type PhotoQuery = { secret?: string }
+type PhotoQuery = { secret?: string; gp?: string }
 
 // Flickr's own embed script writes these embedr endpoints into a frameless iframe. A real id
 // answers 200 with the whole slideshow and an invented one 404.
@@ -463,12 +463,11 @@ const composeGuestPassEmbed = (
   }
 
   const photoId = file[1]
-  const query = composeQuery({ secret: file[2], gp: code })
 
   return {
     provider,
     id: `p/${encodeBase58(photoId)}`,
-    src: `${composePhotoPlayer(photoId)}${query}`,
+    src: composePhotoPlayer(photoId, { secret: file[2], gp: code }),
     ...sizes.photo,
     author: readOwnerAlias(owner),
   }
