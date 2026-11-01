@@ -1134,6 +1134,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    // Constructed: no real flashvar holds a url separator in its secret.
     it('should keep a decoded secret carrying a separator in one thumbnail path segment', async () => {
       const value = html`
         <embed
@@ -1153,6 +1154,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    // Constructed: no real flashvar holds a url separator in its secret.
     it('should keep a decoded secret carrying an ampersand in one query value', async () => {
       const value = html`
         <embed
