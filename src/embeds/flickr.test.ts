@@ -819,7 +819,8 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The file url needs the secret beside the photo id. The player serves the same page without it.
+    // The file url needs the secret beside the photo
+    // id. The player serves the same page without it.
     it('should compose the photo file from the secret and leave it out of the player', async () => {
       const value = html`
         <iframe
