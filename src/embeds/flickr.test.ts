@@ -1046,7 +1046,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/8NKp7f',
-        src: 'https://embedr.flickr.com/photos/5123523742?secret=9f9359f01e&width=640&height=360',
+        src: 'https://embedr.flickr.com/photos/5123523742?secret=9f9359f01e',
         url: 'https://flic.kr/p/8NKp7f',
         thumbnail: 'https://live.staticflickr.com/0/5123523742_9f9359f01e_b.jpg',
         ratio: '16/9',
@@ -1068,7 +1068,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/8NKp7f',
-        src: 'https://embedr.flickr.com/photos/5123523742?secret=9f9359f01e&width=640&height=360',
+        src: 'https://embedr.flickr.com/photos/5123523742?secret=9f9359f01e',
         url: 'https://flic.kr/p/8NKp7f',
         thumbnail: 'https://live.staticflickr.com/0/5123523742_9f9359f01e_b.jpg',
         ratio: '16/9',
@@ -1090,7 +1090,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/4Jm8J9',
-        src: 'https://embedr.flickr.com/photos/2448291368?width=640&height=360',
+        src: 'https://embedr.flickr.com/photos/2448291368',
         url: 'https://flic.kr/p/4Jm8J9',
         ratio: '16/9',
       }
@@ -1098,19 +1098,36 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should ask the video player for its 16:9 box when the carrier states none', async () => {
+    // embedr answers 404 for this private video without its secret.
+    it('should keep the secret a private video plays only with', async () => {
       const value = html`
-        <embed
-          src="https://www.flickr.com/apps/video/stewart.swf"
-          flashvars="photo_secret=3dfa305404&amp;photo_id=2448291368"
-        />
+        <object
+          classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+          data="http://www.flickr.com/apps/video/stewart.swf?v=71377"
+          height="300"
+          type="application/x-shockwave-flash"
+          width="400"
+        >
+          <param
+            name="flashvars"
+            value="intl_lang=en-us&amp;photo_secret=3f2ab9f9f7&amp;photo_id=5182022462"
+          />
+          <param name="movie" value="http://www.flickr.com/apps/video/stewart.swf?v=71377" />
+          <embed
+            type="application/x-shockwave-flash"
+            src="http://www.flickr.com/apps/video/stewart.swf?v=71377"
+            flashvars="intl_lang=en-us&amp;photo_secret=3f2ab9f9f7&amp;photo_id=5182022462"
+            height="300"
+            width="400"
+          />
+        </object>
       `
       const expected: EmbedResolverResult = {
         provider: 'flickr',
-        id: 'p/4Jm8J9',
-        src: 'https://embedr.flickr.com/photos/2448291368?secret=3dfa305404&width=640&height=360',
-        url: 'https://flic.kr/p/4Jm8J9',
-        thumbnail: 'https://live.staticflickr.com/0/2448291368_3dfa305404_b.jpg',
+        id: 'p/8TVdJS',
+        src: 'https://embedr.flickr.com/photos/5182022462?secret=3f2ab9f9f7',
+        url: 'https://flic.kr/p/8TVdJS',
+        thumbnail: 'https://live.staticflickr.com/0/5182022462_3f2ab9f9f7_b.jpg',
         ratio: '16/9',
       }
 
@@ -1127,7 +1144,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/4Jm8J9',
-        src: 'https://embedr.flickr.com/photos/2448291368?secret=3dfa305404/../x&width=640&height=360',
+        src: 'https://embedr.flickr.com/photos/2448291368?secret=3dfa305404/../x',
         url: 'https://flic.kr/p/4Jm8J9',
         thumbnail: 'https://live.staticflickr.com/0/2448291368_3dfa305404%2F..%2Fx_b.jpg',
         ratio: '16/9',
@@ -1146,7 +1163,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'p/4Jm8J9',
-        src: 'https://embedr.flickr.com/photos/2448291368?secret=3dfa305404%26gp=x&width=640&height=360',
+        src: 'https://embedr.flickr.com/photos/2448291368?secret=3dfa305404%26gp=x',
         url: 'https://flic.kr/p/4Jm8J9',
         thumbnail: 'https://live.staticflickr.com/0/2448291368_3dfa305404&gp=x_b.jpg',
         ratio: '16/9',

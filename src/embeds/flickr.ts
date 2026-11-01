@@ -71,7 +71,7 @@ type FlickrSubject = { setId?: string; owner?: string; groupId?: string }
 // A single photo, whose owner and secret are each in the path on one of the two carriers only.
 type FlickrPhoto = { photoId: string; owner?: string; secret?: string }
 
-type PhotoQuery = { secret?: string; width?: number; height?: number }
+type PhotoQuery = { secret?: string }
 
 // Flickr's own embed script writes these embedr endpoints into a frameless iframe. A real id
 // answers 200 with the whole slideshow and an invented one 404.
@@ -143,10 +143,6 @@ const composeShortPhotoUrl = (photoId: string): string => {
 const composePhotoThumbnail = (photoId: string, secret: string): string => {
   return `https://live.staticflickr.com/0/${photoId}_${encodePathSegment(secret)}_b.jpg`
 }
-
-// embedr draws its box at the size the query names, whatever the frame, so the video player is
-// asked for 16:9.
-const videoSize = { width: 640, height: 360 }
 
 // What a page path names, whether it arrived in the flashvars or as the framed page itself.
 // A value read out of a path is decoded, so each is held in one form and only the urls encode it.
@@ -345,7 +341,7 @@ const composePlayerEmbed = (
       return
     }
 
-    const src = composePhotoPlayer(photo.photoId, { secret: photo.secret, ...videoSize })
+    const src = composePhotoPlayer(photo.photoId, { secret: photo.secret })
 
     return composePhotoEmbed(src, photo)
   }
