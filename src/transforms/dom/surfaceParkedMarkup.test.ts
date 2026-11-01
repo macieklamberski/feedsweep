@@ -613,12 +613,12 @@ describeForEachParser('surfaceParkedMarkup', (parseHtml) => {
       `
       const expected = html`
         <div
-          data-embed-ratio="16/9"
-          data-embed-thumbnail="https://i.ytimg.com/vi/3gbUgwwCTeI/hqdefault.jpg"
-          data-embed-url="https://www.youtube.com/watch?v=3gbUgwwCTeI"
-          data-embed-id="3gbUgwwCTeI"
           data-embed-provider="youtube"
+          data-embed-id="3gbUgwwCTeI"
           data-embed-src="https://www.youtube.com/embed/3gbUgwwCTeI"
+          data-embed-url="https://www.youtube.com/watch?v=3gbUgwwCTeI"
+          data-embed-thumbnail="https://i.ytimg.com/vi/3gbUgwwCTeI/hqdefault.jpg"
+          data-embed-ratio="16/9"
         ></div>
       `
       const result = await transformContent(value, {
@@ -668,12 +668,12 @@ describeForEachParser('surfaceParkedMarkup', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://i.ytimg.com/vi/uxPH7CB19h0/hqdefault.jpg"
-        data-embed-url="https://www.youtube.com/watch?v=uxPH7CB19h0"
-        data-embed-id="uxPH7CB19h0"
         data-embed-provider="youtube"
+        data-embed-id="uxPH7CB19h0"
         data-embed-src="https://www.youtube.com/embed/uxPH7CB19h0"
+        data-embed-url="https://www.youtube.com/watch?v=uxPH7CB19h0"
+        data-embed-thumbnail="https://i.ytimg.com/vi/uxPH7CB19h0/hqdefault.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
     const result = await transformContent(value, {

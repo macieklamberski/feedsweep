@@ -277,8 +277,8 @@ describeForEachParser('podomatic through the pipeline', (parseHtml) => {
     const value = '<iframe src="https://www.podomatic.com/embed/html5/episode/10076958"></iframe>'
     const expected = html`
       <div
-        data-embed-id="episode/10076958"
         data-embed-provider="podomatic"
+        data-embed-id="episode/10076958"
         data-embed-src="https://podomatic.com/embed/html5/episode/10076958"
         data-embed-height="208"
       ></div>

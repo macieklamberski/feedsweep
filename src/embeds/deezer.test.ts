@@ -460,8 +460,8 @@ describeForEachParser('deezer through the pipeline', (parseHtml) => {
     const value = '<iframe src="https://widget.deezer.com/widget/dark/track/3135556"></iframe>'
     const expected = html`
       <div
-        data-embed-id="track/3135556"
         data-embed-provider="deezer"
+        data-embed-id="track/3135556"
         data-embed-src="https://widget.deezer.com/widget/dark/track/3135556"
         data-embed-url="https://www.deezer.com/track/3135556"
         data-embed-height="150"

@@ -201,12 +201,12 @@ describeForEachParser('rebuildEmbettyVideoEmbeds', (parseHtml) => {
       `
       const expected = html`
         <div
+          data-embed-provider="youtube"
+          data-embed-id="4BVmeh0pNnQ"
+          data-embed-src="https://www.youtube.com/embed/4BVmeh0pNnQ"
+          data-embed-url="https://www.youtube.com/watch?v=4BVmeh0pNnQ"
           data-embed-thumbnail="https://i.ytimg.com/vi/4BVmeh0pNnQ/hqdefault.jpg"
           data-embed-ratio="16/9"
-          data-embed-url="https://www.youtube.com/watch?v=4BVmeh0pNnQ"
-          data-embed-id="4BVmeh0pNnQ"
-          data-embed-provider="youtube"
-          data-embed-src="https://www.youtube.com/embed/4BVmeh0pNnQ"
         >
         </div>
       `
@@ -227,11 +227,11 @@ describeForEachParser('rebuildEmbettyVideoEmbeds', (parseHtml) => {
       `
       const expected = html`
         <div
-          data-embed-url="https://vimeo.com/232524527"
-          data-embed-src="https://player.vimeo.com/video/232524527"
-          data-embed-ratio="16/9"
           data-embed-provider="vimeo"
           data-embed-id="232524527"
+          data-embed-src="https://player.vimeo.com/video/232524527"
+          data-embed-url="https://vimeo.com/232524527"
+          data-embed-ratio="16/9"
         >
         </div>
       `
@@ -252,11 +252,11 @@ describeForEachParser('rebuildEmbettyVideoEmbeds', (parseHtml) => {
       `
       const expected = html`
         <div
-          data-embed-ratio="16/9"
-          data-embed-url="https://www.facebook.com/watch/?v=10153231379946729"
-          data-embed-id="https://www.facebook.com/video.php?v=10153231379946729"
           data-embed-provider="facebook"
+          data-embed-id="https://www.facebook.com/video.php?v=10153231379946729"
           data-embed-src="https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=10153231379946729"
+          data-embed-url="https://www.facebook.com/watch/?v=10153231379946729"
+          data-embed-ratio="16/9"
         >
         </div>
       `
@@ -278,12 +278,12 @@ describeForEachParser('rebuildEmbettyVideoEmbeds', (parseHtml) => {
       `
       const expected = html`
         <div
-          data-embed-ratio="16/9"
-          data-embed-thumbnail="https://example.com/images/poster.jpg"
-          data-embed-url="https://www.youtube.com/watch?v=4BVmeh0pNnQ"
-          data-embed-id="4BVmeh0pNnQ"
           data-embed-provider="youtube"
+          data-embed-id="4BVmeh0pNnQ"
           data-embed-src="https://www.youtube.com/embed/4BVmeh0pNnQ"
+          data-embed-url="https://www.youtube.com/watch?v=4BVmeh0pNnQ"
+          data-embed-thumbnail="https://example.com/images/poster.jpg"
+          data-embed-ratio="16/9"
         >
         </div>
       `

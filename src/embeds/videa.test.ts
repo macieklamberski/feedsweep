@@ -186,8 +186,8 @@ describeForEachParser('videa through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-id="C6rvO1ZfIkfLILrI"
         data-embed-provider="videa"
+        data-embed-id="C6rvO1ZfIkfLILrI"
         data-embed-src="https://videa.hu/player?v=C6rvO1ZfIkfLILrI"
         data-embed-ratio="16/9"
       ></div>
@@ -208,8 +208,8 @@ describeForEachParser('videa through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-id="qgjdl0tABo6homHV"
         data-embed-provider="videa"
+        data-embed-id="qgjdl0tABo6homHV"
         data-embed-src="https://videa.hu/player?v=qgjdl0tABo6homHV"
         data-embed-ratio="16/9"
       ></div>

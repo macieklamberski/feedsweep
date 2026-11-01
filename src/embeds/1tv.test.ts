@@ -289,10 +289,10 @@ describeForEachParser('1tv players through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-id="147417:12"
         data-embed-provider="1tv"
+        data-embed-id="147417:12"
         data-embed-src="https://www.1tv.ru/embed/147417:12"
+        data-embed-ratio="16/9"
       ></div>
     `
 

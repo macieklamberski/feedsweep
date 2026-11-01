@@ -121,11 +121,11 @@ describeForEachParser('patronite widget through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="306"
         data-embed-provider="patronite"
         data-embed-id="114344"
         data-embed-src="https://patronite.pl/widget/strajk/114344/small/light/colorful"
         data-embed-url="https://patronite.pl/strajk"
+        data-embed-height="306"
       ></div>
     `
 

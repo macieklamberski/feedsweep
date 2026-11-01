@@ -138,9 +138,9 @@ describeForEachParser('unwrapWpcomWidgetFrames through the pipeline', (parseHtml
     `
     const expected = html`
       <div
-        data-embed-src="https://embedr.flickr.com/photosets/72157630500191816?width=400&amp;height=300"
         data-embed-provider="flickr"
         data-embed-id="photosets/72157630500191816"
+        data-embed-src="https://embedr.flickr.com/photosets/72157630500191816?width=400&amp;height=300"
         data-embed-url="https://www.flickr.com/photos/macarignan/sets/72157630500191816"
         data-embed-width="400"
         data-embed-height="300"
@@ -164,9 +164,9 @@ describeForEachParser('unwrapWpcomWidgetFrames through the pipeline', (parseHtml
         <strong><a title="Comunicado día internacional de los museos" href="http://www.slideshare.net/redmuseoschlima/comunicado-da-internacional-de-los-museos">Comunicado día internacional de los museos</a></strong>
       </p>
       <div
-        data-embed-src="https://www.slideshare.net/slideshow/embed_code/8001505"
         data-embed-provider="slideshare"
         data-embed-id="8001505"
+        data-embed-src="https://www.slideshare.net/slideshow/embed_code/8001505"
         data-embed-url="http://www.slideshare.net/redmuseoschlima/comunicado-da-internacional-de-los-museos"
         data-embed-ratio="595/485"
         data-embed-title="Comunicado día internacional de los museos"

@@ -422,11 +422,11 @@ describeForEachParser('documentcloud shapes the pipeline strips first', (parseHt
     `
     const expected = html`
       <div
-        data-embed-thumbnail="https://s3.documentcloud.org/documents/3694123/pages/Feedback-on-the-Nakshe-Portal-p1-normal.gif"
-        data-embed-id="3694123"
         data-embed-provider="documentcloud"
-        data-embed-ratio="17/22"
+        data-embed-id="3694123"
         data-embed-src="https://embed.documentcloud.org/documents/3694123-Feedback-on-the-Nakshe-Portal/"
+        data-embed-thumbnail="https://s3.documentcloud.org/documents/3694123/pages/Feedback-on-the-Nakshe-Portal-p1-normal.gif"
+        data-embed-ratio="17/22"
       ></div>
     `
 

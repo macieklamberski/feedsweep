@@ -252,11 +252,11 @@ describeForEachParser('radioradicale player through the pipeline', (parseHtml) =
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-url="https://www.radioradicale.it/scheda/761070"
-        data-embed-id="761070"
         data-embed-provider="radioradicale"
+        data-embed-id="761070"
         data-embed-src="https://www.radioradicale.it/scheda/761070/iframe"
+        data-embed-url="https://www.radioradicale.it/scheda/761070"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -283,11 +283,11 @@ describeForEachParser('radioradicale player through the pipeline', (parseHtml) =
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-url="https://www.radioradicale.it/scheda/401265"
-        data-embed-id="401265"
         data-embed-provider="radioradicale"
+        data-embed-id="401265"
         data-embed-src="https://www.radioradicale.it/scheda/401265/iframe"
+        data-embed-url="https://www.radioradicale.it/scheda/401265"
+        data-embed-ratio="16/9"
       ></div>
     `
 

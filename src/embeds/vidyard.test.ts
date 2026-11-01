@@ -364,12 +364,12 @@ describeForEachParser('vidyard shapes the pipeline repairs first', (parseHtml) =
     const value = '<p><iframe src="//play.vidyard.com/gdoa8386mue3jppdkpZc9A.html?"></iframe></p>'
     const expected = html`
       <div
-        data-embed-thumbnail="https://play.vidyard.com/gdoa8386mue3jppdkpZc9A.jpg"
-        data-embed-url="https://share.vidyard.com/watch/gdoa8386mue3jppdkpZc9A"
-        data-embed-id="gdoa8386mue3jppdkpZc9A"
         data-embed-provider="vidyard"
-        data-embed-ratio="16/9"
+        data-embed-id="gdoa8386mue3jppdkpZc9A"
         data-embed-src="https://play.vidyard.com/gdoa8386mue3jppdkpZc9A.html"
+        data-embed-url="https://share.vidyard.com/watch/gdoa8386mue3jppdkpZc9A"
+        data-embed-thumbnail="https://play.vidyard.com/gdoa8386mue3jppdkpZc9A.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -397,12 +397,12 @@ describeForEachParser('vidyard shapes the pipeline repairs first', (parseHtml) =
     const expected = html`
       <p>Watch the walkthrough:</p>
       <div
-        data-embed-thumbnail="https://play.vidyard.com/usZcdjA3ec9sxvixST7xKf.jpg"
-        data-embed-url="https://share.vidyard.com/watch/usZcdjA3ec9sxvixST7xKf"
-        data-embed-id="usZcdjA3ec9sxvixST7xKf"
         data-embed-provider="vidyard"
-        data-embed-ratio="16/9"
+        data-embed-id="usZcdjA3ec9sxvixST7xKf"
         data-embed-src="https://play.vidyard.com/usZcdjA3ec9sxvixST7xKf.html"
+        data-embed-url="https://share.vidyard.com/watch/usZcdjA3ec9sxvixST7xKf"
+        data-embed-thumbnail="https://play.vidyard.com/usZcdjA3ec9sxvixST7xKf.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -421,11 +421,11 @@ describeForEachParser('vidyard shapes the pipeline repairs first', (parseHtml) =
     `
     const expected = html`
       <div
-        data-embed-thumbnail="https://play.vidyard.com/Bx22B6hw1HabD7rqhnwTBw.jpg"
-        data-embed-url="https://share.vidyard.com/watch/Bx22B6hw1HabD7rqhnwTBw"
-        data-embed-id="Bx22B6hw1HabD7rqhnwTBw"
         data-embed-provider="vidyard"
+        data-embed-id="Bx22B6hw1HabD7rqhnwTBw"
         data-embed-src="https://play.vidyard.com/Bx22B6hw1HabD7rqhnwTBw.html"
+        data-embed-url="https://share.vidyard.com/watch/Bx22B6hw1HabD7rqhnwTBw"
+        data-embed-thumbnail="https://play.vidyard.com/Bx22B6hw1HabD7rqhnwTBw.jpg"
         data-embed-ratio="16/9"
       ></div>
     `

@@ -190,11 +190,11 @@ describeForEachParser('cspan players the pipeline absolutises first', (parseHtml
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-url="https://www.c-span.org/video/?c4509010"
-        data-embed-id="c4509010"
         data-embed-provider="cspan"
+        data-embed-id="c4509010"
         data-embed-src="https://www.c-span.org/video/standalone/?c4509010"
+        data-embed-url="https://www.c-span.org/video/?c4509010"
+        data-embed-ratio="16/9"
       ></div>
     `
 

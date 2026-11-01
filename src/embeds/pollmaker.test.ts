@@ -392,13 +392,13 @@ describeForEachParser('poll maker snippets the pipeline replaces', (parseHtml) =
     const expected = html`
       <p>Vote below.</p>
       <div
+        data-embed-provider="pollmaker"
+        data-embed-id="1932527x9B3E41f8-53"
+        data-embed-src="https://poll-maker.com/frame1932527x9B3E41f8-53"
+        data-embed-url="https://poll-maker.com/poll1932527x9B3E41f8-53"
         data-embed-height="372"
         data-embed-title="Which book should I read?"
         data-embed-description="Illusions of Fate by Kiersten White"
-        data-embed-url="https://poll-maker.com/poll1932527x9B3E41f8-53"
-        data-embed-id="1932527x9B3E41f8-53"
-        data-embed-provider="pollmaker"
-        data-embed-src="https://poll-maker.com/frame1932527x9B3E41f8-53"
       ></div>
       <p>Created with <a id="qp_foot1932527" href="http://pollmaker.vote/e/DGHLPKSM">Survey Maker</a></p>
     `
@@ -418,11 +418,11 @@ describeForEachParser('poll maker snippets the pipeline replaces', (parseHtml) =
     `
     const expected = html`
       <div
-        data-embed-height="372"
-        data-embed-url="https://poll-maker.com/poll4654868x583844A9-146"
-        data-embed-id="4654868x583844A9-146"
         data-embed-provider="pollmaker"
+        data-embed-id="4654868x583844A9-146"
         data-embed-src="https://poll-maker.com/frame4654868x583844A9-146"
+        data-embed-url="https://poll-maker.com/poll4654868x583844A9-146"
+        data-embed-height="372"
       ></div>
     `
 
@@ -461,13 +461,13 @@ describeForEachParser('poll maker snippets the pipeline replaces', (parseHtml) =
         <li><a href="http://www.kokoras.net/2015/05/blog-post_27.html">Οι αλήθειες για τα ΧΥΤΥ - Επιστημονική έρευνα</a></li>
       </ol>
       <div
+        data-embed-provider="pollmaker"
+        data-embed-id="329271x6228421A-12"
+        data-embed-src="https://poll-maker.com/frame329271x6228421A-12"
+        data-embed-url="https://poll-maker.com/poll329271x6228421A-12"
         data-embed-height="372"
         data-embed-title="Τι θα απαντήσετε;"
         data-embed-description="ΝΑΙ"
-        data-embed-url="https://poll-maker.com/poll329271x6228421A-12"
-        data-embed-id="329271x6228421A-12"
-        data-embed-provider="pollmaker"
-        data-embed-src="https://poll-maker.com/frame329271x6228421A-12"
       ></div>
     `
 
@@ -512,13 +512,13 @@ describeForEachParser('poll maker snippets the pipeline replaces', (parseHtml) =
       <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEimIdxU-ogb1uA_lG8i-qDT_TwOGSbF4tcY4RbN3Of2uNHrKp5xf6xCcUawbO5BfJXXzbS92UpGxnPRxqmflSvXqot1xIKlNIBUBjPJ0L82vH_srzxORNKLXnDZHkLbwWK3pbRduJ1EUFm8/s640/IMG_3999.jpg">
       <p><span>Wine Barrel</span></p>
       <div
+        data-embed-provider="pollmaker"
+        data-embed-id="436149xE0B64CA5-17"
+        data-embed-src="https://poll-maker.com/frame436149xE0B64CA5-17"
+        data-embed-url="https://poll-maker.com/poll436149xE0B64CA5-17"
         data-embed-height="372"
         data-embed-title="My favorite pumpkin is:"
         data-embed-description="Wine Barrel"
-        data-embed-url="https://poll-maker.com/poll436149xE0B64CA5-17"
-        data-embed-id="436149xE0B64CA5-17"
-        data-embed-provider="pollmaker"
-        data-embed-src="https://poll-maker.com/frame436149xE0B64CA5-17"
       ></div>
     `
 

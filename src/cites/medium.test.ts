@@ -186,10 +186,10 @@ describeForEachParser('mediumCiteResolver', (parseHtml) => {
       const expected = html`
         <div
           data-cite-provider="medium"
-          data-cite-description="Preview text"
-          data-cite-publisher="example.com"
           data-cite-url="https://example.com/page"
           data-cite-title="Page title"
+          data-cite-description="Preview text"
+          data-cite-publisher="example.com"
         ></div>
       `
       const result = await transform(value)

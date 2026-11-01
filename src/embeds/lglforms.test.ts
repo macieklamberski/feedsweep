@@ -169,11 +169,11 @@ describeForEachParser('lglforms through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="600"
-        data-embed-url="https://secure.lglforms.com/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A"
-        data-embed-id="F55Z_RZ2NPkjQX0XoghR5A"
         data-embed-provider="lglforms"
+        data-embed-id="F55Z_RZ2NPkjQX0XoghR5A"
         data-embed-src="https://secure.lglforms.com/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A"
+        data-embed-url="https://secure.lglforms.com/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A"
+        data-embed-height="600"
       ></div>
     `
 
@@ -192,11 +192,11 @@ describeForEachParser('lglforms through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="600"
-        data-embed-url="https://secure.lglforms.com/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A"
-        data-embed-id="F55Z_RZ2NPkjQX0XoghR5A"
         data-embed-provider="lglforms"
+        data-embed-id="F55Z_RZ2NPkjQX0XoghR5A"
         data-embed-src="https://secure.lglforms.com/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A"
+        data-embed-url="https://secure.lglforms.com/form_engine/s/F55Z_RZ2NPkjQX0XoghR5A"
+        data-embed-height="600"
       ></div>
     `
 

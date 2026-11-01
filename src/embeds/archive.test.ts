@@ -1153,12 +1153,12 @@ describeForEachParser('archive iframe embeds through the pipeline', (parseHtml) 
     `
     const expected = html`
       <div
-        data-embed-src="https://archive.org/embed/some_album?playlist=1"
         data-embed-provider="archive"
         data-embed-id="some_album"
-        data-embed-height="30"
+        data-embed-src="https://archive.org/embed/some_album?playlist=1"
         data-embed-url="https://archive.org/details/some_album"
         data-embed-thumbnail="https://archive.org/services/img/some_album"
+        data-embed-height="30"
       ></div>
     `
 
@@ -1189,12 +1189,12 @@ describeForEachParser('archive iframe embeds through the pipeline', (parseHtml) 
     const expected = html`
       <div
         data-enclosure=""
-        data-embed-height="30"
-        data-embed-thumbnail="https://archive.org/services/img/nonfiction023_librivox"
-        data-embed-url="https://archive.org/details/nonfiction023_librivox/snf023_declarationofindependence_jefferson_bg.mp3"
-        data-embed-id="nonfiction023_librivox"
         data-embed-provider="archive"
+        data-embed-id="nonfiction023_librivox"
         data-embed-src="https://archive.org/embed/nonfiction023_librivox/snf023_declarationofindependence_jefferson_bg.mp3"
+        data-embed-url="https://archive.org/details/nonfiction023_librivox/snf023_declarationofindependence_jefferson_bg.mp3"
+        data-embed-thumbnail="https://archive.org/services/img/nonfiction023_librivox"
+        data-embed-height="30"
       ></div>
       <p>Body</p>
     `
@@ -1212,12 +1212,12 @@ describeForEachParser('archive iframe embeds through the pipeline', (parseHtml) 
     const expected = html`
       <div
         data-enclosure=""
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://archive.org/services/img/ArteTV-093029-047-A"
-        data-embed-url="https://archive.org/details/ArteTV-093029-047-A/093029-047-A.de.mp4"
-        data-embed-id="ArteTV-093029-047-A"
         data-embed-provider="archive"
+        data-embed-id="ArteTV-093029-047-A"
         data-embed-src="https://archive.org/embed/ArteTV-093029-047-A/093029-047-A.de.mp4"
+        data-embed-url="https://archive.org/details/ArteTV-093029-047-A/093029-047-A.de.mp4"
+        data-embed-thumbnail="https://archive.org/services/img/ArteTV-093029-047-A"
+        data-embed-ratio="16/9"
       ></div>
       <p>Body</p>
     `
@@ -1249,12 +1249,12 @@ describeForEachParser('archive flash embed through the pipeline', (parseHtml) =>
 
     const expected = html`
       <div
-        data-embed-src="https://archive.org/embed/nasa_hubble"
         data-embed-provider="archive"
         data-embed-id="nasa_hubble"
-        data-embed-ratio="16/9"
+        data-embed-src="https://archive.org/embed/nasa_hubble"
         data-embed-url="https://archive.org/details/nasa_hubble"
         data-embed-thumbnail="https://archive.org/services/img/nasa_hubble"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -1281,12 +1281,12 @@ describeForEachParser('archive flash embed through the pipeline', (parseHtml) =>
 
     const expected = html`
       <div
-        data-embed-src="https://archive.org/embed/Eecc_twistedVideo"
         data-embed-provider="archive"
         data-embed-id="Eecc_twistedVideo"
-        data-embed-ratio="16/9"
+        data-embed-src="https://archive.org/embed/Eecc_twistedVideo"
         data-embed-url="https://archive.org/details/Eecc_twistedVideo"
         data-embed-thumbnail="https://archive.org/services/img/Eecc_twistedVideo"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -1320,12 +1320,12 @@ describeForEachParser('archive flash embed through the pipeline', (parseHtml) =>
 
     const expected = html`
       <div
-        data-embed-src="https://archive.org/embed/WeezyAndTheSwish"
         data-embed-provider="archive"
         data-embed-id="WeezyAndTheSwish"
-        data-embed-height="30"
+        data-embed-src="https://archive.org/embed/WeezyAndTheSwish"
         data-embed-url="https://archive.org/details/WeezyAndTheSwish"
         data-embed-thumbnail="https://archive.org/services/img/WeezyAndTheSwish"
+        data-embed-height="30"
       ></div>
     `
 
@@ -1352,12 +1352,12 @@ describeForEachParser('archive flash embed through the pipeline', (parseHtml) =>
 
     const expected = html`
       <div
-        data-embed-src="https://archive.org/embed/7meNiebo/7n265_Roznice_miedzy_kobietami_a_mezczyznami.mp3"
         data-embed-provider="archive"
         data-embed-id="7meNiebo"
-        data-embed-height="30"
+        data-embed-src="https://archive.org/embed/7meNiebo/7n265_Roznice_miedzy_kobietami_a_mezczyznami.mp3"
         data-embed-url="https://archive.org/details/7meNiebo/7n265_Roznice_miedzy_kobietami_a_mezczyznami.mp3"
         data-embed-thumbnail="https://archive.org/services/img/7meNiebo"
+        data-embed-height="30"
       ></div>
     `
 
@@ -1386,12 +1386,12 @@ describeForEachParser('archive audio elements through the pipeline', (parseHtml)
     `
     const expected = html`
       <div
-        data-embed-src="https://archive.org/embed/MickeyMouseTheateroftheAir/MMToA_38-03-13_ep11-The_Pied_Piper.mp3"
         data-embed-provider="archive"
         data-embed-id="MickeyMouseTheateroftheAir"
-        data-embed-height="30"
+        data-embed-src="https://archive.org/embed/MickeyMouseTheateroftheAir/MMToA_38-03-13_ep11-The_Pied_Piper.mp3"
         data-embed-url="https://archive.org/details/MickeyMouseTheateroftheAir/MMToA_38-03-13_ep11-The_Pied_Piper.mp3"
         data-embed-thumbnail="https://archive.org/services/img/MickeyMouseTheateroftheAir"
+        data-embed-height="30"
       ></div>
     `
 
@@ -1409,12 +1409,12 @@ describeForEachParser('archive audio elements through the pipeline', (parseHtml)
     `
     const expected = html`
       <div
-        data-embed-src="https://archive.org/embed/tkl-1-06-v-2/TKL1-00_v2.mp3"
         data-embed-provider="archive"
         data-embed-id="tkl-1-06-v-2"
-        data-embed-height="30"
+        data-embed-src="https://archive.org/embed/tkl-1-06-v-2/TKL1-00_v2.mp3"
         data-embed-url="https://archive.org/details/tkl-1-06-v-2/TKL1-00_v2.mp3"
         data-embed-thumbnail="https://archive.org/services/img/tkl-1-06-v-2"
+        data-embed-height="30"
       ></div>
     `
 
@@ -1430,12 +1430,12 @@ describeForEachParser('archive audio elements through the pipeline', (parseHtml)
     `
     const expected = html`
       <div
-        data-embed-src="https://archive.org/embed/joh-18-mp-3"
         data-embed-provider="archive"
         data-embed-id="joh-18-mp-3"
-        data-embed-height="30"
+        data-embed-src="https://archive.org/embed/joh-18-mp-3"
         data-embed-url="https://archive.org/details/joh-18-mp-3"
         data-embed-thumbnail="https://archive.org/services/img/joh-18-mp-3"
+        data-embed-height="30"
       ></div>
     `
 
@@ -1466,12 +1466,12 @@ describeForEachParser('archive audio elements through the pipeline', (parseHtml)
     `
     const expected = html`
       <div
-        data-embed-src="https://archive.org/embed/alexyz"
         data-embed-provider="archive"
         data-embed-id="alexyz"
-        data-embed-height="30"
+        data-embed-src="https://archive.org/embed/alexyz"
         data-embed-url="https://archive.org/details/alexyz"
         data-embed-thumbnail="https://archive.org/services/img/alexyz"
+        data-embed-height="30"
       ></div>
       <figure class="wp-block-audio">
         <audio controls src="https://archive.org/details/alexyz"></audio>

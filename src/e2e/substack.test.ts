@@ -385,14 +385,14 @@ describeForEachParser('Substack', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="152"
         data-embed-provider="spotify"
         data-embed-id="episode/aB3dEfGhIjKlMnOpQrStUv"
         data-embed-src="https://open.spotify.com/embed/episode/aB3dEfGhIjKlMnOpQrStUv"
         data-embed-url="https://open.spotify.com/episode/aB3dEfGhIjKlMnOpQrStUv"
+        data-embed-thumbnail="https://i.scdn.co/image/ab6765630000ba8a0000000000000000000000ff"
+        data-embed-height="152"
         data-embed-title="Episode 42: Field Recording"
         data-embed-publisher="Casey Host"
-        data-embed-thumbnail="https://i.scdn.co/image/ab6765630000ba8a0000000000000000000000ff"
       ></div>
     `
     const result = await transformContent(value, { parseHtmlFn: parseHtml })
@@ -452,12 +452,12 @@ describeForEachParser('Substack', (parseHtml) => {
       <p>Intro</p>
       <div
         data-cite-provider="substack"
+        data-cite-url="https://otherpub.substack.com/p/field-notes-23"
+        data-cite-title="Field Notes #23"
         data-cite-description="The preview text."
         data-cite-author="Casey Author"
         data-cite-publisher="Other Pub"
         data-cite-date="2026-06-22T13:20:17.562Z"
-        data-cite-url="https://otherpub.substack.com/p/field-notes-23"
-        data-cite-title="Field Notes #23"
         data-cite-icon="https://substackcdn.com/image/fetch/f_auto/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Flogo_1080x1080.png"
       ></div>
     `
@@ -485,10 +485,10 @@ describeForEachParser('Substack', (parseHtml) => {
     const expected = html`
       <div
         data-cite-provider="substack"
-        data-cite-description="The excerpt of the linked post."
-        data-cite-author="Casey Author"
         data-cite-url="https://examplepub.substack.com/p/model-drop"
         data-cite-title="Model Drop"
+        data-cite-description="The excerpt of the linked post."
+        data-cite-author="Casey Author"
       ></div>
     `
     const result = await transformContent(value, { parseHtmlFn: parseHtml })
@@ -848,9 +848,9 @@ describeForEachParser('Substack', (parseHtml) => {
       <div
         data-embed-provider="vimeo"
         data-embed-id="123456789"
-        data-embed-ratio="16/9"
         data-embed-src="https://player.vimeo.com/video/123456789"
         data-embed-url="https://vimeo.com/123456789"
+        data-embed-ratio="16/9"
       ></div>
     `
     const result = await transformContent(value, { parseHtmlFn: parseHtml })
@@ -1070,11 +1070,11 @@ describeForEachParser('Substack', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="738"
-        data-embed-url="https://www.tiktok.com/@caseyhandle/video/7123456789012345678"
-        data-embed-id="@caseyhandle/video/7123456789012345678"
         data-embed-provider="tiktok"
+        data-embed-id="@caseyhandle/video/7123456789012345678"
         data-embed-src="https://www.tiktok.com/embed/v2/7123456789012345678"
+        data-embed-url="https://www.tiktok.com/@caseyhandle/video/7123456789012345678"
+        data-embed-height="738"
       ></div>
       <a href="https://www.tiktok.com/@caseyhandle/video/7123456789012345678" target="_blank">
         <img

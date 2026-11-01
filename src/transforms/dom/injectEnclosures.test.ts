@@ -55,10 +55,10 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
     const expected = html`
       <div
         data-enclosure=""
-        data-embed-height="166"
-        data-embed-id="tracks/2386923495"
         data-embed-provider="soundcloud"
+        data-embed-id="tracks/2386923495"
         data-embed-src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/2386923495"
+        data-embed-height="166"
       ></div>
       <p>Episode notes</p>
     `
@@ -155,9 +155,9 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
 
     const expected = html`
       <div
-        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-provider="youtube"
         data-embed-id="dQw4w9WgXcQ"
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
         data-embed-ratio="16/9"
@@ -185,12 +185,12 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
     const expected = html`
       <div
         data-enclosure=""
-        data-embed-height="30"
-        data-embed-thumbnail="https://archive.org/services/img/bt2024-06-05.BelmontonBroadway2024SaratogaNY"
-        data-embed-url="https://archive.org/details/bt2024-06-05.BelmontonBroadway2024SaratogaNY/bt2024-06-05t20.flac"
-        data-embed-id="bt2024-06-05.BelmontonBroadway2024SaratogaNY"
         data-embed-provider="archive"
+        data-embed-id="bt2024-06-05.BelmontonBroadway2024SaratogaNY"
         data-embed-src="https://archive.org/embed/bt2024-06-05.BelmontonBroadway2024SaratogaNY/bt2024-06-05t20.flac"
+        data-embed-url="https://archive.org/details/bt2024-06-05.BelmontonBroadway2024SaratogaNY/bt2024-06-05t20.flac"
+        data-embed-thumbnail="https://archive.org/services/img/bt2024-06-05.BelmontonBroadway2024SaratogaNY"
+        data-embed-height="30"
       ></div>
       <p>Episode notes</p>
     `
@@ -237,9 +237,9 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
 
     const expected = html`
       <div
-        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-provider="youtube"
         data-embed-id="dQw4w9WgXcQ"
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
         data-embed-ratio="16/9"
@@ -265,9 +265,9 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
 
     const expected = html`
       <div
-        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-provider="youtube"
         data-embed-id="dQw4w9WgXcQ"
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         data-embed-thumbnail="https://cdn.example.com/feed-thumb.jpg"
         data-embed-ratio="16/9"
@@ -286,9 +286,9 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
     ])
     const expected = html`
       <div
-        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-provider="youtube"
         data-embed-id="dQw4w9WgXcQ"
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
         data-embed-ratio="16/9"
@@ -310,9 +310,9 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
 
     const expected = html`
       <div
-        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-provider="youtube"
         data-embed-id="dQw4w9WgXcQ"
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
         data-embed-ratio="16/9"
@@ -358,8 +358,8 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
       ])
       const expected = html`
         <div
-          data-embed-src="https://example.com/e/x"
           data-embed-provider="example"
+          data-embed-src="https://example.com/e/x"
           data-embed-url="https://example.com/watch/x?utm_source=feed"
           data-embed-thumbnail="https://publisher.example/uploads/thumb.jpg"
           data-enclosure=""
@@ -378,8 +378,8 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
       }
       const expected = html`
         <div
-          data-embed-src="https://example.com/e/x"
           data-embed-provider="example"
+          data-embed-src="https://example.com/e/x"
           data-embed-url="https://example.com/watch/x"
           data-enclosure=""
         ></div>
@@ -402,8 +402,8 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
       }
       const expected = html`
         <div
-          data-embed-src="https://example.com/e/x"
           data-embed-provider="example"
+          data-embed-src="https://example.com/e/x"
           data-enclosure=""
         ></div>
         <p>Content</p>
@@ -788,8 +788,8 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
     it('should not inject the image enclosure that is the thumbnail of a player', async () => {
       const value = html`
         <div
-          data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
           data-embed-id="dQw4w9WgXcQ"
+          data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
           data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
         ></div>
       `
@@ -803,8 +803,8 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
     it('should inject an image enclosure beside a player whose thumbnail is another picture', async () => {
       const value = html`
         <div
-          data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
           data-embed-id="dQw4w9WgXcQ"
+          data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
           data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
         ></div>
       `
@@ -814,8 +814,8 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
       const expected = html`
         <img src="https://example.com/uploads/featured.jpg" data-enclosure="">
         <div
-          data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
           data-embed-id="dQw4w9WgXcQ"
+          data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
           data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
         ></div>
       `
@@ -996,9 +996,9 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
       }
       const expected = html`
         <div
-          data-embed-src="https://player.blubrry.com/id/12345678/"
           data-embed-provider="blubrry"
           data-embed-id="12345678"
+          data-embed-src="https://player.blubrry.com/id/12345678/"
           data-embed-height="164"
           data-enclosure=""
         ></div>
@@ -1021,9 +1021,9 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
       }
       const expected = html`
         <div
-          data-embed-src="https://embed.acast.com/myshow/myepisode"
           data-embed-provider="acast"
           data-embed-id="myshow/myepisode"
+          data-embed-src="https://embed.acast.com/myshow/myepisode"
           data-embed-height="190"
           data-enclosure=""
         ></div>
@@ -1041,9 +1041,9 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
       }
       const expected = html`
         <div
-          data-embed-src="https://embed.acast.com/myshow/myepisode"
           data-embed-provider="acast"
           data-embed-id="myshow/myepisode"
+          data-embed-src="https://embed.acast.com/myshow/myepisode"
           data-embed-height="190"
           data-enclosure=""
         ></div>
@@ -1166,9 +1166,9 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
 
     const expected = html`
       <div
-        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-provider="youtube"
         data-embed-id="dQw4w9WgXcQ"
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
         data-embed-ratio="16/9"
@@ -1880,9 +1880,9 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
       ])
       const expected = html`
         <div
-          data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
           data-embed-provider="youtube"
           data-embed-id="dQw4w9WgXcQ"
+          data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
           data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
           data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
           data-embed-ratio="16/9"

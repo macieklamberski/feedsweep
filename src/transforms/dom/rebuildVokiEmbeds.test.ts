@@ -116,11 +116,11 @@ describeForEachParser('rebuildVokiEmbeds through the pipeline', (parseHtml) => {
     const expected = html`
       <p>Listen to our Voki.</p>
       <div
-        data-embed-height="547"
-        data-embed-url="https://www.voki.com/site/pickup?scid=2981757&amp;chsm=007275daae1363c5599d3bae7e3ab08a"
-        data-embed-id="2981757/007275daae1363c5599d3bae7e3ab08a"
         data-embed-provider="voki"
+        data-embed-id="2981757/007275daae1363c5599d3bae7e3ab08a"
         data-embed-src="https://www.voki.com/site/pickup?scid=2981757&amp;chsm=007275daae1363c5599d3bae7e3ab08a"
+        data-embed-url="https://www.voki.com/site/pickup?scid=2981757&amp;chsm=007275daae1363c5599d3bae7e3ab08a"
+        data-embed-height="547"
       ></div>
     `
 

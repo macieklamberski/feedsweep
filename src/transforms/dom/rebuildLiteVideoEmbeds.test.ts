@@ -147,11 +147,11 @@ describeForEachParser('rebuildLiteVideoEmbeds', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-url="https://vimeo.com/364402896/2e5fd2d6a1"
-        data-embed-src="https://player.vimeo.com/video/364402896?h=2e5fd2d6a1"
-        data-embed-ratio="16/9"
         data-embed-provider="vimeo"
         data-embed-id="364402896:2e5fd2d6a1"
+        data-embed-src="https://player.vimeo.com/video/364402896?h=2e5fd2d6a1"
+        data-embed-url="https://vimeo.com/364402896/2e5fd2d6a1"
+        data-embed-ratio="16/9"
       ></div>
     `
     const result = await transformContent(value, {
@@ -270,12 +270,12 @@ describeForEachParser('rebuildLiteVideoEmbeds', (parseHtml) => {
     `
     const expected = html`
       <div
+        data-embed-provider="youtube"
+        data-embed-id="dQw4w9WgXcQ"
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ?start=10"
+        data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
         data-embed-ratio="16/9"
-        data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-        data-embed-id="dQw4w9WgXcQ"
-        data-embed-provider="youtube"
-        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ?start=10"
       >
       </div>
     `
@@ -417,12 +417,12 @@ describeForEachParser('rebuildLiteVideoEmbeds', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-url="https://www.youtube.com/watch?v=Dk9QdDcWJIE"
-        data-embed-thumbnail="https://example.com/hqdefault_6006595100789835371.jpg"
-        data-embed-src="https://www.youtube.com/embed/Dk9QdDcWJIE"
-        data-embed-ratio="16/9"
         data-embed-provider="youtube"
         data-embed-id="Dk9QdDcWJIE"
+        data-embed-src="https://www.youtube.com/embed/Dk9QdDcWJIE"
+        data-embed-url="https://www.youtube.com/watch?v=Dk9QdDcWJIE"
+        data-embed-thumbnail="https://example.com/hqdefault_6006595100789835371.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
     const result = await transformContent(value, {
@@ -515,13 +515,13 @@ describeForEachParser('rebuildLiteVideoEmbeds', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-url="https://rutube.ru/video/8c50f13ca83955b4a234839c2085de0f/"
-        data-embed-title="Как живут и о чём мечтают в детском хосписе?"
-        data-embed-thumbnail="https://pic.rtbcdn.ru/video/2026-03-30/71/b1/71b1db2d97121c53dd31483954af4074.jpg"
-        data-embed-src="https://rutube.ru/play/embed/8c50f13ca83955b4a234839c2085de0f"
-        data-embed-ratio="16/9"
         data-embed-provider="rutube"
         data-embed-id="8c50f13ca83955b4a234839c2085de0f"
+        data-embed-src="https://rutube.ru/play/embed/8c50f13ca83955b4a234839c2085de0f"
+        data-embed-url="https://rutube.ru/video/8c50f13ca83955b4a234839c2085de0f/"
+        data-embed-thumbnail="https://pic.rtbcdn.ru/video/2026-03-30/71/b1/71b1db2d97121c53dd31483954af4074.jpg"
+        data-embed-ratio="16/9"
+        data-embed-title="Как живут и о чём мечтают в детском хосписе?"
       ></div>
     `
     const result = await transformContent(value, {
@@ -660,11 +660,11 @@ describeForEachParser('rebuildLiteVideoEmbeds', (parseHtml) => {
     const value = '<lite-youtube playlistid="PL-G5r6j4GptH5JTveoLTVqpp7w2oc27Q9"></lite-youtube>'
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-url="https://www.youtube.com/playlist?list=PL-G5r6j4GptH5JTveoLTVqpp7w2oc27Q9"
-        data-embed-id="playlist/PL-G5r6j4GptH5JTveoLTVqpp7w2oc27Q9"
         data-embed-provider="youtube"
+        data-embed-id="playlist/PL-G5r6j4GptH5JTveoLTVqpp7w2oc27Q9"
         data-embed-src="https://www.youtube.com/embed/videoseries?list=PL-G5r6j4GptH5JTveoLTVqpp7w2oc27Q9"
+        data-embed-url="https://www.youtube.com/playlist?list=PL-G5r6j4GptH5JTveoLTVqpp7w2oc27Q9"
+        data-embed-ratio="16/9"
       ></div>
     `
     const result = await transformContent(value, {
@@ -679,12 +679,12 @@ describeForEachParser('rebuildLiteVideoEmbeds', (parseHtml) => {
     const value = '<lite-youtube videoid="dQw4w9WgXcQ"></lite-youtube>'
     const expected = html`
       <div
+        data-embed-provider="youtube"
+        data-embed-id="dQw4w9WgXcQ"
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+        data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
         data-embed-ratio="16/9"
-        data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-        data-embed-id="dQw4w9WgXcQ"
-        data-embed-provider="youtube"
-        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
       >
       </div>
     `

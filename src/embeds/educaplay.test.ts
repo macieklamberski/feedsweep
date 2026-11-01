@@ -314,11 +314,11 @@ describeForEachParser('educaplay through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="690"
-        data-embed-id="4582251"
         data-embed-provider="educaplay"
+        data-embed-id="4582251"
         data-embed-src="https://www.educaplay.com/game/4582251-el_universo.html"
         data-embed-url="https://www.educaplay.com/learning-resources/4582251-el_universo.html"
+        data-embed-height="690"
       ></div>
     `
 

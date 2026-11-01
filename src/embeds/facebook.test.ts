@@ -1580,9 +1580,9 @@ describeForEachParser('facebook through the pipeline', (parseHtml) => {
     const value = '<fb:post href="https://www.facebook.com/PageName/posts/123"></fb:post>'
     const expected = html`
       <div
-        data-embed-src="https://www.facebook.com/plugins/post.php?href=https://www.facebook.com/PageName/posts/123"
         data-embed-provider="facebook"
         data-embed-id="https://www.facebook.com/PageName/posts/123"
+        data-embed-src="https://www.facebook.com/plugins/post.php?href=https://www.facebook.com/PageName/posts/123"
         data-embed-url="https://www.facebook.com/PageName/posts/123"
       ></div>
     `
@@ -1597,9 +1597,9 @@ describeForEachParser('facebook through the pipeline', (parseHtml) => {
       '&lt;iframe src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FPageName%2Fposts%2F123"&gt;&lt;/iframe&gt;'
     const expected = html`
       <div
-        data-embed-src="https://www.facebook.com/plugins/post.php?href=https://www.facebook.com/PageName/posts/123"
         data-embed-provider="facebook"
         data-embed-id="https://www.facebook.com/PageName/posts/123"
+        data-embed-src="https://www.facebook.com/plugins/post.php?href=https://www.facebook.com/PageName/posts/123"
         data-embed-url="https://www.facebook.com/PageName/posts/123"
       ></div>
     `

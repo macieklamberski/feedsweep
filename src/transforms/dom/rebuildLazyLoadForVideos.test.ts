@@ -162,9 +162,9 @@ describeForEachParser('rebuildLazyLoadForVideos', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-provider="youtube"
         data-embed-id="dQw4w9WgXcQ"
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
         data-embed-ratio="16/9"
@@ -194,11 +194,11 @@ describeForEachParser('rebuildLazyLoadForVideos', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-src="https://player.vimeo.com/video/76979871"
         data-embed-provider="vimeo"
         data-embed-id="76979871"
-        data-embed-ratio="16/9"
+        data-embed-src="https://player.vimeo.com/video/76979871"
         data-embed-url="https://vimeo.com/76979871"
+        data-embed-ratio="16/9"
         data-embed-title="Glass Beach"
       ></div>
     `

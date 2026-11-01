@@ -200,12 +200,12 @@ describeForEachParser('dailymail player through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-ratio-height-offset="234"
-        data-embed-id="2685575"
         data-embed-provider="dailymail"
+        data-embed-id="2685575"
         data-embed-src="https://www.dailymail.co.uk/embed/video/2685575.html"
         data-embed-url="https://www.dailymail.co.uk/video/video-2685575.html"
+        data-embed-ratio="16/9"
+        data-embed-ratio-height-offset="234"
       ></div>
     `
 
