@@ -494,6 +494,8 @@ export const flickrAnchorEmbedResolver = createMarkupEmbedResolver(
 // Only embedr's video player answers player.js. A photo and the page player post no ready message.
 export const flickrRenderHint: EmbedRenderHint = {
   provider,
+  // With no size in its query, embedr serves every slide at 2048 px and loads them all at once.
+  sizeParams: { width: 'width', height: 'height' },
   isReady: isPlayerJsReady,
   requestPlay: playerJsPlayRequest,
 }
