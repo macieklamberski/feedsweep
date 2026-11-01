@@ -1,4 +1,4 @@
-import { expect, it } from 'bun:test'
+import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
@@ -140,6 +140,83 @@ describeForEachParser('convertLazyImageContainers', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(value)
   })
 
+  describe('ShopPad Blog Studio slider module', () => {
+    it('should convert each painted slide into an image in slide order', async () => {
+      const value = html`
+        <div id="pvmlhxq" class="slider-on-box" style="width:100%;height:100%;display:none;">
+          <div class="is-boxes slider-image" style="background-image: url('https://blogstudio.example.com/shop/6192334d4df0777ab5e4cff97e03e6cc.jpg');position:relative;"></div>
+          <div class="is-boxes slider-image" style="background-image: url('https://blogstudio.example.com/shop/9a9dcdb3c4d0c62abe2b6dd8a95ba740.jpg');position:relative;"></div>
+        </div>
+      `
+      const expected = html`
+        <div id="pvmlhxq" class="slider-on-box" style="width:100%;height:100%;display:none;">
+          <img src="https://blogstudio.example.com/shop/6192334d4df0777ab5e4cff97e03e6cc.jpg">
+          <img src="https://blogstudio.example.com/shop/9a9dcdb3c4d0c62abe2b6dd8a95ba740.jpg">
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
+
+  describe('ShopPad Blog Studio ImageSlider component', () => {
+    it('should convert each painted slide into an image', async () => {
+      const value = html`
+        <div class="slider-on-content">
+          <div data-aspect-ratio="3:2" class="is-boxes slider-image" style="background-image:url(https://blogstudio.example.com/shop/c164d4460b113347fe50560894ff92c0.jpeg);"></div>
+        </div>
+      `
+      const expected = html`
+        <div class="slider-on-content">
+          <img src="https://blogstudio.example.com/shop/c164d4460b113347fe50560894ff92c0.jpeg">
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should put the image of a linked slide inside its link', async () => {
+      const value = html`
+        <div class="slider-on-content">
+          <a href="https://example.org/" data-aspect-ratio="3:2" class="is-boxes slider-image" style="background-image: url('https://blogstudio.example.com/shop/0cc235103320faf06c926b5a22af3dcf.png');"> </a>
+        </div>
+      `
+      const expected = html`
+        <div class="slider-on-content">
+          <a href="https://example.org/" data-aspect-ratio="3:2" class="is-boxes slider-image" style="background-image: url('https://blogstudio.example.com/shop/0cc235103320faf06c926b5a22af3dcf.png');"><img src="https://blogstudio.example.com/shop/0cc235103320faf06c926b5a22af3dcf.png"> </a>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should leave a slide with no background image', async () => {
+      const value = html`
+        <div class="slider-on-content">
+          <div class="is-boxes slider-image" style="position:relative;"></div>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
+  it('should leave a painted slide class outside a ShopPad slider', async () => {
+    const value = html`
+      <div class="carousel">
+        <div class="slider-image" style="background-image: url('https://example.com/photo.jpg');"></div>
+      </div>
+    `
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
+  it('should leave an empty painted div that is not a slide', async () => {
+    const value = '<div style="background-image: url(\'https://example.com/cover.jpg\');"></div>'
+
+    expect(await transform(value)).toEqualHtml(value)
+  })
+
   it('should be idempotent', async () => {
     const value = '<div data-src="https://example.com/photo.jpg"></div>'
     const once = await transform(value)
@@ -159,6 +236,18 @@ describeForEachParser('convertLazyImageContainers', (parseHtml) => {
 
     expect(twice).toEqualHtml(once)
   })
+
+  it('should be idempotent on a linked slide', async () => {
+    const value = html`
+      <div class="slider-on-content">
+        <a href="https://example.org/" class="is-boxes slider-image" style="background-image: url('https://blogstudio.example.com/shop/0cc235103320faf06c926b5a22af3dcf.png');"> </a>
+      </div>
+    `
+    const once = await transform(value)
+    const twice = await transform(once)
+
+    expect(twice).toEqualHtml(once)
+  })
 })
 
 describeForEachParser('convertLazyImageContainers through the pipeline', (parseHtml) => {
@@ -169,6 +258,21 @@ describeForEachParser('convertLazyImageContainers through the pipeline', (parseH
   it('should turn a gallery container into an image', async () => {
     const value = '<div class="cesis_gallery_img" data-src="https://example.com/photo.jpg"></div>'
     const expected = '<img src="https://example.com/photo.jpg">'
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should keep the slides of a hidden ShopPad slider', async () => {
+    const value = html`
+      <div class="slider-on-box" style="width:100%;height:100%;display:none;">
+        <div class="is-boxes slider-image" style="background-image: url('https://blogstudio.example.com/shop/6192334d4df0777ab5e4cff97e03e6cc.jpg');position:relative;"></div>
+        <div class="is-boxes slider-image" style="background-image: url('https://blogstudio.example.com/shop/9a9dcdb3c4d0c62abe2b6dd8a95ba740.jpg');position:relative;"></div>
+      </div>
+    `
+    const expected = html`
+      <img src="https://blogstudio.example.com/shop/6192334d4df0777ab5e4cff97e03e6cc.jpg">
+      <img src="https://blogstudio.example.com/shop/9a9dcdb3c4d0c62abe2b6dd8a95ba740.jpg">
+    `
 
     expect(await convert(value)).toEqualHtml(expected)
   })
