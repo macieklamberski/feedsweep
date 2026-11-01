@@ -139,9 +139,9 @@ export const readRepairedCarrierUrl = (element: Element): string => {
 }
 
 type ResolverOptions = {
-  // Deep handling only: the carrier's declared box replaces the resolver's size. Pass it on a
-  // carrier the publisher sized for the player that loads, never on a retired tool's or dead
-  // route's.
+  // Deep handling, and imgflip, whose own snippet writes each GIF's box: the carrier's declared
+  // box replaces the resolver's size. Pass it on a carrier the publisher sized for the player that
+  // loads, never on a retired tool's or dead route's.
   readCarrierSize?: boolean
   // A url resolver matches its hosts and their subdomains. Pass `isHostOf` where a subdomain of
   // the platform serves files or machinery instead of the player.
