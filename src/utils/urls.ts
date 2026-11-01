@@ -160,6 +160,7 @@ export const urlAttributes: Array<UrlAttribute> = [
   { attribute: 'data-embed-avatar', role: 'media', asset: 'image' },
   { attribute: 'data-cite-icon', role: 'media', asset: 'image' },
   { attribute: 'data-cite-thumbnail', role: 'media', asset: 'image' },
+  { attribute: 'data-file-thumbnail', role: 'media', asset: 'image' },
   { tag: 'a', attribute: 'href', role: 'link' },
   { tag: 'area', attribute: 'href', role: 'link' },
   { tag: 'form', attribute: 'action', role: 'link' },
