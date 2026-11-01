@@ -57,7 +57,7 @@ const anchorStreamPathRegex = /^\/photos\/([^/]+)\/?$/i
 const anchorGalleryPathRegex = /^\/photos\/([^/]+)\/galleries\/(\d+)(?:\/|$)/i
 // A guest pass names no photo, so the script reads the photo and its secret from the image file.
 const anchorGuestPassPathRegex = /^\/gp\/([^/]+)\/([a-z0-9]+)(?:\/|$)/i
-const photoFileRegex = /(?:^|\/)(\d+)_([a-z0-9]+)(?:_[a-z0-9]{1,2})?\.jpg(?:\?zz=1)?$/i
+const photoFileRegex = /(?:^|\/)(\d+)_([a-z0-9]+)(?:_[a-z0-9]+)?\.jpg(?:\?zz=1)?$/i
 
 // A group and a photostream each resolve by NSID and only by NSID: the player answers 200 for
 // `groups/{nsid}` and for `photostreams/{nsid}`, and 404 for a path alias in either position.
