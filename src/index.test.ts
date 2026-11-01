@@ -629,9 +629,9 @@ describeForEachParser('transformContent', (parseHtml) => {
     const expected = html`
       <div
         data-cite-provider="tumblr"
-        data-cite-publisher="example.com"
         data-cite-url="https://example.com/post"
         data-cite-title="Page title"
+        data-cite-publisher="example.com"
         data-cite-thumbnail="https://example.com/cover.png"
       ></div>
     `
@@ -1040,11 +1040,11 @@ describeForEachParser('transformContent', (parseHtml) => {
     const expected = html`
       <p>before</p>
       <div
-        data-embed-width="600"
-        data-embed-url="https://www.pixiv.net/artworks/21083839"
-        data-embed-src="https://embed.pixiv.net/oembed_iframe.php?type=illust&amp;id=21083839"
         data-embed-provider="pixiv"
         data-embed-id="21083839"
+        data-embed-src="https://embed.pixiv.net/oembed_iframe.php?type=illust&amp;id=21083839"
+        data-embed-url="https://www.pixiv.net/artworks/21083839"
+        data-embed-width="600"
         data-embed-height="315"
       ></div>
       <p><noscript>&lt;p&gt;&lt;a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=21083839" target="_blank"&gt;博麗神社&lt;/a&gt; by &lt;a href="http://www.pixiv.net/member.php?id=35490" target="_blank"&gt;kirero【二日目へ-22】&lt;/a&gt; on &lt;a href="http://www.pixiv.net/" target="_blank"&gt;pixiv&lt;/a&gt;&lt;/p&gt;</noscript></p>
@@ -1339,11 +1339,11 @@ describeForEachParser('transformContent', (parseHtml) => {
       <p>Listen: </p>
       <div data-embed-src="https://www.youtube.com/embed/abc123"></div>
       <div
-        data-embed-height="250"
-        data-embed-url="https://zeno.fm/radio/example-radio/"
-        data-embed-id="example-radio"
         data-embed-provider="zeno"
+        data-embed-id="example-radio"
         data-embed-src="https://zeno.fm/player/example-radio"
+        data-embed-url="https://zeno.fm/radio/example-radio/"
+        data-embed-height="250"
       ></div>
     `
     const result = await transformContent(value, {

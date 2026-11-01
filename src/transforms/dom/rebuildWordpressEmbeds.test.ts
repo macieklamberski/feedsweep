@@ -408,7 +408,7 @@ describeForEachParser('rebuildWordpressEmbeds through the pipeline', (parseHtml)
       </figure>
     `
     const expected =
-      '<div data-embed-ratio="16/9" data-embed-thumbnail="https://i.ytimg.com/vi/xfdNWD6Xrjw/hqdefault.jpg" data-embed-url="https://www.youtube.com/watch?v=xfdNWD6Xrjw" data-embed-id="xfdNWD6Xrjw" data-embed-provider="youtube" data-embed-src="https://www.youtube.com/embed/xfdNWD6Xrjw"></div>'
+      '<div data-embed-provider="youtube" data-embed-id="xfdNWD6Xrjw" data-embed-src="https://www.youtube.com/embed/xfdNWD6Xrjw" data-embed-url="https://www.youtube.com/watch?v=xfdNWD6Xrjw" data-embed-thumbnail="https://i.ytimg.com/vi/xfdNWD6Xrjw/hqdefault.jpg" data-embed-ratio="16/9"></div>'
 
     expect(await convert(value)).toEqualHtml(expected)
   })
@@ -427,7 +427,7 @@ describeForEachParser('rebuildWordpressEmbeds through the pipeline', (parseHtml)
       </figure>
     `
     const expected =
-      '<div data-embed-url="https://www.instagram.com/p/DZsKxhUOtvr/" data-embed-id="p/DZsKxhUOtvr" data-embed-provider="instagram" data-embed-src="https://www.instagram.com/p/DZsKxhUOtvr/embed/captioned/"></div>'
+      '<div data-embed-provider="instagram" data-embed-id="p/DZsKxhUOtvr" data-embed-src="https://www.instagram.com/p/DZsKxhUOtvr/embed/captioned/" data-embed-url="https://www.instagram.com/p/DZsKxhUOtvr/"></div>'
 
     expect(await convert(value)).toEqualHtml(expected)
   })
@@ -441,7 +441,7 @@ describeForEachParser('rebuildWordpressEmbeds through the pipeline', (parseHtml)
       </figure>
     `
     const expected =
-      '<div data-embed-ratio="16/9" data-embed-thumbnail="https://i.ytimg.com/vi/xK628wrPMIk/hqdefault.jpg" data-embed-url="https://www.youtube.com/watch?v=xK628wrPMIk" data-embed-id="xK628wrPMIk" data-embed-provider="youtube" data-embed-src="https://www.youtube.com/embed/xK628wrPMIk"></div>'
+      '<div data-embed-provider="youtube" data-embed-id="xK628wrPMIk" data-embed-src="https://www.youtube.com/embed/xK628wrPMIk" data-embed-url="https://www.youtube.com/watch?v=xK628wrPMIk" data-embed-thumbnail="https://i.ytimg.com/vi/xK628wrPMIk/hqdefault.jpg" data-embed-ratio="16/9"></div>'
 
     expect(await convert(value)).toEqualHtml(expected)
   })

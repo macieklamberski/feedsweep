@@ -410,11 +410,11 @@ describeForEachParser('fixLazyIframes through the pipeline', (parseHtml) => {
     })
     const expected = html`
       <div
-        data-embed-src="https://player.vimeo.com/video/41629603"
         data-embed-provider="vimeo"
         data-embed-id="41629603"
-        data-embed-ratio="16/9"
+        data-embed-src="https://player.vimeo.com/video/41629603"
         data-embed-url="https://vimeo.com/41629603"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -434,12 +434,12 @@ describeForEachParser('fixLazyIframes through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-src="https://www.youtube.com/embed/HdcLyhNo3C4"
         data-embed-provider="youtube"
         data-embed-id="HdcLyhNo3C4"
+        data-embed-src="https://www.youtube.com/embed/HdcLyhNo3C4"
+        data-embed-url="https://www.youtube.com/watch?v=HdcLyhNo3C4"
         data-embed-thumbnail="https://i.ytimg.com/vi/HdcLyhNo3C4/hqdefault.jpg"
         data-embed-ratio="16/9"
-        data-embed-url="https://www.youtube.com/watch?v=HdcLyhNo3C4"
       ></div>
     `
 
@@ -462,12 +462,12 @@ describeForEachParser('fixLazyIframes through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-src="https://www.youtube.com/embed/GVn0OvKZVjI?loop=0"
         data-embed-provider="youtube"
         data-embed-id="GVn0OvKZVjI"
+        data-embed-src="https://www.youtube.com/embed/GVn0OvKZVjI?loop=0"
+        data-embed-url="https://www.youtube.com/watch?v=GVn0OvKZVjI"
         data-embed-thumbnail="https://i.ytimg.com/vi/GVn0OvKZVjI/hqdefault.jpg"
         data-embed-ratio="16/9"
-        data-embed-url="https://www.youtube.com/watch?v=GVn0OvKZVjI"
       ></div>
     `
 
@@ -489,12 +489,12 @@ describeForEachParser('fixLazyIframes through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-src="https://www.youtube.com/embed/xBgWac94O2o"
         data-embed-provider="youtube"
         data-embed-id="xBgWac94O2o"
+        data-embed-src="https://www.youtube.com/embed/xBgWac94O2o"
+        data-embed-url="https://www.youtube.com/watch?v=xBgWac94O2o"
         data-embed-thumbnail="https://i.ytimg.com/vi/xBgWac94O2o/hqdefault.jpg"
         data-embed-ratio="16/9"
-        data-embed-url="https://www.youtube.com/watch?v=xBgWac94O2o"
       ></div>
     `
 
@@ -516,12 +516,12 @@ describeForEachParser('fixLazyIframes through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-src="https://www.youtube.com/embed/9UuJRhTiM-s"
         data-embed-provider="youtube"
         data-embed-id="9UuJRhTiM-s"
+        data-embed-src="https://www.youtube.com/embed/9UuJRhTiM-s"
+        data-embed-url="https://www.youtube.com/watch?v=9UuJRhTiM-s"
         data-embed-thumbnail="https://i.ytimg.com/vi/9UuJRhTiM-s/hqdefault.jpg"
         data-embed-ratio="16/9"
-        data-embed-url="https://www.youtube.com/watch?v=9UuJRhTiM-s"
       ></div>
     `
 
@@ -541,13 +541,13 @@ describeForEachParser('fixLazyIframes through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-title="Autenticazione a Due Fattori WordPress"
-        data-embed-src="https://www.youtube.com/embed/4h5tSoljuGk"
         data-embed-provider="youtube"
         data-embed-id="4h5tSoljuGk"
+        data-embed-src="https://www.youtube.com/embed/4h5tSoljuGk"
+        data-embed-url="https://www.youtube.com/watch?v=4h5tSoljuGk"
         data-embed-thumbnail="https://i.ytimg.com/vi/4h5tSoljuGk/hqdefault.jpg"
         data-embed-ratio="16/9"
-        data-embed-url="https://www.youtube.com/watch?v=4h5tSoljuGk"
+        data-embed-title="Autenticazione a Due Fattori WordPress"
       ></div>
     `
 
@@ -569,13 +569,13 @@ describeForEachParser('fixLazyIframes through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-title="Korg multi/poly"
-        data-embed-src="https://www.youtube.com/embed/KD-P3OVJ4eg"
         data-embed-provider="youtube"
         data-embed-id="KD-P3OVJ4eg"
+        data-embed-src="https://www.youtube.com/embed/KD-P3OVJ4eg"
+        data-embed-url="https://www.youtube.com/watch?v=KD-P3OVJ4eg"
         data-embed-thumbnail="https://i.ytimg.com/vi/KD-P3OVJ4eg/hqdefault.jpg"
         data-embed-ratio="16/9"
-        data-embed-url="https://www.youtube.com/watch?v=KD-P3OVJ4eg"
+        data-embed-title="Korg multi/poly"
       ></div>
     `
 
@@ -593,13 +593,13 @@ describeForEachParser('fixLazyIframes through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-title="Miss Keti Koti 2026"
-        data-embed-src="https://www.youtube.com/embed/PWjULSzhwtA"
         data-embed-provider="youtube"
         data-embed-id="PWjULSzhwtA"
+        data-embed-src="https://www.youtube.com/embed/PWjULSzhwtA"
+        data-embed-url="https://www.youtube.com/watch?v=PWjULSzhwtA"
         data-embed-thumbnail="https://i.ytimg.com/vi/PWjULSzhwtA/hqdefault.jpg"
         data-embed-ratio="16/9"
-        data-embed-url="https://www.youtube.com/watch?v=PWjULSzhwtA"
+        data-embed-title="Miss Keti Koti 2026"
       ></div>
     `
 
@@ -615,12 +615,12 @@ describeForEachParser('fixLazyIframes through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-src="https://www.youtube.com/embed/LKM0TztQ_gI"
         data-embed-provider="youtube"
         data-embed-id="LKM0TztQ_gI"
+        data-embed-src="https://www.youtube.com/embed/LKM0TztQ_gI"
+        data-embed-url="https://www.youtube.com/watch?v=LKM0TztQ_gI"
         data-embed-thumbnail="https://i.ytimg.com/vi/LKM0TztQ_gI/hqdefault.jpg"
         data-embed-ratio="16/9"
-        data-embed-url="https://www.youtube.com/watch?v=LKM0TztQ_gI"
       ></div>
     `
 
@@ -640,12 +640,12 @@ describeForEachParser('fixLazyIframes through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-src="https://www.youtube.com/embed/j7OAm_J4ve0"
         data-embed-provider="youtube"
         data-embed-id="j7OAm_J4ve0"
+        data-embed-src="https://www.youtube.com/embed/j7OAm_J4ve0"
+        data-embed-url="https://www.youtube.com/watch?v=j7OAm_J4ve0"
         data-embed-thumbnail="https://i.ytimg.com/vi/j7OAm_J4ve0/hqdefault.jpg"
         data-embed-ratio="16/9"
-        data-embed-url="https://www.youtube.com/watch?v=j7OAm_J4ve0"
       ></div>
     `
 
@@ -665,9 +665,9 @@ describeForEachParser('fixLazyIframes through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-src="https://player.glomex.com/integration/1/integration.html?integrationId=40599x1hkcenoro7&playlistId=v-ctkuga3iqbyh"
         data-embed-provider="glomex"
         data-embed-id="40599x1hkcenoro7/v-ctkuga3iqbyh"
+        data-embed-src="https://player.glomex.com/integration/1/integration.html?integrationId=40599x1hkcenoro7&playlistId=v-ctkuga3iqbyh"
         data-embed-ratio="16/9"
       ></div>
     `

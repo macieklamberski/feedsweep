@@ -15,8 +15,8 @@ describeForEachParser('stravaPlaceholderEmbedResolver', (parseHtml) => {
       const value = html`
         <div
           class="strava-embed-placeholder"
-          data-embed-type="activity"
           data-embed-id="17975533403"
+          data-embed-type="activity"
           data-style="standard"
           data-from-embed="false"
         ></div>
@@ -36,8 +36,8 @@ describeForEachParser('stravaPlaceholderEmbedResolver', (parseHtml) => {
       const value = html`
         <div
           class="strava-embed-placeholder"
-          data-embed-type="route"
           data-embed-id="3498503191028593260"
+          data-embed-type="route"
         ></div>
       `
       const expected: EmbedResolverResult = {
@@ -57,8 +57,8 @@ describeForEachParser('stravaPlaceholderEmbedResolver', (parseHtml) => {
       const value = html`
         <div
           class="strava-embed-placeholder"
-          data-embed-type="segment"
           data-embed-id="229781"
+          data-embed-type="segment"
         ></div>
       `
 
@@ -69,8 +69,8 @@ describeForEachParser('stravaPlaceholderEmbedResolver', (parseHtml) => {
       const value = html`
         <div
           class="strava-embed-placeholder"
-          data-embed-type="constructor"
           data-embed-id="1"
+          data-embed-type="constructor"
         ></div>
       `
 
@@ -81,8 +81,8 @@ describeForEachParser('stravaPlaceholderEmbedResolver', (parseHtml) => {
       const value = html`
         <div
           class="strava-embed-placeholder"
-          data-embed-type="activity"
           data-embed-id="../../route/1"
+          data-embed-type="activity"
         ></div>
       `
       const expected: EmbedResolverResult = {
@@ -100,8 +100,8 @@ describeForEachParser('stravaPlaceholderEmbedResolver', (parseHtml) => {
     it('should ignore a div without the Strava class', async () => {
       const value = html`
         <div
-          data-embed-type="activity"
           data-embed-id="17975533403"
+          data-embed-type="activity"
         ></div>
       `
 

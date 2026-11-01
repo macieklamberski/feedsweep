@@ -360,9 +360,9 @@ describeForEachParser('jotform through the pipeline', (parseHtml) => {
       <p>Body</p>
       <div
         data-enclosure=""
-        data-file-type="application/pdf"
-        data-file-name="report.pdf"
         data-file-url="https://www.jotform.com/uploads/acme/260493476454061/6012345678901234567/report.pdf"
+        data-file-name="report.pdf"
+        data-file-type="application/pdf"
       ></div>
     `
 

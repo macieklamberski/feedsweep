@@ -1,6 +1,5 @@
-import { composeQuery, getQueryParams, parseUrl } from 'trousse'
+import { composeQuery, getOrigin, getQueryParams, parseUrl } from 'trousse'
 import { attr } from '../utils/dom.js'
-import { readOrigin } from '../utils/urls.js'
 import { createMarkupEmbedResolver, readRepairedCarrierUrl } from '../utils/widgets.js'
 
 const provider = 'umap'
@@ -24,7 +23,7 @@ export const umapEmbedResolver = createMarkupEmbedResolver('iframe[src*="/map/"]
   const link = readRepairedCarrierUrl(element)
   const url = parseUrl(link)
 
-  if (!url || !readOrigin(url)) {
+  if (!url || !getOrigin(url)) {
     return
   }
 

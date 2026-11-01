@@ -282,8 +282,8 @@ describeForEachParser('ausha through the pipeline', (parseHtml) => {
     const value = '<iframe src="https://player.ausha.co/?podcastId=BGKwJUJG8D9m&amp;v=3"></iframe>'
     const expected = html`
       <div
-        data-embed-id="podcast/BGKwJUJG8D9m"
         data-embed-provider="ausha"
+        data-embed-id="podcast/BGKwJUJG8D9m"
         data-embed-src="https://player.ausha.co/?podcastId=BGKwJUJG8D9m&amp;v=3"
         data-embed-height="220"
       ></div>

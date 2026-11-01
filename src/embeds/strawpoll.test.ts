@@ -376,11 +376,11 @@ describeForEachParser('strawpoll snippets through the pipeline', (parseHtml) => 
     `
     const expected = html`
       <div
-        data-embed-thumbnail="https://cdn.strawpoll.com/images/polls/previews/ajnE1v35xnW-c.png"
-        data-embed-url="https://strawpoll.com/ajnE1v35xnW"
-        data-embed-id="ajnE1v35xnW"
         data-embed-provider="strawpoll"
+        data-embed-id="ajnE1v35xnW"
         data-embed-src="https://strawpoll.com/embed/ajnE1v35xnW"
+        data-embed-url="https://strawpoll.com/ajnE1v35xnW"
+        data-embed-thumbnail="https://cdn.strawpoll.com/images/polls/previews/ajnE1v35xnW-c.png"
       ></div>
     `
 
@@ -398,11 +398,11 @@ describeForEachParser('strawpoll snippets through the pipeline', (parseHtml) => 
     const expected = html`
       <p>Votez</p>
       <div
-        data-embed-thumbnail="https://cdn.strawpoll.com/images/polls/previews/kjn1DJlNxyQ-c.png"
-        data-embed-url="https://strawpoll.com/kjn1DJlNxyQ"
-        data-embed-id="kjn1DJlNxyQ"
         data-embed-provider="strawpoll"
+        data-embed-id="kjn1DJlNxyQ"
         data-embed-src="https://strawpoll.com/embed/kjn1DJlNxyQ"
+        data-embed-url="https://strawpoll.com/kjn1DJlNxyQ"
+        data-embed-thumbnail="https://cdn.strawpoll.com/images/polls/previews/kjn1DJlNxyQ-c.png"
       ></div>
     `
 
@@ -435,11 +435,11 @@ describeForEachParser('strawpoll snippets through the pipeline', (parseHtml) => 
     `
     const expected = html`
       <div
-        data-embed-thumbnail="https://cdn.strawpoll.com/images/polls/previews/e7ZJajkxMg3-c.png"
-        data-embed-url="https://strawpoll.com/e7ZJajkxMg3"
-        data-embed-id="e7ZJajkxMg3"
         data-embed-provider="strawpoll"
+        data-embed-id="e7ZJajkxMg3"
         data-embed-src="https://strawpoll.com/embed/e7ZJajkxMg3"
+        data-embed-url="https://strawpoll.com/e7ZJajkxMg3"
+        data-embed-thumbnail="https://cdn.strawpoll.com/images/polls/previews/e7ZJajkxMg3-c.png"
       ></div>
     `
 
@@ -515,11 +515,11 @@ describeForEachParser('strawpoll snippets through the pipeline', (parseHtml) => 
         />
       </a>
       <div
-        data-embed-thumbnail="https://cdn.strawpoll.com/images/polls/previews/1Mnwv2Kwjy7-c.png"
-        data-embed-url="https://strawpoll.com/1Mnwv2Kwjy7"
-        data-embed-id="1Mnwv2Kwjy7"
         data-embed-provider="strawpoll"
+        data-embed-id="1Mnwv2Kwjy7"
         data-embed-src="https://strawpoll.com/embed/1Mnwv2Kwjy7"
+        data-embed-url="https://strawpoll.com/1Mnwv2Kwjy7"
+        data-embed-thumbnail="https://cdn.strawpoll.com/images/polls/previews/1Mnwv2Kwjy7-c.png"
       ></div>
     `
 
@@ -545,18 +545,18 @@ describeForEachParser('strawpoll snippets through the pipeline', (parseHtml) => 
     `
     const expected = html`
       <div
-        data-embed-thumbnail="https://cdn.strawpoll.com/images/polls/previews/e7ZJajkxMg3-c.png"
-        data-embed-url="https://strawpoll.com/e7ZJajkxMg3"
-        data-embed-id="e7ZJajkxMg3"
         data-embed-provider="strawpoll"
+        data-embed-id="e7ZJajkxMg3"
         data-embed-src="https://strawpoll.com/embed/e7ZJajkxMg3"
+        data-embed-url="https://strawpoll.com/e7ZJajkxMg3"
+        data-embed-thumbnail="https://cdn.strawpoll.com/images/polls/previews/e7ZJajkxMg3-c.png"
       ></div>
       <div
-        data-embed-thumbnail="https://cdn.strawpoll.com/images/polls/previews/kjn1DJlNxyQ-c.png"
-        data-embed-url="https://strawpoll.com/kjn1DJlNxyQ"
-        data-embed-id="kjn1DJlNxyQ"
         data-embed-provider="strawpoll"
+        data-embed-id="kjn1DJlNxyQ"
         data-embed-src="https://strawpoll.com/embed/kjn1DJlNxyQ"
+        data-embed-url="https://strawpoll.com/kjn1DJlNxyQ"
+        data-embed-thumbnail="https://cdn.strawpoll.com/images/polls/previews/kjn1DJlNxyQ-c.png"
       ></div>
     `
 

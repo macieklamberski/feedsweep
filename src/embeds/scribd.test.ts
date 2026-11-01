@@ -408,10 +408,10 @@ describeForEachParser('scribd through the pipeline', (parseHtml) => {
 
     const expected = html`
       <div
-        data-embed-url="https://www.scribd.com/document/108992419"
-        data-embed-id="108992419"
         data-embed-provider="scribd"
+        data-embed-id="108992419"
         data-embed-src="https://www.scribd.com/embeds/108992419/content"
+        data-embed-url="https://www.scribd.com/document/108992419"
         data-embed-height="600"
       ></div>
     `

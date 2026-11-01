@@ -481,11 +481,11 @@ describeForEachParser('bbc through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-url="https://www.bbc.co.uk/programmes/p017rsj2"
-        data-embed-id="p017rsj2"
         data-embed-provider="bbc"
+        data-embed-id="p017rsj2"
         data-embed-src="https://www.bbc.co.uk/programmes/p017rsj2/player"
+        data-embed-url="https://www.bbc.co.uk/programmes/p017rsj2"
+        data-embed-ratio="16/9"
       ></div>
     `
 

@@ -268,9 +268,9 @@ describeForEachParser('the Flash object the pipeline leaves as markup', (parseHt
       <div
         data-embed-provider="360cities"
         data-embed-id="baroque-abbey-church-altar-hungary"
-        data-embed-ratio="425/315"
         data-embed-src="https://www.360cities.net/embed_iframe/baroque-abbey-church-altar-hungary"
         data-embed-url="https://www.360cities.net/image/baroque-abbey-church-altar-hungary"
+        data-embed-ratio="425/315"
       ></div>
     `
 

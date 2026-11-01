@@ -589,9 +589,9 @@ describeForEachParser('heyzine through the pipeline', (parseHtml) => {
       <p>Body</p>
       <div
         data-enclosure=""
-        data-file-type="application/pdf"
-        data-file-name="4db16f598c5a1f41c91c75d099f41ea4b2c3d4e5.pdf"
         data-file-url="https://cdn.heyzine.com/flip-book/pdf/4db16f598c5a1f41c91c75d099f41ea4b2c3d4e5.pdf"
+        data-file-name="4db16f598c5a1f41c91c75d099f41ea4b2c3d4e5.pdf"
+        data-file-type="application/pdf"
       ></div>
     `
 

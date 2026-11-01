@@ -161,7 +161,7 @@ import { figmaEmbedResolver } from '../embeds/figma.js'
 import { figshareEmbedResolver } from '../embeds/figshare.js'
 import { firesideEmbedResolver } from '../embeds/fireside.js'
 import { firstoryEmbedResolver } from '../embeds/firstory.js'
-import { flickrEmbedResolver } from '../embeds/flickr.js'
+import { flickrAnchorEmbedResolver, flickrIframeEmbedResolver } from '../embeds/flickr.js'
 import {
   fliphtml5IframeEmbedResolver,
   fliphtml5LightBoxEmbedResolver,
@@ -192,6 +192,7 @@ import { heyzineEmbedResolver } from '../embeds/heyzine.js'
 import { hudlIframeEmbedResolver, hudlWidgetEmbedResolver } from '../embeds/hudl.js'
 import { iheartEmbedResolver } from '../embeds/iheart.js'
 import { imdbEmbedResolver } from '../embeds/imdb.js'
+import { imgflipEmbedResolver } from '../embeds/imgflip.js'
 import {
   imgurBlockquoteEmbedResolver,
   imgurGifvEmbedResolver,
@@ -641,7 +642,8 @@ const embedResolvers: Array<EmbedResolver> = [
   figshareEmbedResolver,
   firesideEmbedResolver,
   firstoryEmbedResolver,
-  flickrEmbedResolver,
+  flickrAnchorEmbedResolver,
+  flickrIframeEmbedResolver,
   fliphtml5IframeEmbedResolver,
   fliphtml5LightBoxEmbedResolver,
   flipsnackEmbedResolver,
@@ -673,6 +675,7 @@ const embedResolvers: Array<EmbedResolver> = [
   hudlWidgetEmbedResolver,
   iheartEmbedResolver,
   imdbEmbedResolver,
+  imgflipEmbedResolver,
   imgurBlockquoteEmbedResolver,
   imgurGifvEmbedResolver,
   imgurIframeEmbedResolver,

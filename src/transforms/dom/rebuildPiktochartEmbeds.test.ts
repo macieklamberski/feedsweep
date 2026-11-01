@@ -357,11 +357,11 @@ describeForEachParser('rebuildPiktochartEmbeds in the pipeline', (parseHtml) => 
     const expected = html`
       <p>This post covers the different variants of MS Project like Standard, Online , Project Server etc.</p>
       <div
-        data-embed-ratio="1/2"
-        data-embed-url="https://create.piktochart.com/output/12065746-ms-project-different-variants-conflict-copy"
-        data-embed-id="12065746-ms-project-different-variants-conflict-copy"
         data-embed-provider="piktochart"
+        data-embed-id="12065746-ms-project-different-variants-conflict-copy"
         data-embed-src="https://create.piktochart.com/embed/12065746-ms-project-different-variants-conflict-copy"
+        data-embed-url="https://create.piktochart.com/output/12065746-ms-project-different-variants-conflict-copy"
+        data-embed-ratio="1/2"
       ></div>
     `
 
@@ -395,11 +395,11 @@ describeForEachParser('rebuildPiktochartEmbeds in the pipeline', (parseHtml) => 
       <a href="https://example.com/ms-project.png" imageanchor="1"><img data-align="center" border="0" src="https://example.com/ms-project.png"></a>
       <p>There are different versions of MS Project.</p>
       <div
-        data-embed-ratio="1/2"
-        data-embed-url="https://create.piktochart.com/output/12065239-ms-project-what-was-new"
-        data-embed-id="12065239-ms-project-what-was-new"
         data-embed-provider="piktochart"
+        data-embed-id="12065239-ms-project-what-was-new"
         data-embed-src="https://create.piktochart.com/embed/12065239-ms-project-what-was-new"
+        data-embed-url="https://create.piktochart.com/output/12065239-ms-project-what-was-new"
+        data-embed-ratio="1/2"
       ></div>
     `
 
@@ -428,11 +428,11 @@ describeForEachParser('rebuildPiktochartEmbeds in the pipeline', (parseHtml) => 
     const expected = html`
       <p>Here is the infographic.</p>
       <div
-        data-embed-ratio="1/2"
-        data-embed-url="https://create.piktochart.com/output/25785770-basketball-search-terms"
-        data-embed-id="25785770-basketball-search-terms"
         data-embed-provider="piktochart"
+        data-embed-id="25785770-basketball-search-terms"
         data-embed-src="https://create.piktochart.com/embed/25785770-basketball-search-terms"
+        data-embed-url="https://create.piktochart.com/output/25785770-basketball-search-terms"
+        data-embed-ratio="1/2"
       ></div>
       <p>Thanks for reading.</p>
     `

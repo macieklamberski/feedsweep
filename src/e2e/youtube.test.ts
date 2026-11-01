@@ -44,12 +44,12 @@ describeForEachParser('YouTube', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://i.ytimg.com/vi/zz5KauCbjPI/hqdefault.jpg"
-        data-embed-url="https://www.youtube.com/watch?v=zz5KauCbjPI"
-        data-embed-id="zz5KauCbjPI"
         data-embed-provider="youtube"
+        data-embed-id="zz5KauCbjPI"
         data-embed-src="https://www.youtube.com/embed/zz5KauCbjPI"
+        data-embed-url="https://www.youtube.com/watch?v=zz5KauCbjPI"
+        data-embed-thumbnail="https://i.ytimg.com/vi/zz5KauCbjPI/hqdefault.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -519,13 +519,13 @@ describeForEachParser('YouTube', (parseHtml) => {
     const expected = html`
       <p>Intro</p>
       <div
-        data-embed-title="WebdriverIO Tutorials: Snapshot Testing"
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://i.ytimg.com/vi/wQRGpWX3fsk/hqdefault.jpg"
-        data-embed-url="https://www.youtube.com/watch?v=wQRGpWX3fsk"
-        data-embed-id="wQRGpWX3fsk"
         data-embed-provider="youtube"
+        data-embed-id="wQRGpWX3fsk"
         data-embed-src="https://www.youtube.com/embed/wQRGpWX3fsk"
+        data-embed-url="https://www.youtube.com/watch?v=wQRGpWX3fsk"
+        data-embed-thumbnail="https://i.ytimg.com/vi/wQRGpWX3fsk/hqdefault.jpg"
+        data-embed-ratio="16/9"
+        data-embed-title="WebdriverIO Tutorials: Snapshot Testing"
       ></div>
     `
 
@@ -543,12 +543,12 @@ describeForEachParser('YouTube', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://i.ytimg.com/vi/Ui57rCk2DfU/hqdefault.jpg"
-        data-embed-url="https://www.youtube.com/watch?v=Ui57rCk2DfU"
-        data-embed-id="Ui57rCk2DfU"
         data-embed-provider="youtube"
+        data-embed-id="Ui57rCk2DfU"
         data-embed-src="https://www.youtube.com/embed/Ui57rCk2DfU?list=PLIil3TfyMHXRz7CSs_lOmJopR5AOsWcNF&index=2"
+        data-embed-url="https://www.youtube.com/watch?v=Ui57rCk2DfU"
+        data-embed-thumbnail="https://i.ytimg.com/vi/Ui57rCk2DfU/hqdefault.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -565,12 +565,12 @@ describeForEachParser('YouTube', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://i.ytimg.com/vi/Ps2vLw21-gk/hqdefault.jpg"
-        data-embed-url="https://www.youtube.com/watch?v=Ps2vLw21-gk"
-        data-embed-id="Ps2vLw21-gk"
         data-embed-provider="youtube"
+        data-embed-id="Ps2vLw21-gk"
         data-embed-src="https://www.youtube.com/embed/Ps2vLw21-gk?start=13103"
+        data-embed-url="https://www.youtube.com/watch?v=Ps2vLw21-gk"
+        data-embed-thumbnail="https://i.ytimg.com/vi/Ps2vLw21-gk/hqdefault.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -593,12 +593,12 @@ describeForEachParser('YouTube pages in a media element', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://i.ytimg.com/vi/qa-d1guhpb4/hqdefault.jpg"
-        data-embed-url="https://www.youtube.com/watch?v=qa-d1guhpb4"
-        data-embed-id="qa-d1guhpb4"
         data-embed-provider="youtube"
+        data-embed-id="qa-d1guhpb4"
         data-embed-src="https://www.youtube.com/embed/qa-d1guhpb4"
+        data-embed-url="https://www.youtube.com/watch?v=qa-d1guhpb4"
+        data-embed-thumbnail="https://i.ytimg.com/vi/qa-d1guhpb4/hqdefault.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 

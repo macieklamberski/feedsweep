@@ -117,10 +117,10 @@ describeForEachParser('buddyboss preview through the pipeline', (parseHtml) => {
       <p>One thing that often gets mixed together here is bullion versus jewelry.</p>
       <div
         data-cite-provider="buddyboss"
-        data-cite-description="Free gold price calculator."
-        data-cite-publisher="example.com"
         data-cite-url="https://example.com/calculator"
         data-cite-title="Gold Calculator"
+        data-cite-description="Free gold price calculator."
+        data-cite-publisher="example.com"
         data-cite-thumbnail="https://example.com/opengraph-image"
       ></div>
     `

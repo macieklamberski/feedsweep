@@ -456,8 +456,8 @@ describeForEachParser('anchor through the pipeline', (parseHtml) => {
     const value = '<iframe src="https://anchor.fm/myshow/embed/episodes/my-title-e123"></iframe>'
     const expected = html`
       <div
-        data-embed-id="myshow/my-title-e123"
         data-embed-provider="anchor"
+        data-embed-id="myshow/my-title-e123"
         data-embed-src="https://creators.spotify.com/pod/profile/myshow/embed/episodes/my-title-e123"
         data-embed-height="100"
       ></div>

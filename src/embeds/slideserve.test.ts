@@ -242,10 +242,10 @@ describeForEachParser('slideserve through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="300/271"
-        data-embed-id="12675"
         data-embed-provider="slideserve"
+        data-embed-id="12675"
         data-embed-src="https://www.slideserve.com/embed/12675"
+        data-embed-ratio="300/271"
         data-embed-title="GRADUACIO"
       ></div>
     `

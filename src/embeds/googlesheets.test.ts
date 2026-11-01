@@ -863,11 +863,11 @@ describeForEachParser('googlesheets through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="500"
-        data-embed-url="https://docs.google.com/spreadsheets/d/1cQ8dFdQARpQV-uzmLkEZZZX6m5PhyMClBagpK8yH1mI/pubhtml"
-        data-embed-id="1cQ8dFdQARpQV-uzmLkEZZZX6m5PhyMClBagpK8yH1mI"
         data-embed-provider="googlesheets"
+        data-embed-id="1cQ8dFdQARpQV-uzmLkEZZZX6m5PhyMClBagpK8yH1mI"
         data-embed-src="https://docs.google.com/spreadsheets/d/1cQ8dFdQARpQV-uzmLkEZZZX6m5PhyMClBagpK8yH1mI/pubhtml?gid=0&amp;single=true"
+        data-embed-url="https://docs.google.com/spreadsheets/d/1cQ8dFdQARpQV-uzmLkEZZZX6m5PhyMClBagpK8yH1mI/pubhtml"
+        data-embed-height="500"
       ></div>
     `
 
@@ -886,9 +886,9 @@ describeForEachParser('googlesheets through the pipeline', (parseHtml) => {
       <p>Body</p>
       <div
         data-enclosure=""
-        data-file-type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        data-file-name="export"
         data-file-url="https://docs.google.com/spreadsheets/d/1ZXkA7dZDAvp78rfhz_HPurHEOrB_fM86sNvrQ5YDHFg/export?format=xlsx"
+        data-file-name="export"
+        data-file-type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
       ></div>
     `
 

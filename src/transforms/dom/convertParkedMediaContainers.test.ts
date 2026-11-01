@@ -247,10 +247,10 @@ describeForEachParser('convertParkedMediaContainers through the pipeline', (pars
       '<div data-src="https://feeds.soundcloud.com/stream/1234567890-example-episode.mp3"></div>'
     const expected = html`
       <div
-        data-embed-height="166"
-        data-embed-id="tracks/1234567890"
         data-embed-provider="soundcloud"
+        data-embed-id="tracks/1234567890"
         data-embed-src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/1234567890"
+        data-embed-height="166"
       ></div>
     `
 

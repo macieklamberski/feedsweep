@@ -265,12 +265,12 @@ describeForEachParser('smore through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-title="NCBCC Herding Instinct Test"
-        data-embed-height="600"
-        data-embed-url="https://app.smore.com/n/mbv7u"
-        data-embed-id="mbv7u"
         data-embed-provider="smore"
+        data-embed-id="mbv7u"
         data-embed-src="https://app.smore.com/n/mbv7u?embedded"
+        data-embed-url="https://app.smore.com/n/mbv7u"
+        data-embed-height="600"
+        data-embed-title="NCBCC Herding Instinct Test"
       ></div>
     `
 

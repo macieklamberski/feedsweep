@@ -128,11 +128,11 @@ describeForEachParser('rebuildDocumentcloudEmbeds through the pipeline', (parseH
     const expected = html`
       <p>The Commission decided.</p>
       <div
-        data-embed-ratio="17/22"
-        data-embed-thumbnail="https://s3.documentcloud.org/documents/409020/pages/udo-pc-review-august-14-p1-normal.gif"
-        data-embed-id="409020"
         data-embed-provider="documentcloud"
+        data-embed-id="409020"
         data-embed-src="https://embed.documentcloud.org/documents/409020-udo-pc-review-august-14/"
+        data-embed-thumbnail="https://s3.documentcloud.org/documents/409020/pages/udo-pc-review-august-14-p1-normal.gif"
+        data-embed-ratio="17/22"
       ></div>
     `
 

@@ -377,12 +377,12 @@ describeForEachParser('rebuildIframelyEmbeds through the pipeline', (parseHtml) 
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
-        data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-        data-embed-id="dQw4w9WgXcQ"
         data-embed-provider="youtube"
+        data-embed-id="dQw4w9WgXcQ"
         data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+        data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -407,11 +407,11 @@ describeForEachParser('rebuildIframelyEmbeds through the pipeline', (parseHtml) 
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-url="https://www.canva.com/design/DAG1xDat1Ws/FP_KGaz1JYLKDQxMLY02AQ/view"
-        data-embed-id="DAG1xDat1Ws/FP_KGaz1JYLKDQxMLY02AQ"
         data-embed-provider="canva"
+        data-embed-id="DAG1xDat1Ws/FP_KGaz1JYLKDQxMLY02AQ"
         data-embed-src="https://www.canva.com/design/DAG1xDat1Ws/FP_KGaz1JYLKDQxMLY02AQ/view?embed"
+        data-embed-url="https://www.canva.com/design/DAG1xDat1Ws/FP_KGaz1JYLKDQxMLY02AQ/view"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -437,12 +437,12 @@ describeForEachParser('rebuildIframelyEmbeds through the pipeline', (parseHtml) 
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://i.ytimg.com/vi/wN_PqWOCCb4/hqdefault.jpg"
-        data-embed-url="https://www.youtube.com/watch?v=wN_PqWOCCb4"
-        data-embed-id="wN_PqWOCCb4"
         data-embed-provider="youtube"
+        data-embed-id="wN_PqWOCCb4"
         data-embed-src="https://www.youtube.com/embed/wN_PqWOCCb4"
+        data-embed-url="https://www.youtube.com/watch?v=wN_PqWOCCb4"
+        data-embed-thumbnail="https://i.ytimg.com/vi/wN_PqWOCCb4/hqdefault.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -460,12 +460,12 @@ describeForEachParser('rebuildIframelyEmbeds through the pipeline', (parseHtml) 
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://i.ytimg.com/vi/NObkWjQHNm8/hqdefault.jpg"
-        data-embed-url="https://www.youtube.com/watch?v=NObkWjQHNm8"
-        data-embed-id="NObkWjQHNm8"
         data-embed-provider="youtube"
+        data-embed-id="NObkWjQHNm8"
         data-embed-src="https://www.youtube.com/embed/NObkWjQHNm8"
+        data-embed-url="https://www.youtube.com/watch?v=NObkWjQHNm8"
+        data-embed-thumbnail="https://i.ytimg.com/vi/NObkWjQHNm8/hqdefault.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -484,12 +484,12 @@ describeForEachParser('rebuildIframelyEmbeds through the pipeline', (parseHtml) 
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://i.ytimg.com/vi/vkG0KkjPzfs/hqdefault.jpg"
-        data-embed-url="https://www.youtube.com/watch?v=vkG0KkjPzfs"
-        data-embed-id="vkG0KkjPzfs"
         data-embed-provider="youtube"
+        data-embed-id="vkG0KkjPzfs"
         data-embed-src="https://www.youtube.com/embed/vkG0KkjPzfs"
+        data-embed-url="https://www.youtube.com/watch?v=vkG0KkjPzfs"
+        data-embed-thumbnail="https://i.ytimg.com/vi/vkG0KkjPzfs/hqdefault.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 

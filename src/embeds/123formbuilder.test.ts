@@ -347,10 +347,10 @@ describeForEachParser('123formbuilder through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-url="https://form.123formbuilder.com/5013627"
-        data-embed-id="5013627"
         data-embed-provider="123formbuilder"
+        data-embed-id="5013627"
         data-embed-src="https://form.123formbuilder.com/5013627"
+        data-embed-url="https://form.123formbuilder.com/5013627"
       ></div>
     `
 
@@ -371,10 +371,10 @@ describeForEachParser('123formbuilder through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-url="https://form.123formbuilder.com/783097"
-        data-embed-id="783097"
         data-embed-provider="123formbuilder"
+        data-embed-id="783097"
         data-embed-src="https://form.123formbuilder.com/783097"
+        data-embed-url="https://form.123formbuilder.com/783097"
       ></div>
     `
 

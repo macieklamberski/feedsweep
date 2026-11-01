@@ -361,9 +361,9 @@ describeForEachParser('mixcloud through the pipeline', (parseHtml) => {
     const value = '<iframe src="https://www.mixcloud.com/photogmusic/no-filter/"></iframe>'
     const expected = html`
       <div
-        data-embed-src="https://www.mixcloud.com/widget/iframe/?feed=/photogmusic/no-filter/"
         data-embed-provider="mixcloud"
         data-embed-id="photogmusic/no-filter"
+        data-embed-src="https://www.mixcloud.com/widget/iframe/?feed=/photogmusic/no-filter/"
         data-embed-url="https://www.mixcloud.com/photogmusic/no-filter/"
         data-embed-height="120"
         data-embed-author="photogmusic"

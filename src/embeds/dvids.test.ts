@@ -172,11 +172,11 @@ describeForEachParser('dvids player through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-url="https://www.dvidshub.net/video/549765"
-        data-embed-id="549765"
         data-embed-provider="dvids"
+        data-embed-id="549765"
         data-embed-src="https://www.dvidshub.net/video/embed/549765"
+        data-embed-url="https://www.dvidshub.net/video/549765"
+        data-embed-ratio="16/9"
       ></div>
     `
 

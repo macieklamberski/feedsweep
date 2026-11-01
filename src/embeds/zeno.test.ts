@@ -172,11 +172,11 @@ describeForEachParser('zeno through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="250"
-        data-embed-url="https://zeno.fm/radio/radio-panamericana-bolivia/"
-        data-embed-id="radio-panamericana-bolivia"
         data-embed-provider="zeno"
+        data-embed-id="radio-panamericana-bolivia"
         data-embed-src="https://zeno.fm/player/radio-panamericana-bolivia"
+        data-embed-url="https://zeno.fm/radio/radio-panamericana-bolivia/"
+        data-embed-height="250"
       ></div>
     `
 

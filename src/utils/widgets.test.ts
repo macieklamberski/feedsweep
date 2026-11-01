@@ -239,6 +239,27 @@ describeForEachParser('updateEmbedPlaceholder', (parseHtml) => {
     expect(element.outerHTML).toEqualHtml(expected)
   })
 
+  // toEqualHtml sorts attributes, so the order is read off the element. linkedom puts a new
+  // attribute first and jsdom last, and an enrichment pass writes after the resolver.
+  it('should lay the attributes out in field order across writes', () => {
+    const document = parseHtml('')
+    const element = document.createElement('div')
+    element.setAttribute('data-embed-custom', 'kept')
+
+    updateEmbedPlaceholder(element, { src: 'https://embed.example/abc', title: 'Title' })
+    updateEmbedPlaceholder(element, { provider: 'example', thumbnail: 'https://example.com/t.jpg' })
+
+    const expected = [
+      'data-embed-provider',
+      'data-embed-src',
+      'data-embed-thumbnail',
+      'data-embed-title',
+      'data-embed-custom',
+    ]
+
+    expect(element.getAttributeNames()).toEqual(expected)
+  })
+
   it('should leave an attribute alone when the write does not set it', () => {
     const document = parseHtml('')
     const element = document.createElement('div')
@@ -433,6 +454,23 @@ describeForEachParser('updateCitePlaceholder', (parseHtml) => {
     `
 
     expect(element.outerHTML).toEqualHtml(expected)
+  })
+
+  it('should lay the attributes out in field order across writes', () => {
+    const document = parseHtml('')
+    const element = document.createElement('div')
+
+    updateCitePlaceholder(element, { title: 'Title', publisher: 'example.com' })
+    updateCitePlaceholder(element, { provider: 'example', url: 'https://example.com/post' })
+
+    const expected = [
+      'data-cite-provider',
+      'data-cite-url',
+      'data-cite-title',
+      'data-cite-publisher',
+    ]
+
+    expect(element.getAttributeNames()).toEqual(expected)
   })
 
   // An enricher passing a whole API payload through would otherwise turn every key of it
@@ -784,10 +822,10 @@ describe('normalizeEmbedFields', () => {
       })
 
       expect(Object.keys(fields)).toEqual([
-        'src',
-        'params',
         'provider',
         'id',
+        'src',
+        'params',
         'url',
         'thumbnail',
         'width',
@@ -949,11 +987,11 @@ describeForEachParser('createCitePlaceholder', (parseHtml) => {
     const expected = html`
       <div
         data-cite-provider="ghost"
+        data-cite-url="https://example.com/post"
+        data-cite-title="Post title"
         data-cite-description="Preview text"
         data-cite-author="Author name"
         data-cite-publisher="Publisher name"
-        data-cite-url="https://example.com/post"
-        data-cite-title="Post title"
         data-cite-icon="https://example.com/favicon.ico"
         data-cite-thumbnail="https://example.com/og-image.jpg"
       ></div>
@@ -975,9 +1013,9 @@ describeForEachParser('createCitePlaceholder', (parseHtml) => {
     const expected = html`
       <div
         data-cite-provider="ghost"
-        data-cite-description="Preview text"
         data-cite-url="https://example.com/post"
         data-cite-title="Post title"
+        data-cite-description="Preview text"
       ></div>
     `
 
@@ -1839,12 +1877,12 @@ describeForEachParser('objects naming their player in a movie param', (parseHtml
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://i.ytimg.com/vi/oq4-7rK3dUM/hqdefault.jpg"
-        data-embed-url="https://www.youtube.com/watch?v=oq4-7rK3dUM"
-        data-embed-id="oq4-7rK3dUM"
         data-embed-provider="youtube"
+        data-embed-id="oq4-7rK3dUM"
         data-embed-src="https://www.youtube.com/embed/oq4-7rK3dUM"
+        data-embed-url="https://www.youtube.com/watch?v=oq4-7rK3dUM"
+        data-embed-thumbnail="https://i.ytimg.com/vi/oq4-7rK3dUM/hqdefault.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 

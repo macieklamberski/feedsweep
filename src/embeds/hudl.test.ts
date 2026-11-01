@@ -359,10 +359,10 @@ describeForEachParser('hudl through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-id="athlete/3949971/207852394"
         data-embed-provider="hudl"
+        data-embed-id="athlete/3949971/207852394"
         data-embed-src="https://www.hudl.com/embed/athlete/3949971/highlights/207852394"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -381,11 +381,11 @@ describeForEachParser('hudl through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-url="https://www.hudl.com/video/3/5290399/57e98e2d842eb2648c8f2338"
-        data-embed-id="video/3/5290399/57e98e2d842eb2648c8f2338"
         data-embed-provider="hudl"
+        data-embed-id="video/3/5290399/57e98e2d842eb2648c8f2338"
         data-embed-src="https://www.hudl.com/embed/video/3/5290399/57e98e2d842eb2648c8f2338"
+        data-embed-url="https://www.hudl.com/video/3/5290399/57e98e2d842eb2648c8f2338"
+        data-embed-ratio="16/9"
       ></div>
     `
 

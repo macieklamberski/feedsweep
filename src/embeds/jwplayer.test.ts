@@ -939,11 +939,11 @@ describeForEachParser('jwplayerLibraryEmbedResolver through the pipeline', (pars
     const expected = html`
       <p>Loading the player...</p>
       <div
-        data-embed-thumbnail="https://cdn.jwplayer.com/v2/media/NEnylXdA/poster.jpg"
-        data-embed-src="https://cdn.jwplayer.com/players/NEnylXdA.html"
-        data-embed-ratio="16/9"
         data-embed-provider="jwplayer"
         data-embed-id="NEnylXdA"
+        data-embed-src="https://cdn.jwplayer.com/players/NEnylXdA.html"
+        data-embed-thumbnail="https://cdn.jwplayer.com/v2/media/NEnylXdA/poster.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -969,12 +969,12 @@ describeForEachParser('jwplayerLibraryEmbedResolver through the pipeline', (pars
       <meta itemprop="contentUrl" content="https://cdn.jwplayer.com/v2/media/H4mbSOk5">
       <p>Loading the player…</p>
       <div
-        data-embed-title="Exercise 1"
-        data-embed-thumbnail="https://cdn.jwplayer.com/v2/media/H4mbSOk5/poster.jpg"
-        data-embed-src="https://cdn.jwplayer.com/players/H4mbSOk5.html"
-        data-embed-ratio="16/9"
         data-embed-provider="jwplayer"
         data-embed-id="H4mbSOk5"
+        data-embed-src="https://cdn.jwplayer.com/players/H4mbSOk5.html"
+        data-embed-thumbnail="https://cdn.jwplayer.com/v2/media/H4mbSOk5/poster.jpg"
+        data-embed-ratio="16/9"
+        data-embed-title="Exercise 1"
       ></div>
     `
 
@@ -991,11 +991,11 @@ describeForEachParser('jwplayerLibraryEmbedResolver through the pipeline', (pars
     `
     const expected = html`
       <div
-        data-embed-thumbnail="https://cdn.jwplayer.com/v2/media/7kakZqpT/poster.jpg"
-        data-embed-src="https://cdn.jwplayer.com/players/7kakZqpT.html"
-        data-embed-ratio="16/9"
         data-embed-provider="jwplayer"
         data-embed-id="7kakZqpT"
+        data-embed-src="https://cdn.jwplayer.com/players/7kakZqpT.html"
+        data-embed-thumbnail="https://cdn.jwplayer.com/v2/media/7kakZqpT/poster.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -1017,11 +1017,11 @@ describeForEachParser('jwplayerLibraryEmbedResolver through the pipeline', (pars
     const expected = html`
       <p>In einem fremden Land. </p>
       <div
-        data-embed-thumbnail="https://cdn.jwplayer.com/v2/media/QJmMZD9a/poster.jpg"
-        data-embed-src="https://cdn.jwplayer.com/players/QJmMZD9a.html"
-        data-embed-ratio="16/9"
         data-embed-provider="jwplayer"
         data-embed-id="QJmMZD9a"
+        data-embed-src="https://cdn.jwplayer.com/players/QJmMZD9a.html"
+        data-embed-thumbnail="https://cdn.jwplayer.com/v2/media/QJmMZD9a/poster.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -1048,11 +1048,11 @@ describeForEachParser('jwplayerMountEmbedResolver through the pipeline', (parseH
     `
     const expected = html`
       <div
-        data-embed-thumbnail="https://cdn.jwplayer.com/v2/media/0DG8htfR/poster.jpg"
-        data-embed-src="https://cdn.jwplayer.com/players/0DG8htfR-fuSXM6PS.html"
-        data-embed-ratio="16/9"
         data-embed-provider="jwplayer"
         data-embed-id="0DG8htfR"
+        data-embed-src="https://cdn.jwplayer.com/players/0DG8htfR-fuSXM6PS.html"
+        data-embed-thumbnail="https://cdn.jwplayer.com/v2/media/0DG8htfR/poster.jpg"
+        data-embed-ratio="16/9"
       ></div>
       <h2>How to ride the maze exercise</h2>
     `

@@ -5,20 +5,29 @@ import {
   getQueryParam,
   isHostOf,
   type Nullish,
+  trimObject,
 } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
-import { attr, flashVar, flashVars, keepIfMatches, parseFlashVars } from '../utils/dom.js'
+import {
+  attr,
+  find,
+  flashVar,
+  flashVars,
+  keepIfMatches,
+  parseFlashVars,
+  parsePixelSize,
+} from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { digitsRegex } from '../utils/urls.js'
-import { createUrlEmbedResolver } from '../utils/widgets.js'
+import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
+import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'flickr'
 
 const sizes = {
   // The player fills its frame, and photos come in every shape.
   photo: { ratio: '4/3' },
-  // The size Flickr's own dialog wrote for years. The slideshow renders at whatever box the query
-  // names, so there is no rendered height to measure against.
+  // The size Flickr's own dialog wrote for years. The slideshow fills whatever frame it gets, so
+  // there is no rendered height to measure against.
   slideshow: { width: 400, height: 300 },
   video: { ratio: '16/9' },
 }
@@ -40,6 +49,15 @@ const groupAliasPoolPathRegex = /^\/groups\/[^/]+\/pool\/show(?:\/with\/[^/]+)?\
 // An owner of `_` names nobody: the player ignores it, and `/photos/_/{photoId}/` answers 404.
 const photoPathRegex = /^\/photos\/(?:_|([^/]+))\/(\d+)(?:\/in\/[^/]+)?\/player(?:\/([^/]+))?\/?$/i
 const embedrPhotoPathRegex = /^\/photos\/(\d+)\/?$/i
+// The page hrefs Flickr's embed script turns into a player. A photo page keeps whatever follows
+// its id, such as the `in/{context}` it was opened from, and a pool filtered by a tag has none.
+const anchorPhotoPathRegex = /^\/photos\/([^/]+)\/(\d+)(?:\/|$)/i
+const anchorGroupPathRegex = /^\/groups\/([^/]+)\/pool\/?$/i
+const anchorStreamPathRegex = /^\/photos\/([^/]+)\/?$/i
+const anchorGalleryPathRegex = /^\/photos\/([^/]+)\/galleries\/(\d+)(?:\/|$)/i
+// A guest pass names no photo, so the script reads the photo and its secret from the image file.
+const anchorGuestPassPathRegex = /^\/gp\/([^/]+)\/([a-z0-9]+)(?:\/|$)/i
+const photoFileRegex = /(?:^|\/)(\d+)_([a-z0-9]+)(?:_[a-z0-9]{1,2})?\.jpg(?:\?zz=1)?$/i
 
 // A group and a photostream each resolve by NSID and only by NSID: the player answers 200 for
 // `groups/{nsid}` and for `photostreams/{nsid}`, and 404 for a path alias in either position.
@@ -53,6 +71,8 @@ type FlickrSubject = { setId?: string; owner?: string; groupId?: string }
 // A single photo, whose owner and secret are each in the path on one of the two carriers only.
 type FlickrPhoto = { photoId: string; owner?: string; secret?: string }
 
+type PhotoQuery = { secret?: string; width?: number; height?: number }
+
 // Flickr's own embed script writes these embedr endpoints into a frameless iframe. A real id
 // answers 200 with the whole slideshow and an invented one 404.
 const composeAlbumPlayer = (setId: string): string => {
@@ -63,8 +83,7 @@ const composeStreamPlayer = (owner: string): string => {
   return `https://embedr.flickr.com/photostreams/${encodePathSegment(owner)}`
 }
 
-// The page player takes either owner spelling, serves no frame-blocking header and takes the
-// same width and height query as embedr.
+// The page player takes either owner spelling and serves no frame-blocking header.
 const composeAliasStreamPlayer = (owner: string): string => {
   return `https://www.flickr.com/photos/${encodePathSegment(owner)}/player`
 }
@@ -73,8 +92,16 @@ const composeGroupPlayer = (groupId: string): string => {
   return `https://embedr.flickr.com/groups/${groupId}`
 }
 
-const composePhotoPlayer = (photoId: string): string => {
-  return `https://embedr.flickr.com/photos/${photoId}`
+// embedr answers 404 for a private photo without its secret, and serves a public one whatever
+// secret it is sent.
+const composePhotoPlayer = (photoId: string, query: PhotoQuery = {}): string => {
+  return `https://embedr.flickr.com/photos/${photoId}${composeQuery(trimObject(query))}`
+}
+
+// The owner before the gallery id is the script's spelling. embedr serves the gallery by its id
+// under any existing account.
+const composeGalleryPlayer = (owner: string, galleryId: string): string => {
+  return `https://embedr.flickr.com/galleries/${encodePathSegment(owner)}-${galleryId}`
 }
 
 // The page player ignores the owner segment and the secret after `player/`, and serves the same
@@ -114,12 +141,12 @@ const composeShortPhotoUrl = (photoId: string): string => {
 // The server segment in a photo file path is a don't-care: `/0/` serves the same bytes as the
 // photo's own server.
 const composePhotoThumbnail = (photoId: string, secret: string): string => {
-  return `https://live.staticflickr.com/0/${photoId}_${secret}_b.jpg`
+  return `https://live.staticflickr.com/0/${photoId}_${encodePathSegment(secret)}_b.jpg`
 }
 
 // embedr draws its box at the size the query names, whatever the frame, so the video player is
 // asked for 16:9.
-const videoQuery = '?width=640&height=360'
+const videoSize = { width: 640, height: 360 }
 
 // What a page path names, whether it arrived in the flashvars or as the framed page itself.
 // A value read out of a path is decoded, so each is held in one form and only the urls encode it.
@@ -183,10 +210,7 @@ const readFlashPhoto = (element: Nullish<Element>): FlickrPhoto | undefined => {
     return
   }
 
-  const secret = flashVar(element, 'photo_secret')
-
-  // The flashvar comes out decoded, and it goes into a path beside the raw path spelling.
-  return { photoId, secret: secret ? encodePathSegment(secret) : undefined }
+  return { photoId, secret: flashVar(element, 'photo_secret') }
 }
 
 // The iframe carrier names its subject in its own query. A set is preferred where several
@@ -219,7 +243,7 @@ const readPhotoPlayer = (parsed: URL): { src: string; photo: FlickrPhoto } | und
     const photo = {
       owner: player[1] ? decodePathValue(player[1]) : undefined,
       photoId: player[2],
-      secret: player[3],
+      secret: player[3] ? decodePathValue(player[3]) : undefined,
     }
 
     return { src: composePagePhotoPlayer(photo), photo }
@@ -317,7 +341,13 @@ const composePlayerEmbed = (
   if (flashVideoPathRegex.test(parsed.pathname)) {
     const photo = readFlashPhoto(element)
 
-    return photo && composePhotoEmbed(composePhotoPlayer(photo.photoId), photo)
+    if (!photo) {
+      return
+    }
+
+    const src = composePhotoPlayer(photo.photoId, { secret: photo.secret, ...videoSize })
+
+    return composePhotoEmbed(src, photo)
   }
 
   if (flashPlayerPathRegex.test(parsed.pathname)) {
@@ -346,15 +376,11 @@ const resolveTarget = (url: URL, element: Nullish<Element>): EmbedResolverResult
     return
   }
 
-  // The size always travels in the src: with no query every image renders at NaN.
   if (flashVideoPathRegex.test(url.pathname)) {
-    return { ...result, src: `${result.src}${videoQuery}`, ...sizes.video }
+    return { ...result, ...sizes.video }
   }
 
-  const { width, height } = sizes.slideshow
-  const query = composeQuery({ width, height })
-
-  return { ...result, src: `${result.src}${query}`, ...sizes.slideshow }
+  return { ...result, ...sizes.slideshow }
 }
 
 export const flickrResolveEmbed: ResolveUrlEmbed = (url, element) => {
@@ -373,11 +399,184 @@ export const flickrResolveEmbed: ResolveUrlEmbed = (url, element) => {
 // Flickr's slideshow swf, its video swf, the legacy iframe, a framed album or stream page, and
 // the two players for a single photo. Only `/player/` and `embedr.flickr.com` are served without
 // `x-frame-options: SAMEORIGIN`, so the rest name a frame that renders empty.
-export const flickrEmbedResolver = createUrlEmbedResolver(hosts, flickrResolveEmbed)
+export const flickrIframeEmbedResolver = createUrlEmbedResolver(hosts, flickrResolveEmbed)
+
+// What an anchor href names other than a photo: the album, the group pool or the photostream.
+const readAnchorSubject = (url: URL): FlickrSubject | undefined => {
+  const set = setPathRegex.exec(url.pathname)
+
+  if (set) {
+    return { owner: decodePathValue(set[1]), setId: decodePathValue(set[2]) }
+  }
+
+  const group = anchorGroupPathRegex.exec(url.pathname)
+
+  if (group) {
+    return { groupId: group[1] }
+  }
+
+  // The script maps an owner page to the photostream by NSID only, and leaves an alias as a link.
+  const stream = anchorStreamPathRegex.exec(url.pathname)
+
+  if (stream && nsidRegex.test(stream[1])) {
+    return { owner: stream[1] }
+  }
+}
+
+type AnchorSize = { width: number; height: number }
+
+// The image's size goes on the placeholder only. embedr lays out at the size a query names and
+// ignores its frame, so a query crops the player in a frame narrower than the image, while a bare
+// src fills whatever frame it gets.
+const sizeAnchorPlayer = (result: EmbedResolverResult, size: AnchorSize): EmbedResolverResult => {
+  const { ratio, ...rest } = result
+
+  return {
+    ...rest,
+    ...size,
+  }
+}
+
+// A gallery id is global: embedr serves it under any existing account and with no owner at all,
+// while its page answers 404 under an owner who did not curate it.
+const composeGalleryEmbed = (owner: string, galleryId: string): EmbedResolverResult => {
+  const ownerSegment = encodePathSegment(owner)
+
+  return {
+    provider,
+    id: `galleries/${galleryId}`,
+    src: composeGalleryPlayer(owner, galleryId),
+    url: `https://www.flickr.com/photos/${ownerSegment}/galleries/${galleryId}`,
+    author: readOwnerAlias(owner),
+  }
+}
+
+// A guest pass shows a photo its owner keeps from the public. embedr answers 404 for it without
+// the secret, and plays it with any guest pass code. The code is an access token, so it stays in
+// the src and no page url is minted.
+const composeGuestPassEmbed = (
+  owner: string,
+  code: string,
+  imageSrc: string | undefined,
+): EmbedResolverResult | undefined => {
+  const file = imageSrc ? photoFileRegex.exec(imageSrc) : undefined
+
+  if (!file) {
+    return
+  }
+
+  const photoId = file[1]
+  const query = composeQuery({ secret: file[2], gp: code })
+
+  return {
+    provider,
+    id: `p/${encodeBase58(photoId)}`,
+    src: `${composePhotoPlayer(photoId)}${query}`,
+    ...sizes.photo,
+    author: readOwnerAlias(owner),
+  }
+}
+
+const readAnchorPhoto = (
+  url: URL,
+  imageSrc: string | undefined,
+): EmbedResolverResult | undefined => {
+  const photo = anchorPhotoPathRegex.exec(url.pathname)
+
+  if (photo) {
+    const photoId = photo[2]
+    // Flickr's script sends the secret the image file names, whatever photo or size the file is.
+    const file = imageSrc ? photoFileRegex.exec(imageSrc) : undefined
+
+    return composePhotoEmbed(composePhotoPlayer(photoId, { secret: file?.[2] }), {
+      owner: decodePathValue(photo[1]),
+      photoId,
+    })
+  }
+
+  const guestPass = anchorGuestPassPathRegex.exec(url.pathname)
+
+  if (guestPass) {
+    return composeGuestPassEmbed(decodePathValue(guestPass[1]), guestPass[2], imageSrc)
+  }
+}
+
+const readAnchorTarget = (
+  url: URL,
+  imageSrc: string | undefined,
+  size: AnchorSize | undefined,
+): EmbedResolverResult | undefined => {
+  const photo = readAnchorPhoto(url, imageSrc)
+
+  if (photo) {
+    if (!size) {
+      return photo
+    }
+
+    return sizeAnchorPlayer(photo, size)
+  }
+
+  const gallery = anchorGalleryPathRegex.exec(url.pathname)
+
+  if (gallery) {
+    const result = composeGalleryEmbed(decodePathValue(gallery[1]), gallery[2])
+
+    return sizeAnchorPlayer(result, size ?? sizes.slideshow)
+  }
+
+  const subject = readAnchorSubject(url)
+  const result = subject && composeEmbed(subject)
+
+  if (!result) {
+    return
+  }
+
+  return sizeAnchorPlayer(result, size ?? sizes.slideshow)
+}
+
+// The script leaves an image this narrow as a linked thumbnail.
+const maximumThumbnailWidth = 150
+
+// Flickr's embed code, an anchor around an image that its embedr script replaces with a player
+// asked for the image's own size. Without the script the anchor is a linked image.
+// See: https://widgets.flickr.com/embedr/embedr-47ad26da5deade67d472950b12c94b6c.js.
+export const flickrAnchorEmbedResolver = createMarkupEmbedResolver(
+  'a[data-flickr-embed="true"][href]',
+  (element) => {
+    const image = find(element, 'img')
+    const url = parseUrlOnHosts(attr(element, 'href'), hosts)
+
+    if (!image || !url) {
+      return
+    }
+
+    const width = parsePixelSize(attr(image, 'width'))
+    const height = parsePixelSize(attr(image, 'height'))
+
+    if (width && width <= maximumThumbnailWidth) {
+      return
+    }
+
+    const imageSrc = attr(image, 'src')
+    const result = readAnchorTarget(url, imageSrc, width && height ? { width, height } : undefined)
+
+    if (!result) {
+      return
+    }
+
+    return {
+      ...result,
+      thumbnail: imageSrc,
+      title: attr(element, 'title') ?? attr(image, 'alt'),
+    }
+  },
+)
 
 // Only embedr's video player answers player.js. A photo and the page player post no ready message.
 export const flickrRenderHint: EmbedRenderHint = {
   provider,
+  // With no size in its query, embedr serves every slide at 2048 px and loads them all at once.
+  sizeParams: { width: 'width', height: 'height' },
   isReady: isPlayerJsReady,
   requestPlay: playerJsPlayRequest,
 }

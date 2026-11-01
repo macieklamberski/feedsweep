@@ -713,10 +713,10 @@ describeForEachParser('pbs through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-id="viralplayer/3011411426"
         data-embed-provider="pbs"
+        data-embed-id="viralplayer/3011411426"
         data-embed-src="https://player.pbs.org/widget/partnerplayer/3011411426/"
+        data-embed-ratio="16/9"
       ></div>
     `
 

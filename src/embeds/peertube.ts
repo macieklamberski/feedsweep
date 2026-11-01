@@ -1,7 +1,14 @@
-import { composeQuery, getPathSegments, getQueryParams, isAnyOf, parseUrl } from 'trousse'
+import {
+  composeQuery,
+  getOrigin,
+  getPathSegments,
+  getQueryParams,
+  isAnyOf,
+  parseUrl,
+} from 'trousse'
 import type { EmbedRenderHint } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { readOrigin, uuidRegex } from '../utils/urls.js'
+import { uuidRegex } from '../utils/urls.js'
 import { createMarkupEmbedResolver, readRepairedCarrierUrl } from '../utils/widgets.js'
 
 const provider = 'peertube'
@@ -57,7 +64,7 @@ const readPathId = (segments: Array<string>): string | undefined => {
 }
 
 const parseVideo = (url: URL): PeertubeVideo | undefined => {
-  const origin = readOrigin(url)
+  const origin = getOrigin(url)
 
   if (!origin) {
     return

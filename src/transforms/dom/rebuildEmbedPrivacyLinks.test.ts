@@ -107,12 +107,12 @@ describeForEachParser('Embed Privacy links the pipeline rebuilds', (parseHtml) =
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://i.ytimg.com/vi/QzYozbNneVc/hqdefault.jpg"
-        data-embed-url="https://www.youtube.com/watch?v=QzYozbNneVc"
-        data-embed-id="QzYozbNneVc"
         data-embed-provider="youtube"
+        data-embed-id="QzYozbNneVc"
         data-embed-src="https://www.youtube.com/embed/QzYozbNneVc"
+        data-embed-url="https://www.youtube.com/watch?v=QzYozbNneVc"
+        data-embed-thumbnail="https://i.ytimg.com/vi/QzYozbNneVc/hqdefault.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -126,12 +126,12 @@ describeForEachParser('Embed Privacy links the pipeline rebuilds', (parseHtml) =
     `
     const expected = html`
       <center><div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://i.ytimg.com/vi/FL3184o-TgQ/hqdefault.jpg"
-        data-embed-url="https://www.youtube.com/watch?v=FL3184o-TgQ"
-        data-embed-id="FL3184o-TgQ"
         data-embed-provider="youtube"
+        data-embed-id="FL3184o-TgQ"
         data-embed-src="https://www.youtube.com/embed/FL3184o-TgQ"
+        data-embed-url="https://www.youtube.com/watch?v=FL3184o-TgQ"
+        data-embed-thumbnail="https://i.ytimg.com/vi/FL3184o-TgQ/hqdefault.jpg"
+        data-embed-ratio="16/9"
       ></div></center>
     `
 

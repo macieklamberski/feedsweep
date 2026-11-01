@@ -254,9 +254,9 @@ describeForEachParser('affingerCiteResolver', (parseHtml) => {
       `
       const expected = html`
         <div
-          data-cite-title="Page title"
-          data-cite-url="https://example.com/post"
           data-cite-provider="affinger"
+          data-cite-url="https://example.com/post"
+          data-cite-title="Page title"
         ></div>
       `
 

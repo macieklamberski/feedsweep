@@ -209,8 +209,8 @@ describeForEachParser('ourworldindata through the pipeline', (parseHtml) => {
 
     const expected = html`
       <div
-        data-embed-id="grapher/fertilizer-use-per-hectare-of-cropland"
         data-embed-provider="ourworldindata"
+        data-embed-id="grapher/fertilizer-use-per-hectare-of-cropland"
         data-embed-src="https://ourworldindata.org/grapher/fertilizer-use-per-hectare-of-cropland?tab=map"
         data-embed-url="https://ourworldindata.org/grapher/fertilizer-use-per-hectare-of-cropland?tab=map"
         data-embed-thumbnail="https://ourworldindata.org/grapher/fertilizer-use-per-hectare-of-cropland.png?tab=map"
@@ -226,8 +226,8 @@ describeForEachParser('ourworldindata through the pipeline', (parseHtml) => {
       '<iframe src="https://ourworldindata.org/grapher/co2-by-source?utm_source=newsletter&amp;time=1900..2017"></iframe>'
     const expected = html`
       <div
-        data-embed-id="grapher/co2-by-source"
         data-embed-provider="ourworldindata"
+        data-embed-id="grapher/co2-by-source"
         data-embed-src="https://ourworldindata.org/grapher/co2-by-source?time=1900..2017"
         data-embed-url="https://ourworldindata.org/grapher/co2-by-source?time=1900..2017"
         data-embed-thumbnail="https://ourworldindata.org/grapher/co2-by-source.png?time=1900..2017"

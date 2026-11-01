@@ -39,12 +39,12 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     const expected = html`
       <p>Text</p>
       <div
+        data-embed-provider="youtube"
+        data-embed-id="dQw4w9WgXcQ"
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
         data-embed-ratio="16/9"
-        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-        data-embed-provider="youtube"
-        data-embed-id="dQw4w9WgXcQ"
       ></div>
     `
 
@@ -60,12 +60,12 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     `
     const expected = html`
       <div
+        data-embed-provider="youtube"
+        data-embed-id="dQw4w9WgXcQ"
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg"
         data-embed-ratio="16/9"
-        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-        data-embed-provider="youtube"
-        data-embed-id="dQw4w9WgXcQ"
       ></div>
     `
 
@@ -86,10 +86,10 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-url="https://vimeo.com/76979871"
-        data-embed-src="https://player.vimeo.com/video/76979871"
         data-embed-provider="vimeo"
         data-embed-id="76979871"
+        data-embed-src="https://player.vimeo.com/video/76979871"
+        data-embed-url="https://vimeo.com/76979871"
         data-embed-ratio="16/9"
       ></div>
     `
@@ -201,7 +201,7 @@ describeForEachParser('convertWidgets', (parseHtml) => {
         }),
       }
       const value = '<div data-live="abc123"></div>'
-      const expected = '<div data-embed-id="abc123" data-embed-provider="example"></div>'
+      const expected = '<div data-embed-provider="example" data-embed-id="abc123"></div>'
 
       expect(await transform(value, contextFor(resolver))).toEqualHtml(expected)
     })
@@ -301,16 +301,16 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     `
     const expected = html`
       <div
+        data-embed-provider="youtube"
+        data-embed-id="dQw4w9WgXcQ"
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
         data-embed-ratio="16/9"
-        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-        data-embed-provider="youtube"
-        data-embed-id="dQw4w9WgXcQ"
       ></div>
       <div
-        data-embed-src="https://example.com/player/xyz"
         data-embed-provider="example"
+        data-embed-src="https://example.com/player/xyz"
       ></div>
     `
 
@@ -326,12 +326,12 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     const expected = html`
       <p>Before</p>
       <div
+        data-embed-provider="youtube"
+        data-embed-id="dQw4w9WgXcQ"
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
         data-embed-ratio="16/9"
-        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-        data-embed-provider="youtube"
-        data-embed-id="dQw4w9WgXcQ"
       ></div>
       <p>After</p>
     `
@@ -360,13 +360,13 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     const value = '<iframe src="https://example.com/player/xyz"></iframe>'
     const expected = html`
       <div
-        data-embed-title="Sample title"
-        data-embed-src="https://example.com/player/xyz"
         data-embed-provider="example"
-        data-embed-duration="125"
+        data-embed-src="https://example.com/player/xyz"
+        data-embed-title="Sample title"
         data-embed-description="Sample description"
-        data-embed-avatar="https://example.com/avatar.jpg"
         data-embed-author="@user"
+        data-embed-avatar="https://example.com/avatar.jpg"
+        data-embed-duration="125"
       ></div>
     `
 
@@ -392,8 +392,8 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     const value = '<iframe src="https://example.com/player/xyz"></iframe>'
     const expected = html`
       <div
-        data-embed-src="https://example.com/player/xyz"
         data-embed-provider="example"
+        data-embed-src="https://example.com/player/xyz"
         data-embed-avatar="javascript:alert(1)"
       ></div>
     `
@@ -429,8 +429,8 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-width="640"
         data-embed-src="https://unknown-site.com/123"
+        data-embed-width="640"
         data-embed-height="360"
       ></div>
     `
@@ -470,8 +470,8 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
         data-embed-src="https://unknown-site.com/123"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -488,8 +488,8 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-width="540"
         data-embed-src="https://unknown-site.com/123"
+        data-embed-width="540"
         data-embed-height="300"
       ></div>
     `
@@ -551,8 +551,8 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     const value = '<iframe src="https://example.com/player/xyz"></iframe>'
     const expected = html`
       <div
-        data-embed-src="https://example.com/player/xyz"
         data-embed-provider="example"
+        data-embed-src="https://example.com/player/xyz"
       ></div>
     `
 
@@ -567,12 +567,12 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     const value = '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>'
     const expected = html`
       <div
+        data-embed-provider="youtube"
+        data-embed-id="dQw4w9WgXcQ"
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
         data-embed-ratio="16/9"
-        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-        data-embed-provider="youtube"
-        data-embed-id="dQw4w9WgXcQ"
       ></div>
     `
 
@@ -621,8 +621,8 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     const value = '<iframe src="https://example.com/x"></iframe>'
     const expected = html`
       <div
-        data-embed-src="https://example.com/x"
         data-embed-provider="example"
+        data-embed-src="https://example.com/x"
       ></div>
     `
 
@@ -722,9 +722,9 @@ describeForEachParser('convertWidgets', (parseHtml) => {
       const value = '<iframe src="https://example.com/e/x"></iframe>'
       const expected = html`
         <div
-          data-embed-url="https://example.com/watch/x"
-          data-embed-src="https://example.com/e/x"
           data-embed-provider="example"
+          data-embed-src="https://example.com/e/x"
+          data-embed-url="https://example.com/watch/x"
         ></div>
       `
 
@@ -751,9 +751,9 @@ describeForEachParser('convertWidgets', (parseHtml) => {
       const value = '<iframe src="https://example.com/e/x"></iframe>'
       const expected = html`
         <div
-          data-embed-url="https://example.com/watch/x"
-          data-embed-src="https://example.com/e/x"
           data-embed-provider="example"
+          data-embed-src="https://example.com/e/x"
+          data-embed-url="https://example.com/watch/x"
         ></div>
       `
 
@@ -846,11 +846,11 @@ describeForEachParser('convertWidgets', (parseHtml) => {
       const value = '<embed src="http://vimeo.com/moogaloop.swf?clip_id=76979871">'
       const expected = html`
         <div
-          data-embed-url="https://vimeo.com/76979871"
-          data-embed-src="https://player.vimeo.com/video/76979871"
-          data-embed-ratio="16/9"
           data-embed-provider="vimeo"
           data-embed-id="76979871"
+          data-embed-src="https://player.vimeo.com/video/76979871"
+          data-embed-url="https://vimeo.com/76979871"
+          data-embed-ratio="16/9"
         ></div>
       `
 
@@ -907,9 +907,9 @@ describeForEachParser('convertWidgets', (parseHtml) => {
       const expected = html`
         <div id="__ss_6435157">
           <div
-            data-embed-src="https://www.slideshare.net/slideshow/embed_code/6435157"
             data-embed-provider="slideshare"
             data-embed-id="6435157"
+            data-embed-src="https://www.slideshare.net/slideshow/embed_code/6435157"
             data-embed-ratio="595/485"
           ></div>
         </div>
@@ -940,12 +940,12 @@ describeForEachParser('convertWidgets', (parseHtml) => {
       `
       const expected = html`
         <div
-                    data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                    data-embed-provider="youtube"
+          data-embed-id="dQw4w9WgXcQ"
+          data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+          data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
           data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
           data-embed-ratio="16/9"
-          data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-          data-embed-provider="youtube"
-          data-embed-id="dQw4w9WgXcQ"
         ></div>
       `
 
@@ -956,12 +956,12 @@ describeForEachParser('convertWidgets', (parseHtml) => {
       const value = '<object data="https://www.youtube.com/v/dQw4w9WgXcQ"></object>'
       const expected = html`
         <div
+          data-embed-provider="youtube"
+          data-embed-id="dQw4w9WgXcQ"
+          data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
           data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
           data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
           data-embed-ratio="16/9"
-          data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-          data-embed-provider="youtube"
-          data-embed-id="dQw4w9WgXcQ"
         ></div>
       `
 
@@ -976,12 +976,12 @@ describeForEachParser('convertWidgets', (parseHtml) => {
       `
       const expected = html`
         <div
+          data-embed-provider="youtube"
+          data-embed-id="dQw4w9WgXcQ"
+          data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
           data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
           data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
           data-embed-ratio="16/9"
-          data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-          data-embed-provider="youtube"
-          data-embed-id="dQw4w9WgXcQ"
         ></div>
       `
 
@@ -992,12 +992,12 @@ describeForEachParser('convertWidgets', (parseHtml) => {
       const value = '<embed src="https://www.youtube.com/v/dQw4w9WgXcQ&hl=en_US&fs=1">'
       const expected = html`
         <div
+          data-embed-provider="youtube"
+          data-embed-id="dQw4w9WgXcQ"
+          data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
           data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
           data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
           data-embed-ratio="16/9"
-          data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-          data-embed-provider="youtube"
-          data-embed-id="dQw4w9WgXcQ"
         ></div>
       `
 
@@ -1014,12 +1014,12 @@ describeForEachParser('convertWidgets', (parseHtml) => {
       `
       const expected = html`
         <div
-                    data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                    data-embed-provider="youtube"
+          data-embed-id="dQw4w9WgXcQ"
+          data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+          data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
           data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
           data-embed-ratio="16/9"
-          data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-          data-embed-provider="youtube"
-          data-embed-id="dQw4w9WgXcQ"
         ></div>
       `
 
@@ -1044,12 +1044,12 @@ describeForEachParser('convertWidgets', (parseHtml) => {
             name="src"
           ></param>
           <div
+            data-embed-provider="youtube"
+            data-embed-id="dQw4w9WgXcQ"
+            data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
             data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
             data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
             data-embed-ratio="16/9"
-            data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-            data-embed-provider="youtube"
-            data-embed-id="dQw4w9WgXcQ"
           ></div>
           <p>Your browser cannot play this video.</p>
         </object>
@@ -1070,12 +1070,12 @@ describeForEachParser('convertWidgets', (parseHtml) => {
       `
       const expected = html`
         <div
+          data-embed-provider="youtube"
+          data-embed-id="uM6HzFWFHoI"
+          data-embed-src="https://www.youtube.com/embed/uM6HzFWFHoI"
           data-embed-url="https://www.youtube.com/watch?v=uM6HzFWFHoI"
           data-embed-thumbnail="https://i.ytimg.com/vi/uM6HzFWFHoI/hqdefault.jpg"
           data-embed-ratio="16/9"
-          data-embed-src="https://www.youtube.com/embed/uM6HzFWFHoI"
-          data-embed-provider="youtube"
-          data-embed-id="uM6HzFWFHoI"
         ></div>
       `
 
@@ -1096,12 +1096,12 @@ describeForEachParser('convertWidgets', (parseHtml) => {
       `
       const expected = html`
         <div
+          data-embed-provider="youtube"
+          data-embed-id="GFUa7bjNsZk"
+          data-embed-src="https://www.youtube.com/embed/GFUa7bjNsZk"
           data-embed-url="https://www.youtube.com/watch?v=GFUa7bjNsZk"
           data-embed-thumbnail="https://i.ytimg.com/vi/GFUa7bjNsZk/hqdefault.jpg"
           data-embed-ratio="16/9"
-          data-embed-src="https://www.youtube.com/embed/GFUa7bjNsZk"
-          data-embed-provider="youtube"
-          data-embed-id="GFUa7bjNsZk"
         ></div>
       `
 
@@ -1130,12 +1130,12 @@ describeForEachParser('convertWidgets', (parseHtml) => {
           <div>
             Watch the video:
             <div
+              data-embed-provider="youtube"
+              data-embed-id="uM6HzFWFHoI"
+              data-embed-src="https://www.youtube.com/embed/uM6HzFWFHoI"
               data-embed-url="https://www.youtube.com/watch?v=uM6HzFWFHoI"
               data-embed-thumbnail="https://i.ytimg.com/vi/uM6HzFWFHoI/hqdefault.jpg"
               data-embed-ratio="16/9"
-              data-embed-src="https://www.youtube.com/embed/uM6HzFWFHoI"
-              data-embed-provider="youtube"
-              data-embed-id="uM6HzFWFHoI"
             ></div>
           </div>
         </object>
@@ -1161,12 +1161,12 @@ describeForEachParser('convertWidgets', (parseHtml) => {
       `
       const expected = html`
         <div
+          data-embed-provider="youtube"
+          data-embed-id="v7Ist21lPLU"
+          data-embed-src="https://www.youtube.com/embed/v7Ist21lPLU"
           data-embed-url="https://www.youtube.com/watch?v=v7Ist21lPLU"
           data-embed-thumbnail="https://i.ytimg.com/vi/v7Ist21lPLU/hqdefault.jpg"
           data-embed-ratio="16/9"
-          data-embed-src="https://www.youtube.com/embed/v7Ist21lPLU"
-          data-embed-provider="youtube"
-          data-embed-id="v7Ist21lPLU"
         ></div>
       `
 
@@ -1193,12 +1193,12 @@ describeForEachParser('convertWidgets', (parseHtml) => {
           ></param>
           <a href="http://www.youtube.com/watch?v=LLcTGKByzno">
             <div
+              data-embed-provider="youtube"
+              data-embed-id="LLcTGKByzno"
+              data-embed-src="https://www.youtube.com/embed/LLcTGKByzno"
               data-embed-url="https://www.youtube.com/watch?v=LLcTGKByzno"
               data-embed-thumbnail="https://i.ytimg.com/vi/LLcTGKByzno/hqdefault.jpg"
               data-embed-ratio="16/9"
-              data-embed-src="https://www.youtube.com/embed/LLcTGKByzno"
-              data-embed-provider="youtube"
-              data-embed-id="LLcTGKByzno"
             ></div>
           </a>
         </object>
@@ -1217,20 +1217,20 @@ describeForEachParser('convertWidgets', (parseHtml) => {
       const expected = html`
         <object class="zb-embed">
           <div
+            data-embed-provider="youtube"
+            data-embed-id="l2_AaJUj-bs"
+            data-embed-src="https://www.youtube.com/embed/l2_AaJUj-bs"
             data-embed-url="https://www.youtube.com/watch?v=l2_AaJUj-bs"
             data-embed-thumbnail="https://i.ytimg.com/vi/l2_AaJUj-bs/hqdefault.jpg"
             data-embed-ratio="16/9"
-            data-embed-src="https://www.youtube.com/embed/l2_AaJUj-bs"
-            data-embed-provider="youtube"
-            data-embed-id="l2_AaJUj-bs"
           ></div>
           <div
+            data-embed-provider="youtube"
+            data-embed-id="ZGacBF1zTGI"
+            data-embed-src="https://www.youtube.com/embed/ZGacBF1zTGI"
             data-embed-url="https://www.youtube.com/watch?v=ZGacBF1zTGI"
             data-embed-thumbnail="https://i.ytimg.com/vi/ZGacBF1zTGI/hqdefault.jpg"
             data-embed-ratio="16/9"
-            data-embed-src="https://www.youtube.com/embed/ZGacBF1zTGI"
-            data-embed-provider="youtube"
-            data-embed-id="ZGacBF1zTGI"
           ></div>
         </object>
       `
@@ -1306,12 +1306,12 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
         controls=""
       ></video>
       <div
+        data-embed-provider="youtube"
+        data-embed-id="dQw4w9WgXcQ"
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
         data-embed-ratio="16/9"
-        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-        data-embed-provider="youtube"
-        data-embed-id="dQw4w9WgXcQ"
       ></div>
     `
 
@@ -1574,13 +1574,13 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
       `
       const expected = html`
         <div
-          data-embed-title="Example"
-          data-embed-thumbnail="https://commons.wikimedia.org/wiki/Special:FilePath/Example.webm?width=960"
-          data-embed-id="Example.webm"
           data-embed-provider="wikimedia"
-          data-embed-ratio="16/9"
+          data-embed-id="Example.webm"
           data-embed-src="https://commons.wikimedia.org/wiki/File:Example.webm?embedplayer=yes"
           data-embed-url="https://commons.wikimedia.org/wiki/File:Example.webm"
+          data-embed-thumbnail="https://commons.wikimedia.org/wiki/Special:FilePath/Example.webm?width=960"
+          data-embed-ratio="16/9"
+          data-embed-title="Example"
         ></div>
       `
 
@@ -1711,9 +1711,9 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
     it('should write publisher and date as placeholder attributes', async () => {
       const expected = html`
         <div
+          data-embed-provider="example"
           data-embed-src="https://post.example/embed/1"
           data-embed-publisher="r/example"
-          data-embed-provider="example"
           data-embed-date="2018.10.14"
         ></div>
       `
@@ -1725,9 +1725,9 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
       const parseDateFn = (raw: string) => raw.replaceAll('.', '-')
       const expected = html`
         <div
+          data-embed-provider="example"
           data-embed-src="https://post.example/embed/1"
           data-embed-publisher="r/example"
-          data-embed-provider="example"
           data-embed-date="2018-10-14"
         ></div>
       `
@@ -1739,9 +1739,9 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
       const parseDateFn = () => undefined
       const expected = html`
         <div
+          data-embed-provider="example"
           data-embed-src="https://post.example/embed/1"
           data-embed-publisher="r/example"
-          data-embed-provider="example"
           data-embed-date="2018.10.14"
         ></div>
       `
@@ -1772,12 +1772,12 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://i.ytimg.com/vi/qa-d1guhpb4/hqdefault.jpg"
-        data-embed-url="https://www.youtube.com/watch?v=qa-d1guhpb4"
-        data-embed-id="qa-d1guhpb4"
         data-embed-provider="youtube"
+        data-embed-id="qa-d1guhpb4"
         data-embed-src="https://www.youtube.com/embed/qa-d1guhpb4"
+        data-embed-url="https://www.youtube.com/watch?v=qa-d1guhpb4"
+        data-embed-thumbnail="https://i.ytimg.com/vi/qa-d1guhpb4/hqdefault.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -1788,12 +1788,12 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
     const value = '<video src="https://youtu.be/P9cxtTYHjSQ"></video>'
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://i.ytimg.com/vi/P9cxtTYHjSQ/hqdefault.jpg"
-        data-embed-url="https://www.youtube.com/watch?v=P9cxtTYHjSQ"
-        data-embed-id="P9cxtTYHjSQ"
         data-embed-provider="youtube"
+        data-embed-id="P9cxtTYHjSQ"
         data-embed-src="https://www.youtube.com/embed/P9cxtTYHjSQ"
+        data-embed-url="https://www.youtube.com/watch?v=P9cxtTYHjSQ"
+        data-embed-thumbnail="https://i.ytimg.com/vi/P9cxtTYHjSQ/hqdefault.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -1812,11 +1812,11 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
     `
     const expected = html`
       <div
-        data-embed-height="252"
-        data-embed-url="https://drive.google.com/file/d/1GRb_urzw2vn0JGKamTE70NIoELiXbAJA/view"
-        data-embed-id="1GRb_urzw2vn0JGKamTE70NIoELiXbAJA"
         data-embed-provider="googledrive"
+        data-embed-id="1GRb_urzw2vn0JGKamTE70NIoELiXbAJA"
         data-embed-src="https://drive.google.com/file/d/1GRb_urzw2vn0JGKamTE70NIoELiXbAJA/preview"
+        data-embed-url="https://drive.google.com/file/d/1GRb_urzw2vn0JGKamTE70NIoELiXbAJA/view"
+        data-embed-height="252"
       ></div>
     `
 
@@ -1834,12 +1834,12 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://example.com/poster.jpg"
-        data-embed-url="https://vimeo.com/71168250"
-        data-embed-id="71168250"
         data-embed-provider="vimeo"
+        data-embed-id="71168250"
         data-embed-src="https://player.vimeo.com/video/71168250"
+        data-embed-url="https://vimeo.com/71168250"
+        data-embed-thumbnail="https://example.com/poster.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -1917,9 +1917,9 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
     `
     const expected = html`
       <div
-        data-embed-height="30"
         data-embed-provider="example"
         data-embed-src="https://player.example/episode/1"
+        data-embed-height="30"
       ></div>
     `
 
@@ -1959,10 +1959,10 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
     `
     const expected = html`
       <div
-        data-embed-title="Episode 1"
-        data-embed-height="30"
         data-embed-provider="example"
         data-embed-src="https://player.example/1"
+        data-embed-height="30"
+        data-embed-title="Episode 1"
       ></div>
     `
 
@@ -1985,12 +1985,12 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
     const value = '<audio src="https://youtu.be/P9cxtTYHjSQ"></audio>'
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://i.ytimg.com/vi/P9cxtTYHjSQ/hqdefault.jpg"
-        data-embed-url="https://www.youtube.com/watch?v=P9cxtTYHjSQ"
-        data-embed-id="P9cxtTYHjSQ"
         data-embed-provider="youtube"
+        data-embed-id="P9cxtTYHjSQ"
         data-embed-src="https://www.youtube.com/embed/P9cxtTYHjSQ"
+        data-embed-url="https://www.youtube.com/watch?v=P9cxtTYHjSQ"
+        data-embed-thumbnail="https://i.ytimg.com/vi/P9cxtTYHjSQ/hqdefault.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -2015,12 +2015,12 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
     `
     const expected = html`
       <div
-        data-embed-ratio="4/3"
-        data-embed-thumbnail="https://drive.google.com/thumbnail?id=1GRb_urzw2vn0JGKamTE70NIoELiXbAJA&sz=w640"
-        data-embed-url="https://drive.google.com/file/d/1GRb_urzw2vn0JGKamTE70NIoELiXbAJA/view"
-        data-embed-id="1GRb_urzw2vn0JGKamTE70NIoELiXbAJA"
         data-embed-provider="googledrive"
+        data-embed-id="1GRb_urzw2vn0JGKamTE70NIoELiXbAJA"
         data-embed-src="https://drive.google.com/file/d/1GRb_urzw2vn0JGKamTE70NIoELiXbAJA/preview"
+        data-embed-url="https://drive.google.com/file/d/1GRb_urzw2vn0JGKamTE70NIoELiXbAJA/view"
+        data-embed-thumbnail="https://drive.google.com/thumbnail?id=1GRb_urzw2vn0JGKamTE70NIoELiXbAJA&sz=w640"
+        data-embed-ratio="4/3"
       ></div>
     `
 
@@ -2034,20 +2034,20 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://i.ytimg.com/vi/qo2veCDcG_4/hqdefault.jpg"
-        data-embed-url="https://www.youtube.com/watch?v=qo2veCDcG_4"
-        data-embed-id="qo2veCDcG_4"
         data-embed-provider="youtube"
+        data-embed-id="qo2veCDcG_4"
         data-embed-src="https://www.youtube.com/embed/qo2veCDcG_4"
+        data-embed-url="https://www.youtube.com/watch?v=qo2veCDcG_4"
+        data-embed-thumbnail="https://i.ytimg.com/vi/qo2veCDcG_4/hqdefault.jpg"
+        data-embed-ratio="16/9"
       ></div>
       <div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
-        data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-        data-embed-id="dQw4w9WgXcQ"
         data-embed-provider="youtube"
+        data-embed-id="dQw4w9WgXcQ"
         data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+        data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -2064,14 +2064,14 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
     `
     const expected = html`
       <div
-        data-embed-height="166"
         data-embed-provider="soundcloud"
         data-embed-src="https://w.soundcloud.com/player/?url=https://on.soundcloud.com/x3NpZ7LmQaB2"
+        data-embed-height="166"
       ></div>
       <div
-        data-embed-height="166"
         data-embed-provider="soundcloud"
         data-embed-src="https://w.soundcloud.com/player/?url=https://on.soundcloud.com/Vb8TkR2yHs41"
+        data-embed-height="166"
       ></div>
     `
 
@@ -2098,21 +2098,21 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://i.ytimg.com/vi/qa-d1guhpb4/hqdefault.jpg"
-        data-embed-url="https://www.youtube.com/watch?v=qa-d1guhpb4"
-        data-embed-id="qa-d1guhpb4"
         data-embed-provider="youtube"
+        data-embed-id="qa-d1guhpb4"
         data-embed-src="https://www.youtube.com/embed/qa-d1guhpb4"
+        data-embed-url="https://www.youtube.com/watch?v=qa-d1guhpb4"
+        data-embed-thumbnail="https://i.ytimg.com/vi/qa-d1guhpb4/hqdefault.jpg"
+        data-embed-ratio="16/9"
       ></div>
       <div
-        data-embed-author="Forss"
-        data-embed-title="Flickermood"
-        data-embed-height="166"
-        data-embed-url="https://soundcloud.com/forss/flickermood"
-        data-embed-id="tracks/293"
         data-embed-provider="soundcloud"
+        data-embed-id="tracks/293"
         data-embed-src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/293"
+        data-embed-url="https://soundcloud.com/forss/flickermood"
+        data-embed-height="166"
+        data-embed-title="Flickermood"
+        data-embed-author="Forss"
       ></div>
     `
 
