@@ -26,8 +26,8 @@ const provider = 'flickr'
 const sizes = {
   // The player fills its frame, and photos come in every shape.
   photo: { ratio: '4/3' },
-  // The size Flickr's own dialog wrote for years. The slideshow renders at whatever box the query
-  // names, so there is no rendered height to measure against.
+  // The size Flickr's own dialog wrote for years. The slideshow fills whatever frame it gets, so
+  // there is no rendered height to measure against.
   slideshow: { width: 400, height: 300 },
   video: { ratio: '16/9' },
 }
@@ -83,8 +83,7 @@ const composeStreamPlayer = (owner: string): string => {
   return `https://embedr.flickr.com/photostreams/${encodePathSegment(owner)}`
 }
 
-// The page player takes either owner spelling, serves no frame-blocking header and takes the
-// same width and height query as embedr.
+// The page player takes either owner spelling and serves no frame-blocking header.
 const composeAliasStreamPlayer = (owner: string): string => {
   return `https://www.flickr.com/photos/${encodePathSegment(owner)}/player`
 }
@@ -377,15 +376,11 @@ const resolveTarget = (url: URL, element: Nullish<Element>): EmbedResolverResult
     return
   }
 
-  // The size always travels in the src: with no query every image renders at NaN.
   if (flashVideoPathRegex.test(url.pathname)) {
     return { ...result, ...sizes.video }
   }
 
-  const { width, height } = sizes.slideshow
-  const query = composeQuery({ width, height })
-
-  return { ...result, src: `${result.src}${query}`, ...sizes.slideshow }
+  return { ...result, ...sizes.slideshow }
 }
 
 export const flickrResolveEmbed: ResolveUrlEmbed = (url, element) => {
