@@ -31,7 +31,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photosets/72157637855752606',
-        src: 'https://embedr.flickr.com/photosets/72157637855752606?width=400&height=300',
+        src: 'https://embedr.flickr.com/photosets/72157637855752606',
         url: 'https://www.flickr.com/photos/108534344@N02/sets/72157637855752606',
         width: 400,
         height: 300,
@@ -54,7 +54,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photosets/72157615334609433',
-        src: 'https://embedr.flickr.com/photosets/72157615334609433?width=400&height=300',
+        src: 'https://embedr.flickr.com/photosets/72157615334609433',
         url: 'https://www.flickr.com/photos/yotchan/sets/72157615334609433',
         width: 400,
         height: 300,
@@ -78,7 +78,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photosets/72157635557420286',
-        src: 'https://embedr.flickr.com/photosets/72157635557420286?width=400&height=300',
+        src: 'https://embedr.flickr.com/photosets/72157635557420286',
         url: 'https://www.flickr.com/photos/e-governance/sets/72157635557420286',
         width: 400,
         height: 300,
@@ -88,8 +88,6 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    // The endpoint renders `width: NaNpx` when it is given no size, so a carrier that states
-    // none still has to name one.
     it('should fall back to the dialog size when the carrier states none', async () => {
       const value = html`
         <embed
@@ -102,7 +100,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photosets/72157615334609433',
-        src: 'https://embedr.flickr.com/photosets/72157615334609433?width=400&height=300',
+        src: 'https://embedr.flickr.com/photosets/72157615334609433',
         url: 'https://www.flickr.com/photos/yotchan/sets/72157615334609433',
         width: 400,
         height: 300,
@@ -133,7 +131,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams/77461019@N07',
-        src: 'https://embedr.flickr.com/photostreams/77461019@N07?width=400&height=300',
+        src: 'https://embedr.flickr.com/photostreams/77461019@N07',
         url: 'https://www.flickr.com/photos/77461019@N07/',
         width: 400,
         height: 300,
@@ -158,7 +156,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams/delightw',
-        src: 'https://www.flickr.com/photos/delightw/player?width=400&height=300',
+        src: 'https://www.flickr.com/photos/delightw/player',
         url: 'https://www.flickr.com/photos/delightw/',
         width: 400,
         height: 300,
@@ -181,7 +179,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams/17367418@N03',
-        src: 'https://embedr.flickr.com/photostreams/17367418@N03?width=400&height=300',
+        src: 'https://embedr.flickr.com/photostreams/17367418@N03',
         url: 'https://www.flickr.com/photos/17367418@N03/',
         width: 400,
         height: 300,
@@ -204,7 +202,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'groups/866523@N20',
-        src: 'https://embedr.flickr.com/groups/866523@N20?width=400&height=300',
+        src: 'https://embedr.flickr.com/groups/866523@N20',
         url: 'https://www.flickr.com/groups/866523@N20/',
         width: 400,
         height: 300,
@@ -227,7 +225,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams/39017545@N02',
-        src: 'https://embedr.flickr.com/photostreams/39017545@N02?width=400&height=300',
+        src: 'https://embedr.flickr.com/photostreams/39017545@N02',
         url: 'https://www.flickr.com/photos/39017545@N02/',
         width: 400,
         height: 300,
@@ -250,7 +248,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams/39017545@N02',
-        src: 'https://embedr.flickr.com/photostreams/39017545@N02?width=400&height=300',
+        src: 'https://embedr.flickr.com/photostreams/39017545@N02',
         url: 'https://www.flickr.com/photos/39017545@N02/',
         width: 400,
         height: 300,
@@ -297,7 +295,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'groups/568523@N21',
-        src: 'https://embedr.flickr.com/groups/568523@N21?width=400&height=300',
+        src: 'https://embedr.flickr.com/groups/568523@N21',
         url: 'https://www.flickr.com/groups/568523@N21/',
         width: 400,
         height: 300,
@@ -320,7 +318,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'groups/1614570@N22',
-        src: 'https://embedr.flickr.com/groups/1614570@N22?width=400&height=300',
+        src: 'https://embedr.flickr.com/groups/1614570@N22',
         url: 'https://www.flickr.com/groups/1614570@N22/',
         width: 400,
         height: 300,
@@ -355,7 +353,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'groups/1461497@N24',
-        src: 'https://embedr.flickr.com/groups/1461497@N24?width=400&height=300',
+        src: 'https://embedr.flickr.com/groups/1461497@N24',
         url: 'https://www.flickr.com/groups/1461497@N24/',
         width: 400,
         height: 300,
@@ -405,7 +403,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photosets/123/../../photos/x',
-        src: 'https://embedr.flickr.com/photosets/123%2F..%2F..%2Fphotos%2Fx?width=400&height=300',
+        src: 'https://embedr.flickr.com/photosets/123%2F..%2F..%2Fphotos%2Fx',
         url: 'https://www.flickr.com/photos/35408001@N04/sets/123%2F..%2F..%2Fphotos%2Fx',
         width: 400,
         height: 300,
@@ -423,7 +421,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photosets/72157627734131040',
-        src: 'https://embedr.flickr.com/photosets/72157627734131040?width=400&height=300',
+        src: 'https://embedr.flickr.com/photosets/72157627734131040',
         url: 'https://www.flickr.com/photos/24006738@N07/sets/72157627734131040',
         width: 400,
         height: 300,
@@ -447,7 +445,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photosets/72157639642975434',
-        src: 'https://embedr.flickr.com/photosets/72157639642975434?width=400&height=300',
+        src: 'https://embedr.flickr.com/photosets/72157639642975434',
         url: 'https://www.flickr.com/photos/35408001@N04/sets/72157639642975434',
         width: 400,
         height: 300,
@@ -471,7 +469,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams/94397744@N03',
-        src: 'https://embedr.flickr.com/photostreams/94397744@N03?width=400&height=300',
+        src: 'https://embedr.flickr.com/photostreams/94397744@N03',
         url: 'https://www.flickr.com/photos/94397744@N03/',
         width: 400,
         height: 300,
@@ -496,7 +494,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photosets/72157613575700166',
-        src: 'https://embedr.flickr.com/photosets/72157613575700166?width=400&height=300',
+        src: 'https://embedr.flickr.com/photosets/72157613575700166',
         url: 'https://flic.kr/s/aHsj9KxCzU',
         width: 400,
         height: 300,
@@ -525,7 +523,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photosets/72157613575700166x',
-        src: 'https://embedr.flickr.com/photosets/72157613575700166x?width=400&height=300',
+        src: 'https://embedr.flickr.com/photosets/72157613575700166x',
         url: 'https://www.flickr.com/photos/bees/sets/72157613575700166x',
         width: 400,
         height: 300,
@@ -551,7 +549,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'groups/797770@N21',
-        src: 'https://embedr.flickr.com/groups/797770@N21?width=400&height=300',
+        src: 'https://embedr.flickr.com/groups/797770@N21',
         url: 'https://www.flickr.com/groups/797770@N21/',
         width: 400,
         height: 300,
@@ -592,7 +590,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams/17367418@N03',
-        src: 'https://embedr.flickr.com/photostreams/17367418@N03?width=400&height=300',
+        src: 'https://embedr.flickr.com/photostreams/17367418@N03',
         url: 'https://www.flickr.com/photos/17367418@N03/',
         width: 400,
         height: 300,
@@ -617,7 +615,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photosets/72157623516208778',
-        src: 'https://embedr.flickr.com/photosets/72157623516208778?width=400&height=300',
+        src: 'https://embedr.flickr.com/photosets/72157623516208778',
         url: 'https://www.flickr.com/photos/dublx/sets/72157623516208778',
         width: 400,
         height: 300,
@@ -634,7 +632,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photosets/72157627116531602',
-        src: 'https://embedr.flickr.com/photosets/72157627116531602?width=400&height=300',
+        src: 'https://embedr.flickr.com/photosets/72157627116531602',
         url: 'https://www.flickr.com/photos/53116286@N07/sets/72157627116531602',
         width: 400,
         height: 300,
@@ -650,7 +648,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photosets/72157627116531602',
-        src: 'https://embedr.flickr.com/photosets/72157627116531602?width=400&height=300',
+        src: 'https://embedr.flickr.com/photosets/72157627116531602',
         url: 'https://www.flickr.com/photos/53116286@N07/sets/72157627116531602',
         width: 400,
         height: 300,
@@ -670,7 +668,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photosets/72157704164072492',
-        src: 'https://embedr.flickr.com/photosets/72157704164072492?width=400&height=300',
+        src: 'https://embedr.flickr.com/photosets/72157704164072492',
         url: 'https://www.flickr.com/photos/112691023@N04/sets/72157704164072492',
         width: 400,
         height: 300,
@@ -686,7 +684,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams/33877051@N03',
-        src: 'https://embedr.flickr.com/photostreams/33877051@N03?width=400&height=300',
+        src: 'https://embedr.flickr.com/photostreams/33877051@N03',
         url: 'https://www.flickr.com/photos/33877051@N03/',
         width: 400,
         height: 300,
@@ -700,7 +698,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams/e-governance',
-        src: 'https://www.flickr.com/photos/e-governance/player?width=400&height=300',
+        src: 'https://www.flickr.com/photos/e-governance/player',
         url: 'https://www.flickr.com/photos/e-governance/',
         width: 400,
         height: 300,
@@ -716,7 +714,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams/strictly.kev',
-        src: 'https://www.flickr.com/photos/strictly.kev/player?width=400&height=300',
+        src: 'https://www.flickr.com/photos/strictly.kev/player',
         url: 'https://www.flickr.com/photos/strictly.kev/',
         width: 400,
         height: 300,
@@ -731,7 +729,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams/-strictly-kev',
-        src: 'https://www.flickr.com/photos/-strictly-kev/player?width=400&height=300',
+        src: 'https://www.flickr.com/photos/-strictly-kev/player',
         url: 'https://www.flickr.com/photos/-strictly-kev/',
         width: 400,
         height: 300,
@@ -763,7 +761,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'groups/1753363@N230',
-        src: 'https://embedr.flickr.com/groups/1753363@N230?width=400&height=300',
+        src: 'https://embedr.flickr.com/groups/1753363@N230',
         url: 'https://www.flickr.com/groups/1753363@N230/',
         width: 400,
         height: 300,
@@ -779,7 +777,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'groups/1753363@N23',
-        src: 'https://embedr.flickr.com/groups/1753363@N23?width=400&height=300',
+        src: 'https://embedr.flickr.com/groups/1753363@N23',
         url: 'https://www.flickr.com/groups/1753363@N23/',
         width: 400,
         height: 300,
@@ -1236,7 +1234,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams/bees/pricing',
-        src: 'https://www.flickr.com/photos/bees%2Fpricing/player?width=400&height=300',
+        src: 'https://www.flickr.com/photos/bees%2Fpricing/player',
         url: 'https://www.flickr.com/photos/bees%2Fpricing/',
         width: 400,
         height: 300,
@@ -1256,7 +1254,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photosets/72157624341',
-        src: 'https://embedr.flickr.com/photosets/72157624341?width=400&height=300',
+        src: 'https://embedr.flickr.com/photosets/72157624341',
         url: 'https://www.flickr.com/photos/../sets/72157624341',
         width: 400,
         height: 300,
@@ -1383,7 +1381,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams//bees',
-        src: 'https://www.flickr.com/photos/%2Fbees/player?width=400&height=300',
+        src: 'https://www.flickr.com/photos/%2Fbees/player',
         url: 'https://www.flickr.com/photos/%2Fbees/',
         width: 400,
         height: 300,
@@ -1399,7 +1397,7 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'flickr',
         id: 'photostreams/bees/../x',
-        src: 'https://www.flickr.com/photos/bees%2F..%2Fx/player?width=400&height=300',
+        src: 'https://www.flickr.com/photos/bees%2F..%2Fx/player',
         url: 'https://www.flickr.com/photos/bees%2F..%2Fx/',
         width: 400,
         height: 300,

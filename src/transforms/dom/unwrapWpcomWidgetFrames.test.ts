@@ -140,7 +140,7 @@ describeForEachParser('unwrapWpcomWidgetFrames through the pipeline', (parseHtml
       <div
         data-embed-provider="flickr"
         data-embed-id="photosets/72157630500191816"
-        data-embed-src="https://embedr.flickr.com/photosets/72157630500191816?width=400&amp;height=300"
+        data-embed-src="https://embedr.flickr.com/photosets/72157630500191816"
         data-embed-url="https://www.flickr.com/photos/macarignan/sets/72157630500191816"
         data-embed-width="400"
         data-embed-height="300"
