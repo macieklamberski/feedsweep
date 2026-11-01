@@ -358,10 +358,12 @@ export const readFacebookHeight = (data: unknown): number | undefined => {
 
   const message = new URLSearchParams(data)
 
+  // biome-ignore lint/plugin/useQueryParamReader: Only the plugin frame posts this message.
   if (message.get('type') !== 'resize') {
     return
   }
 
+  // biome-ignore lint/plugin/useQueryParamReader: Only the plugin frame posts this message.
   return readPixels(message.get('height'))
 }
 
