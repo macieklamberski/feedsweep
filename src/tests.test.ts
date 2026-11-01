@@ -20,6 +20,12 @@ describe('selectParsers', () => {
 
     expect(throwing).toThrow('Unknown DOM_LIBRARY "bogus"')
   })
+
+  it('should throw on a name inherited from Object.prototype', () => {
+    const throwing = () => selectParsers('constructor')
+
+    expect(throwing).toThrow('Unknown DOM_LIBRARY "constructor"')
+  })
 })
 
 describe('queryElement', () => {
