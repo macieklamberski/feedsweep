@@ -35,7 +35,8 @@ const sizes = {
 const hosts = ['flickr.com']
 const embedrHosts = ['embedr.flickr.com']
 // WordPress's Photon serves a copy of an image at `i{n}.wp.com/{host}/{path}`, with its resize
-// query after the file name.
+// query after the file name. Flickr's own embed script throws on a Photon image, so the
+// publisher's page shows a linked image.
 const photonHosts = ['i0.wp.com', 'i1.wp.com', 'i2.wp.com']
 
 // Both swf urls name only the player. Their `?v=` cache-buster names no item.
