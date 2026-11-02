@@ -34,6 +34,10 @@ const sizes = {
 
 const hosts = ['flickr.com']
 const embedrHosts = ['embedr.flickr.com']
+// WordPress's Photon serves a copy of an image at `i{n}.wp.com/{host}/{path}`, with its resize
+// query after the file name. Flickr's own embed script throws on a Photon image, so the
+// publisher's page shows a linked image.
+const photonHosts = ['i0.wp.com', 'i1.wp.com', 'i2.wp.com']
 
 // Both swf urls name only the player. Their `?v=` cache-buster names no item.
 const flashPlayerPathRegex = /^\/apps\/slideshow\//i
@@ -448,6 +452,16 @@ const composeGalleryEmbed = (owner: string, galleryId: string): EmbedResolverRes
   }
 }
 
+const readPhotoFile = (imageSrc: string | undefined): RegExpExecArray | undefined => {
+  if (!imageSrc) {
+    return
+  }
+
+  const photon = parseUrlOnHosts(imageSrc, photonHosts)
+
+  return photoFileRegex.exec(photon?.pathname ?? imageSrc) ?? undefined
+}
+
 // A guest pass shows a photo its owner keeps from the public. embedr answers 404 for it without
 // the secret, and plays it with any guest pass code. The code is an access token, so it stays in
 // the src and no page url is minted.
@@ -456,7 +470,7 @@ const composeGuestPassEmbed = (
   code: string,
   imageSrc: string | undefined,
 ): EmbedResolverResult | undefined => {
-  const file = imageSrc ? photoFileRegex.exec(imageSrc) : undefined
+  const file = readPhotoFile(imageSrc)
 
   if (!file) {
     return
@@ -482,7 +496,7 @@ const readAnchorPhoto = (
   if (photo) {
     const photoId = photo[2]
     // Flickr's script sends the secret the image file names, whatever photo or size the file is.
-    const file = imageSrc ? photoFileRegex.exec(imageSrc) : undefined
+    const file = readPhotoFile(imageSrc)
 
     return composePhotoEmbed(composePhotoPlayer(photoId, { secret: file?.[2] }), {
       owner: decodePathValue(photo[1]),
