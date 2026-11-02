@@ -2572,7 +2572,7 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
-    it('should leave a guest pass whose image file name is followed by a query alone', async () => {
+    it('should read the photo and its secret from a Photon copy, read before its resize query', async () => {
       const value = html`
         <a
           data-flickr-embed="true"
@@ -2587,8 +2587,18 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
           />
         </a>
       `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/2hpXxSZ',
+        src: 'https://embedr.flickr.com/photos/48841518641?secret=c9321d3ab9&gp=2A91iY',
+        thumbnail:
+          'https://i0.wp.com/live.staticflickr.com/65535/48841518641_c9321d3ab9_z.jpg?resize=411%2C308&ssl=1',
+        width: 411,
+        height: 308,
+        title: '2019-06 CAVALAIRE',
+      }
 
-      expect(await extract(value)).toBeUndefined()
+      expect(await extract(value)).toEqual(expected)
     })
 
     it('should leave a guest pass whose image file name has a prefix before the photo id alone', async () => {
