@@ -1763,6 +1763,34 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
+    // Constructed: an image with no src, as a lazy loader leaves it.
+    it('should send no secret when the image has no src', async () => {
+      const value = html`
+        <a
+          title="Velocity 2021"
+          href="https://www.flickr.com/photos/romanista/51444344145/in/album-72157719814802262/"
+          data-flickr-embed="true"
+        >
+          <img
+            width="449"
+            height="337"
+          />
+        </a>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'p/2mnXHdM',
+        src: 'https://embedr.flickr.com/photos/51444344145',
+        url: 'https://www.flickr.com/photos/romanista/51444344145/',
+        width: 449,
+        height: 337,
+        title: 'Velocity 2021',
+        author: 'romanista',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should send the secret of an i0.wp.com Photon copy, read before its resize query', async () => {
       const value = html`
         <a
