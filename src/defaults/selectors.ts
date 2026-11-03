@@ -53,6 +53,11 @@ export const defaultNonContentSelectors = [
   'amp-auto-ads', // AMP auto-ads placement marker.
   'amp-sticky-ad', // AMP sticky bottom ad bar.
   'amp-sticky-ad-top-padding', // AMP runtime spacer holding room for the sticky ad bar.
+  'broadstreet-zone', // Broadstreet ad zone.
+  'broadstreet-zone-container', // The wrapper Broadstreet writes around a zone.
+  'broadstreet-zone-container-alt', // The wrapper around a zone that stands in for another.
+  'fbs-ad', // Forbes in-read ad slot.
+  'views-native-ad', // MSN native ad card.
 
   // Affiliate product widgets. Each carries the publisher's own affiliate id and advertises a
   // product the item is not about.
@@ -63,6 +68,8 @@ export const defaultNonContentSelectors = [
   '[src*="amazon" i][src*="/widgets/q" i]',
   'object[data*="amazon" i][data*="/widgets/q" i]',
   'iframe[src*="ad.duga.jp/" i]', // DUGA affiliate banner frame.
+  'affilizz-rendering-component', // Affilizz product card, empty until its script fills it.
+  'fw-embed-feed', // Firework's shoppable video carousel, the site's own across every post.
 
   // ShopSense product grid. Its loader survives where a wrapper held it, so both carriers go.
   'iframe[src*="shopsensewidget.shopstyle.com" i]',
@@ -268,6 +275,8 @@ export const defaultNonContentSelectors = [
   'form[action*="paypal.com/cgi-bin/webscr" i]', // PayPal buy, cart or subscribe form, or a donate form naming no button.
   'img[src*="paypal.com/" i][src*="/i/btn/" i]:not(a img)', // The PayPal button image pasted without its form.
   'form.edd_download_purchase_form', // Easy Digital Downloads buy button and price.
+  'stripe-buy-button', // Stripe buy button, which names no product without its script.
+  'stripe-pricing-table', // Stripe pricing table, which names no plan without its script.
 
   // Affiliate booking widgets, which render a map or a form to sell the reader a stay or a
   // ticket and carry none of the post.

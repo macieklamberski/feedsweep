@@ -72,6 +72,16 @@ const specimens: Record<string, string | [string, string]> = {
     '<amp-sticky-ad layout="nodisplay"><amp-ad width="320" height="50" type="doubleclick" data-slot="/4119129/sticky"></amp-ad></amp-sticky-ad>',
   'amp-sticky-ad-top-padding':
     '<amp-sticky-ad-top-padding class="amp-sticky-ad-top-padding"></amp-sticky-ad-top-padding>',
+  'broadstreet-zone':
+    '<broadstreet-zone zone-id="45657" keywords="" soft-keywords="true" zone-alias=""></broadstreet-zone>',
+  'broadstreet-zone-container':
+    '<broadstreet-zone-container><broadstreet-zone zone-id="56582" uri-keywords="true" soft-keywords="true" tracked="true" id="street-yn7bmlsf34"></broadstreet-zone></broadstreet-zone-container>',
+  'broadstreet-zone-container-alt':
+    '<broadstreet-zone-container-alt><broadstreet-zone alt-zone-id="63622" position="beforebegin" count="1"></broadstreet-zone></broadstreet-zone-container-alt>',
+  'fbs-ad':
+    '<fbs-ad position="inread" progressive="" ad-id="article-0-inread" aria-hidden="true" role="presentation"></fbs-ad>',
+  'views-native-ad':
+    '<views-native-ad class="fetched" config-instance-src="config_index_views_intraarticle_article_page-BB1dLKBM" instance-id="intraArticleNativeAd-AA1SCBvk-0" style="position: relative;"><div class="full-bleed-image-intra-ad"><a href="https://example.com/ad">Sponsored</a></div></views-native-ad>',
   '[src*="amazon" i][src*="/e/cm" i]':
     '<iframe src="https://rcm.amazon.com/e/cm?t=tag-20&o=1&p=8&l=as1&asins=B00451B7WU&f=ifr" style="width:120px;height:240px;" scrolling="no" frameborder="0"></iframe>',
   '[src*="amazon" i][src*="/widgets/q" i]':
@@ -80,6 +90,10 @@ const specimens: Record<string, string | [string, string]> = {
     '<object data="//ws-na.amazon-adsystem.com/widgets/q?ServiceVersion=20070822&asins=B00451B7WU" width="120" height="240"></object>',
   'iframe[src*="ad.duga.jp/" i]':
     '<iframe src="https://ad.duga.jp/dynamic/1002/34/?mode=1" width="440" height="195" scrolling="no"><a href="https://example.com/1002-01">DUGA</a></iframe>',
+  'affilizz-rendering-component':
+    '<affilizz-rendering-component loading="lazy" publication-content-id="65404973fdc13a355ce4e65b"><a href="https://example.com/redirect/5RzqP" rel="sponsored noopener"><img src="https://example.com/products/main.jpg" alt="Product image" width="160" height="160"></a></affilizz-rendering-component>',
+  'fw-embed-feed':
+    '<fw-embed-feed channel="example_channel" playlist="vVOeYb" mode="row" player_placement="bottom-right"></fw-embed-feed>',
   'iframe[src*="shopsensewidget.shopstyle.com" i]':
     '<iframe src="//shopsensewidget.shopstyle.com/#/?options=%7B%22widgetId%22%3A%225bad8374%22%2C%22pid%22%3A%22uid0000-00000000-00%22%7D" width="460" height="402"></iframe>',
   'script[src*="shopsensewidget.shopstyle.com" i]': [
@@ -109,6 +123,10 @@ const specimens: Record<string, string | [string, string]> = {
     '<img src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" alt="Donate with PayPal">',
   'form.edd_download_purchase_form':
     '<form id="edd_purchase_4374" class="edd_download_purchase_form edd_purchase_4374" method="post"><div class="edd_purchase_submit_wrapper"><button class="edd-add-to-cart button red edd-submit" data-action="edd_add_to_cart" data-download-id="4374" data-variable-price="no" data-price-mode="single" data-price="15.00"><span class="edd-add-to-cart-label">$15.00&nbsp;&ndash;&nbsp;Purchase</span></button><a href="https://example.com/checkout/" class="edd_go_to_checkout button red edd-submit" style="display:none;">Checkout</a><span class="edd-cart-ajax-alert" aria-live="assertive"><span class="edd-cart-added-alert" style="display: none;">Added to cart</span></span></div><input type="hidden" name="download_id" value="4374"><input type="hidden" name="edd_action" class="edd_action_input" value="add_to_cart"></form>',
+  'stripe-buy-button':
+    '<stripe-buy-button buy-button-id="buy_btn_1S7y7OLcjFSBpnZSu7QrQJhO" publishable-key="pk_live_example"></stripe-buy-button>',
+  'stripe-pricing-table':
+    '<stripe-pricing-table pricing-table-id="prctbl_1OnW5gBQC3Rpe4XpT66la653" publishable-key="pk_live_example"></stripe-pricing-table>',
   'p:has(> a.redcircle-link)':
     '<p style="font-size: 10px; color: gray;">Powered by <a class="redcircle-link" href="https://example.com/?utm_source=rc_embedded_player">RedCircle</a></p>',
   'iframe[src*="zeno.fm/player/" i] + a:is([href$="//zeno.fm/" i], [href$="//www.zeno.fm/" i], [href$="//www.zeno.fm" i], [href$="//www.zenomedia.com/" i])':
