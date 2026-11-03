@@ -99,6 +99,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `rebuildGofundmeEmbeds` | Rebuild a real `<iframe>` from a GoFundMe campaign widget's empty `div.gfm-embed[data-url]` |
 | `rebuildPiktochartEmbeds` | Rebuild a real `<iframe>` from a Piktochart script snippet's `div.piktowrapper-embed`, keeping any prose the publisher wrote inside it |
 | `linkifyGistEmbeds` | Replace a GitHub Gist script embed, an `<amp-gist>` or a gist loader's unfilled mount with a link to the gist |
+| `linkifyBaselineStatusWidgets` | Replace a web.dev `baseline-status` widget with a link to its feature's page on webstatus.dev |
 | `linkifyPodomaticPlaylists` | Replace a Podomatic Flash player set to a podcast's whole feed with a link to the podcast's page |
 | `linkifyPaypalDonateForms` | Replace a PayPal donate button form with its button image linked to PayPal's donate page |
 | `fixSubstackMentions` | Rebuild a Substack @-mention (empty `span.mention-wrap`) into an inline `<a>@name</a>` link, so the name survives instead of vanishing mid-sentence |

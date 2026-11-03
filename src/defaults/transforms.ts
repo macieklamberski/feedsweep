@@ -34,6 +34,7 @@ import { highlightCode } from '../transforms/dom/highlightCode.js'
 import { hoistBlocksFromParagraphs } from '../transforms/dom/hoistBlocksFromParagraphs.js'
 import { hoistFigcaptionFromAnchor } from '../transforms/dom/hoistFigcaptionFromAnchor.js'
 import { injectEnclosures } from '../transforms/dom/injectEnclosures.js'
+import { linkifyBaselineStatusWidgets } from '../transforms/dom/linkifyBaselineStatusWidgets.js'
 import { linkifyGistEmbeds } from '../transforms/dom/linkifyGistEmbeds.js'
 import { linkifyPaypalDonateForms } from '../transforms/dom/linkifyPaypalDonateForms.js'
 import { linkifyPodomaticPlaylists } from '../transforms/dom/linkifyPodomaticPlaylists.js'
@@ -188,6 +189,10 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // A GitHub Gist embed is a JS-only <script> or loader mount that renders nothing in a reader.
   // Replace it with a link to the gist so the content is at least reachable.
   linkifyGistEmbeds,
+
+  // The web.dev Baseline widget renders nothing without its script either, and names only the
+  // web feature it reports on.
+  linkifyBaselineStatusWidgets,
 
   // Runs after unwrapWpcomWidgetFrames, which rebuilds the player, and before convertWidgets,
   // which drops a swf no resolver claims.
