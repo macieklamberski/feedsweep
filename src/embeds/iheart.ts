@@ -10,7 +10,6 @@ const hosts = ['iheart.com']
 // A route segment is the bare id or a slug hanging before it, `{slug}-{id}`.
 const episodePathRegex =
   /^\/podcast\/(?:[^/]*-)?(?<showId>\d+)\/episode\/(?:[^/]*-)?(?<episodeId>\d+)\/?$/i
-
 const showPathRegex = /^\/podcast\/(?:[^/]*-)?(\d+)\/?$/i
 const stationPathRegex = /^\/(?<kind>live|artist)\/(?:[^/]*-)?(?<id>\d+)\/?$/i
 

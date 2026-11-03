@@ -20,8 +20,6 @@ const isSupportedLanguage = (token: string): boolean => {
   return supportedLabels.has(token.toLowerCase())
 }
 
-// Prism, highlight.js, Ghost, Hugo Chroma, Rouge and most Markdown renderers write language-X.
-const languageRegex = /(?:language|lang)-(\S+)/
 // data-language/-lang cover most editors and renderers. data-enlighter-language is
 // EnlighterJS (WordPress). EnlighterJS's "generic" value maps to no grammar, so such
 // a block stays plain, which is the intent (it means "no specific language").
@@ -31,15 +29,17 @@ const languageAttributes = [
   'data-enlighter-language',
   'data-code-block-lang', // Medium
 ]
-
-const brushRegex = /brush:\s*([\w#+-]+)/
-const crayonRegex = /\blang[:_]([\w#+-]+)/
-const whitespaceRegex = /\s+/
 // Pandoc emits class="sourceCode LANG". These tokens are structural, not the language.
 const pandocStructuralClasses = ['sourceCode', 'numberLines']
 // Jekyll/Rouge and similar wrap the block, putting the language-* class on an
 // ancestor div, not on the pre/code. Look at most this many levels up.
 const maxLanguageAncestorDepth = 3
+
+// Prism, highlight.js, Ghost, Hugo Chroma, Rouge and most Markdown renderers write language-X.
+const languageRegex = /(?:language|lang)-(\S+)/
+const brushRegex = /brush:\s*([\w#+-]+)/
+const crayonRegex = /\blang[:_]([\w#+-]+)/
+const whitespaceRegex = /\s+/
 // Expressive Code (Astro/Starlight) titles its blocks with the source filename.
 // A whitespace-free name ending in an extension yields the language token (the
 // last extension, so paths like .vscode/settings.json resolve to json).

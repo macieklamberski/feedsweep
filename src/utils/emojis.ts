@@ -158,7 +158,6 @@ export const unwrapProxiedEmoji = (element: Element, context: TransformContext):
 // are read too, only for the emoji below 0x100: © and ®, and a keycap on #, * or a digit.
 const codepointNameRegex =
   /^(?:[0-9a-f]{4,5}(?:[-_][0-9a-f]{4,5})*|a[9e](?:[-_]fe0f)?|(?:2[3a]|3[0-9])(?:[-_]fe0f)?[-_]20e3)$/
-
 const codepointSeparatorRegex = /[-_]/
 const shortCodepointRegex = /^a[9e](?:[-_]fe0f)?$/
 const textDefaultRegex = /^(?!\p{Emoji_Presentation})\p{Extended_Pictographic}$/u

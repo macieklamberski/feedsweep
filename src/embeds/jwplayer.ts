@@ -119,7 +119,6 @@ export const jwplayerAmpEmbedResolver = createMarkupEmbedResolver(
 // `feed/{mediaId}.rss`, also on `jwpsrv.com`, `/` often escaped.
 const setupPlaylistRegex =
   /(?:jwplayer|jwplatform|jwpsrv)\.com\\?\/(?:v2\\?\/media|feeds?|jw6)\\?\/([^\\/."'?]+)/i
-
 const setupMountRegex = /jwplayer\(\s*["']([^"']+)["']\s*\)/
 
 // An empty div.jwplayer beside an inline jwplayer(...).setup() call, stripped as an empty tag.

@@ -13,6 +13,7 @@ import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widg
 const provider = 'buzzsprout'
 
 const hosts = ['buzzsprout.com']
+
 // /{podcast}/{episode}-{slug}.js, with or without episodes/.
 const episodeScriptPathRegex = /^\/(\d+)\/(?:episodes\/)?(\d+)(?:-[^/]*)?\.js$/i
 // A script naming the podcast alone is the show player, which carries every episode.

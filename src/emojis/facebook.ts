@@ -31,6 +31,7 @@ export const facebookEmojiResolver: EmojiResolver = {
 const emojiPath = '/images/emoji.php/'
 // The CDN serves from subdomains like `static.xx.fbcdn.net`, older pastes from the main host.
 const emojiHosts = ['fbcdn.net', 'www.facebook.com', 'fbstatic-a.akamaihd.net']
+
 // The host is read up to the path, not parsed, since pasted styles mangle the scheme, as in
 // `https: //static.xx.fbcdn.net/…`.
 const emojiHostRegex = /\/\/([a-z0-9.-]+)\/images\/emoji\.php\//i
@@ -101,6 +102,7 @@ const classicCodes = toMap({
 })
 
 const classicNames = [...classicCodes.keys()]
+
 // Only Facebook's own names, since other widgets name classes like `emoticon_box` the same way.
 const classicClassRegex = new RegExp(`(?:^|\\s)emoticon_(${classicNames.join('|')})(?:\\s|$)`)
 

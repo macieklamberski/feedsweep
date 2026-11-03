@@ -13,6 +13,7 @@ import { paramObjectSelector } from '../../utils/widgets.js'
 
 const hostPrefixedUrlRegex =
   /^(https?:)\/\/[^/?#]+(?:\/[^/?#]+)*?(?<!:|%3a)\/+(?=\/(?:[a-z0-9-]+\.)+[a-z]{2,}\/)/i
+
 const hostPrefixedSrcTags = ['iframe', 'embed', 'script']
 
 // Some sites join their own url onto a protocol-relative src as text, so the feed already holds

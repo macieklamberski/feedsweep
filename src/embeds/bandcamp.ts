@@ -19,6 +19,7 @@ const releaseRegex = /^(?<kind>album|track)=(?<id>[^/]+)$/i
 const signedTrackRegex = /^tracks=([^/,]+)$/i
 // The track number an album player opens on: `album=2182110545/t=38/` plays track 38.
 const startTrackRegex = /^t=[^/]+$/i
+
 // The large player with small artwork and no tracklist, spelled as the embed dialog writes it.
 const playerLayout = 'size=large/tracklist=false/artwork=small/'
 const sizes = {

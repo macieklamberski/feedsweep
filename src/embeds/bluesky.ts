@@ -25,6 +25,7 @@ const mediaHosts = ['bsky.app', 'bsky.social']
 // collection is embeddable. WHATWG url parsing is no use here: `at://did:plc:x/…` reads the
 // colon in the authority as a port and fails, so the URI is split by hand.
 const postCollection = 'app.bsky.feed.post'
+
 // at://{authority}/{collection}/{rkey}.
 const atUriRegex = /^at:\/\/(?<authority>[^/]+)\/(?<collection>[^/]+)\/(?<rkey>[^/?#]+)/
 
