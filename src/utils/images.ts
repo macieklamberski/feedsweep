@@ -69,6 +69,7 @@ const sizeKeywordRanks = toMap({
   preview: 0, // Dedups but never wins: full-size on some hosts
 })
 export const sizeKeywordLiterals = [...sizeKeywordRanks.keys()]
+
 const sizeKeywordLeafRegex = new RegExp(
   `^(?:${sizeKeywordLiterals.join('|')})(\\.[a-z0-9]+)?$`,
   'i',
@@ -111,6 +112,7 @@ const pathTransforms: Array<PathTransform> = [
 
 // phpBB's `download/file.php?id=` and Wikidot's `avatar.php?userid=` name the image in the query.
 const scriptExtensionLiterals = ['php', 'aspx', 'ashx', 'axd', 'cgi']
+
 const scriptLeafRegex = new RegExp(`\\.(?:${scriptExtensionLiterals.join('|')})$`, 'i')
 
 // Size and crop parameters an image service varies between renditions of one picture.
@@ -210,6 +212,7 @@ export const getImageFingerprint = (rawUrl: string, context?: TransformContext):
 
 const urlPairRegex = /(?:^|[/_=-])(\d{2,5})x(\d{2,5})(?=[._\-&)?/]|$)/gi
 const queryPixelsRegex = /^\d{2,5}\b/
+
 const widthQueryParams = ['w', 'width']
 const heightQueryParams = ['h', 'height']
 
@@ -315,6 +318,7 @@ export type PosterEvidence = 'id' | 'stem' | 'same'
 // An id or a file name shorter than this, like a JW Player key or `video`, also turns up inside
 // unrelated file names.
 const minimumKeyLength = 6
+
 const extensionRegex = /\.[a-z0-9]{2,5}$/i
 // A size or a rendition word a file name ends with: `-300x250`, `-poster`, `_std`.
 const renditionSuffixRegex =

@@ -12,6 +12,7 @@ const scriptHosts = ['api-maps.yandex.ru']
 const hosts = ['yandex.by', 'yandex.com', 'yandex.ru']
 
 const widgetPath = '/map-widget/v1/'
+
 // A short link the map's share dialog writes, `/map-widget/v1/-/{code}`. The code names the same
 // map on every regional host.
 const shortLinkPathRegex = /^\/map-widget\/v1\/-\/(?<code>[^/]+)\/?$/i

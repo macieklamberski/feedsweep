@@ -8,6 +8,7 @@ const sizes = {
 }
 
 const hosts = ['figshare.com']
+
 const widgetPathRegex = /^\/articles\/([^/]+)\/embed\/?$/i
 
 // The widget host answers the same shell for any article id. `api.figshare.com/v2/articles/{id}`

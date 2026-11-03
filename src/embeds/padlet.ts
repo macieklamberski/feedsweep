@@ -5,6 +5,7 @@ import { createUrlEmbedResolver } from '../utils/widgets.js'
 const provider = 'padlet'
 
 const hosts = ['padlet.com']
+
 const embedPathRegex = /^\/embed\/([^/]+)\/?$/i
 const previewPathRegex = /^\/padlets\/([^/]+)\/embeds\/preview_embed\/?$/i
 // The board page, `/{user}/{slug}-{id}`, refuses framing. Its id follows the slug's last hyphen.

@@ -29,7 +29,9 @@ const spacerExtensions = ['gif', 'svg']
 const rasterExtensions = webImageExtensions.filter((extension) => {
   return !spacerExtensions.includes(extension)
 })
+
 const rasterExtensionRegex = new RegExp(`\\.(?:${rasterExtensions.join('|')})(?:$|[?#])`, 'i')
+
 const formatQueryParams = ['format', 'fm', 'output']
 
 // A format value can name several formats, such as `webp,auto`.

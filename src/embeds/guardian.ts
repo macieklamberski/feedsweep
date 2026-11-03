@@ -17,6 +17,7 @@ const playerPathRegex = /^\/embed\/video\/([^/]+\/video\/[^/]+\/[^/]+\/[^/]+\/[^
 // edition. A path states a day and not a moment, so `date` carries the calendar day alone, and
 // a name outside the twelve months leaves it unstated.
 const pathDateRegex = /^[a-z0-9-]+\/video\/(\d{4})\/([a-z]+)\/(0[1-9]|[12]\d|3[01])\//
+
 const monthNumbers = toMap({
   jan: '01',
   feb: '02',
@@ -76,6 +77,7 @@ export const guardianResolveEmbed: ResolveUrlEmbed = (url) => {
 export const guardianIframeEmbedResolver = createUrlEmbedResolver(hosts, guardianResolveEmbed)
 
 const flashHosts = ['guardian.co.uk', 'theguardian.com']
+
 const flashPlayerPathRegex = /^\/video\/embed\/?$/i
 const endpointPathRegex = /^(?<path>\/.+)\/json$/i
 

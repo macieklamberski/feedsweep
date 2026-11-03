@@ -2,6 +2,7 @@ import type { StringTransform } from '../../types.js'
 
 const cdataStart = '<![CDATA['
 const cdataEnd = ']]>'
+
 // Only a value that is one whole block unwraps, so a CDATA marker quoted mid-text survives.
 const wrapperRegex = /^\s*<!\[CDATA\[([\s\S]*?)\]\]>\s*$/
 
