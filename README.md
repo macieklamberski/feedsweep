@@ -40,7 +40,7 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `fixLazyVideos` | Promote a lazy `<video>` src and `data-poster` to real attributes |
 | `fixLazyAudios` | Promote a lazy `<audio>` src to real `src` |
 | `fixDropboxMediaUrls` | Force `raw=1` on a Dropbox share URL used as a media `src`, so it serves the file and not the preview page |
-| `convertLazyImageContainers` | Convert a container parking an image URL in a lazy attribute into a real `<img>` |
+| `convertLazyImageContainers` | Convert a container parking an image URL in a lazy attribute, or a ShopPad Blog Studio slider slide painted with a background image, into a real `<img>` |
 | `flattenPictureElements` | Collapse `<picture>` to one `<img>`, keeping the best modern-format source |
 | `hoistFigcaptionFromAnchor` | Move a `<figcaption>` out of the figure's click-through link |
 | `wrapOrphanFigcaptions` | Wrap an image and its detached `<figcaption>` in a `<figure>` |
