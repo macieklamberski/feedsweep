@@ -133,7 +133,7 @@ describe('defaultEmbedRenderHints', () => {
       const action =
         hint.params ?? hint.autoplayParams ?? hint.sizeParams ?? hint.requestPlay ?? hint.readHeight
 
-      expect(action).toBeDefined()
+      expect(action).toEqual(expect.anything())
     },
   )
 
@@ -152,14 +152,14 @@ describe('defaultEmbedRenderHints', () => {
   it.each(defaultEmbedRenderHints.filter((hint) => hint.isReady))(
     'should have a $provider play request to send once ready',
     (hint) => {
-      expect(hint.requestPlay).toBeDefined()
+      expect(hint.requestPlay).toEqual(expect.anything())
     },
   )
 
   it.each(defaultEmbedRenderHints.filter((hint) => hint.requestHeight !== undefined))(
     'should read the answer to the $provider height request',
     (hint) => {
-      expect(hint.readHeight).toBeDefined()
+      expect(hint.readHeight).toEqual(expect.any(Function))
     },
   )
 })
@@ -168,7 +168,7 @@ describe('defaultFieldCleaners', () => {
   it.each(defaultFieldCleaners)(
     'should give the $provider $field entry a pattern to apply',
     (cleaner) => {
-      expect(cleaner.drop ?? cleaner.strip).toBeDefined()
+      expect(cleaner.drop ?? cleaner.strip).toEqual(expect.anything())
     },
   )
 

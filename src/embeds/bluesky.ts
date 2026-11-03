@@ -42,6 +42,11 @@ type BlueskyPost = {
   rkey: string
 }
 
+type QuotedPost = {
+  post?: BlueskyPost
+  fields: Partial<EmbedResolverResult>
+}
+
 type SubstackPostAttributes = {
   authorName?: string
   authorHandle?: string
@@ -202,9 +207,7 @@ const readPostText = (element: Element, postAnchor: Element | undefined): string
   return body.trim() || undefined
 }
 
-const readQuotedPost = (
-  element: Element,
-): { post?: BlueskyPost; fields: Partial<EmbedResolverResult> } => {
+const readQuotedPost = (element: Element): QuotedPost => {
   const postAnchor = findPostAnchor(element)
 
   return {

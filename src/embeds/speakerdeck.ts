@@ -20,13 +20,12 @@ const deckRouteWords = ['player', 'embed']
 const slideSuffixRegex = /\?slide=([^&]+)$/i
 const legacyScriptPathRegex = /^\/embed\/([^/]+)\.js$/i
 
+type DeckFields = { slide?: string; title?: string }
+
 // One feed can embed the same deck at several slides. Without the slide those collapse into
 // identical placeholders, and the player url honours `?slide=`.
 // The public page needs the author and slug, which neither carrier names, so there is no `url`.
-const composeEmbed = (
-  deckId: string,
-  { slide, title }: { slide?: string; title?: string },
-): EmbedResolverResult => {
+const composeEmbed = (deckId: string, { slide, title }: DeckFields): EmbedResolverResult => {
   const query = composeQuery(slide ? { slide } : undefined)
 
   return {

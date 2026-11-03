@@ -254,9 +254,11 @@ const consumeCaption = (
   return fields
 }
 
+type DeckWrapper = { deck?: string; wrapper?: Element }
+
 // Neither player carries the numeric id: the swf query names the deck by a document key from a
 // different id space, and the iframe url by an embed key.
-const readWrapper = (element: Nullish<Element>): { deck?: string; wrapper?: Element } => {
+const readWrapper = (element: Nullish<Element>): DeckWrapper => {
   let deck: string | undefined
   let wrapper: Element | undefined
 
