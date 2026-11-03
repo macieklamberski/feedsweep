@@ -1,6 +1,7 @@
 import { getQueryParam, isAnyOf, parseUrl, webImageExtensions } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import {
+  type ElementDimensions,
   getElementDimensions,
   hasZeroOpacity,
   isElementHidden,
@@ -12,13 +13,13 @@ const isPixelDimension = (value: number | undefined): boolean => {
   return value !== undefined && value <= pixelDimensionLimit
 }
 
-const isPixelSized = (dimensions: { width?: number; height?: number }): boolean => {
+const isPixelSized = (dimensions: ElementDimensions): boolean => {
   return isPixelDimension(dimensions.width) || isPixelDimension(dimensions.height)
 }
 
 // A stated size above a pixel is content whatever serves it: newsletter platforms on the host
 // list serve their posts' images from subdomains of the host that serves their beacons.
-const isContentSized = (dimensions: { width?: number; height?: number }): boolean => {
+const isContentSized = (dimensions: ElementDimensions): boolean => {
   const { width = 0, height = 0 } = dimensions
 
   return width > pixelDimensionLimit || height > pixelDimensionLimit
@@ -48,10 +49,7 @@ const hasRasterFormatQuery = (src: string): boolean => {
 // A raster src clears a 0x0 lazy placeholder only: raster beacons ship at 1x1 as well.
 // A non-empty srcset is a content signal at any size.
 // A 0x0 image still fires its request, and 0 or unset is the lazy-load placeholder convention.
-const hasContentImageSignal = (
-  image: Element,
-  dimensions: { width?: number; height?: number },
-): boolean => {
+const hasContentImageSignal = (image: Element, dimensions: ElementDimensions): boolean => {
   const srcset = image.getAttribute('srcset')
 
   if (srcset && srcset.trim().length > 0) {

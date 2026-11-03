@@ -408,11 +408,16 @@ export const resolveEmojiImage = (
   }
 }
 
+export type EmojiElementFields = {
+  glyph?: EmojiGlyph
+  shortcode?: string
+}
+
 // An element wrapping the glyph, named by a gemoji shortcode. A sanitizer dropping unknown
 // elements would take the glyph with it, so one that resolves to nothing still leaves text.
 export const resolveEmojiElement = (
   element: Element,
-  { glyph, shortcode }: { glyph?: EmojiGlyph; shortcode?: string },
+  { glyph, shortcode }: EmojiElementFields,
 ): EmojiResolverResult | undefined => {
   const text = element.textContent ?? ''
 

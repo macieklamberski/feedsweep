@@ -1074,10 +1074,7 @@ describeForEachParser('createCitePlaceholder', (parseHtml) => {
 describeForEachParser('readCarrierSize', (parseHtml) => {
   const base: EmbedResolverResult = { provider: 'example', id: 'abc', src: 'https://x.test/abc' }
 
-  const extractResult = (
-    resolver: { selector: string; extract: (element: Element) => unknown },
-    value: string,
-  ) => {
+  const extractResult = (resolver: EmbedResolver, value: string) => {
     const element = parseHtml(value).querySelector(resolver.selector)
 
     if (!element) {

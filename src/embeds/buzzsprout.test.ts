@@ -74,9 +74,7 @@ describeForEachParser('buzzsproutScriptEmbedResolver', (parseHtml) => {
 
       expect(await extract(value)).toEqual(expected)
     })
-  })
 
-  describe('happy paths, show player', () => {
     // The div this script fills is empty, so refusing it deletes the player outright rather than
     // leaving a generic placeholder the way the url-keyed resolver does.
     it('should build the show placeholder from a script naming the podcast alone', async () => {
