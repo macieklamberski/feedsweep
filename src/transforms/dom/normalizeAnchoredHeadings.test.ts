@@ -68,44 +68,42 @@ describeForEachParser('normalizeAnchoredHeadings', (parseHtml) => {
   })
 
   describe('generator permalink classes', () => {
-    const cases: Array<[string, string, string]> = [
-      [
-        'heading-anchor',
-        '<h2>In summary<a href="#in-summary" class="heading-anchor">#</a></h2>',
-        '<h2><a id="in-summary" href="#in-summary"></a>In summary</h2>',
-      ],
-      [
-        'heading-link',
-        '<h2>Applications<a href="#applications" class="heading-link"></a></h2>',
-        '<h2><a id="applications" href="#applications"></a>Applications</h2>',
-      ],
-      [
-        'heading-mark',
-        '<h1><a href="#install" class="heading-mark"></a>Install</h1>',
-        '<h1><a id="install" href="#install"></a>Install</h1>',
-      ],
-      [
-        'o-heading-link',
-        '<h2>Images<a class="o-heading-link" href="#images">#</a></h2>',
-        '<h2><a id="images" href="#images"></a>Images</h2>',
-      ],
-      [
-        'wiki-anchor',
-        '<h2>Changes<a class="wiki-anchor" href="#changes">¶</a></h2>',
-        '<h2><a id="changes" href="#changes"></a>Changes</h2>',
-      ],
-      [
-        'permalink',
-        '<h2>The Budget<a class="permalink" href="#the-budget">#</a></h2>',
-        '<h2><a id="the-budget" href="#the-budget"></a>The Budget</h2>',
-      ],
+    const cases = [
+      {
+        name: 'heading-anchor',
+        value: '<h2>In summary<a href="#in-summary" class="heading-anchor">#</a></h2>',
+        expected: '<h2><a id="in-summary" href="#in-summary"></a>In summary</h2>',
+      },
+      {
+        name: 'heading-link',
+        value: '<h2>Applications<a href="#applications" class="heading-link"></a></h2>',
+        expected: '<h2><a id="applications" href="#applications"></a>Applications</h2>',
+      },
+      {
+        name: 'heading-mark',
+        value: '<h1><a href="#install" class="heading-mark"></a>Install</h1>',
+        expected: '<h1><a id="install" href="#install"></a>Install</h1>',
+      },
+      {
+        name: 'o-heading-link',
+        value: '<h2>Images<a class="o-heading-link" href="#images">#</a></h2>',
+        expected: '<h2><a id="images" href="#images"></a>Images</h2>',
+      },
+      {
+        name: 'wiki-anchor',
+        value: '<h2>Changes<a class="wiki-anchor" href="#changes">¶</a></h2>',
+        expected: '<h2><a id="changes" href="#changes"></a>Changes</h2>',
+      },
+      {
+        name: 'permalink',
+        value: '<h2>The Budget<a class="permalink" href="#the-budget">#</a></h2>',
+        expected: '<h2><a id="the-budget" href="#the-budget"></a>The Budget</h2>',
+      },
     ]
 
-    for (const [name, value, expected] of cases) {
-      it(`should normalize a "${name}" permalink anchor`, async () => {
-        expect(await transform(value)).toEqualHtml(expected)
-      })
-    }
+    it.each(cases)('should normalize a "$name" permalink anchor', async ({ value, expected }) => {
+      expect(await transform(value)).toEqualHtml(expected)
+    })
 
     it('should match a permalink class case-insensitively', async () => {
       const value = '<h2><a href="#setup" class="Heading-Link"></a>Setup</h2>'
