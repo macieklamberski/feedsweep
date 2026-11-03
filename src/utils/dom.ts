@@ -513,6 +513,7 @@ export const getElementDimensions = (element: Element): { width?: number; height
 
 // How many ancestors above the element to also check for a responsive wrapper.
 const maxWrapperAncestorDepth = 3
+
 const paddingPercentRegex = /^([\d.]+)%$/
 const whitespaceRegex = /\s+/
 const wpEmbedAspectRegex = /wp-embed-aspect-(?<width>\d+)-(?<height>\d+)/

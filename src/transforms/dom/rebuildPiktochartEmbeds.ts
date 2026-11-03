@@ -6,6 +6,7 @@ import { parseUrlOnHosts } from '../../utils/urls.js'
 import { createIframe } from '../../utils/widgets.js'
 
 const loadingTextRegex = /^Loading(?:\.\.\.|…)$/
+
 const loaderWrappers = ['.embed-loading-overlay', '.pikto-canvas-wrap', '.pikto-canvas']
 
 const isLoadingGif = (element: Element): boolean => {

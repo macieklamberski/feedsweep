@@ -31,6 +31,7 @@ const languageAttributes = [
   'data-enlighter-language',
   'data-code-block-lang', // Medium
 ]
+
 const brushRegex = /brush:\s*([\w#+-]+)/
 const crayonRegex = /\blang[:_]([\w#+-]+)/
 const whitespaceRegex = /\s+/

@@ -62,6 +62,7 @@ const dashboardPathRegex = /^\/apps\/dashboards\/([^/]+)$/i
 // The app shell names the dashboard in the fragment. The retired Operations Dashboard shell 301s
 // to the current one, which keeps the fragment.
 const dashboardShellPaths = ['/apps/dashboards/index.html', '/apps/opsdashboard/index.html']
+
 const dashboardFragmentRegex = /^#\/([^/?]+)/
 
 // The box Map Viewer's and StoryMaps' iframe snippets write.

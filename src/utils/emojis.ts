@@ -37,6 +37,7 @@ const emojiSequenceParts = [
   '[\\u200d\\ufe0f\\u20e3#*0-9\\s]', // Joiner, variation selector, keycap mark and its bases
   '[\\u{e0020}-\\u{e007f}]', // Tag characters, which spell out a subdivision flag
 ]
+
 const emojiSequenceRegex = new RegExp(`^(?:${emojiSequenceParts.join('|')})+$`, 'u')
 
 const emojiPictureParts = [
@@ -44,6 +45,7 @@ const emojiPictureParts = [
   '\\p{Regional_Indicator}', // The pair of letters that makes a flag
   '[0-9#*]\\ufe0f?\\u20e3', // A keycap: base, optional selector, enclosing mark
 ]
+
 const emojiPictureRegex = new RegExp(emojiPictureParts.join('|'), 'u')
 
 export const isEmojiShaped = (text: string): boolean => {
@@ -156,6 +158,7 @@ export const unwrapProxiedEmoji = (element: Element, context: TransformContext):
 // are read too, only for the emoji below 0x100: © and ®, and a keycap on #, * or a digit.
 const codepointNameRegex =
   /^(?:[0-9a-f]{4,5}(?:[-_][0-9a-f]{4,5})*|a[9e](?:[-_]fe0f)?|(?:2[3a]|3[0-9])(?:[-_]fe0f)?[-_]20e3)$/
+
 const codepointSeparatorRegex = /[-_]/
 const shortCodepointRegex = /^a[9e](?:[-_]fe0f)?$/
 const textDefaultRegex = /^(?!\p{Emoji_Presentation})\p{Extended_Pictographic}$/u
@@ -188,6 +191,7 @@ export const glyphFromCodepoints = (stem: string): string | undefined => {
 }
 
 const bytePairRegex = /../g
+
 const utf8Decoder = new TextDecoder('utf-8', { fatal: true })
 
 // A filename spelling its glyph's UTF-8 bytes in hex, as VK and Telegram name theirs.
@@ -222,6 +226,7 @@ const getCodepointText = (stem: string): string | undefined => {
 
 const toneModifierRegex = /[\u{1f3fb}-\u{1f3ff}]/gu
 const modifierBaseRegex = /^\p{Emoji_Modifier_Base}/u
+
 const zeroWidthJoiner = '\u200d'
 const variationSelector = '\ufe0f'
 // 🤝 joins the two people of `people holding hands`, and only they take a tone.

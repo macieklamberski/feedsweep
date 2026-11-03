@@ -35,6 +35,7 @@ const authorSeparatorRegex = /^[\s–—-]+/
 // the Unix epoch the client set when it wrote the post, then a 10-bit clock id.
 // See: https://atproto.com/specs/tid.
 const tidAlphabet = '234567abcdefghijklmnopqrstuvwxyz'
+
 const tidRegex = /^[234567abcdefghij][234567abcdefghijklmnopqrstuvwxyz]{12}$/
 
 type BlueskyPost = {

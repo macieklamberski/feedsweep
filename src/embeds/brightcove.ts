@@ -34,7 +34,9 @@ const sizes = {
 const brightcoveIdRegex = /^\d{5,}$/
 // A reference id is free text the publisher chose, named by Brightcove's own `ref:` prefix.
 const brightcoveVideoIdRegex = /^(?:\d+|ref:.+)$/
+
 const accountScriptSelector = 'script[src*="players.brightcove.net" i]'
+
 const accountScriptRegex = /players\.brightcove\.net\/(\d+)\//i
 
 // Some plugins leave the account out of `data-account` and only in the loader script's url.

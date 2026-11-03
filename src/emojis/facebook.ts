@@ -103,6 +103,7 @@ const classicCodes = toMap({
 const classicNames = [...classicCodes.keys()]
 // Only Facebook's own names, since other widgets name classes like `emoticon_box` the same way.
 const classicClassRegex = new RegExp(`(?:^|\\s)emoticon_(${classicNames.join('|')})(?:\\s|$)`)
+
 const textClassSelector = 'span[class~="emoticon_text"]'
 const hiddenCodeSelector = 'span[class~="_4mcd"]'
 
