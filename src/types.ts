@@ -237,6 +237,7 @@ export type TransformContext = {
   emojiResolvers: Array<EmojiResolver>
   avatarImageHosts: Array<string>
   nonContentSelectors: Array<string>
+  shareIntentSelectors: Array<string>
   preservedPreClasses: Array<string>
   revealableSelectors: Array<string>
   fieldCleaners: Array<FieldCleaner>

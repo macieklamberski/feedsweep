@@ -87,6 +87,7 @@ import { stripInterBlockBreaks } from '../transforms/dom/stripInterBlockBreaks.j
 import { stripLeadingIndentation } from '../transforms/dom/stripLeadingIndentation.js'
 import { stripMarkdownEscapeBackslashes } from '../transforms/dom/stripMarkdownEscapeBackslashes.js'
 import { stripNonContentElements } from '../transforms/dom/stripNonContentElements.js'
+import { stripShareIntentAnchors } from '../transforms/dom/stripShareIntentAnchors.js'
 import { stripWordBreaks } from '../transforms/dom/stripWordBreaks.js'
 import { stripWordpressEmbedFrames } from '../transforms/dom/stripWordpressEmbedFrames.js'
 import { surfaceNoscriptEmbeds } from '../transforms/dom/surfaceNoscriptEmbeds.js'
@@ -276,6 +277,10 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   flattenPictureElements,
   hoistFigcaptionFromAnchor,
   stripNonContentElements,
+
+  // Runs after stripNonContentElements, which removes the label inside a click-to-tweet quote
+  // before the quote is read.
+  stripShareIntentAnchors,
 
   // Runs before wrapBareInlineInParagraphs, which puts the title in a paragraph of its own.
   convertUcozSpoilerButtons,
