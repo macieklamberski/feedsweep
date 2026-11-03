@@ -342,8 +342,8 @@ export const resolveEmbedProbe = async (
   probe: Element,
   resolvers: ReadonlyArray<WidgetResolver>,
 ): Promise<EmbedResolverResult | undefined> => {
-  for (const resolver of resolvers.filter(isEmbedOrMediaResolver)) {
-    if (!probe.matches(resolver.selector)) {
+  for (const resolver of resolvers) {
+    if (!isEmbedOrMediaResolver(resolver) || !probe.matches(resolver.selector)) {
       continue
     }
 

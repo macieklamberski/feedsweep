@@ -205,11 +205,8 @@ export type {
   WidgetResolver,
   WidgetResolverResult,
 } from './types.js'
-export {
-  type GeneratedWrapperType,
-  generatedWrapperTypes,
-  parsePixelSize,
-} from './utils/dom.js'
+export type { GeneratedWrapperType } from './utils/dom.js'
+export { generatedWrapperTypes, parsePixelSize } from './utils/dom.js'
 export { applyDomTransforms, applyStringTransforms } from './utils/transforms.js'
 export {
   createCitePlaceholder,

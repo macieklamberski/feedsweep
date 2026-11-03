@@ -75,10 +75,10 @@ export const convertBloggerCaptionTables: DomTransform = () => {
         continue
       }
 
-      const imageCell = rows[0].children[0]
+      const imageCell = rows[0].firstElementChild
       const [captionCell, ...extraCells] = rows[1].children
 
-      if (!captionCell?.matches('td.tr-caption')) {
+      if (!imageCell || !captionCell?.matches('td.tr-caption')) {
         continue
       }
 
