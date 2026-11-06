@@ -7,7 +7,7 @@ import type {
 } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { createUrlEmbedResolver, readCleanedFlashVar } from '../utils/widgets.js'
+import { createUrlEmbedResolver, readMatchFlashVar } from '../utils/widgets.js'
 
 const provider = 'mrcvideo'
 
@@ -60,7 +60,7 @@ const readCallbackId = (
   element: Element | undefined,
   context: TransformContext | undefined,
 ): string | undefined => {
-  const callback = readCleanedFlashVar(element, 'yourlytics.callback', context)
+  const callback = readMatchFlashVar(element, 'yourlytics.callback', context)
   const parsed = parseUrlOnHosts(callback, hosts, isHostOf)
 
   return getQueryParam(parsed?.searchParams, 'nodeid')

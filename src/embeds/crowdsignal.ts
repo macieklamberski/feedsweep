@@ -5,7 +5,7 @@ import { parseUrlOnHosts } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
-  readCleanedCarrierUrl,
+  readMatchCarrierUrl,
 } from '../utils/widgets.js'
 
 const provider = 'crowdsignal'
@@ -55,7 +55,7 @@ export const crowdsignalIframeEmbedResolver = createUrlEmbedResolver(
 const readFallbackPollId = (fallback: Element, context: TransformContext): string | undefined => {
   const named = fallback.querySelector('a[href], iframe[src]')
   const url =
-    named?.localName === 'iframe' ? readCleanedCarrierUrl(named, context) : attr(named, 'href')
+    named?.localName === 'iframe' ? readMatchCarrierUrl(named, context) : attr(named, 'href')
   const frame = parseUrlOnHosts(url, 'poll.fm')
 
   if (frame) {

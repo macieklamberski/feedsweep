@@ -4,7 +4,7 @@ import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, isElement, text } from '../utils/dom.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
-import { readCleanedAttributeUrl } from '../utils/widgets.js'
+import { matchCarrierUrl } from '../utils/widgets.js'
 
 const provider = 'discourse'
 
@@ -69,12 +69,14 @@ export const discourseCiteResolver: CiteResolver = {
 
     // Old-generation oneboxes (the Stack Exchange shape among them) carry no
     // data-onebox-src. Their canonical url is the source anchor's.
-    const url = readCleanedAttributeUrl(element, 'data-onebox-src', context) ?? attr(source, 'href')
+    const url = attr(element, 'data-onebox-src') ?? attr(source, 'href')
     // Engines differ on the heading level they use for the title.
     const title = text(body, 'h3, h4')
 
     // data-onebox-src arrives unrewritten, so a protocol-relative url names no host without a base.
-    const cited = url ? parseUrl(url, placeholderBaseUrl) : undefined
+    const cited = url
+      ? parseUrl(matchCarrierUrl(element, url, context), placeholderBaseUrl)
+      : undefined
 
     if (cited && (isHostOrSubdomainOf(cited, socialPostHosts) || parseMastodonStatus(cited.href))) {
       return

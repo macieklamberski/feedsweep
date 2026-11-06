@@ -20,11 +20,11 @@ import { parseUrlOnHosts } from '../utils/urls.js'
 import {
   atUsername,
   bareHandleRegex,
-  cleanCarrierUrl,
   createMarkupEmbedResolver,
   createS9eEmbedResolver,
   createUrlEmbedResolver,
-  readCleanedAttributeUrl,
+  matchCarrierUrl,
+  readMatchUrl,
 } from '../utils/widgets.js'
 
 const provider = 'instagram'
@@ -101,7 +101,7 @@ const readWrapperPost = (element: Element, context: TransformContext): Post | un
     return
   }
 
-  const declared = cleanCarrierUrl(wrapper, decodeSegment(dataUrl) ?? dataUrl, context)
+  const declared = matchCarrierUrl(wrapper, decodeSegment(dataUrl) ?? dataUrl, context)
   const link = parseUrlOnHosts(declared, hosts)
 
   return readPostUrl(link)
@@ -111,7 +111,7 @@ const readWrapperPost = (element: Element, context: TransformContext): Post | un
 // then any anchor in the quote, which the pre-2018 versions and every sanitized copy leave as
 // the only trace.
 const findPost = (element: Element, context: TransformContext): Post | undefined => {
-  const declaredUrl = readCleanedAttributeUrl(element, 'data-instgrm-permalink', context)
+  const declaredUrl = readMatchUrl(element, 'data-instgrm-permalink', context)
   const permalink = parseUrlOnHosts(declaredUrl, hosts)
   const declared = readPostUrl(permalink)
 

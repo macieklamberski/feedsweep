@@ -2,7 +2,7 @@ import { getPathSegments, getQueryParam, isAnyOf } from 'trousse'
 import type { MediaResolver } from '../types.js'
 import { paramValue } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { cleanCarrierUrl, pluginCarrierSelector, readCleanedCarrierUrl } from '../utils/widgets.js'
+import { matchCarrierUrl, pluginCarrierSelector, readMatchCarrierUrl } from '../utils/widgets.js'
 
 const hosts = ['podbean.com']
 const playerRoute = 'podcast-audio-video-blog-player'
@@ -17,10 +17,10 @@ export const podbeanFlashMediaResolver: MediaResolver = {
     'object[classid]',
   ].join(', '),
   extract: (element, context) => {
-    let playerUrl: string | undefined = readCleanedCarrierUrl(element, context)
+    let playerUrl: string | undefined = readMatchCarrierUrl(element, context)
 
     if (!playerUrl) {
-      playerUrl = cleanCarrierUrl(element, paramValue(element, 'movie'), context)
+      playerUrl = matchCarrierUrl(element, paramValue(element, 'movie'), context)
     }
 
     const player = parseUrlOnHosts(playerUrl, hosts)

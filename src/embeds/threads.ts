@@ -6,7 +6,7 @@ import {
   atUsername,
   createMarkupEmbedResolver,
   findBareHandle,
-  readCleanedAttributeUrl,
+  readMatchUrl,
 } from '../utils/widgets.js'
 
 const provider = 'threads'
@@ -37,7 +37,7 @@ const readPostUrl = (value: string | undefined): Post | undefined => {
 // Where the post is named: the attribute the dialog writes, then any anchor in the quote, which
 // a sanitized copy leaves as the only trace.
 const findPost = (element: Element, context: TransformContext): Post | undefined => {
-  const permalink = readCleanedAttributeUrl(element, 'data-text-post-permalink', context)
+  const permalink = readMatchUrl(element, 'data-text-post-permalink', context)
   const declared = readPostUrl(permalink)
 
   if (declared) {

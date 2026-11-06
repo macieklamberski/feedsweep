@@ -2,7 +2,7 @@ import { getQueryParam, isAnyOf } from 'trousse'
 import type { MediaResolver } from '../types.js'
 import { flashVars, parseFlashVars } from '../utils/dom.js'
 import { audioFileRegex, imageFileRegex } from '../utils/urls.js'
-import { cleanCarrierUrl, pluginCarrierSelector, readCarrierUrlOnHosts } from '../utils/widgets.js'
+import { matchCarrierUrl, pluginCarrierSelector, readCarrierUrlOnHosts } from '../utils/widgets.js'
 
 const hosts = ['weebly.com']
 const audioPlayerPath = '/weebly/apps/audioPlayer2.swf'
@@ -64,9 +64,9 @@ export const weeblyFlashMediaResolver: MediaResolver = {
     }
 
     const config = parseFlashVars(flashVars(element))
-    const src = cleanCarrierUrl(element, getQueryParam(config, 'soundFile'), context)
+    const src = getQueryParam(config, 'soundFile')
 
-    if (!src || !audioFileRegex.test(src)) {
+    if (!src || !audioFileRegex.test(matchCarrierUrl(element, src, context))) {
       return
     }
 

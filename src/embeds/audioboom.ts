@@ -10,8 +10,8 @@ import { parseUrlOnHosts } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
-  readCleanedAttributeUrl,
-  readCleanedFlashVar,
+  readMatchFlashVar,
+  readMatchUrl,
 } from '../utils/widgets.js'
 
 const provider = 'audioboom'
@@ -87,7 +87,7 @@ export const audioboomIframeEmbedResolver = createUrlEmbedResolver(hosts, audiob
 export const audioboomWidgetEmbedResolver = createMarkupEmbedResolver(
   'div.ab-player[data-boourl]',
   (element, context) => {
-    const parsed = parseUrlOnHosts(readCleanedAttributeUrl(element, 'data-boourl', context), hosts)
+    const parsed = parseUrlOnHosts(readMatchUrl(element, 'data-boourl', context), hosts)
 
     return parsed && audioboomResolveEmbed(parsed)
   },
@@ -109,8 +109,7 @@ const audioboomFlashResolveEmbed: ResolveUrlEmbed = (url, element, context) => {
   }
 
   const link =
-    readCleanedFlashVar(element, 'mp3LinkURL', context) ??
-    readCleanedFlashVar(element, 'mp3', context)
+    readMatchFlashVar(element, 'mp3LinkURL', context) ?? readMatchFlashVar(element, 'mp3', context)
   const parsed = parseUrlOnHosts(link?.replace(mp3ExtensionRegex, ''), hosts)
 
   if (!parsed) {

@@ -4,9 +4,9 @@ import { attr, paramValue, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import {
-  cleanCarrierUrl,
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
+  matchCarrierUrl,
 } from '../utils/widgets.js'
 
 type View = {
@@ -114,7 +114,7 @@ export const tableauObjectEmbedResolver = createMarkupEmbedResolver(
   'object.tableauViz',
   (element, context) => {
     // `viz_v1.js` decodes `host_url` before it builds the frame url on it.
-    const hostUrl = cleanCarrierUrl(
+    const hostUrl = matchCarrierUrl(
       element,
       decodeSegment(paramValue(element, 'host_url')),
       context,

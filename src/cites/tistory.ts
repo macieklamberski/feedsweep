@@ -2,7 +2,6 @@ import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
-import { readCleanedAttributeUrl } from '../utils/widgets.js'
 
 const provider = 'tistory'
 
@@ -12,14 +11,14 @@ export const tistoryCiteResolver: CiteResolver = {
   // Qualifying the attribute with figure misses the variants built from another element, and the
   // bare attribute collides with nothing: no other platform emits data-og-*.
   selector: '[data-og-source-url]',
-  extract: (element, context) => {
+  extract: (element) => {
     return buildCite({
       provider,
       // data-og-url is the canonical target, not the link the author added.
       // data-og-source-url is the link the author added and what the card's own anchor points at.
       url:
-        readCleanedAttributeUrl(element, 'data-og-source-url', context) ??
-        readCleanedAttributeUrl(element, 'data-og-url', context) ??
+        attr(element, 'data-og-source-url') ??
+        attr(element, 'data-og-url') ??
         attr(find(element, 'a'), 'href'),
       // Every field ships twice, a data-og-* attribute on the wrapper and an og-* element inside
       // the anchor, and the slimmer card variants omit the elements.

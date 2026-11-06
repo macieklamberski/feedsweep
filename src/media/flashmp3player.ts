@@ -1,7 +1,7 @@
 import { getPathSegments, getQueryParam, isAnyOf } from 'trousse'
 import type { MediaResolver } from '../types.js'
 import { flashVar } from '../utils/dom.js'
-import { cleanCarrierUrl, pluginCarrierSelector, readCarrierUrlOnHosts } from '../utils/widgets.js'
+import { pluginCarrierSelector, readCarrierUrlOnHosts } from '../utils/widgets.js'
 
 const hosts = ['flash-mp3-player.net']
 
@@ -24,15 +24,13 @@ export const flashMp3PlayerMediaResolver: MediaResolver = {
     }
 
     const declared = flashVar(element, 'mp3') ?? getQueryParam(parsed.searchParams, 'mp3')
-    const source = cleanCarrierUrl(element, declared, context)
-
-    if (!source) {
+    if (!declared) {
       return
     }
 
     return {
       tag: 'audio',
-      src: source,
+      src: declared,
     }
   },
 }

@@ -20,7 +20,7 @@ import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
   getEmbedSize,
-  readCleanedFlashVar,
+  readMatchFlashVar,
 } from '../utils/widgets.js'
 
 const provider = 'archive'
@@ -211,7 +211,7 @@ const readItemPlayer = (
   element: Element | undefined,
   context: TransformContext | undefined,
 ): EmbedResolverResult | undefined => {
-  const soundFile = parseUrlOnHosts(readCleanedFlashVar(element, 'soundFile', context), hosts)
+  const soundFile = parseUrlOnHosts(readMatchFlashVar(element, 'soundFile', context), hosts)
   const [, identifier, file] = soundFile?.pathname.match(itemFilePathRegex) ?? []
 
   if (!identifier) {

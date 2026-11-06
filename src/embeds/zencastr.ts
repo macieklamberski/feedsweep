@@ -4,7 +4,7 @@ import { parseUrlOnHosts } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
-  readCleanedAttributeUrl,
+  readMatchUrl,
 } from '../utils/widgets.js'
 
 const provider = 'zencastr'
@@ -43,7 +43,7 @@ export const zencastrResolveEmbed: ResolveUrlEmbed = (url) => {
 export const zencastrBlockquoteEmbedResolver = createMarkupEmbedResolver(
   'blockquote.zenplayer[data-episode-href]',
   (element, context) => {
-    const episodeUrl = readCleanedAttributeUrl(element, 'data-episode-href', context)
+    const episodeUrl = readMatchUrl(element, 'data-episode-href', context)
     const url = parseUrlOnHosts(episodeUrl, hosts)
 
     if (!url) {

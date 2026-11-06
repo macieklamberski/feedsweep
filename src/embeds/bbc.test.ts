@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
-import { describeForEachParser, html, resolverExtractor } from '../tests.js'
-import type { EmbedResolverResult } from '../types.js'
+import { baseContext, describeForEachParser, html, resolverExtractor } from '../tests.js'
+import type { CleanUrlFn, EmbedResolverResult } from '../types.js'
 import { bbcIframeEmbedResolver, bbcResolveEmbed } from './bbc.js'
 
 describe('bbcResolveEmbed', () => {
@@ -164,6 +164,36 @@ describe('bbcResolveEmbed', () => {
 
 describeForEachParser('bbcIframeEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, bbcIframeEmbedResolver)
+
+  describe('a poster behind an image proxy matchUrlFn unwraps', () => {
+    // An image proxy, `proxy.example.com/{host}/{path}`, the caller's matchUrlFn unwraps.
+    const unwrapImageProxyFn: CleanUrlFn = (url) => {
+      return url.replace('https://proxy.example.com/', 'http://')
+    }
+    const extractMatched = resolverExtractor(parseHtml, bbcIframeEmbedResolver, {
+      ...baseContext,
+      matchUrlFn: unwrapImageProxyFn,
+    })
+
+    it('should keep the poster as written, not the url matchUrlFn unwraps', async () => {
+      const value = html`
+        <embed
+          src="http://news.bbc.co.uk/player/emp/external/player.swf"
+          flashvars="externalIdentifier=p00h8wqt&embedPageUrl=http://www.bbc.co.uk/news/technology-13614478&holdingImage=https://proxy.example.com/news.bbcimg.co.uk/media/images/53087000/jpg/_53087856_jex_1062219_de27-1.jpg"
+        ></embed>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'bbc',
+        id: 'p00h8wqt',
+        src: 'https://www.bbc.com/news/av-embeds/13614478/vpid/p00h8wqt',
+        thumbnail:
+          'https://proxy.example.com/news.bbcimg.co.uk/media/images/53087000/jpg/_53087856_jex_1062219_de27-1.jpg',
+        ratio: '16/9',
+      }
+
+      expect(await extractMatched(value)).toEqual(expected)
+    })
+  })
 
   describe('happy paths', () => {
     it('should read the clip and article the retired news player names', async () => {

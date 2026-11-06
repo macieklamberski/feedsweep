@@ -19,7 +19,6 @@ import type {
 } from '../types.js'
 import {
   atUsername,
-  cleanCarrierUrl,
   createCaptionedFigure,
   createCitePlaceholder,
   createEmbedPlaceholder,
@@ -34,6 +33,7 @@ import {
   embedCarrierSelector,
   findBareHandle,
   getEmbedSize,
+  matchCarrierUrl,
   normalizeEmbedFields,
   prepareCiteMetadata,
   prepareEmbedMetadata,
@@ -1792,7 +1792,7 @@ describeForEachParser('readCarrierUrl', (parseHtml) => {
   })
 })
 
-describeForEachParser('cleanCarrierUrl', (parseHtml) => {
+describeForEachParser('matchCarrierUrl', (parseHtml) => {
   const embedlyUrl =
     'https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2FdQw4w9WgXcQ'
   const unwrapEmbedlyFn = createProxyUnwrapFn('cdn.embedly.com', 'src')
@@ -1810,12 +1810,25 @@ describeForEachParser('cleanCarrierUrl', (parseHtml) => {
     }
     const element = parseHtml('<iframe></iframe>').querySelector('iframe') as Element
 
-    return cleanCarrierUrl(element, url, context)
+    return matchCarrierUrl(element, url, context)
   }
 
   describe('happy paths', () => {
-    it('should give the url the cleaner unwraps an embed proxy to', () => {
+    it('should give the url cleanUrlFn unwraps an embed proxy to, with no matchUrlFn', () => {
       expect(clean(embedlyUrl, unwrapEmbedlyFn)).toBe('https://www.youtube.com/embed/dQw4w9WgXcQ')
+    })
+
+    it('should give the url matchUrlFn unwraps an embed proxy to, ahead of cleanUrlFn', () => {
+      const context: TransformContext = {
+        ...baseContext,
+        cleanUrlFn: stripUtmSourceFn,
+        matchUrlFn: unwrapEmbedlyFn,
+      }
+      const element = parseHtml('<iframe></iframe>').querySelector('iframe') as Element
+
+      expect(matchCarrierUrl(element, embedlyUrl, context)).toBe(
+        'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      )
     })
 
     it('should resolve a protocol-relative url before the cleaner reads its host', () => {
@@ -1855,8 +1868,8 @@ describeForEachParser('cleanCarrierUrl', (parseHtml) => {
       const context: TransformContext = { ...baseContext, cleanUrlFn: mock(unwrapEmbedlyFn) }
       const element = parseHtml('<iframe></iframe>').querySelector('iframe') as Element
 
-      cleanCarrierUrl(element, embedlyUrl, context)
-      cleanCarrierUrl(element, embedlyUrl, context)
+      matchCarrierUrl(element, embedlyUrl, context)
+      matchCarrierUrl(element, embedlyUrl, context)
 
       expect(context.cleanUrlFn).toHaveBeenCalledTimes(1)
     })
@@ -1867,16 +1880,16 @@ describeForEachParser('cleanCarrierUrl', (parseHtml) => {
       const rewritten =
         'https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2FM7lc1UVf-VE'
 
-      cleanCarrierUrl(element, embedlyUrl, context)
+      matchCarrierUrl(element, embedlyUrl, context)
 
-      expect(cleanCarrierUrl(element, rewritten, context)).toBe(
+      expect(matchCarrierUrl(element, rewritten, context)).toBe(
         'https://www.youtube.com/embed/M7lc1UVf-VE',
       )
     })
   })
 })
 
-describeForEachParser('carrier urls cleaned at read time', (parseHtml) => {
+describeForEachParser('carrier urls matched at read time', (parseHtml) => {
   const unwrapEmbedlyFn = createProxyUnwrapFn('cdn.embedly.com', 'src')
 
   const stripUtmSourceFn: CleanUrlFn = (url) => {

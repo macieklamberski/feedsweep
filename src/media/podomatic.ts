@@ -2,7 +2,7 @@ import { encodePathSegment, getPathSegments, isAnyOf, startsWithAnyOf } from 'tr
 import type { MediaResolver } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { cleanCarrierUrl, pluginCarrierSelector, readCarrierUrlOnHosts } from '../utils/widgets.js'
+import { matchCarrierUrl, pluginCarrierSelector, readCarrierUrlOnHosts } from '../utils/widgets.js'
 
 const hosts = ['podomatic.com']
 const playerPath = '/swf/joeplayer'
@@ -20,7 +20,7 @@ export const podomaticFlashMediaResolver: MediaResolver = {
       return
     }
 
-    const jsonLocation = cleanCarrierUrl(element, flashVar(element, 'jsonLocation'), context)
+    const jsonLocation = matchCarrierUrl(element, flashVar(element, 'jsonLocation'), context)
     const location = parseUrlOnHosts(jsonLocation, hosts)
 
     if (!location) {

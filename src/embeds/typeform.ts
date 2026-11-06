@@ -5,7 +5,7 @@ import { alphanumericRegex, parseUrlOnHosts } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
-  readCleanedAttributeUrl,
+  readMatchUrl,
 } from '../utils/widgets.js'
 
 const provider = 'typeform'
@@ -81,7 +81,7 @@ export const typeformWidgetEmbedResolver = createMarkupEmbedResolver(
       return composeLiveEmbed(liveId, element, title)
     }
 
-    const url = parseUrlOnHosts(readCleanedAttributeUrl(element, 'data-url', context), hosts)
+    const url = parseUrlOnHosts(readMatchUrl(element, 'data-url', context), hosts)
 
     if (!url) {
       return

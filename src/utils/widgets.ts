@@ -37,6 +37,7 @@ import {
 } from './dom.js'
 import {
   audioFileRegex,
+  cleanMatchUrl,
   cleanUrl,
   collapseSlashRuns,
   foldEscapedAmpersands,
@@ -137,37 +138,38 @@ export const readCarrierUrl = (element: Element): string => {
   return collapseSlashRuns(foldEscapedAmpersands(url ?? ''))
 }
 
-type CleanCarrierUrl = {
+type MatchCarrierUrl = {
   (element: Element, url: string, context: TransformContext): string
   (element: Element, url: Nullish<string>, context: TransformContext): string | undefined
 }
 
 // Held off the document, so a carrier no resolver claims keeps the url its publisher wrote. Keyed
 // by the url read, since a pass can rewrite a carrier's url between two reads.
-const cleanedCarrierUrls = new WeakMap<Element, Map<string, string>>()
+const matchedCarrierUrls = new WeakMap<Element, Map<string, string>>()
 
-const applyCarrierCleaner = (url: string, context: TransformContext): string => {
-  if (!context.cleanUrlFn) {
+const applyCarrierMatcher = (url: string, context: TransformContext): string => {
+  if (!context.matchUrlFn && !context.cleanUrlFn) {
     return url
   }
 
-  // A cleaner reads the host, which a protocol-relative or site-relative url names only once
+  // A matcher reads the host, which a protocol-relative or site-relative url names only once
   // resolved.
   const resolved = resolveOrKeepUrl(repairUrl(url), context)
-  const cleaned = cleanUrl(resolved, context)
+  const matched = cleanMatchUrl(resolved, context)
 
-  // A cleaner that changes nothing past the repairs leaves the url as written, which is what a
-  // resolver reads with no cleaner.
-  if (cleaned === repairUrl(resolved)) {
+  // A matcher that changes nothing past the repairs leaves the url as written, which is what a
+  // resolver reads with no matcher.
+  if (matched === repairUrl(resolved)) {
     return url
   }
 
-  return cleaned
+  return matched
 }
 
-// A url a resolver reads off a carrier, through the caller's cleanUrlFn, so a resolver reads the
-// url an embed proxy such as Embedly's or Iframely's wraps once the cleaner unwraps it.
-export const cleanCarrierUrl: CleanCarrierUrl = ((
+// A url a resolver reads off a carrier to recognise it, through the caller's matchUrlFn, so a
+// resolver reads the url an embed or image proxy wraps once the matcher unwraps it. Only for
+// recognition: a url the resolver hands on is read as written, and prepareUrl cleans it.
+export const matchCarrierUrl: MatchCarrierUrl = ((
   element: Element,
   url: Nullish<string>,
   context: TransformContext,
@@ -176,45 +178,45 @@ export const cleanCarrierUrl: CleanCarrierUrl = ((
     return url ?? undefined
   }
 
-  let urls = cleanedCarrierUrls.get(element)
+  let urls = matchedCarrierUrls.get(element)
 
   if (!urls) {
     urls = new Map()
-    cleanedCarrierUrls.set(element, urls)
+    matchedCarrierUrls.set(element, urls)
   }
 
-  let cleaned = urls.get(url)
+  let matched = urls.get(url)
 
-  if (cleaned === undefined) {
-    cleaned = applyCarrierCleaner(url, context)
-    urls.set(url, cleaned)
+  if (matched === undefined) {
+    matched = applyCarrierMatcher(url, context)
+    urls.set(url, matched)
   }
 
-  return cleaned
-}) as CleanCarrierUrl
+  return matched
+}) as MatchCarrierUrl
 
-export const readCleanedCarrierUrl = (element: Element, context: TransformContext): string => {
-  return cleanCarrierUrl(element, readCarrierUrl(element), context)
+export const readMatchCarrierUrl = (element: Element, context: TransformContext): string => {
+  return matchCarrierUrl(element, readCarrierUrl(element), context)
 }
 
-// The carrier url a resolver reads, cleaned, with the class repairs applied. A frame no resolver
-// claims keeps the url `readCarrierUrl` gives.
+// The carrier url a resolver recognises, matched, with the class repairs applied. A frame no
+// resolver claims keeps the url `readCarrierUrl` gives.
 export const readRepairedCarrierUrl = (element: Element, context: TransformContext): string => {
-  return repairUrl(readCleanedCarrierUrl(element, context))
+  return repairUrl(readMatchCarrierUrl(element, context))
 }
 
-// The cleaned carrier url, parsed, when it sits on one of the hosts.
+// The matched carrier url, parsed, when it sits on one of the hosts.
 export const readCarrierUrlOnHosts = (
   element: Element,
   hosts: string | ReadonlyArray<string>,
   context: TransformContext,
   isOnHost?: (url: URL, hosts: string | ReadonlyArray<string>) => boolean,
 ): URL | undefined => {
-  return parseUrlOnHosts(readCleanedCarrierUrl(element, context), hosts, isOnHost)
+  return parseUrlOnHosts(readMatchCarrierUrl(element, context), hosts, isOnHost)
 }
 
-// A flashvar holding a url, cleaned where a resolver reads it off its carrier.
-export const readCleanedFlashVar = (
+// A flashvar holding a url, matched where a resolver reads it to recognise it.
+export const readMatchFlashVar = (
   element: Element | undefined,
   name: string,
   context: TransformContext | undefined,
@@ -225,15 +227,16 @@ export const readCleanedFlashVar = (
     return value
   }
 
-  return cleanCarrierUrl(element, value, context)
+  return matchCarrierUrl(element, value, context)
 }
 
-export const readCleanedAttributeUrl = (
+// An attribute holding a url, matched where a resolver reads it to recognise it.
+export const readMatchUrl = (
   element: Element,
   attribute: string,
   context: TransformContext,
 ): string | undefined => {
-  return cleanCarrierUrl(element, attr(element, attribute), context)
+  return matchCarrierUrl(element, attr(element, attribute), context)
 }
 
 type ResolverOptions = {
@@ -379,7 +382,7 @@ export const createUrlEmbedResolver = (
     kind: 'embed',
     selector: embedCarrierSelector,
     extract: (element, context) => {
-      const src = readCleanedCarrierUrl(element, context)
+      const src = readMatchCarrierUrl(element, context)
       const url = parseUrlOnHosts(src, hosts, options.isOnHost)
 
       // A script that never filled its template, `embed/$1`, names no item, and its frame stays

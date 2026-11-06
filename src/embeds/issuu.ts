@@ -13,7 +13,7 @@ import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
-  readCleanedAttributeUrl,
+  readMatchUrl,
 } from '../utils/widgets.js'
 
 const provider = 'issuu'
@@ -102,7 +102,7 @@ export const issuuWidgetEmbedResolver = createMarkupEmbedResolver(
       return configEmbed
     }
 
-    const declared = readCleanedAttributeUrl(element, 'data-url', context)
+    const declared = readMatchUrl(element, 'data-url', context)
 
     return readDocumentUrl(parseUrlOnHosts(declared, hosts))
   },

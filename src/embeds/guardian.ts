@@ -1,7 +1,7 @@
 import { toMap } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { createUrlEmbedResolver, readCleanedFlashVar } from '../utils/widgets.js'
+import { createUrlEmbedResolver, readMatchFlashVar } from '../utils/widgets.js'
 
 const provider = 'guardian'
 
@@ -89,7 +89,7 @@ export const guardianFlashEmbedResolver = createUrlEmbedResolver(
       return
     }
 
-    const endpoint = parseUrlOnHosts(readCleanedFlashVar(element, 'endpoint', context), flashHosts)
+    const endpoint = parseUrlOnHosts(readMatchFlashVar(element, 'endpoint', context), flashHosts)
     const path = endpoint?.pathname.match(endpointPathRegex)?.groups?.path
 
     if (!path) {

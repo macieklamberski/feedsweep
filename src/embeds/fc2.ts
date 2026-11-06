@@ -5,7 +5,7 @@ import { parseUrlOnHosts } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
-  readCleanedAttributeUrl,
+  readMatchUrl,
 } from '../utils/widgets.js'
 
 const provider = 'fc2'
@@ -76,7 +76,7 @@ export const fc2PlayerScriptEmbedResolver = createMarkupEmbedResolver(
     }
 
     // The loader plays `data-id` whenever it is present, whatever `url` names.
-    const pageUrl = readCleanedAttributeUrl(element, 'url', context)
+    const pageUrl = readMatchUrl(element, 'url', context)
     const page = parseUrlOnHosts(pageUrl, videoHosts)?.pathname.match(contentPageRegex)
     const declaredId = attr(element, 'data-id')
     // The attribute comes out decoded, and it goes into a path beside the raw path spelling.

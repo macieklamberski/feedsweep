@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
-import { describeForEachParser, html, resolverExtractor } from '../tests.js'
-import type { MediaResolverResult } from '../types.js'
+import { baseContext, describeForEachParser, html, resolverExtractor } from '../tests.js'
+import type { CleanUrlFn, MediaResolverResult } from '../types.js'
 import { weeblyFlashMediaResolver, weeblyVideoMediaResolver } from './weebly.js'
 
 describeForEachParser('weeblyVideoMediaResolver', (parseHtml) => {
@@ -209,6 +209,33 @@ describeForEachParser('weeblyVideoMediaResolver', (parseHtml) => {
 
 describeForEachParser('weeblyFlashMediaResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, weeblyFlashMediaResolver)
+
+  // A measurement prefix, `measure.example.com/{host}/{path}`, the caller's matchUrlFn unwraps.
+  const unwrapMeasurementFn: CleanUrlFn = (url) => {
+    return url.replace('https://measure.example.com/', 'https://')
+  }
+
+  describe('a file behind a prefix matchUrlFn unwraps', () => {
+    const extractMatched = resolverExtractor(parseHtml, weeblyFlashMediaResolver, {
+      ...baseContext,
+      matchUrlFn: unwrapMeasurementFn,
+    })
+
+    it('should play the file as written, not the url matchUrlFn unwraps', async () => {
+      const value = html`
+        <embed
+          src="http://www.weebly.com/weebly/apps/audioPlayer2.swf?user_id=4427146"
+          flashvars="soundFile=https://measure.example.com/www.example.com/uploads/knowing_yourself.mp3"
+        />
+      `
+      const expected: MediaResolverResult = {
+        tag: 'audio',
+        src: 'https://measure.example.com/www.example.com/uploads/knowing_yourself.mp3',
+      }
+
+      expect(await extractMatched(value)).toEqual(expected)
+    })
+  })
 
   describe('happy paths', () => {
     it('should read the file and its label out of the object params', async () => {

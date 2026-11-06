@@ -2,7 +2,7 @@ import { encodePathSegment, isPresent } from 'trousse'
 import { composeEmbedUrl, readSrcMediaId } from '../../embeds/wistia.js'
 import type { DomTransform, TransformContext } from '../../types.js'
 import { attr, parseRatio } from '../../utils/dom.js'
-import { createIframe, readCleanedCarrierUrl } from '../../utils/widgets.js'
+import { createIframe, readMatchCarrierUrl } from '../../utils/widgets.js'
 
 // Pulls the hashed id out of the `wistia_async_{id}` class the facade carries, up to the end of
 // the class token.
@@ -37,7 +37,7 @@ const readMediaId = (element: Element, context: TransformContext): string | unde
 
   // A script or a frame carries the media id in its src path, and `readSrcMediaId` checks the host.
   if (element.localName === 'iframe') {
-    return readSrcMediaId(readCleanedCarrierUrl(element, context))
+    return readSrcMediaId(readMatchCarrierUrl(element, context))
   }
 
   if (element.localName === 'script') {

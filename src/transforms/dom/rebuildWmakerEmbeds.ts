@@ -1,6 +1,6 @@
 import { composeEmbedUrl, isFlashPlayerUrl } from '../../embeds/wmaker.js'
 import type { DomTransform } from '../../types.js'
-import { createIframe, readCleanedCarrierUrl, setDimensions } from '../../utils/widgets.js'
+import { createIframe, readMatchCarrierUrl, setDimensions } from '../../utils/widgets.js'
 
 // The box WMaker's own snippet writes around a 16:9 video. The player fills its frame, and the dead
 // Flash box was drawn for another player.
@@ -13,7 +13,7 @@ export const rebuildWmakerEmbeds: DomTransform = (context) => {
   return (document) => {
     const objects = document.querySelectorAll('object[data]')
     const [element, ...others] = Array.from(objects).filter((candidate) => {
-      return isFlashPlayerUrl(readCleanedCarrierUrl(candidate, context))
+      return isFlashPlayerUrl(readMatchCarrierUrl(candidate, context))
     })
 
     // The embed route addresses the article rather than the video and serves one video for it: an

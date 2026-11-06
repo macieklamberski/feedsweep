@@ -2,11 +2,7 @@ import { getOrigin, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import {
-  createMarkupEmbedResolver,
-  readCleanedAttributeUrl,
-  readCleanedCarrierUrl,
-} from '../utils/widgets.js'
+import { createMarkupEmbedResolver, readMatchCarrierUrl, readMatchUrl } from '../utils/widgets.js'
 
 const provider = 'mastodon'
 
@@ -66,7 +62,7 @@ export const mastodonBlockquoteEmbedResolver = createMarkupEmbedResolver(
   // div.mastodon-embed only wraps the iframe.
   'iframe[src], blockquote.mastodon-embed, x-mastodon-embed[url]',
   (element, context) => {
-    const src = readCleanedCarrierUrl(element, context)
+    const src = readMatchCarrierUrl(element, context)
 
     // The status iframe is matched by its src, with or without the mastodon-embed class.
     if (element.localName === 'iframe' && !embedRouteEndRegex.test(src)) {
@@ -75,8 +71,8 @@ export const mastodonBlockquoteEmbedResolver = createMarkupEmbedResolver(
 
     const status = [
       src,
-      readCleanedAttributeUrl(element, 'data-embed-url', context),
-      readCleanedAttributeUrl(element, 'url', context),
+      readMatchUrl(element, 'data-embed-url', context),
+      readMatchUrl(element, 'url', context),
       attr(find(element, 'a[href]'), 'href'),
     ]
       .map((link) => (link ? parseMastodonStatus(link) : undefined))

@@ -8,10 +8,11 @@ import {
 } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { filterUrlQuery } from '../utils/urls.js'
+import { filterUrlQuery, repairUrl } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
+  readCarrierUrl,
   readRepairedCarrierUrl,
 } from '../utils/widgets.js'
 
@@ -146,7 +147,7 @@ export const blubrryPowerpressEmbedResolver = createMarkupEmbedResolver(
       provider,
       // A post id is unique only within its site, so the site travels in the id.
       id: [url.host, ...getPathSegments(url), episode].join('/'),
-      src: link,
+      src: repairUrl(readCarrierUrl(element)),
       ...(isVideo ? sizes.powerpressVideo : sizes.powerpressAudio),
       title: attr(element, 'title'),
     }
