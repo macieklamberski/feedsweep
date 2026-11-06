@@ -198,10 +198,10 @@ describeForEachParser('Instagram', (parseHtml) => {
         data-embed-id="p/DZmgID9Eawg"
         data-embed-src="https://www.instagram.com/p/DZmgID9Eawg/embed/"
         data-embed-url="https://www.instagram.com/p/DZmgID9Eawg/"
+        data-embed-thumbnail="https://substack-post-media.s3.amazonaws.com/public/images/__ss-rehost__IG-snapshot-DZmgID9Eawg.jpg"
         data-embed-description="The caption, as the post page titles it."
         data-embed-author="@somebakery"
         data-embed-avatar="https://substack-post-media.s3.amazonaws.com/public/images/__ss-rehost__IG-profile-pic-DZmgID9Eawg.png"
-        data-embed-thumbnail="https://substack-post-media.s3.amazonaws.com/public/images/__ss-rehost__IG-snapshot-DZmgID9Eawg.jpg"
       ></div>
     `
 
@@ -325,8 +325,8 @@ describeForEachParser('Instagram', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="640"
         data-embed-src="https://www.instagram.com/somebakery/embed/"
+        data-embed-height="640"
       ></div>
     `
 
@@ -350,9 +350,9 @@ describeForEachParser('Instagram', (parseHtml) => {
     const value = '<iframe src="https://www.instagram.com/aseverofficial/p/CaUsPbUquKV/"></iframe>'
     const expected = html`
       <div
-        data-embed-src="https://www.instagram.com/p/CaUsPbUquKV/embed/"
         data-embed-provider="instagram"
         data-embed-id="p/CaUsPbUquKV"
+        data-embed-src="https://www.instagram.com/p/CaUsPbUquKV/embed/"
         data-embed-url="https://www.instagram.com/p/CaUsPbUquKV/"
       ></div>
     `

@@ -188,8 +188,8 @@ describeForEachParser('podetize through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-id="zvFEj7DPJ"
         data-embed-provider="podetize"
+        data-embed-id="zvFEj7DPJ"
         data-embed-src="https://player.podetize.com/?id=zvFEj7DPJ&amp;epmode=true"
         data-embed-height="200"
       ></div>

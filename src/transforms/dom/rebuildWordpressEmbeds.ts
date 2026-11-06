@@ -4,6 +4,7 @@ import { createIframe, isEmbedOrMediaResolver, isResolvedIframe } from '../../ut
 
 const wrapperSelector = '.wp-block-embed__wrapper'
 const contentSelector = 'img, video, audio, iframe, object, embed[src]'
+
 const whitespaceRegex = /\s/
 
 // A WordPress embed block whose oEmbed call never rendered: the wrapper holds only the source url,

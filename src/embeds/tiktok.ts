@@ -45,6 +45,7 @@ const readWatchUrl = (parsed: URL | undefined): Clip => {
 
 // A profile url and nothing else: `/@handle`, with no video segment after it.
 const profilePathRegex = /^\/@([^/]+)\/?$/
+
 // The account's opaque id, which TikTok writes where a handle goes.
 const secUidPrefix = 'MS4wLjABAAAA'
 

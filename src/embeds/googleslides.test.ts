@@ -349,9 +349,9 @@ describeForEachParser('googleslides through the pipeline', (parseHtml) => {
       <p>Body</p>
       <div
         data-enclosure=""
-        data-file-type="application/pdf"
-        data-file-name="pdf"
         data-file-url="https://docs.google.com/presentation/d/1k5NXExE8IvVgEIAwhxzwNw93Kt6f8Yqp1K7TuSigXiE/export/pdf"
+        data-file-name="pdf"
+        data-file-type="application/pdf"
       ></div>
     `
 

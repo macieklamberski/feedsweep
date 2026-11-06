@@ -275,10 +275,10 @@ describeForEachParser('condenast through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-id="5ce439aa34e7941264b4701c"
         data-embed-provider="condenast"
+        data-embed-id="5ce439aa34e7941264b4701c"
         data-embed-src="https://player.cnevids.com/iframe/video/5ce439aa34e7941264b4701c"
+        data-embed-ratio="16/9"
       ></div>
     `
 

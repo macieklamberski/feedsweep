@@ -121,12 +121,12 @@ describeForEachParser('rebuildExternalVideoEmbeds through the pipeline', (parseH
     const expected = html`
       <p>こちらが動画での田んぼの様子です。</p>
       <div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://i.ytimg.com/vi/bG39BBff10E/hqdefault.jpg"
-        data-embed-url="https://www.youtube.com/watch?v=bG39BBff10E"
-        data-embed-id="bG39BBff10E"
         data-embed-provider="youtube"
+        data-embed-id="bG39BBff10E"
         data-embed-src="https://www.youtube.com/embed/bG39BBff10E"
+        data-embed-url="https://www.youtube.com/watch?v=bG39BBff10E"
+        data-embed-thumbnail="https://i.ytimg.com/vi/bG39BBff10E/hqdefault.jpg"
+        data-embed-ratio="16/9"
       ></div>
       <p>新米のおにぎりが待ちどおしいです</p>
     `
@@ -144,11 +144,11 @@ describeForEachParser('rebuildExternalVideoEmbeds through the pipeline', (parseH
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-url="https://www.nicovideo.jp/watch/sm9"
-        data-embed-id="sm9"
         data-embed-provider="nicovideo"
+        data-embed-id="sm9"
         data-embed-src="https://embed.nicovideo.jp/watch/sm9"
+        data-embed-url="https://www.nicovideo.jp/watch/sm9"
+        data-embed-ratio="16/9"
       ></div>
     `
 

@@ -209,8 +209,8 @@ describeForEachParser('firstory through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-id="cmm2q46gw0o4d01y9g95lctm9"
         data-embed-provider="firstory"
+        data-embed-id="cmm2q46gw0o4d01y9g95lctm9"
         data-embed-src="https://open.firstory.fm/embed/story/cmm2q46gw0o4d01y9g95lctm9"
         data-embed-url="https://open.firstory.fm/story/cmm2q46gw0o4d01y9g95lctm9"
         data-embed-height="182"

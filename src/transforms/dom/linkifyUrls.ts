@@ -5,6 +5,7 @@ import { cleanUrl } from '../../utils/urls.js'
 import { createLink } from '../../utils/widgets.js'
 
 const urlProtocolRegex = /^https?:\/\//i
+
 const linkifyIgnoreTags = ['a', 'pre', 'code', 'kbd', 'samp', 'var', 'noscript']
 
 const shouldSkipElement = (element: Element): boolean => {

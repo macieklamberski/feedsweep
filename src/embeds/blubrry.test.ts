@@ -433,8 +433,8 @@ describeForEachParser('blubrry through the pipeline', (parseHtml) => {
 
     const expected = html`
       <div
-        data-embed-id="153989314"
         data-embed-provider="blubrry"
+        data-embed-id="153989314"
         data-embed-src="https://player.blubrry.com/id/153989314/"
         data-embed-height="164"
       ></div>
@@ -765,8 +765,8 @@ describeForEachParser('blubrryPowerpressEmbedResolver through the pipeline', (pa
     `
     const expected = html`
       <div
-        data-embed-id="joy.org.au/bentnotes/3443-podcast"
         data-embed-provider="blubrry"
+        data-embed-id="joy.org.au/bentnotes/3443-podcast"
         data-embed-src="https://joy.org.au/bentnotes/?powerpress_embed=3443-podcast&amp;powerpress_player=mediaelement-audio"
         data-embed-height="40"
       ></div>
@@ -783,8 +783,8 @@ describeForEachParser('blubrryPowerpressEmbedResolver through the pipeline', (pa
     `
     const expected = html`
       <div
-        data-embed-id="joy.org.au/bentnotes/3443-podcast"
         data-embed-provider="blubrry"
+        data-embed-id="joy.org.au/bentnotes/3443-podcast"
         data-embed-src="https://joy.org.au/bentnotes/?powerpress_embed=3443-podcast&amp;powerpress_player=mediaelement-audio"
         data-embed-height="40"
       ></div>

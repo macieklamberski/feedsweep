@@ -749,12 +749,12 @@ describeForEachParser('pixiv through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="315"
         data-embed-provider="pixiv"
         data-embed-id="21083839"
         data-embed-src="https://embed.pixiv.net/oembed_iframe.php?type=illust&amp;id=21083839"
         data-embed-url="https://www.pixiv.net/artworks/21083839"
         data-embed-width="600"
+        data-embed-height="315"
       ></div>
     `
 

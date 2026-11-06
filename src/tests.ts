@@ -27,7 +27,7 @@ const parsers: Record<string, ParseHtml> = {
 
 // The parsers a run exercises: every one by default, only the one DOM_LIBRARY names when set.
 export const selectParsers = (selected: string | undefined): Array<[string, ParseHtml]> => {
-  if (selected !== undefined && !(selected in parsers)) {
+  if (selected !== undefined && !Object.hasOwn(parsers, selected)) {
     throw new Error(
       `Unknown DOM_LIBRARY "${selected}". Expected one of: ${Object.keys(parsers).join(', ')}.`,
     )

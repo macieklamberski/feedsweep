@@ -413,11 +413,11 @@ describeForEachParser('listennotes through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="180"
-        data-embed-url="https://www.listennotes.com/e/a78f04d48e2f45fcbd4b6b41af4aff35/"
-        data-embed-id="episode/a78f04d48e2f45fcbd4b6b41af4aff35"
         data-embed-provider="listennotes"
+        data-embed-id="episode/a78f04d48e2f45fcbd4b6b41af4aff35"
         data-embed-src="https://www.listennotes.com/embedded/e/a78f04d48e2f45fcbd4b6b41af4aff35/"
+        data-embed-url="https://www.listennotes.com/e/a78f04d48e2f45fcbd4b6b41af4aff35/"
+        data-embed-height="180"
       ></div>
     `
 

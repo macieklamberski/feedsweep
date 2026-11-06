@@ -205,8 +205,8 @@ describeForEachParser('pinecast through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-id="463fa99c-b84c-464e-95fe-d679dd91c938"
         data-embed-provider="pinecast"
+        data-embed-id="463fa99c-b84c-464e-95fe-d679dd91c938"
         data-embed-src="https://pinecast.com/player/463fa99c-b84c-464e-95fe-d679dd91c938"
         data-embed-height="60"
       ></div>

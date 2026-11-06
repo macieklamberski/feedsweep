@@ -850,9 +850,9 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
           data-embed-id="@user/video/7000000000000000000"
           data-embed-src="https://www.tiktok.com/embed/v2/7000000000000000000"
           data-embed-url="https://www.tiktok.com/@user/video/7000000000000000000"
+          data-embed-height="738"
           data-embed-description="caption text #tag"
           data-embed-author="@user"
-          data-embed-height="738"
         ></div>
       `
 
@@ -870,9 +870,9 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
           data-embed-id="@user/video/7000000000000000000"
           data-embed-src="https://www.tiktok.com/embed/v2/7000000000000000000"
           data-embed-url="https://www.tiktok.com/@user/video/7000000000000000000"
+          data-embed-height="738"
           data-embed-description="caption text #tag"
           data-embed-author="@user"
-          data-embed-height="738"
         ></div>
       `
 
@@ -1230,11 +1230,11 @@ describeForEachParser('tiktokIframeEmbedResolver', (parseHtml) => {
       const expected = html`
         <div
           data-enclosure=""
-          data-embed-height="738"
-          data-embed-url="https://www.tiktok.com/@user/video/7000000000000000000"
-          data-embed-id="@user/video/7000000000000000000"
           data-embed-provider="tiktok"
+          data-embed-id="@user/video/7000000000000000000"
           data-embed-src="https://www.tiktok.com/embed/v2/7000000000000000000"
+          data-embed-url="https://www.tiktok.com/@user/video/7000000000000000000"
+          data-embed-height="738"
         ></div>
       `
       const result = await transformContent('', {

@@ -487,11 +487,11 @@ describeForEachParser('googledocs through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="500"
-        data-embed-url="https://docs.google.com/document/d/e/2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN/pub"
-        data-embed-id="2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN"
         data-embed-provider="googledocs"
+        data-embed-id="2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN"
         data-embed-src="https://docs.google.com/document/d/e/2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN/pub?embedded=true"
+        data-embed-url="https://docs.google.com/document/d/e/2PACX-1vTFVCyuSBO_oiFX_EoEkx9HLbSuWPBaxbQYfKgCNcmRS4MsEmo4YL8K_nm3G6tphPubYB0fgz1bboGN/pub"
+        data-embed-height="500"
       ></div>
     `
 
@@ -510,9 +510,9 @@ describeForEachParser('googledocs through the pipeline', (parseHtml) => {
       <p>Body</p>
       <div
         data-enclosure=""
-        data-file-type="application/pdf"
-        data-file-name="export"
         data-file-url="https://docs.google.com/document/d/1VEG0aH5kQ19Aq3I0honkir-8m9wTfZoWCyLPMOQIypQ/export?format=pdf"
+        data-file-name="export"
+        data-file-type="application/pdf"
       ></div>
     `
 

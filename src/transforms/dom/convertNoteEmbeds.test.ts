@@ -229,9 +229,9 @@ describeForEachParser('convertNoteEmbeds', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-src="https://note.com/embed/notes/n1234"
         data-embed-provider="notecom"
         data-embed-id="n1234"
+        data-embed-src="https://note.com/embed/notes/n1234"
         data-embed-url="https://note.com/n/n1234"
       ></div>
     `
@@ -276,9 +276,9 @@ describeForEachParser('convertNoteEmbeds', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-provider="youtube"
         data-embed-id="dQw4w9WgXcQ"
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
         data-embed-ratio="16/9"

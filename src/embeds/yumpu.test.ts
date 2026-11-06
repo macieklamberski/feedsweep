@@ -387,10 +387,10 @@ describeForEachParser('yumpu through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-id="z4xYaRXnsDqwc2GE"
         data-embed-provider="yumpu"
-        data-embed-ratio="4/3"
+        data-embed-id="z4xYaRXnsDqwc2GE"
         data-embed-src="https://www.yumpu.com/en/embed/view/z4xYaRXnsDqwc2GE"
+        data-embed-ratio="4/3"
       ></div>
     `
 
@@ -424,12 +424,12 @@ describeForEachParser('yumpu through the pipeline', (parseHtml) => {
         <a href="https://www.yumpu.com/de/document/view/71235096/sukultur-2026">catalogue</a>.
       </p>
       <div
-        data-embed-id="z4xYaRXnsDqwc2GE"
         data-embed-provider="yumpu"
-        data-embed-ratio="4/3"
+        data-embed-id="z4xYaRXnsDqwc2GE"
         data-embed-src="https://www.yumpu.com/en/embed/view/z4xYaRXnsDqwc2GE"
-        data-embed-title="SUKULTUR 2026"
         data-embed-url="https://www.yumpu.com/de/document/view/71235096/sukultur-2026"
+        data-embed-ratio="4/3"
+        data-embed-title="SUKULTUR 2026"
       ></div>
     `
 
@@ -445,12 +445,12 @@ describeForEachParser('yumpu through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-id="z4xYaRXnsDqwc2GE"
         data-embed-provider="yumpu"
+        data-embed-id="z4xYaRXnsDqwc2GE"
         data-embed-src="https://www.yumpu.com/en/embed/view/z4xYaRXnsDqwc2GE"
-        data-embed-title="SUKULTUR 2026"
         data-embed-url="https://www.yumpu.com/de/document/view/71235096/sukultur-2026"
         data-embed-ratio="4/3"
+        data-embed-title="SUKULTUR 2026"
       ></div>
     `
 

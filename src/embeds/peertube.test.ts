@@ -281,9 +281,9 @@ describeForEachParser('peertube through the pipeline', (parseHtml) => {
 
     const expected = html`
       <div
-        data-embed-src="https://tube.funfacts.de/videos/embed/4RnoEXF5EfXb8iZCjnJsx9"
         data-embed-provider="peertube"
         data-embed-id="4RnoEXF5EfXb8iZCjnJsx9"
+        data-embed-src="https://tube.funfacts.de/videos/embed/4RnoEXF5EfXb8iZCjnJsx9"
         data-embed-url="https://tube.funfacts.de/w/4RnoEXF5EfXb8iZCjnJsx9"
         data-embed-ratio="16/9"
       ></div>
@@ -307,9 +307,9 @@ describeForEachParser('peertube through the pipeline', (parseHtml) => {
     const expected = html`
       <div
         data-enclosure=""
-        data-embed-src="https://tube.funfacts.de/videos/embed/4RnoEXF5EfXb8iZCjnJsx9"
         data-embed-provider="peertube"
         data-embed-id="4RnoEXF5EfXb8iZCjnJsx9"
+        data-embed-src="https://tube.funfacts.de/videos/embed/4RnoEXF5EfXb8iZCjnJsx9"
         data-embed-url="https://tube.funfacts.de/w/4RnoEXF5EfXb8iZCjnJsx9"
         data-embed-ratio="16/9"
       ></div>

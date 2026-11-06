@@ -2,8 +2,9 @@ import { type EmojiGlyph, glyphFromCodepoints } from './emojis.js'
 
 export type EmojiCarrier = 'au' | 'docomo' | 'softbank' | 'google'
 
-// Each carrier's emoji ids as emoji4unicode maps them to Unicode, in runs of consecutive ids from
-// the first one. A `-` is an id it maps to no Unicode character, a `.` an id the carrier never used.
+// Each carrier's emoji ids as emoji4unicode maps them to Unicode,
+// in runs of consecutive ids from the first one. A `-` is an id it
+// maps to no Unicode character, a `.` an id the carrier never used.
 // See: https://github.com/google/emoji4unicode/blob/5019c2da8c4fa80286ae9cca7d89e062fb8704be/data/emoji4unicode.xml.
 const carrierCodes: Record<EmojiCarrier, Array<[number, Array<string>]>> = {
   // au's icon number.

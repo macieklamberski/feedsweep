@@ -287,11 +287,11 @@ describeForEachParser('googleforms through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="600"
-        data-embed-url="https://docs.google.com/forms/d/e/1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg/viewform"
-        data-embed-id="1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg"
         data-embed-provider="googleforms"
+        data-embed-id="1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg"
         data-embed-src="https://docs.google.com/forms/d/e/1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg/viewform?embedded=true"
+        data-embed-url="https://docs.google.com/forms/d/e/1FAIpQLSc2TjIaI6kPtQDHE7_KCXChPePHjJMdQosR52U1SdPWM_v4eg/viewform"
+        data-embed-height="600"
       ></div>
     `
 

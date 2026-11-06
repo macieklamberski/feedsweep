@@ -787,12 +787,12 @@ describeForEachParser('the Flash reader through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-title="Ramarro, supermasohero, in Moscow"
-        data-embed-ratio="5/3"
-        data-embed-url="https://issuu.com/giuseppepalumbo/docs/ramarromosca"
-        data-embed-id="giuseppepalumbo/ramarromosca"
         data-embed-provider="issuu"
+        data-embed-id="giuseppepalumbo/ramarromosca"
         data-embed-src="https://e.issuu.com/embed.html?u=giuseppepalumbo&amp;d=ramarromosca"
+        data-embed-url="https://issuu.com/giuseppepalumbo/docs/ramarromosca"
+        data-embed-ratio="5/3"
+        data-embed-title="Ramarro, supermasohero, in Moscow"
       ></div>
     `
 

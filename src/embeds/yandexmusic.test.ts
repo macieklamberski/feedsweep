@@ -477,9 +477,9 @@ describeForEachParser('yandex music shapes the pipeline repairs first', (parseHt
       <div
         data-embed-provider="yandexmusic"
         data-embed-id="track/18992685"
-        data-embed-height="244"
-        data-embed-url="https://music.yandex.ru/track/18992685"
         data-embed-src="https://music.yandex.ru/iframe/track/18992685"
+        data-embed-url="https://music.yandex.ru/track/18992685"
+        data-embed-height="244"
       ></div>
     `
 
@@ -501,9 +501,9 @@ describeForEachParser('yandex music shapes the pipeline repairs first', (parseHt
       <div
         data-embed-provider="yandexmusic"
         data-embed-id="album/13437127"
-        data-embed-height="556"
-        data-embed-url="https://music.yandex.ru/album/13437127"
         data-embed-src="https://music.yandex.ru/iframe/album/13437127"
+        data-embed-url="https://music.yandex.ru/album/13437127"
+        data-embed-height="556"
         data-embed-title="Violence Unimagined"
         data-embed-author="Cannibal Corpse"
       ></div>
@@ -523,9 +523,9 @@ describeForEachParser('yandex music shapes the pipeline repairs first', (parseHt
       <div
         data-embed-provider="yandexmusic"
         data-embed-id="track/152405368"
-        data-embed-height="244"
-        data-embed-url="https://music.yandex.ru/album/6965469/track/152405368"
         data-embed-src="https://music.yandex.ru/iframe/album/6965469/track/152405368"
+        data-embed-url="https://music.yandex.ru/album/6965469/track/152405368"
+        data-embed-height="244"
         data-embed-title="Лимеренция: как возникает любовная зависимость?"
       ></div>
     `
@@ -544,9 +544,9 @@ describeForEachParser('yandex music shapes the pipeline repairs first', (parseHt
       <div
         data-embed-provider="yandexmusic"
         data-embed-id="album/13437127"
-        data-embed-height="556"
-        data-embed-url="https://music.yandex.ru/album/13437127"
         data-embed-src="https://music.yandex.ru/iframe/album/13437127"
+        data-embed-url="https://music.yandex.ru/album/13437127"
+        data-embed-height="556"
       ></div>
     `
 

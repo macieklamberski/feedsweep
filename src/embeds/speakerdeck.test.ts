@@ -486,10 +486,10 @@ describeForEachParser('speakerdeck through the pipeline', (parseHtml) => {
     const expected = html`
       <p>Slides:</p>
       <div
-        data-embed-ratio="16/9"
-        data-embed-id="4ee19eec04357e0050004017"
         data-embed-provider="speakerdeck"
+        data-embed-id="4ee19eec04357e0050004017"
         data-embed-src="https://speakerdeck.com/player/4ee19eec04357e0050004017"
+        data-embed-ratio="16/9"
       ></div>
     `
 

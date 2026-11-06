@@ -564,7 +564,8 @@ describeForEachParser('1 pixel out shapes the pipeline places', (parseHtml) => {
     expect(await convert(value)).toEqualHtml(expected)
   })
 
-  // Once the plugin's script has run, the mount is the swf object and the call still sits beside it.
+  // Once the plugin's script has run, the mount is
+  // the swf object and the call still sits beside it.
   it('should play the file once when the script already swapped the mount for the swf', async () => {
     const value = html`
       <p class="audioplayer_container">

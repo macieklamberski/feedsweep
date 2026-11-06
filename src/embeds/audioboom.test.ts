@@ -459,8 +459,8 @@ describeForEachParser('audioboom through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-id="6479208"
         data-embed-provider="audioboom"
+        data-embed-id="6479208"
         data-embed-src="https://embeds.audioboom.com/posts/6479208/embed/v4"
         data-embed-height="300"
       ></div>
@@ -489,8 +489,8 @@ describeForEachParser('audioboom through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-id="88571"
         data-embed-provider="audioboom"
+        data-embed-id="88571"
         data-embed-src="https://embeds.audioboom.com/posts/88571/embed/v4"
         data-embed-height="300"
         data-embed-title="Andrew S, tech entrepreneur, Silicon Valley"
@@ -507,8 +507,8 @@ describeForEachParser('audioboom through the pipeline', (parseHtml) => {
 
     const expected = html`
       <div
-        data-embed-id="1078557"
         data-embed-provider="audioboom"
+        data-embed-id="1078557"
         data-embed-src="https://embeds.audioboom.com/posts/1078557/embed/v4"
         data-embed-height="300"
         data-embed-title="La minute gourmande du 27 novembre : la faim, on peut la convoquer !"

@@ -410,10 +410,10 @@ describeForEachParser('podcloud through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-url="https://podcloud.fr/podcast/les-nuits-de-france-culture/episode/francois-chatelet-une-histoire-de-la-raison-13-slash-20-francois-chatelet-une-histoire-de-la-raison-13-slash-20-kant-et-la-raison-pure-1ere-diffusion-19-slash-08-slash-1992"
-        data-embed-id="les-nuits-de-france-culture/francois-chatelet-une-histoire-de-la-raison-13-slash-20-francois-chatelet-une-histoire-de-la-raison-13-slash-20-kant-et-la-raison-pure-1ere-diffusion-19-slash-08-slash-1992"
         data-embed-provider="podcloud"
+        data-embed-id="les-nuits-de-france-culture/francois-chatelet-une-histoire-de-la-raison-13-slash-20-francois-chatelet-une-histoire-de-la-raison-13-slash-20-kant-et-la-raison-pure-1ere-diffusion-19-slash-08-slash-1992"
         data-embed-src="https://podcloud.fr/podcast/les-nuits-de-france-culture/episode/francois-chatelet-une-histoire-de-la-raison-13-slash-20-francois-chatelet-une-histoire-de-la-raison-13-slash-20-kant-et-la-raison-pure-1ere-diffusion-19-slash-08-slash-1992/player"
+        data-embed-url="https://podcloud.fr/podcast/les-nuits-de-france-culture/episode/francois-chatelet-une-histoire-de-la-raison-13-slash-20-francois-chatelet-une-histoire-de-la-raison-13-slash-20-kant-et-la-raison-pure-1ere-diffusion-19-slash-08-slash-1992"
       ></div>
     `
 
@@ -433,10 +433,10 @@ describeForEachParser('podcloud through the pipeline', (parseHtml) => {
     const expected = html`
       <p>Avant</p>
       <div
-        data-embed-url="https://podcloud.fr/podcast/xv-bras-xv-jambes/episode/festival-rugbimages-colloque-la-melee-au-coeur-du-jeu-et-des-debats"
-        data-embed-id="xv-bras-xv-jambes/festival-rugbimages-colloque-la-melee-au-coeur-du-jeu-et-des-debats"
         data-embed-provider="podcloud"
+        data-embed-id="xv-bras-xv-jambes/festival-rugbimages-colloque-la-melee-au-coeur-du-jeu-et-des-debats"
         data-embed-src="https://podcloud.fr/podcast/xv-bras-xv-jambes/episode/festival-rugbimages-colloque-la-melee-au-coeur-du-jeu-et-des-debats/player"
+        data-embed-url="https://podcloud.fr/podcast/xv-bras-xv-jambes/episode/festival-rugbimages-colloque-la-melee-au-coeur-du-jeu-et-des-debats"
       ></div>
     `
 

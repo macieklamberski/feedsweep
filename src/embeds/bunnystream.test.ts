@@ -247,9 +247,9 @@ describeForEachParser('bunnystream through the pipeline', (parseHtml) => {
       '<div style="position:relative;width:100%;height:0;padding-bottom:56.25%;"><iframe src="https://iframe.mediadelivery.net/play/54257/cb983aec-cd8d-4c21-a2a5-937a077ad47f?autoplay=true&loop=false&muted=false&preload=true&responsive=true&chromecast=true" loading="lazy" style="border:0;position:absolute;top:0;left:0;width:100%;height:100%;" allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;" allowfullscreen="true"></iframe></div>'
     const expected = html`
       <div
-        data-embed-src="https://player.mediadelivery.net/embed/54257/cb983aec-cd8d-4c21-a2a5-937a077ad47f?autoplay=false&loop=false"
         data-embed-provider="bunnystream"
         data-embed-id="54257/cb983aec-cd8d-4c21-a2a5-937a077ad47f"
+        data-embed-src="https://player.mediadelivery.net/embed/54257/cb983aec-cd8d-4c21-a2a5-937a077ad47f?autoplay=false&loop=false"
         data-embed-url="https://player.mediadelivery.net/play/54257/cb983aec-cd8d-4c21-a2a5-937a077ad47f"
         data-embed-ratio="16/9"
       ></div>

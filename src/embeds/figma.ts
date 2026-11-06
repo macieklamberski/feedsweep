@@ -70,7 +70,8 @@ const resolveEmbed: ResolveUrlEmbed = (url) => {
   const [route] = segments
 
   if (segments.length === 1 && isAnyOf(route, 'embed')) {
-    // The wrapper frames whatever its `url` names, so a value off figma is refused and never minted.
+    // The wrapper frames whatever its `url` names, so
+    // a value off figma is refused and never minted.
     const wrapped = parseUrlOnHosts(getQueryParam(url.searchParams, 'url'), fileHosts, isHostOf)
 
     if (!wrapped) {

@@ -14,6 +14,7 @@ const sizes = {
 // shape tells a uid from the listing words that share the bare page route, such as
 // `/models/popular`, and from the slug words before it on the page url `/3d-models/{slug}-{uid}`.
 const uidPattern = '[0-9a-f]{32}|[0-9a-z]{26}'
+
 const uidRegex = new RegExp(`^(?:${uidPattern})$`, 'i')
 const sluggedUidRegex = new RegExp(`(?<uid>${uidPattern})$`, 'i')
 

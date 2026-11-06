@@ -11,6 +11,7 @@ const sizes = {
 }
 
 const hosts = ['player.glomex.com']
+
 const playerPathRegex = /^\/integration\/[^/]+\/(?:integration|iframe-player)\.html$/i
 
 // The url glomex's own loader builds from a `<glomex-player>` element. The host answers the same

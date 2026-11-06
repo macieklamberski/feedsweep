@@ -200,8 +200,8 @@ describeForEachParser('zencastr through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-id="0C_Xr4ma"
         data-embed-provider="zencastr"
+        data-embed-id="0C_Xr4ma"
         data-embed-src="https://zencastr.com/embed/0C_Xr4ma"
         data-embed-url="https://zencastr.com/z/0C_Xr4ma"
         data-embed-ratio="1/1"

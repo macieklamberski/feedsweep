@@ -349,11 +349,11 @@ describeForEachParser('foxnews through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-url="https://www.foxbusiness.com/video/6355436296112"
-        data-embed-id="6355436296112"
         data-embed-provider="foxbusiness"
+        data-embed-id="6355436296112"
         data-embed-src="https://video.foxbusiness.com/v/video-embed.html?video_id=6355436296112"
+        data-embed-url="https://www.foxbusiness.com/video/6355436296112"
+        data-embed-ratio="16/9"
       ></div>
       <p><noscript>Watch the latest video at <a href="https://www.foxbusiness.com">foxbusiness.com</a></noscript></p>
     `

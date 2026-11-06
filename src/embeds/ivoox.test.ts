@@ -412,9 +412,9 @@ describeForEachParser('ivoox flash carriers through the pipeline', (parseHtml) =
     `
     const expected = html`
       <div
-        data-embed-src="https://www.ivoox.com/player_ej_1617339_6_1.html"
         data-embed-provider="ivoox"
         data-embed-id="1617339"
+        data-embed-src="https://www.ivoox.com/player_ej_1617339_6_1.html"
         data-embed-height="200"
       ></div>
     `

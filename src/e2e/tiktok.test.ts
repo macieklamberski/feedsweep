@@ -46,9 +46,9 @@ describeForEachParser('TikTok', (parseHtml) => {
         data-embed-id="@cookingwithlynja/video/7001234567890123456"
         data-embed-src="https://www.tiktok.com/embed/v2/7001234567890123456"
         data-embed-url="https://www.tiktok.com/@cookingwithlynja/video/7001234567890123456"
+        data-embed-height="738"
         data-embed-description="Midnight pasta #pasta"
         data-embed-author="@cookingwithlynja"
-        data-embed-height="738"
       ></div>
     `
 
@@ -76,9 +76,9 @@ describeForEachParser('TikTok', (parseHtml) => {
         data-embed-id="@cookingwithlynja"
         data-embed-src="https://www.tiktok.com/embed/@cookingwithlynja"
         data-embed-url="https://www.tiktok.com/@cookingwithlynja"
+        data-embed-height="478"
         data-embed-description="Midnight pasta"
         data-embed-author="@cookingwithlynja"
-        data-embed-height="478"
       ></div>
     `
 

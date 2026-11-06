@@ -241,11 +241,11 @@ describeForEachParser('gettyimages doubly escaped src', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-url="https://www.gettyimages.com/detail/674950774"
-        data-embed-id="674950774"
         data-embed-provider="gettyimages"
-        data-embed-ratio="3/2"
+        data-embed-id="674950774"
         data-embed-src="https://embed.gettyimages.com/embed/674950774?et=4AHdkSWcRDxQ4l2sDHBIOA&amp;tld=com&amp;viewMoreLink=on&amp;sig=5sVUWW_CnKTtYzfjDnnapRVqjnSK-3499ZUkhrnRc1g="
+        data-embed-url="https://www.gettyimages.com/detail/674950774"
+        data-embed-ratio="3/2"
       ></div>
     `
     const result = await transformContent(value, {

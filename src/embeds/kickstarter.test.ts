@@ -190,9 +190,9 @@ describeForEachParser('kickstarter frames the pipeline resolves first', (parseHt
       <div
         data-embed-provider="kickstarter"
         data-embed-id="thanks-to-hank"
+        data-embed-src="https://www.kickstarter.com/projects/845108579/thanks-to-hank/widget/video.html"
         data-embed-url="https://www.kickstarter.com/projects/845108579/thanks-to-hank"
         data-embed-ratio="16/9"
-        data-embed-src="https://www.kickstarter.com/projects/845108579/thanks-to-hank/widget/video.html"
       ></div>
     `
 

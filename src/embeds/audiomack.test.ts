@@ -387,8 +387,8 @@ describeForEachParser('audiomack through the pipeline', (parseHtml) => {
     const value = '<iframe src="https://audiomack.com/embed/chuuwee/album/cool-world"></iframe>'
     const expected = html`
       <div
-        data-embed-id="chuuwee/album/cool-world"
         data-embed-provider="audiomack"
+        data-embed-id="chuuwee/album/cool-world"
         data-embed-src="https://audiomack.com/embed/chuuwee/album/cool-world"
         data-embed-url="https://audiomack.com/chuuwee/album/cool-world"
         data-embed-height="400"

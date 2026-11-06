@@ -21,6 +21,7 @@ const directories = [
 // Invision Community's cloud serves each site's emoticons under `/<site>/emoticons/`, and its other
 // media beside them on the same host, so only that path marks an image as an emoticon.
 const cloudSelector = 'img[src*="invisioncic.com/" i][src*="/emoticons/" i]'
+
 const cloudRegex = /^https?:\/\/[^/]+\.invisioncic\.com\/[^/]+\/emoticons\//i
 
 // Invision boards' names past the stock set, under `uploads/emoticons` and IPB 2's

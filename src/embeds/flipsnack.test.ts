@@ -251,10 +251,10 @@ describeForEachParser('flipsnack through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="480"
-        data-embed-id="fu8a6imu"
         data-embed-provider="flipsnack"
+        data-embed-id="fu8a6imu"
         data-embed-src="https://cdn.flipsnack.com/widget/v2/widget.html?hash=fu8a6imu"
+        data-embed-height="480"
       ></div>
     `
 

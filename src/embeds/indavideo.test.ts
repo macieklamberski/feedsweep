@@ -270,8 +270,8 @@ describeForEachParser('indavideo through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-id="c75c95c854"
         data-embed-provider="indavideo"
+        data-embed-id="c75c95c854"
         data-embed-src="https://indavideo.hu/player/video/c75c95c854/"
         data-embed-url="https://indavideo.hu/video/c75c95c854"
         data-embed-ratio="16/9"
@@ -292,8 +292,8 @@ describeForEachParser('indavideo through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-id="3ddcb61602"
         data-embed-provider="indavideo"
+        data-embed-id="3ddcb61602"
         data-embed-src="https://indavideo.hu/player/video/3ddcb61602/"
         data-embed-url="https://indavideo.hu/video/3ddcb61602"
         data-embed-ratio="16/9"

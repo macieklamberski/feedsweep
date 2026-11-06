@@ -976,11 +976,11 @@ describeForEachParser('vimeo pages in a media element', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-url="https://vimeo.com/89946577"
-        data-embed-id="89946577"
         data-embed-provider="vimeo"
+        data-embed-id="89946577"
         data-embed-src="https://player.vimeo.com/video/89946577?loop=0"
+        data-embed-url="https://vimeo.com/89946577"
+        data-embed-ratio="16/9"
       ></div>
     `
 

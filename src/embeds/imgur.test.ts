@@ -703,11 +703,11 @@ describeForEachParser('imgur through the pipeline', (parseHtml) => {
     const expected = html`
       <div
         data-enclosure=""
-        data-embed-thumbnail="https://i.imgur.com/pVa2rXLm.jpg"
-        data-embed-url="https://imgur.com/pVa2rXL"
-        data-embed-id="pVa2rXL"
         data-embed-provider="imgur"
+        data-embed-id="pVa2rXL"
         data-embed-src="https://imgur.com/pVa2rXL/embed"
+        data-embed-url="https://imgur.com/pVa2rXL"
+        data-embed-thumbnail="https://i.imgur.com/pVa2rXLm.jpg"
       ></div>
       <p>Body</p>
     `

@@ -345,8 +345,8 @@ describeForEachParser('reverbnation through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-id="artist_1018382"
         data-embed-provider="reverbnation"
+        data-embed-id="artist_1018382"
         data-embed-src="https://www.reverbnation.com/widget_code/html_widget/artist_1018382"
         data-embed-height="265"
       ></div>

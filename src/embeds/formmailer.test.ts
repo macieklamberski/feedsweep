@@ -306,10 +306,10 @@ describeForEachParser('formmailer through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-url="https://pro.form-mailer.jp/fms/44a9f70e243271"
-        data-embed-id="44a9f70e243271"
         data-embed-provider="formmailer"
+        data-embed-id="44a9f70e243271"
         data-embed-src="https://pro.form-mailer.jp/fms/44a9f70e243271"
+        data-embed-url="https://pro.form-mailer.jp/fms/44a9f70e243271"
       ></div>
     `
 
@@ -329,10 +329,10 @@ describeForEachParser('formmailer through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-url="https://ssl.form-mailer.jp/fms/6662b06a268383"
-        data-embed-id="6662b06a268383"
         data-embed-provider="formmailer"
+        data-embed-id="6662b06a268383"
         data-embed-src="https://ssl.form-mailer.jp/fms/6662b06a268383"
+        data-embed-url="https://ssl.form-mailer.jp/fms/6662b06a268383"
       ></div>
     `
 

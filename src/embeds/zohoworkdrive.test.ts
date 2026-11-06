@@ -277,12 +277,12 @@ describeForEachParser('zohoworkdrive through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://previewengine.zohoexternal.com/thumbnail/WD/nyn890d57781aad364bac82edd53e2a1d6b36?size=l"
-        data-embed-url="https://workdrive.zohoexternal.com/embed/nyn890d57781aad364bac82edd53e2a1d6b36"
-        data-embed-id="embed/nyn890d57781aad364bac82edd53e2a1d6b36"
         data-embed-provider="zohoworkdrive"
+        data-embed-id="embed/nyn890d57781aad364bac82edd53e2a1d6b36"
         data-embed-src="https://workdrive.zohoexternal.com/embed/nyn890d57781aad364bac82edd53e2a1d6b36?loop=true"
+        data-embed-url="https://workdrive.zohoexternal.com/embed/nyn890d57781aad364bac82edd53e2a1d6b36"
+        data-embed-thumbnail="https://previewengine.zohoexternal.com/thumbnail/WD/nyn890d57781aad364bac82edd53e2a1d6b36?size=l"
+        data-embed-ratio="16/9"
       ></div>
     `
 

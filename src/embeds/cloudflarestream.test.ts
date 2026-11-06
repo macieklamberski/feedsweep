@@ -417,9 +417,9 @@ describeForEachParser('the empty div the loader script writes into', (parseHtml)
       <div
         data-embed-provider="cloudflarestream"
         data-embed-id="5653cfd537db1edbed98c5c0119f390c"
-        data-embed-ratio="16/9"
         data-embed-src="https://iframe.videodelivery.net/5653cfd537db1edbed98c5c0119f390c"
         data-embed-thumbnail="https://videodelivery.net/5653cfd537db1edbed98c5c0119f390c/thumbnails/thumbnail.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -441,9 +441,9 @@ describeForEachParser('the empty div the loader script writes into', (parseHtml)
       <div
         data-embed-provider="cloudflarestream"
         data-embed-id="5653cfd537db1edbed98c5c0119f390c"
-        data-embed-ratio="16/9"
         data-embed-src="https://iframe.videodelivery.net/5653cfd537db1edbed98c5c0119f390c"
         data-embed-thumbnail="https://videodelivery.net/5653cfd537db1edbed98c5c0119f390c/thumbnails/thumbnail.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 

@@ -4,6 +4,7 @@ import { getElementDimensions, parsePixelSize } from '../../utils/dom.js'
 import { createImage, createLinkedImage, readCarrierUrlOnHosts } from '../../utils/widgets.js'
 
 const hosts = ['tradingeconomics.com', 'd3fy651gv2fhd3.cloudfront.net']
+
 const embedPathRegex = /^\/embed\/?$/i
 
 // A Trading Economics chart iframe, whose page holds nothing but one static PNG of the chart.

@@ -311,11 +311,11 @@ describeForEachParser('abcotv player through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-url="https://abc7news.com/videoClip/5860677/"
-        data-embed-id="5860677"
         data-embed-provider="abcotv"
+        data-embed-id="5860677"
         data-embed-src="https://abc7news.com/video/embed?pid=5860677"
+        data-embed-url="https://abc7news.com/videoClip/5860677/"
+        data-embed-ratio="16/9"
       ></div>
     `
 

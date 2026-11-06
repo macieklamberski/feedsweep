@@ -9,14 +9,14 @@ import {
 import type { EmbedResolverResult, TransformContext } from '../types.js'
 import {
   type MastodonStatus,
-  mastodonEmbedResolver,
+  mastodonBlockquoteEmbedResolver,
   mastodonEmbettyEmbedResolver,
   parseMastodonStatus,
   readMastodonHeight,
 } from './mastodon.js'
 
-describeForEachParser('mastodonEmbedResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, mastodonEmbedResolver)
+describeForEachParser('mastodonBlockquoteEmbedResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, mastodonBlockquoteEmbedResolver)
 
   describe('happy paths', () => {
     it('should resolve the status the player url names', async () => {
@@ -95,7 +95,7 @@ describeForEachParser('mastodonEmbedResolver', (parseHtml) => {
       ...baseContext,
       cleanUrlFn: createProxyUnwrapFn('cdn.embedly.com', 'src'),
     }
-    const extractCleaned = resolverExtractor(parseHtml, mastodonEmbedResolver, context)
+    const extractCleaned = resolverExtractor(parseHtml, mastodonBlockquoteEmbedResolver, context)
 
     it('should resolve the status the unwrapped url names', async () => {
       const value = html`

@@ -314,8 +314,8 @@ describeForEachParser('iheart through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-id="24837940/304420715"
         data-embed-provider="iheart"
+        data-embed-id="24837940/304420715"
         data-embed-src="https://www.iheart.com/podcast/24837940/episode/304420715/?embed=true"
         data-embed-url="https://www.iheart.com/podcast/24837940/episode/304420715/"
         data-embed-height="120"

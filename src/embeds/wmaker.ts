@@ -1,5 +1,4 @@
-import { parseUrl } from 'trousse'
-import { readOrigin } from '../utils/urls.js'
+import { getOrigin, parseUrl } from 'trousse'
 
 // WMaker's Flash player addresses a video by a sha1 that appears nowhere else in the document, so
 // the carrier's own id mints nothing. The article id does address the modern embed route, and the
@@ -19,7 +18,7 @@ export const isFlashPlayerUrl = (url: string | undefined): boolean => {
 // that does not exist. A WMaker carrier always points at the publisher's own domain.
 export const composeEmbedUrl = (permalink: string | undefined): string | undefined => {
   const id = permalink?.match(articleIdRegex)?.[1]
-  const origin = readOrigin(permalink ? parseUrl(permalink) : undefined)
+  const origin = getOrigin(permalink ? parseUrl(permalink) : undefined)
 
   if (!id || !origin) {
     return

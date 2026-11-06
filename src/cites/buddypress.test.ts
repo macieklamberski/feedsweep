@@ -75,9 +75,9 @@ describeForEachParser('buddypress preview through the pipeline', (parseHtml) => 
       <p>Save the date for the next meetup.</p>
       <div
         data-cite-provider="buddypress"
-        data-cite-description="We look forward to the next community meetup on the 12th!"
         data-cite-url="https://example.com/event/meetup"
         data-cite-title="Virtual community meetup in August"
+        data-cite-description="We look forward to the next community meetup on the 12th!"
         data-cite-thumbnail="https://example.com/uploads/meetup.png"
       ></div>
     `

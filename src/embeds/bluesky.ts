@@ -25,6 +25,7 @@ const mediaHosts = ['bsky.app', 'bsky.social']
 // collection is embeddable. WHATWG url parsing is no use here: `at://did:plc:x/…` reads the
 // colon in the authority as a port and fails, so the URI is split by hand.
 const postCollection = 'app.bsky.feed.post'
+
 // at://{authority}/{collection}/{rkey}.
 const atUriRegex = /^at:\/\/(?<authority>[^/]+)\/(?<collection>[^/]+)\/(?<rkey>[^/?#]+)/
 
@@ -35,11 +36,17 @@ const authorSeparatorRegex = /^[\s–—-]+/
 // the Unix epoch the client set when it wrote the post, then a 10-bit clock id.
 // See: https://atproto.com/specs/tid.
 const tidAlphabet = '234567abcdefghijklmnopqrstuvwxyz'
+
 const tidRegex = /^[234567abcdefghij][234567abcdefghijklmnopqrstuvwxyz]{12}$/
 
 type BlueskyPost = {
   authority: string
   rkey: string
+}
+
+type QuotedPost = {
+  post?: BlueskyPost
+  fields: Partial<EmbedResolverResult>
 }
 
 type SubstackPostAttributes = {
@@ -202,9 +209,7 @@ const readPostText = (element: Element, postAnchor: Element | undefined): string
   return body.trim() || undefined
 }
 
-const readQuotedPost = (
-  element: Element,
-): { post?: BlueskyPost; fields: Partial<EmbedResolverResult> } => {
+const readQuotedPost = (element: Element): QuotedPost => {
   const postAnchor = findPostAnchor(element)
 
   return {

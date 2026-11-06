@@ -91,9 +91,9 @@ describeForEachParser('rebuildWistiaEmbeds', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-src="https://fast.wistia.net/embed/iframe/u3gz5bka6b"
         data-embed-provider="wistia"
         data-embed-id="u3gz5bka6b"
+        data-embed-src="https://fast.wistia.net/embed/iframe/u3gz5bka6b"
         data-embed-ratio="16/9"
       ></div>
     `
@@ -319,9 +319,9 @@ describeForEachParser('rebuildWistiaEmbeds', (parseHtml) => {
       `
       const expected = html`
         <div
-          data-embed-src="https://fast.wistia.net/embed/iframe/vufv0kvnq3"
           data-embed-provider="wistia"
           data-embed-id="vufv0kvnq3"
+          data-embed-src="https://fast.wistia.net/embed/iframe/vufv0kvnq3"
           data-embed-ratio="16/9"
         ></div>
       `

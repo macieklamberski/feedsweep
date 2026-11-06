@@ -323,8 +323,8 @@ describeForEachParser('podigee through the pipeline', (parseHtml) => {
 
     const expected = html`
       <div
-        data-embed-id="cloudonaut/72-an-episode"
         data-embed-provider="podigee"
+        data-embed-id="cloudonaut/72-an-episode"
         data-embed-src="https://cloudonaut.podigee.io/72-an-episode/embed?context=external"
         data-embed-url="https://cloudonaut.podigee.io/72-an-episode"
         data-embed-height="145"
@@ -340,8 +340,8 @@ describeForEachParser('podigee through the pipeline', (parseHtml) => {
 
     const expected = html`
       <div
-        data-embed-id="alleineistschwer/embed"
         data-embed-provider="podigee"
+        data-embed-id="alleineistschwer/embed"
         data-embed-src="https://alleineistschwer.podigee.io/embed?context=external"
         data-embed-url="https://alleineistschwer.podigee.io/"
         data-embed-height="145"

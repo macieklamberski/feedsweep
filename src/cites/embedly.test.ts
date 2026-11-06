@@ -96,9 +96,9 @@ describeForEachParser('embedly card through the pipeline', (parseHtml) => {
       <p>Congrats to both of them!</p>
       <div
         data-cite-provider="embedly"
-        data-cite-description="The pair announced a new company on Wednesday."
         data-cite-url="https://example.com/news/venture"
         data-cite-title="Two Founders Launch a Venture"
+        data-cite-description="The pair announced a new company on Wednesday."
       ></div>
     `
 

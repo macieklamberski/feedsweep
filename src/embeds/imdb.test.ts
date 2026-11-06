@@ -173,11 +173,11 @@ describeForEachParser('imdb players through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-url="https://www.imdb.com/video/vi3012802841/"
-        data-embed-id="vi3012802841"
         data-embed-provider="imdb"
+        data-embed-id="vi3012802841"
         data-embed-src="https://www.imdb.com/video/embed/vi3012802841/"
+        data-embed-url="https://www.imdb.com/video/vi3012802841/"
+        data-embed-ratio="16/9"
       ></div>
     `
 

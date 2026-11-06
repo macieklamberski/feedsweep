@@ -59,6 +59,7 @@ export const hyphenatedLettersRegex = /^[a-z]+-[a-z]+$/i
 // url it drops only tabs and newlines: java\tscript: runs, java script: is a relative path.
 // See: https://url.spec.whatwg.org/#concept-basic-url-parser.
 const c0ControlOrSpaceClass = '[\\x00-\\x20]+' // C0 controls and space
+
 const urlEdgeCharsRegex = new RegExp(`^${c0ControlOrSpaceClass}|${c0ControlOrSpaceClass}$`, 'g')
 const urlTabOrNewlineRegex = /[\t\n\r]/g
 
@@ -83,6 +84,7 @@ const fileExtensions = [
   ...imageExtensions,
   ...documentExtensions,
 ]
+
 const fileRegex = new RegExp(`\\.(${fileExtensions.join('|')})(\\?|#|$)`, 'i')
 
 // Whether a url names audio or video the reader can play as it stands. A podcast host serves the
@@ -292,16 +294,6 @@ export const parseRepairedUrl = (url: Nullish<string>): URL | undefined => {
   }
 
   return parseCarrierUrl(repairUrl(url))
-}
-
-// The origin a url can be rebuilt on. A url with no host, such as `javascript:/@user/123`, has an
-// opaque origin, which serializes as the string `null` and builds a relative path.
-export const readOrigin = (url: URL | undefined): string | undefined => {
-  if (!url || url.origin === 'null') {
-    return
-  }
-
-  return url.origin
 }
 
 // The publisher's query with only the parameters a player reads left in it. Each pair stays as

@@ -344,7 +344,7 @@ describeForEachParser('the fallback the Ticket Tailor snippet carries', (parseHt
       </div>
     `
     const expected =
-      '<div data-embed-url="https://www.tickettailor.com/all-tickets/aneti/" data-embed-id="aneti" data-embed-provider="tickettailor" data-embed-src="https://www.tickettailor.com/all-tickets/aneti/?widget=true"></div>'
+      '<div data-embed-provider="tickettailor" data-embed-id="aneti" data-embed-src="https://www.tickettailor.com/all-tickets/aneti/?widget=true" data-embed-url="https://www.tickettailor.com/all-tickets/aneti/"></div>'
 
     expect(await convert(value)).toEqualHtml(expected)
   })
@@ -386,7 +386,7 @@ describeForEachParser('the fallback the Ticket Tailor snippet carries', (parseHt
       </div>
     `
     const expected =
-      '<p><a href="https://www.tickettailor.com/all-tickets/otherbox/">Click here to buy tickets</a></p><div data-embed-url="https://www.tickettailor.com/all-tickets/aneti/" data-embed-id="aneti" data-embed-provider="tickettailor" data-embed-src="https://www.tickettailor.com/all-tickets/aneti/?widget=true"></div>'
+      '<p><a href="https://www.tickettailor.com/all-tickets/otherbox/">Click here to buy tickets</a></p><div data-embed-provider="tickettailor" data-embed-id="aneti" data-embed-src="https://www.tickettailor.com/all-tickets/aneti/?widget=true" data-embed-url="https://www.tickettailor.com/all-tickets/aneti/"></div>'
 
     expect(await convert(value)).toEqualHtml(expected)
   })
@@ -431,10 +431,10 @@ describeForEachParser('tickettailor through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-url="https://www.tickettailor.com/all-tickets/rivalthereimaginingvalueactionlab/"
-        data-embed-id="rivalthereimaginingvalueactionlab"
         data-embed-provider="tickettailor"
+        data-embed-id="rivalthereimaginingvalueactionlab"
         data-embed-src="https://www.tickettailor.com/all-tickets/rivalthereimaginingvalueactionlab/?widget=true"
+        data-embed-url="https://www.tickettailor.com/all-tickets/rivalthereimaginingvalueactionlab/"
       ></div>
     `
 
@@ -454,10 +454,10 @@ describeForEachParser('tickettailor through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-url="https://www.tickettailor.com/events/witneyconservativesassociation/2143010/select-date"
-        data-embed-id="witneyconservativesassociation/2143010"
         data-embed-provider="tickettailor"
+        data-embed-id="witneyconservativesassociation/2143010"
         data-embed-src="https://www.tickettailor.com/events/witneyconservativesassociation/2143010/select-date?widget=true"
+        data-embed-url="https://www.tickettailor.com/events/witneyconservativesassociation/2143010/select-date"
       ></div>
     `
 

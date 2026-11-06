@@ -310,10 +310,10 @@ describeForEachParser('hatena cards beside the prose they sit in', (parseHtml) =
     const expected = html`
       <p>Read this first: </p>
       <div
-        data-cite-title="Page title"
-        data-cite-url="https://example.com/entry"
-        data-cite-publisher="example.com"
         data-cite-provider="hatena"
+        data-cite-url="https://example.com/entry"
+        data-cite-title="Page title"
+        data-cite-publisher="example.com"
       ></div>
     `
 
@@ -334,10 +334,10 @@ describeForEachParser('hatena cards beside the prose they sit in', (parseHtml) =
     const expected = html`
       <p>Intro.</p>
       <div
-        data-cite-title="Page title"
-        data-cite-url="https://example.com/entry"
-        data-cite-publisher="example.com"
         data-cite-provider="hatena"
+        data-cite-url="https://example.com/entry"
+        data-cite-title="Page title"
+        data-cite-publisher="example.com"
       ></div>
     `
 

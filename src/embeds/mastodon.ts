@@ -1,8 +1,7 @@
-import { isPlainObject, parseUrl } from 'trousse'
+import { getOrigin, isPlainObject, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
-import { readOrigin } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   readCleanedAttributeUrl,
@@ -28,7 +27,7 @@ const usersStatusPathRegex = /^\/users\/(?<user>[\w.-]+)\/statuses\/(?<id>\d{6,}
 // Any host filing posts under an author and a number takes this shape, brunch.co.kr among them.
 export const parseMastodonStatus = (link: string): MastodonStatus | undefined => {
   const parsed = parseUrl(link)
-  const origin = readOrigin(parsed)
+  const origin = getOrigin(parsed)
 
   if (!parsed || !origin) {
     return
@@ -62,7 +61,7 @@ const composeEmbedResult = (status: MastodonStatus): EmbedResolverResult => {
 // A Mastodon status: an iframe before 4.3, and from 4.3 a blockquote only embed.js hydrates.
 // WordPress strips embed.js, and the blockquote holds no post text, only a logo, a caption and a
 // link.
-export const mastodonEmbedResolver = createMarkupEmbedResolver(
+export const mastodonBlockquoteEmbedResolver = createMarkupEmbedResolver(
   // aside.mastodon-embed is a hand-typed quote carrying the post's body text, and
   // div.mastodon-embed only wraps the iframe.
   'iframe[src], blockquote.mastodon-embed, x-mastodon-embed[url]',

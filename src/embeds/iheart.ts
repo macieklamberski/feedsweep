@@ -21,10 +21,12 @@ const sizes = {
   station: { height: 200 },
 }
 
+type PlayerSize = { height: number }
+
 const composePlayerEmbed = (
   id: string,
   page: string,
-  size: { height: number },
+  size: PlayerSize,
   element?: Element,
 ): EmbedResolverResult => {
   return {

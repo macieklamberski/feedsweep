@@ -277,10 +277,10 @@ describeForEachParser('allocine player through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-id="19546104"
         data-embed-provider="allocine"
+        data-embed-id="19546104"
         data-embed-src="https://player.allocine.fr/19546104.html"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -300,10 +300,10 @@ describeForEachParser('allocine player through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-id="19349765"
         data-embed-provider="allocine"
+        data-embed-id="19349765"
         data-embed-src="https://player.allocine.fr/19349765.html"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -325,10 +325,10 @@ describeForEachParser('allocine player through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-id="18822093"
         data-embed-provider="allocine"
+        data-embed-id="18822093"
         data-embed-src="https://player.allocine.fr/18822093.html"
+        data-embed-ratio="16/9"
       ></div>
     `
 

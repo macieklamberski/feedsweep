@@ -500,11 +500,11 @@ describeForEachParser('streamable through the pipeline', (parseHtml) => {
     const expected = html`
       <p>Before</p>
       <div
-        data-embed-ratio="16/9"
-        data-embed-url="https://streamable.com/0891o"
-        data-embed-id="0891o"
         data-embed-provider="streamable"
+        data-embed-id="0891o"
         data-embed-src="https://streamable.com/e/0891o"
+        data-embed-url="https://streamable.com/0891o"
+        data-embed-ratio="16/9"
       ></div>
       <p>After</p>
     `
@@ -527,10 +527,10 @@ describeForEachParser('streamable through the pipeline', (parseHtml) => {
     const expected = html`
       <p>Before</p>
       <div
-        data-embed-ratio="16/9"
-        data-embed-id="m/josh-rojas-homers-8-on-a-fly-ball-to-left-field"
         data-embed-provider="streamable"
+        data-embed-id="m/josh-rojas-homers-8-on-a-fly-ball-to-left-field"
         data-embed-src="https://streamable.com/m/josh-rojas-homers-8-on-a-fly-ball-to-left-field"
+        data-embed-ratio="16/9"
       ></div>
       <p>After</p>
     `
@@ -554,11 +554,11 @@ describeForEachParser('streamable through the pipeline', (parseHtml) => {
       <span data-s9e-mediaembed="streamable">
         <span>
           <div
-            data-embed-ratio="16/9"
-            data-embed-url="https://streamable.com/n2run"
-            data-embed-id="n2run"
             data-embed-provider="streamable"
+            data-embed-id="n2run"
             data-embed-src="https://streamable.com/e/n2run"
+            data-embed-url="https://streamable.com/n2run"
+            data-embed-ratio="16/9"
           ></div>
         </span>
       </span>
@@ -579,11 +579,11 @@ describeForEachParser('streamable through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-url="https://streamable.com/3qufhz"
-        data-embed-id="3qufhz"
         data-embed-provider="streamable"
+        data-embed-id="3qufhz"
         data-embed-src="https://streamable.com/e/3qufhz"
+        data-embed-url="https://streamable.com/3qufhz"
+        data-embed-ratio="16/9"
       ></div>
     `
 

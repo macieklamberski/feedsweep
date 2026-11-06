@@ -490,7 +490,9 @@ const isFluidWidth = (element: Element): boolean => {
   return dimensionAttribute(element, 'height') !== undefined
 }
 
-export const getElementDimensions = (element: Element): { width?: number; height?: number } => {
+export type ElementDimensions = { width?: number; height?: number }
+
+export const getElementDimensions = (element: Element): ElementDimensions => {
   // `width: 1px; min-width: 100%` fills the container as well, and names no size either.
   const isContainerWide =
     isFluidWidth(element) || styles.declarations(element)['min-width'] === '100%'
@@ -513,6 +515,7 @@ export const getElementDimensions = (element: Element): { width?: number; height
 
 // How many ancestors above the element to also check for a responsive wrapper.
 const maxWrapperAncestorDepth = 3
+
 const paddingPercentRegex = /^([\d.]+)%$/
 const whitespaceRegex = /\s+/
 const wpEmbedAspectRegex = /wp-embed-aspect-(?<width>\d+)-(?<height>\d+)/

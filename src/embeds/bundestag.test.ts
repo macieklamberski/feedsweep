@@ -186,11 +186,11 @@ describeForEachParser('bundestag players through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-url="https://dbtg.tv/cvid/7657467"
-        data-embed-id="7657467"
         data-embed-provider="bundestag"
+        data-embed-id="7657467"
         data-embed-src="https://webtv.bundestag.de/pservices/player/embed/nokey?e=bt-od&amp;ep=69&amp;a=144277506&amp;c=7657467"
+        data-embed-url="https://dbtg.tv/cvid/7657467"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -206,11 +206,11 @@ describeForEachParser('bundestag players through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-url="https://dbtg.tv/cvid/7466652"
-        data-embed-id="7466652"
         data-embed-provider="bundestag"
+        data-embed-id="7466652"
         data-embed-src="https://webtv.bundestag.de/pservices/player/embed/nokey?e=bt-od&amp;ep=69&amp;a=144277506&amp;c=7466652"
+        data-embed-url="https://dbtg.tv/cvid/7466652"
+        data-embed-ratio="16/9"
       ></div>
     `
 

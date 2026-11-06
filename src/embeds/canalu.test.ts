@@ -225,10 +225,10 @@ describeForEachParser('canalu player through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-id="177362"
         data-embed-provider="canalu"
+        data-embed-id="177362"
         data-embed-src="https://www.canal-u.tv/chaines/ut2j/embed/177362?t=0width=100%25"
+        data-embed-ratio="16/9"
       ></div>
     `
 

@@ -117,10 +117,10 @@ describeForEachParser('Bluesky', (parseHtml) => {
         data-embed-id="did:plc:bhz4agnyzcrsvpnprxrbjrpa/3mbq7aeuwbg42"
         data-embed-src="https://embed.bsky.app/embed/did:plc:bhz4agnyzcrsvpnprxrbjrpa/app.bsky.feed.post/3mbq7aeuwbg42"
         data-embed-url="https://bsky.app/profile/did:plc:bhz4agnyzcrsvpnprxrbjrpa/post/3mbq7aeuwbg42"
+        data-embed-thumbnail="https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:bhz4agnyzcrsvpnprxrbjrpa/bafkreithumb@jpeg"
         data-embed-description="The wrapper carries the post twice over."
         data-embed-author="Newsletter Author (@author.example)"
         data-embed-avatar="https://cdn.bsky.app/img/avatar/plain/did:plc:bhz4agnyzcrsvpnprxrbjrpa/bafkreiavatar@jpeg"
-        data-embed-thumbnail="https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:bhz4agnyzcrsvpnprxrbjrpa/bafkreithumb@jpeg"
         data-embed-date="2025-12-13T14:15:16.017Z"
       ></div>
     `

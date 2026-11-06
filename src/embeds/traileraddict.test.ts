@@ -254,11 +254,11 @@ describeForEachParser('traileraddict player through the pipeline', (parseHtml) =
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-id="13259"
         data-embed-provider="traileraddict"
+        data-embed-id="13259"
         data-embed-src="https://traileraddict.com/iframe.php?id=13259"
         data-embed-url="https://traileraddict.com/watch/13259"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -278,11 +278,11 @@ describeForEachParser('traileraddict player through the pipeline', (parseHtml) =
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-id="104947"
         data-embed-provider="traileraddict"
+        data-embed-id="104947"
         data-embed-src="https://traileraddict.com/iframe.php?id=104947"
         data-embed-url="https://traileraddict.com/watch/104947"
+        data-embed-ratio="16/9"
       ></div>
     `
 

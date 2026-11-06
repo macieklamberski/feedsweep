@@ -27,10 +27,10 @@ describeForEachParser('WordPress', (parseHtml) => {
     const expected = html`
       <p>Look:</p>
       <div
-        data-embed-url="https://x.com/someone/status/1234567890123456789"
-        data-embed-id="1234567890123456789"
         data-embed-provider="twitter"
+        data-embed-id="1234567890123456789"
         data-embed-src="https://platform.twitter.com/embed/Tweet.html?id=1234567890123456789"
+        data-embed-url="https://x.com/someone/status/1234567890123456789"
         data-embed-author="@someone"
       ></div>
     `
@@ -120,13 +120,13 @@ describeForEachParser('WordPress', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
+        data-embed-provider="youtube"
+        data-embed-id="0OqYNLrUoes"
+        data-embed-src="https://www.youtube.com/embed/0OqYNLrUoes"
+        data-embed-url="https://www.youtube.com/watch?v=0OqYNLrUoes"
         data-embed-thumbnail="https://i.ytimg.com/vi/0OqYNLrUoes/hqdefault.jpg"
         data-embed-ratio="16/9"
-        data-embed-url="https://www.youtube.com/watch?v=0OqYNLrUoes"
-        data-embed-id="0OqYNLrUoes"
-        data-embed-provider="youtube"
-        data-embed-src="https://www.youtube.com/embed/0OqYNLrUoes"
+        data-embed-ratio="16/9"
       ></div>
     `
 
@@ -152,12 +152,12 @@ describeForEachParser('WordPress', (parseHtml) => {
       `
       const expected = html`
         <div
+          data-embed-provider="youtube"
+          data-embed-id="0OqYNLrUoes"
+          data-embed-src="https://www.youtube.com/embed/0OqYNLrUoes"
+          data-embed-url="https://www.youtube.com/watch?v=0OqYNLrUoes"
           data-embed-thumbnail="https://i.ytimg.com/vi/0OqYNLrUoes/hqdefault.jpg"
           data-embed-ratio="16/9"
-          data-embed-url="https://www.youtube.com/watch?v=0OqYNLrUoes"
-          data-embed-id="0OqYNLrUoes"
-          data-embed-provider="youtube"
-          data-embed-src="https://www.youtube.com/embed/0OqYNLrUoes"
         ></div>
       `
 

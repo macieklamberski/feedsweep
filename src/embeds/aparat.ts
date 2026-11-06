@@ -11,6 +11,7 @@ const sizes = {
 }
 
 const hosts = ['aparat.com']
+
 const scriptPathRegex = /^\/embed\/([^/]+)$/i
 const framePathRegex = /^\/video\/video\/embed\/videohash\/([^/]+)(?:\/vt\/frame)?\/?$/i
 

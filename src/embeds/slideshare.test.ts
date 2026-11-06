@@ -1435,11 +1435,11 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-title="Designing Accessible Forms"
-        data-embed-id="hK2vDqTQ0Nz9Wm"
         data-embed-provider="slideshare"
+        data-embed-id="hK2vDqTQ0Nz9Wm"
         data-embed-src="https://www.slideshare.net/slideshow/embed_code/key/hK2vDqTQ0Nz9Wm"
         data-embed-ratio="595/485"
+        data-embed-title="Designing Accessible Forms"
       ></div>
     `
 
@@ -1468,13 +1468,13 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-author="haraldf"
-        data-embed-title="Business Quotes for 2011"
-        data-embed-url="https://www.slideshare.net/haraldf/business-quotes-for-2011"
-        data-embed-id="6PCWPGFw9SwsAY"
         data-embed-provider="slideshare"
+        data-embed-id="6PCWPGFw9SwsAY"
         data-embed-src="https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAY"
+        data-embed-url="https://www.slideshare.net/haraldf/business-quotes-for-2011"
         data-embed-ratio="595/485"
+        data-embed-title="Business Quotes for 2011"
+        data-embed-author="haraldf"
       ></div>
     `
 
@@ -1505,13 +1505,13 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-author="xristoasxar"
-        data-embed-title="Θέματα και απαντήσεις"
-        data-embed-url="https://www.slideshare.net/xristoasxar/ss-73029387"
-        data-embed-id="uQJbKEhYOWJAi5"
         data-embed-provider="slideshare"
+        data-embed-id="uQJbKEhYOWJAi5"
         data-embed-src="https://www.slideshare.net/slideshow/embed_code/key/uQJbKEhYOWJAi5"
+        data-embed-url="https://www.slideshare.net/xristoasxar/ss-73029387"
         data-embed-ratio="595/485"
+        data-embed-title="Θέματα και απαντήσεις"
+        data-embed-author="xristoasxar"
       ></div>
       <a href="https://example.com/themata.html"><img src="https://example.com/shot.jpg" /></a>
     `
@@ -1543,13 +1543,13 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-author="zampire"
-        data-embed-title="Down de la guilde rage"
-        data-embed-url="https://fr.slideshare.net/zampire/down-de-la-guilde-rage"
-        data-embed-id="29123651"
         data-embed-provider="slideshare"
+        data-embed-id="29123651"
         data-embed-src="https://www.slideshare.net/slideshow/embed_code/29123651"
+        data-embed-url="https://fr.slideshare.net/zampire/down-de-la-guilde-rage"
         data-embed-ratio="595/485"
+        data-embed-title="Down de la guilde rage"
+        data-embed-author="zampire"
       ></div>
     `
 
@@ -1575,13 +1575,13 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-author="zampire"
-        data-embed-title="Down de la guilde rage"
-        data-embed-url="https://fr.slideshare.net/zampire/down-de-la-guilde-rage"
-        data-embed-id="29123651"
         data-embed-provider="slideshare"
+        data-embed-id="29123651"
         data-embed-src="https://www.slideshare.net/slideshow/embed_code/29123651"
+        data-embed-url="https://fr.slideshare.net/zampire/down-de-la-guilde-rage"
         data-embed-ratio="595/485"
+        data-embed-title="Down de la guilde rage"
+        data-embed-author="zampire"
       ></div>
       <p>See also <a href="https://www.slideshare.net/zampire/raid-recap">the raid recap</a>.</p>
     `
@@ -1612,13 +1612,13 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-author="zampire"
-        data-embed-title="Down de la guilde rage"
-        data-embed-url="https://fr.slideshare.net/zampire/down-de-la-guilde-rage"
-        data-embed-id="29123651"
         data-embed-provider="slideshare"
+        data-embed-id="29123651"
         data-embed-src="https://www.slideshare.net/slideshow/embed_code/29123651"
+        data-embed-url="https://fr.slideshare.net/zampire/down-de-la-guilde-rage"
         data-embed-ratio="595/485"
+        data-embed-title="Down de la guilde rage"
+        data-embed-author="zampire"
       ></div>
       <a href="https://example.org/?url=http://www.slideshare.net/"
         ><img src="https://example.com/slideshare.jpg"
@@ -1646,12 +1646,12 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-title="Down de la guilde rage"
-        data-embed-url="https://fr.slideshare.net/zampire/down-de-la-guilde-rage"
-        data-embed-id="29123651"
         data-embed-provider="slideshare"
+        data-embed-id="29123651"
         data-embed-src="https://www.slideshare.net/slideshow/embed_code/29123651"
+        data-embed-url="https://fr.slideshare.net/zampire/down-de-la-guilde-rage"
         data-embed-ratio="595/485"
+        data-embed-title="Down de la guilde rage"
         data-embed-author="zampire"
       ></div>
     `
@@ -1677,12 +1677,12 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-title="Business Quotes for 2011"
-        data-embed-url="https://www.slideshare.net/haraldf/business-quotes-for-2011"
-        data-embed-id="6PCWPGFw9SwsAY"
         data-embed-provider="slideshare"
+        data-embed-id="6PCWPGFw9SwsAY"
         data-embed-src="https://www.slideshare.net/slideshow/embed_code/key/6PCWPGFw9SwsAY"
+        data-embed-url="https://www.slideshare.net/haraldf/business-quotes-for-2011"
         data-embed-ratio="595/485"
+        data-embed-title="Business Quotes for 2011"
       ></div>
       <p>
         Slides for
@@ -1712,8 +1712,8 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-id="102428855"
         data-embed-provider="slideshare"
+        data-embed-id="102428855"
         data-embed-src="https://www.slideshare.net/slideshow/embed_code/102428855"
         data-embed-ratio="595/485"
       ></div>
@@ -1756,13 +1756,13 @@ describeForEachParser('slideshare through the pipeline', (parseHtml) => {
         from <strong><a href="https://www.slideshare.net/null0x00">Krzysztof Kotowicz</a></strong>
       </p>
       <div
-        data-embed-author="null0x00"
-        data-embed-title="Make profit with UI-redressing attacks"
-        data-embed-url="https://www.slideshare.net/null0x00/make-profit-with-uiredressing-attacks"
-        data-embed-id="10579166"
         data-embed-provider="slideshare"
+        data-embed-id="10579166"
         data-embed-src="https://www.slideshare.net/slideshow/embed_code/10579166"
+        data-embed-url="https://www.slideshare.net/null0x00/make-profit-with-uiredressing-attacks"
         data-embed-ratio="595/485"
+        data-embed-title="Make profit with UI-redressing attacks"
+        data-embed-author="null0x00"
       ></div>
     `
 

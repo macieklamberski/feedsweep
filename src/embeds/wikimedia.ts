@@ -1,11 +1,10 @@
-import { composeQuery, decodeSegment, parseUrl } from 'trousse'
+import { composeQuery, decodeSegment, getOrigin, parseUrl } from 'trousse'
 import type { EmbedResolver, EmbedResolverResult } from '../types.js'
 import { attr } from '../utils/dom.js'
 import {
   isMediaWikiFilePage,
   parseMediaWikiFileName,
   placeholderBaseUrl,
-  readOrigin,
   videoFileRegex,
 } from '../utils/urls.js'
 import { createMarkupEmbedResolver, readRepairedCarrierUrl } from '../utils/widgets.js'
@@ -40,7 +39,7 @@ export const composeFilePathUrl = (
 ): string | undefined => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
-  if (!parsed || !readOrigin(parsed)) {
+  if (!parsed || !getOrigin(parsed)) {
     return
   }
 
@@ -54,7 +53,7 @@ export const composeFilePathUrl = (
 const composeFilePageUrl = (url: string, fileName: string): string | undefined => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
-  if (!parsed || !readOrigin(parsed)) {
+  if (!parsed || !getOrigin(parsed)) {
     return
   }
 

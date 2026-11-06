@@ -41,7 +41,8 @@ export const slideshareResolveEmbed: ResolveUrlEmbed = (url) => {
   // one it replaced, which still serves by redirecting to the key form.
   const [, keyOrId, key] = segments.slice(marker)
   const isKeyed = isAnyOf(keyOrId, 'key')
-  // Some feeds put `&doc=` where the `?` belonged, so the id is cut at the `&`: an id never holds one.
+  // Some feeds put `&doc=` where the `?` belonged, so
+  // the id is cut at the `&`: an id never holds one.
   const deck = (isKeyed ? key : keyOrId)?.split('&')[0]
 
   // SlideShare serves files on slidesharecdn.com, so a file name is an enclosure.
@@ -253,9 +254,11 @@ const consumeCaption = (
   return fields
 }
 
+type DeckWrapper = { deck?: string; wrapper?: Element }
+
 // Neither player carries the numeric id: the swf query names the deck by a document key from a
 // different id space, and the iframe url by an embed key.
-const readWrapper = (element: Nullish<Element>): { deck?: string; wrapper?: Element } => {
+const readWrapper = (element: Nullish<Element>): DeckWrapper => {
   let deck: string | undefined
   let wrapper: Element | undefined
 

@@ -18,7 +18,10 @@ describeForEachParser('assignVideoPosters', (parseHtml) => {
   it('should replace the resolver thumbnail with the publisher inline poster', async () => {
     const value = html`
       <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg">
-      <div data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ" data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"></div>
+      <div
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+        data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
+      ></div>
     `
     const expected = html`
       <div
@@ -509,7 +512,10 @@ describeForEachParser('assignVideoPosters', (parseHtml) => {
   it('should be idempotent', async () => {
     const value = html`
       <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg">
-      <div data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ" data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"></div>
+      <div
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+        data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
+      ></div>
     `
     const once = await transform(value)
     const twice = await transform(once)
@@ -603,12 +609,12 @@ describeForEachParser('assignVideoPosters under heuristics', (parseHtml) => {
     ]
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://i.ytimg.com/vi/UaVU95gsXW8/hqdefault.jpg"
-        data-embed-url="https://www.youtube.com/watch?v=UaVU95gsXW8"
-        data-embed-id="UaVU95gsXW8"
         data-embed-provider="youtube"
+        data-embed-id="UaVU95gsXW8"
         data-embed-src="https://www.youtube.com/embed/UaVU95gsXW8"
+        data-embed-url="https://www.youtube.com/watch?v=UaVU95gsXW8"
+        data-embed-thumbnail="https://i.ytimg.com/vi/UaVU95gsXW8/hqdefault.jpg"
+        data-embed-ratio="16/9"
       ></div>
       <p>You can see the interview below.</p>
     `
@@ -628,12 +634,12 @@ describeForEachParser('assignVideoPosters under heuristics', (parseHtml) => {
     const expected = html`
       <img src="https://example.org/downloads/698/download/premiere.jpg?cb=3d7c6da47266c12d">
       <div
-        data-embed-ratio="16/9"
-        data-embed-thumbnail="https://i.ytimg.com/vi/-GraOPPwGfA/hqdefault.jpg"
-        data-embed-url="https://www.youtube.com/watch?v=-GraOPPwGfA"
-        data-embed-id="-GraOPPwGfA"
         data-embed-provider="youtube"
+        data-embed-id="-GraOPPwGfA"
         data-embed-src="https://www.youtube.com/embed/-GraOPPwGfA"
+        data-embed-url="https://www.youtube.com/watch?v=-GraOPPwGfA"
+        data-embed-thumbnail="https://i.ytimg.com/vi/-GraOPPwGfA/hqdefault.jpg"
+        data-embed-ratio="16/9"
       ></div>
       <p>All is set for the premiere.</p>
     `

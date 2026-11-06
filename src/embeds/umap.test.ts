@@ -258,11 +258,11 @@ describeForEachParser('umap through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="300"
-        data-embed-url="https://umap.openstreetmap.fr/fr/map/maison-des-associations_203723"
-        data-embed-id="umap.openstreetmap.fr/203723"
         data-embed-provider="umap"
+        data-embed-id="umap.openstreetmap.fr/203723"
         data-embed-src="https://umap.openstreetmap.fr/fr/map/maison-des-associations_203723#16/49.1799/-0.3700"
+        data-embed-url="https://umap.openstreetmap.fr/fr/map/maison-des-associations_203723"
+        data-embed-height="300"
       ></div>
     `
 
@@ -280,11 +280,11 @@ describeForEachParser('umap through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="300"
-        data-embed-url="https://umap.openstreetmap.de/de/map/interaktive-karte-von-zinnowitz-historische-bauwer_145587"
-        data-embed-id="umap.openstreetmap.de/145587"
         data-embed-provider="umap"
+        data-embed-id="umap.openstreetmap.de/145587"
         data-embed-src="https://umap.openstreetmap.de/de/map/interaktive-karte-von-zinnowitz-historische-bauwer_145587#15/54.076425/13.914957"
+        data-embed-url="https://umap.openstreetmap.de/de/map/interaktive-karte-von-zinnowitz-historische-bauwer_145587"
+        data-embed-height="300"
       ></div>
     `
 

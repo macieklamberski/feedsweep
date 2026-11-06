@@ -22,7 +22,7 @@ const liveIframeSelector = 'iframe[src]:not([src="about:blank"])'
 // Weebly ships an uploaded video as a wrapper around an about:blank iframe its player JS fills.
 // Weebly stores the upload and its poster under one name, so the poster url also names the mp4.
 // The file url is not written anywhere in the markup.
-export const weeblyMediaResolver: MediaResolver = {
+export const weeblyVideoMediaResolver: MediaResolver = {
   kind: 'media',
   selector: '.wsite-video-wrapper',
   extract: (element) => {

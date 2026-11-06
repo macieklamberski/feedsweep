@@ -381,10 +381,10 @@ describeForEachParser('omny through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-thumbnail="https://omny.fm/shows/the-show/an-episode/image.jpg"
-        data-embed-src="https://omny.fm/shows/the-show/an-episode/embed"
         data-embed-provider="omny"
         data-embed-id="the-show/an-episode"
+        data-embed-src="https://omny.fm/shows/the-show/an-episode/embed"
+        data-embed-thumbnail="https://omny.fm/shows/the-show/an-episode/image.jpg"
         data-embed-height="180"
       ></div>
     `

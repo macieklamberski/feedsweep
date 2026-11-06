@@ -61,8 +61,8 @@ describeForEachParser('enrichEmbedPlaceholders', (parseHtml) => {
       <div
         data-embed-provider="vimeo"
         data-embed-id="123"
-        data-embed-url="https://vimeo.com/123"
         data-embed-src="https://player.vimeo.com/video/123"
+        data-embed-url="https://vimeo.com/123"
       ></div>
     `
     const calls: Array<Array<EmbedRef>> = []

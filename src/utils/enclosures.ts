@@ -349,8 +349,8 @@ const extractEnclosureFromEmbed = (enclosure: Enclosure, document: Document): En
   }
 
   // The size moves whole from whichever source states one, the enclosure's own Media RSS
-  // dimensions first and the frame's otherwise: a width the feed stated beside a height the
-  // iframe stated is a box neither describes. A lone height is the size a fixed-height player states.
+  // dimensions first and the frame's otherwise: a width the feed stated beside a height the iframe
+  // stated is a box neither describes. A lone height is the size a fixed-height player states.
   const frameSize = getEmbedSize(frame, 0)
   const stated = rest.width || rest.height ? rest : frameSize
 

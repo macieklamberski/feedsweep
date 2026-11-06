@@ -190,11 +190,11 @@ describeForEachParser('piktochart through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="1/2"
-        data-embed-url="https://create.piktochart.com/output/22324966-santos-imperiet"
-        data-embed-id="22324966-santos-imperiet"
         data-embed-provider="piktochart"
+        data-embed-id="22324966-santos-imperiet"
         data-embed-src="https://create.piktochart.com/embed/22324966-santos-imperiet"
+        data-embed-url="https://create.piktochart.com/output/22324966-santos-imperiet"
+        data-embed-ratio="1/2"
       ></div>
     `
 

@@ -595,11 +595,11 @@ describeForEachParser('yandexmaps through the pipeline', (parseHtml) => {
     const expected = html`
       <p>Text</p>
       <div
-        data-embed-height="400"
-        data-embed-thumbnail="https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor:0bdc5302cc22f4161a42bca393a443877882d9635d96fa30ee7dc6617ef95c10&amp;width=650&amp;height=400"
-        data-embed-id="constructor:0bdc5302cc22f4161a42bca393a443877882d9635d96fa30ee7dc6617ef95c10"
         data-embed-provider="yandexmaps"
+        data-embed-id="constructor:0bdc5302cc22f4161a42bca393a443877882d9635d96fa30ee7dc6617ef95c10"
         data-embed-src="https://yandex.ru/map-widget/v1/?um=constructor:0bdc5302cc22f4161a42bca393a443877882d9635d96fa30ee7dc6617ef95c10&amp;source=constructor"
+        data-embed-thumbnail="https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor:0bdc5302cc22f4161a42bca393a443877882d9635d96fa30ee7dc6617ef95c10&amp;width=650&amp;height=400"
+        data-embed-height="400"
       ></div>
     `
 
@@ -617,11 +617,11 @@ describeForEachParser('yandexmaps through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="400"
-        data-embed-thumbnail="https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor:e4b22aa7bfb87876b4821a8ea1ec86773f720ba6a4818bb58e0e073c50bc9dde&amp;width=650&amp;height=400"
-        data-embed-id="constructor:e4b22aa7bfb87876b4821a8ea1ec86773f720ba6a4818bb58e0e073c50bc9dde"
         data-embed-provider="yandexmaps"
+        data-embed-id="constructor:e4b22aa7bfb87876b4821a8ea1ec86773f720ba6a4818bb58e0e073c50bc9dde"
         data-embed-src="https://yandex.ru/map-widget/v1/?um=constructor:e4b22aa7bfb87876b4821a8ea1ec86773f720ba6a4818bb58e0e073c50bc9dde&amp;source=constructor"
+        data-embed-thumbnail="https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor:e4b22aa7bfb87876b4821a8ea1ec86773f720ba6a4818bb58e0e073c50bc9dde&amp;width=650&amp;height=400"
+        data-embed-height="400"
       ></div>
     `
 
@@ -640,11 +640,11 @@ describeForEachParser('yandexmaps through the pipeline', (parseHtml) => {
     const expected = html`
       <p>Text</p>
       <div
-        data-embed-height="400"
-        data-embed-thumbnail="https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor:qMkqdbHN9XKYsSEKaL6LC8peZRpEzqo7&amp;width=650&amp;height=400"
-        data-embed-id="constructor:qMkqdbHN9XKYsSEKaL6LC8peZRpEzqo7"
         data-embed-provider="yandexmaps"
+        data-embed-id="constructor:qMkqdbHN9XKYsSEKaL6LC8peZRpEzqo7"
         data-embed-src="https://yandex.ru/map-widget/v1/?um=constructor:qMkqdbHN9XKYsSEKaL6LC8peZRpEzqo7&amp;source=constructor"
+        data-embed-thumbnail="https://api-maps.yandex.ru/services/constructor/1.0/static/?um=constructor:qMkqdbHN9XKYsSEKaL6LC8peZRpEzqo7&amp;width=650&amp;height=400"
+        data-embed-height="400"
       ></div>
     `
 
@@ -681,8 +681,8 @@ describeForEachParser('yandexmaps through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="400"
         data-embed-src="https://api-maps.yandex.ru/frame/v1/-/CVXW56JA"
+        data-embed-height="400"
       ></div>
     `
 

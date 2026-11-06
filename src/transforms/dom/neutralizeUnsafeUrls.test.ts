@@ -365,9 +365,9 @@ describeForEachParser('neutralizeUnsafeUrls', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(value)
     })
 
-    // Every element is walked and its tag name looked up in the url attribute table, so a feed
-    // naming a tag after a member every object inherits reaches that lookup with it. It has to answer the
-    // way it answers a tag it does not know.
+    // Every element is walked and its tag name looked up in the url attribute table,
+    // so a feed naming a tag after a member every object inherits reaches that
+    // lookup with it. It has to answer the way it answers a tag it does not know.
     it('should leave an element named after an inherited member untouched', async () => {
       const value = '<constructor href="javascript:alert(1)">text</constructor>'
 

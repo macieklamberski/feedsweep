@@ -519,8 +519,8 @@ describeForEachParser('stripHiddenElements through the pipeline', (parseHtml) =>
     `
     const expected = html`
       <div
-        data-embed-ratio="100/90"
         data-embed-src="https://docs.google.com/viewer?url=https%3A%2F%2Fexample.com%2Fwp-content%2Fuploads%2F2026%2F03%2Freport.pdf&embedded=true&hl=en"
+        data-embed-ratio="100/90"
       ></div>
     `
 

@@ -2,10 +2,10 @@ import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { MediaResolverResult } from '../types.js'
-import { weeblyFlashMediaResolver, weeblyMediaResolver } from './weebly.js'
+import { weeblyFlashMediaResolver, weeblyVideoMediaResolver } from './weebly.js'
 
-describeForEachParser('weeblyMediaResolver', (parseHtml) => {
-  const extract = resolverExtractor(parseHtml, weeblyMediaResolver)
+describeForEachParser('weeblyVideoMediaResolver', (parseHtml) => {
+  const extract = resolverExtractor(parseHtml, weeblyVideoMediaResolver)
 
   describe('happy paths', () => {
     // Weebly stores the video and its poster under the same name, so the poster carries both
@@ -358,8 +358,8 @@ describeForEachParser('weebly blocks through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-height="480"
         data-embed-src="http://www.weebly.com/weebly/apps/generateVideo.php?source=weebly&elementid=241484370837111095&ineditor=0&align=center&height=480&video=1/3/0/7/13078488/clip_706.mp4&image=1/3/0/7/13078488/clip_706.jpg"
+        data-embed-height="480"
       ></div>
     `
 

@@ -72,9 +72,9 @@ describeForEachParser('surfaceNoscriptEmbeds', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-provider="youtube"
         data-embed-id="dQw4w9WgXcQ"
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
         data-embed-ratio="16/9"
@@ -96,9 +96,9 @@ describeForEachParser('surfaceNoscriptEmbeds', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-provider="youtube"
         data-embed-id="dQw4w9WgXcQ"
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
         data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
         data-embed-ratio="16/9"

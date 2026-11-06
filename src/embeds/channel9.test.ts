@@ -256,9 +256,9 @@ describeForEachParser('channel9 shapes the pipeline resolves first', (parseHtml)
     const value = '<iframe src="//channel9.msdn.com/Shows/Azure-Friday/An-Episode/player"></iframe>'
     const expected = html`
       <div
-        data-embed-src="https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=azure-friday&ep=an-episode"
         data-embed-provider="channel9"
         data-embed-id="azure-friday/an-episode"
+        data-embed-src="https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=azure-friday&ep=an-episode"
         data-embed-ratio="16/9"
       ></div>
     `

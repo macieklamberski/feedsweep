@@ -273,8 +273,8 @@ describeForEachParser('redcircle through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-id="show/7bc4f231-9280-445a-a62b-b5727083ddca"
         data-embed-provider="redcircle"
+        data-embed-id="show/7bc4f231-9280-445a-a62b-b5727083ddca"
         data-embed-src="https://redcircle.com/embedded-show-webplayer/7bc4f231-9280-445a-a62b-b5727083ddca"
         data-embed-url="https://redcircle.com/shows/7bc4f231-9280-445a-a62b-b5727083ddca"
         data-embed-height="320"
@@ -294,8 +294,8 @@ describeForEachParser('redcircle through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-id="show/7bc4f231-9280-445a-a62b-b5727083ddca"
         data-embed-provider="redcircle"
+        data-embed-id="show/7bc4f231-9280-445a-a62b-b5727083ddca"
         data-embed-src="https://redcircle.com/embedded-show-webplayer/7bc4f231-9280-445a-a62b-b5727083ddca"
         data-embed-url="https://redcircle.com/shows/7bc4f231-9280-445a-a62b-b5727083ddca"
         data-embed-height="320"

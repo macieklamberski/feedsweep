@@ -214,8 +214,8 @@ describeForEachParser('hearthis through the pipeline', (parseHtml) => {
     const value = '<iframe src="//hearthis.at/embed/43067/transparent_black/"></iframe>'
     const expected = html`
       <div
-        data-embed-id="track/43067"
         data-embed-provider="hearthis"
+        data-embed-id="track/43067"
         data-embed-src="https://app.hearthis.at/embed/43067/"
         data-embed-height="150"
       ></div>

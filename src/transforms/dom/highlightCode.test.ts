@@ -5,8 +5,10 @@ import type { HighlightFn, TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { detectLanguage, highlightCode } from './highlightCode.js'
 
+type CodeBlock = { pre: Element; code: Element | null }
+
 describe('detectLanguage', () => {
-  const createElement = (value: string): { pre: Element; code: Element | null } => {
+  const createElement = (value: string): CodeBlock => {
     const document = parseHtml(value)
     const pre = queryElement(document, 'pre')
     const code = pre.querySelector('code')

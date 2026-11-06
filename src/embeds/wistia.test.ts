@@ -305,9 +305,9 @@ describeForEachParser('wistia facades the rebuild pass materializes', (parseHtml
     `
     const expected = html`
       <div
-        data-embed-src="https://fast.wistia.net/embed/iframe/2fg072pftb"
         data-embed-provider="wistia"
         data-embed-id="2fg072pftb"
+        data-embed-src="https://fast.wistia.net/embed/iframe/2fg072pftb"
         data-embed-ratio="16/9"
       ></div>
     `

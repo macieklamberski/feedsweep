@@ -161,11 +161,11 @@ describeForEachParser('ispot player through the pipeline', (parseHtml) => {
     `
     const expected = html`
       <div
-        data-embed-ratio="16/9"
-        data-embed-id="7V5I"
         data-embed-provider="ispot"
+        data-embed-id="7V5I"
         data-embed-src="https://www.ispot.tv/share/7V5I"
         data-embed-thumbnail="https://images-cdn.ispot.tv/ad/7V5I/default-large.jpg"
+        data-embed-ratio="16/9"
       ></div>
     `
 
