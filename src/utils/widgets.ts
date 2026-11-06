@@ -715,6 +715,12 @@ type FileFields = {
   name: string
   type?: string
   size?: number
+  // The file's own text, such as an enclosure's description, as on embeds and cites.
+  description?: string
+  // The post author's note about the file, as on cites.
+  caption?: string
+  // A preview image of the file.
+  thumbnail?: string
 }
 
 // A file the reader downloads, never frames.
@@ -724,6 +730,9 @@ export const createFilePlaceholder = (document: Document, fields: FileFields): H
     name: fields.name,
     type: fields.type,
     size: fields.size ? String(fields.size) : undefined,
+    description: fields.description,
+    caption: fields.caption,
+    thumbnail: fields.thumbnail,
   })
 }
 
