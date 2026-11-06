@@ -2,7 +2,7 @@ import { getQueryParam, parseUrl } from 'trousse'
 import type { MediaResolver, MediaResolverResult } from '../types.js'
 import { attr, flashVars, parseFlashVars } from '../utils/dom.js'
 import { flashFileRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
-import { readRepairedCarrierUrl } from '../utils/widgets.js'
+import { pluginCarrierSelector, readRepairedCarrierUrl } from '../utils/widgets.js'
 
 // Weebly's own copy has a resolver of its own, later in the list.
 const weeblyHosts = ['weebly.com']
@@ -50,9 +50,9 @@ const composeAudio = (
 // `soundFile` flashvar or the swf url's query. Flash no longer runs, so the bar renders nothing.
 export const onePixelOutFlashMediaResolver: MediaResolver = {
   kind: 'media',
-  selector: 'object[data*=".swf" i], embed[src*=".swf" i]',
-  extract: (element) => {
-    const carrierUrl = readRepairedCarrierUrl(element)
+  selector: pluginCarrierSelector,
+  extract: (element, context) => {
+    const carrierUrl = readRepairedCarrierUrl(element, context)
     const player = parseUrl(carrierUrl, placeholderBaseUrl)
 
     if (!player || !flashFileRegex.test(player.pathname)) {

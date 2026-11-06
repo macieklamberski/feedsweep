@@ -1,5 +1,5 @@
 import { encodePathSegment } from 'trousse'
-import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
+import type { EmbedResolverResult, ResolveUrlEmbed, TransformContext } from '../types.js'
 import { attr, find, text, textNode } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import {
@@ -7,6 +7,7 @@ import {
   createMarkupEmbedResolver,
   createS9eEmbedResolver,
   createUrlEmbedResolver,
+  matchUrl,
 } from '../utils/widgets.js'
 
 const provider = 'tiktok'
@@ -52,9 +53,12 @@ const readProfileHandle = (anchor: Element | undefined): string | undefined => {
   return parseUrlOnHosts(attr(anchor, 'href'), hosts)?.pathname.match(profilePathRegex)?.[1]
 }
 
-const resolveClip = (element: Element): EmbedResolverResult | undefined => {
+const resolveClip = (
+  element: Element,
+  context: TransformContext,
+): EmbedResolverResult | undefined => {
   const declared = attr(element, 'data-video-id')
-  const cite = attr(element, 'cite')
+  const cite = matchUrl(attr(element, 'cite'), context)
   const cited = readWatchUrl(parseUrlOnHosts(cite, hosts))
 
   let linked: Clip = {}
@@ -131,7 +135,10 @@ const readHandle = (element: Element): { handle: string; segment: string } | und
   }
 }
 
-const resolveAccount = (element: Element): EmbedResolverResult | undefined => {
+const resolveAccount = (
+  element: Element,
+  context: TransformContext,
+): EmbedResolverResult | undefined => {
   const account = readHandle(element)
 
   if (!account) {
@@ -140,7 +147,7 @@ const resolveAccount = (element: Element): EmbedResolverResult | undefined => {
 
   const { handle, segment } = account
 
-  const cite = attr(element, 'cite')
+  const cite = matchUrl(attr(element, 'cite'), context)
   const isCitedProfile = Boolean(cite && parseUrlOnHosts(cite, hosts))
 
   return {
@@ -157,7 +164,7 @@ const resolveAccount = (element: Element): EmbedResolverResult | undefined => {
 // TikTok's oEmbed blockquote: caption and hashtag anchors that only embed.js turns into a player.
 export const tiktokBlockquoteEmbedResolver = createMarkupEmbedResolver(
   'blockquote.tiktok-embed',
-  (element) => resolveClip(element) ?? resolveAccount(element),
+  (element, context) => resolveClip(element, context) ?? resolveAccount(element, context),
 )
 
 // A post has no name: its words go to `description`, and the frame's title is not read.
@@ -201,7 +208,7 @@ export const tiktokS9eEmbedResolver = createS9eEmbedResolver('tiktok', (videoId)
 // MetaSlider Pro's TikTok slide: a poster image that only the plugin's script swaps for the player.
 export const tiktokMetasliderEmbedResolver = createMarkupEmbedResolver(
   'li.ms-tiktok div.tiktok[data-video-id]',
-  (element) => {
+  (element, context) => {
     const videoId = attr(element, 'data-video-id')
 
     if (!videoId) {
@@ -211,7 +218,7 @@ export const tiktokMetasliderEmbedResolver = createMarkupEmbedResolver(
     // The id comes out of its attribute decoded, and it goes into a path.
     const segment = encodePathSegment(videoId)
 
-    const cite = attr(element, 'data-cite')
+    const cite = matchUrl(attr(element, 'data-cite'), context)
     const { handle } = readWatchUrl(parseUrlOnHosts(cite, hosts))
     const watchPath = handle ? `@${handle}/video/${segment}` : undefined
 

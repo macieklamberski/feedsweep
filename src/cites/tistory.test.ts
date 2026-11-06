@@ -69,6 +69,23 @@ describeForEachParser('tistoryCiteResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should take the canonical url when the source url is blank', async () => {
+      const value = html`
+        <figure
+          data-og-source-url=" "
+          data-og-url="https://example.com/item/1"
+          data-og-title="Page title"
+        ></figure>
+      `
+      const expected: CiteResolverResult = {
+        provider: 'tistory',
+        url: 'https://example.com/item/1',
+        title: 'Page title',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should take the first image when several are listed', async () => {
       const value = html`
         <figure

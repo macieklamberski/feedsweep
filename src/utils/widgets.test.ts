@@ -1,9 +1,16 @@
-import { describe, expect, it } from 'bun:test'
+import { describe, expect, it, mock } from 'bun:test'
 import { isHostOf } from 'trousse'
 import { transformContent } from '../index.js'
-import { baseContext, describeForEachParser, html, resolverExtractor } from '../tests.js'
+import {
+  baseContext,
+  createProxyUnwrapFn,
+  describeForEachParser,
+  html,
+  resolverExtractor,
+} from '../tests.js'
 import type {
   CiteResolverResult,
+  CleanUrlFn,
   EmbedResolver,
   EmbedResolverResult,
   MediaResolver,
@@ -26,6 +33,7 @@ import {
   embedCarrierSelector,
   findBareHandle,
   getEmbedSize,
+  matchUrl,
   normalizeEmbedFields,
   prepareCiteMetadata,
   prepareEmbedMetadata,
@@ -43,6 +51,7 @@ import {
 const playerLabelRegex = /^example player$/
 const typeLabelRegex = /^video$/
 const utmParamRegex = /[?&]utm_\w+=\w+/g
+const utmSourceRegex = /[?&]utm_source=[^&]*/
 
 describeForEachParser('createEmbedPlaceholder', (parseHtml) => {
   it('should leave the placeholder empty', () => {
@@ -1081,7 +1090,7 @@ describeForEachParser('readCarrierSize', (parseHtml) => {
       return
     }
 
-    return resolver.extract(element)
+    return resolver.extract(element, baseContext)
   }
 
   describe('a resolver that leaves the option off', () => {
@@ -1783,6 +1792,143 @@ describeForEachParser('readCarrierUrl', (parseHtml) => {
   })
 })
 
+describe('matchUrl', () => {
+  const embedlyUrl =
+    'https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2FdQw4w9WgXcQ'
+  const unwrapEmbedlyFn = createProxyUnwrapFn('cdn.embedly.com', 'src')
+  const unwrapDrupalFn = createProxyUnwrapFn('example.com', 'url')
+
+  const stripUtmSourceFn: CleanUrlFn = (url) => {
+    return url.replace(utmSourceRegex, '')
+  }
+
+  const clean = (url: string, cleanUrlFn?: CleanUrlFn) => {
+    const context: TransformContext = {
+      ...baseContext,
+      baseUrl: 'https://example.com/post',
+      cleanUrlFn,
+    }
+
+    return matchUrl(url, context)
+  }
+
+  describe('happy paths', () => {
+    it('should give the url cleanUrlFn unwraps an embed proxy to, with no matchUrlFn', () => {
+      expect(clean(embedlyUrl, unwrapEmbedlyFn)).toBe('https://www.youtube.com/embed/dQw4w9WgXcQ')
+    })
+
+    it('should give the url matchUrlFn unwraps an embed proxy to, ahead of cleanUrlFn', () => {
+      const context: TransformContext = {
+        ...baseContext,
+        cleanUrlFn: stripUtmSourceFn,
+        matchUrlFn: unwrapEmbedlyFn,
+      }
+
+      expect(matchUrl(embedlyUrl, context)).toBe('https://www.youtube.com/embed/dQw4w9WgXcQ')
+    })
+
+    it('should resolve a protocol-relative url before the cleaner reads its host', () => {
+      const value =
+        '//cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2FdQw4w9WgXcQ'
+
+      expect(clean(value, unwrapEmbedlyFn)).toBe('https://www.youtube.com/embed/dQw4w9WgXcQ')
+    })
+
+    it('should resolve a site-relative url before the cleaner reads its host', () => {
+      const value = '/media/oembed?url=https%3A//www.youtube.com/watch%3Fv%3DdQw4w9WgXcQ'
+
+      expect(clean(value, unwrapDrupalFn)).toBe('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should give the url as written without a cleanUrlFn', () => {
+      expect(clean(embedlyUrl)).toBe(embedlyUrl)
+    })
+
+    it('should give the url as written without a context', () => {
+      expect(matchUrl(embedlyUrl, undefined)).toBe(embedlyUrl)
+    })
+
+    it('should give the url as written when the cleaner keeps it, its repairs included', () => {
+      const value = 'https://example.org/embed/123&amp;autoplay=1'
+
+      expect(clean(value, stripUtmSourceFn)).toBe(value)
+    })
+
+    it('should give the url as written when a run of slashes only shows once resolved', () => {
+      const value = '"//example.org/player?id=1"'
+
+      expect(clean(value, stripUtmSourceFn)).toBe(value)
+    })
+  })
+
+  describe('edge cases', () => {
+    it('should call the cleaner once for a url read twice', () => {
+      const context: TransformContext = { ...baseContext, cleanUrlFn: mock(unwrapEmbedlyFn) }
+
+      matchUrl(embedlyUrl, context)
+      matchUrl(embedlyUrl, context)
+
+      expect(context.cleanUrlFn).toHaveBeenCalledTimes(1)
+    })
+
+    it('should clean a second url apart from the first', () => {
+      const context: TransformContext = { ...baseContext, cleanUrlFn: unwrapEmbedlyFn }
+      const rewritten =
+        'https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2FM7lc1UVf-VE'
+
+      matchUrl(embedlyUrl, context)
+
+      expect(matchUrl(rewritten, context)).toBe('https://www.youtube.com/embed/M7lc1UVf-VE')
+    })
+  })
+})
+
+describeForEachParser('carrier urls matched at read time', (parseHtml) => {
+  const unwrapEmbedlyFn = createProxyUnwrapFn('cdn.embedly.com', 'src')
+
+  const stripUtmSourceFn: CleanUrlFn = (url) => {
+    return url.replace(utmSourceRegex, '')
+  }
+
+  const convert = (value: string, cleanUrlFn: CleanUrlFn): Promise<string> => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      cleanUrlFn,
+    })
+  }
+
+  it('should hand the resolvers the player the cleaner unwraps, with the wrapper poster', async () => {
+    const value = html`
+      <iframe
+        src="https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2FdQw4w9WgXcQ&image=https%3A%2F%2Fi.ytimg.com%2Fvi%2FdQw4w9WgXcQ%2Fhqdefault.jpg"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-provider="youtube"
+        data-embed-id="dQw4w9WgXcQ"
+        data-embed-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+        data-embed-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        data-embed-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
+        data-embed-ratio="16/9"
+      ></div>
+    `
+
+    expect(await convert(value, unwrapEmbedlyFn)).toEqualHtml(expected)
+  })
+
+  it('should give a frame no resolver claims the src its publisher wrote', async () => {
+    const value =
+      '<iframe src="https://example.org/embed/123&amp;autoplay=1&amp;utm_source=feed"></iframe>'
+    const expected = '<div data-embed-src="https://example.org/embed/123&amp;autoplay=1"></div>'
+
+    expect(await convert(value, stripUtmSourceFn)).toEqualHtml(expected)
+  })
+})
+
 describeForEachParser('embedCarrierSelector', (parseHtml) => {
   const match = (value: string) => {
     return Array.from(parseHtml(value).querySelectorAll(embedCarrierSelector), (element) => {
@@ -1932,7 +2078,7 @@ describeForEachParser('createUrlEmbedResolver', (parseHtml) => {
   })
 
   const extract = (value: string) => {
-    return resolver.extract(parseHtml(value).body.firstElementChild as Element)
+    return resolver.extract(parseHtml(value).body.firstElementChild as Element, baseContext)
   }
 
   it('should hand the resolver a query glued onto the path as a query', () => {
@@ -2012,7 +2158,7 @@ describeForEachParser('createUrlEmbedResolver', (parseHtml) => {
     )
 
     const extractExact = (value: string) => {
-      return exactResolver.extract(parseHtml(value).body.firstElementChild as Element)
+      return exactResolver.extract(parseHtml(value).body.firstElementChild as Element, baseContext)
     }
 
     it('should read a carrier on one of its hosts', () => {
@@ -2048,7 +2194,7 @@ describeForEachParser('resolveEmbedProbe', (parseHtml) => {
       id: 'abc',
     }
 
-    expect(await resolveEmbedProbe(value, [embedResolver])).toEqual(expected)
+    expect(await resolveEmbedProbe(value, [embedResolver], baseContext)).toEqual(expected)
   })
 
   it('should skip a resolver whose selector the probe does not match', async () => {
@@ -2063,7 +2209,9 @@ describeForEachParser('resolveEmbedProbe', (parseHtml) => {
       id: 'abc',
     }
 
-    expect(await resolveEmbedProbe(value, [scriptResolver, embedResolver])).toEqual(expected)
+    expect(await resolveEmbedProbe(value, [scriptResolver, embedResolver], baseContext)).toEqual(
+      expected,
+    )
   })
 
   it('should skip a media result for a later embed', async () => {
@@ -2078,7 +2226,9 @@ describeForEachParser('resolveEmbedProbe', (parseHtml) => {
       id: 'abc',
     }
 
-    expect(await resolveEmbedProbe(value, [mediaResolver, embedResolver])).toEqual(expected)
+    expect(await resolveEmbedProbe(value, [mediaResolver, embedResolver], baseContext)).toEqual(
+      expected,
+    )
   })
 })
 
@@ -2106,13 +2256,13 @@ describeForEachParser('readPlayer', (parseHtml) => {
   it('should key the player a resolver reads off the frame', async () => {
     const value = createIframe(parseHtml(''), 'https://player.example/abc')
 
-    expect(await readPlayer(value, [embedResolver])).toBe('example/abc')
+    expect(await readPlayer(value, [embedResolver], baseContext)).toBe('example/abc')
   })
 
   it('should answer nothing for a frame no resolver claims', async () => {
     const value = createIframe(parseHtml(''), 'https://other.example/abc')
 
-    expect(await readPlayer(value, [embedResolver])).toBeUndefined()
+    expect(await readPlayer(value, [embedResolver], baseContext)).toBeUndefined()
   })
 
   it('should leave the frame and its companion markup in place', async () => {
@@ -2132,7 +2282,7 @@ describeForEachParser('readPlayer', (parseHtml) => {
     const frame = document.querySelector('iframe') as Element
     const expected = '<div><iframe src="https://player.example/abc"></iframe><p>Caption</p></div>'
 
-    expect(await readPlayer(frame, [removingResolver])).toBe('example/abc')
+    expect(await readPlayer(frame, [removingResolver], baseContext)).toBe('example/abc')
     expect(document.body.innerHTML).toEqualHtml(expected)
   })
 })

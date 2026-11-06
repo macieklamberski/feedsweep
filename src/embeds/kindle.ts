@@ -49,6 +49,9 @@ export const kindleResolveEmbed: ResolveEmbed = (url, element) => {
   }
 }
 
-export const kindleEmbedResolver = createMarkupEmbedResolver(embedCarrierSelector, (element) => {
-  return kindleResolveEmbed(readRepairedCarrierUrl(element), element)
-})
+export const kindleEmbedResolver = createMarkupEmbedResolver(
+  embedCarrierSelector,
+  (element, context) => {
+    return kindleResolveEmbed(readRepairedCarrierUrl(element, context), element)
+  },
+)

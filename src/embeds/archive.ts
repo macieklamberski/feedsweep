@@ -12,6 +12,7 @@ import type {
   EmbedResolverResult,
   FieldCleaner,
   ResolveUrlEmbed,
+  TransformContext,
 } from '../types.js'
 import { attr, flashVar, flashVars } from '../utils/dom.js'
 import { audioFileRegex, parseUrlOnHosts } from '../utils/urls.js'
@@ -19,6 +20,7 @@ import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
   getEmbedSize,
+  matchUrl,
 } from '../utils/widgets.js'
 
 const provider = 'archive'
@@ -205,8 +207,11 @@ const readXspfPlayer = (player: URL): EmbedResolverResult | undefined => {
 }
 
 // The `soundFile` flashvar names one file of an item that can hold hundreds, so the file is kept.
-const readItemPlayer = (element: Element | undefined): EmbedResolverResult | undefined => {
-  const soundFile = parseUrlOnHosts(flashVar(element, 'soundFile'), hosts)
+const readItemPlayer = (
+  element: Element | undefined,
+  context: TransformContext | undefined,
+): EmbedResolverResult | undefined => {
+  const soundFile = parseUrlOnHosts(matchUrl(flashVar(element, 'soundFile'), context), hosts)
   const [, identifier, file] = soundFile?.pathname.match(itemFilePathRegex) ?? []
 
   if (!identifier) {
@@ -216,13 +221,13 @@ const readItemPlayer = (element: Element | undefined): EmbedResolverResult | und
   return { ...composeEmbedResult(identifier, '', file), ...sizes.audio }
 }
 
-const archiveFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
+const archiveFlashResolveEmbed: ResolveUrlEmbed = (url, element, context) => {
   if (xspfPlayerPathRegex.test(url.pathname)) {
     return readXspfPlayer(url)
   }
 
   if (itemPlayerPathRegex.test(url.pathname)) {
-    return readItemPlayer(element)
+    return readItemPlayer(element, context)
   }
 
   if (!flowPlayerPathRegex.test(url.pathname)) {

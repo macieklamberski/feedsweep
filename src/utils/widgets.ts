@@ -4,6 +4,7 @@ import {
   isAnyOf,
   isString,
   type MaybePromise,
+  type Nullish,
   startsWithAnyOf,
   trimObject,
 } from 'trousse'
@@ -35,6 +36,7 @@ import {
 } from './dom.js'
 import {
   audioFileRegex,
+  cleanMatchUrl,
   cleanUrl,
   collapseSlashRuns,
   foldEscapedAmpersands,
@@ -109,6 +111,9 @@ export const embedCarrierSelector = [
   paramObjectSelector,
 ].join(', ')
 
+// The elements a browser plugin such as Flash ran in.
+export const pluginCarrierSelector = 'embed[src], object[data]'
+
 // Internet Explorer's Flash snippet names the player only in `<param name="movie">`. An object
 // holding text shows it as the fallback today, often the rest of the post an unclosed tag took
 // in, so it keeps its markup.
@@ -132,10 +137,75 @@ export const readCarrierUrl = (element: Element): string => {
   return collapseSlashRuns(foldEscapedAmpersands(url ?? ''))
 }
 
-// The carrier url a resolver reads, with the class repairs applied. A frame no resolver claims
-// keeps the url `readCarrierUrl` gives.
-export const readRepairedCarrierUrl = (element: Element): string => {
-  return repairUrl(readCarrierUrl(element))
+type MatchUrl = {
+  (url: string, context: Nullish<TransformContext>): string
+  (url: Nullish<string>, context: Nullish<TransformContext>): string | undefined
+}
+
+// Held off the document, so a carrier no resolver claims keeps the url its publisher wrote. Keyed
+// by the context, whose hooks and base url decide the result, then by the url read.
+const matchedUrls = new WeakMap<TransformContext, Map<string, string>>()
+
+const applyMatcher = (url: string, context: TransformContext): string => {
+  if (!context.matchUrlFn && !context.cleanUrlFn) {
+    return url
+  }
+
+  // A matcher reads the host, which a protocol-relative or site-relative url names only once
+  // resolved.
+  const resolved = resolveOrKeepUrl(repairUrl(url), context)
+  const matched = cleanMatchUrl(resolved, context)
+
+  // A matcher that changes nothing past the repairs leaves the url as written, which is what a
+  // resolver reads with no matcher.
+  if (matched === repairUrl(resolved)) {
+    return url
+  }
+
+  return matched
+}
+
+// A url a resolver reads to recognise it, through the caller's matchUrlFn, so a resolver reads the
+// url an embed or image proxy wraps once the matcher unwraps it. The resolver reads the value from
+// whatever source holds it. Only for recognition: a url the resolver hands on is read as written,
+// and prepareUrl cleans it.
+export const matchUrl: MatchUrl = ((url: Nullish<string>, context: Nullish<TransformContext>) => {
+  // A helper a resolver shares with a context-free caller reads the url as written.
+  if (!url || !context) {
+    return url ?? undefined
+  }
+
+  let urls = matchedUrls.get(context)
+
+  if (!urls) {
+    urls = new Map()
+    matchedUrls.set(context, urls)
+  }
+
+  let matched = urls.get(url)
+
+  if (matched === undefined) {
+    matched = applyMatcher(url, context)
+    urls.set(url, matched)
+  }
+
+  return matched
+}) as MatchUrl
+
+// The carrier url a resolver recognises, matched, with the class repairs applied. A frame no
+// resolver claims keeps the url `readCarrierUrl` gives.
+export const readRepairedCarrierUrl = (element: Element, context: TransformContext): string => {
+  return repairUrl(matchUrl(readCarrierUrl(element), context))
+}
+
+// The matched carrier url, parsed, when it sits on one of the hosts.
+export const readCarrierUrlOnHosts = (
+  element: Element,
+  hosts: string | ReadonlyArray<string>,
+  context: TransformContext,
+  isOnHost?: (url: URL, hosts: string | ReadonlyArray<string>) => boolean,
+): URL | undefined => {
+  return parseUrlOnHosts(matchUrl(readCarrierUrl(element), context), hosts, isOnHost)
 }
 
 type ResolverOptions = {
@@ -151,14 +221,14 @@ type ResolverOptions = {
 // A resolver whose selector names the platform's own markup.
 export const createMarkupEmbedResolver = (
   selector: string,
-  extract: (element: Element) => EmbedResolverResult | undefined,
+  extract: (element: Element, context: TransformContext) => EmbedResolverResult | undefined,
   options: ResolverOptions = {},
 ): EmbedResolver => {
   return {
     kind: 'embed',
     selector,
-    extract: (element) => {
-      return decideSize(element, extract(element), options.readCarrierSize)
+    extract: (element, context) => {
+      return decideSize(element, extract(element, context), options.readCarrierSize)
     },
   }
 }
@@ -280,8 +350,8 @@ export const createUrlEmbedResolver = (
   return {
     kind: 'embed',
     selector: embedCarrierSelector,
-    extract: (element) => {
-      const src = readCarrierUrl(element)
+    extract: (element, context) => {
+      const src = matchUrl(readCarrierUrl(element), context)
       const url = parseUrlOnHosts(src, hosts, options.isOnHost)
 
       // A script that never filled its template, `embed/$1`, names no item, and its frame stays
@@ -290,7 +360,7 @@ export const createUrlEmbedResolver = (
         return
       }
 
-      return decideSize(element, extract(url, element), options.readCarrierSize)
+      return decideSize(element, extract(url, element, context), options.readCarrierSize)
     },
   }
 }
@@ -308,9 +378,10 @@ export const isEmbedOrMediaResolver = (
 export const isResolvedIframe = async (
   iframe: Element,
   resolvers: ReadonlyArray<WidgetResolver>,
+  context: TransformContext,
 ): Promise<boolean> => {
   for (const resolver of resolvers) {
-    if (iframe.matches(resolver.selector) && (await resolver.extract(iframe))) {
+    if (iframe.matches(resolver.selector) && (await resolver.extract(iframe, context))) {
       return true
     }
   }
@@ -341,13 +412,14 @@ export const getMediaTag = (url: string): MediaResolverResult['tag'] | undefined
 export const resolveEmbedProbe = async (
   probe: Element,
   resolvers: ReadonlyArray<WidgetResolver>,
+  context: TransformContext,
 ): Promise<EmbedResolverResult | undefined> => {
   for (const resolver of resolvers) {
     if (!isEmbedOrMediaResolver(resolver) || !probe.matches(resolver.selector)) {
       continue
     }
 
-    const metadata = await resolver.extract(probe)
+    const metadata = await resolver.extract(probe, context)
 
     if (metadata && !isMediaResult(metadata)) {
       return metadata
@@ -369,8 +441,11 @@ export const toPlayerKey = (embed: EmbedResolverResult | undefined): string | un
 export const readPlayer = async (
   frame: Element,
   resolvers: ReadonlyArray<WidgetResolver>,
+  context: TransformContext,
 ): Promise<string | undefined> => {
-  return toPlayerKey(await resolveEmbedProbe(frame.cloneNode(true) as Element, resolvers))
+  const probe = frame.cloneNode(true) as Element
+
+  return toPlayerKey(await resolveEmbedProbe(probe, resolvers, context))
 }
 
 // Not used by the injectEnclosures probe: anything set here would change what every resolver sees.

@@ -6,7 +6,7 @@ import {
   readThumbnailVideoId,
   hosts as youtubeHosts,
 } from '../../embeds/youtube.js'
-import type { DomTransform } from '../../types.js'
+import type { DomTransform, TransformContext } from '../../types.js'
 import {
   attr,
   isBr,
@@ -26,8 +26,11 @@ const feedThumbnailSelector = 'a:has(> img[alt="YouTube Video"])'
 // The thumbnail is YouTube's poster url, or that url in the `origThumbUrl` param of the plugin's
 // own `lyteCache.php` when it serves thumbnails locally. A bare <img> is claimed as a player, so
 // the id has to have a video's shape.
-const readFeedThumbnailVideoId = (image: Element): string | undefined => {
-  const src = parseUrl(readRepairedCarrierUrl(image), placeholderBaseUrl)
+const readFeedThumbnailVideoId = (
+  image: Element,
+  context: TransformContext,
+): string | undefined => {
+  const src = parseUrl(readRepairedCarrierUrl(image, context), placeholderBaseUrl)
   const cachedUrl = endsWithAnyOf(src?.pathname, '/lytecache.php')
     ? getQueryParam(src, 'origThumbUrl')
     : undefined
@@ -76,7 +79,7 @@ const removeFeedLabel = (thumbnail: Element, videoId: string): void => {
   node.remove()
 }
 
-const rebuildFeedThumbnails = (document: Document): void => {
+const rebuildFeedThumbnails = (document: Document, context: TransformContext): void => {
   for (const thumbnail of document.querySelectorAll(feedThumbnailSelector)) {
     if (thumbnail.children.length > 1) {
       continue
@@ -88,7 +91,7 @@ const rebuildFeedThumbnails = (document: Document): void => {
 
     // The selector matched an `img` child, and the link holds no other element.
     const image = thumbnail.firstElementChild as Element
-    const videoId = readFeedThumbnailVideoId(image)
+    const videoId = readFeedThumbnailVideoId(image, context)
 
     if (!videoId) {
       continue
@@ -112,7 +115,7 @@ const rebuildFeedThumbnails = (document: Document): void => {
 
 // WP YouTube Lyte ships a facade whose id carries the video id and builds the iframe on click.
 // It writes `div.lyMe#WYL_{id}` around `div.pL#lyte_{id}`.
-export const rebuildLyteEmbeds: DomTransform = () => (document) => {
+export const rebuildLyteEmbeds: DomTransform = (context) => (document) => {
   for (const element of document.querySelectorAll('div.lyMe[id^="WYL_"], div.pL[id^="lyte_"]')) {
     // The inner lyte node arrives detached once its WYL wrapper has been replaced.
     if (!element.parentNode) {
@@ -136,5 +139,5 @@ export const rebuildLyteEmbeds: DomTransform = () => (document) => {
     element.replaceWith(iframe)
   }
 
-  rebuildFeedThumbnails(document)
+  rebuildFeedThumbnails(document, context)
 }

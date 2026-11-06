@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
-import { describeForEachParser, html, resolverExtractor } from '../tests.js'
+import { baseContext, describeForEachParser, html, resolverExtractor } from '../tests.js'
 import type { CleanUrlFn, EmbedResolverResult } from '../types.js'
 import {
   type BlubrryPlayer,
@@ -519,6 +519,33 @@ describeForEachParser('blubrryIframeEmbedResolver carrier title', (parseHtml) =>
 
 describeForEachParser('blubrryPowerpressEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, blubrryPowerpressEmbedResolver)
+
+  describe('a frame whose url matchUrlFn rewrites', () => {
+    const stripMediumFn: CleanUrlFn = (url) => {
+      return url.replace('&utm_medium=feed', '')
+    }
+    const extractMatched = resolverExtractor(parseHtml, blubrryPowerpressEmbedResolver, {
+      ...baseContext,
+      matchUrlFn: stripMediumFn,
+    })
+
+    it('should pass the frame through as written, not the url matchUrlFn gives', async () => {
+      const value = html`
+        <iframe
+          height="30"
+          src="https://example.com/show/?powerpress_embed=3443-podcast&amp;powerpress_player=mediaelement-audio&amp;utm_medium=feed"
+        ></iframe>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'blubrry',
+        id: 'example.com/show/3443-podcast',
+        src: 'https://example.com/show/?powerpress_embed=3443-podcast&powerpress_player=mediaelement-audio&utm_medium=feed',
+        height: 40,
+      }
+
+      expect(await extractMatched(value)).toEqual(expected)
+    })
+  })
 
   describe('happy paths', () => {
     it('should pass an audio frame through at the measured bar height', async () => {

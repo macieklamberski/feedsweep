@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../../index.js'
-import { baseContext, describeForEachParser, html } from '../../tests.js'
+import { baseContext, createProxyUnwrapFn, describeForEachParser, html } from '../../tests.js'
+import type { CleanUrlFn } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { rebuildIframelyEmbeds } from './rebuildIframelyEmbeds.js'
+
+const unwrapIframelyFn = createProxyUnwrapFn(['cdn.iframe.ly', 'iframely.net'], 'url')
 
 describeForEachParser('rebuildIframelyEmbeds', (parseHtml) => {
   const transform = (value: string) => {
@@ -171,90 +174,6 @@ describeForEachParser('rebuildIframelyEmbeds', (parseHtml) => {
     })
   })
 
-  describe('the iframe API frame', () => {
-    it('should point a frame on cdn.iframe.ly at the YouTube video it names', async () => {
-      const value = html`
-        <iframe
-          allow="autoplay *; encrypted-media *"
-          allowfullscreen=""
-          scrolling="no"
-          src="https://cdn.iframe.ly/api/iframe?url=https%3A%2F%2Fyoutu.be%2FNObkWjQHNm8%3Fsi%3DucUQoghAP7K-_bgE&amp;v=1&amp;app=1&amp;key=57d2ec5998440ab74c7cf485bffd908c"
-        ></iframe>
-      `
-      const expected = '<iframe src="https://youtu.be/NObkWjQHNm8?si=ucUQoghAP7K-_bgE"></iframe>'
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should point a frame whose API route is in capitals at the video it names', async () => {
-      const value = html`
-        <iframe src="https://cdn.iframe.ly/API/IFRAME?url=https%3A%2F%2Fyoutu.be%2FNObkWjQHNm8&amp;key=57d2ec5998440ab74c7cf485bffd908c"></iframe>
-      `
-      const expected = '<iframe src="https://youtu.be/NObkWjQHNm8"></iframe>'
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should point a frame on iframely.net at the TikTok video it names', async () => {
-      const value = html`
-        <iframe
-          class="tiktok-iframe"
-          src="https://iframely.net/api/iframe?media=1&amp;app=1&amp;url=https%3A%2F%2Fwww.tiktok.com%2F%40tamoorewrites%2Fvideo%2F7641692647203130646&amp;key=e27c740634285c9ddc20db64f73358dd"
-          frameborder="0"
-          allowfullscreen=""
-          scrolling="no"
-          loading="lazy"
-        ></iframe>
-      `
-      const expected =
-        '<iframe src="https://www.tiktok.com/@tamoorewrites/video/7641692647203130646"></iframe>'
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should point a protocol-relative frame at the unencoded url it names', async () => {
-      const value = html`
-        <iframe
-          src="//cdn.iframe.ly/api/iframe?app=1&amp;api_key=082915126879d5135eb7bb&amp;url=https://x.com/rion_eos/status/2043687804111380544"
-          frameborder="0"
-          allowfullscreen=""
-        ></iframe>
-      `
-      const expected = '<iframe src="https://x.com/rion_eos/status/2043687804111380544"></iframe>'
-
-      expect(await transform(value)).toEqualHtml(expected)
-    })
-
-    it('should keep the frame when no resolver claims the url it names', async () => {
-      const value = html`
-        <iframe
-          src="https://cdn.iframe.ly/api/iframe?_layout=standard&amp;_playlist=false&amp;_theme=light&amp;app=1&amp;url=https%3A%2F%2Fdaily.bandcamp.com%2Ffeatures%2Fbeatnik-youth-interview&amp;key=e27c740634285c9ddc20db64f73358dd"
-          frameborder="0"
-          scrolling="no"
-          allowfullscreen="true"
-        ></iframe>
-      `
-
-      expect(await transform(value)).toEqualHtml(value)
-    })
-
-    // Constructed: the iframe API path on a host Iframely does not serve it from.
-    it('should keep a frame on another host carrying the iframe API path', async () => {
-      const value =
-        '<iframe src="https://evil.test/api/iframe?url=https%3A%2F%2Fyoutu.be%2FNObkWjQHNm8"></iframe>'
-
-      expect(await transform(value)).toEqualHtml(value)
-    })
-
-    // Constructed: an iframe API frame naming no url.
-    it('should keep a frame naming no url', async () => {
-      const value =
-        '<iframe src="https://cdn.iframe.ly/api/iframe?app=1&amp;key=57d2ec5998440ab74c7cf485bffd908c"></iframe>'
-
-      expect(await transform(value)).toEqualHtml(value)
-    })
-  })
-
   describe('sad paths', () => {
     it('should leave an anchor that already carries its own text alone', async () => {
       const value = html`
@@ -308,15 +227,6 @@ describeForEachParser('rebuildIframelyEmbeds', (parseHtml) => {
       expect(twice).toEqualHtml(once)
     })
 
-    it('should be idempotent on an iframe API frame', async () => {
-      const value =
-        '<iframe src="https://cdn.iframe.ly/api/iframe?url=https%3A%2F%2Fyoutu.be%2FNObkWjQHNm8%3Fsi%3DucUQoghAP7K-_bgE&amp;v=1&amp;app=1&amp;key=57d2ec5998440ab74c7cf485bffd908c"></iframe>'
-      const once = await transform(value)
-      const twice = await transform(once)
-
-      expect(twice).toEqualHtml(once)
-    })
-
     it('should be idempotent on an oEmbed wrapper', async () => {
       const value = html`
         <div data-oembed-url="https://www.canva.com/design/DAG1xDat1Ws/FP_KGaz1JYLKDQxMLY02AQ/view">
@@ -336,8 +246,12 @@ describeForEachParser('rebuildIframelyEmbeds', (parseHtml) => {
 // The whole run drops an empty anchor and every loader script, so only the pipeline shows the
 // destination surviving.
 describeForEachParser('rebuildIframelyEmbeds through the pipeline', (parseHtml) => {
-  const convert = (value: string) => {
-    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  const convert = (value: string, cleanUrlFn?: CleanUrlFn) => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      cleanUrlFn,
+    })
   }
 
   it('should keep the destination of an article facade as a link', async () => {
@@ -449,7 +363,7 @@ describeForEachParser('rebuildIframelyEmbeds through the pipeline', (parseHtml) 
     expect(await convert(value)).toEqualHtml(expected)
   })
 
-  it('should bring an iframe API frame back as the player of the url it names', async () => {
+  it('should bring an iframe API frame the cleaner unwraps back as the player of the url it names', async () => {
     const value = html`
       <iframe
         allow="autoplay *; encrypted-media *"
@@ -469,10 +383,10 @@ describeForEachParser('rebuildIframelyEmbeds through the pipeline', (parseHtml) 
       ></div>
     `
 
-    expect(await convert(value)).toEqualHtml(expected)
+    expect(await convert(value, unwrapIframelyFn)).toEqualHtml(expected)
   })
 
-  it('should bring a lazy iframe API frame back as the player of the url it names', async () => {
+  it('should bring a lazy iframe API frame the cleaner unwraps back as the player of the url it names', async () => {
     const value = html`
       <iframe
         data-img
@@ -493,7 +407,7 @@ describeForEachParser('rebuildIframelyEmbeds through the pipeline', (parseHtml) 
       ></div>
     `
 
-    expect(await convert(value)).toEqualHtml(expected)
+    expect(await convert(value, unwrapIframelyFn)).toEqualHtml(expected)
   })
 
   it('should load a lazy iframe API frame no resolver claims through its own url', async () => {

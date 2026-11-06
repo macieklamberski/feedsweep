@@ -1,8 +1,10 @@
 import { expect, it } from 'bun:test'
 import { transformContent } from '../../index.js'
-import { baseContext, describeForEachParser, html } from '../../tests.js'
+import { baseContext, createProxyUnwrapFn, describeForEachParser, html } from '../../tests.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { surfaceNoscriptEmbeds } from './surfaceNoscriptEmbeds.js'
+
+const unwrapDrupalFn = createProxyUnwrapFn('example.com', 'url')
 
 describeForEachParser('surfaceNoscriptEmbeds', (parseHtml) => {
   const transform = (value: string) => {
@@ -86,7 +88,7 @@ describeForEachParser('surfaceNoscriptEmbeds', (parseHtml) => {
     expect(result).toEqualHtml(expected)
   })
 
-  it('should produce a youtube placeholder from a Drupal oEmbed route end to end', async () => {
+  it('should produce a youtube placeholder from a Drupal oEmbed route the cleaner unwraps', async () => {
     const value = html`
       <noscript>
         <iframe src="/media/oembed?url=https%3A//www.youtube.com/watch%3Fv%3DdQw4w9WgXcQ&amp;hash=abc"></iframe>
@@ -105,6 +107,7 @@ describeForEachParser('surfaceNoscriptEmbeds', (parseHtml) => {
     const result = await transformContent(value, {
       parseHtmlFn: parseHtml,
       baseUrl: 'https://example.com',
+      cleanUrlFn: unwrapDrupalFn,
     })
 
     expect(result).toEqualHtml(expected)

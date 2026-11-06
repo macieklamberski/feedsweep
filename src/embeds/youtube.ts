@@ -407,6 +407,8 @@ const instanceHosts = ['invidio.us', 'yewtu.be', 'inv.nadeko.net', 'inv.riversid
 // between them, each as seconds or as `1m30s`.
 const frontendOffsetParams = ['t', 'time_continue']
 
+const embedRouteRegex = /\/embed\//i
+
 const isFrontendFrame = (url: URL, element: Element): boolean => {
   const [label] = url.hostname.split('.')
 
@@ -420,11 +422,12 @@ const isFrontendFrame = (url: URL, element: Element): boolean => {
 // An Invidious or Piped frame: the instance's player for a YouTube id, mostly on instances that
 // are gone.
 export const youtubeFrontendEmbedResolver = createMarkupEmbedResolver(
-  'iframe[src*="/embed/" i]',
-  (element) => {
-    const url = parseUrl(readRepairedCarrierUrl(element))
+  'iframe[src]',
+  (element, context) => {
+    const link = readRepairedCarrierUrl(element, context)
+    const url = parseUrl(link)
 
-    if (!url || !isFrontendFrame(url, element)) {
+    if (!url || !embedRouteRegex.test(link) || !isFrontendFrame(url, element)) {
       return
     }
 

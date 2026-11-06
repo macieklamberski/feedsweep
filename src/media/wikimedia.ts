@@ -9,8 +9,8 @@ import { readRepairedCarrierUrl } from '../utils/widgets.js'
 export const wikimediaMediaResolver: MediaResolver = {
   kind: 'media',
   selector: 'iframe',
-  extract: (element) => {
-    const source = readRepairedCarrierUrl(element)
+  extract: (element, context) => {
+    const source = readRepairedCarrierUrl(element, context)
 
     if (!source || !isMediaWikiFilePage(source) || !audioFileRegex.test(source)) {
       return

@@ -104,7 +104,7 @@ export const surfaceParkedMarkup: DomTransform = (context) => async (document) =
       const playedElsewhere: Array<string> = []
 
       for (const frame of document.querySelectorAll('iframe')) {
-        const player = await readPlayer(frame, context.widgetResolvers)
+        const player = await readPlayer(frame, context.widgetResolvers, context)
 
         if (player) {
           playedElsewhere.push(player)
@@ -115,7 +115,7 @@ export const surfaceParkedMarkup: DomTransform = (context) => async (document) =
       const frames: Array<Element> = []
 
       for (const frame of holder.querySelectorAll('iframe')) {
-        const player = await readPlayer(frame, context.widgetResolvers)
+        const player = await readPlayer(frame, context.widgetResolvers, context)
 
         if (player && playedElsewhere.includes(player)) {
           continue

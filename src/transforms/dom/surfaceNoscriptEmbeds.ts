@@ -18,7 +18,7 @@ export const surfaceNoscriptEmbeds: DomTransform = (context) => async (document)
     iframe.setAttribute('src', src)
 
     // Ungated, this would surface Google Tag Manager, reCAPTCHA and ad-network noscript frames.
-    if (!(await isResolvedIframe(iframe, context.widgetResolvers))) {
+    if (!(await isResolvedIframe(iframe, context.widgetResolvers, context))) {
       continue
     }
 

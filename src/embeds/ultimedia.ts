@@ -1,7 +1,5 @@
 import type { EmbedRenderHint } from '../types.js'
-import { attr } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
-import { createMarkupEmbedResolver } from '../utils/widgets.js'
+import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ultimedia'
 
@@ -16,29 +14,25 @@ const playerPathRegex = /^\/deliver\/generic\/iframe\/mdtk\/([^/]+)\/src\/([^/]+
 // Ultimedia, trading as Digiteka: the generic player iframe, which plays as it stands and states
 // its own size. The legacy `/swf/iframe_pub.php` route names its account key in `mdtk`, but its
 // videos answer "Video not found" on the generic player, so there is nothing on it to mint from.
-export const ultimediaEmbedResolver = createMarkupEmbedResolver(
-  'iframe[src*="ultimedia.com/deliver" i]',
-  (element) => {
-    const parsed = parseUrlOnHosts(attr(element, 'src'), 'ultimedia.com')
-    const match = parsed && playerPathRegex.exec(parsed.pathname)
+export const ultimediaEmbedResolver = createUrlEmbedResolver(['ultimedia.com'], (url) => {
+  const match = playerPathRegex.exec(url.pathname)
 
-    if (!match) {
-      return
-    }
+  if (!match) {
+    return
+  }
 
-    const [, accountKey, videoId] = match
+  const [, accountKey, videoId] = match
 
-    return {
-      provider,
-      // A video id under another account key answers "This video is no longer available", and the
-      // route without a key finds no playable source, so the key is part of what names the video.
-      id: `${accountKey}/${videoId}`,
-      // A path without `zone` loads zone 1, the placement the platform's oEmbed answer writes.
-      src: `https://www.ultimedia.com/deliver/generic/iframe/mdtk/${accountKey}/src/${videoId}/`,
-      ...sizes.player,
-    }
-  },
-)
+  return {
+    provider,
+    // A video id under another account key answers "This video is no longer available", and the
+    // route without a key finds no playable source, so the key is part of what names the video.
+    id: `${accountKey}/${videoId}`,
+    // A path without `zone` loads zone 1, the placement the platform's oEmbed answer writes.
+    src: `https://www.ultimedia.com/deliver/generic/iframe/mdtk/${accountKey}/src/${videoId}/`,
+    ...sizes.player,
+  }
+})
 
 export const ultimediaRenderHint: EmbedRenderHint = {
   provider,

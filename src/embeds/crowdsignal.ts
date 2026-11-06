@@ -1,8 +1,13 @@
 import { encodePathSegment } from 'trousse'
-import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
+import type { EmbedResolverResult, ResolveUrlEmbed, TransformContext } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  createMarkupEmbedResolver,
+  createUrlEmbedResolver,
+  matchUrl,
+  readCarrierUrl,
+} from '../utils/widgets.js'
 
 const provider = 'crowdsignal'
 
@@ -48,9 +53,10 @@ export const crowdsignalIframeEmbedResolver = createUrlEmbedResolver(
 
 // The poll a snippet's <noscript> names in its frame or link, on poll.fm or the retired
 // `polldaddy.com/poll/{id}` page.
-const readFallbackPollId = (fallback: Element): string | undefined => {
+const readFallbackPollId = (fallback: Element, context: TransformContext): string | undefined => {
   const named = fallback.querySelector('a[href], iframe[src]')
-  const url = attr(named, 'href') ?? attr(named, 'src')
+  const url =
+    named?.localName === 'iframe' ? matchUrl(readCarrierUrl(named), context) : attr(named, 'href')
   const frame = parseUrlOnHosts(url, 'poll.fm')
 
   if (frame) {
@@ -65,7 +71,7 @@ const readFallbackPollId = (fallback: Element): string | undefined => {
 // naming the same poll as a frame or a link would show the poll a second time.
 export const crowdsignalScriptEmbedResolver = createMarkupEmbedResolver(
   'script[src*="polldaddy.com/p/" i]',
-  (element) => {
+  (element, context) => {
     const loader = parseUrlOnHosts(attr(element, 'src'), 'polldaddy.com')
     const pollId = loader?.pathname.match(loaderPathRegex)?.[1]
 
@@ -88,7 +94,7 @@ export const crowdsignalScriptEmbedResolver = createMarkupEmbedResolver(
 
     const fallback = element.nextElementSibling
 
-    if (fallback?.localName === 'noscript' && readFallbackPollId(fallback) === pollId) {
+    if (fallback?.localName === 'noscript' && readFallbackPollId(fallback, context) === pollId) {
       fallback.remove()
     }
 

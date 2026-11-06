@@ -32,21 +32,28 @@ const composeIframe = (document: Document, source: string, poster?: string): Ele
 }
 
 // Embedly ships an embed as a wrapper iframe or as an empty div only the publishing client fills.
+// Unwrapping the wrapper's url to the embed it holds is the caller's cleanUrlFn's, through
+// urlpurify's embedProxyUnwrappers.
 export const rebuildEmbedlyEmbeds: DomTransform = () => (document) => {
   for (const element of document.querySelectorAll(embedlyCarrierSelector)) {
     if (element.localName === 'iframe') {
-      // The wrapper's query holds the embed as src, its poster as image and the canonical as url.
       const params = parseUrlOnHosts(attr(element, 'src'), embedlyHosts)?.searchParams
-      const inner = getQueryParam(params, 'src')
 
-      if (!isUsableUrl(inner)) {
+      if (!params) {
         continue
       }
 
+      // Embedly titles the wrapper for itself, such as `YouTube embed`, not for the item.
+      element.removeAttribute('title')
+
+      // The wrapper's query holds its poster as image, which the url the cleaner unwraps it to
+      // does not carry.
       const poster = getQueryParam(params, 'image')
 
-      const iframe = composeIframe(document, inner, isUsableUrl(poster) ? poster : undefined)
-      element.replaceWith(iframe)
+      if (isUsableUrl(poster)) {
+        element.setAttribute('data-thumbnail', poster)
+      }
+
       continue
     }
 

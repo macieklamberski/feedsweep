@@ -1,11 +1,11 @@
 import { describe, expect } from 'bun:test'
 import { JSDOM } from 'jsdom'
 import { parseHTML } from 'linkedom'
-import { isString, type MaybePromise } from 'trousse'
+import { getQueryParam, isString, type MaybePromise } from 'trousse'
 import { defaultContext } from './defaults/context.js'
 import { parseHtml as parseWithLinkedom } from './parsers/linkedom.js'
 import { convertEmojis } from './transforms/dom/convertEmojis.js'
-import type { TransformContext } from './types.js'
+import type { CleanUrlFn, TransformContext } from './types.js'
 import { applyDomTransforms } from './utils/transforms.js'
 import { parseUrlOnHosts } from './utils/urls.js'
 import { cleanResultFields } from './utils/widgets.js'
@@ -50,7 +50,7 @@ export const describeForEachParser = (name: string, fn: (parseHtml: ParseHtml) =
 
 type AnyResolver<Result> = {
   selector: string
-  extract: (element: Element) => MaybePromise<Result | undefined>
+  extract: (element: Element, context: TransformContext) => MaybePromise<Result | undefined>
 }
 
 type ExtractFixture<Result> = (value: string) => Promise<Result | undefined>
@@ -67,11 +67,23 @@ export const carrierUrl = (value: string, hosts: string | ReadonlyArray<string>)
   return url
 }
 
+// A caller's cleanUrlFn standing in for urlpurify's embedProxyUnwrappers: a url on the proxy's
+// hosts gives the url in its `param` query value.
+export const createProxyUnwrapFn = (
+  hosts: string | ReadonlyArray<string>,
+  param: string,
+): CleanUrlFn => {
+  return (url) => {
+    return getQueryParam(parseUrlOnHosts(url, hosts)?.searchParams, param) ?? url
+  }
+}
+
 // Runs a resolver's extract on the element its selector claims in a fixture, then the field
 // cleaners the pipeline runs on every result, so a fixture asserts what a placeholder carries.
 export const resolverExtractor = <Result>(
   parseHtml: ParseHtml,
   resolver: AnyResolver<Result>,
+  context: TransformContext = baseContext,
 ): ExtractFixture<Result> => {
   return async (value) => {
     const element = parseHtml(value).querySelector(resolver.selector)
@@ -80,13 +92,13 @@ export const resolverExtractor = <Result>(
       return
     }
 
-    const result = await resolver.extract(element)
+    const result = await resolver.extract(element, context)
 
     if (!result) {
       return
     }
 
-    return cleanResultFields(result, baseContext)
+    return cleanResultFields(result, context)
   }
 }
 
