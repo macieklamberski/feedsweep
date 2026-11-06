@@ -1,7 +1,8 @@
 import { getPathSegments, getQueryParam, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
+import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { createUrlEmbedResolver, readMatchFlashVar } from '../utils/widgets.js'
+import { createUrlEmbedResolver, matchUrl } from '../utils/widgets.js'
 
 const provider = 'corriere'
 
@@ -57,7 +58,7 @@ export const corriereResolveEmbed: ResolveUrlEmbed = (url, element, context) => 
       return
     }
 
-    return readFeedVideo(readMatchFlashVar(element, 'videoUrl', context))
+    return readFeedVideo(matchUrl(flashVar(element, 'videoUrl'), context))
   }
 
   const segments = getPathSegments(url)

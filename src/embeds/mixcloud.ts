@@ -7,9 +7,9 @@ import {
   parseUrl,
 } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
-import { attr } from '../utils/dom.js'
+import { attr, flashVar } from '../utils/dom.js'
 import { isFileName, placeholderBaseUrl } from '../utils/urls.js'
-import { createUrlEmbedResolver, readMatchFlashVar } from '../utils/widgets.js'
+import { createUrlEmbedResolver, matchUrl } from '../utils/widgets.js'
 
 const provider = 'mixcloud'
 
@@ -87,7 +87,7 @@ export const extractMixcloudShow = (url: URL): string | undefined => {
 }
 
 export const mixcloudResolveEmbed: ResolveUrlEmbed = (url, element, context) => {
-  const show = readShowUrl(url, readMatchFlashVar(element, 'feed', context))
+  const show = readShowUrl(url, matchUrl(flashVar(element, 'feed'), context))
 
   if (!show) {
     return

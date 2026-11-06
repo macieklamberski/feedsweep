@@ -7,7 +7,7 @@ import {
   createMarkupEmbedResolver,
   createS9eEmbedResolver,
   createUrlEmbedResolver,
-  readMatchUrl,
+  matchUrl,
 } from '../utils/widgets.js'
 
 const provider = 'tumblr'
@@ -50,7 +50,7 @@ export const tumblrIframeEmbedResolver = createUrlEmbedResolver(hosts, readPostE
 export const tumblrPostEmbedResolver = createMarkupEmbedResolver(
   'div.tumblr-post[data-href]',
   (element, context) => {
-    const frameUrl = parseUrlOnHosts(readMatchUrl(element, 'data-href', context), hosts)
+    const frameUrl = parseUrlOnHosts(matchUrl(attr(element, 'data-href'), context), hosts)
     const result = readPostEmbed(frameUrl)
 
     if (!result) {

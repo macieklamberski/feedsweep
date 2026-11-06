@@ -2,11 +2,7 @@ import { encodePathSegment, getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { alphanumericRegex, parseUrlOnHosts } from '../utils/urls.js'
-import {
-  createMarkupEmbedResolver,
-  createUrlEmbedResolver,
-  readMatchUrl,
-} from '../utils/widgets.js'
+import { createMarkupEmbedResolver, createUrlEmbedResolver, matchUrl } from '../utils/widgets.js'
 
 const provider = 'typeform'
 
@@ -81,7 +77,7 @@ export const typeformWidgetEmbedResolver = createMarkupEmbedResolver(
       return composeLiveEmbed(liveId, element, title)
     }
 
-    const url = parseUrlOnHosts(readMatchUrl(element, 'data-url', context), hosts)
+    const url = parseUrlOnHosts(matchUrl(attr(element, 'data-url'), context), hosts)
 
     if (!url) {
       return

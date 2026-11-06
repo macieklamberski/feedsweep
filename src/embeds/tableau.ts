@@ -3,11 +3,7 @@ import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../t
 import { attr, paramValue, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import {
-  createMarkupEmbedResolver,
-  createUrlEmbedResolver,
-  matchCarrierUrl,
-} from '../utils/widgets.js'
+import { createMarkupEmbedResolver, createUrlEmbedResolver, matchUrl } from '../utils/widgets.js'
 
 type View = {
   workbook: string
@@ -114,11 +110,7 @@ export const tableauObjectEmbedResolver = createMarkupEmbedResolver(
   'object.tableauViz',
   (element, context) => {
     // `viz_v1.js` decodes `host_url` before it builds the frame url on it.
-    const hostUrl = matchCarrierUrl(
-      element,
-      decodeSegment(paramValue(element, 'host_url')),
-      context,
-    )
+    const hostUrl = matchUrl(decodeSegment(paramValue(element, 'host_url')), context)
     const match = paramValue(element, 'name')?.match(viewNameRegex)
 
     if (!parseUrlOnHosts(hostUrl, hosts) || !match) {

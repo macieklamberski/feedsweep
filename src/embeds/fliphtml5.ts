@@ -2,11 +2,7 @@ import { composeFragment, getFragmentParams, getPathSegments } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
-import {
-  createMarkupEmbedResolver,
-  createUrlEmbedResolver,
-  readMatchUrl,
-} from '../utils/widgets.js'
+import { createMarkupEmbedResolver, createUrlEmbedResolver, matchUrl } from '../utils/widgets.js'
 
 const provider = 'fliphtml5'
 
@@ -51,7 +47,7 @@ export const fliphtml5IframeEmbedResolver = createUrlEmbedResolver(hosts, flipht
 export const fliphtml5LightBoxEmbedResolver = createMarkupEmbedResolver(
   'img[data-rel="fh5-light-box-demo"][data-href]',
   (element, context) => {
-    const url = parseUrlOnHosts(readMatchUrl(element, 'data-href', context), hosts)
+    const url = parseUrlOnHosts(matchUrl(attr(element, 'data-href'), context), hosts)
 
     if (!url) {
       return

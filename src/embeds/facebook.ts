@@ -19,7 +19,7 @@ import {
   createMarkupEmbedResolver,
   createS9eEmbedResolver,
   createUrlEmbedResolver,
-  readMatchUrl,
+  matchUrl,
 } from '../utils/widgets.js'
 
 const provider = 'facebook'
@@ -332,7 +332,7 @@ export const facebookS9eEmbedResolver = createS9eEmbedResolver('facebook', (frag
 export const facebookBlockquoteEmbedResolver = createMarkupEmbedResolver(
   fallbackSelector,
   (element, context) => {
-    const cite = readMatchUrl(element, 'cite', context)
+    const cite = matchUrl(attr(element, 'cite'), context)
     const parsed = parseUrlOnHosts(cite, hosts)
 
     if (!cite || !parsed) {

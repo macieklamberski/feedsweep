@@ -2,7 +2,7 @@ import { getPathSegments, isAnyOf } from 'trousse'
 import type { MediaResolver } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { matchCarrierUrl, pluginCarrierSelector, readCarrierUrlOnHosts } from '../utils/widgets.js'
+import { matchUrl, pluginCarrierSelector, readCarrierUrlOnHosts } from '../utils/widgets.js'
 
 const hosts = ['odeo.com']
 
@@ -29,7 +29,7 @@ export const odeoMediaResolver: MediaResolver = {
 
     const source = flashVar(element, 'external_url')
 
-    if (!source || parseUrlOnHosts(matchCarrierUrl(element, source, context), deadFileHosts)) {
+    if (!source || parseUrlOnHosts(matchUrl(source, context), deadFileHosts)) {
       return
     }
 

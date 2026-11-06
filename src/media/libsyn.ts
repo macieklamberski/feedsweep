@@ -2,7 +2,7 @@ import { includesAnyOf, parseUrl } from 'trousse'
 import type { MediaResolver } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { audioFileRegex, placeholderBaseUrl } from '../utils/urls.js'
-import { matchCarrierUrl, readCarrierUrlOnHosts } from '../utils/widgets.js'
+import { matchUrl, readCarrierUrlOnHosts } from '../utils/widgets.js'
 
 const hosts = ['media.libsyn.com']
 const playerPath = '/_static/play/player-licensed.swf'
@@ -25,7 +25,7 @@ export const libsynMediaResolver: MediaResolver = {
       return
     }
 
-    const matched = matchCarrierUrl(element, source, context)
+    const matched = matchUrl(source, context)
     const path = parseUrl(matched, placeholderBaseUrl)?.pathname ?? ''
 
     // JW Player also takes a YouTube watch page in `file`, which an audio element cannot play.

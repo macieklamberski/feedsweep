@@ -33,7 +33,7 @@ import {
   embedCarrierSelector,
   findBareHandle,
   getEmbedSize,
-  matchCarrierUrl,
+  matchUrl,
   normalizeEmbedFields,
   prepareCiteMetadata,
   prepareEmbedMetadata,
@@ -1792,7 +1792,7 @@ describeForEachParser('readCarrierUrl', (parseHtml) => {
   })
 })
 
-describeForEachParser('matchCarrierUrl', (parseHtml) => {
+describe('matchUrl', () => {
   const embedlyUrl =
     'https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2FdQw4w9WgXcQ'
   const unwrapEmbedlyFn = createProxyUnwrapFn('cdn.embedly.com', 'src')
@@ -1808,9 +1808,8 @@ describeForEachParser('matchCarrierUrl', (parseHtml) => {
       baseUrl: 'https://example.com/post',
       cleanUrlFn,
     }
-    const element = parseHtml('<iframe></iframe>').querySelector('iframe') as Element
 
-    return matchCarrierUrl(element, url, context)
+    return matchUrl(url, context)
   }
 
   describe('happy paths', () => {
@@ -1824,11 +1823,8 @@ describeForEachParser('matchCarrierUrl', (parseHtml) => {
         cleanUrlFn: stripUtmSourceFn,
         matchUrlFn: unwrapEmbedlyFn,
       }
-      const element = parseHtml('<iframe></iframe>').querySelector('iframe') as Element
 
-      expect(matchCarrierUrl(element, embedlyUrl, context)).toBe(
-        'https://www.youtube.com/embed/dQw4w9WgXcQ',
-      )
+      expect(matchUrl(embedlyUrl, context)).toBe('https://www.youtube.com/embed/dQw4w9WgXcQ')
     })
 
     it('should resolve a protocol-relative url before the cleaner reads its host', () => {
@@ -1850,6 +1846,10 @@ describeForEachParser('matchCarrierUrl', (parseHtml) => {
       expect(clean(embedlyUrl)).toBe(embedlyUrl)
     })
 
+    it('should give the url as written without a context', () => {
+      expect(matchUrl(embedlyUrl, undefined)).toBe(embedlyUrl)
+    })
+
     it('should give the url as written when the cleaner keeps it, its repairs included', () => {
       const value = 'https://example.org/embed/123&amp;autoplay=1'
 
@@ -1864,27 +1864,23 @@ describeForEachParser('matchCarrierUrl', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should call the cleaner once for a url read twice off one carrier', () => {
+    it('should call the cleaner once for a url read twice', () => {
       const context: TransformContext = { ...baseContext, cleanUrlFn: mock(unwrapEmbedlyFn) }
-      const element = parseHtml('<iframe></iframe>').querySelector('iframe') as Element
 
-      matchCarrierUrl(element, embedlyUrl, context)
-      matchCarrierUrl(element, embedlyUrl, context)
+      matchUrl(embedlyUrl, context)
+      matchUrl(embedlyUrl, context)
 
       expect(context.cleanUrlFn).toHaveBeenCalledTimes(1)
     })
 
-    it('should clean a url a pass wrote over the one read before', () => {
+    it('should clean a second url apart from the first', () => {
       const context: TransformContext = { ...baseContext, cleanUrlFn: unwrapEmbedlyFn }
-      const element = parseHtml('<iframe></iframe>').querySelector('iframe') as Element
       const rewritten =
         'https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2FM7lc1UVf-VE'
 
-      matchCarrierUrl(element, embedlyUrl, context)
+      matchUrl(embedlyUrl, context)
 
-      expect(matchCarrierUrl(element, rewritten, context)).toBe(
-        'https://www.youtube.com/embed/M7lc1UVf-VE',
-      )
+      expect(matchUrl(rewritten, context)).toBe('https://www.youtube.com/embed/M7lc1UVf-VE')
     })
   })
 })

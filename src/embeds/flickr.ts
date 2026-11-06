@@ -19,11 +19,7 @@ import {
 } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
-import {
-  createMarkupEmbedResolver,
-  createUrlEmbedResolver,
-  readMatchUrl,
-} from '../utils/widgets.js'
+import { createMarkupEmbedResolver, createUrlEmbedResolver, matchUrl } from '../utils/widgets.js'
 
 const provider = 'flickr'
 
@@ -566,7 +562,7 @@ export const flickrAnchorEmbedResolver = createMarkupEmbedResolver(
     }
 
     const imageSrc = attr(image, 'src')
-    const matchedSrc = readMatchUrl(image, 'src', context)
+    const matchedSrc = matchUrl(attr(image, 'src'), context)
     const result = readAnchorTarget(
       url,
       matchedSrc,

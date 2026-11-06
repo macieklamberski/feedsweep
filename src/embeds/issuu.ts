@@ -10,11 +10,7 @@ import {
 import type { EmbedResolverResult, FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVars, parseFlashVars } from '../utils/dom.js'
 import { isFileName, parseUrlOnHosts } from '../utils/urls.js'
-import {
-  createMarkupEmbedResolver,
-  createUrlEmbedResolver,
-  readMatchUrl,
-} from '../utils/widgets.js'
+import { createMarkupEmbedResolver, createUrlEmbedResolver, matchUrl } from '../utils/widgets.js'
 
 const provider = 'issuu'
 
@@ -102,7 +98,7 @@ export const issuuWidgetEmbedResolver = createMarkupEmbedResolver(
       return configEmbed
     }
 
-    const declared = readMatchUrl(element, 'data-url', context)
+    const declared = matchUrl(attr(element, 'data-url'), context)
 
     return readDocumentUrl(parseUrlOnHosts(declared, hosts))
   },

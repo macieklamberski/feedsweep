@@ -24,7 +24,6 @@ import type {
 } from '../types.js'
 import {
   attr,
-  flashVar,
   type GeneratedWrapperType,
   getElementDimensions,
   getPairRatio,
@@ -138,16 +137,16 @@ export const readCarrierUrl = (element: Element): string => {
   return collapseSlashRuns(foldEscapedAmpersands(url ?? ''))
 }
 
-type MatchCarrierUrl = {
-  (element: Element, url: string, context: TransformContext): string
-  (element: Element, url: Nullish<string>, context: TransformContext): string | undefined
+type MatchUrl = {
+  (url: string, context: Nullish<TransformContext>): string
+  (url: Nullish<string>, context: Nullish<TransformContext>): string | undefined
 }
 
 // Held off the document, so a carrier no resolver claims keeps the url its publisher wrote. Keyed
-// by the url read, since a pass can rewrite a carrier's url between two reads.
-const matchedCarrierUrls = new WeakMap<Element, Map<string, string>>()
+// by the context, whose hooks and base url decide the result, then by the url read.
+const matchedUrls = new WeakMap<TransformContext, Map<string, string>>()
 
-const applyCarrierMatcher = (url: string, context: TransformContext): string => {
+const applyMatcher = (url: string, context: TransformContext): string => {
   if (!context.matchUrlFn && !context.cleanUrlFn) {
     return url
   }
@@ -166,43 +165,37 @@ const applyCarrierMatcher = (url: string, context: TransformContext): string => 
   return matched
 }
 
-// A url a resolver reads off a carrier to recognise it, through the caller's matchUrlFn, so a
-// resolver reads the url an embed or image proxy wraps once the matcher unwraps it. Only for
-// recognition: a url the resolver hands on is read as written, and prepareUrl cleans it.
-export const matchCarrierUrl: MatchCarrierUrl = ((
-  element: Element,
-  url: Nullish<string>,
-  context: TransformContext,
-) => {
-  if (!url) {
+// A url a resolver reads to recognise it, through the caller's matchUrlFn, so a resolver reads the
+// url an embed or image proxy wraps once the matcher unwraps it. The resolver reads the value from
+// whatever source holds it. Only for recognition: a url the resolver hands on is read as written,
+// and prepareUrl cleans it.
+export const matchUrl: MatchUrl = ((url: Nullish<string>, context: Nullish<TransformContext>) => {
+  // A helper a resolver shares with a context-free caller reads the url as written.
+  if (!url || !context) {
     return url ?? undefined
   }
 
-  let urls = matchedCarrierUrls.get(element)
+  let urls = matchedUrls.get(context)
 
   if (!urls) {
     urls = new Map()
-    matchedCarrierUrls.set(element, urls)
+    matchedUrls.set(context, urls)
   }
 
   let matched = urls.get(url)
 
   if (matched === undefined) {
-    matched = applyCarrierMatcher(url, context)
+    matched = applyMatcher(url, context)
     urls.set(url, matched)
   }
 
   return matched
-}) as MatchCarrierUrl
-
-export const readMatchCarrierUrl = (element: Element, context: TransformContext): string => {
-  return matchCarrierUrl(element, readCarrierUrl(element), context)
-}
+}) as MatchUrl
 
 // The carrier url a resolver recognises, matched, with the class repairs applied. A frame no
 // resolver claims keeps the url `readCarrierUrl` gives.
 export const readRepairedCarrierUrl = (element: Element, context: TransformContext): string => {
-  return repairUrl(readMatchCarrierUrl(element, context))
+  return repairUrl(matchUrl(readCarrierUrl(element), context))
 }
 
 // The matched carrier url, parsed, when it sits on one of the hosts.
@@ -212,31 +205,7 @@ export const readCarrierUrlOnHosts = (
   context: TransformContext,
   isOnHost?: (url: URL, hosts: string | ReadonlyArray<string>) => boolean,
 ): URL | undefined => {
-  return parseUrlOnHosts(readMatchCarrierUrl(element, context), hosts, isOnHost)
-}
-
-// A flashvar holding a url, matched where a resolver reads it to recognise it.
-export const readMatchFlashVar = (
-  element: Element | undefined,
-  name: string,
-  context: TransformContext | undefined,
-): string | undefined => {
-  const value = flashVar(element, name)
-
-  if (!element || !context) {
-    return value
-  }
-
-  return matchCarrierUrl(element, value, context)
-}
-
-// An attribute holding a url, matched where a resolver reads it to recognise it.
-export const readMatchUrl = (
-  element: Element,
-  attribute: string,
-  context: TransformContext,
-): string | undefined => {
-  return matchCarrierUrl(element, attr(element, attribute), context)
+  return parseUrlOnHosts(matchUrl(readCarrierUrl(element), context), hosts, isOnHost)
 }
 
 type ResolverOptions = {
@@ -382,7 +351,7 @@ export const createUrlEmbedResolver = (
     kind: 'embed',
     selector: embedCarrierSelector,
     extract: (element, context) => {
-      const src = readMatchCarrierUrl(element, context)
+      const src = matchUrl(readCarrierUrl(element), context)
       const url = parseUrlOnHosts(src, hosts, options.isOnHost)
 
       // A script that never filled its template, `embed/$1`, names no item, and its frame stays

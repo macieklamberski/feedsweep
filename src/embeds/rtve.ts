@@ -1,7 +1,7 @@
 import { encodePathSegment, getAnyOf, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVar, text } from '../utils/dom.js'
-import { createUrlEmbedResolver, readMatchFlashVar } from '../utils/widgets.js'
+import { createUrlEmbedResolver, matchUrl } from '../utils/widgets.js'
 
 const provider = 'rtve'
 
@@ -75,7 +75,7 @@ const rtveFlashResolveEmbed: ResolveUrlEmbed = (url, element, context) => {
   // says the asset is audio only through its config file.
   if (flvPlayerPathRegex.test(url.pathname)) {
     const config =
-      getQueryParam(url.searchParams, 'config') ?? readMatchFlashVar(element, 'config', context)
+      getQueryParam(url.searchParams, 'config') ?? matchUrl(flashVar(element, 'config'), context)
     const nielsen = getQueryParam(url.searchParams, 'nielsen') ?? flashVar(element, 'nielsen')
     // The asset goes from a decoded query or flashvar into a path.
     const id = encodePathSegment(nielsen?.match(nielsenAssetRegex)?.[1] ?? '')

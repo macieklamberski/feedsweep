@@ -7,7 +7,7 @@ import {
   createMarkupEmbedResolver,
   createS9eEmbedResolver,
   createUrlEmbedResolver,
-  readMatchUrl,
+  matchUrl,
 } from '../utils/widgets.js'
 
 const provider = 'tiktok'
@@ -58,7 +58,7 @@ const resolveClip = (
   context: TransformContext,
 ): EmbedResolverResult | undefined => {
   const declared = attr(element, 'data-video-id')
-  const cite = readMatchUrl(element, 'cite', context)
+  const cite = matchUrl(attr(element, 'cite'), context)
   const cited = readWatchUrl(parseUrlOnHosts(cite, hosts))
 
   let linked: Clip = {}
@@ -147,7 +147,7 @@ const resolveAccount = (
 
   const { handle, segment } = account
 
-  const cite = readMatchUrl(element, 'cite', context)
+  const cite = matchUrl(attr(element, 'cite'), context)
   const isCitedProfile = Boolean(cite && parseUrlOnHosts(cite, hosts))
 
   return {
@@ -218,7 +218,7 @@ export const tiktokMetasliderEmbedResolver = createMarkupEmbedResolver(
     // The id comes out of its attribute decoded, and it goes into a path.
     const segment = encodePathSegment(videoId)
 
-    const cite = readMatchUrl(element, 'data-cite', context)
+    const cite = matchUrl(attr(element, 'data-cite'), context)
     const { handle } = readWatchUrl(parseUrlOnHosts(cite, hosts))
     const watchPath = handle ? `@${handle}/video/${segment}` : undefined
 

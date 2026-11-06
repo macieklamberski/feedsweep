@@ -1,11 +1,8 @@
 import { getPathSegments, isAnyOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
+import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import {
-  createMarkupEmbedResolver,
-  createUrlEmbedResolver,
-  readMatchUrl,
-} from '../utils/widgets.js'
+import { createMarkupEmbedResolver, createUrlEmbedResolver, matchUrl } from '../utils/widgets.js'
 
 const provider = 'zencastr'
 
@@ -43,7 +40,7 @@ export const zencastrResolveEmbed: ResolveUrlEmbed = (url) => {
 export const zencastrBlockquoteEmbedResolver = createMarkupEmbedResolver(
   'blockquote.zenplayer[data-episode-href]',
   (element, context) => {
-    const episodeUrl = readMatchUrl(element, 'data-episode-href', context)
+    const episodeUrl = matchUrl(attr(element, 'data-episode-href'), context)
     const url = parseUrlOnHosts(episodeUrl, hosts)
 
     if (!url) {

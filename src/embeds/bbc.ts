@@ -2,7 +2,7 @@ import { getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed, TransformContext } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { digitsRegex, flashFileRegex, parseUrlOnHosts } from '../utils/urls.js'
-import { createUrlEmbedResolver, readMatchFlashVar } from '../utils/widgets.js'
+import { createUrlEmbedResolver, matchUrl } from '../utils/widgets.js'
 
 const provider = 'bbc'
 
@@ -63,7 +63,7 @@ const readNewsFlash = (
   context: TransformContext | undefined,
 ): EmbedResolverResult | undefined => {
   const pid = flashVar(element, 'externalIdentifier')
-  const page = parseUrlOnHosts(readMatchFlashVar(element, 'embedPageUrl', context), hosts)
+  const page = parseUrlOnHosts(matchUrl(flashVar(element, 'embedPageUrl'), context), hosts)
   const article = page?.pathname.match(newsPagePathRegex)?.groups?.article
 
   if (!isPidSlot(pid) || !article) {
@@ -84,7 +84,7 @@ export const bbcResolveEmbed: ResolveUrlEmbed = (url, element, context) => {
   // `/iplayer/playlist/{pid}` or `/comedy/forge-assets/extra/playlist/{pid}.xml`. News and World
   // Service playlists carry no pid, and the news player names it in other flashvars.
   if (flashFileRegex.test(url.pathname)) {
-    const playlist = parseUrlOnHosts(readMatchFlashVar(element, 'playlist', context), hosts)
+    const playlist = parseUrlOnHosts(matchUrl(flashVar(element, 'playlist'), context), hosts)
     const pid = playlist?.pathname.match(playlistPathRegex)?.[1]
 
     if (isPid(pid)) {

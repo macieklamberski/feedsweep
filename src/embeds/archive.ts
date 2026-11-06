@@ -14,13 +14,13 @@ import type {
   ResolveUrlEmbed,
   TransformContext,
 } from '../types.js'
-import { attr, flashVars } from '../utils/dom.js'
+import { attr, flashVar, flashVars } from '../utils/dom.js'
 import { audioFileRegex, parseUrlOnHosts } from '../utils/urls.js'
 import {
   createMarkupEmbedResolver,
   createUrlEmbedResolver,
   getEmbedSize,
-  readMatchFlashVar,
+  matchUrl,
 } from '../utils/widgets.js'
 
 const provider = 'archive'
@@ -211,7 +211,7 @@ const readItemPlayer = (
   element: Element | undefined,
   context: TransformContext | undefined,
 ): EmbedResolverResult | undefined => {
-  const soundFile = parseUrlOnHosts(readMatchFlashVar(element, 'soundFile', context), hosts)
+  const soundFile = parseUrlOnHosts(matchUrl(flashVar(element, 'soundFile'), context), hosts)
   const [, identifier, file] = soundFile?.pathname.match(itemFilePathRegex) ?? []
 
   if (!identifier) {

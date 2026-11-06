@@ -3,7 +3,7 @@ import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
-import { readMatchCarrierUrl } from '../utils/widgets.js'
+import { matchUrl, readCarrierUrl } from '../utils/widgets.js'
 
 const provider = 'hatena'
 const hosts = ['hatenablog-parts.com']
@@ -32,7 +32,7 @@ export const hatenaCiteResolver: CiteResolver = {
   kind: 'cite',
   selector: `${cardClassSelector}, iframe[src]`,
   extract: (element, context) => {
-    const source = readMatchCarrierUrl(element, context)
+    const source = matchUrl(readCarrierUrl(element), context)
 
     if (!source) {
       return

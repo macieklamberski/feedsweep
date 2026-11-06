@@ -3,7 +3,7 @@ import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find } from '../utils/dom.js'
 import { iframeResizerHeightRequest, readIframeResizerHeight } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { createMarkupEmbedResolver, readMatchUrl } from '../utils/widgets.js'
+import { createMarkupEmbedResolver, matchUrl } from '../utils/widgets.js'
 
 const provider = 'tickettailor'
 
@@ -76,7 +76,7 @@ export const tickettailorScriptEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const page = parseUrlOnHosts(readMatchUrl(element, 'data-url', context), hosts)
+    const page = parseUrlOnHosts(matchUrl(attr(element, 'data-url'), context), hosts)
 
     if (!page) {
       return
