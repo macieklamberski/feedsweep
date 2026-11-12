@@ -18,19 +18,25 @@ describe('parseUrlOnHosts', () => {
   it('should return the parsed url when it is on one of the hosts', () => {
     const value = 'https://platform.example/watch/123?v=1'
 
-    expect(parseUrlOnHosts(value, hosts)?.pathname).toBe('/watch/123')
+    const url = parseUrlOnHosts(value, hosts)
+
+    expect(url?.pathname).toBe('/watch/123')
   })
 
   it('should accept a subdomain of a host', () => {
     const value = 'https://open.platform.example/track/123'
 
-    expect(parseUrlOnHosts(value, hosts)?.hostname).toBe('open.platform.example')
+    const url = parseUrlOnHosts(value, hosts)
+
+    expect(url?.hostname).toBe('open.platform.example')
   })
 
   it('should accept a listed host with an exact host check', () => {
     const value = 'https://platform.example/watch/123'
 
-    expect(parseUrlOnHosts(value, hosts, isHostOf)?.hostname).toBe('platform.example')
+    const url = parseUrlOnHosts(value, hosts, isHostOf)
+
+    expect(url?.hostname).toBe('platform.example')
   })
 
   it('should return undefined for a subdomain with an exact host check', () => {
@@ -42,38 +48,50 @@ describe('parseUrlOnHosts', () => {
   it('should read a scheme followed by one slash as the host, not a path on the base', () => {
     const value = 'https:/platform.example/watch/123'
 
-    expect(parseUrlOnHosts(value, hosts)?.hostname).toBe('platform.example')
+    const url = parseUrlOnHosts(value, hosts)
+
+    expect(url?.hostname).toBe('platform.example')
   })
 
   it('should accept a protocol-relative url on a host', () => {
     const value = '//platform.example/watch/123'
 
-    expect(parseUrlOnHosts(value, hosts)?.hostname).toBe('platform.example')
+    const url = parseUrlOnHosts(value, hosts)
+
+    expect(url?.hostname).toBe('platform.example')
   })
 
   it('should trim whitespace around a query value', () => {
     const value = 'https://platform.example/watch?v=123 &t=10'
 
-    expect(parseUrlOnHosts(value, hosts)?.searchParams.get('v')).toBe('123')
+    const url = parseUrlOnHosts(value, hosts)
+
+    expect(url?.searchParams.get('v')).toBe('123')
   })
 
   it('should trim whitespace around a path segment', () => {
     const value = 'https://platform.example/watch/123%20'
 
-    expect(parseUrlOnHosts(value, hosts)?.pathname).toBe('/watch/123')
+    const url = parseUrlOnHosts(value, hosts)
+
+    expect(url?.pathname).toBe('/watch/123')
   })
 
   it('should repair a query glued onto the path after the host check', () => {
     const value = 'https://platform.example/v/123&t=6s'
 
-    expect(parseUrlOnHosts(value, hosts)?.pathname).toBe('/v/123')
-    expect(parseUrlOnHosts(value, hosts)?.searchParams.get('t')).toBe('6s')
+    const url = parseUrlOnHosts(value, hosts)
+
+    expect(url?.pathname).toBe('/v/123')
+    expect(url?.searchParams.get('t')).toBe('6s')
   })
 
   it('should collapse a run of slashes in the path', () => {
     const value = 'https://platform.example//watch//123'
 
-    expect(parseUrlOnHosts(value, hosts)?.pathname).toBe('/watch/123')
+    const url = parseUrlOnHosts(value, hosts)
+
+    expect(url?.pathname).toBe('/watch/123')
   })
 
   it('should hand a parsed url back once its host is checked', () => {
@@ -86,19 +104,25 @@ describe('parseUrlOnHosts', () => {
   it('should fold a twice-escaped ampersand before the next parameter', () => {
     const value = 'https://platform.example/watch?v=123&amp;amp;key=abc'
 
-    expect(parseUrlOnHosts(value, hosts)?.searchParams.get('key')).toBe('abc')
+    const url = parseUrlOnHosts(value, hosts)
+
+    expect(url?.searchParams.get('key')).toBe('abc')
   })
 
   it('should fold an ampersand WordPress wrote as a percent-encoded entity', () => {
     const value = 'https://platform.example/watch?v=123&%23038;key=abc'
 
-    expect(parseUrlOnHosts(value, hosts)?.searchParams.get('key')).toBe('abc')
+    const url = parseUrlOnHosts(value, hosts)
+
+    expect(url?.searchParams.get('key')).toBe('abc')
   })
 
   it('should fold a percent-encoded WordPress ampersand a twice-escaped feed wrote', () => {
     const value = 'https://platform.example/watch?v=123&amp;%23038;key=abc'
 
-    expect(parseUrlOnHosts(value, hosts)?.searchParams.get('key')).toBe('abc')
+    const url = parseUrlOnHosts(value, hosts)
+
+    expect(url?.searchParams.get('key')).toBe('abc')
   })
 
   it('should return undefined for a url on another host', () => {

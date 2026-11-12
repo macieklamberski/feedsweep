@@ -877,7 +877,9 @@ describeForEachParser('findConfigScript', (parseHtml) => {
       </div>
     `
 
-    expect(find(value)?.textContent).toBe('config()')
+    const script = find(value)
+
+    expect(script?.textContent).toBe('config()')
   })
 
   // `wrapBareInlineInParagraphs` runs before the widget pass, so by then a bare script is
@@ -890,7 +892,9 @@ describeForEachParser('findConfigScript', (parseHtml) => {
       </div>
     `
 
-    expect(find(value)?.textContent).toBe('config()')
+    const script = find(value)
+
+    expect(script?.textContent).toBe('config()')
   })
 
   // Where one item holds several players, each script names its own container, so the id is
@@ -904,7 +908,9 @@ describeForEachParser('findConfigScript', (parseHtml) => {
       </div>
     `
 
-    expect(find(value)?.textContent).toBe('setup("player")')
+    const script = find(value)
+
+    expect(script?.textContent).toBe('setup("player")')
   })
 
   it('should state nothing when a distant script names another player', () => {
@@ -1102,15 +1108,17 @@ describeForEachParser('setInnerHtml', (parseHtml) => {
   it('should parse markup that follows a doctype', () => {
     const element = parseHtml('').createElement('div')
     setInnerHtml(element, '<!DOCTYPE html>\n<p>Kosakata alat kesehatan.</p>')
+    const paragraph = element.querySelector('p')
 
-    expect(element.querySelector('p')?.textContent).toBe('Kosakata alat kesehatan.')
+    expect(paragraph?.textContent).toBe('Kosakata alat kesehatan.')
   })
 
   it('should parse markup that follows a lowercase doctype', () => {
     const element = parseHtml('').createElement('div')
     setInnerHtml(element, '<!doctype html>\n<p>Kosakata alat kesehatan.</p>')
+    const paragraph = element.querySelector('p')
 
-    expect(element.querySelector('p')?.textContent).toBe('Kosakata alat kesehatan.')
+    expect(paragraph?.textContent).toBe('Kosakata alat kesehatan.')
   })
 
   it('should parse markup that follows a doctype with a public identifier', () => {
@@ -1119,8 +1127,9 @@ describeForEachParser('setInnerHtml', (parseHtml) => {
       element,
       '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n<p>Kosakata alat kesehatan.</p>',
     )
+    const paragraph = element.querySelector('p')
 
-    expect(element.querySelector('p')?.textContent).toBe('Kosakata alat kesehatan.')
+    expect(paragraph?.textContent).toBe('Kosakata alat kesehatan.')
   })
 })
 
@@ -1224,7 +1233,9 @@ describeForEachParser('find', (parseHtml) => {
     const document = parseHtml('<div><p class="a">first</p><p class="a">second</p></div>')
     const element = queryElement(document, 'div')
 
-    expect(find(element, '.a')?.textContent).toBe('first')
+    const paragraph = find(element, '.a')
+
+    expect(paragraph?.textContent).toBe('first')
   })
 
   it('should return the first descendant satisfying the predicate', () => {
@@ -1232,7 +1243,9 @@ describeForEachParser('find', (parseHtml) => {
     const element = queryElement(document, 'div')
     const predicate = (node: Element) => node.hasAttribute('data-keep')
 
-    expect(find(element, '.a', predicate)?.textContent).toBe('keep')
+    const paragraph = find(element, '.a', predicate)
+
+    expect(paragraph?.textContent).toBe('keep')
   })
 
   it('should return undefined when nothing matches the predicate', () => {
@@ -1536,11 +1549,15 @@ describe('parseFlashVars', () => {
   })
 
   it('should keep the whitespace inside a value', () => {
-    expect(parseFlashVars('title=Two%20words').get('title')).toBe('Two words')
+    const flashVars = parseFlashVars('title=Two%20words')
+
+    expect(flashVars.get('title')).toBe('Two words')
   })
 
   it('should fold a twice-escaped ampersand between the pairs', () => {
-    expect(parseFlashVars('bg=0xF8F8F8&amp;amp;id=17216').get('id')).toBe('17216')
+    const flashVars = parseFlashVars('bg=0xF8F8F8&amp;amp;id=17216')
+
+    expect(flashVars.get('id')).toBe('17216')
   })
 
   it('should return no pairs for a missing query', () => {
@@ -1717,10 +1734,11 @@ describe('batchSelectors', () => {
   it('should split selectors that would exceed the engine limit', () => {
     const value = Array.from({ length: 40 }, (_, index) => `.${'a'.repeat(60)}${index}`)
     const batches = batchSelectors(value)
+    const selectors = batches.join(',').split(',')
 
     expect(batches.length).toBeGreaterThan(1)
     expect(Math.max(...batches.map((batch) => batch.length))).toBeLessThanOrEqual(2048)
-    expect(batches.join(',').split(',')).toEqual(value)
+    expect(selectors).toEqual(value)
   })
 
   it('should keep a selector longer than the limit in a batch of its own', () => {
