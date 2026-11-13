@@ -6,6 +6,7 @@ import {
   getQueryParams,
   isHostOrSubdomainOf,
   type Nullish,
+  parseUrl,
   toMap,
 } from 'trousse'
 import type { EmbedResolverResult, FieldCleaner, ResolveUrlEmbed } from '../types.js'
@@ -163,9 +164,15 @@ export const appleToolsEmbedResolver = createUrlEmbedResolver(toolsHosts, (url) 
 
   const country = getQueryParam(url.searchParams, 'country')?.toLowerCase()
   const storefront = country ? encodePathSegment(country) : undefined
-  const modernUrl = `https://music.apple.com/${storefront ? `${storefront}/` : ''}${kind}/${pathId}`
+  const modernUrl = parseUrl(
+    `https://music.apple.com/${storefront ? `${storefront}/` : ''}${kind}/${pathId}`,
+  )
 
-  return appleResolveEmbed(new URL(modernUrl))
+  if (!modernUrl) {
+    return
+  }
+
+  return appleResolveEmbed(modernUrl)
 })
 
 export const appleFieldCleaners: Array<FieldCleaner> = [

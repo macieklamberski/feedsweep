@@ -1,4 +1,4 @@
-import { toMap } from 'trousse'
+import { parseUrl, toMap } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -95,5 +95,11 @@ export const guardianFlashEmbedResolver = createUrlEmbedResolver(flashHosts, (ur
     return
   }
 
-  return guardianResolveEmbed(new URL(`https://embed.theguardian.com/embed/video${path}`))
+  const playerUrl = parseUrl(`https://embed.theguardian.com/embed/video${path}`)
+
+  if (!playerUrl) {
+    return
+  }
+
+  return guardianResolveEmbed(playerUrl)
 })
