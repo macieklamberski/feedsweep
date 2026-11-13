@@ -5,6 +5,7 @@ import {
   isAnyOf,
   isPlainObject,
   type Nullish,
+  parseUrl,
   toMap,
 } from 'trousse'
 import type {
@@ -294,7 +295,11 @@ export const instagramIframeEmbedResolver = createUrlEmbedResolver(hosts, instag
 
 // A forum's s9e MediaEmbed helper frame, naming the post's shortcode in its url fragment.
 export const instagramS9eEmbedResolver = createS9eEmbedResolver('instagram', (shortcode) => {
-  const postUrl = new URL(`https://www.instagram.com/p/${encodePathSegment(shortcode)}/`)
+  const postUrl = parseUrl(`https://www.instagram.com/p/${encodePathSegment(shortcode)}/`)
+
+  if (!postUrl) {
+    return
+  }
 
   return instagramResolveEmbed(postUrl)
 })

@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf, isPlainObject, isString } from 'trousse'
+import { getPathSegments, isAnyOf, isPlainObject, isString, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
@@ -67,7 +67,7 @@ export const tumblrPostEmbedResolver = createMarkupEmbedResolver(
 // A forum's s9e MediaEmbed helper frame, naming the post as `{blogKey}/{postId}` in its url
 // fragment.
 export const tumblrS9eEmbedResolver = createS9eEmbedResolver('tumblr', (fragment) => {
-  return readPostEmbed(new URL(`https://embed.tumblr.com/embed/post/${fragment}`))
+  return readPostEmbed(parseUrl(`https://embed.tumblr.com/embed/post/${fragment}`))
 })
 
 // The frame posts its height unasked, as a JSON string whose `args` holds the body's scroll

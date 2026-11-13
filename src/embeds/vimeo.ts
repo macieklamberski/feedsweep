@@ -8,6 +8,7 @@ import {
   getQueryParams,
   isAnyOf,
   isHostOf,
+  parseUrl,
   trimObject,
 } from 'trousse'
 import type {
@@ -355,7 +356,11 @@ export const vimeoMetasliderEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const pageUrl = new URL(`https://vimeo.com/${encodePathSegment(videoId)}`)
+    const pageUrl = parseUrl(`https://vimeo.com/${encodePathSegment(videoId)}`)
+
+    if (!pageUrl) {
+      return
+    }
 
     return vimeoResolveEmbed(pageUrl)
   },

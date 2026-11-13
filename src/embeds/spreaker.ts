@@ -5,6 +5,7 @@ import {
   getQueryParam,
   getQueryParams,
   isAnyOf,
+  parseUrl,
 } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
@@ -94,9 +95,10 @@ export const spreakerAnchorEmbedResolver = createMarkupEmbedResolver(
     // The resource is spelled as a query fragment, `data-resource="episode_id=42"`. The anchor's
     // own href can name the show while the resource names an episode.
     const resource = attr(element, 'data-resource')
-    const result = resource
-      ? spreakerResolveEmbed(new URL(`https://widget.spreaker.com/player?${resource}`))
+    const playerUrl = resource
+      ? parseUrl(`https://widget.spreaker.com/player?${resource}`)
       : undefined
+    const result = playerUrl ? spreakerResolveEmbed(playerUrl) : undefined
 
     if (!result) {
       return
