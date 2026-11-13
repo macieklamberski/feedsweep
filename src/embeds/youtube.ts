@@ -440,6 +440,7 @@ export const youtubeFrontendEmbedResolver = createMarkupEmbedResolver(
 
     // Resolving the path against youtube.com would read a path opening on `//`, which a backslash
     // after the instance host becomes, as a new host. Setting it keeps it a path.
+    // biome-ignore lint/plugin/noBareNewUrl: The url is fixed, so this cannot throw.
     const youtubeUrl = new URL('https://www.youtube.com')
     youtubeUrl.pathname = url.pathname
     youtubeUrl.search = composeQuery(params)
