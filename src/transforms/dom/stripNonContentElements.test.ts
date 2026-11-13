@@ -1066,6 +1066,23 @@ describeForEachParser('stripNonContentElements through the pipeline', (parseHtml
     expect(result).toEqualHtml('')
   })
 
+  it('should strip a lazy chrome image once its real src is promoted', async () => {
+    const value = html`
+      <p>Text</p>
+      <img
+        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+        data-src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif"
+        alt="Donate with PayPal"
+      >
+    `
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+    })
+
+    expect(result).toEqualHtml('<p>Text</p>')
+  })
+
   it('should strip a reCAPTCHA fallback frame from its noscript', async () => {
     const value = html`
       <noscript>

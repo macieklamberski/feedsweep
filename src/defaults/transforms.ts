@@ -127,6 +127,16 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // kind, so every pass below (comment and hidden-element stripping, the rebuilds, convertWidgets,
   // the cite pass) has to see it.
   surfaceParkedMarkup,
+
+  // Runs before the first stripNonContentElements, which strips the `/cgi-bin/webscr` forms this
+  // leaves.
+  linkifyPaypalDonateForms,
+
+  // Runs twice with the same selectors. Here, before any pass rewrites what a selector names:
+  // convertLazyImageContainers turns a `div.ya-share2` holding a data-image into an <img>. Again
+  // after the lazy and rebuild passes, for what they reveal: an `img[src*=…]` selector matches
+  // only once fixLazyImages has promoted the real src.
+  stripNonContentElements,
   stripComments,
 
   // Runs before stripHiddenElements, which deletes an album div the plugin hides with inline
@@ -192,9 +202,6 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // Runs after unwrapWpcomWidgetFrames, which rebuilds the player, and before convertWidgets,
   // which drops a swf no resolver claims.
   linkifyPodomaticPlaylists,
-
-  // Runs before stripNonContentElements, which strips the `/cgi-bin/webscr` forms this leaves.
-  linkifyPaypalDonateForms,
 
   // A Substack @-mention is an empty span whose name lives only in its data-attrs JSON;
   // rebuild the anchor before stripEmptyTags deletes the span and the name with it.
