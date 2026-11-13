@@ -348,11 +348,7 @@ export const twitterIframeEmbedResolver = createUrlEmbedResolver(frameHosts, twi
 
 // A forum's s9e MediaEmbed helper frame, naming the status id in its url fragment.
 export const twitterS9eEmbedResolver = createS9eEmbedResolver('twitter', (id) => {
-  const playerUrl = parseUrl(`https://platform.twitter.com/embed/Tweet.html${composeQuery({ id })}`)
-
-  if (!playerUrl) {
-    return
-  }
+  const playerUrl = new URL(`https://platform.twitter.com/embed/Tweet.html${composeQuery({ id })}`)
 
   return twitterResolveEmbed(playerUrl)
 })

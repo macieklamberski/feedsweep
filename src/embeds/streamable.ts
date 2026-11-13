@@ -1,4 +1,4 @@
-import { composeQuery, getPathSegments, getQueryParams, isAnyOf, isHostOf, parseUrl } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParams, isAnyOf, isHostOf } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr, find } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -99,11 +99,7 @@ export const streamableMlbEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const clipUrl = parseUrl(`https://streamable.com/m/${slug}`)
-
-    if (!clipUrl) {
-      return
-    }
+    const clipUrl = new URL(`https://streamable.com/m/${slug}`)
 
     return streamableResolveEmbed(clipUrl)
   },

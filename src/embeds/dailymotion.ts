@@ -11,7 +11,6 @@ import {
   isPlainObject,
   isString,
   type Nullish,
-  parseUrl,
   trimObject,
 } from 'trousse'
 import type {
@@ -299,11 +298,7 @@ export const dailymotionScriptEmbedResolver = createMarkupEmbedResolver(
       trimObject({ video: attr(element, 'data-video'), playlist: attr(element, 'data-playlist') }),
     )
     // The script writes its player's iframe with the same query.
-    const playerUrl = parseUrl(`https://geo.dailymotion.com/player.html${query}`)
-
-    if (!playerUrl) {
-      return
-    }
+    const playerUrl = new URL(`https://geo.dailymotion.com/player.html${query}`)
 
     const result = dailymotionResolveEmbed(playerUrl)
 
