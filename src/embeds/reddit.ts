@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf, isPlainObject, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, isPlainObject } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
@@ -187,11 +187,8 @@ export const redditIframeEmbedResolver = createUrlEmbedResolver(hosts, redditRes
 // A forum's s9e MediaEmbed helper frame, naming the post as `{subreddit}/comments/{id}` in its
 // url fragment.
 export const redditS9eEmbedResolver = createS9eEmbedResolver('reddit', (fragment) => {
-  const postUrl = parseUrl(`https://www.reddit.com/r/${fragment}`)
-
-  if (!postUrl) {
-    return
-  }
+  // biome-ignore lint/plugin/noBareNewUrl: The host is fixed, so this cannot throw.
+  const postUrl = new URL(`https://www.reddit.com/r/${fragment}`)
 
   return redditResolveEmbed(postUrl)
 })

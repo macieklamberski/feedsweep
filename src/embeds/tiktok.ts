@@ -1,4 +1,4 @@
-import { encodePathSegment, parseUrl } from 'trousse'
+import { encodePathSegment } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, find, text, textNode } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -193,11 +193,8 @@ export const tiktokIframeEmbedResolver = createUrlEmbedResolver(hosts, tiktokRes
 
 // A forum's s9e MediaEmbed helper frame, naming the clip id in its url fragment.
 export const tiktokS9eEmbedResolver = createS9eEmbedResolver('tiktok', (videoId) => {
-  const playerUrl = parseUrl(`https://www.tiktok.com/embed/v2/${encodePathSegment(videoId)}`)
-
-  if (!playerUrl) {
-    return
-  }
+  // biome-ignore lint/plugin/noBareNewUrl: The host is fixed, so this cannot throw.
+  const playerUrl = new URL(`https://www.tiktok.com/embed/v2/${encodePathSegment(videoId)}`)
 
   return tiktokResolveEmbed(playerUrl)
 })

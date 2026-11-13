@@ -5,7 +5,6 @@ import {
   isHostOf,
   isPlainObject,
   isString,
-  parseUrl,
   startsWithAnyOf,
 } from 'trousse'
 import type {
@@ -232,11 +231,8 @@ export const imgurFieldCleaners: Array<FieldCleaner> = [
 // page reads an encoded `%2F` as the slash it stands for.
 export const imgurS9eEmbedResolver = createS9eEmbedResolver('imgur', (path) => {
   const pagePath = path.replaceAll('%2F', '/')
-  const pageUrl = parseUrl(`https://imgur.com/${pagePath}`)
-
-  if (!pageUrl) {
-    return
-  }
+  // biome-ignore lint/plugin/noBareNewUrl: The host is fixed, so this cannot throw.
+  const pageUrl = new URL(`https://imgur.com/${pagePath}`)
 
   return imgurResolveEmbed(pageUrl)
 })
