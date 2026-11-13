@@ -438,7 +438,11 @@ export const youtubeFrontendEmbedResolver = createMarkupEmbedResolver(
       params.start = start
     }
 
-    const youtubeUrl = new URL(`${url.pathname}${composeQuery(params)}`, 'https://www.youtube.com')
+    const youtubeUrl = parseUrl(`${url.pathname}${composeQuery(params)}`, 'https://www.youtube.com')
+
+    if (!youtubeUrl) {
+      return
+    }
 
     return youtubeResolveEmbed(youtubeUrl, element)
   },
