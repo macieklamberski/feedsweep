@@ -8,7 +8,6 @@ import {
   getQueryParams,
   isAnyOf,
   isHostOf,
-  parseUrl,
   trimObject,
 } from 'trousse'
 import type {
@@ -356,11 +355,8 @@ export const vimeoMetasliderEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const pageUrl = parseUrl(`https://vimeo.com/${encodePathSegment(videoId)}`)
-
-    if (!pageUrl) {
-      return
-    }
+    // biome-ignore lint/plugin/noBareNewUrl: The host is fixed, so this cannot throw.
+    const pageUrl = new URL(`https://vimeo.com/${encodePathSegment(videoId)}`)
 
     return vimeoResolveEmbed(pageUrl)
   },
