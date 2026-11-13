@@ -278,50 +278,57 @@ describe('youtubeResolveEmbed', () => {
   it.each(watchOffsetCases)('should read the offset t=%s as %s seconds', (t, start) => {
     const value = `https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=${t}`
     const expected = `https://www.youtube.com/embed/dQw4w9WgXcQ?start=${start}`
+    const src = youtubeResolveEmbed(carrierUrl(value, hosts))?.src
 
-    expect(youtubeResolveEmbed(carrierUrl(value, hosts))?.src).toBe(expected)
+    expect(src).toBe(expected)
   })
 
   it('should let a stated start win over the watch link offset', () => {
     const value = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&start=10&t=42'
     const expected = 'https://www.youtube.com/embed/dQw4w9WgXcQ?start=10'
+    const src = youtubeResolveEmbed(carrierUrl(value, hosts))?.src
 
-    expect(youtubeResolveEmbed(carrierUrl(value, hosts))?.src).toBe(expected)
+    expect(src).toBe(expected)
   })
 
   it('should ignore a watch link offset that is not a duration', () => {
     const value = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=abc'
     const expected = 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+    const src = youtubeResolveEmbed(carrierUrl(value, hosts))?.src
 
-    expect(youtubeResolveEmbed(carrierUrl(value, hosts))?.src).toBe(expected)
+    expect(src).toBe(expected)
   })
 
   it('should ignore a watch link offset with a trailing word', () => {
     const value = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=90x'
     const expected = 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+    const src = youtubeResolveEmbed(carrierUrl(value, hosts))?.src
 
-    expect(youtubeResolveEmbed(carrierUrl(value, hosts))?.src).toBe(expected)
+    expect(src).toBe(expected)
   })
 
   it('should ignore a watch link offset with a leading word', () => {
     const value = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=x90'
     const expected = 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+    const src = youtubeResolveEmbed(carrierUrl(value, hosts))?.src
 
-    expect(youtubeResolveEmbed(carrierUrl(value, hosts))?.src).toBe(expected)
+    expect(src).toBe(expected)
   })
 
   it('should ignore a clock offset with a trailing word', () => {
     const value = 'https://www.youtube.com/embed/vy9FEjsBVvY#t=24:09x'
     const expected = 'https://www.youtube.com/embed/vy9FEjsBVvY'
+    const src = youtubeResolveEmbed(carrierUrl(value, hosts))?.src
 
-    expect(youtubeResolveEmbed(carrierUrl(value, hosts))?.src).toBe(expected)
+    expect(src).toBe(expected)
   })
 
   it('should ignore a clock offset with a leading word', () => {
     const value = 'https://www.youtube.com/embed/vy9FEjsBVvY#t=x24:09'
     const expected = 'https://www.youtube.com/embed/vy9FEjsBVvY'
+    const src = youtubeResolveEmbed(carrierUrl(value, hosts))?.src
 
-    expect(youtubeResolveEmbed(carrierUrl(value, hosts))?.src).toBe(expected)
+    expect(src).toBe(expected)
   })
 
   it('should carry the offset the Flash-era path spelling leaves after the id', () => {
@@ -341,8 +348,9 @@ describe('youtubeResolveEmbed', () => {
   it('should read the query after a name the Flash-era path spelling leaves after the id', () => {
     const value = 'https://www.youtube.com/embed/OgiAa5Xi6ok&t?start=30'
     const expected = 'https://www.youtube.com/embed/OgiAa5Xi6ok?start=30'
+    const src = youtubeResolveEmbed(carrierUrl(value, hosts))?.src
 
-    expect(youtubeResolveEmbed(carrierUrl(value, hosts))?.src).toBe(expected)
+    expect(src).toBe(expected)
   })
 
   it('should carry a fragment offset over as the start', () => {
@@ -404,8 +412,9 @@ describe('youtubeResolveEmbed', () => {
   it('should read a fragment offset with a space before the glued query', () => {
     const value = 'https://www.youtube.com/embed/JOKhbv58_Ss#t=35m58s ?wmode=opaque'
     const expected = 'https://www.youtube.com/embed/JOKhbv58_Ss?start=2158'
+    const src = youtubeResolveEmbed(carrierUrl(value, hosts))?.src
 
-    expect(youtubeResolveEmbed(carrierUrl(value, hosts))?.src).toBe(expected)
+    expect(src).toBe(expected)
   })
 
   it('should preserve the playlist and its position', () => {
@@ -568,10 +577,9 @@ describe('youtubeResolveEmbed', () => {
       'https://www.youtube.com/embed/live_stream?channel=PBS',
     ]
     const expected = ['playlist/PBS', 'user/PBS', 'channel/PBS']
+    const ids = values.map((value) => youtubeResolveEmbed(carrierUrl(value, hosts))?.id)
 
-    expect(values.map((value) => youtubeResolveEmbed(carrierUrl(value, hosts))?.id)).toEqual(
-      expected,
-    )
+    expect(ids).toEqual(expected)
   })
 
   it('should return undefined for a videoseries embed with no list', () => {

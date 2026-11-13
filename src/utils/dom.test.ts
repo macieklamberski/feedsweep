@@ -876,8 +876,9 @@ describeForEachParser('findConfigScript', (parseHtml) => {
         <script>config()</script>
       </div>
     `
+    const textContent = find(value)?.textContent
 
-    expect(find(value)?.textContent).toBe('config()')
+    expect(textContent).toBe('config()')
   })
 
   // `wrapBareInlineInParagraphs` runs before the widget pass, so by then a bare script is
@@ -889,8 +890,9 @@ describeForEachParser('findConfigScript', (parseHtml) => {
         <p><script>config()</script></p>
       </div>
     `
+    const textContent = find(value)?.textContent
 
-    expect(find(value)?.textContent).toBe('config()')
+    expect(textContent).toBe('config()')
   })
 
   // Where one item holds several players, each script names its own container, so the id is
@@ -903,8 +905,9 @@ describeForEachParser('findConfigScript', (parseHtml) => {
         <script>setup("player")</script>
       </div>
     `
+    const textContent = find(value)?.textContent
 
-    expect(find(value)?.textContent).toBe('setup("player")')
+    expect(textContent).toBe('setup("player")')
   })
 
   it('should state nothing when a distant script names another player', () => {
@@ -1102,15 +1105,17 @@ describeForEachParser('setInnerHtml', (parseHtml) => {
   it('should parse markup that follows a doctype', () => {
     const element = parseHtml('').createElement('div')
     setInnerHtml(element, '<!DOCTYPE html>\n<p>Kosakata alat kesehatan.</p>')
+    const textContent = element.querySelector('p')?.textContent
 
-    expect(element.querySelector('p')?.textContent).toBe('Kosakata alat kesehatan.')
+    expect(textContent).toBe('Kosakata alat kesehatan.')
   })
 
   it('should parse markup that follows a lowercase doctype', () => {
     const element = parseHtml('').createElement('div')
     setInnerHtml(element, '<!doctype html>\n<p>Kosakata alat kesehatan.</p>')
+    const textContent = element.querySelector('p')?.textContent
 
-    expect(element.querySelector('p')?.textContent).toBe('Kosakata alat kesehatan.')
+    expect(textContent).toBe('Kosakata alat kesehatan.')
   })
 
   it('should parse markup that follows a doctype with a public identifier', () => {
@@ -1119,8 +1124,9 @@ describeForEachParser('setInnerHtml', (parseHtml) => {
       element,
       '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n<p>Kosakata alat kesehatan.</p>',
     )
+    const textContent = element.querySelector('p')?.textContent
 
-    expect(element.querySelector('p')?.textContent).toBe('Kosakata alat kesehatan.')
+    expect(textContent).toBe('Kosakata alat kesehatan.')
   })
 })
 
@@ -1223,16 +1229,18 @@ describeForEachParser('find', (parseHtml) => {
   it('should return the first matching descendant', () => {
     const document = parseHtml('<div><p class="a">first</p><p class="a">second</p></div>')
     const element = queryElement(document, 'div')
+    const textContent = find(element, '.a')?.textContent
 
-    expect(find(element, '.a')?.textContent).toBe('first')
+    expect(textContent).toBe('first')
   })
 
   it('should return the first descendant satisfying the predicate', () => {
     const document = parseHtml('<div><p class="a">skip</p><p class="a" data-keep>keep</p></div>')
     const element = queryElement(document, 'div')
     const predicate = (node: Element) => node.hasAttribute('data-keep')
+    const textContent = find(element, '.a', predicate)?.textContent
 
-    expect(find(element, '.a', predicate)?.textContent).toBe('keep')
+    expect(textContent).toBe('keep')
   })
 
   it('should return undefined when nothing matches the predicate', () => {
@@ -1536,11 +1544,15 @@ describe('parseFlashVars', () => {
   })
 
   it('should keep the whitespace inside a value', () => {
-    expect(parseFlashVars('title=Two%20words').get('title')).toBe('Two words')
+    const title = parseFlashVars('title=Two%20words').get('title')
+
+    expect(title).toBe('Two words')
   })
 
   it('should fold a twice-escaped ampersand between the pairs', () => {
-    expect(parseFlashVars('bg=0xF8F8F8&amp;amp;id=17216').get('id')).toBe('17216')
+    const id = parseFlashVars('bg=0xF8F8F8&amp;amp;id=17216').get('id')
+
+    expect(id).toBe('17216')
   })
 
   it('should return no pairs for a missing query', () => {
@@ -1717,10 +1729,11 @@ describe('batchSelectors', () => {
   it('should split selectors that would exceed the engine limit', () => {
     const value = Array.from({ length: 40 }, (_, index) => `.${'a'.repeat(60)}${index}`)
     const batches = batchSelectors(value)
+    const selectors = batches.join(',').split(',')
 
     expect(batches.length).toBeGreaterThan(1)
     expect(Math.max(...batches.map((batch) => batch.length))).toBeLessThanOrEqual(2048)
-    expect(batches.join(',').split(',')).toEqual(value)
+    expect(selectors).toEqual(value)
   })
 
   it('should keep a selector longer than the limit in a batch of its own', () => {
