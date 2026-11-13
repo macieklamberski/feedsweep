@@ -298,6 +298,7 @@ export const dailymotionScriptEmbedResolver = createMarkupEmbedResolver(
       trimObject({ video: attr(element, 'data-video'), playlist: attr(element, 'data-playlist') }),
     )
     // The script writes its player's iframe with the same query.
+    // biome-ignore lint/plugin/noBareNewUrl: The host is fixed, so this cannot throw.
     const playerUrl = new URL(`https://geo.dailymotion.com/player.html${query}`)
 
     const result = dailymotionResolveEmbed(playerUrl)

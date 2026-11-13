@@ -294,6 +294,7 @@ export const instagramIframeEmbedResolver = createUrlEmbedResolver(hosts, instag
 
 // A forum's s9e MediaEmbed helper frame, naming the post's shortcode in its url fragment.
 export const instagramS9eEmbedResolver = createS9eEmbedResolver('instagram', (shortcode) => {
+  // biome-ignore lint/plugin/noBareNewUrl: The host is fixed, so this cannot throw.
   const postUrl = new URL(`https://www.instagram.com/p/${encodePathSegment(shortcode)}/`)
 
   return instagramResolveEmbed(postUrl)

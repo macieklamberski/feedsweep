@@ -99,6 +99,7 @@ export const streamableMlbEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
+    // biome-ignore lint/plugin/noBareNewUrl: The host is fixed, so this cannot throw.
     const clipUrl = new URL(`https://streamable.com/m/${slug}`)
 
     return streamableResolveEmbed(clipUrl)

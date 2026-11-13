@@ -95,6 +95,7 @@ export const guardianFlashEmbedResolver = createUrlEmbedResolver(flashHosts, (ur
     return
   }
 
+  // biome-ignore lint/plugin/noBareNewUrl: The host is fixed, so this cannot throw.
   const playerUrl = new URL(`https://embed.theguardian.com/embed/video${path}`)
 
   return guardianResolveEmbed(playerUrl)

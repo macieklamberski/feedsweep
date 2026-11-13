@@ -324,6 +324,7 @@ export const facebookS9eEmbedResolver = createS9eEmbedResolver('facebook', (frag
     ? `https://www.facebook.com/watch/${composeQuery({ v: id })}`
     : `https://www.facebook.com/${page || s9ePlaceholderPage}/posts/${id}`
 
+  // biome-ignore lint/plugin/noBareNewUrl: The host is fixed, so this cannot throw.
   return facebookResolveEmbed(new URL(href))
 })
 

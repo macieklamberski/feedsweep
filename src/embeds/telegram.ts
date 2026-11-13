@@ -77,6 +77,7 @@ export const telegramIframeEmbedResolver = createUrlEmbedResolver(hosts, telegra
 
 // A forum's s9e MediaEmbed helper frame, naming the post as `{channel}/{id}` in its url fragment.
 export const telegramS9eEmbedResolver = createS9eEmbedResolver('telegram', (fragment) => {
+  // biome-ignore lint/plugin/noBareNewUrl: The host is fixed, so this cannot throw.
   const postUrl = new URL(`https://t.me/${fragment}`)
 
   return telegramResolveEmbed(postUrl)
