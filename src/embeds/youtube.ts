@@ -438,11 +438,11 @@ export const youtubeFrontendEmbedResolver = createMarkupEmbedResolver(
       params.start = start
     }
 
-    const youtubeUrl = parseUrl(`${url.pathname}${composeQuery(params)}`, 'https://www.youtube.com')
-
-    if (!youtubeUrl) {
-      return
-    }
+    // Resolving the path against youtube.com would read a path opening on `//`, which a backslash
+    // after the instance host becomes, as a new host. Setting it keeps it a path.
+    const youtubeUrl = new URL('https://www.youtube.com')
+    youtubeUrl.pathname = url.pathname
+    youtubeUrl.search = composeQuery(params)
 
     return youtubeResolveEmbed(youtubeUrl, element)
   },

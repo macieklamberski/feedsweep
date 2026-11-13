@@ -1487,6 +1487,13 @@ describeForEachParser('youtubeFrontendEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should ignore a path opening on a backslash and a host', async () => {
+      const value =
+        '<iframe src="https://invidious.example.com/\\example.com/embed/zz5KauCbjPI"></iframe>'
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should ignore a path opening on a backslash and a malformed host', async () => {
       const value = '<iframe src="https://invidious.example.com/\\[x/embed/zz5KauCbjPI"></iframe>'
 
