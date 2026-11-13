@@ -4,15 +4,21 @@ import { carrierUrl, html, queryElement, selectParsers } from './tests.js'
 
 describe('selectParsers', () => {
   it('should return every parser when no library is selected', () => {
-    expect(selectParsers(undefined).map(([name]) => name)).toEqual(['linkedom', 'jsdom'])
+    const parserNames = selectParsers(undefined).map(([name]) => name)
+
+    expect(parserNames).toEqual(['linkedom', 'jsdom'])
   })
 
   it('should narrow to the selected library', () => {
-    expect(selectParsers('jsdom').map(([name]) => name)).toEqual(['jsdom'])
+    const parserNames = selectParsers('jsdom').map(([name]) => name)
+
+    expect(parserNames).toEqual(['jsdom'])
   })
 
   it('should narrow to the linkedom library', () => {
-    expect(selectParsers('linkedom').map(([name]) => name)).toEqual(['linkedom'])
+    const parserNames = selectParsers('linkedom').map(([name]) => name)
+
+    expect(parserNames).toEqual(['linkedom'])
   })
 
   it('should throw on an unknown library', () => {
@@ -31,8 +37,9 @@ describe('selectParsers', () => {
 describe('queryElement', () => {
   it('should return the element matching the selector', () => {
     const document = parseHtml('<p><img src="photo.jpg"></p>')
+    const src = queryElement(document, 'img').getAttribute('src')
 
-    expect(queryElement(document, 'img').getAttribute('src')).toBe('photo.jpg')
+    expect(src).toBe('photo.jpg')
   })
 
   it('should throw when no element matches', () => {

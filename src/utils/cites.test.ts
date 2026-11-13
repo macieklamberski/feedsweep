@@ -37,8 +37,9 @@ describe('buildCite', () => {
         kind: 'reply',
       } as const
       const expected = 'reply'
+      const kind = buildCite(value)?.kind
 
-      expect(buildCite(value)?.kind).toBe(expected)
+      expect(kind).toBe(expected)
     })
   })
 

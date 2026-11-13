@@ -486,8 +486,9 @@ describeForEachParser('hoistBlocksFromParagraphs', (parseHtml) => {
         </dialog>
       `
       const document = parseHtml(await transformParagraph(value))
+      const dialog = document.querySelector('img')?.closest('dialog')
 
-      expect(document.querySelector('img')?.closest('dialog')).toBeNull()
+      expect(dialog).toBeNull()
     })
   })
 

@@ -1827,11 +1827,10 @@ describeForEachParser('embedCarrierSelector', (parseHtml) => {
         </object>
       </object>
     `
+    const movie = parseHtml(value).querySelector(embedCarrierSelector)?.getAttribute('data')
 
     expect(match(value)).toEqual(['object'])
-    expect(parseHtml(value).querySelector(embedCarrierSelector)?.getAttribute('data')).toBe(
-      'myContent.swf',
-    )
+    expect(movie).toBe('myContent.swf')
   })
 
   it('should leave an object without data that holds an iframe to the iframe', () => {

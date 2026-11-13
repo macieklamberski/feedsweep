@@ -318,8 +318,9 @@ describeForEachParser('spreakerAnchorEmbedResolver', (parseHtml) => {
       const value = html`
       <a class="spreaker-player" href="https://www.spreaker.com/episode/42">Listen.</a>
     `
+      const anchor = parseHtml(value).querySelector(spreakerAnchorEmbedResolver.selector)
 
-      expect(parseHtml(value).querySelector(spreakerAnchorEmbedResolver.selector)).toBeNull()
+      expect(anchor).toBeNull()
     })
   })
 
