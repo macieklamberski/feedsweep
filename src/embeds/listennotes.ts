@@ -1,4 +1,4 @@
-import { composeQuery, getPathSegments, getQueryParams, isAnyOf } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParams, isAnyOf, isLocaleSegment } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -22,9 +22,6 @@ const clipRouteWords = ['clips', 'podcast-clips']
 // The episode player starts at `t`, in seconds. The clip player ignores it for its own start.
 const episodeParams = ['t']
 
-// A locale such as `fr` or `zh-hant` can open the path, ahead of the route word. Two letters tell
-// it from a route word such as `podcasts` or `podcast-clips`, which opens the path in its place.
-const localeRegex = /^[a-z]{2}(?:-[a-z]+)?$/i
 // The short id is the last 11 characters of a slugged segment, after a hyphen. The slug is free
 // text the server ignores, and the id can hold a hyphen of its own.
 const shortIdRegex = /-([^/]{11})$/
@@ -60,7 +57,9 @@ export const listennotesResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const segments = getPathSegments(url)
   const [locale = ''] = segments
 
-  if (localeRegex.test(locale)) {
+  // A locale such as `fr`, `fil` or `zh-hant` can open the path, ahead of the route word that
+  // otherwise opens it, such as `podcasts`.
+  if (isLocaleSegment(locale)) {
     segments.shift()
   }
 
