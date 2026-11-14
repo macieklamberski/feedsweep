@@ -8,7 +8,9 @@ import {
   getQueryParamValues,
   isAnyOf,
   isHostOrSubdomainOf,
+  isLocaleSegment,
   isPlainObject,
+  isRegionSegment,
   isString,
   type Nullish,
   trimObject,
@@ -20,7 +22,7 @@ import type {
   ResolveUrlEmbed,
 } from '../types.js'
 import { attr, find } from '../utils/dom.js'
-import { parseUrlOnHosts, twoLettersRegex } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'dailymotion'
@@ -64,17 +66,21 @@ const isRouteWord = (segment: string): boolean => {
   return isAnyOf(segment, pathWords) || isAnyOf(segment, nonVideoWords)
 }
 
+const isLocalePrefix = (segment: string): boolean => {
+  return isLocaleSegment(segment) || isRegionSegment(segment)
+}
+
 // The segments after the route words the path opens with.
 const skipRouteWords = (segments: Array<string>): Array<string> => {
   let rest = segments
 
   // `/embed/{locale}/video/{id}` serves the player and redirects to
-  // `geo.dailymotion.com/player.html?video={id}`. Two letters tell a locale from an account
-  // handle, since account pages also open the path.
+  // `geo.dailymotion.com/player.html?video={id}`. The locale is a language such as `en` or a
+  // country such as `fr`, which tells it from an account handle, since those open the path too.
   while (rest.length > 0) {
     const [word, nextWord] = rest
 
-    if (!isAnyOf(word, pathWords) && !(twoLettersRegex.test(word) && isRouteWord(nextWord))) {
+    if (!isAnyOf(word, pathWords) && !(isLocalePrefix(word) && isRouteWord(nextWord))) {
       break
     }
 

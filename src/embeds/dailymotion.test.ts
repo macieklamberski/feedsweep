@@ -31,8 +31,11 @@ const videoUrls = [
   'https://geo.dailymotion.com/player.html?video=x7tgad0',
   // Share urls append a title slug to the id.
   'https://www.dailymotion.com/video/x7tgad0_some-title',
-  // The locale Dailymotion writes into the path, on the embed route and on the watch page.
+  // The locale Dailymotion writes into the path, on the embed route and on the watch page. It is a
+  // country such as `fr` or a language such as `en` and `he`.
   'https://www.dailymotion.com/embed/fr/video/x7tgad0',
+  'https://www.dailymotion.com/embed/en/video/x7tgad0',
+  'https://www.dailymotion.com/embed/he/video/x7tgad0',
   'https://www.dailymotion.com/es/video/x7tgad0',
 ]
 
