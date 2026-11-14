@@ -1,13 +1,16 @@
 import { composeQuery, getQueryParam, getQueryParams, isHostOf } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
-import { digitsRegex, isFileName } from '../utils/urls.js'
+import { isFileName } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'megaphone'
 
 const hosts = ['megaphone.fm']
 
+// An episode id is the publisher's prefix in capitals and a run of digits. The player answers 404
+// for the same id in lowercase or with the prefix dropped.
+const episodeIdRegex = /^[A-Z]+\d+$/
 const legacyPlayerPathRegex = /^\/(?<id>[A-Z]+\d+)\/?$/
 
 const sizes = {
@@ -35,8 +38,9 @@ export const extractMegaphoneEmbed = (
       continue
     }
 
-    // NPR writes its bare story number into ?e=, and an episode id opens with letters.
-    if (param === 'e' && digitsRegex.test(id)) {
+    // NPR writes its bare story number into ?e=. A playlist is named by a show id or by a slug, so
+    // ?p= has no format to check.
+    if (param === 'e' && !episodeIdRegex.test(id)) {
       continue
     }
 
