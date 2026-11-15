@@ -73,6 +73,18 @@ describe('extractMegaphoneEmbed', () => {
     expect(extractMegaphoneEmbed(new URL(value))).toBeUndefined()
   })
 
+  it('should not read a lowercase episode id', () => {
+    const value = 'https://playlist.megaphone.fm/?e=glt2131296942'
+
+    expect(extractMegaphoneEmbed(new URL(value))).toBeUndefined()
+  })
+
+  it('should not read an episode id with a character outside the format', () => {
+    const value = 'https://playlist.megaphone.fm/?e=AUDD4761726018%26autoplay%3D1'
+
+    expect(extractMegaphoneEmbed(new URL(value))).toBeUndefined()
+  })
+
   // The prefix is the publisher's own name, so it has no length anyone controls. Both of these
   // are real episodes, confirmed against Megaphone's oEmbed, and a cap at eleven refused them.
   const longPublisherPrefixIds: Array<string> = [
@@ -230,18 +242,6 @@ describe('megaphoneResolveEmbed', () => {
       provider: 'megaphone',
       id: 'episode/FOXM4466927623',
       src: 'https://playlist.megaphone.fm/?e=FOXM4466927623&start=0',
-      height: 200,
-    }
-
-    expect(megaphoneResolveEmbed(new URL(value))).toEqual(expected)
-  })
-
-  it('should use a malformed episode id as written, even if the player answers an error', () => {
-    const value = 'https://playlist.megaphone.fm/?e=AUDD4761726018%26autoplay%3D1'
-    const expected: EmbedResolverResult = {
-      provider: 'megaphone',
-      id: 'episode/AUDD4761726018&autoplay=1',
-      src: 'https://playlist.megaphone.fm/?e=AUDD4761726018%26autoplay=1',
       height: 200,
     }
 
