@@ -212,18 +212,11 @@ describeForEachParser('ganjingworldEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should drop a locale with a longer region code', async () => {
+    it('should ignore a prefix naming no language or country', async () => {
       const value =
-        '<iframe src="https://www.ganjingworld.com/en-USA/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c"></iframe>'
-      const expected: EmbedResolverResult = {
-        provider: 'ganjingworld',
-        id: '1fv8993v57oI3UiHioRJzFV1L1cq1c',
-        src: 'https://www.ganjingworld.com/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c',
-        url: 'https://www.ganjingworld.com/video/1fv8993v57oI3UiHioRJzFV1L1cq1c',
-        ratio: '16/9',
-      }
+        '<iframe src="https://www.ganjingworld.com/xx-YY/embed/1fv8993v57oI3UiHioRJzFV1L1cq1c"></iframe>'
 
-      expect(await extract(value)).toEqual(expected)
+      expect(await extract(value)).toBeUndefined()
     })
 
     it('should pass a 13-character legacy id through', async () => {

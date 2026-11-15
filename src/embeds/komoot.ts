@@ -1,6 +1,5 @@
 import { composeQuery, getPathSegments, getQueryParams, isAnyOf, isLocaleOrRegion } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
-import { hyphenatedLettersRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 type Resource = {
@@ -41,7 +40,7 @@ const readResource = (segments: Array<string>): Resource | undefined => {
 // `komoot.com/collection/{collectionId}/{slug}/embed`, sometimes behind a locale segment.
 export const komootResolveEmbed: ResolveUrlEmbed = (url) => {
   const [first = '', ...rest] = getPathSegments(url)
-  const hasLocale = hyphenatedLettersRegex.test(first)
+  const hasLocale = isLocaleOrRegion(first)
   const resource = readResource(hasLocale ? rest : [first, ...rest])
 
   if (!resource) {
@@ -50,7 +49,7 @@ export const komootResolveEmbed: ResolveUrlEmbed = (url) => {
 
   // The locale sets the player's language and units, `de-de` showing kilometres where the bare
   // path shows miles.
-  const locale = hasLocale && isLocaleOrRegion(first) ? `${first}/` : ''
+  const locale = hasLocale ? `${first}/` : ''
   const params = getQueryParams(url.search, accessParams)
   const result: EmbedResolverResult = {
     provider,

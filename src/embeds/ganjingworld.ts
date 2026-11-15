@@ -1,7 +1,6 @@
-import { getPathSegments, isAnyOf } from 'trousse'
+import { getPathSegments, isAnyOf, isLocaleOrRegion } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
-import { hyphenatedLettersRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'ganjingworld'
@@ -25,8 +24,8 @@ const readVideoId = (url: URL): string | undefined => {
     return
   }
 
-  // The hyphen tells a locale from the route words that share its slot, such as `live`.
-  if (!hyphenatedLettersRegex.test(routeOrLocale ?? '')) {
+  // A locale such as `zh-CN` tells itself from the route words that share its slot, such as `live`.
+  if (!isLocaleOrRegion(routeOrLocale ?? '')) {
     return
   }
 
