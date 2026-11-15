@@ -679,14 +679,14 @@ describeForEachParser('appleToolsEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should lowercase a storefront the tool wrote in capitals', async () => {
+    it('should keep a storefront the tool wrote in capitals as written, even if the player renders blank', async () => {
       const value =
         '<iframe src="https://tools.applemusic.com/embed/v1/album/111492?country=GB"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'applemusic',
         id: 'album/111492',
-        src: 'https://embed.music.apple.com/gb/album/111492',
-        url: 'https://music.apple.com/gb/album/111492',
+        src: 'https://embed.music.apple.com/GB/album/111492',
+        url: 'https://music.apple.com/GB/album/111492',
         height: 450,
       }
 
