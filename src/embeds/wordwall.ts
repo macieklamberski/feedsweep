@@ -1,7 +1,14 @@
-import { composeQuery, getPathSegments, getQueryParams, isAnyOf, isHostOf } from 'trousse'
+import {
+  composeQuery,
+  getPathSegments,
+  getQueryParams,
+  isAnyOf,
+  isHostOf,
+  isLocaleOrRegion,
+} from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
-import { hexRegex, hyphenatedLettersRegex, isLocalePrefix, lettersRegex } from '../utils/urls.js'
+import { hexRegex, hyphenatedLettersRegex, lettersRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'wordwall'
@@ -62,8 +69,8 @@ const wordwallResolveEmbed: ResolveUrlEmbed = (url) => {
 
   // The player keeps a locale, `/pl/` playing with Polish buttons where the bare path plays with
   // English ones.
-  const [localeOrRoute] = getPathSegments(url)
-  const locale = isLocalePrefix(localeOrRoute) ? `${localeOrRoute.toLowerCase()}/` : ''
+  const [localeOrRoute = ''] = getPathSegments(url)
+  const locale = isLocaleOrRegion(localeOrRoute) ? `${localeOrRoute.toLowerCase()}/` : ''
 
   // No thumbnail offline: the embed page's `og:image` on `screens.cdn.wordwall.net` is keyed by
   // a hash that appears nowhere in the embed url.

@@ -8,6 +8,7 @@ import {
   getQueryParamValues,
   isAnyOf,
   isHostOrSubdomainOf,
+  isLocaleOrRegion,
   isPlainObject,
   isString,
   type Nullish,
@@ -20,7 +21,7 @@ import type {
   ResolveUrlEmbed,
 } from '../types.js'
 import { attr, find } from '../utils/dom.js'
-import { isLocalePrefix, parseUrlOnHosts } from '../utils/urls.js'
+import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'dailymotion'
@@ -74,7 +75,7 @@ const skipRouteWords = (segments: Array<string>): Array<string> => {
   while (rest.length > 0) {
     const [word, nextWord] = rest
 
-    if (!isAnyOf(word, pathWords) && !(isLocalePrefix(word) && isRouteWord(nextWord))) {
+    if (!isAnyOf(word, pathWords) && !(isLocaleOrRegion(word) && isRouteWord(nextWord))) {
       break
     }
 

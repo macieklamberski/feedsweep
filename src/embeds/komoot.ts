@@ -1,6 +1,6 @@
-import { composeQuery, getPathSegments, getQueryParams, isAnyOf } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParams, isAnyOf, isLocaleOrRegion } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
-import { hyphenatedLettersRegex, isLocalePrefix } from '../utils/urls.js'
+import { hyphenatedLettersRegex } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 type Resource = {
@@ -50,7 +50,7 @@ export const komootResolveEmbed: ResolveUrlEmbed = (url) => {
 
   // The locale sets the player's language and units, `de-de` showing kilometres where the bare
   // path shows miles. Komoot serves it lowercase only, and `/DE-DE/` answers 404.
-  const locale = hasLocale && isLocalePrefix(first) ? `${first.toLowerCase()}/` : ''
+  const locale = hasLocale && isLocaleOrRegion(first) ? `${first.toLowerCase()}/` : ''
   const params = getQueryParams(url.search, accessParams)
   const result: EmbedResolverResult = {
     provider,

@@ -1,7 +1,7 @@
-import { getPathSegments, isAnyOf, isHostOf } from 'trousse'
+import { getPathSegments, isAnyOf, isHostOf, isLocaleOrRegion } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, isElement, isWhitespaceText, text } from '../utils/dom.js'
-import { isLocalePrefix, lettersRegex, parseUrlOnHosts } from '../utils/urls.js'
+import { lettersRegex, parseUrlOnHosts } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'yumpu'
@@ -56,11 +56,11 @@ const readHash = (segments: Array<string>): string | undefined => {
 
 const yumpuResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const segments = getPathSegments(url)
-  const [localeOrRoute] = segments
+  const [localeOrRoute = ''] = segments
   const isLocaleless = isAnyOf(localeOrRoute, 'embed')
   const hash = readHash(isLocaleless ? segments : segments.slice(1))
 
-  if (!isLocaleless && !lettersRegex.test(localeOrRoute ?? '')) {
+  if (!isLocaleless && !lettersRegex.test(localeOrRoute)) {
     return
   }
 
@@ -70,7 +70,7 @@ const yumpuResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
   // Every locale prefix serves the same document in its own interface language, and YUMPU
   // redirects a path with none to `/en/`. Its `xx` names no language and renders as `/en/`.
-  const locale = isLocalePrefix(localeOrRoute) ? localeOrRoute.toLowerCase() : 'en'
+  const locale = isLocaleOrRegion(localeOrRoute) ? localeOrRoute.toLowerCase() : 'en'
 
   return {
     provider,

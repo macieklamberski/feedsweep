@@ -6,8 +6,6 @@ import {
   getQueryParam,
   imageExtensions,
   isHostOrSubdomainOf,
-  isLocaleSegment,
-  isRegionSegment,
   type Nullish,
   normalizeUrl,
   parseUrl,
@@ -55,12 +53,6 @@ export const hexRegex = /^[0-9a-f]+$/i
 export const wordOrHyphenRegex = /^[\w-]+$/
 export const lettersRegex = /^[a-z]+$/i
 export const hyphenatedLettersRegex = /^[a-z]+-[a-z]+$/i
-
-// Whether a path segment names a language, such as `en` or `zh-hant`, or a country, such as `us`,
-// the two things a site puts in a locale prefix.
-export const isLocalePrefix = (segment: Nullish<string>): segment is string => {
-  return !!segment && (isLocaleSegment(segment) || isRegionSegment(segment))
-}
 
 // A browser trims C0 controls and spaces from both ends, so \x01javascript: runs. Inside the
 // url it drops only tabs and newlines: java\tscript: runs, java script: is a relative path.
