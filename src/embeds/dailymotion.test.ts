@@ -126,10 +126,11 @@ describe('extractDailymotionId', () => {
     expect(extractDailymotionId(carrierUrl(value, hosts))).toEqual(expected)
   })
 
-  it('should extract no id behind a three-letter segment where the locale sits', () => {
+  it('should step over a three-letter language where the locale sits', () => {
     const value = 'https://www.dailymotion.com/fra/video/x7tgad0'
+    const expected = 'x7tgad0'
 
-    expect(extractDailymotionId(carrierUrl(value, hosts))).toBeUndefined()
+    expect(extractDailymotionId(carrierUrl(value, hosts))).toBe(expected)
   })
 })
 
