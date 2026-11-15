@@ -69,12 +69,11 @@ const viralTopBarHeight = 40
 // The route qualifies the id, since a numeric id also fits the slug alphabet and an id alone
 // addresses neither space.
 const composeEmbed = (
-  rawRoute: string,
+  route: string,
   videoId: Nullish<string>,
   query = '',
 ): EmbedResolverResult | undefined => {
-  const route = rawRoute.toLowerCase()
-  const idSpace = idSpaces.get(route)
+  const idSpace = idSpaces.get(route.toLowerCase())
 
   if (!videoId || !idSpace) {
     return
@@ -85,7 +84,7 @@ const composeEmbed = (
     id: `${idSpace}/${videoId}`,
     src: `https://player.pbs.org/${route}/${videoId}/${query}`,
     ...sizes.player,
-    ratioHeightOffset: route === 'viralplayer' ? viralTopBarHeight : undefined,
+    ratioHeightOffset: isAnyOf(route, 'viralplayer') ? viralTopBarHeight : undefined,
   }
 }
 
