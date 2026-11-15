@@ -198,6 +198,20 @@ describe('listennotesResolveEmbed', () => {
       expect(listennotesResolveEmbed(new URL(value))).toEqual(expected)
     })
 
+    it('should drop a three-letter locale opening the episode route', () => {
+      const value =
+        'https://www.listennotes.com/fil/podcasts/nokia-chronicles/david-wood-symbian-psion-XGD3Cq8pn9j/embed/'
+      const expected: EmbedResolverResult = {
+        provider: 'listennotes',
+        id: 'episode/XGD3Cq8pn9j',
+        src: 'https://www.listennotes.com/podcasts/nokia-chronicles/david-wood-symbian-psion-XGD3Cq8pn9j/embed/',
+        url: 'https://www.listennotes.com/podcasts/nokia-chronicles/david-wood-symbian-psion-XGD3Cq8pn9j/',
+        height: 180,
+      }
+
+      expect(listennotesResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
     it('should drop a locale with a script subtag opening the hex route', () => {
       const value =
         'https://www.listennotes.com/zh-hant/embedded/e/77b8e0f907f945a29a64f0ef7c43c822/'
