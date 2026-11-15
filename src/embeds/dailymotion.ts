@@ -8,9 +8,8 @@ import {
   getQueryParamValues,
   isAnyOf,
   isHostOrSubdomainOf,
-  isLocaleSegment,
+  isLocaleOrRegion,
   isPlainObject,
-  isRegionSegment,
   isString,
   type Nullish,
   trimObject,
@@ -66,10 +65,6 @@ const isRouteWord = (segment: string): boolean => {
   return isAnyOf(segment, pathWords) || isAnyOf(segment, nonVideoWords)
 }
 
-const isLocalePrefix = (segment: string): boolean => {
-  return isLocaleSegment(segment) || isRegionSegment(segment)
-}
-
 // The segments after the route words the path opens with.
 const skipRouteWords = (segments: Array<string>): Array<string> => {
   let rest = segments
@@ -80,7 +75,7 @@ const skipRouteWords = (segments: Array<string>): Array<string> => {
   while (rest.length > 0) {
     const [word, nextWord] = rest
 
-    if (!isAnyOf(word, pathWords) && !(isLocalePrefix(word) && isRouteWord(nextWord))) {
+    if (!isAnyOf(word, pathWords) && !(isLocaleOrRegion(word) && isRouteWord(nextWord))) {
       break
     }
 
