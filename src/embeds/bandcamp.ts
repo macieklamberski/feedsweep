@@ -4,6 +4,7 @@ import {
   encodePathSegment,
   getPathSegments,
   getQueryParam,
+  includesAnyOf,
   type Nullish,
 } from 'trousse'
 import type { FieldCleaner, ResolveUrlEmbed } from '../types.js'
@@ -28,10 +29,6 @@ const sizes = {
   video: { ratio: '16/9' },
 }
 const releaseKinds = ['album', 'track']
-
-// The audio player spells its options as path segments (`EmbeddedPlayer/album=123/size=large/`)
-// while the video player uses a query string (`VideoEmbed?track=123&bgcol=…`).
-const videoPathRegex = /\/videoembed/i
 
 // A player pointing at a track inside an album names both, and the two orders both occur: the
 // modern path writes `album=` first and the legacy `v=2/` path writes `track=` first.
@@ -109,9 +106,11 @@ const bandcampResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
   const releases = readReleases(url)
   const [kind, id] = release.split('/')
+  // The audio player spells its options as path segments (`EmbeddedPlayer/album=123/size=large/`)
+  // while the video player uses a query string (`VideoEmbed?track=123&bgcol=…`).
   // The video player names a track and only a track: `VideoEmbed?album={id}` answers 404. A video
   // carrier whose only release is an album falls back to the audio player, which does serve it.
-  const isVideo = videoPathRegex.test(url.pathname) && kind === 'track'
+  const isVideo = includesAnyOf(url.pathname, '/videoembed') && kind === 'track'
   const startTrack = getPathSegments(url).find((segment) => startTrackRegex.test(segment))
   const start = startTrack ? `${startTrack}/` : ''
   // A query id comes out decoded, and it goes into a path.

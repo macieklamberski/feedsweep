@@ -1,4 +1,4 @@
-import { getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import { getPathSegments, getQueryParam, isAnyOf, startsWithAnyOf } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { filterUrlQuery } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -15,11 +15,6 @@ const hosts = ['reverbnation.com']
 // `Album_170738`, and the rarer `fan_` and `promoter_`. The kind is capitalised inconsistently by
 // the site's own snippets, so it is taken as written and passed through as written.
 const safeIdRegex = /^[A-Za-z]+_\d+$/
-
-// The Flash players, all of them under `widgets/swf/{revision}/`. `pro_widget` is the common one
-// at 49 occurrences, then `tuneWidget` 17, `widgetPlayer` 7, `press` 5, `widgetPlayerMini` 3,
-// `blog_player` 2 and `widgetPlayerMicro` 1.
-const flashPathRegex = /^\/widgets\/swf\//i
 
 // The three parameters those players use to name their subject. They are the same id space as
 // the html widget's path: all six Flash-era ids sampled from the corpus answer 200 there, against
@@ -50,7 +45,10 @@ const readWidgetId = (url: URL): string | undefined => {
 
 // The Flash players sit on cache.reverbnation.com, which serves swf files and nothing else.
 const readFlashId = (url: URL): string | undefined => {
-  if (!flashPathRegex.test(url.pathname)) {
+  // The Flash players, all of them under `widgets/swf/{revision}/`. `pro_widget` is the common
+  // one at 49 occurrences, then `tuneWidget` 17, `widgetPlayer` 7, `press` 5, `widgetPlayerMini`
+  // 3, `blog_player` 2 and `widgetPlayerMicro` 1.
+  if (!startsWithAnyOf(url.pathname, '/widgets/swf/')) {
     return
   }
 

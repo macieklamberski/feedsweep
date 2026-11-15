@@ -1,4 +1,4 @@
-import { encodePathSegment } from 'trousse'
+import { encodePathSegment, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -10,7 +10,6 @@ const provider = 'crowdsignal'
 const pollPathRegex = /^\/(\d+)(?:\/embed)?\/?$/i
 const loaderPathRegex = /^\/p\/([^/]+)\.js$/i
 const retiredPollPathRegex = /^\/poll\/([^/]+)\/?$/i
-const flashPlayerPathRegex = /^\/poll\.swf$/i
 
 const sizes = {
   // A poll's height follows its answer count, and the frame posts none.
@@ -97,7 +96,7 @@ export const crowdsignalScriptEmbedResolver = createMarkupEmbedResolver(
 )
 
 const crowdsignalFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
-  if (!flashPlayerPathRegex.test(url.pathname)) {
+  if (!isAnyOf(url.pathname, '/poll.swf')) {
     return
   }
 

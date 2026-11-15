@@ -3,8 +3,10 @@ import {
   decodeSegment,
   encodePathSegment,
   getQueryParam,
+  isAnyOf,
   isHostOf,
   type Nullish,
+  startsWithAnyOf,
   trimObject,
 } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
@@ -39,16 +41,12 @@ const embedrHosts = ['embedr.flickr.com']
 // publisher's page shows a linked image.
 const photonHosts = ['i0.wp.com', 'i1.wp.com', 'i2.wp.com']
 
-// Both swf urls name only the player. Their `?v=` cache-buster names no item.
-const flashPlayerPathRegex = /^\/apps\/slideshow\//i
-const flashVideoPathRegex = /^\/apps\/video\/stewart\.swf$/i
-const legacyPlayerPathRegex = /^\/slideshow\/index\.gne$/i
+const flashVideoPath = '/apps/video/stewart.swf'
 
 // The set id is its digit run, so a link a feed cut into still names the set.
 const setPathRegex = /^\/photos\/([^/]+)\/(?:sets|albums)\/(\d+)/i
 const streamPathRegex = /^\/photos\/([^/]+)\/show\/?$/i
 const groupPathRegex = /^\/groups\/([^/]+)\/pool\/show\/?$/i
-const groupPagePathRegex = /^\/groups\//i
 const groupAliasPoolPathRegex = /^\/groups\/[^/]+\/pool\/show(?:\/with\/[^/]+)?\/?$/i
 // An owner of `_` names nobody: the player ignores it, and `/photos/_/{photoId}/` answers 404.
 const photoPathRegex = /^\/photos\/(?:_|([^/]+))\/(\d+)(?:\/in\/[^/]+)?\/player(?:\/([^/]+))?\/?$/i
@@ -194,7 +192,7 @@ const readFlashSubject = (element: Nullish<Element>): FlickrSubject => {
 
   // A page path under a group names a pool, and a `user_id` beside it names a member's
   // photostream, which is another item.
-  if (groupPagePathRegex.test(page)) {
+  if (startsWithAnyOf(page, '/groups/')) {
     return {}
   }
 
@@ -335,11 +333,12 @@ const composeEmbed = (subject: FlickrSubject): EmbedResolverResult | undefined =
   }
 }
 
+// Both swf urls name only the player. Their `?v=` cache-buster names no item.
 const composePlayerEmbed = (
   parsed: URL,
   element: Nullish<Element>,
 ): EmbedResolverResult | undefined => {
-  if (flashVideoPathRegex.test(parsed.pathname)) {
+  if (isAnyOf(parsed.pathname, flashVideoPath)) {
     const photo = readFlashPhoto(element)
 
     if (!photo) {
@@ -351,11 +350,11 @@ const composePlayerEmbed = (
     return composePhotoEmbed(src, photo)
   }
 
-  if (flashPlayerPathRegex.test(parsed.pathname)) {
+  if (startsWithAnyOf(parsed.pathname, '/apps/slideshow/')) {
     return composeEmbed(readFlashSubject(element))
   }
 
-  if (legacyPlayerPathRegex.test(parsed.pathname)) {
+  if (isAnyOf(parsed.pathname, '/slideshow/index.gne')) {
     return composeEmbed(readLegacySubject(parsed))
   }
 
@@ -377,7 +376,7 @@ const resolveTarget = (url: URL, element: Nullish<Element>): EmbedResolverResult
     return
   }
 
-  if (flashVideoPathRegex.test(url.pathname)) {
+  if (isAnyOf(url.pathname, flashVideoPath)) {
     return { ...result, ...sizes.video }
   }
 

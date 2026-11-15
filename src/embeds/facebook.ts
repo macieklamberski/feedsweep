@@ -189,8 +189,6 @@ export const facebookAmpEmbedResolver = createMarkupEmbedResolver(
 // `/plugins/post.php` or `/plugins/video.php`, with or without a Graph API version in front.
 // Older SDKs prefixed their Graph API version, and those urls still serve the same plugin.
 const pluginPathRegex = /^(?:\/v\d+(?:\.\d+)?)?\/plugins\/(?:post|video)\.php$/i
-// The pre-plugins video frame from old posts, naming its video in `video_id`.
-const legacyVideoPathRegex = /^\/video\/embed$/i
 // The Flash player from older posts, naming its video in the path. Facebook answers it with 400.
 const flashVideoPathRegex = /^\/v\/([^/]+)$/i
 
@@ -226,7 +224,8 @@ const composeWatchEmbed = (videoId: string): EmbedResolverResult => {
 // A post has no name: its words go to `description`, and the frame titles itself
 // `fb:post Facebook Social Plugin`.
 export const facebookResolveEmbed: ResolveUrlEmbed = (url) => {
-  if (legacyVideoPathRegex.test(url.pathname)) {
+  // The pre-plugins video frame from old posts, naming its video in `video_id`.
+  if (isAnyOf(url.pathname, '/video/embed')) {
     const videoId = getQueryParam(url.searchParams, 'video_id')
 
     if (!videoId) {
@@ -272,12 +271,10 @@ export const facebookIframeEmbedResolver = createUrlEmbedResolver(hosts, faceboo
 
 // The Flash player before `/v/`, `/swf/mvp.swf` on Facebook's static hosts, naming its video in
 // flashvars `video_id`. The share player names only a file and stays unresolved.
-const mvpPathRegex = /^\/swf\/mvp\.swf$/i
-
 const facebookFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const videoId = flashVar(element, 'video_id')
 
-  if (!mvpPathRegex.test(url.pathname) || !videoId) {
+  if (!isAnyOf(url.pathname, '/swf/mvp.swf') || !videoId) {
     return
   }
 

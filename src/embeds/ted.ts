@@ -1,4 +1,11 @@
-import { encodePathSegment, getPathSegments, getQueryParam, isAnyOf, isHostOf } from 'trousse'
+import {
+  encodePathSegment,
+  endsWithAnyOf,
+  getPathSegments,
+  getQueryParam,
+  isAnyOf,
+  isHostOf,
+} from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVars, keepIfMatches, parseFlashVars } from '../utils/dom.js'
 import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
@@ -36,10 +43,6 @@ export const extractTedTalk = (link: URL): string | undefined => {
   return talkFile?.replace(htmlSuffixRegex, '')
 }
 
-// The Flash player's url is the same file for every talk, and the player is dead, so these embeds
-// render nothing. The talk is only in the flashVars: as a slug in the ad targeting keys,
-// `adKeys=talk={slug};year=2010;theme=…`, and as a numeric id in `ti`.
-const flashPlayerPathRegex = /\/assets\/player\/swf\/embedplayer\.swf$/i
 // The talk key in the flashVars adKeys value, spelled talk={slug};year={year}.
 const adKeysTalkRegex = /(?:^|;)talk=([^;]+)/i
 
@@ -47,7 +50,10 @@ const readFlashTalk = (
   url: URL,
   element: Element | undefined,
 ): { slug: string; thumbnail?: string } | undefined => {
-  if (!flashPlayerPathRegex.test(url.pathname)) {
+  // The Flash player's url is the same file for every talk, and the player is dead, so these
+  // embeds render nothing. The talk is only in the flashVars: as a slug in the ad targeting keys,
+  // `adKeys=talk={slug};year=2010;theme=…`, and as a numeric id in `ti`.
+  if (!endsWithAnyOf(url.pathname, '/assets/player/swf/embedplayer.swf')) {
     return
   }
 

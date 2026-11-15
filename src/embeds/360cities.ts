@@ -1,3 +1,4 @@
+import { isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -12,7 +13,6 @@ const sizes = {
 }
 
 const framePathRegex = /^\/embed_iframe\/([^/]+)$/i
-const flashPlayerPathRegex = /^\/javascripts\/krpano\/krpano\.swf$/i
 const flashPanoPathRegex = /^\/krpano\/external_embed\/([^/]+)\.xml$/i
 
 const composeEmbed = (slug: string): EmbedResolverResult => {
@@ -29,7 +29,7 @@ const composeEmbed = (slug: string): EmbedResolverResult => {
 // and names the panorama in flashvars as `pano=…/krpano/external_embed/{slug}.xml`, and the
 // frame `360cities.net/embed_iframe/{slug}`.
 export const threeSixtyCitiesResolveEmbed: ResolveUrlEmbed = (url, element) => {
-  if (flashPlayerPathRegex.test(url.pathname)) {
+  if (isAnyOf(url.pathname, '/javascripts/krpano/krpano.swf')) {
     const pano = parseUrlOnHosts(flashVar(element, 'pano'), hosts)
     const slug = pano?.pathname.match(flashPanoPathRegex)?.[1]
 

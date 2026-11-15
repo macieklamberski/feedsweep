@@ -1,4 +1,4 @@
-import { encodePathSegment, getQueryParam, isHostOf, type Nullish } from 'trousse'
+import { encodePathSegment, getQueryParam, isAnyOf, isHostOf, type Nullish } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -11,7 +11,6 @@ const sizes = {
 const hosts = ['allocine.fr']
 
 // The server answers every route in lowercase only, so `src` mints the route words that way.
-const blogPlayerPathRegex = /^\/_video\/iblogvision\.aspx$/i
 const flashPlayerPathRegex = /^\/blogvision\/([^/]+)$/i
 const playerPathRegex = /^\/([^/]+)\.html$/i
 
@@ -21,7 +20,7 @@ const readCmedia = (parsed: URL): Nullish<string> => {
     return parsed.pathname.match(playerPathRegex)?.[1]
   }
 
-  if (blogPlayerPathRegex.test(parsed.pathname)) {
+  if (isAnyOf(parsed.pathname, '/_video/iblogvision.aspx')) {
     return getQueryParam(parsed.searchParams, 'cmedia')
   }
 

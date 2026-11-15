@@ -1,5 +1,6 @@
 import {
   encodePathSegment,
+  endsWithAnyOf,
   getPathSegments,
   isAnyOf,
   isHostOf,
@@ -88,9 +89,6 @@ const sizes = {
   // never does.
   album: { height: 500 },
 }
-
-// `imgur.com/{id}.gifv` redirects to the video on i.imgur.com, and no file list names `gifv`.
-const gifvFileRegex = /\.gifv$/i
 
 // The hyphen pins the id: without it a word behind any other character, such as an encoded
 // slash, reads as one.
@@ -188,7 +186,8 @@ export const imgurResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 
   // imgur.com redirects a file name to the file on i.imgur.com, so it is an image or a video.
-  if (isFileName(route) || gifvFileRegex.test(route)) {
+  // `imgur.com/{id}.gifv` redirects to the video there too, and no file list names `gifv`.
+  if (isFileName(route) || endsWithAnyOf(route, '.gifv')) {
     return
   }
 

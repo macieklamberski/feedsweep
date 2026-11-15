@@ -7,7 +7,6 @@ const provider = 'voki'
 const flashHosts = ['vhss-a.oddcast.com', 'vhss-d.oddcast.com']
 const hosts = ['www.voki.com']
 
-const flashPlayerPathRegex = /^\/vhss_editors\/voki_player\.swf$/i
 const pickupPathRegex = /^\/site\/pickup\/?$/i
 
 // The pickup page sizes the player to its window less 280 pixels of site chrome, so this frame
@@ -34,7 +33,7 @@ const composeEmbed = (sc: string, chsm: string): EmbedResolverResult => {
 }
 
 const vokiFlashResolveEmbed: ResolveUrlEmbed = (url) => {
-  if (!flashPlayerPathRegex.test(url.pathname)) {
+  if (!isAnyOf(url.pathname, '/vhss_editors/voki_player.swf')) {
     return
   }
 

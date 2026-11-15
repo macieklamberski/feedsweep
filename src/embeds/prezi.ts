@@ -1,4 +1,4 @@
-import { encodePathSegment, getPathSegments, isAnyOf } from 'trousse'
+import { encodePathSegment, endsWithAnyOf, getPathSegments, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -12,9 +12,6 @@ const sizes = {
   video: { ratio: '16/9' },
 }
 
-// The Flash snippet's one loader, with the presentation named in flashvars and repeated in the
-// element ids as `prezi_{id}` and `preziEmbed_{id}`.
-const loaderPathRegex = /\/bin\/preziloader\.swf$/i
 const elementIdRegex = /^prezi(?:Embed)?_(.+)/i
 
 // Classic ids are 12 characters and share tokens 20. A share token's page lives on `/view/{id}/`,
@@ -67,7 +64,9 @@ const readFrameId = ([route, idOrEmbed, embedOrId]: Array<string>): string | und
 // `prezi.com/embed/{id}/`, `prezi.com/p/{id}/embed`, `prezi.com/view/{id}/embed` and Prezi Video's
 // `prezi.com/v/embed/{id}/`, and `prezi.com/p/embed/{id}/`, which asks for a login.
 export const preziResolveEmbed: ResolveUrlEmbed = (url, element) => {
-  if (loaderPathRegex.test(url.pathname)) {
+  // The Flash snippet's one loader, with the presentation named in flashvars and repeated in the
+  // element ids as `prezi_{id}` and `preziEmbed_{id}`.
+  if (endsWithAnyOf(url.pathname, '/bin/preziloader.swf')) {
     const flashId = flashVar(element, 'prezi_id')
     const declaredId = flashId ? flashId : attr(element, 'id')?.match(elementIdRegex)?.[1]
     // The flashvar and the element id come out decoded, and the id goes into a path.

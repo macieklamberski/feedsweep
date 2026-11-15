@@ -3,6 +3,7 @@ import {
   getQueryParam,
   getQueryParams,
   includesAnyOf,
+  isAnyOf,
   isHostOrSubdomainOf,
   toMap,
 } from 'trousse'
@@ -40,7 +41,6 @@ const urnPlayerPathRegex = /^\/(?:p\/[^/]+\/embed|play\/embed)\/?$/i
 // The page players, which name a media id in `id`: the retired per-show `videoembed` answers 404,
 // and `popupvideoplayer` is a live page that renders the same player as `/play/embed`.
 const retiredPlayerPathRegex = /^\/player\/tv\/[^/]+\/videoembed\/[^/]+$/i
-const popupPlayerPathRegex = /^\/play\/tv\/popupvideoplayer$/i
 
 const readBusinessUnit = (parsed: URL): string | undefined => {
   for (const [unit, host] of playerHosts) {
@@ -81,7 +81,7 @@ const srgplayResolveEmbed: ResolveUrlEmbed = (url) => {
 
   const isRetired = retiredPlayerPathRegex.test(url.pathname)
 
-  if (!isRetired && !popupPlayerPathRegex.test(url.pathname)) {
+  if (!isRetired && !isAnyOf(url.pathname, '/play/tv/popupvideoplayer')) {
     return
   }
 

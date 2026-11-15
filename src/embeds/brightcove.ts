@@ -3,6 +3,7 @@ import {
   encodePathSegment,
   getPathSegments,
   getQueryParam,
+  includesAnyOf,
   type Nullish,
 } from 'trousse'
 import type { EmbedRenderHint, ResolveUrlEmbed } from '../types.js'
@@ -206,12 +207,10 @@ export const brightcoveSkyEmbedResolver = createMarkupEmbedResolver(
   },
 )
 
-const federatedPathRegex = /\/services\/viewer\/federated_/i
-
 // The account sits in the url as `publisherID` and the video id in `flashVars`. The federated
 // player id in the path is not a modern player id.
 const brightcoveFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
-  if (!federatedPathRegex.test(url.pathname)) {
+  if (!includesAnyOf(url.pathname, '/services/viewer/federated_')) {
     return
   }
 

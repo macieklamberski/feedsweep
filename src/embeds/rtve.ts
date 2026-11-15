@@ -1,4 +1,11 @@
-import { encodePathSegment, getAnyOf, getPathSegments, getQueryParam, isAnyOf } from 'trousse'
+import {
+  encodePathSegment,
+  endsWithAnyOf,
+  getAnyOf,
+  getPathSegments,
+  getQueryParam,
+  isAnyOf,
+} from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVar, text } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -19,10 +26,8 @@ const flashAssetRegex = /^(?<id>[^_]+)_[^_]+_(?<kind>audios|videos)$/i
 
 const flashPlayerPathRegex = /^\/swf\/.*\.swf$/i
 const flashEmbedPathRegex = /^\/swf\/v2\/embed\/([^/]+)\/RTVEPlayer\.swf$/i
-const flvPlayerPathRegex = /^\/swf\/FLVPlayer\.swf$/i
 const nielsenAssetRegex = /(?:^|,)assetID::([^,]+)/i
 const nielsenTitleRegex = /(?:^|,)title::(.+)$/i
-const audioConfigRegex = /\/rtve_config_audio_embed\.xml$/i
 
 const sizes = {
   // The player fills whatever box it gets, and the Flash video carriers state 425 by 239, 16:9.
@@ -73,13 +78,13 @@ const rtveFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
   // The FLVPlayer names its asset only in the nielsen beacon, assetID::{id},title::{title}, and
   // says the asset is audio only through its config file.
-  if (flvPlayerPathRegex.test(url.pathname)) {
+  if (isAnyOf(url.pathname, '/swf/FLVPlayer.swf')) {
     const config = getQueryParam(url.searchParams, 'config') ?? flashVar(element, 'config')
     const nielsen = getQueryParam(url.searchParams, 'nielsen') ?? flashVar(element, 'nielsen')
     // The asset goes from a decoded query or flashvar into a path.
     const id = encodePathSegment(nielsen?.match(nielsenAssetRegex)?.[1] ?? '')
 
-    if (!config || !audioConfigRegex.test(config) || !id) {
+    if (!config || !endsWithAnyOf(config, '/rtve_config_audio_embed.xml') || !id) {
       return
     }
 

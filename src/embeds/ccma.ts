@@ -1,4 +1,4 @@
-import { encodePathSegment } from 'trousse'
+import { encodePathSegment, isAnyOf, startsWithAnyOf } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, flashVar } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -14,8 +14,6 @@ const hosts = [
 const embedPathRegex = /^\/3cat\/video\/([^/]+)\/embed\/?$/i
 const legacyEmbedPathRegex = /^\/video\/embed\/(super3\/)?(\d+)\/?$/i
 const audioEmbedPathRegex = /^\/audio\/embed\/([^/]+)\/?$/i
-const evpPlayerPathRegex = /^\/ria\/players\//i
-const svpPlayerPathRegex = /^\/svp2\/svp2\.swf$/i
 const svpObjectIdRegex = /^SVP(\d+)IE$/i
 
 const sizes = {
@@ -87,11 +85,11 @@ export const ccmaResolveEmbed: ResolveUrlEmbed = (url, element) => {
     return composeAudioResult(audioId)
   }
 
-  if (evpPlayerPathRegex.test(url.pathname)) {
+  if (startsWithAnyOf(url.pathname, '/ria/players/')) {
     return composeResult(readFlashVideoId(element, 'videoid'))
   }
 
-  if (svpPlayerPathRegex.test(url.pathname)) {
+  if (isAnyOf(url.pathname, '/svp2/svp2.swf')) {
     const objectId = attr(element?.closest('object'), 'id')
 
     return composeResult(
