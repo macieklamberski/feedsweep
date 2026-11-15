@@ -1,4 +1,4 @@
-import { encodePathSegment, getQueryParam } from 'trousse'
+import { encodePathSegment, getQueryParam, isAnyOf } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
@@ -16,7 +16,6 @@ const sizes = {
 // adult site's `/a/content/` is refused, since the embed player cannot play it.
 const contentPageRegex = /^\/(?:[A-Za-z0-9_]{2}\/)?content\/([^/]+)\/?$/i
 const embedPlayerRegex = /^\/embed\/player\/([^/]+)\/?$/i
-const flashPlayerRegex = /^\/flv2\.swf$/i
 
 // `/embed/player/{id}/` is the route `outerplayer.min.js` composes. The content page is not a
 // frame target.
@@ -41,7 +40,7 @@ const fc2IframeResolveEmbed: ResolveUrlEmbed = (url) => {
 }
 
 const fc2FlashResolveEmbed: ResolveUrlEmbed = (url) => {
-  if (!flashPlayerRegex.test(url.pathname)) {
+  if (!isAnyOf(url.pathname, '/flv2.swf')) {
     return
   }
 

@@ -1,4 +1,11 @@
-import { composeQuery, getPathSegments, isHostOf, parseUrl, startsWithAnyOf } from 'trousse'
+import {
+  composeQuery,
+  getPathSegments,
+  includesAnyOf,
+  isHostOf,
+  parseUrl,
+  startsWithAnyOf,
+} from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { attr } from '../../utils/dom.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../../utils/urls.js'
@@ -6,10 +13,6 @@ import { createLinkedImage } from '../../utils/widgets.js'
 
 // Listed exactly: a www.sandbox.paypal.com form is a test button that takes no real payment.
 const paypalHosts = ['paypal.com', 'www.paypal.com']
-
-// PayPal names its donate button image files `btn_donate…`, and a publisher's own upload says
-// donate in its file name. A host or folder saying donate names the site, not the button.
-const donateImageRegex = /donat/i
 
 const donateFormSelector = [
   'form[action*="paypal.com/cgi-bin/webscr" i]',
@@ -29,7 +32,9 @@ const readDonateButtonId = (form: Element, imageSrc: string): string | undefined
   // On `/cgi-bin/webscr` a hosted button is a donation, a sale, a cart or a subscription alike,
   // and the donate page renders "This organization's page is broken" for any but a donation.
 
-  if (!startsWithAnyOf(action.pathname, '/donate') && !donateImageRegex.test(imageFileName)) {
+  // PayPal names its donate button image files `btn_donate…`, and a publisher's own upload says
+  // donate in its file name. A host or folder saying donate names the site, not the button.
+  if (!startsWithAnyOf(action.pathname, '/donate') && !includesAnyOf(imageFileName, 'donat')) {
     return
   }
 

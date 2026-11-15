@@ -1,6 +1,7 @@
 import {
   audioExtensions,
   documentExtensions,
+  endsWithAnyOf,
   fixMalformedQuery,
   flashExtensions,
   getQueryParam,
@@ -104,7 +105,6 @@ export const isFileName = (value: string): boolean => {
 // extension while the response is HTML. Feeds carry the colon percent-encoded too, and the
 // `/w/index.php?title=File:Clip.webm` spelling moves the namespace into the query.
 const filePagePathRegex = /\/wiki\/[^/?#]*(?::|%3A)[^/?#]*$/i
-const scriptPathRegex = /\/index\.php$/i
 const filePageNameRegex = /\/wiki\/[^/?#]*?(?::|%3A)([^/?#]+)$/i
 
 export const isMediaWikiFilePage = (value: string): boolean => {
@@ -114,7 +114,7 @@ export const isMediaWikiFilePage = (value: string): boolean => {
     return true
   }
 
-  if (!scriptPathRegex.test(path)) {
+  if (!endsWithAnyOf(path, '/index.php')) {
     return false
   }
 

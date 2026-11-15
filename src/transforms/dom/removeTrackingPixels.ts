@@ -42,7 +42,7 @@ const hasRasterFormatQuery = (src: string): boolean => {
   return formatQueryParams.some((name) => {
     const formats = getQueryParam(url, name)?.split(',') ?? []
 
-    return formats.some((format) => isAnyOf(format.trim(), rasterExtensions))
+    return formats.some((format) => isAnyOf(format, rasterExtensions))
   })
 }
 

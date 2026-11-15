@@ -168,7 +168,6 @@ export const archiveAudioEmbedResolver = createMarkupEmbedResolver('audio', (ele
 })
 
 const flowPlayerPathRegex = /^\/(?:flow|flv)\//i
-const xspfPlayerPathRegex = /^\/audio\/xspf_player\.swf$/i
 // The WordPress audio player swf, uploaded into an item of its own or beside the files it plays.
 const itemPlayerPathRegex = /^\/download\/.+\/player\.swf$/i
 // `archive.org/download/{identifier}/{file}`, or
@@ -217,7 +216,7 @@ const readItemPlayer = (element: Element | undefined): EmbedResolverResult | und
 }
 
 const archiveFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
-  if (xspfPlayerPathRegex.test(url.pathname)) {
+  if (isAnyOf(url.pathname, '/audio/xspf_player.swf')) {
     return readXspfPlayer(url)
   }
 

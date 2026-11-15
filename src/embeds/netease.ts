@@ -1,4 +1,4 @@
-import { composeQuery, getQueryParam, toMap } from 'trousse'
+import { composeQuery, getQueryParam, isAnyOf, toMap } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
@@ -17,7 +17,6 @@ const typeRoutes = toMap({
 })
 
 const playerPathRegex = /^\/outchain\/player\/?$/i
-const flashPlayerPathRegex = /^\/style\/swf\/widget\.swf$/i
 
 const sizes = {
   // Without `height` the player loads its list layout and fills its box. 250 shows the header,
@@ -50,7 +49,7 @@ export const neteaseResolveEmbed: ResolveUrlEmbed = (url) => {
     return composeResult(getQueryParam(query, 'type') ?? '', getQueryParam(query, 'id') ?? '')
   }
 
-  if (flashPlayerPathRegex.test(url.pathname)) {
+  if (isAnyOf(url.pathname, '/style/swf/widget.swf')) {
     return composeResult(getQueryParam(query, 'type') ?? '', getQueryParam(query, 'sid') ?? '')
   }
 }

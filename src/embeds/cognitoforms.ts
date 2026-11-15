@@ -16,7 +16,6 @@ const provider = 'cognitoforms'
 // `services.cognitoforms.com` is the older embed host, and still serves the same forms.
 const hosts = ['www.cognitoforms.com', 'services.cognitoforms.com']
 
-const seamlessPathRegex = /^\/f\/seamless\.js$/i
 // The loader's `Cognito.load` refuses any kind but `"forms"`, and mounts the form named by `id`.
 const loadCallRegex = /Cognito\.load\(\s*"forms"\s*,\s*\{\s*id\s*:\s*"([^"]+)"/
 
@@ -61,7 +60,7 @@ export const cognitoformsScriptEmbedResolver = createMarkupEmbedResolver(
     const orgKey = encodePathSegment(attr(element, 'data-key') ?? '')
     const formNumber = encodePathSegment(attr(element, 'data-form') ?? '')
 
-    if (!loader || !seamlessPathRegex.test(loader.pathname) || !orgKey || !formNumber) {
+    if (!loader || !isAnyOf(loader.pathname, '/f/seamless.js') || !orgKey || !formNumber) {
       return
     }
 

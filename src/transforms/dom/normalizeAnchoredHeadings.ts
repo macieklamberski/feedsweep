@@ -1,4 +1,4 @@
-import { isAnyOf } from 'trousse'
+import { includesAnyOf, isAnyOf } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import {
   hasAncestorWithTagName,
@@ -32,7 +32,6 @@ const permalinkClasses = [
 
 // Hash, pilcrow, section sign, fleuron, link emoji or zero-width space.
 const permalinkLabelRegex = /^[#¶§❡\u{1f517}​]+$/u
-const footnoteClassRegex = /footnote/i
 const bracketedNumberRegex = /^\[\d+\]$/
 const whitespaceRegex = /\s+/
 const slugSeparatorRegex = /[^\p{L}\p{N}]+/gu
@@ -105,7 +104,7 @@ export const normalizeAnchoredHeadings: DomTransform = ({ baseUrl, resolveUrlFn 
         // Footnote references inside headings (sup-wrapped, footnote-classed, or a
         // bracketed numeral) are citations, not permalinks: leave them alone.
         const isFootnote =
-          footnoteClassRegex.test(className) ||
+          includesAnyOf(className, 'footnote') ||
           bracketedNumberRegex.test(visible) ||
           hasAncestorWithTagName(anchor, supTags, heading)
 

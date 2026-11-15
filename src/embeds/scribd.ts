@@ -2,6 +2,7 @@ import {
   composeQuery,
   decodeSegment,
   encodePathSegment,
+  endsWithAnyOf,
   getPathSegments,
   getQueryParam,
   getQueryParams,
@@ -25,8 +26,6 @@ const hosts = ['scribd.com']
 const flashHosts = [...hosts, 'scribdassets.com']
 
 const documentIdMarkers = ['embeds', 'document', 'doc']
-
-const flashPlayerPathRegex = /\/scribdviewer\.swf$/i
 
 // A private document opens only with its `access_key`, and `start_page` is where reading starts.
 const playerParams = ['access_key', 'start_page']
@@ -84,7 +83,7 @@ export const scribdResolveEmbed: ResolveUrlEmbed = (url, element) => {
 export const scribdIframeEmbedResolver = createUrlEmbedResolver(hosts, scribdResolveEmbed)
 
 export const scribdFlashResolveEmbed: ResolveUrlEmbed = (url, element) => {
-  if (!flashPlayerPathRegex.test(url.pathname)) {
+  if (!endsWithAnyOf(url.pathname, '/scribdviewer.swf')) {
     return
   }
 
