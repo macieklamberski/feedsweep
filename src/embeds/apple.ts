@@ -161,7 +161,7 @@ export const appleToolsEmbedResolver = createUrlEmbedResolver(toolsHosts, (url) 
 
   const [, kind, pathId] = match
 
-  const country = getQueryParam(url.searchParams, 'country')?.toLowerCase()
+  const country = getQueryParam(url.searchParams, 'country')
   const storefront = country ? encodePathSegment(country) : undefined
   // biome-ignore lint/plugin/noBareNewUrl: The host is fixed, so this cannot throw.
   const modernUrl = new URL(

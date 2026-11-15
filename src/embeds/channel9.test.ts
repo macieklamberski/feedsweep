@@ -20,8 +20,8 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'channel9',
-        id: 'azure-friday/introducing-azure-analysis-services',
-        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=azure-friday&ep=introducing-azure-analysis-services',
+        id: 'Azure-Friday/Introducing-Azure-Analysis-Services',
+        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=Azure-Friday&ep=Introducing-Azure-Analysis-Services',
         ratio: '16/9',
       }
 
@@ -53,8 +53,8 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'channel9',
-        id: 'aspnetmonsters/aspnet-monsters-78-azure-functions-with-chris-anderson',
-        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=aspnetmonsters&ep=aspnet-monsters-78-azure-functions-with-chris-anderson',
+        id: 'aspnetmonsters/ASPNET-Monsters-78-Azure-Functions-with-Chris-Anderson',
+        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=aspnetmonsters&ep=ASPNET-Monsters-78-Azure-Functions-with-Chris-Anderson',
         ratio: '16/9',
       }
 
@@ -66,8 +66,8 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
         '<iframe src="https://channel9.msdn.com/Events/Build/2017/T6064/player"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'channel9',
-        id: 'events/build-2017/t6064',
-        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?ev=build-2017&session=t6064',
+        id: 'events/Build-2017/T6064',
+        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?ev=Build-2017&session=T6064',
         ratio: '16/9',
       }
 
@@ -125,13 +125,13 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should lowercase the two names and compose each as one parameter', async () => {
+    it('should keep the two names as written and compose each as one parameter', async () => {
       const value =
         '<iframe src="https://channel9.msdn.com/Shows/Going+Deep/Inside-Windows-8/player"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'channel9',
-        id: 'going+deep/inside-windows-8',
-        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=going%2Bdeep&ep=inside-windows-8',
+        id: 'Going+Deep/Inside-Windows-8',
+        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=Going%2BDeep&ep=Inside-Windows-8',
         ratio: '16/9',
       }
 
@@ -143,8 +143,8 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
         '<iframe src="https://channel9.msdn.com/SHOWS/Azure-Friday/An-Episode/PLAYER"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'channel9',
-        id: 'azure-friday/an-episode',
-        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=azure-friday&ep=an-episode',
+        id: 'Azure-Friday/An-Episode',
+        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=Azure-Friday&ep=An-Episode',
         ratio: '16/9',
       }
 
@@ -156,8 +156,8 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
         '<iframe src="https://channel9.msdn.com/Shows/Azure-Friday/An-Episode/player/"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'channel9',
-        id: 'azure-friday/an-episode',
-        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=azure-friday&ep=an-episode',
+        id: 'Azure-Friday/An-Episode',
+        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=Azure-Friday&ep=An-Episode',
         ratio: '16/9',
       }
 
@@ -169,8 +169,8 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
         '<iframe src="https://channel9.msdn.com/Shows/Azure-Friday/An-Episode/player?format=html5"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'channel9',
-        id: 'azure-friday/an-episode',
-        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=azure-friday&ep=an-episode',
+        id: 'Azure-Friday/An-Episode',
+        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=Azure-Friday&ep=An-Episode',
         ratio: '16/9',
       }
 
@@ -182,8 +182,8 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
         '<iframe src="https://channel9.msdn.com/Shows/Azure%26Friends/An-Episode/player"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'channel9',
-        id: 'azure&friends/an-episode',
-        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=azure%26friends&ep=an-episode',
+        id: 'Azure&Friends/An-Episode',
+        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=Azure%26Friends&ep=An-Episode',
         ratio: '16/9',
       }
 
@@ -195,8 +195,8 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
         '<iframe src="https://channel9.msdn.com/Events/Build/2017/T6064%26ev%3Dstolen/player"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'channel9',
-        id: 'events/build-2017/t6064&ev=stolen',
-        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?ev=build-2017&session=t6064%26ev=stolen',
+        id: 'events/Build-2017/T6064&ev=stolen',
+        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?ev=Build-2017&session=T6064%26ev=stolen',
         ratio: '16/9',
       }
 
@@ -230,8 +230,8 @@ describeForEachParser('channel9EmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'channel9',
-        id: 'events/net-fringe-net-fringe-2016/net-fringe-2016',
-        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?ev=net-fringe-net-fringe-2016&session=net-fringe-2016',
+        id: 'events/NET-Fringe-NET-Fringe-2016/NET-Fringe-2016',
+        src: 'https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?ev=NET-Fringe-NET-Fringe-2016&session=NET-Fringe-2016',
         ratio: '16/9',
       }
 
@@ -257,8 +257,8 @@ describeForEachParser('channel9 shapes the pipeline resolves first', (parseHtml)
     const expected = html`
       <div
         data-embed-provider="channel9"
-        data-embed-id="azure-friday/an-episode"
-        data-embed-src="https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=azure-friday&ep=an-episode"
+        data-embed-id="Azure-Friday/An-Episode"
+        data-embed-src="https://learn.microsoft.com/_themes/docs.theme/master/en-us/_themes/global/video-embed-one-stream.html?show=Azure-Friday&ep=An-Episode"
         data-embed-ratio="16/9"
       ></div>
     `

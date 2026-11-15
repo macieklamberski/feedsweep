@@ -41,8 +41,7 @@ const ourworldindataResolveEmbed: ResolveUrlEmbed = (url) => {
 
   return {
     provider,
-    // The site redirects any other case of a slug to its lowercase spelling.
-    id: `${kind}/${slug.toLowerCase()}`,
+    id: `${kind}/${slug}`,
     src,
     url: src,
     // An explorer's image shows its default view whatever the query names.

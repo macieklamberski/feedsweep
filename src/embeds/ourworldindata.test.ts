@@ -71,7 +71,7 @@ describeForEachParser('ourworldindataEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should keep the stack mode and fold the slug case in the key only', async () => {
+    it('should keep the stack mode and the slug case', async () => {
       const value = html`
         <iframe
           src="https://ourworldindata.org/grapher/CO2-by-source?stackMode=absolute&amp;time=1900..2017"
@@ -80,7 +80,7 @@ describeForEachParser('ourworldindataEmbedResolver', (parseHtml) => {
       `
       const expected: EmbedResolverResult = {
         provider: 'ourworldindata',
-        id: 'grapher/co2-by-source',
+        id: 'grapher/CO2-by-source',
         src: 'https://ourworldindata.org/grapher/CO2-by-source?stackMode=absolute&time=1900..2017',
         url: 'https://ourworldindata.org/grapher/CO2-by-source?stackMode=absolute&time=1900..2017',
         thumbnail:
