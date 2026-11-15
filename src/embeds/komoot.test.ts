@@ -31,13 +31,13 @@ describe('komootResolveEmbed', () => {
       expect(komootResolveEmbed(new URL(value))).toEqual(expected)
     })
 
-    // The route 404s on the uppercase locale and serves the lowercase one.
-    it('should lowercase an uppercase locale, which the route does not serve', () => {
+    // The route 404s on the uppercase locale, as the feed's own frame does.
+    it('should keep an uppercase locale as written, even if the route does not serve it', () => {
       const value = 'https://www.komoot.com/DE-DE/tour/727321743/embed'
       const expected: EmbedResolverResult = {
         provider: 'komoot',
         id: '727321743',
-        src: 'https://www.komoot.com/de-de/tour/727321743/embed',
+        src: 'https://www.komoot.com/DE-DE/tour/727321743/embed',
         url: 'https://www.komoot.com/tour/727321743',
         height: 440,
       }

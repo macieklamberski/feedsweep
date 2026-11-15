@@ -187,12 +187,12 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should lowercase an uppercase locale prefix', async () => {
+    it('should keep an uppercase locale prefix as written', async () => {
       const value = '<iframe src="https://www.yumpu.com/DE/embed/view/z4xYaRXnsDqwc2GE"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
-        src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
+        src: 'https://www.yumpu.com/DE/embed/view/z4xYaRXnsDqwc2GE',
         ratio: '4/3',
       }
 

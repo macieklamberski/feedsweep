@@ -70,7 +70,7 @@ const yumpuResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
   // Every locale prefix serves the same document in its own interface language, and YUMPU
   // redirects a path with none to `/en/`. Its `xx` names no language and renders as `/en/`.
-  const locale = isLocaleOrRegion(localeOrRoute) ? localeOrRoute.toLowerCase() : 'en'
+  const locale = isLocaleOrRegion(localeOrRoute) ? localeOrRoute : 'en'
 
   return {
     provider,

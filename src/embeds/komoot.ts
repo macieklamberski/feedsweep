@@ -49,8 +49,8 @@ export const komootResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 
   // The locale sets the player's language and units, `de-de` showing kilometres where the bare
-  // path shows miles. Komoot serves it lowercase only, and `/DE-DE/` answers 404.
-  const locale = hasLocale && isLocaleOrRegion(first) ? `${first.toLowerCase()}/` : ''
+  // path shows miles.
+  const locale = hasLocale && isLocaleOrRegion(first) ? `${first}/` : ''
   const params = getQueryParams(url.search, accessParams)
   const result: EmbedResolverResult = {
     provider,
