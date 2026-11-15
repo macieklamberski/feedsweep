@@ -49,7 +49,7 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should drop the locale prefix from the player url and keep it out of the id', async () => {
+    it('should keep the locale prefix in the player url and out of the id', async () => {
       const value = html`
         <iframe
           allowfullscreen=""
@@ -62,7 +62,7 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'wordwall',
         id: '4f37d8201dea4a218f20e24bf5a6b622',
-        src: 'https://wordwall.net/embed/4f37d8201dea4a218f20e24bf5a6b622?templateId=8',
+        src: 'https://wordwall.net/pl/embed/4f37d8201dea4a218f20e24bf5a6b622?templateId=8',
         ratio: '500/380',
       }
 
@@ -147,9 +147,22 @@ describeForEachParser('wordwallEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should read past a locale prefix of unusual length', async () => {
+    it('should keep a locale prefix of unusual length', async () => {
       const value =
         '<iframe src="https://wordwall.net/fil/embed/d4e3c25ffe7545a19a8b0cd802f68f4d"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'wordwall',
+        id: 'd4e3c25ffe7545a19a8b0cd802f68f4d',
+        src: 'https://wordwall.net/fil/embed/d4e3c25ffe7545a19a8b0cd802f68f4d',
+        ratio: '500/380',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should drop a prefix naming no language or country', async () => {
+      const value =
+        '<iframe src="https://wordwall.net/xx/embed/d4e3c25ffe7545a19a8b0cd802f68f4d"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'wordwall',
         id: 'd4e3c25ffe7545a19a8b0cd802f68f4d',

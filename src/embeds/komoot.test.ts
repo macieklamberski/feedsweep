@@ -18,12 +18,12 @@ describe('komootResolveEmbed', () => {
       expect(komootResolveEmbed(new URL(value))).toEqual(expected)
     })
 
-    it('should drop the locale from the map and the page', () => {
+    it('should keep the locale in the map and drop it from the page', () => {
       const value = 'https://www.komoot.com/de-de/tour/2011745032/embed'
       const expected: EmbedResolverResult = {
         provider: 'komoot',
         id: '2011745032',
-        src: 'https://www.komoot.com/tour/2011745032/embed',
+        src: 'https://www.komoot.com/de-de/tour/2011745032/embed',
         url: 'https://www.komoot.com/tour/2011745032',
         height: 440,
       }
@@ -31,14 +31,13 @@ describe('komootResolveEmbed', () => {
       expect(komootResolveEmbed(new URL(value))).toEqual(expected)
     })
 
-    // The route 404s on the uppercase locale, and the map minted without the locale serves the
-    // tour.
-    it('should drop an uppercase locale, which the route does not serve', () => {
+    // The route 404s on the uppercase locale and serves the lowercase one.
+    it('should lowercase an uppercase locale, which the route does not serve', () => {
       const value = 'https://www.komoot.com/DE-DE/tour/727321743/embed'
       const expected: EmbedResolverResult = {
         provider: 'komoot',
         id: '727321743',
-        src: 'https://www.komoot.com/tour/727321743/embed',
+        src: 'https://www.komoot.com/de-de/tour/727321743/embed',
         url: 'https://www.komoot.com/tour/727321743',
         height: 440,
       }
@@ -212,7 +211,7 @@ describe('komootResolveEmbed', () => {
       const expected: EmbedResolverResult = {
         provider: 'komoot',
         id: '2011745032',
-        src: 'https://www.komoot.com/tour/2011745032/embed?share_token=aBTJUZkJPE0Q0fxRFmoCr1AfWEChEEtXO4Bm57ZbsAKrVDvgb8',
+        src: 'https://www.komoot.com/de-de/tour/2011745032/embed?share_token=aBTJUZkJPE0Q0fxRFmoCr1AfWEChEEtXO4Bm57ZbsAKrVDvgb8',
         height: 440,
       }
 
