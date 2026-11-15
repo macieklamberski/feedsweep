@@ -8,9 +8,7 @@ import {
   getQueryParamValues,
   isAnyOf,
   isHostOrSubdomainOf,
-  isLocaleSegment,
   isPlainObject,
-  isRegionSegment,
   isString,
   type Nullish,
   trimObject,
@@ -22,7 +20,7 @@ import type {
   ResolveUrlEmbed,
 } from '../types.js'
 import { attr, find } from '../utils/dom.js'
-import { parseUrlOnHosts } from '../utils/urls.js'
+import { isLocalePrefix, parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'dailymotion'
@@ -64,10 +62,6 @@ const nonVideoWords = [
 
 const isRouteWord = (segment: string): boolean => {
   return isAnyOf(segment, pathWords) || isAnyOf(segment, nonVideoWords)
-}
-
-const isLocalePrefix = (segment: string): boolean => {
-  return isLocaleSegment(segment) || isRegionSegment(segment)
 }
 
 // The segments after the route words the path opens with.

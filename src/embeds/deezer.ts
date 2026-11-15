@@ -1,14 +1,7 @@
-import {
-  encodePathSegment,
-  getPathSegments,
-  getQueryParam,
-  isAnyOf,
-  isLocaleSegment,
-  isRegionSegment,
-  toMap,
-} from 'trousse'
+import { encodePathSegment, getPathSegments, getQueryParam, isAnyOf, toMap } from 'trousse'
 import type { EmbedRenderHint, FieldCleaner, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
+import { isLocalePrefix } from '../utils/urls.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
 
 const provider = 'deezer'
@@ -51,8 +44,7 @@ const readResource = (url: URL): Resource | undefined => {
   const [locale = ''] = segments
   // A locale in front of the route is the site's own prefix, not part of the route. Deezer takes a
   // language such as `en` or a country such as `us` there, which tells it from a route word.
-  const isPrefix = isLocaleSegment(locale) || isRegionSegment(locale)
-  const route = isPrefix ? segments.slice(1) : segments
+  const route = isLocalePrefix(locale) ? segments.slice(1) : segments
   // A query value comes out decoded, and the id goes into a path beside the raw path spellings.
   const query = (name: string) => encodePathSegment(getQueryParam(url.searchParams, name) ?? '')
 
