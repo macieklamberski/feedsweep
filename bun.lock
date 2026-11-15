@@ -20,7 +20,7 @@
         "jsdom": "^30.1.3",
         "kvalita": "^1.39.0",
         "linkedom": "^0.18.15",
-        "trousse": "^3.13.0",
+        "trousse": "^3.15.0",
         "tsdown": "0.23.5",
       },
       "peerDependencies": {
@@ -798,7 +798,7 @@
 
     "traverse": ["traverse@0.6.8", "", {}, "sha512-aXJDbk6SnumuaZSANd21XAo15ucCDE38H4fkqiGsc3MhCK+wOlZvLP9cB/TvpHT0mOyWgC4Z8EwRlzqYSUzdsA=="],
 
-    "trousse": ["trousse@3.13.0", "", { "dependencies": { "entities": "^9.0.0" } }, "sha512-1tr1pxaSAPUpJBBMtvEK/Exbgo8tLNWDmPWRUw2Nd6Mnngis1lhKJnOHaBao3o+Jq6C2mDqoU/ghYxPzwNjv3w=="],
+    "trousse": ["trousse@3.15.0", "", { "dependencies": { "entities": "^9.0.0" } }, "sha512-mwqHXl/x0OwgKfkFwuQfJ6tV6cGrvqyGpuV19qqoRsbrpUjOJAPPPhQG6HfKaiINv36b+3qhw/RgROIEebf/Eg=="],
 
     "tsdown": ["tsdown@0.23.5", "", { "dependencies": { "cac": "^7.1.0", "defu": "^6.1.7", "empathic": "^2.1.0", "hookable": "^6.1.2", "import-without-cache": "^0.4.1", "obug": "^3.0.0", "picomatch": "^4.0.7", "rolldown": "~1.2.16", "rolldown-plugin-dts": "^0.29.0", "tinyexec": "^1.3.1", "tinyglobby": "^0.2.17", "tinyps": "^0.5.1", "unconfig-core": "^7.5.0", "verkit": "^0.5.0" }, "peerDependencies": { "@arethetypeswrong/core": "^0.18.1", "@tsdown/css": "0.23.5", "@tsdown/exe": "0.23.5", "@vitejs/devtools": "*", "publint": "^0.3.8", "tsx": "*", "typescript": "^5.0.0 || ^6.0.0 || ^7.0.0", "unplugin-unused": ">=0.5.0", "unrun": "*" }, "optionalPeers": ["@arethetypeswrong/core", "@tsdown/css", "@tsdown/exe", "@vitejs/devtools", "publint", "tsx", "typescript", "unplugin-unused", "unrun"], "bin": { "tsdown": "./dist/run.mjs" } }, "sha512-nD6Dvg2oEPBaU1T/78TkAelU9ycYT7QosVOjDxpKI9I3LSnu7saBvL3u+urLSb4cwioqzqxeqGEjtKwc9TnOpQ=="],
 

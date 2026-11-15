@@ -1,4 +1,4 @@
-import { composeQuery, getPathSegments, getQueryParams, isAnyOf, isLocaleSegment } from 'trousse'
+import { composeQuery, getPathSegments, getQueryParams, isAnyOf, isLocale } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -59,7 +59,7 @@ export const listennotesResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
   // A locale such as `fr`, `fil` or `zh-hant` can open the path, ahead of the route word that
   // otherwise opens it, such as `podcasts`.
-  if (isLocaleSegment(locale)) {
+  if (isLocale(locale)) {
     segments.shift()
   }
 
