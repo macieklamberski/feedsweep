@@ -179,30 +179,10 @@ describe('komootResolveEmbed', () => {
   })
 
   describe('edge cases', () => {
-    it('should drop a locale with a three-letter language', () => {
-      const value = 'https://www.komoot.com/xde-de/tour/727321743/embed'
-      const expected: EmbedResolverResult = {
-        provider: 'komoot',
-        id: '727321743',
-        src: 'https://www.komoot.com/tour/727321743/embed',
-        url: 'https://www.komoot.com/tour/727321743',
-        height: 440,
-      }
+    it('should ignore a prefix naming no language or country', () => {
+      const value = 'https://www.komoot.com/xx-yy/tour/727321743/embed'
 
-      expect(komootResolveEmbed(new URL(value))).toEqual(expected)
-    })
-
-    it('should drop a locale with a three-letter region', () => {
-      const value = 'https://www.komoot.com/de-dex/tour/727321743/embed'
-      const expected: EmbedResolverResult = {
-        provider: 'komoot',
-        id: '727321743',
-        src: 'https://www.komoot.com/tour/727321743/embed',
-        url: 'https://www.komoot.com/tour/727321743',
-        height: 440,
-      }
-
-      expect(komootResolveEmbed(new URL(value))).toEqual(expected)
+      expect(komootResolveEmbed(new URL(value))).toBeUndefined()
     })
 
     it('should keep the share token and name no page for a private tour', () => {
