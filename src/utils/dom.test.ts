@@ -1587,7 +1587,7 @@ describeForEachParser('paramValue', (parseHtml) => {
     expect(paramValue(element, 'playerkey')).toBe('AQ~~,abc,def')
   })
 
-  it('should return undefined when the caller states the name in another casing', () => {
+  it('should read the name the caller states in another casing', () => {
     const document = parseHtml(html`
       <object>
         <param name="playerkey" value="AQ~~,abc,def" />
@@ -1595,7 +1595,7 @@ describeForEachParser('paramValue', (parseHtml) => {
     `)
     const element = queryElement(document, 'object')
 
-    expect(paramValue(element, 'playerKey')).toBeUndefined()
+    expect(paramValue(element, 'playerKey')).toBe('AQ~~,abc,def')
   })
 
   it('should pick the named param out of several', () => {
