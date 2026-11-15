@@ -25,9 +25,9 @@ const channel9ResolveEmbed: ResolveUrlEmbed = (url) => {
     return
   }
 
-  // Channel 9's first redirect lowercases the names. They move from path segments into the query,
-  // so they are decoded first and composed as one parameter each.
-  const names = segments.slice(1, -1).map((name) => (decodeSegment(name) ?? name).toLowerCase())
+  // The names move from path segments into the query, so they are decoded first and composed as
+  // one parameter each.
+  const names = segments.slice(1, -1).map((name) => decodeSegment(name) ?? name)
 
   if (isAnyOf(section, episodeSections) && names.length === 2) {
     const [show, episode] = names
