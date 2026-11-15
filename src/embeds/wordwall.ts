@@ -62,8 +62,8 @@ const wordwallResolveEmbed: ResolveUrlEmbed = (url) => {
 
   // The player keeps a locale, `/pl/` playing with Polish buttons where the bare path plays with
   // English ones.
-  const [first] = getPathSegments(url)
-  const locale = isLocalePrefix(first) ? `${first.toLowerCase()}/` : ''
+  const [localeOrRoute] = getPathSegments(url)
+  const locale = isLocalePrefix(localeOrRoute) ? `${localeOrRoute.toLowerCase()}/` : ''
 
   // No thumbnail offline: the embed page's `og:image` on `screens.cdn.wordwall.net` is keyed by
   // a hash that appears nowhere in the embed url.
