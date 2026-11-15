@@ -25,6 +25,19 @@ describe('pbsResolveEmbed', () => {
       expect(pbsResolveEmbed(new URL(value))).toEqual(expected)
     })
 
+    it('should keep a route written in capitals as written', () => {
+      const value = 'https://player.pbs.org/ViralPlayer/3005825044/'
+      const expected: EmbedResolverResult = {
+        provider: 'pbs',
+        id: 'viralplayer/3005825044',
+        src: 'https://player.pbs.org/ViralPlayer/3005825044/',
+        ratio: '16/9',
+        ratioHeightOffset: 40,
+      }
+
+      expect(pbsResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
     it('should give the widget route the same key and keep only its clip bounds', () => {
       const value =
         'https://player.pbs.org/widget/partnerplayer/2365866769/?start=0&end=0&chapterbar=false&endscreen=false'
