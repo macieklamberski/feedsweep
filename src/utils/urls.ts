@@ -52,7 +52,6 @@ export const alphanumericRegex = /^[A-Za-z0-9]+$/
 export const hexRegex = /^[0-9a-f]+$/i
 export const wordOrHyphenRegex = /^[\w-]+$/
 export const lettersRegex = /^[a-z]+$/i
-export const twoLettersRegex = /^[a-z]{2}$/i
 export const hyphenatedLettersRegex = /^[a-z]+-[a-z]+$/i
 
 // A browser trims C0 controls and spaces from both ends, so \x01javascript: runs. Inside the

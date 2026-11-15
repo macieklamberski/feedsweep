@@ -31,8 +31,11 @@ const videoUrls = [
   'https://geo.dailymotion.com/player.html?video=x7tgad0',
   // Share urls append a title slug to the id.
   'https://www.dailymotion.com/video/x7tgad0_some-title',
-  // The locale Dailymotion writes into the path, on the embed route and on the watch page.
+  // The locale Dailymotion writes into the path, on the embed route and on the watch page. It is a
+  // country such as `fr` or a language such as `en` and `he`.
   'https://www.dailymotion.com/embed/fr/video/x7tgad0',
+  'https://www.dailymotion.com/embed/en/video/x7tgad0',
+  'https://www.dailymotion.com/embed/he/video/x7tgad0',
   'https://www.dailymotion.com/es/video/x7tgad0',
 ]
 
@@ -123,10 +126,11 @@ describe('extractDailymotionId', () => {
     expect(extractDailymotionId(carrierUrl(value, hosts))).toEqual(expected)
   })
 
-  it('should extract no id behind a three-letter segment where the locale sits', () => {
+  it('should step over a three-letter language where the locale sits', () => {
     const value = 'https://www.dailymotion.com/fra/video/x7tgad0'
+    const expected = 'x7tgad0'
 
-    expect(extractDailymotionId(carrierUrl(value, hosts))).toBeUndefined()
+    expect(extractDailymotionId(carrierUrl(value, hosts))).toBe(expected)
   })
 })
 

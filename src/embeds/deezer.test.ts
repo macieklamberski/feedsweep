@@ -241,8 +241,14 @@ describe('deezerResolveEmbed', () => {
       expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
     })
 
-    it('should step over the locale the site puts in front of the route', () => {
-      const value = 'https://www.deezer.com/fr/plugins/player?type=playlist&id=57888101&app_id=1'
+    // The site prefixes the route with a language or a country.
+    const localeUrls: Array<string> = [
+      'https://www.deezer.com/fr/plugins/player?type=playlist&id=57888101&app_id=1',
+      'https://www.deezer.com/en/plugins/player?type=playlist&id=57888101&app_id=1',
+      'https://www.deezer.com/us/plugins/player?type=playlist&id=57888101&app_id=1',
+    ]
+
+    it.each(localeUrls)('should step over the locale in front of the route in %s', (value) => {
       const expected: EmbedResolverResult = {
         provider: 'deezer',
         id: 'playlist/57888101',
