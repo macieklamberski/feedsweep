@@ -56,7 +56,7 @@ const readResource = (url: URL): Resource | undefined => {
 
   // The current widget, `widget.deezer.com/widget/{theme}/{type}/{id}`.
   if (isAnyOf(route[0], 'widget')) {
-    return { type: route[2]?.toLowerCase() ?? '', id: route[3] ?? '' }
+    return { type: route[2] ?? '', id: route[3] ?? '' }
   }
 
   // The classic plugin player, `deezer.com/plugins/player?type={type}&id={id}`. It redirects to
@@ -83,7 +83,7 @@ const readResource = (url: URL): Resource | undefined => {
 export const deezerResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const resource = readResource(url)
 
-  if (!resource || !deezerHeights.has(resource.type) || !resource.id) {
+  if (!resource || !deezerHeights.has(resource.type.toLowerCase()) || !resource.id) {
     return
   }
 
@@ -97,7 +97,7 @@ export const deezerResolveEmbed: ResolveUrlEmbed = (url, element) => {
     // The theme is the one Deezer's share dialog writes, whatever the carrier chose.
     src: `https://widget.deezer.com/widget/dark/${type}/${id}`,
     url: `https://www.deezer.com/${type}/${id}`,
-    height: deezerHeights.get(type),
+    height: deezerHeights.get(type.toLowerCase()),
     title: attr(element, 'title'),
   }
 }

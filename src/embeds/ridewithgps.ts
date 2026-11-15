@@ -86,8 +86,8 @@ const composePrivateEmbed = (
 
 // `ridewithgps.com/embeds?type={route|trip|event}`, the id in the parameter its kind names.
 const readQueryEmbed = (parsed: URL): EmbedResolverResult | undefined => {
-  const kind = getQueryParam(parsed.searchParams, 'type')?.toLowerCase() ?? ''
-  const shape = embedKinds.get(kind)
+  const kind = getQueryParam(parsed.searchParams, 'type') ?? ''
+  const shape = embedKinds.get(kind.toLowerCase())
 
   if (!isAnyOf(parsed.pathname, '/embeds') || !shape) {
     return

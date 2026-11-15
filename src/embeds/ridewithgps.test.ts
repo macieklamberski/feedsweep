@@ -212,6 +212,20 @@ describeForEachParser('ridewithgpsEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should keep a kind written in capitals as written', async () => {
+      const value = '<iframe src="https://ridewithgps.com/embeds?type=Route&id=38984773"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'ridewithgps',
+        id: 'Route/38984773',
+        src: 'https://ridewithgps.com/embeds?type=Route&id=38984773',
+        url: 'https://ridewithgps.com/routes/38984773',
+        thumbnail: 'https://ridewithgps.com/routes/38984773/thumb.png',
+        height: 700,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should ignore a kind that is only a property of Object.prototype', async () => {
       const value =
         '<iframe src="https://ridewithgps.com/embeds?type=constructor&undefined=38984773"></iframe>'

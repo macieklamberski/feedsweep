@@ -66,7 +66,7 @@ export const appleResolveEmbed: ResolveUrlEmbed = (url) => {
 
   return {
     provider: isPodcast ? podcastsProvider : musicProvider,
-    id: `${kind}/${id}`,
+    id: `${rawKind}/${id}`,
     src: `https://embed.${host}${url.pathname}${query}`,
     url: `https://${host}${url.pathname}${query}`,
     height: appleHeights.get(trackId ? 'song' : kind),

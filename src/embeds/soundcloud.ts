@@ -213,7 +213,7 @@ const soundcloudResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const params = url.searchParams
   const inner = getQueryParam(params, 'url')
   const reference = inner?.match(referenceRegex)
-  const referenceKind = reference?.[1].toLowerCase()
+  const referenceKind = reference?.[1]
   const streamTrackId = url.pathname.match(streamPathRegex)?.[1]
   const queryToken = readQueryToken(params, inner)
   const startTrack = getQueryParam(params, 'start_track')
@@ -270,8 +270,9 @@ const soundcloudResolveEmbed: ResolveUrlEmbed = (url, element) => {
   // A kind the carrier does not name, such as a share link's, gets the single-track bar, which
   // the classic player draws for a list too.
   result.height =
-    classicPlayerHeights.get(referenceKind ?? (streamTrackId && 'tracks') ?? pageKind ?? '') ??
-    classicPlayerHeights.get('tracks')
+    classicPlayerHeights.get(
+      referenceKind?.toLowerCase() ?? (streamTrackId && 'tracks') ?? pageKind ?? '',
+    ) ?? classicPlayerHeights.get('tracks')
 
   const title = attr(element, 'title')
 

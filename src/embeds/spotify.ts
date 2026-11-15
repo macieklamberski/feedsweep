@@ -64,9 +64,10 @@ const readSubstackItem = (element: Element, type: string): Partial<EmbedResolver
     return {}
   }
 
-  const isPublisherType = publisherTypes.includes(type)
-  const act =
-    type === 'playlist' ? attributes.subtitle?.replace(ownerPrefixRegex, '') : attributes.subtitle
+  const isPublisherType = isAnyOf(type, publisherTypes)
+  const act = isAnyOf(type, 'playlist')
+    ? attributes.subtitle?.replace(ownerPrefixRegex, '')
+    : attributes.subtitle
 
   return {
     title: attributes.title,
@@ -116,10 +117,9 @@ export const spotifyResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const pair =
     readPathPair(url) ??
     (legacy ? [legacy[1], legacy[2]] : readPathPair(parseUrlOnHosts(uri, hosts)))
-  const [rawType, id] = pair ?? []
-  const type = rawType?.toLowerCase()
+  const [type, id] = pair ?? []
 
-  if (!type || !id || !spotifyHeights.has(type)) {
+  if (!type || !id || !spotifyHeights.has(type.toLowerCase())) {
     return
   }
 
@@ -131,7 +131,7 @@ export const spotifyResolveEmbed: ResolveUrlEmbed = (url, element) => {
     src: `https://open.spotify.com/embed/${type}/${id}${composeQuery(getQueryParams(url, spotifyEmbedParams))}`,
     url: `https://open.spotify.com/${type}/${id}`,
     thumbnail: card.thumbnail,
-    height: spotifyHeights.get(type),
+    height: spotifyHeights.get(type.toLowerCase()),
     // Some payloads carry an empty title string, and ?? would let it shadow the stated one.
     title: card.title?.trim() || attr(element, 'title'),
     description: card.description,

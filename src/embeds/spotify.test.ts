@@ -222,6 +222,19 @@ describe('spotifyResolveEmbed', () => {
   })
 
   describe('edge cases', () => {
+    it('should keep a type written in capitals as written', () => {
+      const value = 'https://open.spotify.com/embed/Track/4uLU6hMCjMI75M1A2tKUQC'
+      const expected: EmbedResolverResult = {
+        provider: 'spotify',
+        id: 'Track/4uLU6hMCjMI75M1A2tKUQC',
+        src: 'https://open.spotify.com/embed/Track/4uLU6hMCjMI75M1A2tKUQC',
+        url: 'https://open.spotify.com/Track/4uLU6hMCjMI75M1A2tKUQC',
+        height: 152,
+      }
+
+      expect(spotifyResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
     it('should return undefined for a uri url on another host', () => {
       const uri = 'https://example.com/track/2ikQOoW9SMmgec0xdU94B0'
       const value = `https://open.spotify.com/embed?uri=${encodeURIComponent(uri)}`
