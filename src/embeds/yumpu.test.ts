@@ -8,7 +8,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, yumpuEmbedResolver)
 
   describe('happy paths', () => {
-    it('should read the document hash and drop its locale prefix', async () => {
+    it('should read the document hash and keep its locale prefix', async () => {
       const value = html`
         <iframe
           src="https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE"
@@ -18,7 +18,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
-        src: 'https://www.yumpu.com/en/embed/view/z4xYaRXnsDqwc2GE',
+        src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
         ratio: '4/3',
       }
 
@@ -45,7 +45,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
-        src: 'https://www.yumpu.com/en/embed/view/z4xYaRXnsDqwc2GE',
+        src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
         url: 'https://www.yumpu.com/de/document/view/71235096/sukultur-2026',
         ratio: '4/3',
         title: 'SUKULTUR 2026',
@@ -59,7 +59,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
-        src: 'https://www.yumpu.com/en/embed/view/z4xYaRXnsDqwc2GE',
+        src: 'https://www.yumpu.com/fr/embed/view/z4xYaRXnsDqwc2GE',
         ratio: '4/3',
       }
 
@@ -80,7 +80,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yumpu',
         id: 'HItJxtpSy3tdyhFd',
-        src: 'https://www.yumpu.com/en/embed/view/HItJxtpSy3tdyhFd',
+        src: 'https://www.yumpu.com/es/embed/view/HItJxtpSy3tdyhFd',
         ratio: '4/3',
       }
 
@@ -134,7 +134,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yumpu',
         id: 'z4xY%2F..%2Fevil',
-        src: 'https://www.yumpu.com/en/embed/view/z4xY%2F..%2Fevil',
+        src: 'https://www.yumpu.com/de/embed/view/z4xY%2F..%2Fevil',
         ratio: '4/3',
       }
 
@@ -163,8 +163,20 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
-    it('should drop a locale prefix of another length', async () => {
+    it('should keep a locale prefix of another length', async () => {
       const value = '<iframe src="https://www.yumpu.com/deu/embed/view/z4xYaRXnsDqwc2GE"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'yumpu',
+        id: 'z4xYaRXnsDqwc2GE',
+        src: 'https://www.yumpu.com/deu/embed/view/z4xYaRXnsDqwc2GE',
+        ratio: '4/3',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should mint the English locale for a prefix naming no language', async () => {
+      const value = '<iframe src="https://www.yumpu.com/xx/embed/view/z4xYaRXnsDqwc2GE"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
@@ -175,12 +187,12 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should drop an uppercase locale prefix', async () => {
+    it('should keep an uppercase locale prefix as written', async () => {
       const value = '<iframe src="https://www.yumpu.com/DE/embed/view/z4xYaRXnsDqwc2GE"></iframe>'
       const expected: EmbedResolverResult = {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
-        src: 'https://www.yumpu.com/en/embed/view/z4xYaRXnsDqwc2GE',
+        src: 'https://www.yumpu.com/DE/embed/view/z4xYaRXnsDqwc2GE',
         ratio: '4/3',
       }
 
@@ -210,7 +222,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
-        src: 'https://www.yumpu.com/en/embed/view/z4xYaRXnsDqwc2GE',
+        src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
         ratio: '4/3',
       }
 
@@ -223,7 +235,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
-        src: 'https://www.yumpu.com/en/embed/view/z4xYaRXnsDqwc2GE',
+        src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
         ratio: '4/3',
       }
 
@@ -236,7 +248,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
-        src: 'https://www.yumpu.com/en/embed/view/z4xYaRXnsDqwc2GE',
+        src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
         ratio: '4/3',
       }
 
@@ -253,7 +265,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
-        src: 'https://www.yumpu.com/en/embed/view/z4xYaRXnsDqwc2GE',
+        src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
         url: 'https://www.yumpu.com/de/document/view/71235096/sukultur-2026',
         ratio: '4/3',
         title: 'SUKULTUR 2026',
@@ -270,7 +282,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
-        src: 'https://www.yumpu.com/en/embed/view/z4xYaRXnsDqwc2GE',
+        src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
         url: 'https://www.yumpu.com/fil/document/view/71235096/sukultur-2026',
         ratio: '4/3',
         title: 'SUKULTUR 2026',
@@ -288,7 +300,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
-        src: 'https://www.yumpu.com/en/embed/view/z4xYaRXnsDqwc2GE',
+        src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
         ratio: '4/3',
       }
 
@@ -306,7 +318,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
-        src: 'https://www.yumpu.com/en/embed/view/z4xYaRXnsDqwc2GE',
+        src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
         ratio: '4/3',
       }
 
@@ -324,7 +336,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
-        src: 'https://www.yumpu.com/en/embed/view/z4xYaRXnsDqwc2GE',
+        src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
         ratio: '4/3',
       }
 
@@ -342,7 +354,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
-        src: 'https://www.yumpu.com/en/embed/view/z4xYaRXnsDqwc2GE',
+        src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
         ratio: '4/3',
       }
 
@@ -360,7 +372,7 @@ describeForEachParser('yumpuEmbedResolver', (parseHtml) => {
       const expected: EmbedResolverResult = {
         provider: 'yumpu',
         id: 'z4xYaRXnsDqwc2GE',
-        src: 'https://www.yumpu.com/en/embed/view/z4xYaRXnsDqwc2GE',
+        src: 'https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE',
         ratio: '4/3',
       }
 
@@ -389,7 +401,7 @@ describeForEachParser('yumpu through the pipeline', (parseHtml) => {
       <div
         data-embed-provider="yumpu"
         data-embed-id="z4xYaRXnsDqwc2GE"
-        data-embed-src="https://www.yumpu.com/en/embed/view/z4xYaRXnsDqwc2GE"
+        data-embed-src="https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE"
         data-embed-ratio="4/3"
       ></div>
     `
@@ -426,7 +438,7 @@ describeForEachParser('yumpu through the pipeline', (parseHtml) => {
       <div
         data-embed-provider="yumpu"
         data-embed-id="z4xYaRXnsDqwc2GE"
-        data-embed-src="https://www.yumpu.com/en/embed/view/z4xYaRXnsDqwc2GE"
+        data-embed-src="https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE"
         data-embed-url="https://www.yumpu.com/de/document/view/71235096/sukultur-2026"
         data-embed-ratio="4/3"
         data-embed-title="SUKULTUR 2026"
@@ -447,7 +459,7 @@ describeForEachParser('yumpu through the pipeline', (parseHtml) => {
       <div
         data-embed-provider="yumpu"
         data-embed-id="z4xYaRXnsDqwc2GE"
-        data-embed-src="https://www.yumpu.com/en/embed/view/z4xYaRXnsDqwc2GE"
+        data-embed-src="https://www.yumpu.com/de/embed/view/z4xYaRXnsDqwc2GE"
         data-embed-url="https://www.yumpu.com/de/document/view/71235096/sukultur-2026"
         data-embed-ratio="4/3"
         data-embed-title="SUKULTUR 2026"

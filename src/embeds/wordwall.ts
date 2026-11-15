@@ -1,4 +1,11 @@
-import { composeQuery, getPathSegments, getQueryParams, isAnyOf, isHostOf } from 'trousse'
+import {
+  composeQuery,
+  getPathSegments,
+  getQueryParams,
+  isAnyOf,
+  isHostOf,
+  isLocaleOrRegion,
+} from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { keepIfMatches } from '../utils/dom.js'
 import { hexRegex, hyphenatedLettersRegex, lettersRegex } from '../utils/urls.js'
@@ -37,7 +44,7 @@ const extractActivityId = (link: URL): string | undefined => {
   }
 
   // Wordwall serves the same activity at `/embed/{id}` and at `/{lang}/embed/{id}`, where the
-  // locale prefix only sets the language of the player strings.
+  // locale prefix sets the language of the player strings.
   const locale = isAnyOf(route, 'embed') ? undefined : route
   const [embedRoute, activityId] = locale ? segments.slice(1) : segments
 
@@ -60,13 +67,18 @@ const wordwallResolveEmbed: ResolveUrlEmbed = (url) => {
     return
   }
 
+  // The player keeps a locale, `/pl/` playing with Polish buttons where the bare path plays with
+  // English ones.
+  const [localeOrRoute = ''] = getPathSegments(url)
+  const locale = isLocaleOrRegion(localeOrRoute) ? `${localeOrRoute}/` : ''
+
   // No thumbnail offline: the embed page's `og:image` on `screens.cdn.wordwall.net` is keyed by
   // a hash that appears nowhere in the embed url.
   // No separate page either: that page states the embed url itself as its `og:url`.
   return {
     provider,
     id: activityId,
-    src: `https://wordwall.net/embed/${activityId}${composeQuery(getQueryParams(url, playParams))}`,
+    src: `https://wordwall.net/${locale}embed/${activityId}${composeQuery(getQueryParams(url, playParams))}`,
     ...sizes.player,
   }
 }
