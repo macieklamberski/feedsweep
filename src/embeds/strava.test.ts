@@ -152,6 +152,19 @@ describe('stravaResolveEmbed', () => {
     })
   })
   describe('edge cases', () => {
+    it('should keep a kind written in capitals as written', () => {
+      const value = 'https://strava-embeds.com/Activity/2243948928'
+      const expected: EmbedResolverResult = {
+        provider: 'strava',
+        id: 'Activity/2243948928',
+        src: 'https://strava-embeds.com/Activity/2243948928',
+        url: 'https://www.strava.com/activities/2243948928',
+        ratio: '300/472',
+      }
+
+      expect(stravaResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
     // A player route word on the wrong host or with a trailing segment still names a live
     // player's id, so it is repaired rather than refused.
     it('should repair a player route on the apex host with a trailing segment', () => {

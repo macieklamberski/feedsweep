@@ -919,6 +919,19 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should keep a kind written in capitals as written', async () => {
+      const value =
+        '<iframe src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/Playlists/44018"></iframe>'
+      const expected: EmbedResolverResult = {
+        provider: 'soundcloud',
+        id: 'Playlists/44018',
+        src: 'https://w.soundcloud.com/player/?url=https://api.soundcloud.com/Playlists/44018',
+        height: 450,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
     it('should yield only the src, id and height for a bare iframe', async () => {
       const value = html`
         <iframe

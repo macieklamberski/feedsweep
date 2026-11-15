@@ -1094,6 +1094,18 @@ describe('instagramResolveEmbed', () => {
     expect(instagramResolveEmbed(new URL(value))).toEqual(expected)
   })
 
+  it('should keep a kind written in capitals as written', () => {
+    const value = 'https://www.instagram.com/Reel/CdWN1jeOWr0/embed/'
+    const expected: EmbedResolverResult = {
+      provider: 'instagram',
+      id: 'Reel/CdWN1jeOWr0',
+      src: 'https://www.instagram.com/Reel/CdWN1jeOWr0/embed/',
+      url: 'https://www.instagram.com/Reel/CdWN1jeOWr0/',
+    }
+
+    expect(instagramResolveEmbed(new URL(value))).toEqual(expected)
+  })
+
   it('should keep the captioned form of the frame', () => {
     const value = 'https://www.instagram.com/reel/DGPdABWz84n/embed/captioned/'
     const expected: EmbedResolverResult = {

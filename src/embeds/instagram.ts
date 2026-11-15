@@ -63,9 +63,7 @@ const readPostUrl = (parsed: URL | undefined): Post | undefined => {
     return
   }
 
-  const kind = post.kind.toLowerCase()
-
-  return { kind: kind === 'reels' ? 'reel' : kind, shortcode: post.shortcode }
+  return { kind: isAnyOf(post.kind, 'reels') ? 'reel' : post.kind, shortcode: post.shortcode }
 }
 
 // The captioned frame renders the post's text under the picture, so which of the two a

@@ -48,6 +48,19 @@ describe('deezerResolveEmbed', () => {
   })
 
   describe('edge cases', () => {
+    it('should keep a type written in capitals as written', () => {
+      const value = 'https://widget.deezer.com/widget/dark/Playlist/57888101'
+      const expected: EmbedResolverResult = {
+        provider: 'deezer',
+        id: 'Playlist/57888101',
+        src: 'https://widget.deezer.com/widget/dark/Playlist/57888101',
+        url: 'https://www.deezer.com/Playlist/57888101',
+        height: 300,
+      }
+
+      expect(deezerResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
     it('should fall back to the share dialog theme when the stated one is unknown', () => {
       const value = 'https://widget.deezer.com/widget/purple/playlist/57888101'
       const expected: EmbedResolverResult = {

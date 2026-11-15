@@ -38,8 +38,8 @@ const composeEmbed = (
   id: string | undefined,
   query = '',
 ): EmbedResolverResult | undefined => {
-  const kind = rawKind?.toLowerCase() ?? ''
-  const embedKind = embedKinds.get(kind)
+  const kind = rawKind ?? ''
+  const embedKind = embedKinds.get(kind.toLowerCase())
 
   if (!embedKind || !id) {
     return

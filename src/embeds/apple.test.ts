@@ -151,6 +151,19 @@ describe('appleResolveEmbed', () => {
   })
 
   describe('edge cases', () => {
+    it('should keep a kind written in capitals as written', () => {
+      const value = 'https://embed.music.apple.com/us/Album/1195107058'
+      const expected: EmbedResolverResult = {
+        provider: 'applemusic',
+        id: 'Album/1195107058',
+        src: 'https://embed.music.apple.com/us/Album/1195107058',
+        url: 'https://music.apple.com/us/Album/1195107058',
+        height: 450,
+      }
+
+      expect(appleResolveEmbed(new URL(value))).toEqual(expected)
+    })
+
     it('should keep a storefront of another length as written', () => {
       const value = 'https://music.apple.com/usa/album/thriller/1440857781'
       const expected: EmbedResolverResult = {
