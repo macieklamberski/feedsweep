@@ -11,6 +11,7 @@ import { dailymailFieldCleaners } from '../embeds/dailymail.js'
 import { dailymotionFieldCleaners } from '../embeds/dailymotion.js'
 import { deezerFieldCleaners } from '../embeds/deezer.js'
 import { firstoryFieldCleaners } from '../embeds/firstory.js'
+import { flickrFieldCleaners } from '../embeds/flickr.js'
 import { flourishFieldCleaners } from '../embeds/flourish.js'
 import { googleformsFieldCleaners } from '../embeds/googleforms.js'
 import { imgurFieldCleaners } from '../embeds/imgur.js'
@@ -50,6 +51,7 @@ export const defaultFieldCleaners: Array<FieldCleaner> = [
   ...dailymotionFieldCleaners,
   ...deezerFieldCleaners,
   ...firstoryFieldCleaners,
+  ...flickrFieldCleaners,
   ...flourishFieldCleaners,
   ...googleformsFieldCleaners,
   ...imgurFieldCleaners,

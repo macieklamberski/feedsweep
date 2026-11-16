@@ -9,7 +9,12 @@ import {
   startsWithAnyOf,
   trimObject,
 } from 'trousse'
-import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
+import type {
+  EmbedRenderHint,
+  EmbedResolverResult,
+  FieldCleaner,
+  ResolveUrlEmbed,
+} from '../types.js'
 import {
   attr,
   find,
@@ -580,6 +585,12 @@ export const flickrAnchorEmbedResolver = createMarkupEmbedResolver(
     }
   },
 )
+
+// Flickr's embed code can title its anchor "{title} by {owner}, on Flickr". Cutting the label off
+// would mean matching chrome, so the whole title goes and enrichment fills it.
+export const flickrFieldCleaners: Array<FieldCleaner> = [
+  { provider, field: 'title', drop: /^.*, on flickr$/ },
+]
 
 // Only embedr's video player answers player.js. A photo and the page player post no ready message.
 export const flickrRenderHint: EmbedRenderHint = {
