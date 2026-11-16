@@ -1937,7 +1937,7 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toEqual(expected)
     })
 
-    it('should take the anchor title over the image alt', async () => {
+    it('should leave an anchor title ending in the on Flickr label unread, over the image alt', async () => {
       const value = html`
         <a
           data-flickr-embed="true"
@@ -1960,8 +1960,6 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
         thumbnail: 'https://live.staticflickr.com/65535/55314222738_99e28970f0_z.jpg',
         width: 800,
         height: 600,
-        title:
-          '33rd Annual Celebration of Mundelein - 2026 - Photographer Photos by University of Saint Mary of the Lake, on Flickr',
       }
 
       expect(await extract(value)).toEqual(expected)
@@ -1989,6 +1987,40 @@ describeForEachParser('flickrAnchorEmbedResolver', (parseHtml) => {
         width: 800,
         height: 600,
         author: 'dublx',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should leave the labelled title of a sets anchor unread', async () => {
+      const value = html`
+        <a
+          data-flickr-embed="true"
+          href="https://www.flickr.com/photos/pamelahall/sets/72157689396363115"
+          title="United Against a Nuclear Iran Summit- NYC by The Pamela Hall, on Flickr"
+        >
+          <img
+            src="https://farm5.staticflickr.com/4373/36522495034_edab2e5a05.jpg"
+            width="500"
+            height="325"
+            alt="EA8_1531-2jpg copy"
+          />
+        </a>
+        <script
+          async
+          src="https://embedr.flickr.com/assets/client-code.js"
+          charset="utf-8"
+        ></script>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'flickr',
+        id: 'photosets/72157689396363115',
+        src: 'https://embedr.flickr.com/photosets/72157689396363115',
+        url: 'https://www.flickr.com/photos/pamelahall/sets/72157689396363115',
+        thumbnail: 'https://farm5.staticflickr.com/4373/36522495034_edab2e5a05.jpg',
+        width: 500,
+        height: 325,
+        author: 'pamelahall',
       }
 
       expect(await extract(value)).toEqual(expected)
