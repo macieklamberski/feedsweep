@@ -14,6 +14,7 @@ export {
 } from './defaults/hosts.js'
 export { defaultEmojiResolvers, defaultWidgetResolvers } from './defaults/resolvers.js'
 export {
+  defaultGalleryNoscriptSelectors,
   defaultNonContentSelectors,
   defaultPreservedPreClasses,
   defaultRevealableSelectors,
