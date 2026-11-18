@@ -1,11 +1,38 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
-import { describeForEachParser, html, resolverExtractor } from '../tests.js'
-import type { MediaResolverResult } from '../types.js'
+import { baseContext, describeForEachParser, html, resolverExtractor } from '../tests.js'
+import type { CleanUrlFn, MediaResolverResult } from '../types.js'
 import { odeoMediaResolver } from './odeo.js'
 
 describeForEachParser('odeoMediaResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, odeoMediaResolver)
+
+  // A measurement prefix, `measure.example.com/{host}/{path}`, the caller's matchUrlFn unwraps.
+  const unwrapMeasurementFn: CleanUrlFn = (url) => {
+    return url.replace('https://measure.example.com/', 'https://')
+  }
+
+  describe('a file behind a prefix matchUrlFn unwraps', () => {
+    const extractMatched = resolverExtractor(parseHtml, odeoMediaResolver, {
+      ...baseContext,
+      matchUrlFn: unwrapMeasurementFn,
+    })
+
+    it('should play the file as written, not the url matchUrlFn unwraps', async () => {
+      const value = html`
+        <embed
+          src="http://odeo.com/flash/audio_player_gray.swf"
+          flashvars="external_url=https://measure.example.com/example.com/show/episode.mp3"
+        />
+      `
+      const expected: MediaResolverResult = {
+        tag: 'audio',
+        src: 'https://measure.example.com/example.com/show/episode.mp3',
+      }
+
+      expect(await extractMatched(value)).toEqual(expected)
+    })
+  })
 
   describe('happy paths', () => {
     it('should play the file the player names in its flashvars', async () => {

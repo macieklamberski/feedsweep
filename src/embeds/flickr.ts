@@ -26,7 +26,7 @@ import {
 } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
 import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import { createMarkupEmbedResolver, createUrlEmbedResolver, matchUrl } from '../utils/widgets.js'
 
 const provider = 'flickr'
 
@@ -41,10 +41,6 @@ const sizes = {
 
 const hosts = ['flickr.com']
 const embedrHosts = ['embedr.flickr.com']
-// WordPress's Photon serves a copy of an image at `i{n}.wp.com/{host}/{path}`, with its resize
-// query after the file name. Flickr's own embed script throws on a Photon image, so the
-// publisher's page shows a linked image.
-const photonHosts = ['i0.wp.com', 'i1.wp.com', 'i2.wp.com']
 
 const flashVideoPath = '/apps/video/stewart.swf'
 
@@ -461,9 +457,7 @@ const readPhotoFile = (imageSrc: string | undefined): RegExpExecArray | undefine
     return
   }
 
-  const photon = parseUrlOnHosts(imageSrc, photonHosts)
-
-  return photoFileRegex.exec(photon?.pathname ?? imageSrc) ?? undefined
+  return photoFileRegex.exec(imageSrc) ?? undefined
 }
 
 // A guest pass shows a photo its owner keeps from the public. embedr answers 404 for it without
@@ -556,7 +550,7 @@ const maximumThumbnailWidth = 150
 // See: https://widgets.flickr.com/embedr/embedr-47ad26da5deade67d472950b12c94b6c.js.
 export const flickrAnchorEmbedResolver = createMarkupEmbedResolver(
   'a[data-flickr-embed="true"][href]',
-  (element) => {
+  (element, context) => {
     const image = find(element, 'img')
     const url = parseUrlOnHosts(attr(element, 'href'), hosts)
 
@@ -572,7 +566,12 @@ export const flickrAnchorEmbedResolver = createMarkupEmbedResolver(
     }
 
     const imageSrc = attr(image, 'src')
-    const result = readAnchorTarget(url, imageSrc, width && height ? { width, height } : undefined)
+    const matchedSrc = matchUrl(attr(image, 'src'), context)
+    const result = readAnchorTarget(
+      url,
+      matchedSrc,
+      width && height ? { width, height } : undefined,
+    )
 
     if (!result) {
       return

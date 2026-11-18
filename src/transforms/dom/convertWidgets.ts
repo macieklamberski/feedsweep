@@ -1,5 +1,5 @@
 import { isSoundcloudStream } from '../../embeds/soundcloud.js'
-import type { DomTransform, WidgetResolver } from '../../types.js'
+import type { DomTransform, TransformContext, WidgetResolver } from '../../types.js'
 import { attr, isElement, isNonWhitespaceText } from '../../utils/dom.js'
 import { cleanUnclaimedUrl, flashFileRegex, resolveOrDropUrl } from '../../utils/urls.js'
 import {
@@ -34,6 +34,7 @@ const readPageMedia = async (
   media: Element,
   resolvers: ReadonlyArray<WidgetResolver>,
   document: Document,
+  context: TransformContext,
 ): Promise<PageMedia | undefined> => {
   const found: Array<PageMedia> = []
 
@@ -55,7 +56,7 @@ const readPageMedia = async (
     const frame = createIframe(document, url)
     frame.setAttribute('type', `${media.localName}/*`)
 
-    const embed = await resolveEmbedProbe(frame, resolvers)
+    const embed = await resolveEmbedProbe(frame, resolvers, context)
 
     if (!embed) {
       return
@@ -69,7 +70,7 @@ const readPageMedia = async (
   const copy = media.cloneNode(true) as Element
 
   for (const element of [copy, ...copy.querySelectorAll('source')]) {
-    if (await isResolvedIframe(element, resolvers)) {
+    if (await isResolvedIframe(element, resolvers, context)) {
       return
     }
   }
@@ -156,7 +157,7 @@ export const convertWidgets: DomTransform = (context) => {
     const pageMedia: Array<PageMedia> = []
 
     for (const media of document.querySelectorAll('audio, video')) {
-      const found = await readPageMedia(media, embedOrMediaResolvers, document)
+      const found = await readPageMedia(media, embedOrMediaResolvers, document, context)
 
       if (found) {
         pageMedia.push(found)
@@ -168,7 +169,7 @@ export const convertWidgets: DomTransform = (context) => {
 
     if (pageMedia.length) {
       for (const frame of document.querySelectorAll(embedCarrierSelector)) {
-        const player = await readPlayer(frame, widgetResolvers)
+        const player = await readPlayer(frame, widgetResolvers, context)
 
         if (player) {
           framedPlayers.push(player)
@@ -200,7 +201,7 @@ export const convertWidgets: DomTransform = (context) => {
           continue
         }
 
-        const metadata = await resolver.extract(element)
+        const metadata = await resolver.extract(element, context)
 
         if (!metadata) {
           continue

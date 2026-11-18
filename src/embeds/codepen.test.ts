@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
-import { describeForEachParser, html, resolverExtractor } from '../tests.js'
-import type { EmbedResolverResult } from '../types.js'
+import { createProxyUnwrapFn, describeForEachParser, html, resolverExtractor } from '../tests.js'
+import type { CleanUrlFn, EmbedResolverResult } from '../types.js'
 import {
   codepenIframeEmbedResolver,
   codepenResolveEmbed,
   codepenWidgetEmbedResolver,
 } from './codepen.js'
+
+const unwrapEmbedlyFn = createProxyUnwrapFn('cdn.embedly.com', 'src')
 
 // Every `data-embed-*` field the placeholder carries, for the shapes that only resolve once the
 // pipeline has repaired them and so cannot be asserted on the resolver alone.
@@ -1706,12 +1708,19 @@ describeForEachParser('codepenIframeEmbedResolver', (parseHtml) => {
 // The Embedly wrapper and the plain-link forms only reach their final state after earlier passes
 // have unwrapped or left them alone, so the assertion belongs at the end of the pipeline.
 describeForEachParser('codepen shapes the pipeline settles first', (parseHtml) => {
-  const convert = (value: string): Promise<string> => {
-    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  const convert = (value: string, cleanUrlFn?: CleanUrlFn): Promise<string> => {
+    return transformContent(value, {
+      parseHtmlFn: parseHtml,
+      baseUrl: 'https://example.com/post',
+      cleanUrlFn,
+    })
   }
 
-  const placeholder = async (value: string): Promise<Record<string, string>> => {
-    return readPlaceholder(await convert(value), parseHtml)
+  const placeholder = async (
+    value: string,
+    cleanUrlFn?: CleanUrlFn,
+  ): Promise<Record<string, string>> => {
+    return readPlaceholder(await convert(value, cleanUrlFn), parseHtml)
   }
 
   describe('Variant #1: the anchor block and its loader', () => {
@@ -1781,7 +1790,7 @@ describeForEachParser('codepen shapes the pipeline settles first', (parseHtml) =
   })
 
   // Embedly proxies the whole embed for platforms that route third-party content through it.
-  // `rebuildEmbedlyEmbeds` unwraps it to the inner player before the widget pass, and the poster
+  // The caller's cleanUrlFn unwraps it to the inner player before the widget pass, and the poster
   // Embedly names is the exact frame the publisher chose, so it outranks the derived screenshot.
   describe('Variant #3: the Embedly-proxied player', () => {
     it('should resolve the inner pen and keep the proxied poster', async () => {
@@ -1802,7 +1811,7 @@ describeForEachParser('codepen shapes the pipeline settles first', (parseHtml) =
         author: '@argyleink',
       }
 
-      expect(await placeholder(value)).toEqual(expected)
+      expect(await placeholder(value, unwrapEmbedlyFn)).toEqual(expected)
     })
   })
 

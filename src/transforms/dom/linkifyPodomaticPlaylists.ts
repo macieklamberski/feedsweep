@@ -3,16 +3,11 @@ import { composePodcastUrl } from '../../embeds/podomatic.js'
 import type { DomTransform } from '../../types.js'
 import { flashVar } from '../../utils/dom.js'
 import { parseUrlOnHosts } from '../../utils/urls.js'
-import { createLink, readCarrierUrl } from '../../utils/widgets.js'
+import { createLink, pluginCarrierSelector, readCarrierUrlOnHosts } from '../../utils/widgets.js'
 
 const podomaticHost = 'podomatic.com'
 const playerPath = '/swf/jwplayer'
 const playlistPath = '/mrss_stream.xml'
-
-const playerSelector = [
-  `embed[src*="${podomaticHost}${playerPath}" i]`,
-  `object[data*="${podomaticHost}${playerPath}" i]`,
-].join(', ')
 
 const readSubdomain = (url: string | undefined): string | undefined => {
   if (!url) {
@@ -31,9 +26,9 @@ const readSubdomain = (url: string | undefined): string | undefined => {
 // Podomatic's Flash JW Player set to a podcast's whole feed, `file={sub}.podomatic.com/
 // mrss_stream.xml`. Flash no longer runs, so it renders nothing, and the playlist's episodes are
 // played only by a player keyed on a numeric podcast id, so the podcast's page is linked instead.
-export const linkifyPodomaticPlaylists: DomTransform = () => (document) => {
-  for (const element of document.querySelectorAll(playerSelector)) {
-    const player = parseUrlOnHosts(readCarrierUrl(element), podomaticHost)
+export const linkifyPodomaticPlaylists: DomTransform = (context) => (document) => {
+  for (const element of document.querySelectorAll(pluginCarrierSelector)) {
+    const player = readCarrierUrlOnHosts(element, podomaticHost, context)
 
     if (!player || !startsWithAnyOf(player.pathname, playerPath)) {
       continue

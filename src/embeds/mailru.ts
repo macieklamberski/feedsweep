@@ -3,7 +3,11 @@ import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../t
 import { attr, flashVar } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
-import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
+import {
+  createMarkupEmbedResolver,
+  createUrlEmbedResolver,
+  readCarrierUrlOnHosts,
+} from '../utils/widgets.js'
 
 const provider = 'mailru'
 
@@ -145,7 +149,7 @@ export const mailruIframeEmbedResolver = createUrlEmbedResolver(hosts, mailruRes
 // naming the video as `/{type}/{user}/{album}/{counter}`.
 export const mailruWidgetEmbedResolver = createMarkupEmbedResolver(
   '.b-history-event__videoevent-object[data-videoplayer-moviesrc]',
-  (element) => {
+  (element, context) => {
     const movieSrc = attr(element, 'data-videoplayer-moviesrc')?.replace(leadingSlashRegex, '')
     const subject = movieSrc ? composeSubject(movieSrc) : undefined
 
@@ -159,7 +163,7 @@ export const mailruWidgetEmbedResolver = createMarkupEmbedResolver(
 
     // A republished card sits beside the my.mail.ru iframe of the same video, which already plays.
     for (const frame of frames) {
-      const frameUrl = parseUrlOnHosts(attr(frame, 'src'), hosts)
+      const frameUrl = readCarrierUrlOnHosts(frame, hosts, context)
       const framedId = frameUrl && mailruResolveEmbed(frameUrl)?.id
 
       if (framedId && videoIds.includes(framedId)) {

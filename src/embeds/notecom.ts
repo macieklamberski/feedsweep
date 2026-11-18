@@ -2,7 +2,7 @@ import { getPathSegments, isAnyOf, isString } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { readPixels } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
-import { createUrlEmbedResolver } from '../utils/widgets.js'
+import { createUrlEmbedResolver, readWrittenCarrierUrl } from '../utils/widgets.js'
 
 const provider = 'notecom'
 
@@ -61,7 +61,7 @@ const readNoteUrl = (link: URL): NoteUrl | undefined => {
 
 // A note.com embed figure carries the post url, not the player, so a reader frames the article.
 // A CMS that ran the figure's script saves the player iframe itself into the feed.
-export const notecomIframeEmbedResolver = createUrlEmbedResolver(hosts, (url) => {
+export const notecomIframeEmbedResolver = createUrlEmbedResolver(hosts, (url, element) => {
   const target = readNoteUrl(url)
 
   if (!target) {
@@ -69,7 +69,10 @@ export const notecomIframeEmbedResolver = createUrlEmbedResolver(hosts, (url) =>
   }
 
   // Only the post form names the user, so only it can state the canonical url outright.
-  return composeEmbed(target.noteId, target.kind === 'post' ? url.href : undefined)
+  return composeEmbed(
+    target.noteId,
+    target.kind === 'post' ? readWrittenCarrierUrl(url, element) : undefined,
+  )
 })
 
 // The player's height message, `height::{player url}::{pixels}`.

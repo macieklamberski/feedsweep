@@ -21,7 +21,7 @@ import {
   placeholderBaseUrl,
   wordOrHyphenRegex,
 } from '../utils/urls.js'
-import { createUrlEmbedResolver } from '../utils/widgets.js'
+import { createUrlEmbedResolver, readWrittenCarrierUrl } from '../utils/widgets.js'
 
 const provider = 'soundcloud'
 
@@ -217,7 +217,7 @@ const soundcloudResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const streamTrackId = url.pathname.match(streamPathRegex)?.[1]
   const queryToken = readQueryToken(params, inner)
   const startTrack = getQueryParam(params, 'start_track')
-  const result: EmbedResolverResult = { provider, src: url.href }
+  const result: EmbedResolverResult = { provider, src: readWrittenCarrierUrl(url, element) }
 
   if (reference) {
     result.id = `${referenceKind}/${reference[2]}`

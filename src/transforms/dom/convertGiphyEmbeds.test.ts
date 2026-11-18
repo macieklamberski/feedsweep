@@ -1,6 +1,7 @@
 import { expect, it } from 'bun:test'
 import { transformContent } from '../../index.js'
-import { baseContext, describeForEachParser, html } from '../../tests.js'
+import { baseContext, createProxyUnwrapFn, describeForEachParser, html } from '../../tests.js'
+import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { convertGiphyEmbeds } from './convertGiphyEmbeds.js'
 
@@ -92,6 +93,27 @@ describeForEachParser('convertGiphyEmbeds', (parseHtml) => {
     `
 
     expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should convert a gif frame behind an embed proxy the caller unwraps', async () => {
+    const context: TransformContext = {
+      ...baseContext,
+      cleanUrlFn: createProxyUnwrapFn('cdn.embedly.com', 'src'),
+    }
+    const value = html`
+      <iframe
+        src="https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fgiphy.com%2Fembed%2F3o7TKMt1VVNkHV2PaE%2Ftwitter%2Fiframe"
+      ></iframe>
+    `
+    const expected = html`
+      <a href="https://giphy.com/gifs/3o7TKMt1VVNkHV2PaE">
+        <img src="https://media.giphy.com/media/3o7TKMt1VVNkHV2PaE/giphy.gif">
+      </a>
+    `
+
+    expect(await applyDomTransforms(parseHtml(value), [convertGiphyEmbeds(context)])).toEqualHtml(
+      expected,
+    )
   })
 
   it('should leave an iframe on another host naming giphy in its query', async () => {
