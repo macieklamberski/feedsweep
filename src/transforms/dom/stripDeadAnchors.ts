@@ -1,12 +1,7 @@
 import type { DomTransform } from '../../types.js'
-import { stripUrlIgnorableChars } from '../../utils/urls.js'
+import { isDeadHref } from '../../utils/urls.js'
 
-const javascriptSchemeRegex = /^javascript:/i
-
-const deadHrefs = ['', '#']
-
-// An anchor with an empty, bare # or javascript: href looks clickable and goes nowhere.
-// A javascript: href is left over from an interactive widget whose script context is gone.
+// An anchor whose href goes nowhere, which still looks clickable.
 export const stripDeadAnchors: DomTransform = () => {
   return (document) => {
     const anchors = document.querySelectorAll('a')
@@ -15,16 +10,7 @@ export const stripDeadAnchors: DomTransform = () => {
       const href = anchor.getAttribute('href')
 
       // An anchor with no href is a named target other links scroll to.
-      if (href === null) {
-        continue
-      }
-
-      const trimmed = href.trim()
-
-      const normalized = stripUrlIgnorableChars(href)
-      const isDead = deadHrefs.includes(trimmed) || javascriptSchemeRegex.test(normalized)
-
-      if (!isDead) {
+      if (href === null || !isDeadHref(href)) {
         continue
       }
 

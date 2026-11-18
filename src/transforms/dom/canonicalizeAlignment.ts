@@ -1,5 +1,5 @@
 import type { DomTransform } from '../../types.js'
-import { isElement, isSkippable } from '../../utils/dom.js'
+import { isElement, isPlaceholder, isSkippable, placeholderSelectors } from '../../utils/dom.js'
 import * as styles from '../../utils/styles.js'
 
 type Direction = 'center' | 'left' | 'right'
@@ -137,7 +137,7 @@ const isMediaPrimary = (wrapper: Element, inner: Element): boolean => {
       continue
     }
 
-    if (isElement(node) && mediaTags.includes(node.localName)) {
+    if (isElement(node) && (mediaTags.includes(node.localName) || isPlaceholder(node))) {
       hasContent = true
       continue
     }
@@ -190,14 +190,21 @@ const resolve = (media: Element): Resolution | undefined => {
 // Media aligned by WordPress classes, an align attribute, <center> or inline style a reader strips.
 export const canonicalizeAlignment: DomTransform = () => {
   return (document) => {
-    for (const media of document.querySelectorAll('img, video, audio, iframe')) {
+    for (const media of document.querySelectorAll(
+      [...mediaTags, ...placeholderSelectors].join(', '),
+    )) {
       if (media.hasAttribute('data-align')) {
         continue
       }
 
       const resolution = resolve(media)
 
-      if (resolution && !resolution.target.hasAttribute('data-align')) {
+      // The placeholder writers own a placeholder's attributes, so only its figure takes the hook.
+      if (!resolution || isPlaceholder(resolution.target)) {
+        continue
+      }
+
+      if (!resolution.target.hasAttribute('data-align')) {
         resolution.target.setAttribute('data-align', resolution.direction)
       }
     }

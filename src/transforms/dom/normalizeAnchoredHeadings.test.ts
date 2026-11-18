@@ -176,6 +176,38 @@ describeForEachParser('normalizeAnchoredHeadings', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should keep a placeholder when a self-referential link holding it unwraps', async () => {
+      const value = html`
+        <h2 id="player">
+          <a href="#player"><div data-embed-provider="youtube" data-embed-id="abc123"></div></a>
+        </h2>
+      `
+      const expected = html`
+        <h2>
+          <a id="player" href="#player"></a>
+          <div data-embed-provider="youtube" data-embed-id="abc123"></div>
+        </h2>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep a span holding a placeholder when a self-referential link holding it unwraps', async () => {
+      const value = html`
+        <h2 id="player">
+          <a href="#player"><span><div data-embed-provider="youtube" data-embed-id="abc123"></div></span></a>
+        </h2>
+      `
+      const expected = html`
+        <h2>
+          <a id="player" href="#player"></a>
+          <span><div data-embed-provider="youtube" data-embed-id="abc123"></div></span>
+        </h2>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should keep the title when the link wraps only part of the heading', async () => {
       const value = html`
         <h2 id="getting-started">

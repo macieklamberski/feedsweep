@@ -862,15 +862,17 @@ describeForEachParser('mailruIframeEmbedResolver through the pipeline', (parseHt
       </span>
     `
     const expected = html`
-      <div
-        data-embed-provider="mailru"
-        data-embed-id="mail/beeline_russia/_vblogs/2"
-        data-embed-src="https://my.mail.ru/mail/beeline_russia/video/embed/_vblogs/2"
-        data-embed-url="https://my.mail.ru/mail/beeline_russia/video/_vblogs/2.html"
-        data-embed-thumbnail="https://filed15-30.my.mail.ru/pic?url=https%3A%2F%2Fmy.mail.ru%2F%2B%2Fvideo%2Furl%2Fi%2F1752755258481704962&amp;mw=660&amp;mh=370&amp;sig=0f19984c08ef1f187b969126ca25a034&amp;croped=1"
-        data-embed-ratio="16/9"
-        data-embed-author="beeline_russia"
-      ></div>
+      <span class="b-history-event__videoevent-item">
+        <div
+          data-embed-provider="mailru"
+          data-embed-id="mail/beeline_russia/_vblogs/2"
+          data-embed-src="https://my.mail.ru/mail/beeline_russia/video/embed/_vblogs/2"
+          data-embed-url="https://my.mail.ru/mail/beeline_russia/video/_vblogs/2.html"
+          data-embed-thumbnail="https://filed15-30.my.mail.ru/pic?url=https%3A%2F%2Fmy.mail.ru%2F%2B%2Fvideo%2Furl%2Fi%2F1752755258481704962&amp;mw=660&amp;mh=370&amp;sig=0f19984c08ef1f187b969126ca25a034&amp;croped=1"
+          data-embed-ratio="16/9"
+          data-embed-author="beeline_russia"
+        ></div>
+      </span>
     `
 
     expect(await convert(value)).toEqualHtml(expected)

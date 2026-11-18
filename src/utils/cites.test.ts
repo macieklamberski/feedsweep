@@ -111,6 +111,26 @@ describe('buildCite', () => {
       expect(buildCite(title)).toBeUndefined()
     })
 
+    it('should return undefined when the url is a bare hash', () => {
+      const value = {
+        provider: 'stub',
+        url: '#',
+        title: 'Page title',
+      }
+
+      expect(buildCite(value)).toBeUndefined()
+    })
+
+    it('should return undefined when the url is a javascript: link', () => {
+      const value = {
+        provider: 'stub',
+        url: 'javascript:void(0)',
+        title: 'Page title',
+      }
+
+      expect(buildCite(value)).toBeUndefined()
+    })
+
     it('should return undefined when the url or the title is blank', () => {
       const url = {
         provider: 'stub',

@@ -207,6 +207,17 @@ describeForEachParser('wrapBareInlineInParagraphs', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should keep a span holding only a placeholder out of the following paragraph', async () => {
+      const value =
+        '<span><div data-embed-provider="youtube" data-embed-id="abc123"></div></span>Caption'
+      const expected = html`
+        <span><div data-embed-provider="youtube" data-embed-id="abc123"></div></span>
+        <p>Caption</p>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should keep an inline image surrounded by text inside the paragraph', async () => {
       const value = '<div>before <img src="smiley.gif"> after</div>'
       const expected = '<div><p>before <img src="smiley.gif"> after</p></div>'

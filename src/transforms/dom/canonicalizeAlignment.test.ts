@@ -80,6 +80,38 @@ describeForEachParser('canonicalizeAlignment', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should stamp the figure around a placeholder', async () => {
+      const value = html`
+        <figure class="aligncenter">
+          <div data-embed-provider="youtube" data-embed-id="abc123"></div>
+        </figure>
+      `
+      const expected = html`
+        <figure class="aligncenter" data-align="center">
+          <div data-embed-provider="youtube" data-embed-id="abc123"></div>
+        </figure>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should relocate a div signal onto an image beside a placeholder', async () => {
+      const value = html`
+        <div class="aligncenter">
+          <img src="a.jpg">
+          <div data-embed-provider="youtube" data-embed-id="abc123"></div>
+        </div>
+      `
+      const expected = html`
+        <div class="aligncenter">
+          <img src="a.jpg" data-align="center">
+          <div data-embed-provider="youtube" data-embed-id="abc123"></div>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should relocate a media-primary div signal onto the image', async () => {
       const value = '<div class="aligncenter"><img src="a.jpg"></div>'
       const expected = '<div class="aligncenter"><img src="a.jpg" data-align="center"></div>'
@@ -227,6 +259,16 @@ describeForEachParser('canonicalizeAlignment', (parseHtml) => {
   })
 
   describe('edge cases', () => {
+    it('should leave a placeholder outside a figure without a hook', async () => {
+      const value = html`
+        <div class="aligncenter">
+          <div data-embed-provider="youtube" data-embed-id="abc123"></div>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it('should leave a text paragraph alignment untouched', async () => {
       const value = '<p class="has-text-align-center">Some prose.</p>'
 

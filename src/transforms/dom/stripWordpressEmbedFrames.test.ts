@@ -230,6 +230,17 @@ describeForEachParser('stripWordpressEmbedFrames', (parseHtml) => {
   })
 
   describe('frames left alone', () => {
+    it('should keep the frame when the blockquote links to a bare hash', async () => {
+      const value = html`
+        <blockquote class="wp-embedded-content" data-secret="AbC123xYz9">
+          <a href="#">Post title</a>
+        </blockquote>
+        <iframe class="wp-embedded-content" sandbox="allow-scripts" security="restricted" src="https://example.org/post/embed/#?secret=AbC123xYz9" data-secret="AbC123xYz9"></iframe>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+
     it('should keep a frame whose secret no blockquote carries', async () => {
       const value = html`
         <blockquote class="wp-embedded-content" data-secret="p8frefqv0M">

@@ -1,4 +1,5 @@
 import { expect, it } from 'bun:test'
+import { transformContent } from '../../index.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
@@ -177,5 +178,18 @@ describeForEachParser('stripDeadAnchors', (parseHtml) => {
     const twice = await transform(once)
 
     expect(twice).toEqualHtml(once)
+  })
+})
+
+describeForEachParser('stripDeadAnchors in the pipeline', (parseHtml) => {
+  const convert = (value: string) => {
+    return transformContent(value, { parseHtmlFn: parseHtml })
+  }
+
+  it('should unwrap a javascript: link before neutralizeUnsafeUrls rewrites its href', async () => {
+    const value = '<p><a href="javascript:void(0)">Read more</a></p>'
+    const expected = '<p>Read more</p>'
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })
