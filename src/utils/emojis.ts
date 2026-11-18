@@ -1,7 +1,7 @@
-import { t, toMap } from 'trousse'
+import { coerceArray, type Nullish, t, toMap } from 'trousse'
 import locales from '../locales.json' with { type: 'json' }
 import type { EmojiResolverResult, TransformContext } from '../types.js'
-import { attr } from './dom.js'
+import { attr, isElement, isText } from './dom.js'
 import { emojiShortcodes } from './shortcodes.js'
 import { cleanMatchUrl } from './urls.js'
 
@@ -435,4 +435,38 @@ export const resolveEmojiElement = (
   if (fallback) {
     return { text: fallback }
   }
+}
+
+const appendEmojiText = (node: Node, parts: Array<string>): void => {
+  if (isText(node)) {
+    parts.push(node.data)
+    return
+  }
+
+  if (!isElement(node)) {
+    return
+  }
+
+  const alt = node.localName === 'img' ? attr(node, 'alt') : undefined
+
+  if (alt && isEmojiShaped(alt)) {
+    parts.push(withEmojiPresentation(alt))
+    return
+  }
+
+  for (const child of node.childNodes) {
+    appendEmojiText(child, parts)
+  }
+}
+
+// The trimmed text of the nodes, with an emoji image read as the glyph its alt names, the same
+// text convertEmojis leaves once it has replaced the image.
+export const readEmojiText = (nodes: Nullish<Node | Array<Node>>): string | undefined => {
+  const parts: Array<string> = []
+
+  for (const node of coerceArray(nodes)) {
+    appendEmojiText(node, parts)
+  }
+
+  return parts.join('').trim() || undefined
 }

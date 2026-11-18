@@ -12,7 +12,8 @@ import {
   trimObject,
 } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
-import { attr, find, flashVar, text } from '../utils/dom.js'
+import { attr, collectParagraphs, find, flashVar } from '../utils/dom.js'
+import { readEmojiText } from '../utils/emojis.js'
 import { readPixels } from '../utils/hints.js'
 import { digitsRegex, parseUrlOnHosts } from '../utils/urls.js'
 import {
@@ -56,7 +57,8 @@ const readFallback = (blockquote: Nullish<Element>): Partial<EmbedResolverResult
     return {}
   }
 
-  const description = text(find(blockquote, 'p'))
+  const [caption] = collectParagraphs(blockquote)
+  const description = readEmojiText(caption)
   const anchors = Array.from(blockquote.querySelectorAll('a'))
 
   if (anchors.length !== 2) {

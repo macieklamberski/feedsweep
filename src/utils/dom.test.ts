@@ -4,8 +4,10 @@ import type { ScopedAttribute } from '../types.js'
 import {
   attr,
   batchSelectors,
+  collectParagraphs,
   find,
   findConfigScript,
+  findNextContentSibling,
   flashVar,
   flashVars,
   formatRatio,
@@ -1286,6 +1288,121 @@ describeForEachParser('text', (parseHtml) => {
     const anchor = queryElement(document, 'a')
 
     expect(text(anchor.firstChild)).toBe('#')
+  })
+})
+
+describeForEachParser('findNextContentSibling', (parseHtml) => {
+  it('should skip whitespace and line breaks to the next element', () => {
+    const document = parseHtml(
+      '<p><img src="https://example.com/a.jpg"><br> <br><a href="https://example.com/">Label</a></p>',
+    )
+    const image = queryElement(document, 'img')
+    const label = queryElement(document, 'a')
+
+    expect(findNextContentSibling(image)).toBe(label)
+  })
+
+  it('should stop at a text node with words in it', () => {
+    const document = parseHtml(
+      '<p><img src="https://example.com/a.jpg"> Caption <a href="https://example.com/">Label</a></p>',
+    )
+    const image = queryElement(document, 'img')
+    const sibling = findNextContentSibling(image)
+
+    expect(sibling?.textContent).toBe(' Caption ')
+  })
+
+  it('should return undefined when only whitespace and breaks follow', () => {
+    const document = parseHtml('<p><img src="https://example.com/a.jpg"> <br></p>')
+    const image = queryElement(document, 'img')
+
+    expect(findNextContentSibling(image)).toBeUndefined()
+  })
+})
+
+describeForEachParser('collectParagraphs', (parseHtml) => {
+  const readTexts = (value: string): Array<string> => {
+    const element = queryElement(parseHtml(value), 'body > *')
+
+    return collectParagraphs(element).map((paragraph) => {
+      return paragraph
+        .map((node) => node.textContent)
+        .join('')
+        .trim()
+    })
+  }
+
+  it('should read every paragraph element', () => {
+    const value = '<blockquote><p>First</p><p>Second</p></blockquote>'
+    const expected = ['First', 'Second']
+
+    expect(readTexts(value)).toEqual(expected)
+  })
+
+  it('should read a loose run beside a block as a paragraph', () => {
+    const value =
+      '<blockquote><p>Tweet text</p>— Example (@example) <a href="https://example.com/">May 21</a></blockquote>'
+    const expected = ['Tweet text', '— Example (@example) May 21']
+
+    expect(readTexts(value)).toEqual(expected)
+  })
+
+  it('should split a loose run at two line breaks', () => {
+    const value = '<blockquote>First<br> <br>Second</blockquote>'
+    const expected = ['First', 'Second']
+
+    expect(readTexts(value)).toEqual(expected)
+  })
+
+  it('should keep a single line break inside one run', () => {
+    const value = '<div>First line<br>second line</div>'
+    const expected = ['First linesecond line']
+
+    expect(readTexts(value)).toEqual(expected)
+  })
+
+  it('should read the only run of a div as a paragraph', () => {
+    const value = '<div>Loose text</div>'
+    const expected = ['Loose text']
+
+    expect(readTexts(value)).toEqual(expected)
+  })
+
+  it('should read no paragraph from the only run of a blockquote', () => {
+    const value = '<blockquote>Tweet text <a href="https://example.com/">May 21</a></blockquote>'
+
+    expect(readTexts(value)).toEqual([])
+  })
+
+  it('should read no paragraph from a run inside a heading', () => {
+    const value = '<div><h2>Heading <span>text</span></h2></div>'
+
+    expect(readTexts(value)).toEqual([])
+  })
+
+  it('should leave media at the edge of a run out of its paragraph', () => {
+    const value =
+      '<div><iframe src="https://example.com/player"></iframe><a href="https://example.com/">Artist</a> · <a href="https://example.com/track">Track</a></div>'
+    const element = queryElement(parseHtml(value), 'div')
+    const [paragraph] = collectParagraphs(element)
+    const expected = ['a', '#text', 'a']
+
+    expect(paragraph.map((node) => node.nodeName.toLowerCase())).toEqual(expected)
+  })
+
+  // Built by hand: no parser nests a <p>, and the paragraph passes do where they wrap a run
+  // around an inline element holding a block.
+  it('should read a paragraph nested in a paragraph', () => {
+    const document = parseHtml('<div></div>')
+    const element = queryElement(document, 'div')
+    const outer = document.createElement('p')
+    const inner = document.createElement('p')
+    outer.append('Outer ', inner)
+    inner.append('Inner')
+    element.append(outer)
+    const expected = 2
+
+    expect(collectParagraphs(element).length).toBe(expected)
   })
 })
 

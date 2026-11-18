@@ -14,7 +14,14 @@ import type {
   FieldCleaner,
   ResolveUrlEmbed,
 } from '../types.js'
-import { attr, jsonAttr, text } from '../utils/dom.js'
+import {
+  attr,
+  collectParagraphs,
+  findNextContentSibling,
+  isElement,
+  jsonAttr,
+  text,
+} from '../utils/dom.js'
 import {
   isFileName,
   parseUrlOnHosts,
@@ -201,6 +208,30 @@ const readSubstackTrack = (element: Nullish<Element>): Partial<EmbedResolverResu
   )
 }
 
+// The credit line the share snippet writes after the frame: the element that follows it past
+// whitespace and breaks, or the loose run of text and anchors that element starts.
+const readCreditLine = (element: Element): Array<ChildNode> => {
+  const next = findNextContentSibling(element)
+
+  if (!isElement(next)) {
+    return []
+  }
+
+  const container = next.parentElement
+
+  if (!container || container.localName === 'p') {
+    return [next]
+  }
+
+  const run = collectParagraphs(container).find((paragraph) => paragraph.includes(next))
+
+  if (!run || run.includes(element)) {
+    return [next]
+  }
+
+  return run
+}
+
 // Answers whether a url is SoundCloud's feed stream, the episode file named after its track.
 export const isSoundcloudStream = (url: string): boolean => {
   const parsed = parseUrlOnHosts(url, hosts)
@@ -285,8 +316,14 @@ const soundcloudResolveEmbed: ResolveUrlEmbed = (url, element) => {
   // Both anchors are permalinks, so they are matched on the page hosts: a substring of the href
   // takes `evil.test/soundcloud.com/b` for the track page, and two of those write the author,
   // the title and the url before the block is deleted.
-  const sibling = element?.nextElementSibling
-  const links = Array.from(sibling?.querySelectorAll('a[href]') ?? [])
+  const credit = element ? readCreditLine(element) : []
+  const links = credit.flatMap((node) => {
+    if (!isElement(node)) {
+      return []
+    }
+
+    return node.matches('a[href]') ? [node] : Array.from(node.querySelectorAll('a[href]'))
+  })
   const anchors = links.filter((anchor) => {
     const page = parseUrlOnHosts(attr(anchor, 'href'), hosts)
 
@@ -302,7 +339,10 @@ const soundcloudResolveEmbed: ResolveUrlEmbed = (url, element) => {
     result.author = text(artist)
     result.title = text(track) ?? result.title
     result.url = attr(track, 'href')
-    sibling?.remove()
+
+    for (const node of credit) {
+      node.remove()
+    }
   }
 
   return result

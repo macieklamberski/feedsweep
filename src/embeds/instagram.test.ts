@@ -991,6 +991,83 @@ describeForEachParser('instagramBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
   })
+
+  describe('the caption as the feed ships it, before the paragraph and emoji passes', () => {
+    it('should read the caption and the byline from the divs the version 6 dialog writes', async () => {
+      const value = html`
+        <blockquote
+          class="instagram-media"
+          data-instgrm-captioned=""
+          data-instgrm-version="6"
+        >
+          <div style="padding: 8px;">
+            <div style="margin: 8px 0 0 0; padding: 0 4px;">
+              <a
+                href="https://www.instagram.com/p/AbCdEfGhIjK/"
+                target="_blank"
+                >A sunny day in the old town. 💙 #travel</a
+              >
+            </div>
+            <div style="color: #c9c8cd; text-align: center;">
+              Een foto die is geplaatst door Example Traveller (@exampletraveller) op
+              <time datetime="2016-02-05T15:44:35+00:00">5 Feb 2016 om 7:44 PST</time>
+            </div>
+          </div>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/AbCdEfGhIjK',
+        src: 'https://www.instagram.com/p/AbCdEfGhIjK/embed/captioned/',
+        url: 'https://www.instagram.com/p/AbCdEfGhIjK/',
+        description: 'A sunny day in the old town. 💙 #travel',
+        author: '@exampletraveller',
+        date: '2016-02-05T15:44:35+00:00',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read an emoji image in the caption by its alt', async () => {
+      const value = html`
+        <blockquote
+          class="instagram-media"
+          data-instgrm-captioned=""
+          data-instgrm-version="7"
+        >
+          <div style="padding: 8px;">
+            <p style="margin: 8px 0 0 0; padding: 0 4px;">
+              <a
+                href="https://www.instagram.com/p/AbCdEfGhIjK/"
+                target="_blank"
+                >Check out my stories
+                <img
+                  src="https://example.com/emoji/72x72/2764.png"
+                  alt="❤"
+                  class="wp-smiley"
+                  style="height: 1em; max-height: 1em;"
+              /></a>
+            </p>
+            <p style="color: #c9c8cd; text-align: center;">
+              Una publicación compartida de Example Player (@exampleplayer) el
+              <time datetime="2017-09-13T13:39:15+00:00">13 de Sep de 2017 a la(s) 6:39 PDT</time>
+            </p>
+          </div>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'instagram',
+        id: 'p/AbCdEfGhIjK',
+        src: 'https://www.instagram.com/p/AbCdEfGhIjK/embed/captioned/',
+        url: 'https://www.instagram.com/p/AbCdEfGhIjK/',
+        description: 'Check out my stories ❤\ufe0f',
+        author: '@exampleplayer',
+        date: '2017-09-13T13:39:15+00:00',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
 })
 
 describeForEachParser('instagramIframeEmbedResolver', (parseHtml) => {

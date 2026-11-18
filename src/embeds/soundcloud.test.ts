@@ -1087,6 +1087,75 @@ describeForEachParser('soundcloudEmbedResolver', (parseHtml) => {
 
     expect(twice).toEqualHtml(once)
   })
+
+  describe('the credit line as the feed ships it, before the paragraph passes', () => {
+    it('should read the credit from the loose run of anchors after the frame', async () => {
+      const value = html`
+        <div>
+          <iframe
+            allow="autoplay; encrypted-media"
+            scrolling="no"
+            src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/123456789&amp;color=%23d18962&amp;auto_play=false"
+            width="100%"
+            frameborder="no"
+            height="166"
+          ></iframe
+          ><a
+            href="https://soundcloud.com/exampleartist"
+            title="exampleartist"
+            target="_blank"
+            >exampleartist</a
+          >
+          ·
+          <a
+            href="https://soundcloud.com/exampleartist/example-mix-135"
+            title="Example mix 135"
+            target="_blank"
+            >Example mix 135</a
+          >
+          <p><a href="https://example.com/mixes/example-mix-135.mp3">Download</a></p>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'soundcloud',
+        id: 'tracks/123456789',
+        src: 'https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/123456789',
+        url: 'https://soundcloud.com/exampleartist/example-mix-135',
+        height: 166,
+        title: 'Example mix 135',
+        author: 'exampleartist',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should remove the loose credit run so its links do not render twice', async () => {
+      const value = html`
+        <div>
+          <iframe src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1"></iframe>
+          <a href="https://soundcloud.com/artist">Artist</a> ·
+          <a href="https://soundcloud.com/artist/track">Track title</a>
+          <p>Download</p>
+        </div>
+      `
+      const expected = html`
+        <div>
+          <div
+            data-embed-provider="soundcloud"
+            data-embed-id="tracks/1"
+            data-embed-src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/1"
+            data-embed-url="https://soundcloud.com/artist/track"
+            data-embed-height="166"
+            data-embed-title="Track title"
+            data-embed-author="Artist"
+          ></div>
+          <p>Download</p>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+  })
 })
 
 // injectEnclosures offers every attachment to every url-keyed resolver, so this is the path where

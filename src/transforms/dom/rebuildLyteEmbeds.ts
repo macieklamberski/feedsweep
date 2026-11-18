@@ -9,11 +9,10 @@ import {
 import type { DomTransform, TransformContext } from '../../types.js'
 import {
   attr,
-  isBr,
+  findNextContentSibling,
   isElement,
   isNonWhitespaceText,
   isText,
-  isWhitespaceText,
 } from '../../utils/dom.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../../utils/urls.js'
 import { createIframe, readRepairedCarrierUrl } from '../../utils/widgets.js'
@@ -44,13 +43,7 @@ const readFeedThumbnailVideoId = (
 // Removes the label link that follows the thumbnail when it names the same video, with the break
 // before it and the period the plugin writes after it.
 const removeFeedLabel = (thumbnail: Element, videoId: string): void => {
-  const between: Array<ChildNode> = []
-  let node = thumbnail.nextSibling
-
-  while (node && (isWhitespaceText(node) || isBr(node))) {
-    between.push(node)
-    node = node.nextSibling
-  }
+  const node = findNextContentSibling(thumbnail)
 
   if (!isElement(node)) {
     return
@@ -72,8 +65,8 @@ const removeFeedLabel = (thumbnail: Element, videoId: string): void => {
     after.data = after.data.slice(1)
   }
 
-  for (const item of between) {
-    item.remove()
+  while (thumbnail.nextSibling !== node) {
+    thumbnail.nextSibling?.remove()
   }
 
   node.remove()
