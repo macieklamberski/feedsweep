@@ -526,9 +526,13 @@ describeForEachParser('flickrIframeEmbedResolver', (parseHtml) => {
       const ownedResult = await extract(owned)
       const ownerlessResult = await extract(ownerless)
 
-      expect(ownedResult?.id).toBe('photosets/72157637855752606')
-      expect(ownerlessResult?.id).toBe('photosets/72157637855752606')
-      expect(ownerlessResult?.url).toBe('https://flic.kr/s/aHsjMK6fgG')
+      expect(ownedResult).toEqual(expect.objectContaining({ id: 'photosets/72157637855752606' }))
+      expect(ownerlessResult).toEqual(
+        expect.objectContaining({
+          id: 'photosets/72157637855752606',
+          url: 'https://flic.kr/s/aHsjMK6fgG',
+        }),
+      )
     })
 
     it('should use a malformed set id as written, even if the player answers an error', async () => {

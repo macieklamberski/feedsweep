@@ -7,7 +7,6 @@ import { convertAmpNativeElements } from '../transforms/dom/convertAmpNativeElem
 import { convertAsciinemaEmbeds } from '../transforms/dom/convertAsciinemaEmbeds.js'
 import { convertBloggerCaptionTables } from '../transforms/dom/convertBloggerCaptionTables.js'
 import { convertBreaksToParagraphs } from '../transforms/dom/convertBreaksToParagraphs.js'
-import { convertCiteCards } from '../transforms/dom/convertCiteCards.js'
 import { convertDatawrapperEmbeds } from '../transforms/dom/convertDatawrapperEmbeds.js'
 import { convertEmojis } from '../transforms/dom/convertEmojis.js'
 import { convertGiphyEmbeds } from '../transforms/dom/convertGiphyEmbeds.js'
@@ -123,8 +122,8 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
 
   // Dissolves a lazy-loader or Borlabs Cookie container into the original embed markup it holds
   // encoded. Runs at the head of the cluster because what comes out is ordinary markup of any
-  // kind, so every pass below (comment and hidden-element stripping, the rebuilds, convertWidgets,
-  // the cite pass) has to see it.
+  // kind, so every pass below (comment and hidden-element stripping, the rebuilds and
+  // convertWidgets) has to see it.
   surfaceParkedMarkup,
   stripComments,
 
@@ -169,9 +168,9 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   rebuildElementorVideoEmbeds,
 
   // Carries an Embedly wrapper's poster as data-thumbnail, and rebuilds the empty div whose oEmbed
-  // payload rides in `data` into the iframe it names. Runs before convertCiteCards so a payload
-  // naming `link` still reaches the cite pass, and before stripEmptyTags, which is what deletes an
-  // empty carrier nothing has claimed.
+  // payload rides in `data` into the iframe it names. Runs before convertWidgets so a payload
+  // naming `link` still reaches a cite resolver, and before stripEmptyTags, which is what deletes
+  // an empty carrier nothing has claimed.
   rebuildEmbedlyEmbeds,
   rebuildDocumentcloudEmbeds,
   rebuildGettyImagesEmbeds,
@@ -207,7 +206,7 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
 
   // Converts note.com's empty embed figures: media services become plain iframes for the
   // widget pass to classify, own-post embeds become plain links (the figure carries only
-  // the post URL). External-article figures stay for the cite pass.
+  // the post URL). External-article figures stay for a cite resolver.
   convertNoteEmbeds,
 
   // Materializes an iframe parked in a <div> attribute (see defaultDeferredIframeSources) so it's
@@ -260,15 +259,14 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   rebuildEmbedPrivacyLinks,
 
   // Runs after stripNonContentElements, which can take the link out of a post embed's
-  // blockquote, and before convertCiteCards replaces the blockquote it pairs by.
+  // blockquote, and before convertWidgets replaces the blockquote it pairs by.
   stripWordpressEmbedFrames,
-  convertCiteCards,
 
   // Runs before convertWidgets, which replaces the iframes its playable guard relies on.
   convertParkedMediaContainers,
 
-  // Runs before every pass below that reshapes the post, so each resolver reads the markup the
-  // feed shipped.
+  // The block widget step: cites, then embeds, then media. Runs before every pass below that
+  // reshapes the post, so each resolver reads the markup the feed shipped.
   convertWidgets,
 
   // Wraps Cargo (cargo.site) portfolio images in <figure> before wrapBareInlineInParagraphs, so
@@ -303,9 +301,9 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // Compares the first heading's text with the article title, so it runs after
   // normalizeAnchoredHeadings has dropped the permalink glyph (`#`, `¶`) a generator puts
   // inside the heading, or the glyph is read as part of the text and the title never matches,
-  // and after convertCiteCards has folded link cards into placeholders: a card quotes the
+  // and after convertWidgets has folded link cards into placeholders: a card quotes the
   // linked page's title in a heading of its own, and a post about that page carries the same
-  // title, so read before the cite pass the card's heading was taken for the article's.
+  // title, so read before convertWidgets the card's heading was taken for the article's.
   stripDuplicateTitleHeading,
 
   // Runs after stripDuplicateTitleHeading: a removed title <h1> must not demote the body's
@@ -361,7 +359,7 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
 
   // Fills cite placeholder metadata via the caller's enrichCiteFn, for the fields a card's
   // markup leaves out (e.g. a Tumblr link block whose poster carries no URL). No-ops when
-  // that option is unset. Runs after convertCiteCards has written the placeholders with
+  // that option is unset. Runs after convertWidgets has written the placeholders with
   // their urls resolved and cleaned, and before neutralize/proxy so any enriched URLs are
   // still neutralized and proxied.
   enrichCitePlaceholders,

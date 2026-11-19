@@ -1,5 +1,5 @@
 import { isAnyOf, parseJson, startsWithAnyOf } from 'trousse'
-import type { MediaResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { findConfigScript } from '../utils/dom.js'
 
 // The script inlines the config as podlovePlayerCache.add([{data: {audio: [{url, mimeType}]}}]).
@@ -50,7 +50,8 @@ const readEpisode = (script: Element): PodloveEpisode | undefined => {
 }
 
 // Podlove Publisher ships an episode as custom elements a sibling script builds into a player.
-export const podloveMediaResolver: MediaResolver = {
+export const podloveMediaResolver: WidgetResolver = {
+  step: 'block',
   kind: 'media',
   selector: 'div.podlove-web-player',
   extract: (element) => {

@@ -11,10 +11,8 @@ import {
 import type {
   CiteResolverResult,
   DomTransform,
-  EmbedResolver,
   EmbedResolverResult,
   FieldCleaner,
-  MediaResolver,
   MediaResolverResult,
   ParseDateFn,
   ResolveUrlEmbed,
@@ -230,8 +228,9 @@ export const createMarkupEmbedResolver = (
   selector: string,
   extract: (element: Element, context: TransformContext) => EmbedResolverResult | undefined,
   options: ResolverOptions = {},
-): EmbedResolver => {
+): WidgetResolver => {
   return {
+    step: 'block',
     kind: 'embed',
     selector,
     extract: (element, context) => {
@@ -244,7 +243,7 @@ export const createMarkupEmbedResolver = (
 export const createS9eEmbedResolver = (
   platform: string,
   compose: (fragment: string) => EmbedResolverResult | undefined,
-): EmbedResolver => {
+): WidgetResolver => {
   return createMarkupEmbedResolver(`iframe[data-s9e-mediaembed="${platform}"]`, (element) => {
     const fragment = readS9eFragment(element)
 
@@ -353,8 +352,9 @@ export const createUrlEmbedResolver = (
   hosts: Array<string>,
   extract: ResolveUrlEmbed,
   options: ResolverOptions = {},
-): EmbedResolver => {
+): WidgetResolver => {
   return {
+    step: 'block',
     kind: 'embed',
     selector: embedCarrierSelector,
     extract: (element, context) => {
@@ -374,9 +374,7 @@ export const createUrlEmbedResolver = (
 
 const playerResolverKinds: Array<WidgetResolver['kind']> = ['embed', 'media']
 
-export const isEmbedOrMediaResolver = (
-  resolver: WidgetResolver,
-): resolver is EmbedResolver | MediaResolver => {
+export const isEmbedOrMediaResolver = (resolver: WidgetResolver): boolean => {
   return playerResolverKinds.includes(resolver.kind)
 }
 
@@ -398,6 +396,11 @@ export const isResolvedIframe = async (
 
 export const isMediaResult = (result: WidgetResolverResult): result is MediaResolverResult => {
   return 'tag' in result
+}
+
+// A card about another page carries its url and title, and names no player and no file.
+export const isCiteResult = (result: WidgetResolverResult): result is CiteResolverResult => {
+  return 'url' in result && 'title' in result && !('src' in result) && !('id' in result)
 }
 
 export const getMediaTag = (url: string): MediaResolverResult['tag'] | undefined => {

@@ -1,11 +1,12 @@
-import type { CiteResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 
 const provider = 'pzlinkcard'
 
 // Pz-LinkCard's WordPress link card: the whole card sits inside one anchor to the target.
-export const pzlinkcardCiteResolver: CiteResolver = {
+export const pzlinkcardCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   // Matching the card inside its anchor leaves the anchor wrapping the placeholder, and anchors
   // cannot nest, so it reparses into a stray empty link.

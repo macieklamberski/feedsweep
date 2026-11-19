@@ -1,4 +1,4 @@
-import type { CiteResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
@@ -6,7 +6,8 @@ import * as styles from '../utils/styles.js'
 const provider = 'tistory'
 
 // Tistory renders a pasted link as a card of the page's Open Graph tags frozen in at publish time.
-export const tistoryCiteResolver: CiteResolver = {
+export const tistoryCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   // Qualifying the attribute with figure misses the variants built from another element, and the
   // bare attribute collides with nothing: no other platform emits data-og-*.

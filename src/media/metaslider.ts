@@ -1,4 +1,4 @@
-import type { MediaResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { attr, jsonAttr } from '../utils/dom.js'
 import { videoFileRegex } from '../utils/urls.js'
 
@@ -9,7 +9,8 @@ type VideoSource = {
 
 // MetaSlider's local and external video slides: an empty div whose `data-sources` list only the
 // plugin's Video.js script turns into a player.
-export const metasliderMediaResolver: MediaResolver = {
+export const metasliderMediaResolver: WidgetResolver = {
+  step: 'block',
   kind: 'media',
   selector:
     'li.ms-local-video div.local-video[data-sources], li.ms-external-video div.external-video[data-sources]',

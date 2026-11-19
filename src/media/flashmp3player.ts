@@ -1,5 +1,5 @@
 import { getPathSegments, getQueryParam, isAnyOf } from 'trousse'
-import type { MediaResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { pluginCarrierSelector, readCarrierUrlOnHosts } from '../utils/widgets.js'
 
@@ -7,7 +7,8 @@ const hosts = ['flash-mp3-player.net']
 
 // The Flash MP3 Player widget, an `<object>` or `<embed>` whose `.swf` on flash-mp3-player.net
 // answers 404, so it renders nothing.
-export const flashMp3PlayerMediaResolver: MediaResolver = {
+export const flashMp3PlayerMediaResolver: WidgetResolver = {
+  step: 'block',
   kind: 'media',
   selector: pluginCarrierSelector,
   extract: (element, context) => {

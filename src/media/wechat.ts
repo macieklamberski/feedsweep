@@ -1,5 +1,5 @@
 import { composeQuery } from 'trousse'
-import type { MediaResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { attr } from '../utils/dom.js'
 
 // res.wx.qq.com serves the file for the id with no key, no Referer and no user agent.
@@ -8,7 +8,8 @@ const composeSourceUrl = (mediaId: string): string => {
 }
 
 // WeChat articles carry narration as an <mpvoice> element with no audio anywhere on the page.
-export const wechatMediaResolver: MediaResolver = {
+export const wechatMediaResolver: WidgetResolver = {
+  step: 'block',
   kind: 'media',
   selector: 'mpvoice[voice_encode_fileid]',
   extract: (element) => {

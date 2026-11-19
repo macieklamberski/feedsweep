@@ -1,6 +1,6 @@
 import { isHostOrSubdomainOf, parseUrl } from 'trousse'
 import { parseMastodonStatus } from '../embeds/mastodon.js'
-import type { CiteResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, isElement, text } from '../utils/dom.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
@@ -60,7 +60,8 @@ const socialPostHosts = ['bsky.app', 'threads.net', 'threads.com']
 const fediverseHandleRegex = /@[\w.-]+@[\w-]+(?:\.[\w-]+)+/
 
 // Discourse's onebox: a pasted link expanded into an aside of divs the forum's CSS lays out.
-export const discourseCiteResolver: CiteResolver = {
+export const discourseCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   selector: `aside.onebox${omittedOneboxClasses.map((name) => `:not(.${name})`).join('')}`,
   extract: (element, context) => {

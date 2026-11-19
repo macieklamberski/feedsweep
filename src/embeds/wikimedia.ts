@@ -1,5 +1,5 @@
 import { composeQuery, decodeSegment, getOrigin, parseUrl } from 'trousse'
-import type { EmbedResolver, EmbedResolverResult } from '../types.js'
+import type { EmbedResolverResult, WidgetResolver } from '../types.js'
 import { attr } from '../utils/dom.js'
 import {
   isMediaWikiFilePage,
@@ -70,7 +70,7 @@ const composePlayerUrl = (url: string, fileName: string): string | undefined => 
 
 // MediaWiki's TimedMediaHandler frames its own player for a freely licensed file, and that player
 // carries the subtitles and the attribution the raw file does not.
-export const wikimediaEmbedResolver: EmbedResolver = createMarkupEmbedResolver(
+export const wikimediaEmbedResolver: WidgetResolver = createMarkupEmbedResolver(
   'iframe',
   (element, context): EmbedResolverResult | undefined => {
     const source = readRepairedCarrierUrl(element, context)

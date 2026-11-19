@@ -4,15 +4,18 @@ import { attr, isElement, isNonWhitespaceText } from '../../utils/dom.js'
 import { cleanUnclaimedUrl, flashFileRegex, resolveOrDropUrl } from '../../utils/urls.js'
 import {
   createCaptionedFigure,
+  createCitePlaceholder,
   createEmbedPlaceholder,
   createIframe,
   createMediaElement,
   embedCarrierSelector,
   getEmbedSize,
   getMediaTag,
+  isCiteResult,
   isEmbedOrMediaResolver,
   isMediaResult,
   isResolvedIframe,
+  prepareCiteMetadata,
   prepareEmbedMetadata,
   prepareMediaMetadata,
   readCarrierUrl,
@@ -132,7 +135,8 @@ const captionMedia = (
   return createCaptionedFigure(document, media, text)
 }
 
-// Embed carriers as shipped: third-party iframes and dead Flash objects.
+// The block widget step: quote and link cards, third-party iframes and dead Flash objects as
+// shipped. Each element goes to the first resolver in registry order that claims it.
 export const convertWidgets: DomTransform = (context) => {
   const { widgetResolvers } = context
   const embedOrMediaResolvers = widgetResolvers.filter(isEmbedOrMediaResolver)
@@ -192,7 +196,7 @@ export const convertWidgets: DomTransform = (context) => {
       media.replaceWith(frame)
     }
 
-    for (const resolver of embedOrMediaResolvers) {
+    for (const resolver of widgetResolvers) {
       for (const element of elementsFor(resolver.selector)) {
         // Legacy Flash pairs an `<object>` with a nested `<embed>` and a url-keyed resolver
         // matches both. Replacing the outer one detaches the inner, which is still in this
@@ -204,6 +208,13 @@ export const convertWidgets: DomTransform = (context) => {
         const metadata = await resolver.extract(element, context)
 
         if (!metadata) {
+          continue
+        }
+
+        if (isCiteResult(metadata)) {
+          element.replaceWith(
+            createCitePlaceholder(document, prepareCiteMetadata(metadata, context)),
+          )
           continue
         }
 

@@ -1,5 +1,5 @@
 import { getQueryParam, isAnyOf } from 'trousse'
-import type { MediaResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { flashVars, parseFlashVars } from '../utils/dom.js'
 import { audioFileRegex, imageFileRegex } from '../utils/urls.js'
 import { matchUrl, pluginCarrierSelector, readCarrierUrlOnHosts } from '../utils/widgets.js'
@@ -22,7 +22,8 @@ const liveIframeSelector = 'iframe[src]:not([src="about:blank"])'
 // Weebly ships an uploaded video as a wrapper around an about:blank iframe its player JS fills.
 // Weebly stores the upload and its poster under one name, so the poster url also names the mp4.
 // The file url is not written anywhere in the markup.
-export const weeblyVideoMediaResolver: MediaResolver = {
+export const weeblyVideoMediaResolver: WidgetResolver = {
+  step: 'block',
   kind: 'media',
   selector: '.wsite-video-wrapper',
   extract: (element) => {
@@ -53,7 +54,8 @@ export const weeblyVideoMediaResolver: MediaResolver = {
 }
 
 // The Flash audio block: Flash no longer runs, and the mp3 url and its label sit in flashvars.
-export const weeblyFlashMediaResolver: MediaResolver = {
+export const weeblyFlashMediaResolver: WidgetResolver = {
+  step: 'block',
   kind: 'media',
   selector: pluginCarrierSelector,
   extract: (element, context) => {

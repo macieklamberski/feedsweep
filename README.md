@@ -110,12 +110,12 @@ Inventory of every transform exported from the package. Most are enabled by defa
 | `convertGiphyEmbeds` | Convert a Giphy gif shipped as an iframe (`giphy.com/embed/{id}`, `media.giphy.com`, `giphy.com/gifs/{id}`) into an `<img>` of the gif, linked to its Giphy page |
 | `convertSmartframeEmbeds` | Convert SmartFrame's `<smartframe-embed>` element into the picture it names as a static image |
 | `convertParkedMediaContainers` | Add a real `<video>`/`<audio>` to a container parking a media file URL in a lazy media attribute |
-| `convertWidgets` | Convert recognized widgets: embeds become `data-embed-*` placeholders, platform-hosted media becomes a real `<video>`/`<audio>` (from an id template or a media-file src) |
+| `convertWidgets` | Convert recognized widgets, cites first, then embeds, then media: link-preview cards become `data-cite-*` placeholders, embeds become `data-embed-*` placeholders, platform-hosted media becomes a real `<video>`/`<audio>` (from an id template or a media-file src) |
 | `assignVideoPosters` | _Heuristic (opt-in):_ move a redundant video-poster image (inline or an enclosure) onto the embed as its poster, then drop the standalone image |
 | `stripDuplicateEnclosures` | _Heuristic (opt-in):_ remove an injected enclosure that duplicates inline content (image size-variants, exact audio/video/embed) |
 | `stripDuplicateLeadingImages` | _Heuristic (opt-in):_ remove a leading image the body repeats as the very next image (featured-image prepends), keeping the larger copy |
 | `stripWordpressEmbedFrames` | Remove the frame of a WordPress post embed whose blockquote becomes a cite, so the post shows once |
-| `convertCiteCards` | Convert link-preview cards into `data-cite-*` placeholders |
+| `convertCiteCards` | _Deprecated:_ `convertWidgets` converts cites. Convert link-preview cards into `data-cite-*` placeholders |
 | `enrichEmbedPlaceholders` | Fill placeholder metadata via the caller's `enrichEmbedFn` (no-op unless set) |
 | `enrichCitePlaceholders` | Fill cite placeholder metadata via the caller's `enrichCiteFn` (no-op unless set) |
 | `neutralizeUnsafeUrls` | Replace dangerous-scheme URLs (and any the `isSafeUrlFn` option rejects) with an inert sentinel, keeping the element |

@@ -108,15 +108,6 @@ export type EnrichEmbedFn = (
   embeds: Array<EmbedRef>,
 ) => MaybePromise<Array<Partial<EmbedResolverResult> | undefined>>
 
-export type EmbedResolver = {
-  kind: 'embed'
-  selector: string
-  extract: (
-    element: Element,
-    context: TransformContext,
-  ) => MaybePromise<EmbedResolverResult | undefined>
-}
-
 // An attribute holding a url, read on the elements `selector` matches, or on any element that
 // carries it when there is no selector.
 export type ScopedAttribute = {
@@ -161,15 +152,6 @@ export type EnrichCiteFn = (
   cites: Array<CiteRef>,
 ) => MaybePromise<Array<Partial<CiteResolverResult> | undefined>>
 
-export type CiteResolver = {
-  kind: 'cite'
-  selector: string
-  extract: (
-    element: Element,
-    context: TransformContext,
-  ) => MaybePromise<CiteResolverResult | undefined>
-}
-
 export type MediaResolverResult = {
   tag: 'video' | 'audio'
   src: string
@@ -179,20 +161,29 @@ export type MediaResolverResult = {
   height?: number
 }
 
-// A platform that ships its own media as a container naming the file by an id, with no url in
-// the markup.
-export type MediaResolver = {
-  kind: 'media'
+export type WidgetResolverResult = EmbedResolverResult | MediaResolverResult | CiteResolverResult
+
+// One resolver type for every widget. The step writes whatever result extract returns, so the
+// result's shape decides the form, and `kind` names the one kind the resolver is meant to produce.
+export type WidgetResolver = {
+  // Absent reads as block, for a resolver written before the field.
+  step?: 'block'
+  kind: 'embed' | 'media' | 'cite'
   selector: string
   extract: (
     element: Element,
     context: TransformContext,
-  ) => MaybePromise<MediaResolverResult | undefined>
+  ) => MaybePromise<WidgetResolverResult | undefined>
 }
 
-export type WidgetResolver = EmbedResolver | MediaResolver | CiteResolver
+/** @deprecated Use `WidgetResolver`. */
+export type EmbedResolver = WidgetResolver
 
-export type WidgetResolverResult = EmbedResolverResult | MediaResolverResult | CiteResolverResult
+/** @deprecated Use `WidgetResolver`. */
+export type MediaResolver = WidgetResolver
+
+/** @deprecated Use `WidgetResolver`. */
+export type CiteResolver = WidgetResolver
 
 export type EmojiResolverResult =
   | { glyph: string } // Replaced by the text

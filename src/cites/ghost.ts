@@ -1,11 +1,12 @@
-import type { CiteResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 
 const provider = 'ghost'
 
 // Ghost's bookmark card: a figure of nested divs that only Ghost's card stylesheet lays out.
-export const ghostCiteResolver: CiteResolver = {
+export const ghostCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   selector: '.kg-bookmark-card',
   extract: (element) => {

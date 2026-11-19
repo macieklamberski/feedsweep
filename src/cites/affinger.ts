@@ -1,11 +1,12 @@
-import type { CiteResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 
 const provider = 'affinger'
 
 // AFFINGER's card block: an anchor wrapping a card of divs the theme's stylesheet lays out.
-export const affingerCiteResolver: CiteResolver = {
+export const affingerCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   // Excluding .kanren drops real cards: the theme co-classes it on cards and its related listing.
   // st-cardlink-card and st-cardlink-img belong to the theme's unrelated header-card grid.

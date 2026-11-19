@@ -1,4 +1,4 @@
-import type { CiteResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 
@@ -17,7 +17,8 @@ const cardUrl = (element: Element): string | undefined => {
 
 // The hyphenated blog-card several WordPress themes emit: divs whose layout lives in theme CSS.
 // Cocoon's unhyphenated blogcard-* classes are a different card.
-export const blogCardCiteResolver: CiteResolver = {
+export const blogCardCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   selector: '.blog-card',
   extract: (element) => {

@@ -1,4 +1,4 @@
-import type { CiteResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 
@@ -6,7 +6,8 @@ const provider = 'wordpress'
 
 // WordPress core writes a link to another WordPress post as this blockquote, holding the post's
 // url and title, beside a frame that renders the post's card. The frame is stripped as a duplicate.
-export const wordpressCiteResolver: CiteResolver = {
+export const wordpressCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   selector: 'blockquote.wp-embedded-content',
   extract: (element) => {

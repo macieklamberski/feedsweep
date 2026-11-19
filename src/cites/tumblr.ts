@@ -1,4 +1,4 @@
-import type { CiteResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { buildCite, trim } from '../utils/cites.js'
 import { attr, find, jsonAttr, text } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
@@ -27,7 +27,8 @@ const bareUrl = (value: string): string => {
 
 // Tumblr's NPF link block: a bare anchor with the card as JSON, or a painted card, poster in CSS.
 // The url is usually wrapped in t.umblr.com/redirect or href.li, sometimes nested.
-export const tumblrCiteResolver: CiteResolver = {
+export const tumblrCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   selector: '.npf_link, .npf-link-block',
   extract: (element) => {

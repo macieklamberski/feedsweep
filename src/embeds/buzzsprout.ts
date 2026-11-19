@@ -1,9 +1,9 @@
 import { composeQuery, getQueryParams } from 'trousse'
 import type {
   EmbedRenderHint,
-  EmbedResolver,
   EmbedResolverResult,
   ResolveUrlEmbed,
+  WidgetResolver,
 } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest } from '../utils/hints.js'
@@ -65,7 +65,7 @@ export const buzzsproutResolveEmbed: ResolveUrlEmbed = (url, element) => {
   return title ? { ...result, title } : result
 }
 
-export const buzzsproutIframeEmbedResolver: EmbedResolver = createUrlEmbedResolver(
+export const buzzsproutIframeEmbedResolver: WidgetResolver = createUrlEmbedResolver(
   hosts,
   buzzsproutResolveEmbed,
 )

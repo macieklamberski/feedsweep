@@ -1,4 +1,4 @@
-import type { CiteResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 
@@ -6,7 +6,8 @@ const provider = 'xenforo'
 
 // XenForo unfurls a pasted link into a block whose fields carry js-unfurl-* hooks.
 // The hooks are near-universal and the theme classes vary from site to site.
-export const xenforoCiteResolver: CiteResolver = {
+export const xenforoCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   selector: '.bbCodeBlock--unfurl[data-url]',
   extract: (element) => {

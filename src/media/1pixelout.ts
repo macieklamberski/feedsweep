@@ -1,5 +1,5 @@
 import { getQueryParam, parseUrl } from 'trousse'
-import type { MediaResolver, MediaResolverResult } from '../types.js'
+import type { MediaResolverResult, WidgetResolver } from '../types.js'
 import { attr, flashVars, parseFlashVars } from '../utils/dom.js'
 import { flashFileRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import { pluginCarrierSelector, readRepairedCarrierUrl } from '../utils/widgets.js'
@@ -48,7 +48,8 @@ const composeAudio = (
 
 // The 1 Pixel Out audio player, a `.swf` any publisher can host, which names its file in the
 // `soundFile` flashvar or the swf url's query. Flash no longer runs, so the bar renders nothing.
-export const onePixelOutFlashMediaResolver: MediaResolver = {
+export const onePixelOutFlashMediaResolver: WidgetResolver = {
+  step: 'block',
   kind: 'media',
   selector: pluginCarrierSelector,
   extract: (element, context) => {
@@ -74,7 +75,8 @@ export const onePixelOutFlashMediaResolver: MediaResolver = {
 // Version 2 of the WordPress plugin writes a `<p id="audioplayer_N">` holding fallback text, and
 // an `AudioPlayer.embed` call naming that id swaps it for the player. The Joomla `rapid1pixelout`
 // plugin writes `onepixeloutaudioplayer_{hex}`.
-export const onePixelOutWidgetMediaResolver: MediaResolver = {
+export const onePixelOutWidgetMediaResolver: WidgetResolver = {
+  step: 'block',
   kind: 'media',
   selector: [
     'p[id^="audioplayer_" i]',

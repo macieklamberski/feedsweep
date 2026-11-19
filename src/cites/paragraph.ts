@@ -1,4 +1,4 @@
-import type { CiteResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, jsonAttr } from '../utils/dom.js'
 
@@ -17,7 +17,8 @@ type EmbedlyData = {
 // Paragraph's link card: a div its client renders from the Embedly JSON blob the div carries.
 // The inner DOM has shipped as an older .twitter-summary and today's .link-embed, and the JSON
 // keys are Embedly's.
-export const paragraphCiteResolver: CiteResolver = {
+export const paragraphCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   selector: 'div[data-type="embedly"]',
   extract: (element) => {

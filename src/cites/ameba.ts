@@ -1,11 +1,12 @@
-import type { CiteResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 
 const provider = 'ameba'
 
 // Ameba's ogpCard: an anchor of inline-styled spans frozen from the link's Open Graph data.
-export const amebaCiteResolver: CiteResolver = {
+export const amebaCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   selector: '.ogpCard_wrap',
   extract: (element) => {

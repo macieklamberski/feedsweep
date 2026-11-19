@@ -1,4 +1,4 @@
-import type { CiteResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, keepIfMatches, text, textNode } from '../utils/dom.js'
 
@@ -11,7 +11,8 @@ const yearRegex = /\b(19|20)\d{2}\b|'\d{2}\b/
 
 // Forem's embed card for an external link, compiled into the stored body as bare divs.
 // The feed sanitizer's allowlist keeps div, class and id intact.
-export const devtoLinkCiteResolver: CiteResolver = {
+export const devtoLinkCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   selector: '.c-embed',
   extract: (element) => {
@@ -33,7 +34,8 @@ export const devtoLinkCiteResolver: CiteResolver = {
 }
 
 // Forem's card for another dev.to post, frozen at save time in the markup its generator emitted.
-export const devtoPostCiteResolver: CiteResolver = {
+export const devtoPostCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   selector: '.ltag__link--embedded',
   extract: (element) => {
@@ -65,7 +67,8 @@ export const devtoPostCiteResolver: CiteResolver = {
 const authorSeparator = '・' // Katakana middle dot, U+30FB
 
 // The dev.to post card Forem shipped before March 2026, still frozen in the bodies saved then.
-export const devtoLegacyPostCiteResolver: CiteResolver = {
+export const devtoLegacyPostCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   selector: '.ltag__link',
   extract: (element) => {

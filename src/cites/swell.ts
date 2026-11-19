@@ -1,4 +1,4 @@
-import type { CiteResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 
@@ -9,7 +9,8 @@ const provider = 'swell'
 const defaultCaptionLabel = 'あわせて読みたい' // The theme's stock caption label, "read this too"
 
 // SWELL's post-link block renders as a card whose url sits on the title anchor, not a wrapper.
-export const swellCiteResolver: CiteResolver = {
+export const swellCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   selector: '.p-blogCard',
   extract: (element) => {
