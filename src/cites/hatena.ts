@@ -1,9 +1,15 @@
 import { getQueryParam, isHostOf, parseUrl, startsWithAnyOf } from 'trousse'
-import type { WidgetResolver } from '../types.js'
+import type { TransformContext, WidgetResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
-import { matchUrl, readCarrierUrl } from '../utils/widgets.js'
+import {
+  createIframe,
+  matchUrl,
+  readCarrierUrl,
+  readPlayer,
+  readRepairedCarrierUrl,
+} from '../utils/widgets.js'
 
 const provider = 'hatena'
 const hosts = ['hatenablog-parts.com']
@@ -12,18 +18,27 @@ const hosts = ['hatenablog-parts.com']
 // hatenablogcard, wp-embedded-content, a theme's own class, or nothing at all.
 const cardClassSelector = 'iframe.embed-card, iframe.hatenablogcard'
 
-// A host list misses this: a blog on a custom domain serves its own card from that domain.
-// The self-served card is at {blog}.hatenablog.com/embed/{entry}, and the citation beside it
-// names the same host.
-const isSelfHosted = (source: string, citationHref: string | undefined): boolean => {
-  const citation = citationHref ? parseUrl(citationHref, placeholderBaseUrl) : undefined
-  const card = parseUrl(source, placeholderBaseUrl)
+// Hatena Blog writes a citation right after every card and player it renders, a <cite> whose
+// link names the page shown.
+const findCitation = (element: Element): Element | undefined => {
+  const sibling = element.nextElementSibling
 
-  if (!citation || !card) {
+  if (!sibling?.matches('cite.hatena-citation')) {
+    return
+  }
+
+  return sibling
+}
+
+const isOnCitedHost = (source: string, citationHref: string | undefined): boolean => {
+  const citation = citationHref ? parseUrl(citationHref, placeholderBaseUrl) : undefined
+  const frame = parseUrl(source, placeholderBaseUrl)
+
+  if (!citation || !frame) {
     return false
   }
 
-  return isHostOf(card, citation.hostname)
+  return isHostOf(frame, citation.hostname)
 }
 
 // Hatena Blog's link card: an iframe at its card renderer, with a <cite> holding the real link.
@@ -39,8 +54,7 @@ export const hatenaCiteResolver: WidgetResolver = {
       return
     }
 
-    const sibling = element.nextElementSibling
-    const citation = sibling?.matches('cite.hatena-citation') ? sibling : undefined
+    const citation = findCitation(element)
     const citationLink = find(citation, 'a')
     const citationHref = attr(citationLink, 'href')
     const cardUrl = parseUrlOnHosts(source, hosts)
@@ -50,8 +64,10 @@ export const hatenaCiteResolver: WidgetResolver = {
       return
     }
 
-    // A foreign player carrying the class would become a cite.
-    if (!cardUrl && !isSelfHosted(source, citationHref)) {
+    // A foreign player carrying the class would become a cite. A host list misses a blog on a
+    // custom domain, which serves its own card at {blog}.hatenablog.com/embed/{entry}, and the
+    // citation beside it names the same host.
+    if (!cardUrl && !isOnCitedHost(source, citationHref)) {
       return
     }
 
@@ -70,4 +86,31 @@ export const hatenaCiteResolver: WidgetResolver = {
 
     return result
   },
+}
+
+// The citation after a player names the player's host or its item. Left in place, it would stay
+// behind under the player as a stray domain link.
+export const removeHatenaPlayerCitation = async (
+  carrier: Element,
+  player: string | undefined,
+  resolvers: ReadonlyArray<WidgetResolver>,
+  context: TransformContext,
+): Promise<void> => {
+  const citation = findCitation(carrier)
+  const citationHref = attr(find(citation, 'a'), 'href')
+
+  if (!citation || !citationHref) {
+    return
+  }
+
+  if (isOnCitedHost(readRepairedCarrierUrl(carrier, context), citationHref)) {
+    citation.remove()
+    return
+  }
+
+  const probe = createIframe(carrier.ownerDocument, citationHref)
+
+  if (player && (await readPlayer(probe, resolvers, context)) === player) {
+    citation.remove()
+  }
 }
