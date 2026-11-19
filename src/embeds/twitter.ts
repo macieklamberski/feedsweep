@@ -4,11 +4,20 @@ import {
   isAnyOf,
   isHostOrSubdomainOf,
   isPlainObject,
-  type Nullish,
   parseUrl,
 } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
-import { attr, find, jsonAttr, keepIfMatches, setInnerHtml, text } from '../utils/dom.js'
+import {
+  attr,
+  collectParagraphs,
+  find,
+  isBr,
+  jsonAttr,
+  keepIfMatches,
+  setInnerHtml,
+  text,
+} from '../utils/dom.js'
+import { readEmojiText } from '../utils/emojis.js'
 import { readPixels } from '../utils/hints.js'
 import { digitsRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
 import {
@@ -133,31 +142,32 @@ const readAuthor = (status: Status): string | undefined => {
 
 // A blockquote with no paragraph of its own keeps the tweet text in the byline's paragraph,
 // ahead of the line break before the byline.
-const readLeadText = (byline: Nullish<Element>): string | undefined => {
-  const parts: Array<string> = []
+const readLeadText = (byline: ReadonlyArray<Node>): string | undefined => {
+  const parts: Array<Node> = []
 
-  for (const node of Array.from(byline?.childNodes ?? [])) {
-    if (node.nodeName === 'BR') {
-      return parts.join('').trim() || undefined
+  for (const node of byline) {
+    if (isBr(node)) {
+      return readEmojiText(parts)
     }
 
-    parts.push(node.textContent ?? '')
+    parts.push(node)
   }
 }
 
-// The tweet text: every paragraph but the one holding the dated anchor, which is the byline once
-// the pipeline has wrapped it. A long tweet spans several paragraphs.
+// The tweet text: every paragraph but the one holding the dated anchor, which is the byline.
+// A long tweet spans several paragraphs, and a paragraph is a loose text run as well as a <p>.
 const readContent = (element: Element, status: Status, anchor: Element | undefined) => {
-  const byline = anchor?.parentElement
-  const paragraphs = Array.from(element.querySelectorAll('p'))
+  const paragraphs = collectParagraphs(element)
+  const byline = anchor ? paragraphs.find((paragraph) => paragraph.includes(anchor)) : undefined
   const body = paragraphs
     .filter((paragraph) => paragraph !== byline)
-    .map((paragraph) => text(paragraph))
+    .map((paragraph) => readEmojiText(paragraph))
     .filter((value) => !!value)
     .join('\n')
 
   return {
-    description: body || readLeadText(byline),
+    description:
+      body || readLeadText(byline ?? Array.from(anchor?.parentElement?.childNodes ?? [])),
     author: readAuthor(status),
   }
 }

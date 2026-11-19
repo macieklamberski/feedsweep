@@ -14,7 +14,8 @@ import type {
   ResolveUrlEmbed,
   TransformContext,
 } from '../types.js'
-import { attr, find, jsonAttr, text } from '../utils/dom.js'
+import { attr, collectParagraphs, find, isElement, jsonAttr, text } from '../utils/dom.js'
+import { readEmojiText } from '../utils/emojis.js'
 import { readPixels } from '../utils/hints.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import {
@@ -133,15 +134,15 @@ const profilePathRegex = /^\/([A-Za-z0-9_.]+)\/?$/
 // caption, the first bare @token is as likely to be a mention as the author.
 const bylineHandleRegex = /\(@([A-Za-z0-9_.]+)\)/
 
+const readAnchorHandle = (anchor: Element): string | undefined => {
+  const parsed = parseUrlOnHosts(attr(anchor, 'href'), hosts)
+
+  return parsed?.pathname.match(profilePathRegex)?.[1]
+}
+
 const readProfileHandle = (element: Element): string | undefined => {
   for (const anchor of element.querySelectorAll('a[href]')) {
-    const parsed = parseUrlOnHosts(attr(anchor, 'href'), hosts)
-
-    if (!parsed) {
-      continue
-    }
-
-    const handle = parsed.pathname.match(profilePathRegex)?.[1]
+    const handle = readAnchorHandle(anchor)
 
     if (handle) {
       return handle
@@ -150,18 +151,31 @@ const readProfileHandle = (element: Element): string | undefined => {
 }
 
 // The byline paragraph: the one that links the account or dates the post.
-const findByline = (element: Element): Element | undefined => {
-  return find(element, 'p', (paragraph) => {
-    return Boolean(find(paragraph, 'time') ?? readProfileHandle(paragraph))
+const isByline = (paragraph: ReadonlyArray<Node>): boolean => {
+  return paragraph.some((node) => {
+    if (!isElement(node)) {
+      return false
+    }
+
+    if (node.matches('time') || find(node, 'time')) {
+      return true
+    }
+
+    if (node.matches('a[href]') && readAnchorHandle(node)) {
+      return true
+    }
+
+    return Boolean(readProfileHandle(node))
   })
 }
 
 const readContent = (element: Element): Partial<EmbedResolverResult> => {
-  const byline = findByline(element)
+  const paragraphs = collectParagraphs(element)
+  const byline = paragraphs.find(isByline)
   // Only beside a byline: the modern skeleton's first paragraph is its own chrome.
   // The older dialog puts the caption in a paragraph above the byline "A post shared by {name}
   // (@handle) on {date}", and the current one writes neither.
-  const caption = byline ? find(element, 'p', (paragraph) => paragraph !== byline) : undefined
+  const caption = byline ? paragraphs.find((paragraph) => paragraph !== byline) : undefined
   const time = find(element, 'time')
   const quoted = text(element)
   const handle =
@@ -170,7 +184,7 @@ const readContent = (element: Element): Partial<EmbedResolverResult> => {
     (caption ? undefined : quoted?.match(bareHandleRegex)?.[1])
 
   return {
-    description: text(caption),
+    description: readEmojiText(caption),
     // The display name sits behind a localized "A post shared by" prefix in the shape that
     // still carries it, so the handle is the half every era spells the same way.
     author: handle ? atUsername(handle) : undefined,

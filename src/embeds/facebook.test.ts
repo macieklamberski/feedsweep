@@ -355,6 +355,51 @@ describeForEachParser('facebookWidgetEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
   })
+
+  describe('the fallback as the feed ships it, before the paragraph passes', () => {
+    it('should read the caption from the loose link ahead of an empty paragraph', async () => {
+      const value = html`
+        <div
+          class="fb-post"
+          data-href="https://www.facebook.com/123456789/posts/987654321"
+          data-width="500"
+          data-show-text="true"
+        >
+          <blockquote
+            cite="https://www.facebook.com/123456789/posts/987654321"
+            class="fb-xfbml-parse-ignore"
+          >
+            <a
+              href="https://www.facebook.com/123456789/posts/987654321"
+              target="_blank"
+              >On our way to the coast in the morning!</a
+            >
+            <p></p>
+            Posted by
+            <a
+              href="https://www.facebook.com/app_scoped_user_id/123456789/"
+              target="_blank"
+              >Example Person</a
+            >
+            on&nbsp;<a
+              href="https://www.facebook.com/123456789/posts/987654321"
+              target="_blank"
+              >12 Mar 2019, 05:29</a
+            >
+          </blockquote>
+        </div>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'facebook',
+        id: 'https://www.facebook.com/123456789/posts/987654321',
+        src: 'https://www.facebook.com/plugins/post.php?href=https://www.facebook.com/123456789/posts/987654321',
+        url: 'https://www.facebook.com/123456789/posts/987654321',
+        description: 'On our way to the coast in the morning!',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
 })
 
 describeForEachParser('facebookXfbmlEmbedResolver', (parseHtml) => {

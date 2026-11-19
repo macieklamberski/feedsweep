@@ -1,6 +1,7 @@
 import { encodePathSegment } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed, TransformContext } from '../types.js'
-import { attr, find, text, textNode } from '../utils/dom.js'
+import { attr, collectParagraphs, find, text, textNode } from '../utils/dom.js'
+import { readEmojiText } from '../utils/emojis.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import {
   atUsername,
@@ -90,11 +91,11 @@ const resolveClip = (
   // Where the link holds a secUid, the account name survives only in the link's `title`, as
   // `@{name}`, which is not always the handle.
   const author = profileHandle?.startsWith(secUidPrefix) ? attr(profile, 'title') : profileHandle
-  const caption = find(element, 'section p', (paragraph) => {
-    const value = text(paragraph)
-
-    return Boolean(value && value !== byline && !value.startsWith('♬'))
-  })
+  // The snippet's caption is a <p> in the section, or a loose text run where a copy dropped it.
+  const caption = collectParagraphs(element)
+    .filter((paragraph) => Boolean(paragraph[0]?.parentElement?.closest('section')))
+    .map((paragraph) => readEmojiText(paragraph))
+    .find((value) => Boolean(value && value !== byline && !value.startsWith('♬')))
 
   // A handle read from a path is already a segment.
   const handle = cited.handle ?? linked.handle ?? profileHandle
@@ -111,7 +112,7 @@ const resolveClip = (
     src: `https://www.tiktok.com/embed/v2/${segment}`,
     // A sanitized cite is truncated to the bare host, which links nothing worth keeping.
     url: cited.videoId ? attr(element, 'cite') : watchPath && `https://www.tiktok.com/${watchPath}`,
-    description: text(caption),
+    description: caption,
     author: author ? atUsername(author) : undefined,
     ...sizes.video,
   }

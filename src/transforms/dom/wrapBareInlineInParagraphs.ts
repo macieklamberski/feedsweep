@@ -1,70 +1,21 @@
 import type { DomTransform } from '../../types.js'
 import {
+  alwaysWrapTags,
+  dissolvingTags,
   hasAncestorWithTagName,
   hasText,
+  inlineHostTags,
   isBlockElement,
   isComment,
-  isElement,
-  isText,
-  mediaSelector,
-  processContainersSelector,
+  isMediaBoundary,
+  paragraphContainersSelector,
 } from '../../utils/dom.js'
-
-// Figure is here so a bare caption gets a <p>. A <br> run inside one needs no paragraph, so
-// convertBreaksToParagraphs leaves it out.
-const containersSelector = `${processContainersSelector}, figure`
-
-// Contexts where inline content sits directly, so wrapping it in a <p> would be
-// wrong (captions, anchors, headings, raw-text blocks).
-const inlineHostTags = new Set([
-  'pre',
-  'code',
-  'figcaption',
-  'a',
-  'picture',
-  'caption',
-  'summary',
-  'h1',
-  'h2',
-  'h3',
-  'h4',
-  'h5',
-  'h6',
-])
-
-// Standalone media at a run's edge (bare or wrapped in a textless anchor/span)
-// renders as a block of its own. Pulling it into the text's paragraph would glue
-// the text to it and hide it from media-specific styling.
-const isMediaBoundary = (node: Node): boolean => {
-  if (isText(node)) {
-    return !hasText(node)
-  }
-
-  if (!isElement(node)) {
-    return true
-  }
-
-  if (hasText(node)) {
-    return false
-  }
-
-  return node.matches(mediaSelector) || node.querySelector(mediaSelector) !== null
-}
-
-// Wrappers unwrapWrappers later dissolves into a flow root. Their inline content
-// would otherwise become bare text, so even a single full-container run is wrapped.
-const dissolvingTags = ['div', 'article', 'section', 'main', 'header', 'footer']
-
-// Persistent containers whose single-run inline content still needs paragraphs:
-// body as the root flow, figure so its bare text (often a caption div dissolved
-// by unwrapWrappers) gets an element to carry caption spacing and styling.
-const alwaysWrapTags = ['body', 'figure']
 
 // Bare inline runs beside block siblings in a container, which render with no paragraph spacing,
 // and every run in a wrapper unwrapWrappers dissolves, whose text would otherwise land bare.
 export const wrapBareInlineInParagraphs: DomTransform = () => {
   return (document) => {
-    for (const container of document.querySelectorAll(containersSelector)) {
+    for (const container of document.querySelectorAll(paragraphContainersSelector)) {
       if (hasAncestorWithTagName(container, inlineHostTags)) {
         continue
       }

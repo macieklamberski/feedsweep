@@ -358,6 +358,207 @@ export const hasAncestorWithTagName = (node: Node, tagSet: Set<string>, stopAt?:
   return false
 }
 
+// The first sibling after the node that is not whitespace or a `<br>`.
+export const findNextContentSibling = (node: Node): ChildNode | undefined => {
+  let sibling = node.nextSibling
+
+  while (sibling && (isWhitespaceText(sibling) || isBr(sibling))) {
+    sibling = sibling.nextSibling
+  }
+
+  return sibling ?? undefined
+}
+
+// Contexts where inline content sits directly, so wrapping it in a <p> would be
+// wrong (captions, anchors, headings, raw-text blocks).
+export const inlineHostTags = new Set([
+  'pre',
+  'code',
+  'figcaption',
+  'a',
+  'picture',
+  'caption',
+  'summary',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+])
+
+// Figure is here so a bare caption gets a <p>. A <br> run inside one needs no paragraph, so
+// convertBreaksToParagraphs leaves it out.
+export const paragraphContainersSelector = `${processContainersSelector}, figure`
+
+// Wrappers unwrapWrappers later dissolves into a flow root. Their inline content
+// would otherwise become bare text, so even a single full-container run is wrapped.
+export const dissolvingTags = ['div', 'article', 'section', 'main', 'header', 'footer']
+
+// Persistent containers whose single-run inline content still needs paragraphs:
+// body as the root flow, figure so its bare text (often a caption div dissolved
+// by unwrapWrappers) gets an element to carry caption spacing and styling.
+export const alwaysWrapTags = ['body', 'figure']
+
+// Standalone media at a run's edge (bare or wrapped in a textless anchor/span)
+// renders as a block of its own. Pulling it into the text's paragraph would glue
+// the text to it and hide it from media-specific styling.
+export const isMediaBoundary = (node: Node): boolean => {
+  if (isText(node)) {
+    return !hasText(node)
+  }
+
+  if (!isElement(node)) {
+    return true
+  }
+
+  if (hasText(node)) {
+    return false
+  }
+
+  return node.matches(mediaSelector) || node.querySelector(mediaSelector) !== null
+}
+
+// The index past a run of two or more <br> starting at `index`, whitespace between them
+// allowed, or `index` itself when no such run starts there.
+const skipBreakRun = (children: Array<ChildNode>, index: number): number => {
+  if (!isBr(children[index])) {
+    return index
+  }
+
+  let count = 0
+  let next = index
+
+  while (next < children.length && (isBr(children[next]) || isWhitespaceText(children[next]))) {
+    if (isBr(children[next])) {
+      count++
+    }
+
+    next++
+  }
+
+  return count >= 2 ? next : index
+}
+
+const trimMediaBoundaries = (run: Array<ChildNode>): Array<ChildNode> => {
+  let start = 0
+  let end = run.length
+
+  while (start < end && isMediaBoundary(run[start])) {
+    start++
+  }
+
+  while (end > start && isMediaBoundary(run[end - 1])) {
+    end--
+  }
+
+  return run.slice(start, end)
+}
+
+const pushParagraphsOf = (element: Element, paragraphs: Array<Array<ChildNode>>): void => {
+  for (const paragraph of element.querySelectorAll('p')) {
+    paragraphs.push(Array.from(paragraph.childNodes))
+  }
+}
+
+// A container's runs, split where a block or a run of <br> stands, and the paragraphs inside
+// its children. A run becomes a paragraph only where the paragraph passes would wrap it.
+const collectContainerParagraphs = (
+  container: Element,
+  paragraphs: Array<Array<ChildNode>>,
+): void => {
+  const children = Array.from(container.childNodes)
+  const runs: Array<Array<ChildNode>> = []
+  let run: Array<ChildNode> = []
+  let isSplit =
+    dissolvingTags.includes(container.localName) || alwaysWrapTags.includes(container.localName)
+  let index = 0
+
+  while (index < children.length) {
+    const next = skipBreakRun(children, index)
+
+    if (next > index) {
+      runs.push(run)
+      run = []
+      isSplit = true
+      index = next
+      continue
+    }
+
+    const child = children[index]
+    index++
+
+    if (isBlockElement(child)) {
+      runs.push(run, [child])
+      run = []
+      isSplit = true
+      continue
+    }
+
+    run.push(child)
+  }
+
+  runs.push(run)
+
+  for (const nodes of runs) {
+    const [first] = nodes
+
+    if (nodes.length === 1 && isElement(first) && isBlockElement(first)) {
+      collectElementParagraphs(first, paragraphs)
+      continue
+    }
+
+    if (isSplit && nodes.some((node) => !isComment(node) && hasText(node))) {
+      paragraphs.push(trimMediaBoundaries(nodes))
+    }
+
+    for (const node of nodes) {
+      if (isElement(node)) {
+        collectElementParagraphs(node, paragraphs)
+      }
+    }
+  }
+}
+
+const collectElementParagraphs = (element: Element, paragraphs: Array<Array<ChildNode>>): void => {
+  // A <p> holds a nested one only where the paragraph passes wrapped a run around a block.
+  if (element.localName === 'p') {
+    paragraphs.push(Array.from(element.childNodes))
+    pushParagraphsOf(element, paragraphs)
+    return
+  }
+
+  if (inlineHostTags.has(element.localName)) {
+    pushParagraphsOf(element, paragraphs)
+    return
+  }
+
+  if (element.matches(paragraphContainersSelector)) {
+    collectContainerParagraphs(element, paragraphs)
+    return
+  }
+
+  for (const child of element.children) {
+    collectElementParagraphs(child, paragraphs)
+  }
+}
+
+// The element's paragraphs in document order, each as its nodes: every <p>, and every inline
+// run of text that convertBreaksToParagraphs and wrapBareInlineInParagraphs would wrap in one.
+export const collectParagraphs = (element: Element): Array<Array<ChildNode>> => {
+  const paragraphs: Array<Array<ChildNode>> = []
+
+  if (hasAncestorWithTagName(element, inlineHostTags)) {
+    pushParagraphsOf(element, paragraphs)
+
+    return paragraphs
+  }
+
+  collectElementParagraphs(element, paragraphs)
+
+  return paragraphs
+}
+
 // The selector engine jsdom uses refuses anything over 2048 characters, and the default
 // non-content list is longer than that, so a caller queries one batch at a time.
 const maxSelectorLength = 2000

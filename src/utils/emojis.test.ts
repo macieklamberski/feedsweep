@@ -7,6 +7,7 @@ import {
   type EmojiNameTable,
   glyphFromCodepoints,
   mergeEmojiNames,
+  readEmojiText,
   resolveEmojiImage,
   withEmojiPresentation,
 } from './emojis.js'
@@ -160,5 +161,51 @@ describe('resolveEmojiImage', () => {
     const image = getImage('<img src="https://example.com/smilies/banner.gif" alt="">')
 
     expect(resolveEmojiImage(image, { isStrong: false, names: mixedNames })).toBeUndefined()
+  })
+})
+
+describe('readEmojiText', () => {
+  it('should read an emoji image as the glyph its alt names', () => {
+    const value = queryElement(
+      parseHtml('<p>On fire <img src="https://example.com/1f525.png" alt="🔥"></p>'),
+      'p',
+    )
+    const expected = 'On fire 🔥'
+
+    expect(readEmojiText(value)).toBe(expected)
+  })
+
+  it('should add the presentation selector to a glyph that renders as text without it', () => {
+    const value = queryElement(
+      parseHtml('<p>Love <img src="https://example.com/2764.png" alt="❤"></p>'),
+      'p',
+    )
+    const expected = 'Love ❤\ufe0f'
+
+    expect(readEmojiText(value)).toBe(expected)
+  })
+
+  it('should skip an image whose alt is not an emoji', () => {
+    const value = queryElement(
+      parseHtml('<p>Photo <img src="https://example.com/cat.jpg" alt="A cat"></p>'),
+      'p',
+    )
+    const expected = 'Photo'
+
+    expect(readEmojiText(value)).toBe(expected)
+  })
+
+  it('should join the text of several nodes', () => {
+    const paragraph = queryElement(parseHtml('<p>First <b>bold</b> last</p>'), 'p')
+    const value = Array.from(paragraph.childNodes)
+    const expected = 'First bold last'
+
+    expect(readEmojiText(value)).toBe(expected)
+  })
+
+  it('should return undefined for nodes with no text', () => {
+    const value = queryElement(parseHtml('<p> <br> </p>'), 'p')
+
+    expect(readEmojiText(value)).toBeUndefined()
   })
 })

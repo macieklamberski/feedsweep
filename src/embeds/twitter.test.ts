@@ -991,6 +991,65 @@ describeForEachParser('twitterBlockquoteEmbedResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
   })
+
+  describe('the tweet as the feed ships it, before the paragraph and emoji passes', () => {
+    it('should read the text from a div and the byline from the loose run after it', async () => {
+      const value = html`
+        <blockquote
+          class="twitter-tweet tw-align-center"
+          data-lang="en"
+        >
+          <div
+            dir="ltr"
+            lang="en"
+          >
+            The effect is mediated by the cells and is not optimal without them.
+          </div>
+          — Example Lab (@examplelab) <a href="https://twitter.com/examplelab/status/123456789012345?ref_src=twsrc%5Etfw">March 21, 2019</a>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: '123456789012345',
+        src: 'https://platform.twitter.com/embed/Tweet.html?id=123456789012345',
+        url: 'https://x.com/examplelab/status/123456789012345',
+        description: 'The effect is mediated by the cells and is not optimal without them.',
+        author: '@examplelab',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read an emoji image in the tweet text by its alt', async () => {
+      const value = html`
+        <blockquote class="twitter-tweet">
+          <p
+            dir="ltr"
+            lang="en"
+          >
+            On fire tonight!!
+            <img
+              src="https://example.com/emoji/72x72/1f525.png"
+              alt="🔥"
+              class="wp-smiley"
+              style="height: 1em; max-height: 1em;"
+            />
+          </p>
+          <p>— Example Show (@exampleshow) <a href="https://x.com/exampleshow/status/123456789012345?ref_src=twsrc%5Etfw">June 20, 2026</a></p>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'twitter',
+        id: '123456789012345',
+        src: 'https://platform.twitter.com/embed/Tweet.html?id=123456789012345',
+        url: 'https://x.com/exampleshow/status/123456789012345',
+        description: 'On fire tonight!! 🔥',
+        author: '@exampleshow',
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
 })
 
 // Found by probing the pipeline (2026-08-12), not by the survey's 200-file sample, so its

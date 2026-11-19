@@ -661,6 +661,7 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         id: '@user/video/7001234567890123456',
         src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
         url: 'https://www.tiktok.com/@user/video/7001234567890123456',
+        description: 'Watch on TikTok',
         height: 738,
       }
 
@@ -937,6 +938,89 @@ describeForEachParser('tiktokBlockquoteEmbedResolver', (parseHtml) => {
         src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
         url: 'https://www.tiktok.com/@realname/video/7001234567890123456',
         author: '@realname',
+        height: 738,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+  })
+
+  describe('the caption as the feed ships it, before the paragraph and emoji passes', () => {
+    it('should read the caption from the loose run of a section that holds no paragraph', async () => {
+      const value = html`
+        <blockquote
+          class="tiktok-embed"
+          style="max-width: 605px; min-width: 325px;"
+          cite="https://www.tiktok.com/@examplecreator/video/7001234567890123456"
+          data-video-id="7001234567890123456"
+        >
+          <section>
+            <a
+              title="@examplecreator"
+              href="https://www.tiktok.com/@examplecreator?refer=embed"
+              target="_blank"
+              rel="noopener"
+              >@examplecreator</a
+            >
+            A scene from the festival.
+            <a
+              title="film"
+              href="https://www.tiktok.com/tag/film?refer=embed"
+              target="_blank"
+              rel="noopener"
+              >#film</a
+            >
+          </section>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@examplecreator/video/7001234567890123456',
+        src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
+        url: 'https://www.tiktok.com/@examplecreator/video/7001234567890123456',
+        description: '@examplecreator A scene from the festival. #film',
+        author: '@examplecreator',
+        height: 738,
+      }
+
+      expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read an emoji image in the caption by its alt', async () => {
+      const value = html`
+        <blockquote
+          class="tiktok-embed"
+          cite="https://www.tiktok.com/@examplebaker/video/7001234567890123456"
+          data-video-id="7001234567890123456"
+          data-embed-from="oembed"
+        >
+          <section>
+            <a
+              target="_blank"
+              title="@examplebaker"
+              href="https://www.tiktok.com/@examplebaker?refer=embed"
+              >@examplebaker</a
+            >
+            <p>
+              Purin
+              <img
+                src="https://example.com/emoji/72x72/1f36e.png"
+                alt="🍮"
+                class="wp-smiley"
+                style="height: 1em; max-height: 1em;"
+              />
+              the best wobbly pudding
+            </p>
+          </section>
+        </blockquote>
+      `
+      const expected: EmbedResolverResult = {
+        provider: 'tiktok',
+        id: '@examplebaker/video/7001234567890123456',
+        src: 'https://www.tiktok.com/embed/v2/7001234567890123456',
+        url: 'https://www.tiktok.com/@examplebaker/video/7001234567890123456',
+        description: 'Purin 🍮 the best wobbly pudding',
+        author: '@examplebaker',
         height: 738,
       }
 
