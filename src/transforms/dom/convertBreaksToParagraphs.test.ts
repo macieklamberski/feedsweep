@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../../index.js'
-import { baseContext, describeForEachParser } from '../../tests.js'
+import { baseContext, describeForEachParser, html } from '../../tests.js'
 import type { TransformContext } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { convertBreaksToParagraphs } from './convertBreaksToParagraphs.js'
@@ -121,6 +121,104 @@ describeForEachParser('convertBreaksToParagraphs', (parseHtml) => {
       expect(await transform(value)).toEqualHtml(expected)
     })
 
+    it('should wrap the text at the edges of two block chunks in paragraphs', async () => {
+      const value = html`
+        <div>
+          <div>Player</div>Relaxing to.<br><br>
+          <a href="https://example.com">Listen</a><div>Player</div>
+        </div>
+      `
+      const expected = html`
+        <div>
+          <div>Player</div>
+          <p>Relaxing to.</p>
+          <p><a href="https://example.com">Listen</a></p>
+          <div>Player</div>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should drop the break between two block chunks meeting at a block', async () => {
+      const value = '<div>Intro<div>One</div><br><br><div>Two</div>Outro</div>'
+      const expected = '<div>Intro<div>One</div><div>Two</div>Outro</div>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should drop the break between two block chunks with text at one edge only', async () => {
+      const value = '<div><div>One</div>Outro<br><br><div>Two</div>Intro</div>'
+      const expected = '<div><div>One</div>Outro<div>Two</div>Intro</div>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should drop the break between two block chunks with text after it only', async () => {
+      const value = '<div><div>One</div><br><br>Intro<div>Two</div></div>'
+      const expected = '<div><div>One</div>Intro<div>Two</div></div>'
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should wrap the text at the edges of three block chunks in a row', async () => {
+      const value = html`
+        <div>
+          <div>One</div>First<br><br>Second<div>Two</div>Third<br><br>Fourth<div>Three</div>
+        </div>
+      `
+      const expected = html`
+        <div>
+          <div>One</div>
+          <p>First</p>
+          <p>Second</p>
+          <div>Two</div>
+          <p>Third</p>
+          <p>Fourth</p>
+          <div>Three</div>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should wrap the edges across an empty chunk between two block chunks', async () => {
+      const value = html`
+        <div>
+          <div>One</div>First<br><br><!--gap--><br><br>Second<div>Two</div>
+        </div>
+      `
+      const expected = html`
+        <div>
+          <div>One</div>
+          <p>First</p>
+          <p>Second</p>
+          <div>Two</div>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should drop the break between text and an iframe at a block chunk edge', async () => {
+      const value = html`
+        <div>
+          <div>One</div>
+          <span>Available</span><br><br><iframe src="https://example.com/player"></iframe>
+          <div>Two</div>
+        </div>
+      `
+      const expected = html`
+        <div>
+          <div>One</div>
+          <span>Available</span><iframe src="https://example.com/player"></iframe>
+          <div>Two</div>
+        </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
     it('should drop leading <br><br>', async () => {
       const value = '<div><br><br>Text</div>'
       const expected = '<div><p>Text</p></div>'
@@ -210,6 +308,15 @@ describeForEachParser('convertBreaksToParagraphs', (parseHtml) => {
 
       expect(twice).toEqualHtml(once)
     })
+
+    it('should be idempotent on block chunks with text at their edges', async () => {
+      const value =
+        '<div><div>One</div>First<br><br>Second<div>Two</div>Third<br><br>Fourth<div>Three</div></div>'
+      const once = await transform(value)
+      const twice = await transform(once)
+
+      expect(twice).toEqualHtml(once)
+    })
   })
 })
 
@@ -221,6 +328,23 @@ describeForEachParser('convertBreaksToParagraphs through the pipeline', (parseHt
   it('should split double-break prose into paragraphs', async () => {
     const value = '<div>One<br><br>Two</div>'
     const expected = '<p>One</p><p>Two</p>'
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
+  it('should split the text between two block chunks into paragraphs', async () => {
+    const value = html`
+      <div>
+        <div>Player</div>Relax.<br><br>
+        <a href="https://example.com">Listen</a><div>Player</div>
+      </div>
+    `
+    const expected = html`
+      <p>Player</p>
+      <p>Relax.</p>
+      <p><a href="https://example.com">Listen</a></p>
+      <p>Player</p>
+    `
 
     expect(await convert(value)).toEqualHtml(expected)
   })
