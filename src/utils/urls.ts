@@ -68,6 +68,16 @@ export const stripUrlIgnorableChars = (url: string): string => {
   return url.replace(urlEdgeCharsRegex, '').replace(urlTabOrNewlineRegex, '')
 }
 
+const javascriptSchemeRegex = /^javascript:/i
+
+const deadHrefs = ['', '#']
+
+// An empty, bare # or javascript: href looks clickable and goes nowhere. A javascript: href is
+// left over from an interactive widget whose script context is gone.
+export const isDeadHref = (href: string): boolean => {
+  return deadHrefs.includes(href.trim()) || javascriptSchemeRegex.test(stripUrlIgnorableChars(href))
+}
+
 // No m3u8 or mpd: only Safari plays them natively, so promoting one breaks the player elsewhere.
 export const imageFileRegex = new RegExp(`\\.(${webImageExtensions.join('|')})(\\?|#|$)`, 'i')
 export const videoFileRegex = new RegExp(`\\.(${webVideoExtensions.join('|')})(\\?|#|$)`, 'i')

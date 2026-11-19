@@ -67,6 +67,51 @@ describeForEachParser('convertBloggerCaptionTables', (parseHtml) => {
     })
   })
 
+  describe('a placeholder over one caption cell', () => {
+    it('should convert the table into a figure holding the placeholder and the caption', async () => {
+      const value = html`
+        <table class="tr-caption-container">
+          <tbody>
+            <tr>
+              <td><div data-embed-provider="flickr" data-embed-id="p/AbC123"></div></td>
+            </tr>
+            <tr>
+              <td class="tr-caption">Harbour at dawn</td>
+            </tr>
+          </tbody>
+        </table>
+      `
+      const expected = html`
+        <figure>
+          <div data-embed-provider="flickr" data-embed-id="p/AbC123"></div>
+          <figcaption>Harbour at dawn</figcaption>
+        </figure>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep the table when the caption cell holds a placeholder', async () => {
+      const value = html`
+        <table class="tr-caption-container">
+          <tbody>
+            <tr>
+              <td><img src="https://example.org/harbour.jpg"></td>
+            </tr>
+            <tr>
+              <td class="tr-caption">
+                Harbour at dawn
+                <div data-embed-provider="youtube" data-embed-id="abc123"></div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      `
+
+      expect(await transform(value)).toEqualHtml(value)
+    })
+  })
+
   describe('Variant #3: a link around a span around the image', () => {
     it('should keep the link with the span it holds', async () => {
       const value = html`

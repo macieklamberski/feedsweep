@@ -5,7 +5,9 @@ import {
   headingSelector,
   isElement,
   isMediaElement,
+  isPlaceholder,
   mediaSelector,
+  placeholderSelector,
   text,
 } from '../../utils/dom.js'
 import { isSamePage } from '../../utils/urls.js'
@@ -47,7 +49,11 @@ const interactiveAttrRegex = /toggle|accordion|collapse/i
 // render (e.g. `<span class="anchor">#intro</span>`).
 const isGlyphMarker = (node: Node, fragment: string): boolean => {
   // An image or player has no text but is content, never a marker.
-  if (isMediaElement(node) || (isElement(node) && node.querySelector(mediaSelector))) {
+  if (isMediaElement(node) || isPlaceholder(node)) {
+    return false
+  }
+
+  if (isElement(node) && node.querySelector(`${mediaSelector}, ${placeholderSelector}`)) {
     return false
   }
 

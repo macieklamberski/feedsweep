@@ -4,10 +4,11 @@ import {
   isElement,
   isNonWhitespaceText,
   NodeFilter,
+  placeholderSelector,
   setInnerHtml,
 } from '../../utils/dom.js'
 
-const mediaSelector = 'img, picture, video, audio, iframe, svg'
+const mediaSelector = `img, picture, video, audio, iframe, svg, ${placeholderSelector}`
 
 const whitespaceRunRegex = /\s+/g
 

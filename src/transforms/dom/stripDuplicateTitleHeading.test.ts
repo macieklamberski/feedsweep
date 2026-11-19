@@ -229,6 +229,27 @@ describeForEachParser('stripDuplicateTitleHeading', (parseHtml) => {
       expect(await transform(value, context)).toEqualHtml(value)
     })
 
+    it('should leave a matching heading alone when a placeholder precedes it', async () => {
+      const value = html`
+        <div data-embed-provider="youtube" data-embed-id="abc123"></div>
+        <h1>Breaking News Today</h1>
+        <p>Body.</p>
+      `
+      const context: TransformContext = { ...baseContext, articleTitle: 'Breaking News Today' }
+
+      expect(await transform(value, context)).toEqualHtml(value)
+    })
+
+    it('should leave a matching heading alone when it holds a placeholder', async () => {
+      const value = html`
+        <h1>Breaking News Today<div data-embed-provider="youtube" data-embed-id="abc123"></div></h1>
+        <p>Body.</p>
+      `
+      const context: TransformContext = { ...baseContext, articleTitle: 'Breaking News Today' }
+
+      expect(await transform(value, context)).toEqualHtml(value)
+    })
+
     it('should leave a run of headings alone when together they overshoot the title', async () => {
       const value = html`
         <h1>Breaking News</h1>

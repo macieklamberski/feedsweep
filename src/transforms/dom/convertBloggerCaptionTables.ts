@@ -1,10 +1,16 @@
 import type { DomTransform } from '../../types.js'
-import { hasText, isElement, isWhitespaceText, mediaSelector } from '../../utils/dom.js'
+import {
+  hasText,
+  isElement,
+  isWhitespaceText,
+  mediaSelector,
+  placeholderSelector,
+} from '../../utils/dom.js'
 import { createCaptionedFigure } from '../../utils/widgets.js'
 
 const jumpTargetSelector = '[id], [name]'
 
-const captionContentSelector = `${mediaSelector}, table`
+const captionContentSelector = `${mediaSelector}, ${placeholderSelector}, table`
 
 const isEmpty = (element: Element): boolean => {
   if (hasText(element) || element.matches(captionContentSelector)) {
@@ -48,9 +54,9 @@ const holdsOnlyImage = (cell: Element, image: Element): boolean => {
   return true
 }
 
-// The one image in the cell, with the link around it in the cell when there is one.
+// The one image or placeholder in the cell, with the link around it in the cell when there is one.
 const readImage = (cell: Element): Element | undefined => {
-  const images = cell.querySelectorAll('img')
+  const images = cell.querySelectorAll(`img, ${placeholderSelector}`)
 
   if (images.length !== 1) {
     return

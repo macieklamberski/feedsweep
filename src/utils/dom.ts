@@ -400,7 +400,7 @@ export const dissolvingTags = ['div', 'article', 'section', 'main', 'header', 'f
 // by unwrapWrappers) gets an element to carry caption spacing and styling.
 export const alwaysWrapTags = ['body', 'figure']
 
-// Standalone media at a run's edge (bare or wrapped in a textless anchor/span)
+// Standalone media or a placeholder at a run's edge (bare or wrapped in a textless anchor/span)
 // renders as a block of its own. Pulling it into the text's paragraph would glue
 // the text to it and hide it from media-specific styling.
 export const isMediaBoundary = (node: Node): boolean => {
@@ -416,7 +416,11 @@ export const isMediaBoundary = (node: Node): boolean => {
     return false
   }
 
-  return node.matches(mediaSelector) || node.querySelector(mediaSelector) !== null
+  return (
+    node.matches(mediaSelector) ||
+    node.querySelector(mediaSelector) !== null ||
+    node.querySelector(placeholderSelector) !== null
+  )
 }
 
 // The index past a run of two or more <br> starting at `index`, whitespace between them
@@ -598,11 +602,20 @@ export const isGeneratedWrapper = (element: Element): boolean => {
   return element.getAttributeNames().some((name) => startsWithAnyOf(name, generatedWrapperPrefixes))
 }
 
+// A frame no resolver claims keeps its src as an embed placeholder with no provider.
 export const placeholderSelectors = [
   '[data-embed-provider]',
+  '[data-embed-src]',
   '[data-cite-provider]',
   '[data-file-url]',
 ]
+
+export const placeholderSelector = placeholderSelectors.join(', ')
+
+// The reader renders a placeholder as a player or a card on its own line, as it does media.
+export const isPlaceholder = (node: Node): boolean => {
+  return isElement(node) && node.matches(placeholderSelector)
+}
 
 // A player url or embed attribute states `200`, or `200px` where the publisher wrote the unit.
 // Not shared with dimensionAttribute: removeTrackingPixels needs 0, 1 and 2 to parse there.

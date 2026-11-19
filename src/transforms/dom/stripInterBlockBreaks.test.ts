@@ -174,6 +174,62 @@ describeForEachParser('stripInterBlockBreaks', (parseHtml) => {
     expect(await transform(value)).toEqualHtml(expected)
   })
 
+  it('should remove br between an embed placeholder and following bare text', async () => {
+    const value = '<div data-embed-provider="youtube" data-embed-id="abc123"></div><br>Caption text'
+    const expected = '<div data-embed-provider="youtube" data-embed-id="abc123"></div>Caption text'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should remove br between an unclaimed frame placeholder and following bare text', async () => {
+    const value = '<div data-embed-src="https://example.com/embed/1"></div><br>Caption text'
+    const expected = '<div data-embed-src="https://example.com/embed/1"></div>Caption text'
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should remove br between a cite placeholder and following bare text', async () => {
+    const value = html`
+      <div data-cite-provider="wordpress" data-cite-url="https://example.com/post"></div>
+      <br>
+      Caption text
+    `
+    const expected = html`
+      <div data-cite-provider="wordpress" data-cite-url="https://example.com/post"></div>
+      Caption text
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should remove br between a file placeholder and following bare text', async () => {
+    const value = html`
+      <div data-file-url="https://example.com/report.pdf" data-file-name="report.pdf"></div>
+      <br>
+      Caption text
+    `
+    const expected = html`
+      <div data-file-url="https://example.com/report.pdf" data-file-name="report.pdf"></div>
+      Caption text
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
+  it('should remove br between a span holding only a placeholder and following bare text', async () => {
+    const value = html`
+      <span><div data-embed-provider="youtube" data-embed-id="abc123"></div></span>
+      <br>
+      Caption text
+    `
+    const expected = html`
+      <span><div data-embed-provider="youtube" data-embed-id="abc123"></div></span>
+      Caption text
+    `
+
+    expect(await transform(value)).toEqualHtml(expected)
+  })
+
   it('should preserve br between a link with text beside its image and following text', async () => {
     const value = html`
       <p>

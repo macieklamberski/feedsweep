@@ -57,6 +57,16 @@ describeForEachParser('wordpressCiteResolver', (parseHtml) => {
       expect(await extract(value)).toBeUndefined()
     })
 
+    it('should return undefined when the link is a bare hash', async () => {
+      const value = html`
+        <blockquote class="wp-embedded-content">
+          <a href="#">Post title</a>
+        </blockquote>
+      `
+
+      expect(await extract(value)).toBeUndefined()
+    })
+
     it('should not match a plain blockquote', async () => {
       const value = html`
         <blockquote>

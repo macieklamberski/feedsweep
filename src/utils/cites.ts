@@ -1,5 +1,6 @@
 import { isString, type PartialNullish } from 'trousse'
 import type { CiteResolverResult } from '../types.js'
+import { isDeadHref } from './urls.js'
 
 // What a resolver scrapes: the result fields as the markup or the JSON blob carries them,
 // untrimmed and nullish wherever the field is absent.
@@ -18,7 +19,8 @@ export const buildCite = (result: RawCiteResult): CiteResolverResult | undefined
   const url = trim(result.url)
   const title = trim(result.title)
 
-  if (!url || !title) {
+  // A card whose link goes nowhere cites nothing, as a WordPress post embed's `href="#"` shows.
+  if (!url || !title || isDeadHref(url)) {
     return
   }
 

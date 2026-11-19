@@ -198,15 +198,6 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // image passes below dimension and proxy it like any other.
   fixSubstackImageLinks,
 
-  // Wraps Cargo (cargo.site) portfolio images in <figure> here in the normalize
-  // cluster, so wrapBareInlineInParagraphs later sees block boundaries and keeps the
-  // caption, images, and PREV/NEXT nav apart instead of gluing them into one paragraph.
-  wrapCargoGalleryImages,
-
-  // Runs before wrapTablesForScroll, which wraps the caption table as a data table, and before
-  // canonicalizeAlignment, so alignment set on the link around the image lands on the figure.
-  convertBloggerCaptionTables,
-
   // Converts AMP custom elements into their native HTML equivalents so the image/embed
   // transforms below can dimension, placeholder, and proxy them. Runs in this normalize
   // cluster so an amp-iframe becomes an <iframe> before convertWidgets, and an amp-img an
@@ -238,11 +229,6 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   convertAsciinemaEmbeds,
   convertGiphyEmbeds,
   convertSmartframeEmbeds,
-  unwrapDoublyNestedLists,
-
-  // Runs before flattenPictureElements and unwrapWrappers so an alignment signal on
-  // a soon-dissolved <picture> or wrapper <div> is relocated onto the surviving media.
-  canonicalizeAlignment,
 
   // Recovers a real <img> from a lazy-image container (a media-less <div>/<figure>
   // carrying an image-shaped lazy src) before the image transforms run, so the
@@ -265,19 +251,45 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // resolveMediaDimensions, which drops any width/height that is not a positive integer. A
   // declared `0` is what marks the dominant beacon shape, so reading it has to happen first.
   removeTrackingPixels,
-  resolveMediaDimensions,
-  flattenPictureElements,
-  hoistFigcaptionFromAnchor,
   stripNonContentElements,
-
-  // Runs before wrapBareInlineInParagraphs, which puts the title in a paragraph of its own.
-  convertUcozSpoilerButtons,
   resolveRelativeUrls,
   cleanAnchorUrls,
 
   // Runs after resolveRelativeUrls, so the probe a resolver answers for carries an absolute url
   // where the link was protocol-relative, and before convertWidgets, which claims the frame.
   rebuildEmbedPrivacyLinks,
+
+  // Runs after stripNonContentElements, which can take the link out of a post embed's
+  // blockquote, and before convertCiteCards replaces the blockquote it pairs by.
+  stripWordpressEmbedFrames,
+  convertCiteCards,
+
+  // Runs before convertWidgets, which replaces the iframes its playable guard relies on.
+  convertParkedMediaContainers,
+
+  // Runs before every pass below that reshapes the post, so each resolver reads the markup the
+  // feed shipped.
+  convertWidgets,
+
+  // Wraps Cargo (cargo.site) portfolio images in <figure> before wrapBareInlineInParagraphs, so
+  // it sees block boundaries and keeps the caption, images, and PREV/NEXT nav apart instead of
+  // gluing them into one paragraph.
+  wrapCargoGalleryImages,
+
+  // Runs before wrapTablesForScroll, which wraps the caption table as a data table, and before
+  // canonicalizeAlignment, so alignment set on the link around the image lands on the figure.
+  convertBloggerCaptionTables,
+  unwrapDoublyNestedLists,
+
+  // Runs before flattenPictureElements and unwrapWrappers so an alignment signal on
+  // a soon-dissolved <picture> or wrapper <div> is relocated onto the surviving media.
+  canonicalizeAlignment,
+  resolveMediaDimensions,
+  flattenPictureElements,
+  hoistFigcaptionFromAnchor,
+
+  // Runs before wrapBareInlineInParagraphs, which puts the title in a paragraph of its own.
+  convertUcozSpoilerButtons,
 
   // Runs after cleanAnchorUrls, whose cleanUrlFn can unwrap a redirect around a link to this
   // same page, and before normalizeAnchoredHeadings so heading permalinks are already bare
@@ -287,12 +299,6 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // Runs after cleanAnchorUrls so the href it inspects is already cleaned/resolved,
   // and before stripDeadAnchors so a `#`-only permalink isn't unwrapped first.
   normalizeAnchoredHeadings,
-  stripDeadAnchors,
-
-  // Runs after stripNonContentElements and stripDeadAnchors, which can take the link out of a
-  // post embed's blockquote, and before convertCiteCards replaces the blockquote it pairs by.
-  stripWordpressEmbedFrames,
-  convertCiteCards,
 
   // Compares the first heading's text with the article title, so it runs after
   // normalizeAnchoredHeadings has dropped the permalink glyph (`#`, `¶`) a generator puts
@@ -341,10 +347,6 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   stripWordBreaks,
   linkifyUrls,
   markTimestamps,
-
-  // Runs before convertWidgets, which replaces the iframes its playable guard relies on.
-  convertParkedMediaContainers,
-  convertWidgets,
   injectEnclosures,
 
   // Runs after injectEnclosures, and so after the heuristic stripDuplicateEnclosures folded in
@@ -363,6 +365,10 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // their urls resolved and cleaned, and before neutralize/proxy so any enriched URLs are
   // still neutralized and proxied.
   enrichCitePlaceholders,
+
+  // Runs after the widget passes, which read a link as the feed shipped it, and before
+  // neutralizeUnsafeUrls, which turns a `javascript:` href into a live `#unsafe-link`.
+  stripDeadAnchors,
 
   // Neutralizes unsafe URLs (dangerous-scheme floor + optional isSafeUrlFn) after embeds
   // and cites are placeholdered, so it covers their data-* URLs, and before
