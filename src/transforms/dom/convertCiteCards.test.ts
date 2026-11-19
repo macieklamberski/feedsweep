@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'bun:test'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
-import type { CiteResolver, TransformContext } from '../../types.js'
+import type { TransformContext, WidgetResolver } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { convertCiteCards } from './convertCiteCards.js'
 
 // Reads cite fields off a `.card` element's data-* attributes.
-const cardResolver: CiteResolver = {
+const cardResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   selector: '.card',
   extract: (element) => {
@@ -30,7 +31,7 @@ const cardResolver: CiteResolver = {
 describeForEachParser('convertCiteCards', (parseHtml) => {
   const transform = (
     value: string,
-    citeResolvers: Array<CiteResolver>,
+    citeResolvers: Array<WidgetResolver>,
     context: TransformContext = baseContext,
   ) => {
     return applyDomTransforms(parseHtml(value), [
@@ -80,7 +81,8 @@ describeForEachParser('convertCiteCards', (parseHtml) => {
     })
 
     it('should run each resolver in the registry', async () => {
-      const resolverA: CiteResolver = {
+      const resolverA: WidgetResolver = {
+        step: 'block',
         kind: 'cite',
         selector: '.a',
         extract: (element) => {
@@ -97,7 +99,8 @@ describeForEachParser('convertCiteCards', (parseHtml) => {
           }
         },
       }
-      const resolverB: CiteResolver = {
+      const resolverB: WidgetResolver = {
+        step: 'block',
         kind: 'cite',
         selector: '.b',
         extract: (element) => {
@@ -135,7 +138,8 @@ describeForEachParser('convertCiteCards', (parseHtml) => {
     })
 
     it('should support a resolver with a promise-returning extract', async () => {
-      const asyncResolver: CiteResolver = {
+      const asyncResolver: WidgetResolver = {
+        step: 'block',
         kind: 'cite',
         selector: '.card',
         extract: (element) => {

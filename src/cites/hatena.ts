@@ -1,5 +1,5 @@
 import { getQueryParam, isHostOf, parseUrl, startsWithAnyOf } from 'trousse'
-import type { CiteResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 import { parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
@@ -28,7 +28,8 @@ const isSelfHosted = (source: string, citationHref: string | undefined): boolean
 
 // Hatena Blog's link card: an iframe at its card renderer, with a <cite> holding the real link.
 // The iframe is the element replaced, so prose the author wrote beside it in its paragraph stays.
-export const hatenaCiteResolver: CiteResolver = {
+export const hatenaCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   selector: `${cardClassSelector}, iframe[src]`,
   extract: (element, context) => {

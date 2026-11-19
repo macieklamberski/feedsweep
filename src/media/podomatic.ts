@@ -1,5 +1,5 @@
 import { encodePathSegment, getPathSegments, isAnyOf, startsWithAnyOf } from 'trousse'
-import type { MediaResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { matchUrl, pluginCarrierSelector, readCarrierUrlOnHosts } from '../utils/widgets.js'
@@ -10,7 +10,8 @@ const playerPath = '/swf/joeplayer'
 // Podomatic's Flash "joeplayer", whose `jsonLocation` flashvar names the episode by its timestamp
 // in `{sub}.podomatic.com/entry/embed_params/{timestamp}`. Flash no longer runs, so it renders
 // nothing, and the same timestamp names the episode's file on `/enclosure/{timestamp}.mp3`.
-export const podomaticFlashMediaResolver: MediaResolver = {
+export const podomaticFlashMediaResolver: WidgetResolver = {
+  step: 'block',
   kind: 'media',
   selector: pluginCarrierSelector,
   extract: (element, context) => {

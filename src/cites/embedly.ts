@@ -1,4 +1,4 @@
-import type { CiteResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 
@@ -6,7 +6,8 @@ const provider = 'embedly'
 
 // Embedly's blockquote card: a title link and a description that only platform.js hydrates.
 // The thumbnail and publisher exist only in the hydrated iframe.
-export const embedlyCiteResolver: CiteResolver = {
+export const embedlyCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   // The bare a.embedly-card stays: it already renders as the titled link a placeholder would fall
   // back to, and replacing an inline anchor with a block breaks its paragraph.

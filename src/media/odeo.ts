@@ -1,5 +1,5 @@
 import { getPathSegments, isAnyOf } from 'trousse'
-import type { MediaResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { matchUrl, pluginCarrierSelector, readCarrierUrlOnHosts } from '../utils/widgets.js'
@@ -11,7 +11,8 @@ const deadFileHosts = ['media.odeo.com']
 
 // Odeo's 2006 Flash audio player, which names the episode's own file in `external_url`. The
 // player is gone and the file it names is usually on the publisher's own host.
-export const odeoMediaResolver: MediaResolver = {
+export const odeoMediaResolver: WidgetResolver = {
+  step: 'block',
   kind: 'media',
   selector: pluginCarrierSelector,
   extract: (element, context) => {

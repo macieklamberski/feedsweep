@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
 import { baseContext, describeForEachParser, html, resolverExtractor } from '../tests.js'
-import { convertCiteCards } from '../transforms/dom/convertCiteCards.js'
+import { convertWidgets } from '../transforms/dom/convertWidgets.js'
 import type { CiteResolverResult, TransformContext } from '../types.js'
 import { applyDomTransforms } from '../utils/transforms.js'
 import { affingerCiteResolver } from './affinger.js'
@@ -15,7 +15,7 @@ describeForEachParser('affingerCiteResolver', (parseHtml) => {
       widgetResolvers: [affingerCiteResolver],
     }
 
-    return applyDomTransforms(parseHtml(value), [convertCiteCards(context)])
+    return applyDomTransforms(parseHtml(value), [convertWidgets(context)])
   }
 
   describe('happy paths', () => {
@@ -243,7 +243,7 @@ describeForEachParser('affingerCiteResolver', (parseHtml) => {
     })
   })
 
-  describe('through convertCiteCards', () => {
+  describe('through convertWidgets', () => {
     it('should replace the wrapping anchor along with the card', async () => {
       const value = html`
         <a href="https://example.com/post" class="st-cardlink">

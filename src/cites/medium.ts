@@ -1,4 +1,4 @@
-import type { CiteResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text, textNode } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
@@ -7,7 +7,8 @@ const provider = 'medium'
 
 // Medium's mixtape link card: two anchors, the thumbnail as a CSS background with no <img>.
 // Current Medium feeds carry no card: it arrives through exported archives on personal sites.
-export const mediumCiteResolver: CiteResolver = {
+export const mediumCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   // Exports drop the .graf--mixtapeEmbed wrapper, leaving the bare anchor.
   selector: '.graf--mixtapeEmbed, a.markup--mixtapeEmbed-anchor:not(.graf--mixtapeEmbed a)',

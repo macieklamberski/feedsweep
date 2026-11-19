@@ -1,11 +1,12 @@
-import type { CiteResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 
 // BuddyPress's link preview: unfurled into the activity update as bare divs the theme styles.
 // BuddyBoss, built on BuddyPress, ships the same preview under its own class prefix.
-export const createLinkPreviewCiteResolver = (provider: string, prefix: string): CiteResolver => {
+export const createLinkPreviewCiteResolver = (provider: string, prefix: string): WidgetResolver => {
   return {
+    step: 'block',
     kind: 'cite',
     selector: `.${prefix}-container`,
     extract: (element) => {

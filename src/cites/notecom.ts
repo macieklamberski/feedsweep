@@ -1,4 +1,4 @@
-import type { CiteResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
@@ -8,7 +8,8 @@ const provider = 'notecom'
 // note.com's external-article card, stripped of every class and style by its RSS sanitizer.
 // The sanitizer leaves <a><strong>title</strong><em>description</em><em>host</em></a>, and page
 // HTML carries the classful external-article-widget-* tree with a CSS background-image thumbnail.
-export const notecomCiteResolver: CiteResolver = {
+export const notecomCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   // The same embedded-service value also marks shopping and crowdfunding cards, which never carry
   // both a title and an anchor.

@@ -1,5 +1,5 @@
 import { encodePathSegment } from 'trousse'
-import type { MediaResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { jsonAttr } from '../utils/dom.js'
 
 // Following the redirect stores a signed url that expires.
@@ -14,7 +14,8 @@ type MediaAttrs = {
 }
 
 // Substack uploads reach a feed as an empty div naming the file by a UUID, with no url anywhere.
-export const substackMediaResolver: MediaResolver = {
+export const substackMediaResolver: WidgetResolver = {
+  step: 'block',
   kind: 'media',
   selector: '.native-video-embed, .native-audio-embed',
   extract: (element) => {

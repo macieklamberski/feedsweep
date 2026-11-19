@@ -1,11 +1,12 @@
 import { getQueryParam, parseUrl } from 'trousse'
-import type { MediaResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { audioFileRegex, placeholderBaseUrl } from '../utils/urls.js'
 import { readRepairedCarrierUrl } from '../utils/widgets.js'
 
 // A Tumblr audio post frames its player page, which a native <audio> cannot play. The page url
 // names the file in its `audio_file` query value, so the file plays as the native element.
-export const tumblrMediaResolver: MediaResolver = {
+export const tumblrMediaResolver: WidgetResolver = {
+  step: 'block',
   kind: 'media',
   selector: 'iframe.tumblr_audio_player',
   extract: (element, context) => {

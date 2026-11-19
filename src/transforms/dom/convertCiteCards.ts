@@ -2,6 +2,7 @@ import type { DomTransform } from '../../types.js'
 import { createCitePlaceholder, prepareCiteMetadata } from '../../utils/widgets.js'
 
 // Quote and link cards a cite resolver claims, shipped as the platform's own card markup.
+/** @deprecated convertWidgets converts cites first, in the same step as embeds and media. */
 export const convertCiteCards: DomTransform = (context) => {
   const citeResolvers = context.widgetResolvers.filter((resolver) => resolver.kind === 'cite')
 

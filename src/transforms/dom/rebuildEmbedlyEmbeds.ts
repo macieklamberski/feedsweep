@@ -60,7 +60,7 @@ export const rebuildEmbedlyEmbeds: DomTransform = () => (document) => {
     // The div's data attribute carries an oEmbed payload.
     const payload = jsonAttr<EmbedlyPayload>(element, 'data')
 
-    // A link payload, or one with no type, is a cite the cite pass claims.
+    // A link payload, or one with no type, is a cite a cite resolver claims.
     if (payload && (payload.type === undefined || payload.type === 'link')) {
       continue
     }

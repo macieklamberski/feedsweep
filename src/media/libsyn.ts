@@ -1,5 +1,5 @@
 import { includesAnyOf, parseUrl } from 'trousse'
-import type { MediaResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { flashVar } from '../utils/dom.js'
 import { audioFileRegex, placeholderBaseUrl } from '../utils/urls.js'
 import { matchUrl, readCarrierUrlOnHosts } from '../utils/widgets.js'
@@ -9,7 +9,8 @@ const playerPath = '/_static/play/player-licensed.swf'
 
 // A licensed JW Player `.swf` uploaded to a show's Libsyn space, which renders nothing since Flash
 // was blocked. Its `file` flashvar names the episode's own audio file.
-export const libsynMediaResolver: MediaResolver = {
+export const libsynMediaResolver: WidgetResolver = {
+  step: 'block',
   kind: 'media',
   selector: 'embed[src]',
   extract: (element, context) => {

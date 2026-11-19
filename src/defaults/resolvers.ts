@@ -523,18 +523,12 @@ import { tumblrMediaResolver } from '../media/tumblr.js'
 import { wechatMediaResolver } from '../media/wechat.js'
 import { weeblyFlashMediaResolver, weeblyVideoMediaResolver } from '../media/weebly.js'
 import { wikimediaMediaResolver } from '../media/wikimedia.js'
-import type {
-  CiteResolver,
-  EmbedResolver,
-  EmojiResolver,
-  MediaResolver,
-  WidgetResolver,
-} from '../types.js'
+import type { EmojiResolver, WidgetResolver } from '../types.js'
 
 // Alphabetical by platform, so a new resolver lands on its own line instead of at the tail.
 // Order still matters when selectors overlap: each resolver runs in array order and a claimed
 // element can't be re-matched, so a broader selector leaves the alphabet and moves below.
-const embedResolvers: Array<EmbedResolver> = [
+const embedResolvers: Array<WidgetResolver> = [
   oneTwoThreeFormBuilderScriptEmbedResolver,
   oneTwoThreeFormBuilderIframeEmbedResolver,
   channelOneEmbedResolver,
@@ -887,7 +881,7 @@ const embedResolvers: Array<EmbedResolver> = [
 
 // Alphabetical by platform. Wikimedia's bare `iframe` selector sits last so a host-keyed
 // resolver gets the carrier first.
-const mediaResolvers: Array<MediaResolver> = [
+const mediaResolvers: Array<WidgetResolver> = [
   onePixelOutFlashMediaResolver,
   onePixelOutWidgetMediaResolver,
   discourseMediaResolver,
@@ -910,7 +904,7 @@ const mediaResolvers: Array<MediaResolver> = [
 
 // Alphabetical by platform. A resolver replaces the element it matches, so a later one never
 // sees it, and a broader selector leaves the alphabet and moves below.
-const citeResolvers: Array<CiteResolver> = [
+const citeResolvers: Array<WidgetResolver> = [
   affingerCiteResolver,
   amebaCiteResolver,
   blogCardCiteResolver,
@@ -945,10 +939,11 @@ const citeResolvers: Array<CiteResolver> = [
   microformatsCiteResolver,
 ]
 
+// One block step runs them in this order, so a card claims its element before a player does.
 export const defaultWidgetResolvers: Array<WidgetResolver> = [
+  ...citeResolvers,
   ...embedResolvers,
   ...mediaResolvers,
-  ...citeResolvers,
 ]
 
 // First claim wins, so every resolver that reads a filename sits ahead of the ones that only

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 import { baseContext, describeForEachParser, html, resolverExtractor } from '../tests.js'
-import { convertCiteCards } from '../transforms/dom/convertCiteCards.js'
+import { convertWidgets } from '../transforms/dom/convertWidgets.js'
 import type { CiteResolverResult, TransformContext } from '../types.js'
 import { applyDomTransforms } from '../utils/transforms.js'
 import { mediumCiteResolver } from './medium.js'
@@ -14,7 +14,7 @@ describeForEachParser('mediumCiteResolver', (parseHtml) => {
       widgetResolvers: [mediumCiteResolver],
     }
 
-    return applyDomTransforms(parseHtml(value), [convertCiteCards(context)])
+    return applyDomTransforms(parseHtml(value), [convertWidgets(context)])
   }
 
   describe('happy paths', () => {
@@ -172,7 +172,7 @@ describeForEachParser('mediumCiteResolver', (parseHtml) => {
     })
   })
 
-  describe('through convertCiteCards', () => {
+  describe('through convertWidgets', () => {
     it('should replace the wrapper so no empty image anchor is left behind', async () => {
       const value = html`
         <div class="graf graf--mixtapeEmbed">

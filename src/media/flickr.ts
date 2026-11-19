@@ -1,4 +1,4 @@
-import type { MediaResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 
@@ -11,7 +11,8 @@ const retiredRouteRegex =
 
 // A WordPress `<video src>` on a Flickr photo's play route, which no longer serves the item on
 // its retired `iphone_wifi` quality.
-export const flickrMediaResolver: MediaResolver = {
+export const flickrMediaResolver: WidgetResolver = {
+  step: 'block',
   kind: 'media',
   selector: 'video[src*="/play/iphone_wifi/" i]',
   extract: (element) => {

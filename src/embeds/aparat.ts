@@ -1,4 +1,4 @@
-import type { EmbedResolver, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
+import type { EmbedResolverResult, ResolveUrlEmbed, WidgetResolver } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { createMarkupEmbedResolver, createUrlEmbedResolver } from '../utils/widgets.js'
@@ -45,7 +45,7 @@ const aparatResolveEmbed: ResolveUrlEmbed = (url, element) => {
 }
 
 // Aparat's player iframe.
-export const aparatIframeEmbedResolver: EmbedResolver = createUrlEmbedResolver(
+export const aparatIframeEmbedResolver: WidgetResolver = createUrlEmbedResolver(
   hosts,
   aparatResolveEmbed,
 )

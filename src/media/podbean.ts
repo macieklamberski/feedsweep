@@ -1,5 +1,5 @@
 import { getPathSegments, getQueryParam, isAnyOf } from 'trousse'
-import type { MediaResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { paramValue } from '../utils/dom.js'
 import { parseUrlOnHosts } from '../utils/urls.js'
 import { matchUrl, pluginCarrierSelector, readCarrierUrl } from '../utils/widgets.js'
@@ -9,7 +9,8 @@ const playerRoute = 'podcast-audio-video-blog-player'
 
 // Podbean's Flash mp3 player, an `<embed>` or `<object>` whose swf query names the file in
 // `audioPath`. Flash no longer runs, so it renders nothing.
-export const podbeanFlashMediaResolver: MediaResolver = {
+export const podbeanFlashMediaResolver: WidgetResolver = {
+  step: 'block',
   kind: 'media',
   selector: [
     pluginCarrierSelector,

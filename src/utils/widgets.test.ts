@@ -11,11 +11,10 @@ import {
 import type {
   CiteResolverResult,
   CleanUrlFn,
-  EmbedResolver,
   EmbedResolverResult,
-  MediaResolver,
   MediaResolverResult,
   TransformContext,
+  WidgetResolver,
 } from '../types.js'
 import {
   atUsername,
@@ -1084,7 +1083,7 @@ describeForEachParser('createCitePlaceholder', (parseHtml) => {
 describeForEachParser('readCarrierSize', (parseHtml) => {
   const base: EmbedResolverResult = { provider: 'example', id: 'abc', src: 'https://x.test/abc' }
 
-  const extractResult = (resolver: EmbedResolver, value: string) => {
+  const extractResult = (resolver: WidgetResolver, value: string) => {
     const element = parseHtml(value).querySelector(resolver.selector)
 
     if (!element) {
@@ -2181,7 +2180,8 @@ describeForEachParser('createUrlEmbedResolver', (parseHtml) => {
 })
 
 describeForEachParser('resolveEmbedProbe', (parseHtml) => {
-  const embedResolver: EmbedResolver = {
+  const embedResolver: WidgetResolver = {
+    step: 'block',
     kind: 'embed',
     selector: 'iframe[src*="player.example"]',
     extract: () => ({ provider: 'example', id: 'abc' }),
@@ -2198,7 +2198,8 @@ describeForEachParser('resolveEmbedProbe', (parseHtml) => {
   })
 
   it('should skip a resolver whose selector the probe does not match', async () => {
-    const scriptResolver: EmbedResolver = {
+    const scriptResolver: WidgetResolver = {
+      step: 'block',
       kind: 'embed',
       selector: 'script[src]',
       extract: () => ({ provider: 'script' }),
@@ -2215,7 +2216,8 @@ describeForEachParser('resolveEmbedProbe', (parseHtml) => {
   })
 
   it('should skip a media result for a later embed', async () => {
-    const mediaResolver: MediaResolver = {
+    const mediaResolver: WidgetResolver = {
+      step: 'block',
       kind: 'media',
       selector: 'iframe',
       extract: () => ({ tag: 'video', src: 'https://player.example/abc.mp4' }),
@@ -2266,7 +2268,8 @@ describe('toPlayerKey', () => {
 })
 
 describeForEachParser('readPlayer', (parseHtml) => {
-  const embedResolver: EmbedResolver = {
+  const embedResolver: WidgetResolver = {
+    step: 'block',
     kind: 'embed',
     selector: 'iframe[src*="player.example"]',
     extract: () => ({ provider: 'example', id: 'abc' }),
@@ -2288,7 +2291,8 @@ describeForEachParser('readPlayer', (parseHtml) => {
     const document = parseHtml(
       '<div><iframe src="https://player.example/abc"></iframe><p>Caption</p></div>',
     )
-    const removingResolver: EmbedResolver = {
+    const removingResolver: WidgetResolver = {
+      step: 'block',
       kind: 'embed',
       selector: 'iframe[src*="player.example"]',
       extract: (element) => {

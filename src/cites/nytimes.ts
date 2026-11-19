@@ -1,5 +1,5 @@
 import { getQueryParam, isAnyOf, parseUrl } from 'trousse'
-import type { CiteResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr } from '../utils/dom.js'
 import { absoluteUrlRegex } from '../utils/urls.js'
@@ -14,7 +14,8 @@ const articleBaseUrl = 'https://www.nytimes.com'
 // The Times' oEmbed answer: an iframe of its own article card, a link card and not a player.
 // The card is a headline, byline, date and summary linking to the article. WordPress emits it
 // for a pasted article link, and the snippet states the headline in the iframe's title.
-export const nytimesCiteResolver: CiteResolver = {
+export const nytimesCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   selector: 'iframe[src]',
   extract: (element, context) => {

@@ -1,11 +1,12 @@
-import type { MediaResolver, MediaResolverResult } from '../types.js'
+import type { MediaResolverResult, WidgetResolver } from '../types.js'
 import { attr, find, getElementDimensions, text } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
 
 // Ghost's video and audio cards ship their media element without controls, so it never plays.
 // Feeds from after Ghost's June 2026 RSS cleanup carry neither container and are left alone.
 // The card's scripted player chrome ships with the element and survives in a feed as junk.
-export const ghostMediaResolver: MediaResolver = {
+export const ghostMediaResolver: WidgetResolver = {
+  step: 'block',
   kind: 'media',
   // Matching the card instead of its player container would drop the figcaption and cover image.
   selector: '.kg-video-card .kg-video-container, .kg-audio-card .kg-audio-player-container',

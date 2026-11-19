@@ -1,12 +1,13 @@
 import { composeFilePathUrl, composeFileTitle } from '../embeds/wikimedia.js'
-import type { MediaResolver, MediaResolverResult } from '../types.js'
+import type { MediaResolverResult, WidgetResolver } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { audioFileRegex, isMediaWikiFilePage, parseMediaWikiFileName } from '../utils/urls.js'
 import { readRepairedCarrierUrl } from '../utils/widgets.js'
 
 // A MediaWiki file page for audio frames a player 20 pixels tall, and `Special:FilePath` offers
 // it only a generic file icon in place of a poster, so the file plays as a native element.
-export const wikimediaMediaResolver: MediaResolver = {
+export const wikimediaMediaResolver: WidgetResolver = {
+  step: 'block',
   kind: 'media',
   selector: 'iframe',
   extract: (element, context) => {

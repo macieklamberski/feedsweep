@@ -3,11 +3,12 @@ import { defaultWidgetResolvers } from '../../defaults.js'
 import { youtubeIframeEmbedResolver } from '../../embeds/youtube.js'
 import { tumblrMediaResolver } from '../../media/tumblr.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
-import type { EmbedResolver, MediaResolver, TransformContext } from '../../types.js'
+import type { TransformContext, WidgetResolver } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { convertWidgets } from './convertWidgets.js'
 
-const stubResolver: EmbedResolver = {
+const stubResolver: WidgetResolver = {
+  step: 'block',
   kind: 'embed',
   selector: 'iframe[src*="example.com"]',
   extract: (element) => ({
@@ -161,7 +162,8 @@ describeForEachParser('convertWidgets', (parseHtml) => {
   })
 
   it('should carry the per-embed params onto the placeholder', async () => {
-    const paramsResolver: EmbedResolver = {
+    const paramsResolver: WidgetResolver = {
+      step: 'block',
       kind: 'embed',
       selector: 'iframe[src*="example.com"]',
       extract: (element) => ({
@@ -186,13 +188,170 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     expect(await transform(value, customContext)).toEqualHtml(expected)
   })
 
+  describe('cite results', () => {
+    const citeResolver: WidgetResolver = {
+      step: 'block',
+      kind: 'cite',
+      selector: 'iframe.card',
+      extract: (element) => ({
+        provider: 'card',
+        url: element.getAttribute('data-url') ?? '',
+        title: element.getAttribute('title') ?? '',
+      }),
+    }
+
+    it('should replace a card a cite resolver claims with a cite placeholder', async () => {
+      const context: TransformContext = { ...baseContext, widgetResolvers: [citeResolver] }
+      const value = html`
+        <iframe
+          class="card"
+          src="https://example.org/card"
+          data-url="https://example.org/post"
+          title="Post"
+        ></iframe>
+      `
+      const expected = html`
+        <div
+          data-cite-provider="card"
+          data-cite-url="https://example.org/post"
+          data-cite-title="Post"
+        ></div>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should give an element to the first resolver in the list that claims it', async () => {
+      const context: TransformContext = {
+        ...baseContext,
+        widgetResolvers: [citeResolver, stubResolver],
+      }
+      const value = html`
+        <iframe
+          class="card"
+          src="https://example.com/card"
+          data-url="https://example.org/post"
+          title="Post"
+        ></iframe>
+      `
+      const expected = html`
+        <div
+          data-cite-provider="card"
+          data-cite-url="https://example.org/post"
+          data-cite-title="Post"
+        ></div>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should write the form the result names, whatever kind the resolver is', async () => {
+      const resolver: WidgetResolver = {
+        step: 'block',
+        kind: 'embed',
+        selector: 'div[data-card]',
+        extract: () => ({ provider: 'card', url: 'https://example.org/post', title: 'Post' }),
+      }
+      const context: TransformContext = { ...baseContext, widgetResolvers: [resolver] }
+      const value = '<div data-card></div>'
+      const expected = html`
+        <div
+          data-cite-provider="card"
+          data-cite-url="https://example.org/post"
+          data-cite-title="Post"
+        ></div>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should write a result naming a src as an embed, even with a url and a title', async () => {
+      const resolver: WidgetResolver = {
+        step: 'block',
+        kind: 'cite',
+        selector: 'div[data-card]',
+        extract: () => ({
+          provider: 'card',
+          src: 'https://example.org/player',
+          url: 'https://example.org/post',
+          title: 'Post',
+        }),
+      }
+      const context: TransformContext = { ...baseContext, widgetResolvers: [resolver] }
+      const value = '<div data-card></div>'
+      const expected = html`
+        <div
+          data-embed-provider="card"
+          data-embed-src="https://example.org/player"
+          data-embed-url="https://example.org/post"
+          data-embed-title="Post"
+        ></div>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should write a result naming an id as an embed, even with a url and a title', async () => {
+      const resolver: WidgetResolver = {
+        step: 'block',
+        kind: 'cite',
+        selector: 'div[data-card]',
+        extract: () => ({
+          provider: 'card',
+          id: 'abc123',
+          url: 'https://example.org/post',
+          title: 'Post',
+        }),
+      }
+      const context: TransformContext = { ...baseContext, widgetResolvers: [resolver] }
+      const value = '<div data-card></div>'
+      const expected = html`
+        <div
+          data-embed-provider="card"
+          data-embed-id="abc123"
+          data-embed-url="https://example.org/post"
+          data-embed-title="Post"
+        ></div>
+      `
+
+      expect(await transform(value, context)).toEqualHtml(expected)
+    })
+
+    it('should leave a carrier whose result names a url and no title', async () => {
+      const resolver: WidgetResolver = {
+        step: 'block',
+        kind: 'cite',
+        selector: 'div[data-card]',
+        extract: () => ({ provider: 'card', url: 'https://example.org/post' }),
+      }
+      const context: TransformContext = { ...baseContext, widgetResolvers: [resolver] }
+      const value = '<div data-card></div>'
+
+      expect(await transform(value, context)).toEqualHtml(value)
+    })
+
+    it('should leave a carrier whose result names a title and no url', async () => {
+      const resolver: WidgetResolver = {
+        step: 'block',
+        kind: 'cite',
+        selector: 'div[data-card]',
+        extract: () => ({ provider: 'card', title: 'Post' }),
+      }
+      const context: TransformContext = { ...baseContext, widgetResolvers: [resolver] }
+      const value = '<div data-card></div>'
+
+      expect(await transform(value, context)).toEqualHtml(value)
+    })
+  })
+
   describe('a result with no usable src', () => {
-    const contextFor = (resolver: EmbedResolver | MediaResolver): TransformContext => {
+    const contextFor = (resolver: WidgetResolver): TransformContext => {
       return { ...baseContext, widgetResolvers: [resolver] }
     }
 
     it('should name an embed that only enrichment can play by its provider and id', async () => {
-      const resolver: EmbedResolver = {
+      const resolver: WidgetResolver = {
+        step: 'block',
         kind: 'embed',
         selector: 'div[data-live]',
         extract: (element) => ({
@@ -207,7 +366,8 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     })
 
     it('should leave a carrier whose embed names neither a src nor an id', async () => {
-      const resolver: EmbedResolver = {
+      const resolver: WidgetResolver = {
+        step: 'block',
         kind: 'embed',
         selector: 'div[data-live]',
         extract: () => ({ provider: 'example' }),
@@ -218,7 +378,8 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     })
 
     it('should leave a carrier whose embed src resolves to nothing', async () => {
-      const resolver: EmbedResolver = {
+      const resolver: WidgetResolver = {
+        step: 'block',
         kind: 'embed',
         selector: 'div[data-live]',
         extract: () => ({ provider: 'example', id: 'abc123', src: 'about:blank' }),
@@ -229,7 +390,8 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     })
 
     it('should leave a carrier whose media src resolves to nothing', async () => {
-      const resolver: MediaResolver = {
+      const resolver: WidgetResolver = {
+        step: 'block',
         kind: 'media',
         selector: 'div[data-live]',
         extract: () => ({ tag: 'audio', src: 'about:blank' }),
@@ -241,7 +403,8 @@ describeForEachParser('convertWidgets', (parseHtml) => {
   })
 
   it('should fall back to resolver metadata dimensions when the iframe has none', async () => {
-    const sizedResolver: EmbedResolver = {
+    const sizedResolver: WidgetResolver = {
+      step: 'block',
       kind: 'embed',
       selector: 'iframe[src*="example.com"]',
       extract: (element) => ({
@@ -269,7 +432,8 @@ describeForEachParser('convertWidgets', (parseHtml) => {
   })
 
   it('should support a resolver with a promise-returning extract', async () => {
-    const asyncResolver: EmbedResolver = {
+    const asyncResolver: WidgetResolver = {
+      step: 'block',
       kind: 'embed',
       selector: 'iframe[src*="example.com"]',
       extract: (element) => {
@@ -340,7 +504,8 @@ describeForEachParser('convertWidgets', (parseHtml) => {
   })
 
   it('should emit data-embed-title, description, author, avatar and duration when handler returns them', async () => {
-    const customResolver: EmbedResolver = {
+    const customResolver: WidgetResolver = {
+      step: 'block',
       kind: 'embed',
       selector: 'iframe[src*="example.com"]',
       extract: (element) => ({
@@ -376,7 +541,8 @@ describeForEachParser('convertWidgets', (parseHtml) => {
   // URL safety is neutralizeUnsafeUrls' job (see its tests); this transform only
   // emits the placeholder, so an unsafe avatar passes through here unchanged.
   it('should pass an unsafe avatar url through unchanged', async () => {
-    const customResolver: EmbedResolver = {
+    const customResolver: WidgetResolver = {
+      step: 'block',
       kind: 'embed',
       selector: 'iframe[src*="example.com"]',
       extract: (element) => ({
@@ -580,7 +746,8 @@ describeForEachParser('convertWidgets', (parseHtml) => {
   })
 
   it('should skip resolver-claimed iframe when metadata.src is unsafe', async () => {
-    const unsafeResolver: EmbedResolver = {
+    const unsafeResolver: WidgetResolver = {
+      step: 'block',
       kind: 'embed',
       selector: 'iframe[src]',
       extract: () => ({
@@ -605,7 +772,8 @@ describeForEachParser('convertWidgets', (parseHtml) => {
   // ends up naming a page on the reader's own origin. What the resolver read about the embed
   // itself is not in question, so the placeholder is still built, just without the url.
   it('should drop a resolver url that resolves to nothing and keep the rest of the embed', async () => {
-    const pathResolver: EmbedResolver = {
+    const pathResolver: WidgetResolver = {
+      step: 'block',
       kind: 'embed',
       selector: 'iframe[src]',
       extract: () => ({
@@ -705,7 +873,8 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     // A resolver that carries its url out of the markup rather than minting it from an id
     // hands over whatever the publisher pasted, so it is cleaned like every other url here.
     it('should clean a resolver url with the provided cleanUrlFn', async () => {
-      const urlResolver: EmbedResolver = {
+      const urlResolver: WidgetResolver = {
+        step: 'block',
         kind: 'embed',
         selector: 'iframe[src*="example.com"]',
         extract: () => ({
@@ -734,7 +903,8 @@ describeForEachParser('convertWidgets', (parseHtml) => {
     // Reading an empty answer as the cleaned url would leave the placeholder with no url to
     // honour, and the whole embed is dropped over that. The url handed to the cleaner stands.
     it('should keep the resolver url when the cleanUrlFn answers with nothing', async () => {
-      const urlResolver: EmbedResolver = {
+      const urlResolver: WidgetResolver = {
+        step: 'block',
         kind: 'embed',
         selector: 'iframe[src*="example.com"]',
         extract: () => ({
@@ -1269,7 +1439,7 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
     return applyDomTransforms(parseHtml(value), [convertWidgets(context)])
   }
 
-  const withResolver = (resolver: MediaResolver): TransformContext => {
+  const withResolver = (resolver: WidgetResolver): TransformContext => {
     return { ...baseContext, widgetResolvers: [resolver] }
   }
 
@@ -1361,7 +1531,8 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
   })
 
   it('should write a poster onto a video', async () => {
-    const posterResolver: MediaResolver = {
+    const posterResolver: WidgetResolver = {
+      step: 'block',
       kind: 'media',
       selector: '.poster-embed',
       extract: () => ({
@@ -1383,7 +1554,8 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
   })
 
   it('should clean a poster with the provided cleanUrlFn', async () => {
-    const posterResolver: MediaResolver = {
+    const posterResolver: WidgetResolver = {
+      step: 'block',
       kind: 'media',
       selector: '.poster-embed',
       extract: () => ({
@@ -1409,7 +1581,8 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
   })
 
   it('should not write a poster onto an audio element', async () => {
-    const posterResolver: MediaResolver = {
+    const posterResolver: WidgetResolver = {
+      step: 'block',
       kind: 'media',
       selector: '.poster-embed',
       extract: () => ({
@@ -1427,7 +1600,8 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
   // `width` and `height` are not valid on <audio>, so a resolver stating them describes a box
   // the element cannot have.
   it('should not write dimensions onto an audio element', async () => {
-    const sizedResolver: MediaResolver = {
+    const sizedResolver: WidgetResolver = {
+      step: 'block',
       kind: 'media',
       selector: '.poster-embed',
       extract: () => ({
@@ -1445,7 +1619,8 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
 
   // A native element has nowhere to put a name, so a title travels in a figcaption beside it.
   it('should hang a stated title off the media in a figcaption', async () => {
-    const titledResolver: MediaResolver = {
+    const titledResolver: WidgetResolver = {
+      step: 'block',
       kind: 'media',
       selector: '.titled-embed',
       extract: () => ({
@@ -1469,7 +1644,8 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
   })
 
   it('should mint the bare element when the title is nothing but whitespace', async () => {
-    const blankTitleResolver: MediaResolver = {
+    const blankTitleResolver: WidgetResolver = {
+      step: 'block',
       kind: 'media',
       selector: '.titled-embed',
       extract: () => ({ tag: 'audio', src: 'https://example.com/track.mp3', title: '   ' }),
@@ -1483,7 +1659,8 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
   // The markup already gives the player a figure to sit in, which is where a caption of the
   // author's own hangs, so a second one around it would nest two figures for one player.
   it('should add no figure around media landing inside one already', async () => {
-    const titledResolver: MediaResolver = {
+    const titledResolver: WidgetResolver = {
+      step: 'block',
       kind: 'media',
       selector: '.titled-embed',
       extract: () => ({
@@ -1512,7 +1689,8 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
   })
 
   it('should await an async media resolver', async () => {
-    const asyncResolver: MediaResolver = {
+    const asyncResolver: WidgetResolver = {
+      step: 'block',
       kind: 'media',
       selector: '.async-embed',
       extract: async () => ({ tag: 'video', src: 'https://example.com/clip.mp4' }),
@@ -1692,7 +1870,8 @@ describeForEachParser('convertWidgets (media results)', (parseHtml) => {
   })
 
   describe('post fields', () => {
-    const postResolver: EmbedResolver = {
+    const postResolver: WidgetResolver = {
+      step: 'block',
       kind: 'embed',
       selector: 'iframe[src*="post.example"]',
       extract: () => ({
@@ -1896,7 +2075,8 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
 
   it('should leave an element to a resolver that claims it', async () => {
     // Constructed: a resolver claiming the <audio> itself, the way a platform's audio bar does.
-    const audioResolver: EmbedResolver = {
+    const audioResolver: WidgetResolver = {
+      step: 'block',
       kind: 'embed',
       selector: 'audio.podcast-player',
       extract: () => ({
@@ -1930,7 +2110,8 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
 
   it('should leave the element and its companion markup to the resolver that claims it', async () => {
     // Constructed: a resolver that reads and removes its credit sibling, as SoundCloud's does.
-    const creditResolver: EmbedResolver = {
+    const creditResolver: WidgetResolver = {
+      step: 'block',
       kind: 'embed',
       selector: 'audio.podcast-player',
       extract: (element) => {
@@ -1973,7 +2154,8 @@ describeForEachParser('convertWidgets (media elements naming a platform page)', 
 
   it('should frame an element whose resolver selector matches but refuses it', async () => {
     // Constructed: a resolver selecting every <audio> that reads only its own platform's urls.
-    const audioResolver: EmbedResolver = {
+    const audioResolver: WidgetResolver = {
+      step: 'block',
       kind: 'embed',
       selector: 'audio',
       extract: () => undefined,

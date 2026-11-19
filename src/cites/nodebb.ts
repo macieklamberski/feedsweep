@@ -1,4 +1,4 @@
-import type { CiteResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text, textNode } from '../utils/dom.js'
 
@@ -6,7 +6,8 @@ const provider = 'nodebb'
 
 // NodeBB's link-preview plugin card: a Bootstrap card stored in the post HTML.
 // Core bundles the plugin since 4.7.0 but leaves it off, so only forums that turned it on emit it.
-export const nodebbCiteResolver: CiteResolver = {
+export const nodebbCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   // Either class alone is one any theme can mint, so the pair is the match.
   selector: '.card.link-preview',

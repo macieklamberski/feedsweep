@@ -1,11 +1,12 @@
-import type { CiteResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 
 const provider = 'cocoon'
 
 // Cocoon's blogcard: an anchor wrapping a card of divs the theme's stylesheet lays out.
-export const cocoonCiteResolver: CiteResolver = {
+export const cocoonCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   // Internal cards stay: the author places them, unlike the related-posts widgets we strip.
   selector: '.blogcard-wrap',

@@ -5,7 +5,7 @@ import { blubrryIframeEmbedResolver } from '../../embeds/blubrry.js'
 import { soundcloudEmbedResolver } from '../../embeds/soundcloud.js'
 import { youtubeIframeEmbedResolver } from '../../embeds/youtube.js'
 import { baseContext, describeForEachParser, html } from '../../tests.js'
-import type { EmbedResolver, Enclosure, TransformContext } from '../../types.js'
+import type { Enclosure, TransformContext, WidgetResolver } from '../../types.js'
 import { applyDomTransforms } from '../../utils/transforms.js'
 import { injectEnclosures } from './injectEnclosures.js'
 import { neutralizeUnsafeUrls } from './neutralizeUnsafeUrls.js'
@@ -328,7 +328,8 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
   // A placeholder built from an enclosure carries its urls on the same terms as one built from
   // the markup: every url resolved, the canonical one cleaned, and a listed provider's src cleaned.
   describe('placeholder fields', () => {
-    const exampleResolver: EmbedResolver = {
+    const exampleResolver: WidgetResolver = {
+      step: 'block',
       kind: 'embed',
       selector: 'iframe[src*="example.com"]',
       extract: () => ({
@@ -391,7 +392,7 @@ describeForEachParser('injectEnclosures', (parseHtml) => {
 
     it('should clean the src with the provided cleanUrlFn', async () => {
       const value = '<p>Content</p>'
-      const trackedResolver: EmbedResolver = {
+      const trackedResolver: WidgetResolver = {
         ...exampleResolver,
         extract: () => ({ provider: 'example', src: 'https://example.com/e/x?utm_source=feed' }),
       }

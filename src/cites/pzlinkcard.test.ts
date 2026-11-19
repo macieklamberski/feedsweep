@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 import { baseContext, describeForEachParser, html, resolverExtractor } from '../tests.js'
-import { convertCiteCards } from '../transforms/dom/convertCiteCards.js'
+import { convertWidgets } from '../transforms/dom/convertWidgets.js'
 import type { CiteResolverResult, TransformContext } from '../types.js'
 import { applyDomTransforms } from '../utils/transforms.js'
 import { pzlinkcardCiteResolver } from './pzlinkcard.js'
@@ -16,7 +16,7 @@ describeForEachParser('pzlinkcardCiteResolver', (parseHtml) => {
       widgetResolvers: [pzlinkcardCiteResolver],
     }
 
-    return applyDomTransforms(parseHtml(value), [convertCiteCards(context)])
+    return applyDomTransforms(parseHtml(value), [convertWidgets(context)])
   }
 
   describe('happy paths', () => {
@@ -197,7 +197,7 @@ describeForEachParser('pzlinkcardCiteResolver', (parseHtml) => {
     })
   })
 
-  describe('through convertCiteCards', () => {
+  describe('through convertWidgets', () => {
     it('should replace the wrapping anchor along with the card', async () => {
       const value = html`
         <a href="https://example.com/page">

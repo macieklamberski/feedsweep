@@ -1,4 +1,4 @@
-import type { CiteResolver } from '../types.js'
+import type { WidgetResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, jsonAttr, text } from '../utils/dom.js'
 
@@ -27,7 +27,8 @@ type OwnPostAttrs = {
 }
 
 // Substack's embed of another creator's post: an empty div its client hydrates from JSON.
-export const substackCrossPostCiteResolver: CiteResolver = {
+export const substackCrossPostCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   selector: '.embedded-post-wrap',
   extract: (element) => {
@@ -52,7 +53,8 @@ export const substackCrossPostCiteResolver: CiteResolver = {
 }
 
 // Substack's embed of the publication's own post: an empty hydration div, or hydrated on its site.
-export const substackOwnPostCiteResolver: CiteResolver = {
+export const substackOwnPostCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   // On Substack's own site the class is build-hashed, digestPostEmbed-flwiST, and reader
   // extraction drops classes.
@@ -88,7 +90,8 @@ export const substackOwnPostCiteResolver: CiteResolver = {
 }
 
 // Substack's Embed button card for other sites: three paragraphs and a link its SDK restyles.
-export const substackPostEmbedCiteResolver: CiteResolver = {
+export const substackPostEmbedCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   selector: 'div.substack-post-embed',
   extract: (element) => {
@@ -118,7 +121,8 @@ type PublicationAttrs = {
 // Substack's card for a whole publication: a childless div in feeds, hydrated on its own site.
 // Its data-attrs carries no description or hero_image. Nothing in either shape separates a card
 // the author introduced from one Substack injected.
-export const substackPublicationCiteResolver: CiteResolver = {
+export const substackPublicationCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   selector:
     '.embedded-publication-wrap, [data-component-name="EmbeddedPublicationToDOMWithSubscribe"]',

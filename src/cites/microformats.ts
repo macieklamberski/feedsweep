@@ -1,5 +1,5 @@
 import { type Nullish, startsWithAnyOf, toMap } from 'trousse'
-import type { CiteKind, CiteResolver } from '../types.js'
+import type { CiteKind, WidgetResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, text } from '../utils/dom.js'
 
@@ -42,7 +42,8 @@ const readImageUrl = (element: Nullish<Element>): string | undefined => {
 // An h-cite citation, wrapped in an IndieWeb response class naming the kind of reference.
 // See: https://microformats.org/wiki/h-cite.
 // Any mf2-emitting theme, IndieWeb sites and Hugo microblog themes, renders the same classes.
-export const microformatsCiteResolver: CiteResolver = {
+export const microformatsCiteResolver: WidgetResolver = {
+  step: 'block',
   kind: 'cite',
   selector: '[class~="h-cite" i]',
   extract: (element) => {
