@@ -5,8 +5,10 @@ import {
   isBlockElement,
   isBr,
   isElement,
+  isSkippable,
   isText,
   isWhitespaceText,
+  playableElements,
   processContainersSelector,
 } from '../../utils/dom.js'
 
@@ -17,6 +19,21 @@ type Chunk = {
   end: number
   hasContent: boolean
   hasBlock: boolean
+}
+
+// A player renders on its own line, so text beside it is no edge to keep apart.
+const isBlockEdge = (node: Node): boolean => {
+  return isBlockElement(node) || (isElement(node) && playableElements.includes(node.localName))
+}
+
+const hasContentBetween = (children: Array<Node>, from: number, to: number): boolean => {
+  for (let k = from; k < to; k++) {
+    if (!isSkippable(children[k])) {
+      return true
+    }
+  }
+
+  return false
 }
 
 // Prose split into paragraphs by runs of two or more <br>, which no stylesheet spaces as such.
@@ -104,25 +121,84 @@ export const convertBreaksToParagraphs: DomTransform = () => {
         continue
       }
 
+      const contentChunks = chunks.filter((chunk) => chunk.hasContent)
+      const leadingRunEnds: Array<number> = []
+      const trailingRunStarts: Array<number> = []
+
+      for (const chunk of contentChunks) {
+        let leadingEnd = chunk.start
+        let trailingStart = chunk.end
+
+        if (chunk.hasBlock) {
+          while (!isBlockEdge(children[leadingEnd])) {
+            leadingEnd++
+          }
+
+          while (!isBlockEdge(children[trailingStart - 1])) {
+            trailingStart--
+          }
+        }
+
+        leadingRunEnds.push(leadingEnd)
+        trailingRunStarts.push(trailingStart)
+      }
+
+      // Two block chunks left bare would join the inline runs at their edges into one line, so
+      // each run gets the paragraph a chunk without a block gets.
+      const wrapsRunBefore: Array<boolean> = [false]
+
+      for (let n = 1; n < contentChunks.length; n++) {
+        const previous = contentChunks[n - 1]
+        const chunk = contentChunks[n]
+
+        wrapsRunBefore.push(
+          previous.hasBlock &&
+            chunk.hasBlock &&
+            hasContentBetween(children, trailingRunStarts[n - 1], previous.end) &&
+            hasContentBetween(children, chunk.start, leadingRunEnds[n]),
+        )
+      }
+
+      wrapsRunBefore.push(false)
+
       const newChildren: Array<Node> = []
 
-      for (const chunk of chunks) {
-        if (!chunk.hasContent) {
+      const pushParagraph = (from: number, to: number) => {
+        const paragraph = document.createElement('p')
+
+        for (let k = from; k < to; k++) {
+          paragraph.appendChild(children[k])
+        }
+
+        newChildren.push(paragraph)
+      }
+
+      for (let n = 0; n < contentChunks.length; n++) {
+        const chunk = contentChunks[n]
+
+        if (!chunk.hasBlock) {
+          pushParagraph(chunk.start, chunk.end)
           continue
         }
 
-        if (chunk.hasBlock) {
-          for (let k = chunk.start; k < chunk.end; k++) {
-            newChildren.push(children[k])
-          }
-        } else {
-          const paragraph = document.createElement('p')
+        let start = chunk.start
+        let end = chunk.end
 
-          for (let k = chunk.start; k < chunk.end; k++) {
-            paragraph.appendChild(children[k])
-          }
+        if (wrapsRunBefore[n]) {
+          pushParagraph(start, leadingRunEnds[n])
+          start = leadingRunEnds[n]
+        }
 
-          newChildren.push(paragraph)
+        if (wrapsRunBefore[n + 1]) {
+          end = trailingRunStarts[n]
+        }
+
+        for (let k = start; k < end; k++) {
+          newChildren.push(children[k])
+        }
+
+        if (wrapsRunBefore[n + 1]) {
+          pushParagraph(end, chunk.end)
         }
       }
 
