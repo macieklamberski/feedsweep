@@ -1,8 +1,38 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
-import { describeForEachParser, html, resolverExtractor } from '../tests.js'
-import type { CiteResolverResult } from '../types.js'
+import { baseContext, describeForEachParser, html, resolverExtractor } from '../tests.js'
+import { convertWidgets } from '../transforms/dom/convertWidgets.js'
+import type { CiteResolverResult, EmbedResolver, TransformContext } from '../types.js'
+import { applyDomTransforms } from '../utils/transforms.js'
 import { hatenaCiteResolver } from './hatena.js'
+
+const playerOrShortLinkRegex = /^https:\/\/(?:example\.org\/embed|example\.net)\/(\w+)$/
+
+// A player at example.org/embed/{id} whose short link is example.net/{id}.
+const playerResolver: EmbedResolver = {
+  kind: 'embed',
+  selector: 'iframe',
+  extract: (element) => {
+    const src = element.getAttribute('src') ?? ''
+    const id = playerOrShortLinkRegex.exec(src)?.[1]
+
+    if (!id) {
+      return
+    }
+
+    return { provider: 'example', id, src: `https://example.org/embed/${id}` }
+  },
+}
+
+const withPlayer: TransformContext = {
+  ...baseContext,
+  widgetResolvers: [playerResolver],
+}
+
+const withNoResolvers: TransformContext = {
+  ...baseContext,
+  widgetResolvers: [],
+}
 
 describeForEachParser('hatenaCiteResolver', (parseHtml) => {
   const extract = resolverExtractor(parseHtml, hatenaCiteResolver)
@@ -344,6 +374,27 @@ describeForEachParser('hatena cards beside the prose they sit in', (parseHtml) =
     expect(await convert(value)).toEqualHtml(expected)
   })
 
+  it('should drop the citation with a player on its host', async () => {
+    const value = html`
+      <p>
+        <iframe
+          src="https://example.com/player/abc"
+          width="480"
+          height="270"
+        ></iframe> <cite class="hatena-citation"><a href="https://example.com/watch/abc">example.com</a></cite>
+      </p>
+    `
+    const expected = html`
+      <div
+        data-embed-src="https://example.com/player/abc"
+        data-embed-width="480"
+        data-embed-height="270"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
+
   it('should leave the citation beside a player it does not claim', async () => {
     const value = html`
       <p>
@@ -387,5 +438,171 @@ describeForEachParser('hatena cards beside the prose they sit in', (parseHtml) =
     `
 
     expect(await convert(value)).toEqualHtml(expected)
+  })
+})
+
+// Hatena Blog writes the same citation after every player it renders, as its own embed tool
+// produces it: a space, then the cite.
+describeForEachParser('removeHatenaPlayerCitation', (parseHtml) => {
+  const transform = (value: string, context: TransformContext = withPlayer) => {
+    return applyDomTransforms(parseHtml(value), [convertWidgets(context)])
+  }
+
+  describe('happy paths', () => {
+    it('should remove the citation on the host of the player it follows', async () => {
+      const value = html`
+        <div>
+          <iframe
+            src="https://example.org/embed/abc"
+            width="710"
+            height="399"
+          ></iframe> <cite class="hatena-citation"><a href="https://example.org/someone/a-talk">example.org</a></cite>
+        </div>
+      `
+      const expected = html`
+        <div>
+          <div
+            data-embed-provider="example"
+            data-embed-id="abc"
+            data-embed-src="https://example.org/embed/abc"
+          ></div> </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should remove the citation naming the same item on another host', async () => {
+      const value = html`
+        <div>
+          <iframe
+            src="https://example.org/embed/abc"
+            width="480"
+            height="270"
+          ></iframe> <cite class="hatena-citation"><a href="https://example.net/abc">example.net</a></cite>
+        </div>
+      `
+      const expected = html`
+        <div>
+          <div
+            data-embed-provider="example"
+            data-embed-id="abc"
+            data-embed-src="https://example.org/embed/abc"
+          ></div> </div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should remove the citation on the host of a frame no resolver claims', async () => {
+      const value = html`
+        <div>
+          <iframe
+            src="https://example.com/player/abc"
+            width="480"
+            height="270"
+          ></iframe> <cite class="hatena-citation"><a href="https://example.com/watch/abc">example.com</a></cite>
+        </div>
+      `
+      const expected = html`
+        <div>
+          <div
+            data-embed-src="https://example.com/player/abc"
+            data-embed-width="480"
+            data-embed-height="270"
+          ></div> </div>
+      `
+
+      expect(await transform(value, withNoResolvers)).toEqualHtml(expected)
+    })
+  })
+
+  describe('sad paths', () => {
+    it('should keep the citation naming another item on another host', async () => {
+      const value = html`
+        <iframe src="https://example.org/embed/abc"></iframe> <cite class="hatena-citation"><a href="https://example.net/xyz">example.net</a></cite>
+      `
+      const expected = html`
+        <div
+          data-embed-provider="example"
+          data-embed-id="abc"
+          data-embed-src="https://example.org/embed/abc"
+        ></div> <cite class="hatena-citation"><a href="https://example.net/xyz">example.net</a></cite>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep the citation on another host than the frame no resolver claims', async () => {
+      const value = html`
+        <iframe src="https://example.com/player/abc"></iframe> <cite class="hatena-citation"><a href="https://example.org/watch/abc">example.org</a></cite>
+      `
+      const expected = html`
+        <div data-embed-src="https://example.com/player/abc"></div> <cite class="hatena-citation"><a href="https://example.org/watch/abc">example.org</a></cite>
+      `
+
+      expect(await transform(value, withNoResolvers)).toEqualHtml(expected)
+    })
+
+    it('should keep the citation after an element that sits between it and the player', async () => {
+      const value = html`
+        <iframe src="https://example.org/embed/abc"></iframe>
+        <a href="https://example.org/someone/a-talk">A talk</a><cite class="hatena-citation"><a href="https://example.org/someone/a-talk">example.org</a></cite>
+      `
+      const expected = html`
+        <div
+          data-embed-provider="example"
+          data-embed-id="abc"
+          data-embed-src="https://example.org/embed/abc"
+        ></div>
+        <a href="https://example.org/someone/a-talk">A talk</a><cite class="hatena-citation"><a href="https://example.org/someone/a-talk">example.org</a></cite>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep the citation written before the player', async () => {
+      const value = html`
+        <cite class="hatena-citation"><a href="https://example.org/someone/a-talk">example.org</a></cite> <iframe src="https://example.org/embed/abc"></iframe>
+      `
+      const expected = html`
+        <cite class="hatena-citation"><a href="https://example.org/someone/a-talk">example.org</a></cite> <div
+          data-embed-provider="example"
+          data-embed-id="abc"
+          data-embed-src="https://example.org/embed/abc"
+        ></div>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep a cite the author wrote after the player', async () => {
+      const value = html`
+        <iframe src="https://example.org/embed/abc"></iframe> <cite><a href="https://example.org/someone/a-talk">A talk</a></cite>
+      `
+      const expected = html`
+        <div
+          data-embed-provider="example"
+          data-embed-id="abc"
+          data-embed-src="https://example.org/embed/abc"
+        ></div> <cite><a href="https://example.org/someone/a-talk">A talk</a></cite>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
+
+    it('should keep a citation that holds no link', async () => {
+      const value = html`
+        <iframe src="https://example.org/embed/abc"></iframe> <cite class="hatena-citation">A talk</cite>
+      `
+      const expected = html`
+        <div
+          data-embed-provider="example"
+          data-embed-id="abc"
+          data-embed-src="https://example.org/embed/abc"
+        ></div> <cite class="hatena-citation">A talk</cite>
+      `
+
+      expect(await transform(value)).toEqualHtml(expected)
+    })
   })
 })

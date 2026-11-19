@@ -1,3 +1,4 @@
+import { removeHatenaPlayerCitation } from '../../cites/hatena.js'
 import { isSoundcloudStream } from '../../embeds/soundcloud.js'
 import type { DomTransform, TransformContext, WidgetResolver } from '../../types.js'
 import { attr, isElement, isNonWhitespaceText } from '../../utils/dom.js'
@@ -249,8 +250,15 @@ export const convertWidgets: DomTransform = (context) => {
           ...prepared,
           src: prepared.src ?? src,
         })
+        const target = carrierOrShell(element)
 
-        carrierOrShell(element).replaceWith(placeholder)
+        await removeHatenaPlayerCitation(
+          target,
+          toPlayerKey(metadata),
+          embedOrMediaResolvers,
+          context,
+        )
+        target.replaceWith(placeholder)
       }
     }
 
@@ -299,8 +307,10 @@ export const convertWidgets: DomTransform = (context) => {
         src: cleaned,
         ...getEmbedSize(element),
       })
+      const target = carrierOrShell(element)
 
-      carrierOrShell(element).replaceWith(placeholder)
+      await removeHatenaPlayerCitation(target, undefined, embedOrMediaResolvers, context)
+      target.replaceWith(placeholder)
     }
   }
 }
