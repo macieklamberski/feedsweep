@@ -6,6 +6,7 @@ import {
   getPathSegments,
   getQueryParam,
   getQueryParams,
+  includesAnyOf,
   isAnyOf,
   isHostOrSubdomainOf,
   type Nullish,
@@ -420,11 +421,12 @@ const isFrontendFrame = (url: URL, element: Element): boolean => {
 // An Invidious or Piped frame: the instance's player for a YouTube id, mostly on instances that
 // are gone.
 export const youtubeFrontendEmbedResolver = createMarkupEmbedResolver(
-  'iframe[src*="/embed/" i]',
-  (element) => {
-    const url = parseUrl(readRepairedCarrierUrl(element))
+  'iframe[src]',
+  (element, context) => {
+    const link = readRepairedCarrierUrl(element, context)
+    const url = parseUrl(link)
 
-    if (!url || !isFrontendFrame(url, element)) {
+    if (!url || !includesAnyOf(link, '/embed/') || !isFrontendFrame(url, element)) {
       return
     }
 

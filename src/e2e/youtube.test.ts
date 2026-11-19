@@ -1,6 +1,8 @@
 import { expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
-import { describeForEachParser, html } from '../tests.js'
+import { createProxyUnwrapFn, describeForEachParser, html } from '../tests.js'
+
+const unwrapDrupalFn = createProxyUnwrapFn('example.com', 'url')
 
 describeForEachParser('YouTube', (parseHtml) => {
   // The widest spread. youtubeIframeEmbedResolver and youtubeAmpEmbedResolver claim the
@@ -552,7 +554,12 @@ describeForEachParser('YouTube', (parseHtml) => {
       ></div>
     `
 
-    expect(await transformContent(value, { parseHtmlFn: parseHtml })).toEqualHtml(expected)
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      cleanUrlFn: unwrapDrupalFn,
+    })
+
+    expect(result).toEqualHtml(expected)
   })
 
   it('should keep the start of a frame whose ampersand the feed escaped many times', async () => {

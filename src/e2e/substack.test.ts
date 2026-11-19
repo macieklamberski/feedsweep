@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
-import { describeForEachParser, html, jsonAttrValue } from '../tests.js'
+import { createProxyUnwrapFn, describeForEachParser, html, jsonAttrValue } from '../tests.js'
+
+const unwrapIframelyFn = createProxyUnwrapFn('cdn.iframe.ly', 'url')
 
 describeForEachParser('Substack', (parseHtml) => {
   // substackOwnPostCiteResolver and substackCrossPostCiteResolver claim the post embeds,
@@ -1023,8 +1025,8 @@ describeForEachParser('Substack', (parseHtml) => {
   })
 
   it('should turn the TikTok embed pair into the TikTok placeholder and its static link', async () => {
-    // The Iframely frame names the video in its `url` query value, the hidden cookie-check iframe
-    // is stripped, and the static thumbnail link survives.
+    // The caller's cleanUrlFn unwraps the Iframely frame to the video in its `url` query value, the
+    // hidden cookie-check iframe is stripped, and the static thumbnail link survives.
     const tiktokAttrs = jsonAttrValue({
       url: 'https://www.tiktok.com/@caseyhandle/video/7123456789012345678',
       thumbnail_url:
@@ -1085,7 +1087,10 @@ describeForEachParser('Substack', (parseHtml) => {
         >
       </a>
     `
-    const result = await transformContent(value, { parseHtmlFn: parseHtml })
+    const result = await transformContent(value, {
+      parseHtmlFn: parseHtml,
+      cleanUrlFn: unwrapIframelyFn,
+    })
 
     expect(result).toEqualHtml(expected)
   })

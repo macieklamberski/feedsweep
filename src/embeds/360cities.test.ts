@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'bun:test'
 import { transformContent } from '../index.js'
-import { describeForEachParser, html, resolverExtractor } from '../tests.js'
-import type { EmbedResolverResult } from '../types.js'
+import {
+  baseContext,
+  createProxyUnwrapFn,
+  describeForEachParser,
+  html,
+  resolverExtractor,
+} from '../tests.js'
+import type { EmbedResolverResult, TransformContext } from '../types.js'
 import { threeSixtyCitiesEmbedResolver, threeSixtyCitiesResolveEmbed } from './360cities.js'
 
 describe('threeSixtyCitiesResolveEmbed', () => {
@@ -144,6 +150,29 @@ describeForEachParser('threeSixtyCitiesEmbedResolver', (parseHtml) => {
       }
 
       expect(await extract(value)).toEqual(expected)
+    })
+
+    it('should read the panorama a redirect the caller unwraps names', async () => {
+      const context: TransformContext = {
+        ...baseContext,
+        cleanUrlFn: createProxyUnwrapFn('redirect.example.com', 'url'),
+      }
+      const extractCleaned = resolverExtractor(parseHtml, threeSixtyCitiesEmbedResolver, context)
+      const value = html`
+        <embed
+          src="http://www.360cities.net/javascripts/krpano/krpano.swf"
+          flashvars="pano=https://redirect.example.com/?url=http%253A%252F%252Fwww.360cities.net%252Fkrpano%252Fexternal_embed%252Flittle-hagia-sophia-istanbul.xml"
+        />
+      `
+      const expected: EmbedResolverResult = {
+        provider: '360cities',
+        id: 'little-hagia-sophia-istanbul',
+        src: 'https://www.360cities.net/embed_iframe/little-hagia-sophia-istanbul',
+        url: 'https://www.360cities.net/image/little-hagia-sophia-istanbul',
+        ratio: '425/315',
+      }
+
+      expect(await extractCleaned(value)).toEqual(expected)
     })
 
     it('should read the panorama out of a bare embed on https', async () => {

@@ -8,7 +8,7 @@ export const convertCiteCards: DomTransform = (context) => {
   return async (document) => {
     for (const resolver of citeResolvers) {
       for (const element of document.querySelectorAll(resolver.selector)) {
-        const result = await resolver.extract(element)
+        const result = await resolver.extract(element, context)
 
         if (!result) {
           continue

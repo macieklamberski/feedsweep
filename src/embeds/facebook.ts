@@ -19,6 +19,8 @@ import {
   createMarkupEmbedResolver,
   createS9eEmbedResolver,
   createUrlEmbedResolver,
+  matchUrl,
+  readWrittenCarrierUrl,
 } from '../utils/widgets.js'
 
 const provider = 'facebook'
@@ -223,7 +225,7 @@ const composeWatchEmbed = (videoId: string): EmbedResolverResult => {
 
 // A post has no name: its words go to `description`, and the frame titles itself
 // `fb:post Facebook Social Plugin`.
-export const facebookResolveEmbed: ResolveUrlEmbed = (url) => {
+export const facebookResolveEmbed: ResolveUrlEmbed = (url, element) => {
   // The pre-plugins video frame from old posts, naming its video in `video_id`.
   if (isAnyOf(url.pathname, '/video/embed')) {
     const videoId = getQueryParam(url.searchParams, 'video_id')
@@ -245,7 +247,9 @@ export const facebookResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 
   if (contentPathRegex.test(url.pathname) || isWatchPage(url)) {
-    return composePluginEmbed(readPlugin(url, 'post'), url.href, {})
+    return composePluginEmbed(readPlugin(url, 'post'), url.href, {
+      url: readWrittenCarrierUrl(url, element),
+    })
   }
 
   if (!pluginPathRegex.test(url.pathname)) {
@@ -328,8 +332,8 @@ export const facebookS9eEmbedResolver = createS9eEmbedResolver('facebook', (frag
 // The embed dialog's fallback blockquote, kept by the publisher without its widget div.
 export const facebookBlockquoteEmbedResolver = createMarkupEmbedResolver(
   fallbackSelector,
-  (element) => {
-    const cite = attr(element, 'cite')
+  (element, context) => {
+    const cite = matchUrl(attr(element, 'cite'), context)
     const parsed = parseUrlOnHosts(cite, hosts)
 
     if (!cite || !parsed) {

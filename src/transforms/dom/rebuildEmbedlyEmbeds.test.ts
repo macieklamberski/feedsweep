@@ -9,7 +9,7 @@ describeForEachParser('rebuildEmbedlyEmbeds', (parseHtml) => {
     return applyDomTransforms(parseHtml(value), [rebuildEmbedlyEmbeds(baseContext)])
   }
 
-  it('should unwrap an Embedly media iframe to the inner src and carry the poster', async () => {
+  it('should carry the wrapper poster as data-thumbnail and keep the wrapper url', async () => {
     const value = html`
       <iframe
         src="https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2FdQw4w9WgXcQ&image=https%3A%2F%2Fi.ytimg.com%2Fvi%2FdQw4w9WgXcQ%2Fhqdefault.jpg&url=https%3A%2F%2Fyoutu.be%2FdQw4w9WgXcQ&schema=youtube"
@@ -19,67 +19,52 @@ describeForEachParser('rebuildEmbedlyEmbeds', (parseHtml) => {
     `
     const expected = html`
       <iframe
+        src="https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2FdQw4w9WgXcQ&image=https%3A%2F%2Fi.ytimg.com%2Fvi%2FdQw4w9WgXcQ%2Fhqdefault.jpg&url=https%3A%2F%2Fyoutu.be%2FdQw4w9WgXcQ&schema=youtube"
+        width="640"
+        height="360"
         data-thumbnail="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
-        src="https://www.youtube.com/embed/dQw4w9WgXcQ"
       ></iframe>
     `
 
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should unwrap an Embedly-wrapped Datawrapper chart', async () => {
+  it('should read the poster of a protocol-relative wrapper', async () => {
     const value = html`
       <iframe
-        src="https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fdatawrapper.dwcdn.net%2FAbCdE%2F4%2F&image=https%3A%2F%2Fdatawrapper.dwcdn.net%2FAbCdE%2Fplain-s.png&schema=dwcdn"
+        src="//cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fvimeo.com%2F76979871&image=https%3A%2F%2Fi.vimeocdn.com%2Fvideo%2F452001751.jpg"
       ></iframe>
     `
     const expected = html`
       <iframe
-        data-thumbnail="https://datawrapper.dwcdn.net/AbCdE/plain-s.png"
-        src="https://datawrapper.dwcdn.net/AbCdE/4/"
+        src="//cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fvimeo.com%2F76979871&image=https%3A%2F%2Fi.vimeocdn.com%2Fvideo%2F452001751.jpg"
+        data-thumbnail="https://i.vimeocdn.com/video/452001751.jpg"
       ></iframe>
     `
 
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should handle a protocol-relative embedly src', async () => {
+  it('should drop the title Embedly gives its wrapper', async () => {
     const value = html`
       <iframe
-        src="//cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fvimeo.com%2F76979871"
+        src="https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2FdQw4w9WgXcQ"
+        title="YouTube embed"
       ></iframe>
     `
-    const expected = '<iframe src="https://vimeo.com/76979871"></iframe>'
-
-    expect(await transform(value)).toEqualHtml(expected)
-  })
-
-  it('should keep an unencoded query inside the inner src', async () => {
-    const value = html`
+    const expected = html`
       <iframe
-        src="https://cdn.embedly.com/widgets/media.html?src=https://www.youtube.com/embed/dQw4w9WgXcQ?start=30"
+        src="https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2FdQw4w9WgXcQ"
       ></iframe>
     `
-    const expected = '<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?start=30"></iframe>'
 
     expect(await transform(value)).toEqualHtml(expected)
   })
 
-  it('should omit data-thumbnail when there is no image param', async () => {
+  it('should leave a wrapper with no image param untouched', async () => {
     const value = html`
       <iframe
         src="https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fexample.com%2Fembed"
-      ></iframe>
-    `
-    const expected = '<iframe src="https://example.com/embed"></iframe>'
-
-    expect(await transform(value)).toEqualHtml(expected)
-  })
-
-  it('should leave an embedly iframe with no src param untouched', async () => {
-    const value = html`
-      <iframe
-        src="https://cdn.embedly.com/widgets/media.html?url=https%3A%2F%2Fexample.com"
       ></iframe>
     `
 
@@ -89,7 +74,8 @@ describeForEachParser('rebuildEmbedlyEmbeds', (parseHtml) => {
   it('should leave a foreign host carrying the wrapper path in its query untouched', async () => {
     const value = html`
       <iframe
-        src="https://evil.test/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2FdQw4w9WgXcQ&cdn.embedly.com/widgets/media.html"
+        src="https://evil.test/widgets/media.html?image=https%3A%2F%2Fexample.com%2Fp.jpg&cdn.embedly.com/widgets/media.html"
+        title="A chart"
       ></iframe>
     `
 
@@ -366,5 +352,26 @@ describeForEachParser('rebuildEmbedlyEmbeds', (parseHtml) => {
     const twice = await applyDomTransforms(parseHtml(once), [rebuildEmbedlyEmbeds(baseContext)])
 
     expect(twice).toEqualHtml(once)
+  })
+})
+
+describeForEachParser('rebuildEmbedlyEmbeds through the pipeline', (parseHtml) => {
+  const convert = (value: string): Promise<string> => {
+    return transformContent(value, { parseHtmlFn: parseHtml, baseUrl: 'https://example.com/post' })
+  }
+
+  it('should keep the wrapper url for a caller passing no cleanUrlFn', async () => {
+    const value = html`
+      <iframe
+        src="https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2FdQw4w9WgXcQ&amp;image=https%3A%2F%2Fi.ytimg.com%2Fvi%2FdQw4w9WgXcQ%2Fhqdefault.jpg"
+      ></iframe>
+    `
+    const expected = html`
+      <div
+        data-embed-src="https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2FdQw4w9WgXcQ&amp;image=https%3A%2F%2Fi.ytimg.com%2Fvi%2FdQw4w9WgXcQ%2Fhqdefault.jpg"
+      ></div>
+    `
+
+    expect(await convert(value)).toEqualHtml(expected)
   })
 })

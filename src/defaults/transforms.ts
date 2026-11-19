@@ -94,7 +94,6 @@ import { surfaceParkedMarkup } from '../transforms/dom/surfaceParkedMarkup.js'
 import { surfaceTemplateEmbeds } from '../transforms/dom/surfaceTemplateEmbeds.js'
 import { trimPreWhitespace } from '../transforms/dom/trimPreWhitespace.js'
 import { unwrapDoublyNestedLists } from '../transforms/dom/unwrapDoublyNestedLists.js'
-import { unwrapDrupalOembedIframes } from '../transforms/dom/unwrapDrupalOembedIframes.js'
 import { unwrapHeadingBold } from '../transforms/dom/unwrapHeadingBold.js'
 import { unwrapNestedCodeWrappers } from '../transforms/dom/unwrapNestedCodeWrappers.js'
 import { unwrapRebelmouseEmbedFrames } from '../transforms/dom/unwrapRebelmouseEmbedFrames.js'
@@ -138,11 +137,6 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   // transforms run, so each is placeholdered and any poster connected.
   surfaceTemplateEmbeds,
 
-  // Points a Drupal media oEmbed frame at the page url it wraps, so the provider resolvers
-  // below see the video and not the site's proxy route. Runs before surfaceNoscriptEmbeds,
-  // which surfaces only a frame a resolver claims.
-  unwrapDrupalOembedIframes,
-
   // Runs before convertWidgets, whose Flash resolvers claim the rebuilt embed and which drops a
   // swf none of them claims.
   unwrapWpcomWidgetFrames,
@@ -153,7 +147,7 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
 
   // Runs after surfaceParkedMarkup and surfaceTemplateEmbeds, which can surface a lazy iframe, and
   // before every pass that reads an iframe's `src`, convertDatawrapperEmbeds and convertGiphyEmbeds
-  // among them. unwrapDrupalOembedIframes reads the lazy attributes itself.
+  // among them.
   fixLazyIframes,
   surfaceNoscriptEmbeds,
   rebuildEmbedPlusEmbeds,
@@ -174,11 +168,10 @@ export const defaultStandardDomTransforms: Array<DomTransform> = [
   rebuildLazyYtEmbeds,
   rebuildElementorVideoEmbeds,
 
-  // Unwraps both Embedly carriers to the inner provider iframe (carrying Embedly's poster as
-  // data-thumbnail), so the provider transforms below handle them instead of an Embedly shell:
-  // the rendered cdn.embedly wrapper, and the empty div whose oEmbed payload rides in `data`.
-  // Runs before convertCiteCards so a payload naming `link` still reaches the cite pass, and
-  // before stripEmptyTags, which is what deletes an empty carrier nothing has claimed.
+  // Carries an Embedly wrapper's poster as data-thumbnail, and rebuilds the empty div whose oEmbed
+  // payload rides in `data` into the iframe it names. Runs before convertCiteCards so a payload
+  // naming `link` still reaches the cite pass, and before stripEmptyTags, which is what deletes an
+  // empty carrier nothing has claimed.
   rebuildEmbedlyEmbeds,
   rebuildDocumentcloudEmbeds,
   rebuildGettyImagesEmbeds,

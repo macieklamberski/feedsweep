@@ -1,17 +1,16 @@
 import { getQueryParam } from 'trousse'
 import type { DomTransform } from '../../types.js'
-import { attr } from '../../utils/dom.js'
-import { parseUrlOnHosts } from '../../utils/urls.js'
+import { readCarrierUrlOnHosts } from '../../utils/widgets.js'
 
 const wrapperHosts = ['wpcomwidgets.com']
 
 // WordPress.com's frame around a Flash embed its post filter took out, which serves only a "No
 // hotlinking please." page. Its query holds the player: the swf in `src`, its configuration in
 // `flashvars` and its box in `width` and `height`.
-export const unwrapWpcomWidgetFrames: DomTransform = () => {
+export const unwrapWpcomWidgetFrames: DomTransform = (context) => {
   return (document) => {
     for (const iframe of document.querySelectorAll('iframe[src]')) {
-      const wrapper = parseUrlOnHosts(attr(iframe, 'src'), wrapperHosts)
+      const wrapper = readCarrierUrlOnHosts(iframe, wrapperHosts, context)
 
       if (!wrapper) {
         continue

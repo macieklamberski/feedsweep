@@ -4,6 +4,7 @@ import type { CiteResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
 import { attr, find, isElement, text } from '../utils/dom.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
+import { matchUrl } from '../utils/widgets.js'
 
 const provider = 'discourse'
 
@@ -62,7 +63,7 @@ const fediverseHandleRegex = /@[\w.-]+@[\w-]+(?:\.[\w-]+)+/
 export const discourseCiteResolver: CiteResolver = {
   kind: 'cite',
   selector: `aside.onebox${omittedOneboxClasses.map((name) => `:not(.${name})`).join('')}`,
-  extract: (element) => {
+  extract: (element, context) => {
     const body = find(element, '.onebox-body')
     const source = find(element, 'header.source a')
 
@@ -73,7 +74,7 @@ export const discourseCiteResolver: CiteResolver = {
     const title = text(body, 'h3, h4')
 
     // data-onebox-src arrives unrewritten, so a protocol-relative url names no host without a base.
-    const cited = url ? parseUrl(url, placeholderBaseUrl) : undefined
+    const cited = url ? parseUrl(matchUrl(url, context), placeholderBaseUrl) : undefined
 
     if (cited && (isHostOrSubdomainOf(cited, socialPostHosts) || parseMastodonStatus(cited.href))) {
       return
