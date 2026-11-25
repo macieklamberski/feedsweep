@@ -2,7 +2,7 @@ import type { UrlPattern } from '../types.js'
 
 // Images served from these hosts are tracking. An entry with a `path` matches only the
 // pathnames its regex tests true, for a host that also serves content images.
-export const defaultTrackingUrls: Array<UrlPattern> = [
+export const defaultTrackingUrls: ReadonlyArray<UrlPattern> = [
   { host: 'feedsportal.com' }, // Postmedia/Newsfutures feed-syndication pixels (/c/<id>/<…>.gif).
   { host: 'stats.wordpress.com' }, // WordPress.com / Jetpack Stats pixels.
   { host: 'pixel.wp.com' }, // WordPress.com / Jetpack Stats pixels.
@@ -64,6 +64,6 @@ export const defaultTrackingUrls: Array<UrlPattern> = [
 // author's gravatar as a per-item media:content image, so an otherwise imageless
 // post would inject the author's face as its lead image. Matched by host and
 // subdomain, so the sharded 0/1/2.gravatar.com and secure.gravatar.com are covered.
-export const defaultAvatarImageHosts = [
+export const defaultAvatarImageHosts: ReadonlyArray<string> = [
   'gravatar.com', // WordPress / WP.com per-item author gravatar as media:content.
 ]

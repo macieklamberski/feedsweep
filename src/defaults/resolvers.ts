@@ -940,7 +940,7 @@ const citeResolvers: Array<WidgetResolver> = [
 ]
 
 // One block step runs them in this order, so a card claims its element before a player does.
-export const defaultWidgetResolvers: Array<WidgetResolver> = [
+export const defaultWidgetResolvers: ReadonlyArray<WidgetResolver> = [
   ...citeResolvers,
   ...embedResolvers,
   ...mediaResolvers,
@@ -948,7 +948,7 @@ export const defaultWidgetResolvers: Array<WidgetResolver> = [
 
 // First claim wins, so every resolver that reads a filename sits ahead of the ones that only
 // mark: an image on a CDN host can still carry a forum class whose table resolves it.
-export const defaultEmojiResolvers: Array<EmojiResolver> = [
+export const defaultEmojiResolvers: ReadonlyArray<EmojiResolver> = [
   telegramEmojiResolver,
   gitlabEmojiResolver,
   githubElementEmojiResolver,
