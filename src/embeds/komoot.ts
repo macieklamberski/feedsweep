@@ -50,7 +50,7 @@ export const komootResolveEmbed: ResolveUrlEmbed = (url) => {
   // The locale sets the player's language and units, `de-de` showing kilometres where the bare
   // path shows miles.
   const locale = hasLocale ? `${first}/` : ''
-  const params = getQueryParams(url.search, accessParams)
+  const params = getQueryParams(url, accessParams)
   const result: EmbedResolverResult = {
     provider,
     id: resource.id,

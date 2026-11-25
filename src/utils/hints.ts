@@ -1,4 +1,4 @@
-import { coerceNumber, isPlainObject, isString } from 'trousse'
+import { coerceNumber, isPlainObject, isString, parseJson } from 'trousse'
 
 // A height a player reported, or nothing. A player says 0 before it has rendered and `null`
 // for a post it could not load, and neither is a size to draw.
@@ -26,13 +26,9 @@ export const isPlayerJsReady = (data: unknown): boolean => {
     return false
   }
 
-  try {
-    const message: unknown = JSON.parse(data)
+  const message = parseJson(data)
 
-    return isPlainObject(message) && message.context === 'player.js' && message.event === 'ready'
-  } catch {
-    return false
-  }
+  return isPlainObject(message) && message.context === 'player.js' && message.event === 'ready'
 }
 
 // The height several embeds post unasked as an object, `{ height }`, beside fields of their own.
@@ -51,13 +47,11 @@ export const readIframeResizeHeight = (data: unknown): number | undefined => {
     return
   }
 
-  try {
-    const message: unknown = JSON.parse(data)
+  const message = parseJson(data)
 
-    if (isPlainObject(message) && message.context === 'iframe.resize') {
-      return readPixels(message.height)
-    }
-  } catch {}
+  if (isPlainObject(message) && message.context === 'iframe.resize') {
+    return readPixels(message.height)
+  }
 }
 
 // iframe-resizer's start message. A frame running its child script reports no height until a

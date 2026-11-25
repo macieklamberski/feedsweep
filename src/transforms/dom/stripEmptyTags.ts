@@ -1,3 +1,4 @@
+import { isNonEmptyString } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { isBlockElement, isElement, isGeneratedWrapper, isText } from '../../utils/dom.js'
 
@@ -78,7 +79,7 @@ export const stripEmptyTags: DomTransform = () => {
           break
         }
 
-        if (isText(child) && child.data.trim().length > 0) {
+        if (isText(child) && isNonEmptyString(child.data)) {
           hasContent = true
           break
         }

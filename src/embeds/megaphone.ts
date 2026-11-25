@@ -70,7 +70,7 @@ export const megaphoneResolveEmbed: ResolveUrlEmbed = (url) => {
     return
   }
 
-  const playback = getQueryParams(url.search, ['start'])
+  const playback = getQueryParams(url, ['start'])
   const query = composeQuery({ [embed.param]: embed.id, ...playback })
 
   return {

@@ -2,6 +2,7 @@ import {
   composeQuery,
   getQueryParam,
   isAnyOf,
+  isHostOf,
   isHostOrSubdomainOf,
   isPlainObject,
   parseUrl,
@@ -52,7 +53,7 @@ const frameHosts = ['twitter.com', 'x.com']
 const nitterHostRegex = /(^|\.)nitter\./
 
 const isTweetUrl = (url: URL, hosts: string | ReadonlyArray<string>): boolean => {
-  return isHostOrSubdomainOf(url, hosts) || nitterHostRegex.test(url.hostname)
+  return isHostOrSubdomainOf(url, hosts) || isHostOf(url, nitterHostRegex)
 }
 
 // `/{handle}/status/{id}`, with the plural `statuses` form from the earliest era. The id is its

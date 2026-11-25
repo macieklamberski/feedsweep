@@ -66,7 +66,7 @@ export const spreakerResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const title = attr(element, 'title')
   const query = composeQuery({
     [embed.param]: embed.id,
-    ...getQueryParams(url.search, playerParams),
+    ...getQueryParams(url, playerParams),
   })
 
   // Both kinds name a page that takes the bare id and redirects to its canonical slugged form,

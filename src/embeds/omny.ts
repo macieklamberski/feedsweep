@@ -54,7 +54,7 @@ export const omnyResolveEmbed: ResolveUrlEmbed = (url, element) => {
     return
   }
 
-  const { media, t } = getQueryParams(url.search, omnyEmbedParams)
+  const { media, t } = getQueryParams(url, omnyEmbedParams)
   // The player reads the value in any case.
   const isVideo = isAnyOf(media, 'video')
   const isPlaylist = includesAnyOf(clip, '/playlists/')

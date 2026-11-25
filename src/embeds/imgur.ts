@@ -6,6 +6,7 @@ import {
   isHostOf,
   isPlainObject,
   isString,
+  parseJson,
   startsWithAnyOf,
 } from 'trousse'
 import type {
@@ -245,13 +246,11 @@ export const readImgurHeight = (data: unknown): number | undefined => {
     return
   }
 
-  try {
-    const message: unknown = JSON.parse(data)
+  const message = parseJson(data)
 
-    if (isPlainObject(message) && message.message === 'resize_imgur') {
-      return readPixels(message.height)
-    }
-  } catch {}
+  if (isPlainObject(message) && message.message === 'resize_imgur') {
+    return readPixels(message.height)
+  }
 }
 
 export const imgurRenderHint: EmbedRenderHint = {

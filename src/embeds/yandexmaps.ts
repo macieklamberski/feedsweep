@@ -128,7 +128,7 @@ export const yandexMapsIframeEmbedResolver = createUrlEmbedResolver(hosts, (url,
     return
   }
 
-  const position = getQueryParams(url.search, positionParams)
+  const position = getQueryParams(url, positionParams)
 
   return (
     resolveConstructorMap(url.hostname, url.searchParams, position) ??

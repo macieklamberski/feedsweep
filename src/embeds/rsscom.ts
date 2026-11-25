@@ -25,7 +25,7 @@ export const rsscomResolveEmbed: ResolveUrlEmbed = (url, element) => {
     return
   }
 
-  const query = composeQuery({ ...playerParams, ...getQueryParams(url.search, ['time']) })
+  const query = composeQuery({ ...playerParams, ...getQueryParams(url, ['time']) })
   const title = attr(element, 'title')
 
   if (episodeId === latestSegment) {

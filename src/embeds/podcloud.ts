@@ -1,4 +1,4 @@
-import { encodePathSegment, getPathSegments, isAnyOf, startsWithAnyOf } from 'trousse'
+import { encodePathSegment, getPathSegments, isAnyOf, isHostOf, startsWithAnyOf } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { readIframeResizeHeight } from '../utils/hints.js'
@@ -63,7 +63,7 @@ const composeEmbed = (
 // plays and are kept, and the rest, such as `fixed-size` or `list:opened`, are display options
 // and are dropped. The `title` its embed dialog writes is the show's or the episode's name.
 export const podcloudResolveEmbed: ResolveUrlEmbed = (url, element) => {
-  if (!isAnyOf(url.hostname, hosts)) {
+  if (!isHostOf(url, hosts)) {
     return
   }
 

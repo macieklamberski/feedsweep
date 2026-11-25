@@ -100,7 +100,7 @@ const readQueryEmbed = (parsed: URL): EmbedResolverResult | undefined => {
   }
 
   // `title` is the heading the player draws over the map in place of the route's own name.
-  const { title, ...playerParams } = getQueryParams(parsed.search, embedParams)
+  const { title, ...playerParams } = getQueryParams(parsed, embedParams)
   const src = composeSource(kind, shape, id, playerParams)
 
   if (playerParams.privacyCode) {
@@ -128,7 +128,7 @@ const readPathEmbed = (parsed: URL): EmbedResolverResult | undefined => {
     return
   }
 
-  const playerParams = getQueryParams(parsed.search, privateParams)
+  const playerParams = getQueryParams(parsed, privateParams)
   const src = composeSource(kind, shape, decodeSegment(id) ?? id, playerParams)
 
   if (playerParams.privacyCode) {

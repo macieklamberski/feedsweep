@@ -1,4 +1,4 @@
-import { composeQuery, encodePathSegment, getQueryParam, isAnyOf } from 'trousse'
+import { composeQuery, encodePathSegment, getQueryParam, isAnyOf, isHostOf } from 'trousse'
 import type {
   EmbedRenderHint,
   EmbedResolverResult,
@@ -21,7 +21,7 @@ const hosts = ['kaltura.com']
 
 // The SaaS hosts all serve the player and the thumbnail from `cdnapisec.kaltura.com`; a regional
 // API host (`api.ca.kaltura.com`) serves them only itself, so the carrier's host is kept there.
-const saasHosts = new Set(['kaltura.com', 'www.kaltura.com', 'cdnapi.kaltura.com'])
+const saasHosts = ['kaltura.com', 'www.kaltura.com', 'cdnapi.kaltura.com']
 
 // The clip's start and end, as the embedIframeJs player and the embedPlaykitJs player read them.
 const playbackParams = [
@@ -63,7 +63,7 @@ const readEntry = (parsed: URL | undefined): Entry | undefined => {
 // The player path names the partner and the player config. Without `iframeembed=true` the same
 // route answers the auto-embed script, not a player.
 const composeEmbed = ({ partner, entryId, parsed }: Entry): EmbedResolverResult => {
-  const host = saasHosts.has(parsed.hostname) ? 'cdnapisec.kaltura.com' : parsed.hostname
+  const host = isHostOf(parsed, saasHosts) ? 'cdnapisec.kaltura.com' : parsed.hostname
   const query = composeQuery({ iframeembed: 'true', entry_id: entryId })
   const hasToken = getQueryParam(parsed.searchParams, tokenParam) !== undefined
   const kept = filterUrlQuery(
