@@ -2,6 +2,7 @@ import {
   coerceNumber,
   getQueryParam,
   isAnyOf,
+  isNonEmptyString,
   isPresent,
   isSameText,
   type Nullish,
@@ -101,8 +102,13 @@ export const find = (
 
 export const text = (node: Nullish<Node>, selector?: string): string | undefined => {
   const target = selector ? find(isElement(node) ? node : undefined, selector) : node
+  const value = target?.textContent?.trim()
 
-  return target?.textContent?.trim() || undefined
+  if (!isNonEmptyString(value)) {
+    return
+  }
+
+  return value
 }
 
 // Text of the element's direct text-node children only, ignoring text inside nested elements.
@@ -236,9 +242,9 @@ export const isComment = (node: Nullish<Node>): node is Comment => {
   return node?.nodeType === Node.COMMENT_NODE
 }
 
-// The same trim as `text`, so a node holding only a byte-order mark is empty to both.
+// The same test as `text`, so a node holding only a byte-order mark is empty to both.
 export const hasText = (node: Nullish<Node>): boolean => {
-  return Boolean(node?.textContent?.trim())
+  return isNonEmptyString(node?.textContent)
 }
 
 export const isWhitespaceText = (node: Node): boolean => {
