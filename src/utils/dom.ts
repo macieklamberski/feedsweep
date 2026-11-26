@@ -100,15 +100,21 @@ export const find = (
   }
 }
 
-export const text = (node: Nullish<Node>, selector?: string): string | undefined => {
-  const target = selector ? find(isElement(node) ? node : undefined, selector) : node
-  const value = target?.textContent?.trim()
+// The trimmed value, or undefined when only Unicode whitespace or a byte-order mark is left.
+const trimText = (value: Nullish<string>): string | undefined => {
+  const trimmed = value?.trim()
 
-  if (!isNonEmptyString(value)) {
+  if (!isNonEmptyString(trimmed)) {
     return
   }
 
-  return value
+  return trimmed
+}
+
+export const text = (node: Nullish<Node>, selector?: string): string | undefined => {
+  const target = selector ? find(isElement(node) ? node : undefined, selector) : node
+
+  return trimText(target?.textContent)
 }
 
 // Text of the element's direct text-node children only, ignoring text inside nested elements.
@@ -125,7 +131,7 @@ export const textNode = (element: Nullish<Element>): string | undefined => {
     }
   }
 
-  return result.trim() || undefined
+  return trimText(result)
 }
 
 // Several platforms configure a player from an inline <script> beside it, with no iframe.
@@ -156,7 +162,7 @@ export const findConfigScript = (element: Element): Element | undefined => {
 }
 
 export const attr = (element: Nullish<Element>, name: string): string | undefined => {
-  return element?.getAttribute(name)?.trim() || undefined
+  return trimText(element?.getAttribute(name))
 }
 
 // Whether a scoped attribute entry reads this element: any element when it names no selector.

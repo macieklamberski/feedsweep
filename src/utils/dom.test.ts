@@ -1462,6 +1462,13 @@ describeForEachParser('textNode', (parseHtml) => {
     expect(textNode(element)).toBeUndefined()
   })
 
+  it('should return undefined for a lone next-line character', () => {
+    const document = parseHtml('<div>\u0085<span>nested only</span></div>')
+    const element = queryElement(document, 'div')
+
+    expect(textNode(element)).toBeUndefined()
+  })
+
   it('should return undefined for a nullish element', () => {
     expect(textNode(null)).toBeUndefined()
   })
@@ -1477,6 +1484,13 @@ describeForEachParser('attr', (parseHtml) => {
 
   it('should return undefined for a blank attribute', () => {
     const document = parseHtml('<a href="  "></a>')
+    const element = queryElement(document, 'a')
+
+    expect(attr(element, 'href')).toBeUndefined()
+  })
+
+  it('should return undefined for a lone next-line character', () => {
+    const document = parseHtml('<a href="\u0085"></a>')
     const element = queryElement(document, 'a')
 
     expect(attr(element, 'href')).toBeUndefined()
