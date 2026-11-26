@@ -225,11 +225,11 @@ export const instagramAmpEmbedResolver = createMarkupEmbedResolver(
 
 type SubstackPostAttributes = {
   instagram_id?: string
-  title?: string | null
-  author_name?: string | null
-  thumbnail_url?: string | null
-  profile_pic_url?: string | null
-  timestamp?: string | null
+  title?: Nullish<string>
+  author_name?: Nullish<string>
+  thumbnail_url?: Nullish<string>
+  profile_pic_url?: Nullish<string>
+  timestamp?: Nullish<string>
 }
 
 // The og:title quotes the caption behind the poster's name, and the payload carries no field

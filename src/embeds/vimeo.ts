@@ -294,7 +294,7 @@ const vimeoEmbedParams = ['loop']
 // The player seeks to `t` in the fragment, `#t=30s`, and ignores a `t` in the query, which a page
 // url shared with a start carries.
 const readStart = (url: URL): string | undefined => {
-  return getFragmentParams(url, ['t']).t ?? getQueryParams(url.search, ['t']).t
+  return getFragmentParams(url, ['t']).t ?? getQueryParams(url, ['t']).t
 }
 
 // The `title` a share snippet writes is usually the video's own title, but sometimes a player
@@ -314,7 +314,7 @@ export const vimeoResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const params = {
     // The player takes the hash only as h=: the /video/{id}/{hash} path spelling is a 404.
     ...trimObject({ h: hash }, Boolean),
-    ...getQueryParams(url.search, vimeoEmbedParams),
+    ...getQueryParams(url, vimeoEmbedParams),
   }
 
   return {

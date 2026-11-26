@@ -188,13 +188,13 @@ const parseWatchOffset = (value: string): string | undefined => {
 // The player ignores `t`, so an offset moves over as `start` unless one is stated. Besides the
 // query, publishers write it in the fragment as `#t=220`.
 const readEmbedParams = (url: URL): Record<string, string> => {
-  const params = getQueryParams(url.search, youtubeEmbedParams)
+  const params = getQueryParams(url, youtubeEmbedParams)
 
   if (params.start) {
     return params
   }
 
-  const offsets = [getQueryParams(url.search, ['t']).t, getFragmentParams(url, ['t']).t]
+  const offsets = [getQueryParams(url, ['t']).t, getFragmentParams(url, ['t']).t]
   const start = offsets.map((offset) => parseWatchOffset(offset ?? '')).find(Boolean)
 
   if (start) {
@@ -430,7 +430,7 @@ export const youtubeFrontendEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const params = getQueryParams(url.search, youtubeEmbedParams)
+    const params = getQueryParams(url, youtubeEmbedParams)
     const offset = frontendOffsetParams
       .map((name) => getQueryParam(url.searchParams, name))
       .find(Boolean)

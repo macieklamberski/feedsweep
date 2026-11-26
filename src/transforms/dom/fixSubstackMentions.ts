@@ -1,4 +1,4 @@
-import { isInteger, isNonEmptyString } from 'trousse'
+import { isInteger, isNonEmptyString, type Nullish } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { jsonAttr } from '../../utils/dom.js'
 import { isUrlShaped } from '../../utils/urls.js'
@@ -7,7 +7,7 @@ import { createLink } from '../../utils/widgets.js'
 type MentionAttrs = {
   name?: string
   id?: number
-  url?: string | null
+  url?: Nullish<string>
 }
 
 // Substack ships an @-mention as an empty span whose name lives only in its data-attrs JSON.

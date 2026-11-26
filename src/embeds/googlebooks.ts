@@ -4,6 +4,7 @@ import {
   getQueryParam,
   getQueryParams,
   isAnyOf,
+  isHostOf,
   parseUrl,
 } from 'trousse'
 import { placeholderBaseUrl } from '../utils/urls.js'
@@ -37,7 +38,7 @@ export const googlebooksEmbedResolver = createMarkupEmbedResolver(
   (element, context) => {
     const parsed = parseUrl(readRepairedCarrierUrl(element, context), placeholderBaseUrl)
 
-    if (!parsed || !viewerHostRegex.test(parsed.hostname)) {
+    if (!parsed || !isHostOf(parsed, viewerHostRegex)) {
       return
     }
 
@@ -48,8 +49,8 @@ export const googlebooksEmbedResolver = createMarkupEmbedResolver(
       return
     }
 
-    const volume = { id, ...getQueryParams(parsed.search, pageParams) }
-    const highlights = getQueryParams(parsed.search, highlightParams)
+    const volume = { id, ...getQueryParams(parsed, pageParams) }
+    const highlights = getQueryParams(parsed, highlightParams)
     const cover = { id, printsec: 'frontcover', img: '1', zoom: '1' }
 
     return {

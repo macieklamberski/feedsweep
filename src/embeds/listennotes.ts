@@ -65,7 +65,7 @@ export const listennotesResolveEmbed: ResolveUrlEmbed = (url, element) => {
 
   const [route = '', slug = '', item, embed] = segments
   const title = attr(element, 'title')
-  const episodeQuery = composeQuery(getQueryParams(url.search, episodeParams))
+  const episodeQuery = composeQuery(getQueryParams(url, episodeParams))
 
   if (!item) {
     return

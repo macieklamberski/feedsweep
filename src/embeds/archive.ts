@@ -105,7 +105,7 @@ const readItemEmbed = (url: URL | undefined): EmbedResolverResult | undefined =>
   }
 
   // The parameters that say what plays are carried over; the rest is dropped.
-  const query = composeQuery(getQueryParams(url?.search ?? '', archiveEmbedParams))
+  const query = composeQuery(getQueryParams(url, archiveEmbedParams))
 
   return composeEmbedResult(identifier, query, file)
 }

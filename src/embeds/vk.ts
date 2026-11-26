@@ -6,6 +6,7 @@ import {
   isPlainObject,
   isPresent,
   isString,
+  parseJson,
   toMap,
   trimObject,
 } from 'trousse'
@@ -69,8 +70,8 @@ export const vkResolveEmbed: ResolveUrlEmbed = (url) => {
   }
 
   const params = page
-    ? { oid: ownerId, id: videoId, ...getQueryParams(url.search, ['t']) }
-    : getQueryParams(url.search, playerParams)
+    ? { oid: ownerId, id: videoId, ...getQueryParams(url, ['t']) }
+    : getQueryParams(url, playerParams)
   const id = `${ownerId}_${videoId}`
   // See: https://dev.vk.com/ru/widgets/video, which writes the player on vk.ru.
   const src = `https://vk.ru${player.path}${composeQuery(params)}`
@@ -188,13 +189,11 @@ export const readVkHeight = (data: unknown): number | undefined => {
     return
   }
 
-  try {
-    const message: unknown = JSON.parse(data.slice(widgetFrameKey.length + 1))
+  const message = parseJson(data.slice(widgetFrameKey.length + 1))
 
-    if (Array.isArray(message) && message[0] === 'resize' && Array.isArray(message[1])) {
-      return readPixels(message[1][0])
-    }
-  } catch {}
+  if (Array.isArray(message) && message[0] === 'resize' && Array.isArray(message[1])) {
+    return readPixels(message[1][0])
+  }
 }
 
 // See: https://vk.com/js/api/videoplayer.js.

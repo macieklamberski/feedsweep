@@ -48,7 +48,7 @@ const readFileEmbed = (url: URL): EmbedResolverResult | undefined => {
     return
   }
 
-  const params = getQueryParams(url.search, contentParams)
+  const params = getQueryParams(url, contentParams)
   const path = `${kind}/${key}/${name}`
   // Figma renamed the `file` route to `design`, and both name one file, so they share one key.
   const idKind = isAnyOf(kind, 'file') ? 'design' : kind

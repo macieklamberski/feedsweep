@@ -74,7 +74,7 @@ export const scribdResolveEmbed: ResolveUrlEmbed = (url, element) => {
     return
   }
 
-  const params = getQueryParams(url.search, playerParams)
+  const params = getQueryParams(url, playerParams)
 
   return { ...composeEmbed(document, params), title: attr(element, 'title') }
 }

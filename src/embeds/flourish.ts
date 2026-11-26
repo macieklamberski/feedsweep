@@ -5,6 +5,7 @@ import {
   isHostOf,
   isPlainObject,
   isString,
+  parseJson,
 } from 'trousse'
 import type {
   EmbedRenderHint,
@@ -108,13 +109,11 @@ export const readFlourishHeight = (data: unknown): number | undefined => {
     return
   }
 
-  try {
-    const message: unknown = JSON.parse(data)
+  const message = parseJson(data)
 
-    if (isPlainObject(message) && message.sender === 'Flourish') {
-      return readPixels(message.height)
-    }
-  } catch {}
+  if (isPlainObject(message) && message.sender === 'Flourish') {
+    return readPixels(message.height)
+  }
 }
 
 export const flourishFieldCleaners: Array<FieldCleaner> = [

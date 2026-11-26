@@ -29,7 +29,7 @@ export const bunnystreamResolveEmbed: ResolveUrlEmbed = (url, element) => {
   }
 
   const [, libraryId, videoId] = match
-  const picked = getQueryParams(url.search, playbackParams)
+  const picked = getQueryParams(url, playbackParams)
   // The player autoplays unless the library turns it off, so a frame loaded without a click
   // would play unasked.
   const query = composeQuery({ autoplay: 'false', ...picked })

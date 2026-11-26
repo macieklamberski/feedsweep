@@ -1,4 +1,4 @@
-import { getPathSegments, isAnyOf, isPlainObject, isString, parseUrl } from 'trousse'
+import { getPathSegments, isAnyOf, isPlainObject, isString, parseJson, parseUrl } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
@@ -78,17 +78,15 @@ export const readTumblrHeight = (data: unknown): number | undefined => {
     return
   }
 
-  try {
-    const message: unknown = JSON.parse(data)
+  const message = parseJson(data)
 
-    if (
-      isPlainObject(message) &&
-      message.method === 'tumblr-post:sizeChange' &&
-      Array.isArray(message.args)
-    ) {
-      return readPixels(message.args[0])
-    }
-  } catch {}
+  if (
+    isPlainObject(message) &&
+    message.method === 'tumblr-post:sizeChange' &&
+    Array.isArray(message.args)
+  ) {
+    return readPixels(message.args[0])
+  }
 }
 
 export const tumblrRenderHint: EmbedRenderHint = {

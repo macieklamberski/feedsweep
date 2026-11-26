@@ -1,4 +1,4 @@
-import { getQueryParam, isAnyOf, parseUrl, webImageExtensions } from 'trousse'
+import { getQueryParam, isAnyOf, isNonEmptyString, parseUrl, webImageExtensions } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import {
   type ElementDimensions,
@@ -52,7 +52,7 @@ const hasRasterFormatQuery = (src: string): boolean => {
 const hasContentImageSignal = (image: Element, dimensions: ElementDimensions): boolean => {
   const srcset = image.getAttribute('srcset')
 
-  if (srcset && srcset.trim().length > 0) {
+  if (isNonEmptyString(srcset)) {
     return true
   }
 

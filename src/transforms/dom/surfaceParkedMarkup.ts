@@ -1,4 +1,4 @@
-import { decodeSegment } from 'trousse'
+import { decodeBase64Binary, decodeSegment } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { setInnerHtml } from '../../utils/dom.js'
 import { isUrlShaped } from '../../utils/urls.js'
@@ -20,10 +20,17 @@ const hasStatedUrl = (holder: Element): boolean => {
   return false
 }
 
-// Borlabs Cookie unblocks with `b64DecodeToUnicode`, which reads the base64 bytes as UTF-8.
-const decodeBase64 = (value: string): string | undefined => {
+// Borlabs Cookie unblocks with `b64DecodeToUnicode`, which reads the base64 bytes as UTF-8. A
+// payload that is not UTF-8 is left parked.
+const decodeBorlabsPayload = (value: string): string | undefined => {
+  const binary = decodeBase64Binary(value)
+
+  if (binary === undefined) {
+    return
+  }
+
   try {
-    const bytes = Uint8Array.from(atob(value), (char) => char.charCodeAt(0))
+    const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0))
 
     return new TextDecoder('utf-8', { fatal: true }).decode(bytes)
   } catch {}
@@ -44,7 +51,7 @@ const parkedCarriers = [
   {
     selector: '[data-borlabs-cookie-content]',
     attribute: 'data-borlabs-cookie-content',
-    decode: decodeBase64,
+    decode: decodeBorlabsPayload,
     hasOwnContent: false,
   },
 

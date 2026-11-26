@@ -12,6 +12,7 @@ import {
   isPlainObject,
   isString,
   type Nullish,
+  parseJson,
   trimObject,
 } from 'trousse'
 import type {
@@ -192,7 +193,7 @@ const dailymotionEmbedParams = ['start', 'startTime', 'loop', 'playlist']
 
 // A player id's player reads the start as `startTime` and ignores the old `start`.
 const readPlayerParams = (url: URL): Record<string, string> => {
-  const params = getQueryParams(url.search, dailymotionEmbedParams)
+  const params = getQueryParams(url, dailymotionEmbedParams)
 
   return {
     ...trimObject(
@@ -331,13 +332,9 @@ const isDailymotionReady = (data: unknown): boolean => {
     return false
   }
 
-  try {
-    const message: unknown = JSON.parse(data)
+  const message = parseJson(data)
 
-    return isPlainObject(message) && message.event === 'apiready' && message.id === iframeId
-  } catch {
-    return false
-  }
+  return isPlainObject(message) && message.event === 'apiready' && message.id === iframeId
 }
 
 export const dailymotionRenderHint: EmbedRenderHint = {

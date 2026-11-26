@@ -1,4 +1,4 @@
-import type { Nullish } from 'trousse'
+import { isNonEmptyString, type Nullish } from 'trousse'
 
 // The explicit `undefined` stands in for noUncheckedIndexedAccess, which the project does not run.
 export type Declarations = Record<string, string | undefined>
@@ -204,7 +204,7 @@ export const removeDeclarations = (element: Element, properties: Array<string>):
     return !properties.includes(property)
   })
 
-  if (!kept.join('').trim()) {
+  if (!isNonEmptyString(kept.join(''))) {
     element.removeAttribute('style')
     return
   }

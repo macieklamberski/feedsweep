@@ -1,4 +1,12 @@
-import { getPathSegments, isAnyOf, isPlainObject, isString, parseUrl } from 'trousse'
+import {
+  getPathSegments,
+  isAnyOf,
+  isHostOf,
+  isPlainObject,
+  isString,
+  parseJson,
+  parseUrl,
+} from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { isPlayerJsReady, playerJsPlayRequest, readPixels } from '../utils/hints.js'
@@ -61,7 +69,7 @@ export const podigeeScriptEmbedResolver = createMarkupEmbedResolver(
 )
 
 export const podigeeResolveEmbed: ResolveUrlEmbed = (url) => {
-  if (!showHostRegex.test(url.hostname)) {
+  if (!isHostOf(url, showHostRegex)) {
     return
   }
 
@@ -100,13 +108,11 @@ export const readPodigeeHeight = (data: unknown): number | undefined => {
     return
   }
 
-  try {
-    const message: unknown = JSON.parse(data)
+  const message = parseJson(data)
 
-    if (isPlainObject(message) && message.listenTo === 'configurePlayer') {
-      return readPixels(message.height)
-    }
-  } catch {}
+  if (isPlainObject(message) && message.listenTo === 'configurePlayer') {
+    return readPixels(message.height)
+  }
 }
 
 // The player takes no query to start and speaks player.js, and Podigee's help says playback waits

@@ -1,5 +1,6 @@
 import {
   composeQuery,
+  decodeBase64UrlBinary,
   encodePathSegment,
   getPathSegments,
   getQueryParam,
@@ -61,14 +62,10 @@ const readPlayerKeyAccount = (key: Nullish<string>): string | undefined => {
     return
   }
 
-  let bytes: string
+  // The key's base64 pads with either `~` or `.`.
+  const bytes = decodeBase64UrlBinary(encoded.replaceAll('~', '=').replaceAll('.', '='))
 
-  try {
-    // The key's base64 pads with either `~` or `.`.
-    bytes = atob(
-      encoded.replaceAll('-', '+').replaceAll('_', '/').replaceAll('~', '=').replaceAll('.', '='),
-    )
-  } catch {
+  if (bytes === undefined) {
     return
   }
 

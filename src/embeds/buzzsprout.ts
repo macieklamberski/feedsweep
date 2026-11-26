@@ -92,7 +92,7 @@ export const buzzsproutScriptEmbedResolver = createMarkupEmbedResolver(
     const show = url.pathname.match(showScriptPathRegex)
 
     if (show?.[1]) {
-      return composeEmbed(show[1], undefined, getQueryParams(url.search, showPlayerParams))
+      return composeEmbed(show[1], undefined, getQueryParams(url, showPlayerParams))
     }
   },
 )

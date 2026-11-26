@@ -1,4 +1,5 @@
 import { find as linkifyFind } from 'linkifyjs'
+import { isNonEmptyString } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import { collectTextNodes, rawTextElements } from '../../utils/dom.js'
 import { cleanUrl } from '../../utils/urls.js'
@@ -24,7 +25,7 @@ export const linkifyUrls: DomTransform = (context) => {
       const text = node.textContent
 
       // Fast pre-check: skip nodes without "://".
-      if (!text?.trim() || !text?.includes('://')) {
+      if (!isNonEmptyString(text) || !text.includes('://')) {
         continue
       }
 

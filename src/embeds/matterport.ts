@@ -28,7 +28,7 @@ const matterportResolveEmbed: ResolveUrlEmbed = (url, element) => {
     return
   }
 
-  const query = composeQuery({ m: id, ...getQueryParams(url.search, navigationParams) })
+  const query = composeQuery({ m: id, ...getQueryParams(url, navigationParams) })
 
   return {
     provider,

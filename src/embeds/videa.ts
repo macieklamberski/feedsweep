@@ -28,7 +28,7 @@ export const videaResolveEmbed: ResolveUrlEmbed = (url, element) => {
     return
   }
 
-  const query = composeQuery({ v: id, ...getQueryParams(url.search, ['start']) })
+  const query = composeQuery({ v: id, ...getQueryParams(url, ['start']) })
 
   return {
     provider,

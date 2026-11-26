@@ -1,4 +1,4 @@
-import { composeQuery, encodePathSegment, getQueryParam, parseUrl } from 'trousse'
+import { composeQuery, encodePathSegment, getQueryParam, isHostOf, parseUrl } from 'trousse'
 import type { ResolveEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { placeholderBaseUrl } from '../utils/urls.js'
@@ -25,7 +25,7 @@ const cardPathRegex = /^\/kp\/card\/?$/i
 export const kindleResolveEmbed: ResolveEmbed = (url, element) => {
   const parsed = parseUrl(url, placeholderBaseUrl)
 
-  if (!parsed || !readerHostRegex.test(parsed.hostname) || !cardPathRegex.test(parsed.pathname)) {
+  if (!parsed || !isHostOf(parsed, readerHostRegex) || !cardPathRegex.test(parsed.pathname)) {
     return
   }
 

@@ -3,6 +3,7 @@ import {
   getPathSegments,
   getQueryParam,
   isAnyOf,
+  isHostOf,
   type Nullish,
   parseUrl,
   toMap,
@@ -268,8 +269,8 @@ const soundcloudResolveEmbed: ResolveUrlEmbed = (url, element) => {
   // widget's `url=` or as the whole src. A page states its kind in the path, which is enough to
   // size the player and to give the placeholder a url a reader can follow.
   const page = reference || streamTrackId ? undefined : parseUrlOnHosts(inner ?? url, hosts)
-  const shortLink = page && shortLinkHostRegex.test(page.hostname) ? page : undefined
-  const pageSegments = page && pageHostRegex.test(page.hostname) ? getPathSegments(page) : []
+  const shortLink = page && isHostOf(page, shortLinkHostRegex) ? page : undefined
+  const pageSegments = page && isHostOf(page, pageHostRegex) ? getPathSegments(page) : []
   const secretToken = pageSegments.find((segment) => secretTokenRegex.test(segment))
   const permalink = pageSegments.filter((segment) => segment !== secretToken)
   const pageKind = readPageKind(permalink)
@@ -290,7 +291,7 @@ const soundcloudResolveEmbed: ResolveUrlEmbed = (url, element) => {
     result.src = composeWidgetUrl(inner, queryToken, startTrack)
   }
 
-  if (flashPlayerHostRegex.test(url.hostname) && !inner) {
+  if (isHostOf(url, flashPlayerHostRegex) && !inner) {
     return
   }
 
@@ -327,7 +328,7 @@ const soundcloudResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const anchors = links.filter((anchor) => {
     const page = parseUrlOnHosts(attr(anchor, 'href'), hosts)
 
-    return page && pageHostRegex.test(page.hostname)
+    return page && isHostOf(page, pageHostRegex)
   })
 
   // The Copy embed snippet ships a sibling div, `{artist} · {track}`, and the Flash snippet a

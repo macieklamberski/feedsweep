@@ -39,9 +39,8 @@ const vokiFlashResolveEmbed: ResolveUrlEmbed = (url) => {
 
   // The scene url ends in `getvoki/chsm={chsm}&sc={sc}`, its `&` kept as `%26` inside `doc`.
   const [route, scene] = getQueryParam(url.searchParams, 'doc')?.split('/').slice(-2) ?? []
-  const params = new URLSearchParams(scene)
-  const sc = getQueryParam(params, 'sc')
-  const chsm = getQueryParam(params, 'chsm')
+  const sc = getQueryParam(scene, 'sc')
+  const chsm = getQueryParam(scene, 'chsm')
 
   if (!isAnyOf(route, 'getvoki') || !sc || !chsm) {
     return

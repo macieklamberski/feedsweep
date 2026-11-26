@@ -1,4 +1,4 @@
-import { composeQuery, getQueryParam, isAnyOf, isHostOf } from 'trousse'
+import { composeQuery, decodeBase64Binary, getQueryParam, isAnyOf, isHostOf } from 'trousse'
 import type { ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { createUrlEmbedResolver } from '../utils/widgets.js'
@@ -22,9 +22,7 @@ const sizes = {
 
 // The player's `hash` is the base64 of `{accountId}+{itemHash}`.
 const decodePlayerHash = (hash: string): string | undefined => {
-  try {
-    return atob(hash).split('+')[1]
-  } catch {}
+  return decodeBase64Binary(hash)?.split('+')[1]
 }
 
 const readItemHash = (parsed: URL): string | undefined => {

@@ -1,4 +1,4 @@
-import { getQueryParam, parseUrl } from 'trousse'
+import { decodeBase64UrlBinary, getQueryParam, parseUrl } from 'trousse'
 import type { MediaResolverResult, WidgetResolver } from '../types.js'
 import { attr, flashVars, parseFlashVars } from '../utils/dom.js'
 import { flashFileRegex, parseUrlOnHosts, placeholderBaseUrl } from '../utils/urls.js'
@@ -18,14 +18,13 @@ const titlesOptionRegex = /\btitles\s*:\s*(["'])(.*?)\1/i
 const decodeSource = (value: string): string => {
   const trimmed = value.length % 4 === 1 ? value.slice(0, -1) : value
 
-  try {
-    const binary = atob(trimmed.replaceAll('-', '+').replaceAll('_', '/'))
-    const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0))
+  const binary = decodeBase64UrlBinary(trimmed)
 
-    return new TextDecoder().decode(bytes)
-  } catch {
+  if (binary === undefined) {
     return value
   }
+
+  return new TextDecoder().decode(Uint8Array.from(binary, (char) => char.charCodeAt(0)))
 }
 
 // The player splits `soundFile` and `titles` on commas into a playlist and starts at the first.

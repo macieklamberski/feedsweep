@@ -1,3 +1,4 @@
+import { isNonEmptyString } from 'trousse'
 import type { StringTransform } from '../../types.js'
 import { isEscapedHtmlFragment } from '../../utils/html.js'
 
@@ -18,7 +19,7 @@ export const paragraphizePlainText: StringTransform = () => {
       return html
     }
 
-    if (!html.trim()) {
+    if (!isNonEmptyString(html)) {
       return ''
     }
 
@@ -36,7 +37,7 @@ export const paragraphizePlainText: StringTransform = () => {
     for (const chunk of chunks) {
       const piece = chunk.replace(edgeNewlinesRegex, '')
 
-      if (!piece.trim()) {
+      if (!isNonEmptyString(piece)) {
         continue
       }
 

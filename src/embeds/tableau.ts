@@ -1,4 +1,4 @@
-import { decodeSegment, encodePathSegment, isString, type Nullish } from 'trousse'
+import { decodeSegment, encodePathSegment, isString, type Nullish, parseJson } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr, paramValue, text } from '../utils/dom.js'
 import { readPixels } from '../utils/hints.js'
@@ -157,18 +157,16 @@ export const readTableauHeight = (data: unknown): number | undefined => {
     return
   }
 
-  try {
-    const message: SizeMessage = JSON.parse(data.match(sizeMessageRegex)?.[1] ?? '')
-    const command: SizeCommand = JSON.parse(message['api.commandData'] ?? '')
-    const constraints = command.sizeConstraints
-    const vizHeight = readPixels(constraints?.maxHeight) ?? readPixels(constraints?.minHeight)
+  const message = parseJson<SizeMessage>(data.match(sizeMessageRegex)?.[1])
+  const command = parseJson<SizeCommand>(message?.['api.commandData'])
+  const constraints = command?.sizeConstraints
+  const vizHeight = readPixels(constraints?.maxHeight) ?? readPixels(constraints?.minHeight)
 
-    if (!vizHeight) {
-      return
-    }
+  if (!vizHeight) {
+    return
+  }
 
-    return vizHeight + (readPixels(command.chromeHeight) ?? 0)
-  } catch {}
+  return vizHeight + (readPixels(command?.chromeHeight) ?? 0)
 }
 
 export const tableauRenderHint: EmbedRenderHint = {

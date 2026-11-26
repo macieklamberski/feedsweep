@@ -1,4 +1,4 @@
-import { isAnyOf, toMap } from 'trousse'
+import { isAnyOf, isNonEmptyString, toMap } from 'trousse'
 import type { DomTransform } from '../../types.js'
 import {
   attr,
@@ -332,7 +332,7 @@ export const highlightCode: DomTransform = ({ highlightFn }) => {
       }
 
       const rawContentLines = getCodeBlockText(code).split('\n')
-      const nonEmptyContentLines = rawContentLines.filter((line) => line.trim())
+      const nonEmptyContentLines = rawContentLines.filter(isNonEmptyString)
 
       // A pretty-printing feed wraps inline <code>word</code> in newlines, so one line is no block.
       if (nonEmptyContentLines.length < 2) {
@@ -358,7 +358,7 @@ export const highlightCode: DomTransform = ({ highlightFn }) => {
 
       const text = getCodeBlockText(target)
 
-      if (!text.trim()) {
+      if (!isNonEmptyString(text)) {
         continue
       }
 
