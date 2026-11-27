@@ -244,7 +244,7 @@ const readPayloadCaption = (title: string | undefined): string | undefined => {
     return
   }
 
-  const wrapped = title.match(wrappedCaptionRegex)
+  const wrapped = wrappedCaptionRegex.exec(title)
 
   if (!wrapped) {
     return title

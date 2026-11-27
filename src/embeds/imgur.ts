@@ -141,7 +141,7 @@ const composeAlbumEmbed = (segment: string | undefined): EmbedResolverResult | u
     return
   }
 
-  const id = segment.match(sluggedPostIdRegex)?.[1]
+  const id = sluggedPostIdRegex.exec(segment)?.[1]
 
   if (!id) {
     return
