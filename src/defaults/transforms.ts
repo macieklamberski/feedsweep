@@ -109,7 +109,7 @@ import { unwrapCdataComments } from '../transforms/string/unwrapCdataComments.js
 import { unwrapCdataMarkers } from '../transforms/string/unwrapCdataMarkers.js'
 import type { DomTransform, ResolveUrlFn, StringTransform } from '../types.js'
 
-export const defaultStringTransforms: ReadonlyArray<StringTransform> = [
+export const defaultStringTransforms: Array<StringTransform> = [
   stripControlChars,
   stripOversizedBase64Sources,
   unwrapCdataComments,
@@ -117,7 +117,7 @@ export const defaultStringTransforms: ReadonlyArray<StringTransform> = [
   paragraphizePlainText,
 ]
 
-export const defaultStandardDomTransforms: ReadonlyArray<DomTransform> = [
+export const defaultStandardDomTransforms: Array<DomTransform> = [
   decodeDoubleEncodedTags,
 
   // Dissolves a lazy-loader or Borlabs Cookie container into the original embed markup it holds
@@ -405,7 +405,7 @@ export const defaultStandardDomTransforms: ReadonlyArray<DomTransform> = [
 // Opt-in "best judgement" transforms that may drop content on a heuristic. Not in
 // the standard pipeline. Enable them with the `heuristics` option (which selects
 // defaultAllDomTransforms) or by composing them into a custom `domTransforms`.
-export const heuristicDomTransforms: ReadonlyArray<DomTransform> = [
+export const heuristicDomTransforms: Array<DomTransform> = [
   assignVideoPosters,
   stripDuplicateEnclosures,
 
@@ -417,10 +417,11 @@ export const heuristicDomTransforms: ReadonlyArray<DomTransform> = [
 // The standard pipeline with the heuristic transforms spliced in right after
 // injectEnclosures: they must run after injection (stripDuplicateEnclosures reads
 // the markers it leaves) and before proxyAssetUrls rewrites media URLs.
-export const defaultAllDomTransforms: ReadonlyArray<DomTransform> =
-  defaultStandardDomTransforms.flatMap((transform) => {
+export const defaultAllDomTransforms: Array<DomTransform> = defaultStandardDomTransforms.flatMap(
+  (transform) => {
     return transform === injectEnclosures ? [transform, ...heuristicDomTransforms] : [transform]
-  })
+  },
+)
 
 export const defaultResolveUrlFn: ResolveUrlFn = resolveUrl
 

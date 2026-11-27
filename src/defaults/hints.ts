@@ -98,7 +98,7 @@ import type { EmbedRenderHint } from '../types.js'
 // What a reader needs from each provider once it turns the placeholder into a frame: how to
 // start playback on the click, by query or by a message into the frame, and how the player
 // reports its rendered height. One per provider, beside its resolver.
-export const defaultEmbedRenderHints: ReadonlyArray<EmbedRenderHint> = [
+export const defaultEmbedRenderHints: Array<EmbedRenderHint> = [
   acastRenderHint,
   acuityschedulingRenderHint,
   airtableRenderHint,

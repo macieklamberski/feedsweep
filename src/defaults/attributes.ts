@@ -2,7 +2,7 @@ import type { ScopedAttribute } from '../types.js'
 
 // Attributes that park a media file URL on a container which then builds the player with JS,
 // so the media never appears for a reader. The shapes were verified in live markup 2026-08-01.
-export const defaultMediaSrcAttributes: ReadonlyArray<ScopedAttribute> = [
+export const defaultMediaSrcAttributes: Array<ScopedAttribute> = [
   { attribute: 'data-src' }, // Drupal audiofield (`.audiofield-wordpress-player`) and assorted themes.
   { attribute: 'data-video-src' }, // Discourse video placeholders, Discourse 3.2+: every forum on that version emits it.
   { attribute: 'data-mp4' }, // Beaver Builder row background video (`.fl-bg-video`).
@@ -17,7 +17,7 @@ export const defaultMediaSrcAttributes: ReadonlyArray<ScopedAttribute> = [
   { attribute: 'data-pswp-video-src' }, // PhotoSwipe video support.
 ]
 
-export const defaultLazySrcAttributes: ReadonlyArray<string> = [
+export const defaultLazySrcAttributes = [
   'data-src', // lazysizes / vanilla-lazyload / lozad / Drupal Blazy / a3 Lazy Load / Smush / EWWW / generic.
   'data-original', // Legacy jquery_lazyload (tuupola v1): large legacy footprint.
   'data-lazy-src', // Jetpack Lazy Images / WP Rocket / BJ Lazy Load.
@@ -43,7 +43,7 @@ export const defaultLazySrcAttributes: ReadonlyArray<string> = [
   'data-original-mos', // CMS lazy-image variant.
 ]
 
-export const defaultLazySrcsetAttributes: ReadonlyArray<string> = [
+export const defaultLazySrcsetAttributes = [
   'data-srcset', // lazysizes / vanilla-lazyload / lozad / bLazy / generic.
   'data-tf-srcset', // Avada / Fusion ThemeBuilder.
   'data-lazy-srcset', // Jetpack Lazy Images / WP Rocket / BJ Lazy Load.
@@ -62,13 +62,13 @@ export const defaultLazySrcsetAttributes: ReadonlyArray<string> = [
 ]
 
 // Attributes that park an image's alt text on a <picture> whose loader script appends the <img>.
-export const defaultLazyAltAttributes: ReadonlyArray<string> = [
+export const defaultLazyAltAttributes = [
   'data-alt', // lozad.
 ]
 
 // Attributes that hold a lazy/consent-gated iframe src (the real embed URL) when the
 // `src` itself is empty or `about:blank`.
-export const defaultLazyIframeAttributes: ReadonlyArray<string> = [
+export const defaultLazyIframeAttributes = [
   'data-lazy-src', // Generic lazy loaders.
   'data-src', // Generic lazy loaders.
   'data-url', // Generic lazy loaders.
@@ -127,7 +127,7 @@ export const defaultLazyIframeAttributes: ReadonlyArray<string> = [
   'data-wp-video-popup-url', // WP Video Popup: the lightbox iframe ships with an empty src.
 ]
 
-export const defaultDeferredIframeSources: ReadonlyArray<ScopedAttribute> = [
+export const defaultDeferredIframeSources: Array<ScopedAttribute> = [
   // Pym.js (NPR): the established responsive-embed convention; skip already-initialized nodes.
   { selector: '[data-pym-src]:not([data-pym-auto-initialized])', attribute: 'data-pym-src' },
 

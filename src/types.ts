@@ -230,20 +230,20 @@ export type TransformContext = {
   // The feed's logo, icon and cover, which an enclosure repeats as decoration.
   feedImageUrls?: Array<string>
   enclosures?: Array<Enclosure>
-  widgetResolvers: ReadonlyArray<WidgetResolver>
-  mediaSrcAttributes: ReadonlyArray<ScopedAttribute>
-  lazySrcAttributes: ReadonlyArray<string>
-  lazySrcsetAttributes: ReadonlyArray<string>
-  lazyAltAttributes: ReadonlyArray<string>
-  lazyIframeAttributes: ReadonlyArray<string>
-  deferredIframeSources: ReadonlyArray<ScopedAttribute>
-  trackingUrls: ReadonlyArray<UrlPattern>
-  emojiResolvers: ReadonlyArray<EmojiResolver>
-  avatarImageHosts: ReadonlyArray<string>
-  nonContentSelectors: ReadonlyArray<string>
-  preservedPreClasses: ReadonlyArray<string>
-  revealableSelectors: ReadonlyArray<string>
-  fieldCleaners: ReadonlyArray<FieldCleaner>
+  widgetResolvers: Array<WidgetResolver>
+  mediaSrcAttributes: Array<ScopedAttribute>
+  lazySrcAttributes: Array<string>
+  lazySrcsetAttributes: Array<string>
+  lazyAltAttributes: Array<string>
+  lazyIframeAttributes: Array<string>
+  deferredIframeSources: Array<ScopedAttribute>
+  trackingUrls: Array<UrlPattern>
+  emojiResolvers: Array<EmojiResolver>
+  avatarImageHosts: Array<string>
+  nonContentSelectors: Array<string>
+  preservedPreClasses: Array<string>
+  revealableSelectors: Array<string>
+  fieldCleaners: Array<FieldCleaner>
   resolveUrlFn: ResolveUrlFn
   cleanUrlFn?: CleanUrlFn
   matchUrlFn?: CleanUrlFn
@@ -280,8 +280,8 @@ export type TransformContentOptions = {
   parseDateFn?: ParseDateFn
   highlightFn?: HighlightFn
   articleTitle?: string
-  stringTransforms?: ReadonlyArray<StringTransform>
-  domTransforms?: ReadonlyArray<DomTransform>
+  stringTransforms?: Array<StringTransform>
+  domTransforms?: Array<DomTransform>
   // Opt into the "best judgement" heuristic transforms (video-poster assignment, duplicate
   // enclosures and duplicate leading images). Ignored when `domTransforms` is set explicitly.
   heuristics?: boolean
