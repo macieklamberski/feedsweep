@@ -1,4 +1,4 @@
-export const defaultNonContentSelectors = [
+export const defaultNonContentSelectors: ReadonlyArray<string> = [
   // Subscribe and newsletter signup forms.
   '[data-component-name="SubscribeWidget"]', // Substack inline subscribe widget.
   '.subscription-widget-wrap-editor', // Substack paywall / subscribe CTA.
@@ -334,7 +334,7 @@ export const defaultNonContentSelectors = [
 // matching runs, `wp-block-verse` and `wp-block-preformatted` dominate
 // the false-positive cases (split poems, ToCs), while `wp-block-code`
 // stays out: fragmented code blocks are the merge's intended target.
-export const defaultPreservedPreClasses = [
+export const defaultPreservedPreClasses: ReadonlyArray<string> = [
   'wp-block-verse', // WordPress Gutenberg Verse block: poems, lyrics, scripture stanzas.
   'wp-block-preformatted', // WordPress Gutenberg Preformatted block: author-chosen distinct blocks (ToCs, quotes, numbered headings).
 ]
@@ -342,7 +342,7 @@ export const defaultPreservedPreClasses = [
 // Slider, gallery, spoiler, accordion and tab containers, and document frames, a plugin hides
 // until a click or its script shows them. `stripHiddenElements` unhides a hidden element matching
 // one of these.
-export const defaultRevealableSelectors = [
+export const defaultRevealableSelectors: ReadonlyArray<string> = [
   // Accordions and collapsible blocks.
   '.text-accordion-content', // Accordion block panel.
   '.collapsible-block-unfolded', // Wikidot collapsible block.
