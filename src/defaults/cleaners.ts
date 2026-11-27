@@ -37,7 +37,7 @@ import type { FieldCleaner } from '../types.js'
 // The labels a platform's snippet writes where the item's own title or description belongs,
 // stripped once where every placeholder is prepared rather than in each resolver. Declared
 // beside the resolver that knows the platform.
-export const defaultFieldCleaners: ReadonlyArray<FieldCleaner> = [
+export const defaultFieldCleaners: Array<FieldCleaner> = [
   ...acastFieldCleaners,
   ...anchorFieldCleaners,
   ...appleFieldCleaners,

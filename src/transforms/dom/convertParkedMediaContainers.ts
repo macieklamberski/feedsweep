@@ -7,7 +7,7 @@ const playableSelector = playableElements.join(', ')
 
 const findParkedMedia = (
   element: Element,
-  entries: ReadonlyArray<ScopedAttribute>,
+  entries: Array<ScopedAttribute>,
 ): MediaResolverResult | undefined => {
   for (const entry of entries) {
     if (!isInScope(element, entry)) {
