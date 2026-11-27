@@ -2,6 +2,7 @@ import {
   coerceNumber,
   getQueryParam,
   isAnyOf,
+  isNonEmptyString,
   isPresent,
   isSameText,
   type Nullish,
@@ -99,10 +100,21 @@ export const find = (
   }
 }
 
+// The trimmed value, or undefined when only Unicode whitespace or a byte-order mark is left.
+const trimText = (value: Nullish<string>): string | undefined => {
+  const trimmed = value?.trim()
+
+  if (!isNonEmptyString(trimmed)) {
+    return
+  }
+
+  return trimmed
+}
+
 export const text = (node: Nullish<Node>, selector?: string): string | undefined => {
   const target = selector ? find(isElement(node) ? node : undefined, selector) : node
 
-  return target?.textContent?.trim() || undefined
+  return trimText(target?.textContent)
 }
 
 // Text of the element's direct text-node children only, ignoring text inside nested elements.
@@ -119,7 +131,7 @@ export const textNode = (element: Nullish<Element>): string | undefined => {
     }
   }
 
-  return result.trim() || undefined
+  return trimText(result)
 }
 
 // Several platforms configure a player from an inline <script> beside it, with no iframe.
@@ -150,7 +162,7 @@ export const findConfigScript = (element: Element): Element | undefined => {
 }
 
 export const attr = (element: Nullish<Element>, name: string): string | undefined => {
-  return element?.getAttribute(name)?.trim() || undefined
+  return trimText(element?.getAttribute(name))
 }
 
 // Whether a scoped attribute entry reads this element: any element when it names no selector.
@@ -236,9 +248,9 @@ export const isComment = (node: Nullish<Node>): node is Comment => {
   return node?.nodeType === Node.COMMENT_NODE
 }
 
-// The same trim as `text`, so a node holding only a byte-order mark is empty to both.
+// The same test as `text`, so a node holding only a byte-order mark is empty to both.
 export const hasText = (node: Nullish<Node>): boolean => {
-  return Boolean(node?.textContent?.trim())
+  return isNonEmptyString(node?.textContent)
 }
 
 export const isWhitespaceText = (node: Node): boolean => {

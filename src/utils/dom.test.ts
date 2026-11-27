@@ -1279,6 +1279,13 @@ describeForEachParser('text', (parseHtml) => {
     expect(text(element, '.a')).toBeUndefined()
   })
 
+  it('should return undefined for a lone next-line character', () => {
+    const document = parseHtml('<div><p class="a">\u0085</p></div>')
+    const element = queryElement(document, 'div')
+
+    expect(text(element, '.a')).toBeUndefined()
+  })
+
   it('should return undefined for a nullish element', () => {
     expect(text(undefined)).toBeUndefined()
   })
@@ -1428,6 +1435,13 @@ describeForEachParser('hasText', (parseHtml) => {
     expect(hasText(element)).toBe(false)
   })
 
+  it('should be false for a lone next-line character', () => {
+    const document = parseHtml('<p>\u0085</p>')
+    const element = queryElement(document, 'p')
+
+    expect(hasText(element)).toBe(false)
+  })
+
   it('should be false for a nullish node', () => {
     expect(hasText(undefined)).toBe(false)
   })
@@ -1448,6 +1462,13 @@ describeForEachParser('textNode', (parseHtml) => {
     expect(textNode(element)).toBeUndefined()
   })
 
+  it('should return undefined for a lone next-line character', () => {
+    const document = parseHtml('<div>\u0085<span>nested only</span></div>')
+    const element = queryElement(document, 'div')
+
+    expect(textNode(element)).toBeUndefined()
+  })
+
   it('should return undefined for a nullish element', () => {
     expect(textNode(null)).toBeUndefined()
   })
@@ -1463,6 +1484,13 @@ describeForEachParser('attr', (parseHtml) => {
 
   it('should return undefined for a blank attribute', () => {
     const document = parseHtml('<a href="  "></a>')
+    const element = queryElement(document, 'a')
+
+    expect(attr(element, 'href')).toBeUndefined()
+  })
+
+  it('should return undefined for a lone next-line character', () => {
+    const document = parseHtml('<a href="\u0085"></a>')
     const element = queryElement(document, 'a')
 
     expect(attr(element, 'href')).toBeUndefined()
