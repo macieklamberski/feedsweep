@@ -1,4 +1,4 @@
-import { coerceArray, type Nullish, t, toMap } from 'trousse'
+import { coerceArray, type Nullish, t, toMap, trimString } from 'trousse'
 import locales from '../locales.json' with { type: 'json' }
 import type { EmojiResolverResult, TransformContext } from '../types.js'
 import { attr, isElement, isText } from './dom.js'
@@ -468,5 +468,5 @@ export const readEmojiText = (nodes: Nullish<Node | Array<Node>>): string | unde
     appendEmojiText(node, parts)
   }
 
-  return parts.join('').trim() || undefined
+  return trimString(parts.join(''))
 }

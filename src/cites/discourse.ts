@@ -1,4 +1,4 @@
-import { isHostOrSubdomainOf, parseUrl } from 'trousse'
+import { isHostOrSubdomainOf, parseUrl, trimString } from 'trousse'
 import { parseMastodonStatus } from '../embeds/mastodon.js'
 import type { WidgetResolver } from '../types.js'
 import { buildCite } from '../utils/cites.js'
@@ -33,7 +33,7 @@ const githubDescription = (paragraph: Element): string | undefined => {
     result += node.textContent ?? ''
   }
 
-  return result.trim() || undefined
+  return trimString(result)
 }
 
 // Engines whose cards are not link previews, or whose body is content a cite would drop. TikTok,

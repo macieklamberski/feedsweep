@@ -118,7 +118,7 @@ const composeWebMapSource = (url: URL, path: string, webMapId: string): string =
   // latitude box OnePane wrote as `gcsextent`.
   if (path === onePanePath) {
     const extent = getQueryParam(url.searchParams, 'gcsextent')
-    const query = composeQuery(trimObject({ webmap: webMapId, extent }, Boolean))
+    const query = composeQuery(trimObject({ webmap: webMapId, extent }, { keep: Boolean }))
 
     return `https://www.arcgis.com${embedViewerPath}${query}`
   }

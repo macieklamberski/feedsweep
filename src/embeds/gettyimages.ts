@@ -93,7 +93,7 @@ export const composeEmbedUrl = (config: WidgetConfig): string => {
         tld: config.tld,
         sig: config.sig,
       },
-      Boolean,
+      { keep: Boolean },
     ),
   )
 

@@ -46,7 +46,7 @@ export const aushaResolveEmbed: ResolveUrlEmbed = (url) => {
 
   // The spelling Ausha's share dialog writes, with the start position the frame names.
   const start = getQueryParam(url.searchParams, 't')
-  const query = composeQuery(trimObject({ [`${kind}Id`]: id, v: '3', t: start }, Boolean))
+  const query = composeQuery(trimObject({ [`${kind}Id`]: id, v: '3', t: start }, { keep: Boolean }))
 
   return {
     provider,

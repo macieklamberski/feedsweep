@@ -25,7 +25,9 @@ const resolveLibrary = (url: URL): EmbedResolverResult | undefined => {
 
   const rows = getQueryParam(url.searchParams, 'rows')
   const rowCount = Number.parseInt(rows ?? '', 10)
-  const query = composeQuery(trimObject({ type: 'account', id: accountId, rows }, Boolean))
+  const query = composeQuery(
+    trimObject({ type: 'account', id: accountId, rows }, { keep: Boolean }),
+  )
 
   return {
     provider,
@@ -59,7 +61,7 @@ export const calameoResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const authId = getQueryParam(params, 'authid')
   // The page the viewer opens on.
   const page = getQueryParam(params, 'page')
-  const query = composeQuery(trimObject({ bkcode: code, page, authid: authId }, Boolean))
+  const query = composeQuery(trimObject({ bkcode: code, page, authid: authId }, { keep: Boolean }))
   const src = `https://v.calameo.com/${query}`
 
   // The book page answers 404 without the token, and the token stays in the player url alone.

@@ -1,4 +1,4 @@
-import { isNonEmptyString, type Nullish } from 'trousse'
+import { isNonEmptyString, type Nullish, trimString } from 'trousse'
 
 // The explicit `undefined` stands in for noUncheckedIndexedAccess, which the project does not run.
 export type Declarations = Record<string, string | undefined>
@@ -40,9 +40,9 @@ const parseStyles = (style: string): Declarations => {
     }
 
     const statedProperty = clean(style.slice(declarationStart, colonIndex))
-    const property = statedProperty.trim()
+    const property = trimString(statedProperty)
     const statedValue = clean(style.slice(colonIndex + 1, declarationEnd))
-    const value = statedValue.replace(importantRegex, '').trim()
+    const value = trimString(statedValue.replace(importantRegex, ''))
 
     if (!property || !value) {
       return
@@ -187,13 +187,7 @@ const bgImageUrlRegex = /url\(\s*['"]?([^'")]+)/
 export const bgImage = (element: Nullish<Element>): string | undefined => {
   const styles = declarations(element)
   const background = styles['background-image'] ?? styles.background
-  const url = background?.match(bgImageUrlRegex)?.[1]?.trim()
-
-  if (!url) {
-    return
-  }
-
-  return url
+  return trimString(background?.match(bgImageUrlRegex)?.[1])
 }
 
 // Every other declaration stays as the source wrote it.

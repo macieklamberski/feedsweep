@@ -198,7 +198,7 @@ const readPlayerParams = (url: URL): Record<string, string> => {
   return {
     ...trimObject(
       { loop: params.loop, playlist: params.playlist, startTime: params.startTime ?? params.start },
-      Boolean,
+      { keep: Boolean },
     ),
   }
 }
