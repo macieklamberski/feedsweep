@@ -172,4 +172,20 @@ describeForEachParser('convertLazyImageContainers through the pipeline', (parseH
 
     expect(await convert(value)).toEqualHtml(expected)
   })
+
+  it('should leave a Yandex share row to the strip, logo and all', async () => {
+    const value = html`
+      <p>Text</p>
+      <div
+        class="ya-share2"
+        data-curtain=""
+        data-shape="round"
+        data-services="vkontakte,facebook,odnoklassniki,telegram,twitter,viber"
+        data-image="https://www.gsu.by/themes/gsutheme/images/skoryna_logo.jpg"
+      ></div>
+    `
+    const expected = '<p>Text</p>'
+
+    expect(await convert(value)).toEqualHtml(expected)
+  })
 })
