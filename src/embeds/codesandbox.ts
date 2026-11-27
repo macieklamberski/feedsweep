@@ -90,13 +90,13 @@ const parseTarget = (value: URL | undefined): CodesandboxTarget | undefined => {
   if (isProject) {
     const pagePath = `p/${kindOrSlug}/${slug}`
     const file = getQueryParam(parsed.searchParams, 'file')
-    const query = composeQuery(trimObject({ file, embed: '1' }, Boolean))
+    const query = composeQuery(trimObject({ file, embed: '1' }, { keep: Boolean }))
 
     return { slug, id, pagePath, src: `https://codesandbox.io/${pagePath}${query}` }
   }
 
   const module = getQueryParam(parsed.searchParams, 'module')
-  const query = composeQuery(trimObject({ module }, Boolean))
+  const query = composeQuery(trimObject({ module }, { keep: Boolean }))
 
   return { slug, id, pagePath: `s/${slug}`, src: `https://codesandbox.io/embed/${slug}${query}` }
 }

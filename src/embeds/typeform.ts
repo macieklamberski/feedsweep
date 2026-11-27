@@ -1,4 +1,4 @@
-import { encodePathSegment, getPathSegments, isAnyOf } from 'trousse'
+import { encodePathSegment, getPathSegments, isAnyOf, trimString } from 'trousse'
 import type { EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import { attr } from '../utils/dom.js'
 import { alphanumericRegex, parseUrlOnHosts } from '../utils/urls.js'
@@ -51,7 +51,7 @@ const composeLiveEmbed = (
 }
 
 const readTitle = (element: Element): string | undefined => {
-  return attr(element, 'data-tf-iframe-props')?.match(titlePropRegex)?.[1]?.trim() || undefined
+  return trimString(attr(element, 'data-tf-iframe-props')?.match(titlePropRegex)?.[1])
 }
 
 // Typeform's inline embed is an empty div only the SDK hydrates into an iframe.

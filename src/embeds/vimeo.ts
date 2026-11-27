@@ -313,7 +313,7 @@ export const vimeoResolveEmbed: ResolveUrlEmbed = (url, element) => {
   const title = element ? attr(element, 'title') : undefined
   const params = {
     // The player takes the hash only as h=: the /video/{id}/{hash} path spelling is a 404.
-    ...trimObject({ h: hash }, Boolean),
+    ...trimObject({ h: hash }, { keep: Boolean }),
     ...getQueryParams(url, vimeoEmbedParams),
   }
 

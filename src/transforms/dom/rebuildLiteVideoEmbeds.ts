@@ -31,7 +31,7 @@ const embedSources = toMap<EmbedSource>({
     compose: (id, params, element) => {
       const start = digitsRegex.test(params.start ?? '') ? `${params.start}s` : params.start
       // An unlisted video plays only with its hash, which the player takes as h=.
-      const query = trimObject({ h: element.getAttribute('videohash') }, Boolean)
+      const query = trimObject({ h: element.getAttribute('videohash') }, { keep: Boolean })
 
       return composeVimeoUrl(id, query, start)
     },

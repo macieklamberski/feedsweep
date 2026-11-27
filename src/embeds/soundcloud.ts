@@ -205,7 +205,7 @@ const readSubstackTrack = (element: Nullish<Element>): Partial<EmbedResolverResu
       author: attributes.author_name,
       url: attributes.targetUrl,
     },
-    Boolean,
+    { keep: Boolean },
   )
 }
 

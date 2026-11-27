@@ -128,7 +128,7 @@ const parseTarget = (value: URL | undefined): CodepenTarget | undefined => {
 
 // The key opens a private pen, so it travels with the player and the page alike.
 const composePenQuery = (target: CodepenTarget): string => {
-  return composeQuery(trimObject({ key: target.key }, Boolean))
+  return composeQuery(trimObject({ key: target.key }, { keep: Boolean }))
 }
 
 const composeThumbnail = (target: CodepenTarget): string => {

@@ -8,11 +8,6 @@ const provider = 'airtable'
 // Exact: `static.airtable.com` serves the embed script and images.
 const hosts = ['airtable.com']
 
-// A shared view is `shr…` and its base `app…`. An interface page `pag…` and a table `tbl…`
-// share the same path depth, and the server matches both prefixes case-sensitively.
-const shareIdRegex = /^shr/
-const baseIdRegex = /^app/
-
 const sizes = {
   // Airtable's snippet and oEmbed answer frame every view at 533.
   view: { height: 533 },
@@ -30,11 +25,13 @@ export const airtableResolveEmbed: ResolveUrlEmbed = (url) => {
   const share = ids.at(-1)
   const base = ids.length === 2 ? ids[0] : undefined
 
-  if (!share || !shareIdRegex.test(share)) {
+  // A shared view is `shr…` and its base `app…`. An interface page `pag…` and a table `tbl…`
+  // share the same path depth, and the server matches both prefixes case-sensitively.
+  if (!share?.startsWith('shr')) {
     return
   }
 
-  if (base !== undefined && !baseIdRegex.test(base)) {
+  if (base !== undefined && !base.startsWith('app')) {
     return
   }
 

@@ -1,5 +1,6 @@
+import { trimString } from 'trousse'
 import type { WidgetResolver } from '../types.js'
-import { buildCite, trim } from '../utils/cites.js'
+import { buildCite } from '../utils/cites.js'
 import { attr, find, jsonAttr, text } from '../utils/dom.js'
 import * as styles from '../utils/styles.js'
 
@@ -50,12 +51,12 @@ export const tumblrCiteResolver: WidgetResolver = {
     }
 
     const anchor = find(element, 'a')
-    const url = trim(data.url) ?? attr(anchor, 'href')
+    const url = trimString(data.url) ?? attr(anchor, 'href')
 
     // The anchor repeats the title when there is one and shows the link itself when there is
     // not, so it only works as a fallback once it is checked against the link.
     const anchorText = text(anchor)
-    const displayUrl = trim(data.display_url) ?? url
+    const displayUrl = trimString(data.display_url) ?? url
     const isLinkText =
       !!url && !!anchorText && !!displayUrl && bareUrl(displayUrl).startsWith(bareUrl(anchorText))
 
@@ -66,7 +67,7 @@ export const tumblrCiteResolver: WidgetResolver = {
       url,
       // The anchor shows the link itself when there is no title, so without the check that link
       // text becomes the title.
-      title: trim(data.title) ?? (isLinkText ? undefined : anchorText),
+      title: trimString(data.title) ?? (isLinkText ? undefined : anchorText),
       description: data.description,
       author: data.author,
       publisher: data.site_name,

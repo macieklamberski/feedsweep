@@ -1,3 +1,4 @@
+import { trimString } from 'trousse'
 import { removeHatenaPlayerCitation } from '../../cites/hatena.js'
 import { isSoundcloudStream } from '../../embeds/soundcloud.js'
 import type { DomTransform, TransformContext, WidgetResolver } from '../../types.js'
@@ -127,7 +128,7 @@ const captionMedia = (
   target: Element,
   title: string | undefined,
 ): Element => {
-  const text = title?.trim()
+  const text = trimString(title)
 
   if (!text || target.parentElement?.closest('figure')) {
     return media

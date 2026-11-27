@@ -6,6 +6,7 @@ import {
   isAnyOf,
   isPlainObject,
   toMap,
+  trimString,
 } from 'trousse'
 import type {
   EmbedRenderHint,
@@ -74,7 +75,7 @@ const readSubstackItem = (element: Element, type: string): Partial<EmbedResolver
     author: isPublisherType ? undefined : act,
     publisher: isPublisherType ? attributes.subtitle : undefined,
     // Some payloads carry an empty description string.
-    description: attributes.description?.trim() || undefined,
+    description: trimString(attributes.description),
     thumbnail: parseUrlOnHosts(attributes.image, imageHosts) ? attributes.image : undefined,
   }
 }

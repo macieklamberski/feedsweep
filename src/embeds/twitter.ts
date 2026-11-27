@@ -6,6 +6,7 @@ import {
   isHostOrSubdomainOf,
   isPlainObject,
   parseUrl,
+  trimString,
 } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult, ResolveUrlEmbed } from '../types.js'
 import {
@@ -287,7 +288,7 @@ const readSubstackAuthor = (attrs: SubstackTweetAttrs): string | undefined => {
     return name
   }
 
-  const username = attrs.username?.trim()
+  const username = trimString(attrs.username)
 
   if (!username) {
     return
@@ -312,8 +313,8 @@ const extractSubstackTweet = (element: Element): EmbedResolverResult | undefined
   return composeEmbed(status, {
     description: readTweetText(element, attrs.full_text ?? attrs.html),
     author: readSubstackAuthor(attrs),
-    avatar: attrs.profile_image_url?.trim() || undefined,
-    date: attrs.date?.trim() || undefined,
+    avatar: trimString(attrs.profile_image_url),
+    date: trimString(attrs.date),
     thumbnail: readPhotoUrl(attrs.photos),
   })
 }

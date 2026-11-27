@@ -29,7 +29,7 @@ const megatvResolveEmbed: ResolveUrlEmbed = (url) => {
 
   // A shorter number behind the prefix is another id space, and ?p= serves an article for any id.
   // An id without the prefix names a post under some other mapping.
-  const post = id.match(prefixedPostIdRegex)?.[1]
+  const post = prefixedPostIdRegex.exec(id)?.[1]
 
   // The embed page answers 200 for any id and plays some other post's video for an unknown one.
   // It carries the poster, a WordPress upload not derivable from the id, in data-kwik_image beside

@@ -1,4 +1,4 @@
-import { encodePathSegment, getPathSegments, isAnyOf, type Nullish } from 'trousse'
+import { encodePathSegment, getPathSegments, isAnyOf, type Nullish, trimString } from 'trousse'
 import type { EmbedRenderHint, EmbedResolverResult } from '../types.js'
 import { attr, find, isBlockElement, isBr, isElement, jsonAttr } from '../utils/dom.js'
 import { readObjectHeight } from '../utils/hints.js'
@@ -206,7 +206,7 @@ const readPostText = (element: Element, postAnchor: Element | undefined): string
     }
   }
 
-  return body.trim() || undefined
+  return trimString(body)
 }
 
 const readQuotedPost = (element: Element): QuotedPost => {

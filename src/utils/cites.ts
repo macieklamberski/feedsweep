@@ -1,4 +1,4 @@
-import { isString, type PartialNullish } from 'trousse'
+import { type PartialNullish, trimString } from 'trousse'
 import type { CiteResolverResult } from '../types.js'
 import { isDeadHref } from './urls.js'
 
@@ -6,18 +6,9 @@ import { isDeadHref } from './urls.js'
 // untrimmed and nullish wherever the field is absent.
 type RawCiteResult = PartialNullish<CiteResolverResult> & Pick<CiteResolverResult, 'provider'>
 
-// A JSON payload can carry a number, an array or an object where the card has text.
-export const trim = (value: unknown): string | undefined => {
-  if (!isString(value)) {
-    return
-  }
-
-  return value.trim() || undefined
-}
-
 export const buildCite = (result: RawCiteResult): CiteResolverResult | undefined => {
-  const url = trim(result.url)
-  const title = trim(result.title)
+  const url = trimString(result.url)
+  const title = trimString(result.title)
 
   // A card whose link goes nowhere cites nothing, as a WordPress post embed's `href="#"` shows.
   if (!url || !title || isDeadHref(url)) {
@@ -28,13 +19,13 @@ export const buildCite = (result: RawCiteResult): CiteResolverResult | undefined
     provider: result.provider,
     url,
     title,
-    description: trim(result.description),
-    caption: trim(result.caption),
-    author: trim(result.author),
-    publisher: trim(result.publisher),
-    date: trim(result.date),
-    icon: trim(result.icon),
-    thumbnail: trim(result.thumbnail),
+    description: trimString(result.description),
+    caption: trimString(result.caption),
+    author: trimString(result.author),
+    publisher: trimString(result.publisher),
+    date: trimString(result.date),
+    icon: trimString(result.icon),
+    thumbnail: trimString(result.thumbnail),
     kind: result.kind ?? undefined,
   }
 }
