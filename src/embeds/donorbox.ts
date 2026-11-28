@@ -25,7 +25,7 @@ export const donorboxResolveEmbed: ResolveUrlEmbed = (url) => {
 
   // The amount prefills the donation. The rest of the query is the form's look.
   const amount = getQueryParam(url.searchParams, 'amount')
-  const query = composeQuery(trimObject({ amount }, Boolean))
+  const query = composeQuery(trimObject({ amount }, { keep: Boolean }))
 
   return {
     provider,
