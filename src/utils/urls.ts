@@ -10,6 +10,7 @@ import {
   type Nullish,
   normalizeUrl,
   parseUrl,
+  trimString,
   trimUrlValues,
   videoExtensions,
   webAudioExtensions,
@@ -340,7 +341,7 @@ export const resolveOrDropUrl = (
   url: string | undefined,
   context: TransformContext,
 ): string | undefined => {
-  const trimmed = url?.trim()
+  const trimmed = trimString(url)
 
   if (!trimmed) {
     return

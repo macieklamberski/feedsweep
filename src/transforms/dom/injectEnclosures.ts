@@ -5,6 +5,7 @@ import {
   isString,
   type Nullish,
   parseUrl,
+  trimString,
 } from 'trousse'
 import type {
   DomTransform,
@@ -121,7 +122,7 @@ const readImageCaption = (
     return (value ?? '').trim().toLowerCase().replace(whitespaceRunRegex, ' ')
   }
 
-  const caption = enclosure.description?.trim()
+  const caption = trimString(enclosure.description)
   const normalized = normalize(caption)
 
   if (!caption || placeholderCaptions.includes(normalized)) {

@@ -7,6 +7,7 @@ import {
   type Nullish,
   startsWithAnyOf,
   trimObject,
+  trimString,
 } from 'trousse'
 import type {
   CiteResolverResult,
@@ -319,7 +320,7 @@ export const getEmbedSize = (element: Element, wrapperDepth?: number): EmbedSize
   }
 
   // `width="0" height="360"` claims a height only, and Flickr renders nothing for a zero width.
-  const size = trimObject(dimensions, Boolean)
+  const size = trimObject(dimensions, { keep: Boolean })
 
   if (size) {
     return size
@@ -700,7 +701,7 @@ const cleanField = (
     }
 
     if (cleaner.strip) {
-      value = stripPrefix(value, cleaner.strip).trim() || undefined
+      value = trimString(stripPrefix(value, cleaner.strip))
     }
   }
 

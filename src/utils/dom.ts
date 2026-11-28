@@ -2,9 +2,9 @@ import {
   coerceNumber,
   getQueryParam,
   isAnyOf,
+  isLooseMatch,
   isNonEmptyString,
   isPresent,
-  isSameText,
   type Nullish,
   parseJson,
   startsWithAnyOf,
@@ -220,7 +220,7 @@ export const flashVar = (element: Nullish<Element>, name: string): string | unde
 // Publishers spell a `<param>` name in every case, so it is matched in any case.
 export const paramValue = (root: Nullish<Element>, name: string): string | undefined => {
   const params = Array.from(root?.querySelectorAll('param') ?? [])
-  const named = params.find((param) => isSameText(attr(param, 'name'), name))
+  const named = params.find((param) => isLooseMatch(attr(param, 'name'), name))
 
   return attr(named, 'value')
 }
